@@ -1,0 +1,61 @@
+
+
+TODOLIST before tests
+
+ SHOW ALL/FOUND selection
+
+ - X corriger touche OK
+ - X switch window/fullscreen
+ - X avoir load xml fonctionnel.
+ - X Stack watch
+ - X os frameskip when too fast (uae)
+
+ - O default pads OK.
+
+ - O coin1 & start1 by default.
+
+ frameskip
+
+	- O emu frameskip when too slow
+
+ - O tag "beta" before lending to anyone
+ - O audio
+ - O neogeo ? -> mode 15b -> toujours pas.
+ - O gestion rotation jeux ROT90 ROT270 , ...
+
+
+ link drivers issues...
+  - O remove S-TV , too much non working drivers.
+
+ - X do save/load state
+ - O do save screenshot
+ - O nicer mame menu
+
+ - O mui list: mettre "nOT working" sur le titre
+ - O mui list: avoir un id conf graphique "320x224_16b_r90"
+ - O mui list: avoir show all fonctionnel.
+ - O mui list avoir année et entreprise en colonne
+ - O mui list: have a column for nb players -> where to get that ?
+ - O allow sorting by columns
+ - O finish drawing leds, test with a driver that lag while booting if it helps
+
+ config from ui
+  - O ...endless things...
+
+
+ -  command line
+	- O liste roms
+	- O lancer rom direct avec ligne commande ou tooltip.
+
+ - O test memory leaks with mublabla
+ - O verif GetCatalogStr , -> REMOVE ugly locale/catcomp engine, recode later maybe.
+
+
+
+
+
+
+IPT_UI_SHOW_PROFILER   seq: 46 96
+
+
+
