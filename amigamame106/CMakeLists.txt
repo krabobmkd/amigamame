@@ -10,13 +10,14 @@ set(C_STANDARD 11)
 project(AmigaMame LANGUAGES C CXX VERSION 1.0)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-option(MAME_USE_HARDFLOAT "compile using direct 68882 FPU, will not work on economic 060" ON)
+# this option system makes sure each cpu options are the same for each libs.
 # options can only be bool:
+option(MAME_USE_HARDFLOAT "compile using direct 68882 FPU, will not work on economic 060" ON)
 option(AMIGA_USE_68030 " use 68030" OFF)
 option(AMIGA_USE_68040 " use 68040" OFF)
 option(AMIGA_USE_68060 " use 68060" ON)
 
-option(COMPILE_TESTS " compile extra dev tools/ test units" ON)
+option(COMPILE_TESTS " compile extra dev tools/ test units" OFF)
 
 if(AMIGA)
 
@@ -44,7 +45,7 @@ if(AMIGA)
 endif()
 #add_compile_options( -mhard-float -ffast-math )
 #add_link_options( -mhard-float -ffast-math)
-
+set(COMMONLIBS "../../amigacommonlibs")
 
 add_subdirectory(../mame106 MameLib)
 
@@ -53,10 +54,7 @@ set(AMIGA_SRC
 
 	gui_mui.cpp
 	gui_gadtools.cpp
-
 	amiga106.cpp
-
-
 	amiga106_audiostream.cpp
 	amiga106_filesystem.cpp
 	amiga106_timer.cpp
@@ -65,7 +63,6 @@ set(AMIGA_SRC
 	amiga106_video.h
 	amiga106_video.cpp
 #	amiga106_video_p96.cpp
-
 #	amiga106_video_aga.h
 #	amiga106_video_aga.cpp
 	amiga_locale.cpp
@@ -105,8 +102,6 @@ set(AMIGA_SRC
 	if(MAME_USE_HARDFLOAT)
 		target_compile_definitions(Mame106AmigaO2 PRIVATE MAME_USE_HARD_FLOAT=1 )
 	endif()
-	target_link_directories(Mame106AmigaO2 PUBLIC "../../lib")
-	target_include_directories(Mame106AmigaO2 PUBLIC "../../include" )
 	target_include_directories(Mame106AmigaO2 PUBLIC "../mame106")
 	target_compile_options(Mame106AmigaO2 PRIVATE -O2 ${AMIGA_COMPILER_OPTIONS} )
 # - - - -
@@ -122,18 +117,14 @@ endif()
 # the static libs that are part eof this repo:
 target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO2 mamecoreO2 z expat)
 
-target_link_directories(${PROGNAME} PUBLIC "../../lib")
-target_include_directories(${PROGNAME} PUBLIC "../../include" )
-
-#add_library(${PROGNAME} PUBLIC OBJECT IMPORTED  ../../c2p.s.o ../../gfx.s.o)
-
 # target_include_directories(${PROGNAME} PUBLIC "../mame037b/src")
 target_include_directories(${PROGNAME} PUBLIC "../mame106")
 
 # MUI is not provided by gccbebbo6.5 ndk by default, we have it there:
-target_include_directories(${PROGNAME} PUBLIC "../../../extrasdk/MUI/include")
-target_include_directories(${PROGNAME} PUBLIC "../../../extrasdk/P96/include")
+target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
+target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/P96/include")
 
+# the MUI code doesn't support -O1 and -O2
 target_compile_options(${PROGNAME} PRIVATE -O0 -Wno-narrowing ${AMIGA_COMPILER_OPTIONS} )
 
 target_link_options(${PROGNAME} PRIVATE -O0 -s ${AMIGA_COMPILER_OPTIONS})

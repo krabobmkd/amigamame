@@ -16,9 +16,10 @@ endmacro()
 
 
 include(gamedrivers.cmake)
+set(COMMONLIBS "../../amigacommonlibs")
 
-set(ZLIBPATH "../../../zlib")
-set(EXPATPATH "../../../libexpat")
+set(ZLIBPATH "${COMMONLIBS}/zlib")
+set(EXPATPATH "${COMMONLIBS}/libexpat")
 add_subdirectory(${ZLIBPATH} zlib)
 add_subdirectory(${EXPATPATH} libexpat)
 

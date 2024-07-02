@@ -7,6 +7,7 @@
  
  If not done, Install a working bebbo gcc6.5 on linux windows or macos.
  follow instructions at : https://github.com/bebbo/amiga-gcc
+ also install git and cmake.
  
  ...Then in some directory do:
  
@@ -22,20 +23,45 @@
  then:
  mkdir amiga-mame-build
  cd amiga-mame-build
+ cmake ../amigamame106/ -DCMAKE_TOOLCHAIN_FILE=../../amigacommonlibs/cmake/Modules/Platform/m68k-amigaos.cmake -DCMAKE_BUILD_TYPE=Release
+
+ .. then build with:
+ cmake --build .
  
- cmake ../
+ The cmake platform will search gcc compiler in /opt/amiga on linux and macos, or search it from path. Windows will only look C:\cygwin64\opt\amiga , if it's elsewhere edit the platform file. Yes, the Windows version is also working, and this cmake platform also allow .s old syntax assembler sources to be automatically assembled with vasm and linked.
  
- The cmake platform will search gcc compiler in /opt/amiga on linux and macos, or search it from path. Windows will only look C:\cygwin64\opt\amiga , if it's elsewhere edit the platform file.
- 
- For development, you may also configure a "amiga gcc platform" with an IDE like QtCreator or VSCode, using the cmake platform in amigacommonlibs/cmake/Modules/Platform/m68k-amigaos.cmake.
+ For development, you may also configure a "amiga gcc platform" with an IDE like QtCreator or VSCode, using this cmake platform in amigacommonlibs/cmake/Modules/Platform/m68k-amigaos.cmake.
  
    Warning : BETA in development.
  
- Too slow, this is for experimental purpose at this level.
- Efforts are focused on translating original makefiles to more configurable cmake files in order to enable or disable drivers at linking. Only most popular drivers are there.
- Also focus on having 4 players with lowlevel.library and parralel port pads.
+ Too slow, for experimental purpose, at this level. (well, does great with UAE JIT)
+ Efforts are focused on translating original makefiles to more configurable cmake files in order to enable or disable drivers at linking , havig no bugs or memory leak. Only most popular drivers are there. Also focus on having 4 players with lowlevel.library and parallel port pads.
 
- Everything is still slow on a pistorm 3, only "dino" is likely playable,
- audio disabled, neogeo non working.
+ Everything is still slow ,(between 40% and 60% of native speed) on a pistorm 3, only "dino" is likely playable, audio disabled (no use of no 100% speed), neogeo non working (because i dont know).
+ P96 users are urged to create screen modes with adapted resolutions for their favorite games so it looks fullscreen. Do not use mode promotion, each games have different needs.
  
+  You can switch on and off the linking of drivers with options on top of: mame106\gamedrivers.cmake,
+  which makes things very handy. This .cmake is generated with buildtools/mameMakToCmake that allows that. Not all switch are tested and some sub-configurations may have some missing defines. In that case the correction should be made in mameMakToCmake, not the .cmake itself.
+ 
+  Users doc:
+  It's mame. It needs copyrighted .zip files in a "roms" directory. Read Mame106 documentation.
+  If you have a CD32 pads plug it before launching Mame.
+  Keyboard if very finely used and will not mix up your keymap configuration.
   
+  Player1 use port 2
+  Player2 use mouse port  ... or reconfigure that
+  Player 3 4 use parralel port extension but just one button. (...)
+  
+  p			pause.
+  Tab		configure panel.
+  esc		exit panel or game.
+  ShitF7	(+some pad number)save state
+  F7		(+some apd number)load state
+  Help		display performance stats.
+  F3		reset machine
+  F4 		display machine palette
+  ... 
+  
+ Don't try to use drivers that are marked "not working.", just look if a parent driver can work. 
+  
+   
