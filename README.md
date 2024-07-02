@@ -12,8 +12,11 @@
  ...Then in some directory do:
  
  git clone https://github.com/krabobmkd/amigacommonlibs
+ 
  git clone https://github.com/krabobmkd/amigamame
+ 
  cd amigamame
+
  git switch beta106
  
  ... then download mame106 source at
@@ -21,11 +24,16 @@
  unzip and do a non-overwriting copy in amigamame/mame106 to add the missing files.
  
  then still in amigamame:
+ 
  mkdir amiga-mame-build
+ 
  cd amiga-mame-build
- cmake ../amigamame106/ -DCMAKE_TOOLCHAIN_FILE=../../amigacommonlibs/cmake/Modules/Platform/m68k-amigaos.cmake -DCMAKE_BUILD_TYPE=Release
+ 
+ cmake ../amigamame106/ 
+ -DCMAKE_TOOLCHAIN_FILE=../../amigacommonlibs/cmake/Modules/Platform/m68k-amigaos.cmake -DCMAKE_BUILD_TYPE=Release
 
  .. then build with:
+ 
  cmake --build .
  
  The cmake platform will search gcc compiler in /opt/amiga on linux and macos, or search it from path. Windows will only look C:\cygwin64\opt\amiga , if it's elsewhere edit the platform file. Yes, the Windows version is also working, and this cmake platform also allow .s old syntax assembler sources to be automatically assembled with vasm and linked.
@@ -44,7 +52,7 @@
  - neogeo non working (because i dont know ) 
  - rotations and flip modes unmanaged on this version.
  
- You can switch on and off the linking of drivers with options on top of: mame106\gamedrivers.cmake,
+ You can switch on and off the linking of drivers with cmake options on top of: mame106\gamedrivers.cmake,
  which makes things very handy. This .cmake is generated with buildtools/mameMakToCmake that allows that. Not all switch are tested and some sub-configurations may have some missing defines. In that case the correction should be made in mameMakToCmake, not the .cmake itself.
  
   Users doc:
@@ -56,20 +64,33 @@
   Keyboard if very finely used and will not mix up your country keymap configuration.
   
   Player1 use port 2
+  
   Player2 use mouse port  ... or reconfigure that (tab)
+  
   Player 3 4 use parralel port extension but allow just one button. ... or reconfigure that (tab).
+  
   Keys:
   
   p			pause.
+  
   Tab		configure panel.
+  
   Esc		exit panel or game.
+  
   ShitF7	(+some pad number)save state
+  
   F3		reset machine
+  
   F4 		display machine palette
+  
   F7		(+some apd number)load state
+  
   Help		display/hide performance stats. (note:when in pause only video driver is emulated.)
+  
   1-4		Player 1/2/3/4 start
+  
   5-8		Player 1/2/3/4 Coins
+  
   
  Don't try to use drivers that are marked "not working.", just look if a parent driver can work. 
   
