@@ -14,7 +14,7 @@
 #include "cheat.h"
 #include "profiler.h"
 #include "debugger.h"
-#include <stdio.h>
+
 #if defined(MAME_DEBUG) && defined(NEW_DEBUGGER)
 #include "debug/debugcpu.h"
 #endif
@@ -200,7 +200,6 @@ int cpuexec_init(void)
 {
 	int cpunum;
 
- printf("a\n");
 	/* initialize the refresh timer */
 	init_refresh_timer();
 
@@ -249,7 +248,6 @@ int cpuexec_init(void)
 		num_regs = state_save_get_reg_count();
 		if (cpuintrf_init_cpu(cpunum, cputype, cpu[cpunum].clock, Machine->drv->cpu[cpunum].reset_param, cpu_irq_callbacks[cpunum]))
 			return 1;
-
 		num_regs = state_save_get_reg_count() - num_regs;
 		state_save_pop_tag();
 
@@ -294,6 +292,9 @@ static void cpuexec_reset(void)
 	cpu_inittimers();
 	watchdog_counter = WATCHDOG_IS_INVALID;
 	watchdog_setup(TRUE);
+
+	/* reset the osd level */
+	osd_reset();
 
 	/* first pass over CPUs */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
@@ -957,10 +958,9 @@ static void init_refresh_timer(void)
 	/* we rely on this being NULL for the time being */
 	vblank_timer = NULL;
 
- printf("init_refresh_timer alloc\n");
 	/* allocate an infinite timer to track elapsed time since the last refresh */
 	refresh_timer = mame_timer_alloc(NULL);
- printf("cpu_compute_scanline_timing\n");
+
 	/* while we're at it, compute the scanline times */
 	cpu_compute_scanline_timing();
 }
@@ -975,7 +975,6 @@ static void init_refresh_timer(void)
 
 void cpu_compute_scanline_timing(void)
 {
-    // may crash here if gcc in FPU software mode...
 	/* recompute the refresh period */
 	refresh_period = double_to_mame_time(1.0 / Machine->refresh_rate);
 
@@ -993,7 +992,6 @@ void cpu_compute_scanline_timing(void)
 	}
 	else
 		scanline_period.subseconds /= Machine->drv->screen_height;
-
 
 	LOG(("cpu_compute_scanline_timing: refresh=%.9f vblank=%.9f scanline=%.9f\n", mame_time_to_double(refresh_period), mame_time_to_double(vblank_period), mame_time_to_double(scanline_period)));
 }

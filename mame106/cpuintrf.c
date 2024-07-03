@@ -11,7 +11,7 @@
 
 #include "driver.h"
 
-#include <stdio.h>
+
 
 /*************************************
  *
@@ -777,7 +777,7 @@ static int temp_string_pool_index;
  *
  *************************************/
 
-static inline void set_cpu_context(int cpunum)
+INLINE void set_cpu_context(int cpunum)
 {
 	int newfamily = cpu[cpunum].family;
 	int oldcontext = cpu_active_context[newfamily];
@@ -859,9 +859,6 @@ char *cpuintrf_temp_str(void)
 void cpuintrf_init(void)
 {
 	int mapindex;
-
-	printf("\n\n ***** cpuintrf_init() *****\n\n");
-
 
 	/* reset the cpuintrf array */
 	memset(cpuintrf, 0, sizeof(cpuintrf));
@@ -1626,15 +1623,9 @@ genf *cputype_get_info_fct(int cputype, UINT32 state)
 {
 	union cpuinfo info;
 
-//    printf("cputype_get_info_fct:%d totalcpu:%d\n",cputype,totalcpu);
-
 	VERIFY_CPUTYPE(cputype_get_info_fct);
-//    printf("cputype_get_info_fct:%d CPU_COUNT:%d\n",cputype,(int)CPU_COUNT);
-//    printf("cpuintrf[cputype].get_info:%08x\n",(int)cpuintrf[cputype].get_info);
 	info.f = NULL;
 	(*cpuintrf[cputype].get_info)(state, &info);
-
- //   printf("cputype_get_info_fct: end\n");
 	return info.f;
 }
 

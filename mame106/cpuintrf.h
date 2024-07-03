@@ -9,8 +9,6 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef __CPUINTRF_H__
 #define __CPUINTRF_H__
 
@@ -679,7 +677,7 @@ void cpu_dump_states(void);
  *************************************/
 
 /* return a pointer to the interface struct for a given CPU type */
-static inline const cpu_interface *cputype_get_interface(int cputype)
+INLINE const cpu_interface *cputype_get_interface(int cputype)
 {
 	extern cpu_interface cpuintrf[];
 	return &cpuintrf[cputype];
@@ -687,7 +685,7 @@ static inline const cpu_interface *cputype_get_interface(int cputype)
 
 
 /* return a the index of the active CPU */
-static inline int cpu_getactivecpu(void)
+INLINE int cpu_getactivecpu(void)
 {
 	extern int activecpu;
 	return activecpu;
@@ -695,7 +693,7 @@ static inline int cpu_getactivecpu(void)
 
 
 /* return a the index of the executing CPU */
-static inline int cpu_getexecutingcpu(void)
+INLINE int cpu_getexecutingcpu(void)
 {
 	extern int executingcpu;
 	return executingcpu;
@@ -703,7 +701,7 @@ static inline int cpu_getexecutingcpu(void)
 
 
 /* return a the total number of registered CPUs */
-static inline int cpu_gettotalcpu(void)
+INLINE int cpu_gettotalcpu(void)
 {
 	extern int totalcpu;
 	return totalcpu;
@@ -711,7 +709,7 @@ static inline int cpu_gettotalcpu(void)
 
 
 /* return the current PC or ~0 if no CPU is active */
-static inline offs_t safe_activecpu_get_pc(void)
+INLINE offs_t safe_activecpu_get_pc(void)
 {
 	return (cpu_getactivecpu() >= 0) ? activecpu_get_pc() : ~0;
 }

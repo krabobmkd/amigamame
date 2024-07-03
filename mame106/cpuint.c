@@ -351,7 +351,7 @@ void cpunum_set_irq_callback(int cpunum, int (*callback)(int))
  *
  *************************************/
 
-static inline int cpu_irq_callback(int cpunum, int line)
+INLINE int cpu_irq_callback(int cpunum, int line)
 {
 	int vector = input_line_vector[cpunum][line];
 

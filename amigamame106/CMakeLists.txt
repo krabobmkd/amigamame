@@ -19,6 +19,16 @@ option(AMIGA_USE_68060 " use 68060" ON)
 
 option(COMPILE_TESTS " compile extra dev tools/ test units" OFF)
 
+# get current git branch id
+execute_process(
+  COMMAND git rev-parse --abbrev-ref HEAD
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_BRANCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+#string(REPLACE "/" "." GIT_BRANCH ${GIT_BRANCH} )
+# message(WARNING "git branch detected:${GIT_BRANCH}")
+
 if(AMIGA)
 
 #  -fno-rtti -fno-exceptions -fno-strict-aliasing
@@ -110,7 +120,7 @@ set(PROGNAME Mame106)
 add_executable(${PROGNAME} ${AMIGA_SRC} )
 set_property(TARGET ${PROGNAME} PROPERTY C_STANDARD 11)
 set_property(TARGET ${PROGNAME} PROPERTY CXX_STANDARD 11)
-target_compile_definitions(${PROGNAME} PUBLIC MAMEVERSION=106 ZIP_CACHE=1 )
+target_compile_definitions(${PROGNAME} PUBLIC MAMEVERSION=106 ZIP_CACHE=1 GIT_BRANCH="${GIT_BRANCH}" )
 if(MAME_USE_HARDFLOAT)
 	target_compile_definitions(${PROGNAME} PRIVATE MAME_USE_HARD_FLOAT=1 )
 endif()

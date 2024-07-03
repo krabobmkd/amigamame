@@ -65,19 +65,21 @@ typedef ULONG (*RE_HOOKFUNC)();
 #define CFGS_ALL 0
 #define CFGS_FOUND 1
 
-//#define DRIVER_OFFSET 2
-
-#define TEXT_ABOUT \
-"\33c\n\33b\33uMAME - Multiple Arcade Machine Emulator\33n\n\n" \
-"0."REVISION" ("REVDATE")\n\n" \
-"Copyright (C) 1997-2024 by Nicola Salmoria and the MAME team\n" \
-"http://mamedev.org\n\n" \
-"Amiga port by Vic 'Krb' Ferry (2024)\n" \
-" Partly based on Mats Eirik Hansen Mame060(1999)\n" \
-"http://www.triumph.no/mame\n" \
-"This program uses libexpat,zlib,\n"\
-" MUI - Magic User Interface\n" \
-"MUI is copyright 1992 - 2024 by Stefan Stuntz\n" \
+#ifndef GIT_BRANCH
+#define GIT_BRANCH
+#endif
+const char *TextAbout =
+"\33c\n\33b\33uMAME - Multiple Arcade Machine Emulator\33n\n\n"
+"0."REVISION" \n\n"
+"Copyright (C) 1997-2024 by Nicola Salmoria and the MAME team\n"
+"http://mamedev.org\n\n"
+"Amiga port by Vic 'Krb' Ferry (2024) source:\n"
+" https://github.com/krabobmkd/amigamame\n"
+"compiled branch:" GIT_BRANCH " " REVDATE " " REVTIME "\n"
+"Partly based on Mats Eirik Hansen Mame060(1999)\n"
+" http://www.triumph.no/mame\n"
+"This program uses libexpat,zlib,\n"
+" MUI - Magic User Interface\n";
 
 
 // https://github.com/krabobmkd
@@ -1374,7 +1376,7 @@ static void CreateApp(void)
 {
   App = MUI_NewObject(MUIC_Application,
     MUIA_Application_Title      , (ULONG)APPNAME,
-    MUIA_Application_Version    , (ULONG)("$VER: "APPNAME" ("REVDATE")"),
+    //MUIA_Application_Version    , (ULONG)("$VER: " APPNAME " (" REVDATE ")"),
     MUIA_Application_Author     , (ULONG)AUTHOR,
     MUIA_Application_Base       , (ULONG)"MAME",
     SubWindow, (ULONG)(AboutWin = MUI_NewObject(MUIC_Window,
@@ -1389,7 +1391,7 @@ static void CreateApp(void)
             MUIA_Background, MUII_TextBack,
             Child, UMUINO(MUIC_Group,
               Child, UMUINO(MUIC_Text,
-                MUIA_Text_Contents, (ULONG)TEXT_ABOUT,
+                MUIA_Text_Contents, (ULONG)TextAbout,
               TAG_DONE),
               Child, VSpace(0),
             TAG_DONE),
