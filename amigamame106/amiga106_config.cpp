@@ -267,13 +267,15 @@ void MameConfig::setUserPath(const char *userpath)
 }
 
 // extern const game_driver * const drivers[];
-void MameConfig::getDriverScreenModestring(const _game_driver *drv, std::string &screenid)
+void MameConfig::getDriverScreenModestring(const _game_driver *drv, std::string &screenid,int &video_attribs)
 {
     struct _machine_config machine;
     drv->drv(&machine);
+    video_attribs = machine.video_attributes;
+
     int width = (machine.default_visible_area.max_x - machine.default_visible_area.min_x)+1;
     int height = (machine.default_visible_area.max_y - machine.default_visible_area.min_y)+1;
-    if(machine.video_attributes & ORIENTATION_SWAP_XY) {
+    if(drv->flags & ORIENTATION_SWAP_XY) {
         std::swap(width,height);
     }
 
@@ -297,8 +299,9 @@ int MameConfig::initDriverIndex()
     if(drv->flags & (/*GAME_NOT_WORKING|*/NOT_A_DRIVER)) continue;
      _driverIndex.insert(drv->name,NumDrivers);
      // also get its screen id:
-    std::string screenmodeId;
-    getDriverScreenModestring(drv,screenmodeId);
+//    std::string screenmodeId;
+//    int vidattribs;
+//    getDriverScreenModestring(drv,screenmodeId,vidattribs);
 
   }
   _NumDrivers =NumDrivers;

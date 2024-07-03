@@ -450,6 +450,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
                 pRemap->_clut32.data());
             } else
             {
+
                 directDrawClut32(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut32.data());
             }
          }
@@ -464,7 +465,17 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
     }
 
     UnLockBitMap(hdl);
- //           printf("_width:%d sourcewidth:%d \n",_width,sourcewidth);
+//    if(pRemap->_clut32.size()>16384)
+//    {
+//        printf("_clut32 values:%08x %08x %08x\n",pRemap->_clut32[14000],
+//                pRemap->_clut32[15000],pRemap->_clut32[12000]);
+//    }
+//    if(pRemap->_clut16.size()>16384)
+//    {
+//        printf("_clut16 values:%04x %04x %04x\n",pRemap->_clut16[14000],
+//                pRemap->_clut16[15000],pRemap->_clut16[12000]);
+//    }
+   //         printf("_width:%d sourcewidth:%d \n",_width,sourcewidth);
 //    printf("isit?\n");
 //      printf("ddsource x1:%d  y1:%d \n",ddsource._x1,ddsource._y1);
 //    printf("or?\n");

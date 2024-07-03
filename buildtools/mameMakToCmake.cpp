@@ -8,7 +8,7 @@
 #include <stdlib.h>
 using namespace std;
 
-string sourcebase("../src/mame106/");
+string sourcebase("../mame106/");
 
 class TGameDriver {
     public:

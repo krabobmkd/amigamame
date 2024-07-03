@@ -415,8 +415,8 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2), 
   static char archive[16];
   static char parent[16];
  // static char players[16];
-  static char comment[128];
-
+//  static char comment[128];
+ static std::string strComment;
   if(!drv_indirect)
   {
     snprintf(driver,55,   "\033b\033u%s", String_Driver);
@@ -429,15 +429,17 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2), 
     parent[15]=0;
 //    snprintf(players,15,    "\033b\033u%s", String_Players);
 //    players[15]=0;
-    snprintf(comment,127,  "\033b\033u%s", String_Comment);
-    comment[127]=0;
+   // snprintf(comment,127,  "\033b\033u%s", String_Comment);
+   // comment[127]=0;
+    strComment =  "\033b\033u";
+    strComment += String_Comment;
 
     pColumns->_driver = driver;
     pColumns->_screen = screen;
     pColumns->_archive = archive;
     pColumns->_parent = parent;
    // pColumns->_players = players;
-    pColumns->_comment = comment;
+    pColumns->_comment = (char *)strComment.c_str(); //comment;
     return(0);
   }
 
@@ -457,7 +459,8 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2), 
  }
 
  static std::string str_screen;
- config.getDriverScreenModestring(drv,str_screen);
+ int video_attribs;
+ config.getDriverScreenModestring(drv,str_screen,video_attribs);
  pColumns->_screen = (char*) str_screen.c_str();
 
    pColumns->_archive = (char *) drv->name;
@@ -467,15 +470,33 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2), 
     pColumns->_parent = (char*)drv->parent;
 
 
-  if(drv->flags & GAME_NOT_WORKING)
-   pColumns->_comment = NotWorkingString;
-  else if(drv->flags & GAME_WRONG_COLORS)
-   pColumns->_comment = WrongColorsString;
-  else if(drv->flags & GAME_IMPERFECT_COLORS)
-   pColumns->_comment = ImperfectColorsString;
-  else
-   pColumns->_comment =(char*) "";
+//  if(drv->flags & GAME_NOT_WORKING)
+//   pColumns->_comment = NotWorkingString;
+//  else if(drv->flags & GAME_WRONG_COLORS)
+//   pColumns->_comment = WrongColorsString;
+//  else if(drv->flags & GAME_IMPERFECT_COLORS)
+//   pColumns->_comment = ImperfectColorsString;
+//  else
+//   pColumns->_comment =(char*) "";
+     if(drv->flags & GAME_NOT_WORKING)
+      strComment = NotWorkingString;
+     else if(drv->flags & GAME_WRONG_COLORS)
+      strComment = WrongColorsString;
+     else if(drv->flags & GAME_IMPERFECT_COLORS)
+      strComment = ImperfectColorsString;
+     else
+        strComment.clear();
 
+     if(video_attribs & VIDEO_RGB_DIRECT) strComment += " RGB";
+     if(video_attribs & VIDEO_NEEDS_6BITS_PER_GUN) strComment += " HighColors";
+     int orientation = drv->flags & ORIENTATION_MASK;
+     if(orientation)
+     {
+      if(orientation == ROT90)  strComment += " ROT90";
+      if(orientation == ROT180)  strComment += " ROT180";
+      if(orientation == ROT270)  strComment += " ROT270";
+     }
+   pColumns->_comment = (char *)strComment.c_str(); //comment;
   return(0);
 }
 

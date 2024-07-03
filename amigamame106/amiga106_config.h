@@ -101,7 +101,7 @@ public:
     };
     const Inputs &inputs() const { return _inputsprefs; }
 
-    static void getDriverScreenModestring(const _game_driver *drv, std::string &screenid);
+    static void getDriverScreenModestring(const _game_driver *drv, std::string &screenid,int &video_attribs);
 protected:
     int _NumDrivers; // in current linker mame driver list. Can be huge.
     // - - - prefs unique for app

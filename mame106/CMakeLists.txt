@@ -73,7 +73,7 @@ set(MAME_CORE_SRC
 
 # ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}
 
-set(MAME_INCLUDE_DIRS "src" "../amiga" "." "./includes" ${EXPATPATH})
+set(MAME_INCLUDE_DIRS "src" "../amigamame106" "." "./includes" ${EXPATPATH})
 
 #add_library( mamecore STATIC ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}
 #							  )
