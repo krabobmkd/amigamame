@@ -111,41 +111,50 @@ static Object *AboutWin=NULL;
 static Object *DisplayName=NULL;
 
 static Object * RE_Options=NULL;
-static Object * CM_Allow16Bit=NULL;
-static Object * CM_FlipX=NULL;
-static Object * CM_FlipY=NULL;
-static Object * CM_DirtyLines=NULL;
-static Object * CM_AutoFrameSkip=NULL;
+
+//static Object * CM_Allow16Bit=NULL;
+//static Object * CM_FlipX=NULL;
+//static Object * CM_FlipY=NULL;
+//static Object * CM_DirtyLines=NULL;
+//static Object * CM_AutoFrameSkip=NULL;
 #ifndef MESS
 static Object * CY_Show;
-static Object *CM_UseDefaults;
+//static Object *CM_UseDefaults;
 static Object * BU_Scan;
 #endif
-static Object * CM_Antialiasing;
-static Object * CM_Translucency;
-static Object * SL_BeamWidth;
-static Object * SL_VectorFlicker;
-static Object * SL_AudioChannel[4];
-static Object * SL_MinFreeChip;
-static Object * SL_FrameSkip;
-static Object * SL_Joy1ButtonBTime;
-static Object * SL_Joy1AutoFireRate;
-static Object * SL_Joy2ButtonBTime;
-static Object * SL_Joy2AutoFireRate;
-static Object * ST_Width;
-static Object * ST_Height;
+//static Object * CM_Antialiasing;
+//static Object * CM_Translucency;
+//static Object * SL_BeamWidth;
+//static Object * SL_VectorFlicker;
+
+// audio
+//static Object * SL_AudioChannel[4];
+//static Object * SL_MinFreeChip;
+
+//static Object * SL_FrameSkip;
+
+//static Object * ST_Width;
+//static Object * ST_Height;
 static Object * ST_RomPath;
 static Object * ST_SamplePath;
 static Object * CY_ScreenType;
-static Object * CY_DirectMode;
+//static Object * CY_DirectMode;
 static Object * CY_Sound;
-static Object * CY_Buffering;
-static Object * CY_Rotation;
-static Object * CY_Joy1Type;
-static Object * CY_Joy2Type;
+//static Object * CY_Buffering;
+//static Object * CY_Rotation;
+
+// --- controllers
+//static Object * CY_Joy1Type;
+//static Object * CY_Joy2Type;
+//static Object * SL_Joy1ButtonBTime;
+//static Object * SL_Joy1AutoFireRate;
+//static Object * SL_Joy2ButtonBTime;
+//static Object * SL_Joy2AutoFireRate;
+
+
 static Object * PA_ScreenMode;
 static Object * PA_RomPath;
-static Object * PA_SamplePath;
+//static Object * PA_SamplePath;
 static Object *LI_Driver;
 static Object * LV_Driver;
 static Object * BU_Start;
@@ -501,7 +510,7 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2), 
    pColumns->_comment = (char *)strComment.c_str(); //comment;
   return(0);
 }
-
+// extend list class
 static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1))
 {
   struct DriverData   *data;
@@ -826,15 +835,13 @@ ULONG createPanel_Drivers()
           MUIA_Listview_Input, TRUE,
             MUIA_Listview_List, (ULONG)( LI_Driver = MUINewObject(MUIC_List,
               MUIA_List_Title, TRUE,
-              MUIA_List_Format, "BAR,BAR,BAR,BAR,BAR,BAR,",
+              MUIA_List_Format, "BAR,BAR,BAR,BAR,",
               MUIA_List_DisplayHook,  &DriverDisplayHook,
             InputListFrame,
           TAG_DONE)),
         TAG_DONE)
         ,
-        Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-          Child, Label((ULONG)GetMessage(MSG_USE_DEFAULTS)),
-          Child, (ULONG)(CM_UseDefaults = OCheckMark(/*Config[CFG_USEDEFAULTS]*/1)),
+        Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,          
           Child, Label((ULONG)GetMessage(MSG_SHOW)),
           Child, (ULONG) (CY_Show = OMUINO(MUIC_Cycle,
             MUIA_Cycle_Entries, (ULONG) Shows,
@@ -842,67 +849,72 @@ ULONG createPanel_Drivers()
           Child,(ULONG)(BU_Scan = SimpleButton((ULONG)GetMessage(MSG_SCAN))),
         TAG_DONE),
     TAG_DONE);
+    // Child, Label((ULONG)GetMessage(MSG_USE_DEFAULTS)),
+    //           Child, (ULONG)(CM_UseDefaults = OCheckMark(/*Config[CFG_USEDEFAULTS]*/1)),
+
 }
 
 ULONG createPanel_Display()
 {
- ULONG w= UMUINO(MUIC_Group,
+    ULONG w= UMUINO(MUIC_Group,
     Child, HVSpace,
     Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
       Child, HSpace(0),
-      // column group of 4 column, name/checkbox/name/checkbox.
-      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,4,
-        MUIA_HorizWeight, 1000,
-        Child, Label((ULONG)GetMessage(MSG_ALLOW16BIT)),
-        Child, (ULONG)(CM_Allow16Bit = OCheckMark(/*Config[CFG_ALLOW16BIT]*/1)),
-        Child, Label((ULONG)GetMessage(MSG_AUTO_FRAMESKIP)),
-        Child, (ULONG)(CM_AutoFrameSkip = OCheckMark(/*Config[CFG_AUTOFRAMESKIP]*/1)),
-        Child, Label((ULONG)GetMessage(MSG_FLIPX)),
-        Child, (ULONG)(CM_FlipX = OCheckMark(/*Config[CFG_FLIPX]*/0)),
-        Child, Label((ULONG)GetMessage(MSG_ANTIALIAS)),
-        Child, (ULONG)(CM_Antialiasing = OCheckMark(/*Config[CFG_ANTIALIASING]*/1)),
-        Child, Label((ULONG)GetMessage(MSG_FLIPY)),
-        Child, (ULONG)(CM_FlipY = OCheckMark(/*Config[CFG_FLIPY]*/0)),
-        Child, Label((ULONG)GetMessage(MSG_TRANSLUCENCY)),
-        Child, (ULONG)(CM_Translucency = OCheckMark(/*Config[CFG_TRANSLUCENCY]*/1)),
-        Child, Label((ULONG)GetMessage(MSG_DIRTY_LINES)),
-        Child, (ULONG)(CM_DirtyLines = OCheckMark(/*Config[CFG_DIRTYLINES]*/1)),
 
-      TAG_DONE), // end colgroup 4
+      // column group of 4 column, name/checkbox/name/checkbox.
+//      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,4,
+//        MUIA_HorizWeight, 1000,
+//        Child, Label((ULONG)GetMessage(MSG_ALLOW16BIT)),
+//        Child, (ULONG)(CM_Allow16Bit = OCheckMark(/*Config[CFG_ALLOW16BIT]*/1)),
+//        Child, Label((ULONG)GetMessage(MSG_AUTO_FRAMESKIP)),
+//        Child, (ULONG)(CM_AutoFrameSkip = OCheckMark(/*Config[CFG_AUTOFRAMESKIP]*/1)),
+//        Child, Label((ULONG)GetMessage(MSG_FLIPX)),
+//        Child, (ULONG)(CM_FlipX = OCheckMark(/*Config[CFG_FLIPX]*/0)),
+//        Child, Label((ULONG)GetMessage(MSG_ANTIALIAS)),
+//        Child, (ULONG)(CM_Antialiasing = OCheckMark(/*Config[CFG_ANTIALIASING]*/1)),
+//        Child, Label((ULONG)GetMessage(MSG_FLIPY)),
+//        Child, (ULONG)(CM_FlipY = OCheckMark(/*Config[CFG_FLIPY]*/0)),
+//        Child, Label((ULONG)GetMessage(MSG_TRANSLUCENCY)),
+//        Child, (ULONG)(CM_Translucency = OCheckMark(/*Config[CFG_TRANSLUCENCY]*/1)),
+//        Child, Label((ULONG)GetMessage(MSG_DIRTY_LINES)),
+//        Child, (ULONG)(CM_DirtyLines = OCheckMark(/*Config[CFG_DIRTYLINES]*/1)),
+//      TAG_DONE), // end colgroup 4
+
       Child, HSpace(0),
     TAG_DONE),
-    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-      Child, HSpace(0),
-      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-        MUIA_HorizWeight, 1000,
-        Child, Label((ULONG)GetMessage(MSG_BEAM)),
-        Child,(ULONG)( SL_BeamWidth = OMUINO(MUIC_Slider,
-          MUIA_Slider_Min, 1,
-          MUIA_Slider_Max, 16,
-        TAG_DONE)),
-        Child, Label((ULONG)GetMessage(MSG_FLICKER)),
-        Child,(ULONG)( SL_VectorFlicker = OMUINO(MUIC_Slider,
-          MUIA_Slider_Min, 0,
-          MUIA_Slider_Max, 100,
-        TAG_DONE)),
-        Child, Label((ULONG)GetMessage(MSG_FRAMESKIP)),
-        Child,(ULONG)( SL_FrameSkip = OMUINO(MUIC_Slider,
-          MUIA_Slider_Min, 0,
-          MUIA_Slider_Max, 3,
-        TAG_DONE)),
-        Child, Label((ULONG)GetMessage(MSG_WIDTH)),
-        Child,(ULONG)( ST_Width = MUI_NewObject(MUIC_String,
-          StringFrame,
-          MUIA_String_Accept, (ULONG) "0123456789",
-        TAG_DONE)),
-        Child, Label((ULONG)GetMessage(MSG_HEIGHT)),
-        Child,(ULONG)( ST_Height = MUI_NewObject(MUIC_String,
-          StringFrame,
-          MUIA_String_Accept, (ULONG) "0123456789",
-        TAG_DONE)),
-      TAG_DONE),
-      Child, HSpace(0),
-    TAG_DONE),
+//    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
+//      Child, HSpace(0),
+//      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
+//        MUIA_HorizWeight, 1000,
+//        Child, Label((ULONG)GetMessage(MSG_BEAM)),
+//        Child,(ULONG)( SL_BeamWidth = OMUINO(MUIC_Slider,
+//          MUIA_Slider_Min, 1,
+//          MUIA_Slider_Max, 16,
+//        TAG_DONE)),
+//        Child, Label((ULONG)GetMessage(MSG_FLICKER)),
+//        Child,(ULONG)( SL_VectorFlicker = OMUINO(MUIC_Slider,
+//          MUIA_Slider_Min, 0,
+//          MUIA_Slider_Max, 100,
+//        TAG_DONE)),
+//        Child, Label((ULONG)GetMessage(MSG_FRAMESKIP)),
+//        Child,(ULONG)( SL_FrameSkip = OMUINO(MUIC_Slider,
+//          MUIA_Slider_Min, 0,
+//          MUIA_Slider_Max, 3,
+//        TAG_DONE)),
+//        Child, Label((ULONG)GetMessage(MSG_WIDTH)),
+//        Child,(ULONG)( ST_Width = MUI_NewObject(MUIC_String,
+//          StringFrame,
+//          MUIA_String_Accept, (ULONG) "0123456789",
+//        TAG_DONE)),
+//        Child, Label((ULONG)GetMessage(MSG_HEIGHT)),
+//        Child,(ULONG)( ST_Height = MUI_NewObject(MUIC_String,
+//          StringFrame,
+//          MUIA_String_Accept, (ULONG) "0123456789",
+//        TAG_DONE)),
+//      TAG_DONE),
+//      Child, HSpace(0),
+//    TAG_DONE),
+
     Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
       Child, HSpace(0),
       Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
@@ -911,18 +923,18 @@ ULONG createPanel_Display()
         Child, CY_ScreenType = OMUINO(MUIC_Cycle,
           MUIA_Cycle_Entries, (ULONG) ScreenTypes,
         TAG_DONE),
-        Child, Label((ULONG)GetMessage(MSG_DIRECT_MODE)),
-        Child, CY_DirectMode = OMUINO(MUIC_Cycle,
-          MUIA_Cycle_Entries, (ULONG) DirectModes,
-        TAG_DONE),
-        Child, Label((ULONG)GetMessage(MSG_BUFFERING)),
-        Child, CY_Buffering = OMUINO(MUIC_Cycle,
-          MUIA_Cycle_Entries, (ULONG) Bufferings,
-        TAG_DONE),
-        Child, Label((ULONG)GetMessage(MSG_ROTATION)),
-        Child, CY_Rotation = OMUINO(MUIC_Cycle,
-          MUIA_Cycle_Entries, (ULONG) Rotations,
-        TAG_DONE),
+//        Child, Label((ULONG)GetMessage(MSG_DIRECT_MODE)),
+//        Child, CY_DirectMode = OMUINO(MUIC_Cycle,
+//          MUIA_Cycle_Entries, (ULONG) DirectModes,
+//        TAG_DONE),
+//        Child, Label((ULONG)GetMessage(MSG_BUFFERING)),
+//        Child, CY_Buffering = OMUINO(MUIC_Cycle,
+//          MUIA_Cycle_Entries, (ULONG) Bufferings,
+//        TAG_DONE),
+//        Child, Label((ULONG)GetMessage(MSG_ROTATION)),
+//        Child, CY_Rotation = OMUINO(MUIC_Cycle,
+//          MUIA_Cycle_Entries, (ULONG) Rotations,
+//        TAG_DONE),
       TAG_DONE),
       Child, HSpace(0),
     TAG_DONE),
@@ -950,7 +962,7 @@ ULONG createPanel_Display()
     TAG_DONE),
     Child, HVSpace,
   TAG_DONE);
-  printf("display:%08x\n",w);
+
   return w;
 }
 
@@ -969,41 +981,41 @@ ULONG createPanel_Sound()
           TAG_DONE),
           Child, HSpace(0),
         TAG_DONE),
-        Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-          Child, MUI_NewObject(MUIC_Rectangle, TAG_DONE),
-          Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-            MUIA_HorizWeight, 1000,
-            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_0)),
-            Child, SL_AudioChannel[0] = OMUINO(MUIC_Slider,
-              MUIA_Slider_Min,    0,
-              MUIA_Slider_Max,    15,
-            TAG_DONE),
-            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_1)),
-            Child, SL_AudioChannel[1] = OMUINO(MUIC_Slider,
-              MUIA_Slider_Min,    0,
-              MUIA_Slider_Max,    15,
-            TAG_DONE),
-            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_2)),
-            Child, SL_AudioChannel[2] = OMUINO(MUIC_Slider,
-              MUIA_Slider_Min,    0,
-              MUIA_Slider_Max,    15,
-            TAG_DONE),
-            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_3)),
-            Child, SL_AudioChannel[3] = OMUINO(MUIC_Slider,
-              MUIA_Slider_Min,    0,
-              MUIA_Slider_Max,    15,
-            TAG_DONE),
-            Child, Label((ULONG)GetMessage(MSG_MIN_CHIP)),
-            Child, SL_MinFreeChip = OMUINO(MUIC_Slider,
-              MUIA_Slider_Min,    0,
-              MUIA_Slider_Max,    2048,
-            TAG_DONE),
-          TAG_DONE),
-          Child, MUI_NewObject(MUIC_Rectangle, TAG_DONE),
-        TAG_DONE),
+//        Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
+//          Child, MUI_NewObject(MUIC_Rectangle, TAG_DONE),
+//          Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
+//            MUIA_HorizWeight, 1000,
+//            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_0)),
+//            Child, SL_AudioChannel[0] = OMUINO(MUIC_Slider,
+//              MUIA_Slider_Min,    0,
+//              MUIA_Slider_Max,    15,
+//            TAG_DONE),
+//            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_1)),
+//            Child, SL_AudioChannel[1] = OMUINO(MUIC_Slider,
+//              MUIA_Slider_Min,    0,
+//              MUIA_Slider_Max,    15,
+//            TAG_DONE),
+//            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_2)),
+//            Child, SL_AudioChannel[2] = OMUINO(MUIC_Slider,
+//              MUIA_Slider_Min,    0,
+//              MUIA_Slider_Max,    15,
+//            TAG_DONE),
+//            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_3)),
+//            Child, SL_AudioChannel[3] = OMUINO(MUIC_Slider,
+//              MUIA_Slider_Min,    0,
+//              MUIA_Slider_Max,    15,
+//            TAG_DONE),
+//            Child, Label((ULONG)GetMessage(MSG_MIN_CHIP)),
+//            Child, SL_MinFreeChip = OMUINO(MUIC_Slider,
+//              MUIA_Slider_Min,    0,
+//              MUIA_Slider_Max,    2048,
+//            TAG_DONE),
+//          TAG_DONE),
+//          Child, MUI_NewObject(MUIC_Rectangle, TAG_DONE),
+//        TAG_DONE),
         Child, HVSpace,
       TAG_DONE);
-  printf("sound:%08x\n",w);
+
   return w;
 }
 
@@ -1011,50 +1023,51 @@ ULONG createPanel_Controls()
 {
     return UMUINO(MUIC_Group,
     Child, HVSpace,
-    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-      Child, HSpace(0),
-      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-        GroupFrameT((ULONG)GetMessage(MSG_PRIMARY_CONTROLLER)),
-        MUIA_HorizWeight, 1000,
-        Child, Label((ULONG)GetMessage(MSG_TYPE)),
-        Child, CY_Joy1Type = OMUINO(MUIC_Cycle,
-          MUIA_Cycle_Entries, (ULONG) Joy1Types,
-        TAG_DONE),
-        Child, Label((ULONG)GetMessage(MSG_BUTTON_B_HOLD_TIME)),
-        Child, SL_Joy1ButtonBTime = OMUINO(MUIC_Slider,
-          MUIA_Slider_Min,    0,
-          MUIA_Slider_Max,    9,
-        TAG_DONE),
-        Child, Label((ULONG)GetMessage(MSG_AUTO_FIRE_RATE)),
-        Child, SL_Joy1AutoFireRate = OMUINO(MUIC_Slider,
-          MUIA_Slider_Min,    0,
-          MUIA_Slider_Max,    5,
-        TAG_DONE),
-      TAG_DONE),
-      Child, HSpace(0),
-    TAG_DONE),
-    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-      Child, HSpace(0),
-      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-        GroupFrameT((ULONG)GetMessage(MSG_SECONDARY_CONTROLLER)),
-        MUIA_HorizWeight, 1000,
-        Child, Label((ULONG)GetMessage(MSG_TYPE)),
-        Child, CY_Joy2Type = OMUINO(MUIC_Cycle,
-          MUIA_Cycle_Entries, (ULONG) Joy2Types,
-        TAG_DONE),
-        Child, Label((ULONG)GetMessage(MSG_BUTTON_B_HOLD_TIME)),
-        Child, SL_Joy2ButtonBTime = OMUINO(MUIC_Slider,
-          MUIA_Slider_Min,    0,
-          MUIA_Slider_Max,    9,
-        TAG_DONE),
-        Child, Label((ULONG)GetMessage(MSG_AUTO_FIRE_RATE)),
-        Child, SL_Joy2AutoFireRate = OMUINO(MUIC_Slider,
-          MUIA_Slider_Min,    0,
-          MUIA_Slider_Max,    5,
-        TAG_DONE),
-      TAG_DONE),
-      Child, HSpace(0),
-    TAG_DONE),
+//    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
+//      Child, HSpace(0),
+//      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
+//        GroupFrameT((ULONG)GetMessage(MSG_PRIMARY_CONTROLLER)),
+//        MUIA_HorizWeight, 1000,
+//        Child, Label((ULONG)GetMessage(MSG_TYPE)),
+//        Child, CY_Joy1Type = OMUINO(MUIC_Cycle,
+//          MUIA_Cycle_Entries, (ULONG) Joy1Types,
+//        TAG_DONE),
+//        Child, Label((ULONG)GetMessage(MSG_BUTTON_B_HOLD_TIME)),
+//        Child, SL_Joy1ButtonBTime = OMUINO(MUIC_Slider,
+//          MUIA_Slider_Min,    0,
+//          MUIA_Slider_Max,    9,
+//        TAG_DONE),
+//        Child, Label((ULONG)GetMessage(MSG_AUTO_FIRE_RATE)),
+//        Child, SL_Joy1AutoFireRate = OMUINO(MUIC_Slider,
+//          MUIA_Slider_Min,    0,
+//          MUIA_Slider_Max,    5,
+//        TAG_DONE),
+//      TAG_DONE),
+//      Child, HSpace(0),
+//    TAG_DONE),
+
+//    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
+//      Child, HSpace(0),
+//      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
+//        GroupFrameT((ULONG)GetMessage(MSG_SECONDARY_CONTROLLER)),
+//        MUIA_HorizWeight, 1000,
+//        Child, Label((ULONG)GetMessage(MSG_TYPE)),
+//        Child, CY_Joy2Type = OMUINO(MUIC_Cycle,
+//          MUIA_Cycle_Entries, (ULONG) Joy2Types,
+//        TAG_DONE),
+//        Child, Label((ULONG)GetMessage(MSG_BUTTON_B_HOLD_TIME)),
+//        Child, SL_Joy2ButtonBTime = OMUINO(MUIC_Slider,
+//          MUIA_Slider_Min,    0,
+//          MUIA_Slider_Max,    9,
+//        TAG_DONE),
+//        Child, Label((ULONG)GetMessage(MSG_AUTO_FIRE_RATE)),
+//        Child, SL_Joy2AutoFireRate = OMUINO(MUIC_Slider,
+//          MUIA_Slider_Min,    0,
+//          MUIA_Slider_Max,    5,
+//        TAG_DONE),
+//      TAG_DONE),
+//      Child, HSpace(0),
+//    TAG_DONE),
     Child, HVSpace,
   TAG_DONE);
 }
@@ -1073,12 +1086,12 @@ ULONG createPanel_Paths()
               MUIA_Popstring_Button, (ULONG)(PopButton(MUII_PopDrawer)),
               ASLFR_DrawersOnly,    TRUE,
             TAG_DONE)),
-            Child, Label((ULONG)GetMessage(MSG_SAMPLE_PATH)),
-            Child,(ULONG)(PA_SamplePath = MUI_NewObject(MUIC_Popasl,
+           /* Child, Label((ULONG)GetMessage(MSG_SAMPLE_PATH)),
+             Child,(ULONG)(PA_SamplePath = MUI_NewObject(MUIC_Popasl,
               MUIA_Popstring_String,(ULONG)(  ST_SamplePath = OString(0, 256)),
               MUIA_Popstring_Button,(ULONG)(PopButton(MUII_PopDrawer)),
               ASLFR_DrawersOnly,    TRUE,
-            TAG_DONE)),
+            TAG_DONE)),*/
           TAG_DONE),
           Child, HSpace(0),
         TAG_DONE),
@@ -1103,6 +1116,21 @@ ULONG createOptionTabGroup()
         TAG_DONE);
     printf("OptionTabGroup:%08x\n",(int)RE_Options);
     return (ULONG)RE_Options;
+}
+
+// at init
+void UpdateUIToConfig()
+{
+    MameConfig &config = getMainConfig();
+
+    // set list is in previous state, from configuration.
+    int listShowState = config.driverListstate();
+    ShowNotify(NULL, NULL,(ULONG*) &listShowState);
+
+    // paths
+    const char *prompaths = config.getRomsDir();
+    set(ST_RomPath, MUIA_String_Contents,(ULONG)prompaths);
+
 }
 
 int MainGUI(void)
@@ -1182,14 +1210,14 @@ int MainGUI(void)
           DoMethod(MainWin, MUIM_Notify,  MUIA_Window_CloseRequest, TRUE,
                    App, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
 
-          DoMethod(CM_AutoFrameSkip, MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
-                   SL_FrameSkip, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
+//          DoMethod(CM_AutoFrameSkip, MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+//                   SL_FrameSkip, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
 
-          DoMethod(SL_Joy1AutoFireRate, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime,
-                   SL_Joy1ButtonBTime, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
+//          DoMethod(SL_Joy1AutoFireRate, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime,
+//                   SL_Joy1ButtonBTime, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
 
-          DoMethod(SL_Joy2AutoFireRate, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime,
-                   SL_Joy2ButtonBTime, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
+//          DoMethod(SL_Joy2AutoFireRate, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime,
+//                   SL_Joy2ButtonBTime, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
 
           DoMethod(MainWin, MUIM_Notify, MUIA_Window_MenuAction, MUIV_EveryTime,
                    App, 2, MUIM_Application_ReturnID, MUIV_TriggerValue);
@@ -1197,8 +1225,8 @@ int MainGUI(void)
           DoMethod(CY_ScreenType, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
                    CY_ScreenType, 3, MUIM_CallHook, &ScreenTypeNotifyHook,  MUIV_TriggerValue);
 
-          DoMethod(CY_DirectMode, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
-                   CY_DirectMode, 3, MUIM_CallHook, &DirectModeNotifyHook, MUIV_TriggerValue);
+//          DoMethod(CY_DirectMode, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
+//                   CY_DirectMode, 3, MUIM_CallHook, &DirectModeNotifyHook, MUIV_TriggerValue);
 
           DoMethod(CY_Sound, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
                    CY_Sound, 3, MUIM_CallHook, &SoundNotifyHook, MUIV_TriggerValue);
@@ -1209,31 +1237,30 @@ int MainGUI(void)
           DoMethod(CY_Show, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
                    CY_Show, 3, MUIM_CallHook, &ShowNotifyHook, MUIV_TriggerValue);
 
-          DoMethod(CM_UseDefaults, MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
-                   CM_UseDefaults, 3, MUIM_CallHook, &UseDefaultsNotifyHook, MUIV_TriggerValue);
+//          DoMethod(CM_UseDefaults, MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+//                   CM_UseDefaults, 3, MUIM_CallHook, &UseDefaultsNotifyHook, MUIV_TriggerValue);
 
           DoMethod(BU_Scan, MUIM_Notify, MUIA_Pressed, FALSE,
                    App, 2, MUIM_Application_ReturnID, RID_Scan);
 #endif
-          DoMethod(MainWin,  MUIM_Window_SetCycleChain,  LV_Driver,
-#ifndef MESS
-                   CM_UseDefaults, CY_Show, BU_Scan,
-#endif
-                   BU_Start, BU_Quit, CM_Allow16Bit, CM_FlipX, CM_FlipY, CM_DirtyLines, CM_AutoFrameSkip,
-                   CM_Antialiasing, CM_Translucency, SL_BeamWidth, SL_VectorFlicker, SL_FrameSkip,
-                   ST_Width, ST_Height, CY_ScreenType, CY_DirectMode, CY_Buffering, CY_Rotation,
-                   PU_ScreenMode, CY_Sound, SL_AudioChannel[0], SL_AudioChannel[1], SL_AudioChannel[2],
-                   SL_AudioChannel[3], SL_MinFreeChip, CY_Joy1Type, SL_Joy1ButtonBTime, SL_Joy1AutoFireRate,
-                   CY_Joy2Type, SL_Joy2ButtonBTime, SL_Joy2AutoFireRate, ST_RomPath, PA_RomPath,
-                   ST_SamplePath, PA_SamplePath, RE_Options, NULL);
 
-#ifdef MESS
-          DoMethod(LI_Driver, MUIM_List_Insert, SortedDrivers, NumDrivers + DRIVER_OFFSET, MUIV_List_Insert_Bottom);
-#else
-        // list is in previous state.
-          int listShowState = config.driverListstate();
-          ShowNotify(NULL, NULL,(ULONG*) &listShowState);
-#endif
+//re, todo but do that better please.
+
+//          DoMethod(MainWin,  MUIM_Window_SetCycleChain,  LV_Driver,
+
+//                   /*CM_UseDefaults,*/ CY_Show, BU_Scan,
+
+//                   BU_Start, BU_Quit, CM_Allow16Bit, CM_FlipX, CM_FlipY, CM_DirtyLines, CM_AutoFrameSkip,
+//                   CM_Antialiasing, CM_Translucency, SL_BeamWidth, SL_VectorFlicker, SL_FrameSkip,
+//                   ST_Width, ST_Height, CY_ScreenType, CY_DirectMode, CY_Buffering, CY_Rotation,
+//                   PU_ScreenMode, CY_Sound, SL_AudioChannel[0], SL_AudioChannel[1], SL_AudioChannel[2],
+//                   SL_AudioChannel[3], SL_MinFreeChip, CY_Joy1Type, SL_Joy1ButtonBTime, SL_Joy1AutoFireRate,
+//                   CY_Joy2Type, SL_Joy2ButtonBTime, SL_Joy2AutoFireRate, ST_RomPath, PA_RomPath,
+//                   ST_SamplePath,/* PA_SamplePath,*/ RE_Options, NULL);
+
+
+         UpdateUIToConfig();
+
         }
       }
       if(MainWin)
@@ -1683,23 +1710,23 @@ static ULONG ASM DirectModeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), U
 
 static ULONG ASM SoundNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
 {
-  switch(*par)
-  {
-    case 1:
-      set(SL_AudioChannel[0], MUIA_Disabled, FALSE);
-      set(SL_AudioChannel[1], MUIA_Disabled, FALSE);
-      set(SL_AudioChannel[2], MUIA_Disabled, FALSE);
-      set(SL_AudioChannel[3], MUIA_Disabled, FALSE);
-      set(SL_MinFreeChip, MUIA_Disabled, FALSE);
-      break;
-    default:
-      set(SL_AudioChannel[0], MUIA_Disabled, TRUE);
-      set(SL_AudioChannel[1], MUIA_Disabled, TRUE);
-      set(SL_AudioChannel[2], MUIA_Disabled, TRUE);
-      set(SL_AudioChannel[3], MUIA_Disabled, TRUE);
-      set(SL_MinFreeChip, MUIA_Disabled, TRUE);
-      break;
-  }
+//  switch(*par)
+//  {
+//    case 1:
+//      set(SL_AudioChannel[0], MUIA_Disabled, FALSE);
+//      set(SL_AudioChannel[1], MUIA_Disabled, FALSE);
+//      set(SL_AudioChannel[2], MUIA_Disabled, FALSE);
+//      set(SL_AudioChannel[3], MUIA_Disabled, FALSE);
+//      set(SL_MinFreeChip, MUIA_Disabled, FALSE);
+//      break;
+//    default:
+//      set(SL_AudioChannel[0], MUIA_Disabled, TRUE);
+//      set(SL_AudioChannel[1], MUIA_Disabled, TRUE);
+//      set(SL_AudioChannel[2], MUIA_Disabled, TRUE);
+//      set(SL_AudioChannel[3], MUIA_Disabled, TRUE);
+//      set(SL_MinFreeChip, MUIA_Disabled, TRUE);
+//      break;
+//  }
 
   return(0);
 }
@@ -1711,15 +1738,14 @@ static ULONG ASM DriverNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG
 
   if(*par < 0)
   {
-    set(CM_UseDefaults, MUIA_Disabled, TRUE);
-    set(CM_Allow16Bit,  MUIA_Disabled, FALSE);
+  //  set(CM_UseDefaults, MUIA_Disabled, TRUE);
+  //  set(CM_Allow16Bit,  MUIA_Disabled, FALSE);
   }
   else
   {
-    set(CM_UseDefaults, MUIA_Disabled, FALSE);
+   // set(CM_UseDefaults, MUIA_Disabled, FALSE);
   }
 
-  //Config[CFG_DRIVER] = GetDriverIndex();
    config.setActiveDriver(GetDriverIndex());
   SetOptions(FALSE);
 
@@ -1736,39 +1762,40 @@ static ULONG ASM UseDefaultsNotify(struct Hook *hook REG(a0), APTR obj REG(a2), 
   if(*par)
   {
     set(CY_ScreenType,       MUIA_Disabled, TRUE);
-    set(CY_DirectMode,       MUIA_Disabled, TRUE);
-    set(CM_Allow16Bit,       MUIA_Disabled, TRUE);
-    set(CM_FlipX,            MUIA_Disabled, TRUE);
-    set(CM_FlipY,            MUIA_Disabled, TRUE);
-    set(CM_Antialiasing,     MUIA_Disabled, TRUE);
-    set(CM_Translucency,     MUIA_Disabled, TRUE);
-    set(CM_AutoFrameSkip,    MUIA_Disabled, TRUE);
-    set(SL_BeamWidth,        MUIA_Disabled, TRUE);
-    set(SL_VectorFlicker,    MUIA_Disabled, TRUE);
-    set(SL_FrameSkip,        MUIA_Disabled, TRUE);
-    set(ST_Width,            MUIA_Disabled, TRUE);
-    set(ST_Height,           MUIA_Disabled, TRUE);
-    set(CY_Buffering,        MUIA_Disabled, TRUE);
-    set(CY_Rotation,         MUIA_Disabled, TRUE);
+//    set(CY_DirectMode,       MUIA_Disabled, TRUE);
+//    set(CM_Allow16Bit,       MUIA_Disabled, TRUE);
+//    set(CM_FlipX,            MUIA_Disabled, TRUE);
+//    set(CM_FlipY,            MUIA_Disabled, TRUE);
+//    set(CM_Antialiasing,     MUIA_Disabled, TRUE);
+//    set(CM_Translucency,     MUIA_Disabled, TRUE);
+//    set(CM_AutoFrameSkip,    MUIA_Disabled, TRUE);
+//    set(SL_BeamWidth,        MUIA_Disabled, TRUE);
+//    set(SL_VectorFlicker,    MUIA_Disabled, TRUE);
+//    set(SL_FrameSkip,        MUIA_Disabled, TRUE);
+//    set(ST_Width,            MUIA_Disabled, TRUE);
+//    set(ST_Height,           MUIA_Disabled, TRUE);
+//    set(CY_Buffering,        MUIA_Disabled, TRUE);
+//    set(CY_Rotation,         MUIA_Disabled, TRUE);
     set(CY_Sound,            MUIA_Disabled, TRUE);
-    set(SL_MinFreeChip,      MUIA_Disabled, TRUE);
-    set(CY_Joy1Type,         MUIA_Disabled, TRUE);
-    set(SL_Joy1ButtonBTime,  MUIA_Disabled, TRUE);
-    set(SL_Joy1AutoFireRate, MUIA_Disabled, TRUE);
-    set(CY_Joy2Type,         MUIA_Disabled, TRUE);
-    set(SL_Joy2ButtonBTime,  MUIA_Disabled, TRUE);
-    set(SL_Joy2AutoFireRate, MUIA_Disabled, TRUE);
+//    set(SL_MinFreeChip,      MUIA_Disabled, TRUE);
+
+//    set(CY_Joy1Type,         MUIA_Disabled, TRUE);
+//    set(SL_Joy1ButtonBTime,  MUIA_Disabled, TRUE);
+//    set(SL_Joy1AutoFireRate, MUIA_Disabled, TRUE);
+//    set(CY_Joy2Type,         MUIA_Disabled, TRUE);
+//    set(SL_Joy2ButtonBTime,  MUIA_Disabled, TRUE);
+//    set(SL_Joy2AutoFireRate, MUIA_Disabled, TRUE);
     set(ST_RomPath,          MUIA_Disabled, TRUE);
     set(ST_SamplePath,       MUIA_Disabled, TRUE);
     set(PA_RomPath,          MUIA_Disabled, TRUE);
-    set(PA_SamplePath,       MUIA_Disabled, TRUE);
-    set(CM_DirtyLines,       MUIA_Disabled, TRUE);
+ //   set(PA_SamplePath,       MUIA_Disabled, TRUE);
+ //   set(CM_DirtyLines,       MUIA_Disabled, TRUE);
     set(PU_ScreenMode,       MUIA_Disabled, TRUE);
     set(PA_ScreenMode,       MUIA_Disabled, TRUE);
-    set(SL_AudioChannel[0],  MUIA_Disabled, TRUE);
-    set(SL_AudioChannel[1],  MUIA_Disabled, TRUE);
-    set(SL_AudioChannel[2],  MUIA_Disabled, TRUE);
-    set(SL_AudioChannel[3],  MUIA_Disabled, TRUE);
+//    set(SL_AudioChannel[0],  MUIA_Disabled, TRUE);
+//    set(SL_AudioChannel[1],  MUIA_Disabled, TRUE);
+//    set(SL_AudioChannel[2],  MUIA_Disabled, TRUE);
+//    set(SL_AudioChannel[3],  MUIA_Disabled, TRUE);
 #ifdef POWERUP
     set(CM_AsyncPPC,         MUIA_Disabled, TRUE);
 #endif
@@ -1776,31 +1803,32 @@ static ULONG ASM UseDefaultsNotify(struct Hook *hook REG(a0), APTR obj REG(a2), 
   else
   {
     set(CY_ScreenType,       MUIA_Disabled, FALSE);
-    set(CY_DirectMode,       MUIA_Disabled, FALSE);
-    set(CM_FlipX,            MUIA_Disabled, FALSE);
-    set(CM_FlipY,            MUIA_Disabled, FALSE);
-    set(CM_Antialiasing,     MUIA_Disabled, FALSE);
-    set(CM_Translucency,     MUIA_Disabled, FALSE);
-    set(CM_AutoFrameSkip,    MUIA_Disabled, FALSE);
-    set(SL_BeamWidth,        MUIA_Disabled, FALSE);
-    set(SL_VectorFlicker,    MUIA_Disabled, FALSE);
-    set(SL_FrameSkip,        MUIA_Disabled, FALSE);
-    set(ST_Width,            MUIA_Disabled, FALSE);
-    set(ST_Height,           MUIA_Disabled, FALSE);
-    set(CY_Buffering,        MUIA_Disabled, FALSE);
-    set(CY_Rotation,         MUIA_Disabled, FALSE);
+//    set(CY_DirectMode,       MUIA_Disabled, FALSE);
+//    set(CM_FlipX,            MUIA_Disabled, FALSE);
+//    set(CM_FlipY,            MUIA_Disabled, FALSE);
+//    set(CM_Antialiasing,     MUIA_Disabled, FALSE);
+//    set(CM_Translucency,     MUIA_Disabled, FALSE);
+//    set(CM_AutoFrameSkip,    MUIA_Disabled, FALSE);
+//    set(SL_BeamWidth,        MUIA_Disabled, FALSE);
+//    set(SL_VectorFlicker,    MUIA_Disabled, FALSE);
+//    set(SL_FrameSkip,        MUIA_Disabled, FALSE);
+//    set(ST_Width,            MUIA_Disabled, FALSE);
+//    set(ST_Height,           MUIA_Disabled, FALSE);
+//    set(CY_Buffering,        MUIA_Disabled, FALSE);
+//    set(CY_Rotation,         MUIA_Disabled, FALSE);
     set(CY_Sound,            MUIA_Disabled, FALSE);
-    set(SL_MinFreeChip,      MUIA_Disabled, FALSE);
-    set(CY_Joy1Type,         MUIA_Disabled, FALSE);
-    set(SL_Joy1ButtonBTime,  MUIA_Disabled, FALSE);
-    set(SL_Joy1AutoFireRate, MUIA_Disabled, FALSE);
-    set(CY_Joy2Type,         MUIA_Disabled, FALSE);
-    set(SL_Joy2ButtonBTime,  MUIA_Disabled, FALSE);
-    set(SL_Joy2AutoFireRate, MUIA_Disabled, FALSE);
+//    set(SL_MinFreeChip,      MUIA_Disabled, FALSE);
+//    set(CY_Joy1Type,         MUIA_Disabled, FALSE);
+//    set(SL_Joy1ButtonBTime,  MUIA_Disabled, FALSE);
+//    set(SL_Joy1AutoFireRate, MUIA_Disabled, FALSE);
+//    set(CY_Joy2Type,         MUIA_Disabled, FALSE);
+//    set(SL_Joy2ButtonBTime,  MUIA_Disabled, FALSE);
+//    set(SL_Joy2AutoFireRate, MUIA_Disabled, FALSE);
+
     set(ST_RomPath,          MUIA_Disabled, FALSE);
     set(ST_SamplePath,       MUIA_Disabled, FALSE);
     set(PA_RomPath,          MUIA_Disabled, FALSE);
-    set(PA_SamplePath,       MUIA_Disabled, FALSE);
+//    set(PA_SamplePath,       MUIA_Disabled, FALSE);
 #ifdef POWERUP
     set(CM_AsyncPPC,         MUIA_Disabled, FALSE);
 #endif
@@ -1808,22 +1836,21 @@ static ULONG ASM UseDefaultsNotify(struct Hook *hook REG(a0), APTR obj REG(a2), 
     get(CY_ScreenType, MUIA_Cycle_Active, &v);
     ScreenTypeNotify(&ScreenTypeNotifyHook, CY_ScreenType, &v);
 
-    get(CY_DirectMode, MUIA_Cycle_Active,  &v);
-    DirectModeNotify(&DirectModeNotifyHook, CY_DirectMode, &v);
+//    get(CY_DirectMode, MUIA_Cycle_Active,  &v);
+//    DirectModeNotify(&DirectModeNotifyHook, CY_DirectMode, &v);
 
     get(CY_Sound, MUIA_Cycle_Active, &v);
     SoundNotify(&SoundNotifyHook, CY_Sound, &v);
 
-    drv = GetDriver();
+//    drv = GetDriver();
+//    machine_config machine;
+//    memset(&machine,0,sizeof(machine));
+//    if(drv) drv->drv(&machine);
 
-    machine_config machine;
-    memset(&machine,0,sizeof(machine));
-    if(drv) drv->drv(&machine);
-
-    if(machine.total_colors<256 )
-      set(CM_Allow16Bit, MUIA_Disabled, FALSE);
-    else
-      set(CM_Allow16Bit, MUIA_Disabled, TRUE);
+//    if(machine.total_colors<256 )
+//      set(CM_Allow16Bit, MUIA_Disabled, FALSE);
+//    else
+//      set(CM_Allow16Bit, MUIA_Disabled, TRUE);
   }
 
   return(0);

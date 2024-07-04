@@ -13,6 +13,26 @@ struct FileInfoBlock;
 struct _game_driver;
 struct _global_options;
 
+class ASerialization;
+
+class AConf {
+public:
+    virtual void serialize(ASerialization &serializer)=0;
+};
+
+class ASerialization {
+public:
+    virtual void operator()(const std::string &sMemberName, AConf &subconf) = 0;
+    virtual void operator()(const std::string &sMemberName, std::string &str) = 0;
+    // for sliders
+    virtual void operator()(const std::string &sMemberName, int &v, int min, int max) = 0;
+    // for cycling
+    virtual void operator()(const std::string &sMemberName, int &v,const std::vector<std::string> &values) = 0;
+    // for checkbox
+    virtual void operator()(const std::string &sMemberName, bool &v) = 0;
+
+};
+
 // driver name list could actually get big, avoid looping it.
 class NameDriverMap {
 public:
