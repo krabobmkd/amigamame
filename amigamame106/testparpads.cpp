@@ -3,6 +3,7 @@ extern "C"
 {
     #include <proto/exec.h>
     #include <proto/graphics.h>
+    #include <proto/intuition.h>
     #include <dos/dos.h>
 }
 #include <stdlib.h>
@@ -22,6 +23,8 @@ int main(int argc, char **argv)
     atexit(&close);
     g_pParPads = createParallelPads();
     ParallelPads *ppads = g_pParPads;
+Window
+
 
     if(!g_pParPads)
     {

@@ -129,16 +129,17 @@ void ConfigureLowLevelLib()
     {
         int explicitConfType = inputConfig._lowlevelExplicitPortsType[iport];
         ULONG state=explicitConfType;
-        if(explicitConfType != SJA_TYPE_AUTOSENSE)
+     //re   if(explicitConfType != SJA_TYPE_AUTOSENSE)
         {
            // printf("iport:%d explicit\n",iport);
             // explicit configuration, hopes it matches what's plugged.
-            SetJoyPortAttrs(iport,SJA_Type,explicitConfType);
-        } else
+          //Re  SetJoyPortAttrs(iport,SJA_Type,explicitConfType);
+            SetJoyPortAttrs(iport,SJA_Type,SJA_TYPE_GAMECTLR);
+        }/* else
         {   // autosense
             state = ReadJoyPort(iport)>>28;
             printf("iport:%d autosense:%d\n",iport,(int)state);
-        }
+        }*/
 //        if( iport<2)
 //        {
 //            if (state == SJA_TYPE_GAMECTLR ||

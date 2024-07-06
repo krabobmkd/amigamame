@@ -17,7 +17,7 @@ option(AMIGA_USE_68030 " use 68030" OFF)
 option(AMIGA_USE_68040 " use 68040" OFF)
 option(AMIGA_USE_68060 " use 68060" ON)
 
-option(COMPILE_TESTS " compile extra dev tools/ test units" OFF)
+option(COMPILE_TESTS " compile extra dev tools/ test units" ON)
 
 # get current git branch id
 execute_process(
