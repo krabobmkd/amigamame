@@ -248,6 +248,34 @@ error:
     if(file) mame_fclose(file);
     return 0;
 }
+void MameConfig::serialize(ASerializer &serializer)
+{
+    // defines what is loaded/saved/gui edited.
+    serializer("Display",   (ASerializer&)_display,0);
+    serializer("Audio",     (ASerializer&)_audio,0);
+    serializer("Controls",  (ASerializer&)_controls,0);
+    serializer("Paths",     (ASerializer&)_paths,0);
+}
+
+
+void MameConfig::Display::serialize(ASerializer &serializer)
+{
+
+}
+void MameConfig::Audio::serialize(ASerializer &serializer)
+{
+    serializer("Audio",_mode,{"None","Paula","AHI"});
+}
+void MameConfig::Controls::serialize(ASerializer &serializer)
+{
+
+}
+void MameConfig::Paths::serialize(ASerializer &serializer)
+{
+
+}
+
+
 void MameConfig::init(int argc,char **argv)
 {
 

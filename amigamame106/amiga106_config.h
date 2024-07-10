@@ -8,30 +8,12 @@ extern "C"
 #include <unordered_map>
 #include <vector>
 
+#include "serializer.h"
+
 typedef long BPTR;
 struct FileInfoBlock;
 struct _game_driver;
 struct _global_options;
-
-class ASerialization;
-
-class AConf {
-public:
-    virtual void serialize(ASerialization &serializer)=0;
-};
-
-class ASerialization {
-public:
-    virtual void operator()(const std::string &sMemberName, AConf &subconf) = 0;
-    virtual void operator()(const std::string &sMemberName, std::string &str) = 0;
-    // for sliders
-    virtual void operator()(const std::string &sMemberName, int &v, int min, int max) = 0;
-    // for cycling
-    virtual void operator()(const std::string &sMemberName, int &v,const std::vector<std::string> &values) = 0;
-    // for checkbox
-    virtual void operator()(const std::string &sMemberName, bool &v) = 0;
-
-};
 
 // driver name list could actually get big, avoid looping it.
 class NameDriverMap {
@@ -67,7 +49,7 @@ struct ScreenConf {
  *  - scanned rom found list.
  *  Then modeid and per game prefs should be patched in mame per driver conf.
  */
-class MameConfig {
+class MameConfig : public ASerializable {
 public:
     MameConfig();
     ~MameConfig();
@@ -122,8 +104,44 @@ public:
     const Inputs &inputs() const { return _inputsprefs; }
 
     static void getDriverScreenModestring(const _game_driver *drv, std::string &screenid,int &video_attribs);
+
+    void serialize(ASerializer &serializer) override;
+
+    struct Display : public ASerializable
+    {
+        void serialize(ASerializer &serializer) override;
+        // general
+        // per screenmode:
+
+    };
+
+    struct Audio : public ASerializable
+    {
+        void serialize(ASerializer &serializer) override;
+        int _mode=0;
+    };
+
+    struct Controls : public ASerializable
+    {
+        void serialize(ASerializer &serializer) override;
+
+    };
+
+    struct Paths : public ASerializable
+    {
+        void serialize(ASerializer &serializer) override;
+        std::string _romsPath,_userPath;
+    };
+
 protected:
     int _NumDrivers; // in current linker mame driver list. Can be huge.
+
+    // - - -  paragraphs
+    Display     _display;
+    Audio       _audio;
+    Controls    _controls;
+    Paths       _paths;
+
     // - - - prefs unique for app
     std::string _userDir;
     std::string _romsDir; // finally just use one, but a tested one.
@@ -143,6 +161,9 @@ protected:
     // TODO video prefs, per video config
     // keys are like: "320x224x16"
     std::unordered_map<std::string,ScreenConf> _screenconfs;
+
+
+
 
     //TODO
     Inputs _inputsprefs;

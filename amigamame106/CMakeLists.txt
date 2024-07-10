@@ -106,13 +106,19 @@ set(AMIGA_SRC
 
 		amiga_parallelpads.h
 		amiga_parallelpads.c
+
+		${COMMONLIBS}/libserializer/serializer.h
+		serializer_mamexml.cpp
+		serializer_mamexml.h
+		${COMMONLIBS}/libserializer/serializer_mui.cpp
+		${COMMONLIBS}/libserializer/serializer_mui.h
 	)
 	set_property(TARGET Mame106AmigaO2 PROPERTY C_STANDARD 11)
 	set_property(TARGET Mame106AmigaO2 PROPERTY CXX_STANDARD 11)
 	if(MAME_USE_HARDFLOAT)
 		target_compile_definitions(Mame106AmigaO2 PRIVATE MAME_USE_HARD_FLOAT=1 )
 	endif()
-	target_include_directories(Mame106AmigaO2 PUBLIC "../mame106")
+	target_include_directories(Mame106AmigaO2 PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
 	target_compile_options(Mame106AmigaO2 PRIVATE -O2 ${AMIGA_COMPILER_OPTIONS} )
 # - - - -
 
@@ -128,7 +134,7 @@ endif()
 target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO2 mamecoreO2 z expat)
 
 # target_include_directories(${PROGNAME} PUBLIC "../mame037b/src")
-target_include_directories(${PROGNAME} PUBLIC "../mame106")
+target_include_directories(${PROGNAME} PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
 
 # MUI is not provided by gccbebbo6.5 ndk by default, we have it there:
 target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")

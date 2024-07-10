@@ -43,6 +43,7 @@ extern "C" {
 
 #include "gui_mui.h"
 #include "amiga106_config.h"
+#include "serializer_mui.h"
 
 #include "version.h"
 
@@ -1100,6 +1101,21 @@ ULONG createPanel_Paths()
 }
 ULONG createOptionTabGroup()
 {
+    MameConfig &config = getMainConfig();
+
+// MUI_NewObjectA
+
+    MUISerializer muiconfigCreator;
+    config.serialize(muiconfigCreator);// use config definition to create panels.
+
+    // feed tabs taglist with panels created..
+    vector<string> panelNames({"Drivers"});
+    vector<ULONG> register_taglist({MUIA_Register_Titles,(ULONG)panelNames.data()});
+
+    register_taglist.push_back(TAG_DONE);
+createPanel_Display
+    RE_Options = MUI_NewObjectA(MUIC_Register, (struct TagItem *) register_taglist.data());
+/*
     RE_Options = OMUINO(MUIC_Register,MUIA_Register_Titles,(ULONG)(&RegisterTitles[0]),
 
                 // Tab1: Drivers
@@ -1114,6 +1130,7 @@ ULONG createOptionTabGroup()
                 Child,createPanel_Paths() ,
 
         TAG_DONE);
+        */
     printf("OptionTabGroup:%08x\n",(int)RE_Options);
     return (ULONG)RE_Options;
 }
