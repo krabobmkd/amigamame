@@ -68,8 +68,7 @@ public:
 
     int activeDriver() const { return _activeDriver; }
     int driverListstate() const {return _listShowState; }
-    ULONG audio() const { return _audio; }
-    ULONG sampleRate() const { return _sampleRate; }
+
     // - -  update detected rom list - - -
     int scanDrivers();
     //int allDrivers();
@@ -152,7 +151,6 @@ protected:
     int     _activeDriver;
     int     _listShowState;
 
-    int         _audio;
     ULONG       _sampleRate;
 
     int     _doubleWindow;

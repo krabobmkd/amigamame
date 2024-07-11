@@ -38,7 +38,6 @@ MameConfig::MameConfig()
     , _startWindowed(0) // else fullscreen.
     , _activeDriver(-1)
     , _listShowState(0)
-    , _audio(1)
     , _sampleRate(16000)
     , _inputsprefs()
 {
@@ -75,7 +74,6 @@ static const char *pcf_last="last";
 static const char *pcf_list="list";
 static const char *pcf_display="display";
 static const char *pcf_startwindowed="startwindowed";
-static const char *pcf_doublewindow="doublewindow";
 int MameConfig::save()
 {
     // note: got to save rom short name id, not driver index ! index evolve with compilation.
@@ -139,7 +137,7 @@ int MameConfig::save()
     if(display)
     {
         if(_startWindowed) xml_add_child(confignode,pcf_startwindowed,NULL );
-        if(_doubleWindow)  xml_add_child(confignode,pcf_doublewindow,NULL );
+        //if(_doubleWindow)  xml_add_child(confignode,pcf_doublewindow,NULL );
     }
 
     /* flush the file */
@@ -251,10 +249,10 @@ error:
 void MameConfig::serialize(ASerializer &serializer)
 {
     // defines what is loaded/saved/gui edited.
-    serializer("Display",   (ASerializer&)_display,0);
-    serializer("Audio",     (ASerializer&)_audio,0);
-    serializer("Controls",  (ASerializer&)_controls,0);
-    serializer("Paths",     (ASerializer&)_paths,0);
+    serializer("Display",   (ASerializable&)_display,0);
+    serializer("Audio",     (ASerializable&)_audio,0);
+    serializer("Controls",  (ASerializable&)_controls,0);
+    serializer("Paths",     (ASerializable&)_paths,0);
 }
 
 
@@ -264,7 +262,7 @@ void MameConfig::Display::serialize(ASerializer &serializer)
 }
 void MameConfig::Audio::serialize(ASerializer &serializer)
 {
-    serializer("Audio",_mode,{"None","Paula","AHI"});
+    serializer("Mode",_mode,{"None","Paula","AHI"});
 }
 void MameConfig::Controls::serialize(ASerializer &serializer)
 {
@@ -465,7 +463,8 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions)
     options.brightness = 1.0f;
     options.gamma=0.5f;
 
-    options.samplerate=(audio())?0:sampleRate();
+    //Re options.samplerate=(audio())?0:sampleRate();
+    options.samplerate = 0;
     options.use_samples = 0;
 
      printf("MameConfig::applyToMameOptions applied samplerate:%d\n",options.samplerate);

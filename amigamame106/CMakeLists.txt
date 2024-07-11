@@ -77,7 +77,8 @@ set(AMIGA_SRC
 #	amiga106_video_aga.cpp
 	amiga_locale.cpp
 
-
+	${COMMONLIBS}/libserializer/serializer_mui.cpp
+	${COMMONLIBS}/libserializer/serializer_mui.h
 	audio.h
 
 	amiga_locale.h
@@ -110,8 +111,7 @@ set(AMIGA_SRC
 		${COMMONLIBS}/libserializer/serializer.h
 		serializer_mamexml.cpp
 		serializer_mamexml.h
-		${COMMONLIBS}/libserializer/serializer_mui.cpp
-		${COMMONLIBS}/libserializer/serializer_mui.h
+
 	)
 	set_property(TARGET Mame106AmigaO2 PROPERTY C_STANDARD 11)
 	set_property(TARGET Mame106AmigaO2 PROPERTY CXX_STANDARD 11)
@@ -120,6 +120,7 @@ set(AMIGA_SRC
 	endif()
 	target_include_directories(Mame106AmigaO2 PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
 	target_compile_options(Mame106AmigaO2 PRIVATE -O2 ${AMIGA_COMPILER_OPTIONS} )
+target_include_directories(Mame106AmigaO2 PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
 # - - - -
 
 set(PROGNAME Mame106)
