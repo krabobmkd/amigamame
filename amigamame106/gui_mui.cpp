@@ -116,11 +116,11 @@ static Object * RE_Options=NULL;
 //static Object * CM_FlipY=NULL;
 //static Object * CM_DirtyLines=NULL;
 //static Object * CM_AutoFrameSkip=NULL;
-#ifndef MESS
-static Object * CY_Show;
+
+static Object * CY_Show=NULL;
 //static Object *CM_UseDefaults;
-static Object * BU_Scan;
-#endif
+static Object * BU_Scan=NULL;
+
 //static Object * CM_Antialiasing;
 //static Object * CM_Translucency;
 //static Object * SL_BeamWidth;
@@ -154,12 +154,12 @@ static Object * BU_Scan;
 //static Object * PA_ScreenMode;
 //static Object * PA_RomPath;
 //static Object * PA_SamplePath;
-static Object *LI_Driver;
-static Object * LV_Driver;
-static Object * BU_Start;
-static Object * BU_Quit;
-static Object * BU_About_OK;
-static Object * PU_ScreenMode;
+static Object *LI_Driver=NULL;
+static Object * LV_Driver=NULL;
+static Object * BU_Start=NULL;
+static Object * BU_Quit=NULL;
+static Object * BU_About_OK=NULL;
+static Object * PU_ScreenMode=NULL;
 
 int dummy=0;
 
@@ -1106,10 +1106,14 @@ ULONG createOptionTabGroup()
 {
     MameConfig &config = getMainConfig();
 
-    config.serialize(muiConfigCreator);// use config definition to create panels.
+ printf("createOptionTabGroup1\n");
+ muiConfigCreator("Main",(ASerializable &)config);
+ //   config.serialize(muiConfigCreator);// use config definition to create panels.
+ printf("createOptionTabGroup2\n");
     muiConfigCreator.insertFirstPanel(createPanel_Drivers(),"Drivers");
+ printf("createOptionTabGroup3\n");
     RE_Options = muiConfigCreator.compile();
-
+ printf("createOptionTabGroup4:%08x\n",(int)RE_Options);
     // feed tabs taglist with panels created..
 //    vector<string> panelNames({"Drivers"});
 //    vector<ULONG> register_taglist({MUIA_Register_Titles,(ULONG)panelNames.data()});
@@ -1275,13 +1279,16 @@ int MainGUI(void)
 //                   CY_Joy2Type, SL_Joy2ButtonBTime, SL_Joy2AutoFireRate, ST_RomPath, PA_RomPath,
 //                   ST_SamplePath,/* PA_SamplePath,*/ RE_Options, NULL);
 
+        printf("before UpdateUIToConfig\n");
 
          UpdateUIToConfig();
+        printf("after UpdateUIToConfig\n");
 
         }
       }
       if(MainWin)
       {
+printf("LI_Driver:%08x\n",(int)LI_Driver);
         SetOptions(TRUE);
         set(MainWin,  MUIA_Window_ActiveObject, (ULONG) LV_Driver);
         set(MainWin,  MUIA_Window_Open,     TRUE);
@@ -1289,6 +1296,7 @@ int MainGUI(void)
         /* This must be done after the window has been opened. */
         DoMethod( LI_Driver, MUIM_List_Jump, MUIV_List_Jump_Active);
 
+printf("before MUI loop\n");
         do
         {
           rid = DoMethod(App,MUIM_Application_NewInput,&signals);
