@@ -251,7 +251,7 @@ void MameConfig::serialize(ASerializer &serializer)
     // defines what is loaded/saved/gui edited.
     serializer("Display",   (ASerializable&)_display,0);
     serializer("Audio",     (ASerializable&)_audio,0);
-    serializer("Controls",  (ASerializable&)_controls,0);
+    serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS);
     serializer("Paths",     (ASerializable&)_paths,0);
 }
 
@@ -267,9 +267,41 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
 void MameConfig::Controls::serialize(ASerializer &serializer)
 {
 
+
+    vector<string> ports={
+        "None",
+        "Port 1(Mouse)",
+        "Port 2(Joy)",
+        "Port 3 Lowlevel.lib",
+        "Port 4 Lowlevel.lib",
+        "Parallel Port3(1bt)",
+        "Parallel Port4(1bt)",
+        "Parallel Port3(2bt)"
+    };
+//#define SJA_TYPE_AUTOSENSE 0
+//#define SJA_TYPE_GAMECTLR  1
+//#define SJA_TYPE_MOUSE	   2
+//#define SJA_TYPE_JOYSTK    3
+    // lowlevel
+    vector<string> controlerTypesLL={
+        "Auto Sense",
+        "CD32 7bt Pad",
+        "Mouse",
+        "Joystick(2bt)",
+    };
+    serializer("Player1", _PlayerPort[0],ports);
+    serializer("Type1", _PlayerPortType[0],controlerTypesLL);
+    serializer("Player2", _PlayerPort[1],ports);
+    serializer("Type2", _PlayerPortType[1],controlerTypesLL);
+    serializer("Player3", _PlayerPort[2],ports);
+    serializer("Type3", _PlayerPortType[2],controlerTypesLL);
+    serializer("Player4", _PlayerPort[3],ports);
+    serializer("Type4", _PlayerPortType[3],controlerTypesLL);
+
 }
 void MameConfig::Paths::serialize(ASerializer &serializer)
 {
+    serializer("Roms",_romsPath,SERFLAG_STRING_ISPATH);
 
 }
 

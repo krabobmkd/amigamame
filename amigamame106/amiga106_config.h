@@ -123,7 +123,8 @@ public:
     struct Controls : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
-
+        int _PlayerPort[4],_PlayerPortType[4];
+        //int _Ports[7];
     };
 
     struct Paths : public ASerializable
