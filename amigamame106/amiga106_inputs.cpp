@@ -113,7 +113,6 @@ void ConfigureLowLevelLib()
 //#define SJA_TYPE_GAMECTLR  1
 //#define SJA_TYPE_MOUSE	   2
 //#define SJA_TYPE_JOYSTK    3
-    const MameConfig::Inputs &inputConfig = getMainConfig().inputs();
 
     printf("configure lowlevel\n");
 
@@ -127,8 +126,8 @@ void ConfigureLowLevelLib()
 
     for(int iport=0;iport<4;iport++) // actually 2
     {
-        int explicitConfType = inputConfig._lowlevelExplicitPortsType[iport];
-        ULONG state=explicitConfType;
+        //int explicitConfType = inputConfig._lowlevelExplicitPortsType[iport];
+        ULONG state=SJA_TYPE_GAMECTLR;
      //re   if(explicitConfType != SJA_TYPE_AUTOSENSE)
         {
            // printf("iport:%d explicit\n",iport);

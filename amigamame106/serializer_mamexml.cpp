@@ -8,7 +8,12 @@ extern "C" {
 
 using namespace std;
 
-xmlwriter::xmlwriter()
+//    if(!_romsDir.empty()) xml_add_child(confignode,pcf_romsdir, _romsDir.c_str());
+//    if(!_userDir.empty()) xml_add_child(confignode,pcf_userdir, _userDir.c_str());
+
+
+xmlwriter::xmlwriter(xml_data_node *rootnode) : ASerializer()
+ ,_rootnode(rootnode)
 {
 }
 void xmlwriter::operator()(const char *sMemberName, ASerializable &subconf, int flags)
@@ -29,7 +34,15 @@ void xmlwriter::operator()(const char *sMemberName, bool &v)
 
 // -------------------------------
 
-xmlreader::xmlreader()
+//   node = xml_get_sibling(confignode->child, pcf_romsdir);
+//    if(node && node->value) _romsDir = node->value;
+
+//    node = xml_get_sibling(confignode->child, pcf_userdir);
+//    if(node && node->value) _userDir = node->value;
+
+
+xmlreader::xmlreader(xml_data_node *rootnode) : ASerializer()
+ ,_rootnode(rootnode)
 {
 }
 void xmlreader::operator()(const char *sMemberName, ASerializable &subconf, int flags)

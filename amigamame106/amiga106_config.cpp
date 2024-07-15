@@ -33,17 +33,9 @@ MameConfig &getMainConfig()
 
 MameConfig::MameConfig()
     : _NumDrivers(0)
-    , _userDir("PROGDIR:user")
-    , _romsDir("PROGDIR:roms")
-    , _startWindowed(0) // else fullscreen.
     , _activeDriver(-1)
     , _listShowState(0)
-    , _sampleRate(16000)
-    , _inputsprefs()
 {
-    for(int i=0;i<4;i++)_inputsprefs._lowlevelExplicitPortsType[i] = 0;
-
-    _inputsprefs._useParallelPadsForp3p4 = true;
     initDriverIndex();
 }
 MameConfig::~MameConfig()
@@ -120,8 +112,6 @@ int MameConfig::save()
         xml_add_child(confignode,pcf_roms, romslist.c_str());
     }
 
-    if(!_romsDir.empty()) xml_add_child(confignode,pcf_romsdir, _romsDir.c_str());
-    if(!_userDir.empty()) xml_add_child(confignode,pcf_userdir, _userDir.c_str());
 
     if(_activeDriver !=-1)
     {
@@ -133,12 +123,12 @@ int MameConfig::save()
         if(pn) xml_set_attribute_int(pn,"show",_listShowState);
     }
 
-    display = xml_add_child(confignode,pcf_display, NULL );
-    if(display)
-    {
-        if(_startWindowed) xml_add_child(confignode,pcf_startwindowed,NULL );
-        //if(_doubleWindow)  xml_add_child(confignode,pcf_doublewindow,NULL );
-    }
+//    display = xml_add_child(confignode,pcf_display, NULL );
+//    if(display)
+//    {
+//        if(_startWindowed) xml_add_child(confignode,pcf_startwindowed,NULL );
+//        //if(_doubleWindow)  xml_add_child(confignode,pcf_doublewindow,NULL );
+//    }
 
     /* flush the file */
     xml_file_write(root, file);
@@ -159,8 +149,8 @@ error:
 }
 void MameConfig::resettodefault()
 {
-    _userDir="PROGDIR:user";
-    _romsDir="PROGDIR:roms";
+    toDefault();
+
     _romsFound.clear();
     _romsFoundReverse.clear();
     _activeDriver =-1;
@@ -214,11 +204,11 @@ int MameConfig::load()
         initRomsFoundReverse();
     }
 
-    node = xml_get_sibling(confignode->child, pcf_romsdir);
-    if(node && node->value) _romsDir = node->value;
+//    node = xml_get_sibling(confignode->child, pcf_romsdir);
+//    if(node && node->value) _romsDir = node->value;
 
-    node = xml_get_sibling(confignode->child, pcf_userdir);
-    if(node && node->value) _userDir = node->value;
+//    node = xml_get_sibling(confignode->child, pcf_userdir);
+//    if(node && node->value) _userDir = node->value;
 
     node = xml_get_sibling(confignode->child, pcf_last);
     if(node && node->value) _activeDriver = _driverIndex.index(node->value);
@@ -228,15 +218,15 @@ int MameConfig::load()
     _listShowState = 0;
     if(node) _listShowState = xml_get_attribute_int(node,"show",0);
 
-    node = xml_get_sibling(confignode->child, pcf_display);
-    if(node)
-    {
-        xml_data_node *subnode= xml_get_sibling(node->child, pcf_startwindowed);
-        _startWindowed = (int)(subnode!=NULL);
-//        xml_data_node *subnode= xml_get_sibling(node->child, pcf_doublewindow);
-//
+//    node = xml_get_sibling(confignode->child, pcf_display);
+//    if(node)
+//    {
+//        xml_data_node *subnode= xml_get_sibling(node->child, pcf_startwindowed);
+//        _startWindowed = (int)(subnode!=NULL);
+////        xml_data_node *subnode= xml_get_sibling(node->child, pcf_doublewindow);
+////
 
-    }
+//    }
 
     xml_file_free(root);
 	mame_fclose(file);
@@ -254,7 +244,20 @@ void MameConfig::serialize(ASerializer &serializer)
     serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS);
     serializer("Paths",     (ASerializable&)_paths,0);
 }
+void MameConfig::toDefault()
+{
+    _audio._mode = 0;
+    _audio._freq = 22050;
 
+    _controls._PlayerPort[0]=2; _controls._PlayerPortType[0]=1;
+    _controls._PlayerPort[1]=0; _controls._PlayerPortType[0]=0;
+    _controls._PlayerPort[2]=0; _controls._PlayerPortType[0]=0;
+    _controls._PlayerPort[3]=0; _controls._PlayerPortType[0]=0;
+
+    _paths._romsPath = "PROGDIR:roms";
+    _paths._userPath = "PROGDIR:user";
+
+}
 
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
@@ -263,6 +266,8 @@ void MameConfig::Display::serialize(ASerializer &serializer)
 void MameConfig::Audio::serialize(ASerializer &serializer)
 {
     serializer("Mode",_mode,{"None","Paula","AHI"});
+    serializer("Frequency",_freq,0,22050);
+
 }
 void MameConfig::Controls::serialize(ASerializer &serializer)
 {
@@ -310,19 +315,6 @@ void MameConfig::init(int argc,char **argv)
 {
 
 }
-void MameConfig::setRomPath(const char *rompath)
-{
-    if(!rompath || *rompath==0)_romsDir = "PROGDIR:roms";
-    else { _romsDir = rompath; _romsDir = trimSlach(_romsDir); }
-    // todo send update
-
-}
-void MameConfig::setUserPath(const char *userpath)
-{
-    if(!userpath || *userpath==0) _userDir = "PROGDIR:user";
-     else { _userDir = userpath;  _userDir = trimSlach(_userDir); }
-    // todo send update
-}
 
 // extern const game_driver * const drivers[];
 void MameConfig::getDriverScreenModestring(const _game_driver *drv, std::string &screenid,int &video_attribs)
@@ -367,16 +359,16 @@ int MameConfig::initDriverIndex()
 
 int MameConfig::scanDrivers()
 {
-  printf(" *** ScanDrivers: _romsDir:%s\n", _romsDir.c_str());
+  printf(" *** ScanDrivers: _romsDir:%s\n", _paths._romsPath.c_str());
   _romsFound.clear();
-  if(_romsDir.empty()) return 0;
+  if(_paths._romsPath.empty()) return 0;
   printf(" *** ScanDrivers 1\n");
 
     struct FileInfoBlock *fib;
     fib = (struct FileInfoBlock *)AllocDosObject(DOS_FIB, NULL);
     if(!fib) return 0;
 
-    BPTR lock = Lock( _romsDir.c_str(), ACCESS_READ);
+    BPTR lock = Lock( _paths._romsPath.c_str(), ACCESS_READ);
     if(lock)
     {
         scanDriversRecurse(lock,fib);

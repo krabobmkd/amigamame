@@ -73,8 +73,8 @@ public:
     int scanDrivers();
     //int allDrivers();
     // - - path to main dirs --
-    const char *getUserDir() const {return _userDir.c_str(); }
-    const char *getRomsDir() const {return _romsDir.c_str(); }
+    const char *getUserDir() const {return _paths._userPath.c_str(); }
+    const char *getRomsDir() const {return _paths._romsPath.c_str(); }
 
     const std::vector<const _game_driver *const*> &romsFound() const { return _romsFound; };
     // do not keep that table...
@@ -87,20 +87,6 @@ public:
 
     // apply to mame options
     void applyToMameOptions(_global_options &mameOptions);
-
-    //  - - - -amiga ports related confs (ll is for lowlevel library) ---.
-    // playercontrols
-
-    struct Inputs {
-        // user defined use of ports. If NotAvail will use ll "autosense"
-//#define SJA_TYPE_AUTOSENSE 0
-//#define SJA_TYPE_GAMECTLR  1
-//#define SJA_TYPE_MOUSE	   2
-//#define SJA_TYPE_JOYSTK    3
-        int _lowlevelExplicitPortsType[4]; // lowlevel.library is said to manage 4 ports...
-        bool        _useParallelPadsForp3p4;
-    };
-    const Inputs &inputs() const { return _inputsprefs; }
 
     static void getDriverScreenModestring(const _game_driver *drv, std::string &screenid,int &video_attribs);
 
@@ -118,54 +104,39 @@ public:
     {
         void serialize(ASerializer &serializer) override;
         int _mode=0;
+        int _freq=0;
     };
 
     struct Controls : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
         int _PlayerPort[4],_PlayerPortType[4];
-        //int _Ports[7];
     };
 
     struct Paths : public ASerializable
     {
-        void serialize(ASerializer &serializer) override;
+        void serialize(ASerializer &serializer) override;        
         std::string _romsPath,_userPath;
     };
+
+    void toDefault();
 
 protected:
     int _NumDrivers; // in current linker mame driver list. Can be huge.
 
-    // - - -  paragraphs
+    // - - - configuration as serialized paragraphs.
     Display     _display;
     Audio       _audio;
     Controls    _controls;
     Paths       _paths;
 
-    // - - - prefs unique for app
-    std::string _userDir;
-    std::string _romsDir; // finally just use one, but a tested one.
-
-    int   _startWindowed; // else fullscreen.
-
-
     int     _activeDriver;
     int     _listShowState;
-
-    ULONG       _sampleRate;
-
-    int     _doubleWindow;
 
     ScreenConf _defaultscreenconf;
     // TODO video prefs, per video config
     // keys are like: "320x224x16"
     std::unordered_map<std::string,ScreenConf> _screenconfs;
-
-
-
-
-    //TODO
-    Inputs _inputsprefs;
 
     // name to current mame index to fasten dir search
     NameDriverMap _driverIndex;
