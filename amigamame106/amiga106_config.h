@@ -37,10 +37,11 @@ public:
 
     std::unordered_map<char,std::unordered_map<std::string,int>> _m;
 };
-
+/*
 struct ScreenConf {
      ULONG _modeID;
 };
+*/
 
 /** Main configuration.
  *  Mame106 core manage itself default and per driver configuration.
@@ -102,22 +103,19 @@ public:
     };
     enum class RotateMode :  int
     {
-        CgxDirectCpu,
-        CgxScalePixelArray,
-        WritePixelArray8,
-        GLShader
-        // "CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
+        Rot0,
+        Rot90,
+        Rot180,
+        Rot270
     };
     struct Display : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
-        // general
-        DrawEngine _drawEngine=0;
-        RotateMode _rotateMode=0;
+        DrawEngine _drawEngine = DrawEngine::CgxDirectCpu;
+        RotateMode _rotateMode = RotateMode::Rot0;
         bool _rotateOnlyVerticalGames=true;
-        // per screenmode:
-
     };
+    Display &display() { return _display; }
 
     struct Audio : public ASerializable
     {
@@ -125,18 +123,33 @@ public:
         int _mode=0;
         int _freq=0;
     };
+    Audio &display() { return _audio; }
+
+    enum class ControlPort :  int
+    {
+        None,
+        Port1llMouse,
+        Port2llJoy,
+        Port3ll,
+        Port4ll,
+        Para3,
+        Para4,
+        Para3Bt4
+    };
 
     struct Controls : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
-        int _PlayerPort[4],_PlayerPortType[4];
+        ControlPort _PlayerPort[4],_PlayerPortType[4];
     };
+    Controls &controls() { return _controls; }
 
     struct Paths : public ASerializable
     {
         void serialize(ASerializer &serializer) override;        
         std::string _romsPath,_userPath;
     };
+    Paths &paths() { return _paths; }
 
     void toDefault();
 
@@ -152,10 +165,10 @@ protected:
     int     _activeDriver;
     int     _listShowState;
 
-    ScreenConf _defaultscreenconf;
-    // TODO video prefs, per video config
-    // keys are like: "320x224x16"
-    std::unordered_map<std::string,ScreenConf> _screenconfs;
+//    ScreenConf _defaultscreenconf;
+//    // TODO video prefs, per video config
+//    // keys are like: "320x224x16"
+//    std::unordered_map<std::string,ScreenConf> _screenconfs;
 
     // name to current mame index to fasten dir search
     NameDriverMap _driverIndex;

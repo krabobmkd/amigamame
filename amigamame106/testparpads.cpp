@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     atexit(&close);
     g_pParPads = createParallelPads();
     ParallelPads *ppads = g_pParPads;
-Window
+
 
 
     if(!g_pParPads)

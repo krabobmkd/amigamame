@@ -116,6 +116,8 @@ void ConfigureLowLevelLib()
 
     printf("configure lowlevel\n");
 
+    MameConfig::Controls &configControls = getMainConfig().controls();
+
     // for correct autosense,
     for(int itest=0;itest<2;itest++)
     {
@@ -123,45 +125,51 @@ void ConfigureLowLevelLib()
         WaitTOF();
         WaitTOF();
     }
-
-    for(int iport=0;iport<4;iport++) // actually 2
+    bool useParallelExtension=false;
+    for(int iplayer=0;iplayer<4;iplayer++) // actually 2
     {
-        //int explicitConfType = inputConfig._lowlevelExplicitPortsType[iport];
-        ULONG state=SJA_TYPE_GAMECTLR;
-     //re   if(explicitConfType != SJA_TYPE_AUTOSENSE)
+        using cp = MameConfig::ControlPort;
+        cp controlPort = configControls._PlayerPort[iplayer];
+        int lowlevelState = configControls._PlayerPortType[iplayer];
+        if(lowlevelState<0) lowlevelState=0; // shouldnt
+        if(lowlevelState>3) lowlevelState=3; // shouldnt
+        if(controlPort == cp::Port1llMouse ||
+           controlPort == cp::Port2llJoy ||
+           controlPort == cp::Port3ll ||
+           controlPort == cp::Port4ll )
         {
-           // printf("iport:%d explicit\n",iport);
-            // explicit configuration, hopes it matches what's plugged.
-          //Re  SetJoyPortAttrs(iport,SJA_Type,explicitConfType);
-            SetJoyPortAttrs(iport,SJA_Type,SJA_TYPE_GAMECTLR);
-        }/* else
-        {   // autosense
-            state = ReadJoyPort(iport)>>28;
-            printf("iport:%d autosense:%d\n",iport,(int)state);
-        }*/
-//        if( iport<2)
-//        {
-//            if (state == SJA_TYPE_GAMECTLR ||
-//                state == SJA_TYPE_JOYSTK )
-//            {
-//            printf("iport:%d SCON_AddCreateKeys:\n",iport);
+            int iport = (int)controlPort -1; // 0->3
+            if(lowlevelState == SJA_TYPE_AUTOSENSE)
+            {
+                state = ReadJoyPort(iport)>>28;
+            } else
+            {
+                SetJoyPortAttrs(iport,SJA_Type,lowlevelState);
+            }
+        }
+        if(controlPort == cp::Para3 ||
+           controlPort == cp::Para4 ||
+           controlPort == cp::Para3Bt4 )
+        {
+            useParallelExtension = true;
+        }
 
-//            } else {
-//                printf("iport:%d SCON_RemCreateKeys:\n",iport);
-//                SystemControl(
-//                    SCON_RemCreateKeys,iport,
-//                    TAG_END,0);
-//            }
-//        }
-        llPortsTypes[iport] = state;
+    } // loop by player
 
-    }
+
     SystemControl(
         SCON_AddCreateKeys,0,
         SCON_AddCreateKeys,1,
 //        SCON_AddCreateKeys,2,
 //        SCON_AddCreateKeys,3,
         TAG_END,0);
+
+    // note: if needed
+    if(!g_pParallelPads && useParallelExtension)
+    {
+        g_pParallelPads = createParallelPads(); // could fail.
+    }
+
 
 }
 void CloseLowLevelLib()
@@ -191,11 +199,6 @@ void AllocInputs()
 
     rawkeymap.clear(); // will make the rawkey table again using conf.
 
-    // note: if needed
-    if(!g_pParallelPads)
-    {
-        g_pParallelPads = createParallelPads(); // could fail.
-    }
 
 
 }
@@ -535,6 +538,7 @@ void RawKeyMap::init()
 
         // and then CD32 pads in lowlevel.library state of the art
         // we consider mame port 1 is second port, port2 is mouse, then the 2 parallel ports
+        /*
         {"PAD0 BLUE",RAWKEY_PORT0_BUTTON_BLUE,JOYCODE_2_BUTTON2},
         {"PAD0 RED",RAWKEY_PORT0_BUTTON_RED,JOYCODE_2_BUTTON1},
         {"PAD0 YELLOW",RAWKEY_PORT0_BUTTON_YELLOW,JOYCODE_2_BUTTON3},
@@ -582,11 +586,44 @@ void RawKeyMap::init()
         {"PAD3 DOWN",RAWKEY_PORT3_JOY_DOWN,JOYCODE_4_DOWN},
         {"PAD3 LEFT",RAWKEY_PORT3_JOY_LEFT,JOYCODE_4_LEFT},
         {"PAD3 RIGHT",RAWKEY_PORT3_JOY_RIGHT,JOYCODE_4_RIGHT},
-
+        */
     };
-    // then add player to paddle according to conf.
+    // then add player to paddle according to conf.    
     // lowlevel send rawkeys for each CD32 pads.
+    {
+        MameConfig::Controls &configControls = getMainConfig().controls();
+        for(int iplayer=0;iplayer<4;iplayer++) // actually 2
+        {
+            using cp = MameConfig::ControlPort;
+            cp controlPort = configControls._PlayerPort[iplayer];
+            int lowlevelState = configControls._PlayerPortType[iplayer];
+            if(controlPort == cp::Port1llMouse ||
+               controlPort == cp::Port2llJoy ||
+               controlPort == cp::Port3ll ||
+               controlPort == cp::Port4ll )
+            {
+                int iport = (int)controlPort -1; // 0->3
+                //
+                TODO
+                vector<os_code_info> kbi2 =
+                {
+                {"PAD1 BLUE",RAWKEY_PORT1_BUTTON_BLUE,JOYCODE_1_BUTTON2},
+                {"PAD1 RED",RAWKEY_PORT1_BUTTON_RED,JOYCODE_1_BUTTON1},
+                {"PAD1 YELLOW",RAWKEY_PORT1_BUTTON_YELLOW,JOYCODE_1_BUTTON3},
+                {"PAD1 GREEN",RAWKEY_PORT1_BUTTON_GREEN,JOYCODE_1_BUTTON4},
+                {"PAD1 FORWARD",RAWKEY_PORT1_BUTTON_FORWARD,JOYCODE_1_BUTTON6},
+                {"PAD1 REVERSE",RAWKEY_PORT1_BUTTON_REVERSE,JOYCODE_1_BUTTON5},
+                {"PAD1 PLAY",RAWKEY_PORT1_BUTTON_PLAY,JOYCODE_1_START},
+                {"PAD1 UP",RAWKEY_PORT1_JOY_UP,JOYCODE_1_UP},
+                {"PAD1 DOWN",RAWKEY_PORT1_JOY_DOWN,JOYCODE_1_DOWN},
+                {"PAD1 LEFT",RAWKEY_PORT1_JOY_LEFT,JOYCODE_1_LEFT},
+                {"PAD1 RIGHT",RAWKEY_PORT1_JOY_RIGHT,JOYCODE_1_RIGHT}
+                };
 
+            } // end if lowlevel rawkey concerned
+        }
+
+    }
 
 
 

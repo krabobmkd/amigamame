@@ -226,9 +226,9 @@ void MameConfig::toDefault()
     _audio._freq = 22050;
 
     _controls._PlayerPort[0]=2; _controls._PlayerPortType[0]=1;
-    _controls._PlayerPort[1]=0; _controls._PlayerPortType[0]=0;
-    _controls._PlayerPort[2]=0; _controls._PlayerPortType[0]=0;
-    _controls._PlayerPort[3]=0; _controls._PlayerPortType[0]=0;
+    _controls._PlayerPort[1]=0; _controls._PlayerPortType[1]=0;
+    _controls._PlayerPort[2]=0; _controls._PlayerPortType[2]=0;
+    _controls._PlayerPort[3]=0; _controls._PlayerPortType[3]=0;
 
     _paths._romsPath = "PROGDIR:roms";
     _paths._userPath = "PROGDIR:user";
@@ -237,9 +237,9 @@ void MameConfig::toDefault()
 
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
-    serializer("Draw Engine",_drawEngine,{"CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
+    serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
     serializer("Rotate Vertical Games",_rotateOnlyVerticalGames);
-    serializer("Rotate",_rotateMode,{"None","+90°","180°","270°"});
+    serializer("Rotate",(int &)_rotateMode,{"None","+90°","180°","270°"});
 
     // todo per conf.
 
@@ -283,6 +283,15 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
     serializer("Type3", _PlayerPortType[2],controlerTypesLL);
     serializer("Player4", _PlayerPort[3],ports);
     serializer("Type4", _PlayerPortType[3],controlerTypesLL);
+
+//    strcomment c(
+//"Port 1->4 are managed by lowlevel.library\n"
+//"SMS 2 buttons pads & CD32 7bt can be used\n"
+//"on Amiga port 1&2,\n"
+//"Parallel port3&4 extension only have 1 bt\n"
+//"Poseidon USB can patch 4 USB pads on lowlevel\n"
+//                );
+//    serializer((const char *)NULL,c);
 
 }
 void MameConfig::Paths::serialize(ASerializer &serializer)
