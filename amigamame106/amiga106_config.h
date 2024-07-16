@@ -92,10 +92,29 @@ public:
 
     void serialize(ASerializer &serializer) override;
 
+    enum class DrawEngine :  int
+    {
+        CgxDirectCpu,
+        CgxScalePixelArray,
+        WritePixelArray8,
+        GLShader
+        // "CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
+    };
+    enum class RotateMode :  int
+    {
+        CgxDirectCpu,
+        CgxScalePixelArray,
+        WritePixelArray8,
+        GLShader
+        // "CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
+    };
     struct Display : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
         // general
+        DrawEngine _drawEngine=0;
+        RotateMode _rotateMode=0;
+        bool _rotateOnlyVerticalGames=true;
         // per screenmode:
 
     };

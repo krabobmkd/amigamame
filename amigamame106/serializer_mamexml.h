@@ -2,34 +2,39 @@
 #define KRB_SERIALIZER_MAMEXML_H_
 
 #include "serializer.h"
-
+#include <vector>
 
 extern "C" {
 struct _xml_data_node;
 typedef struct _xml_data_node xml_data_node;
 }
 
-struct xmlwriter : public ASerializer {
+struct XmlWriter : public ASerializer {
 	
-	xmlwriter(xml_data_node *rootnode);
+	XmlWriter(xml_data_node *rootnode);
     void operator()(const char *sMemberName, ASerializable &subconf, int flags=0) override;
     void operator()(const char *sMemberName, std::string &str,int flags=0) override;
     void operator()(const char *sMemberName, int &v, int min, int max) override;
     void operator()(const char *sMemberName, int &v,const std::vector<std::string> &values) override;
     void operator()(const char *sMemberName, bool &v) override;
-
-    xml_data_node *_rootnode;
+//    void operator()(const char *sMemberName,
+//            std::map<std::string,std::unique_ptr<ASerializable>> &confmap) override;
+    std::vector<xml_data_node *> _recursenode;
+    int                     _error;
 };
 
-struct xmlreader : public ASerializer {
+struct XmlReader : public ASerializer {
 	
-	xmlreader(xml_data_node *rootnode);
+	XmlReader(xml_data_node *rootnode);
     void operator()(const char *sMemberName, ASerializable &subconf, int flags=0) override;
     void operator()(const char *sMemberName, std::string &str,int flags) override;
     void operator()(const char *sMemberName, int &v, int min, int max) override;
     void operator()(const char *sMemberName, int &v,const std::vector<std::string> &values) override;
     void operator()(const char *sMemberName, bool &v) override;
-    xml_data_node *_rootnode;
+//    void operator()(const char *sMemberName,
+//            std::map<std::string,std::unique_ptr<ASerializable>> &confmap) override;
+    std::vector<xml_data_node *> _recursenode;
+    int                     _error;
 };
 
 #endif

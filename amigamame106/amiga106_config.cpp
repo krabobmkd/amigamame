@@ -16,6 +16,8 @@ extern "C" {
     #include <stdio.h>
 }
 
+#include "serializer_mamexml.h"
+
 using namespace std;
 
 inline const std::string trimSlach( std::string s) {
@@ -59,13 +61,13 @@ void MameConfig::setDriverListState(int listState)
 // xml ids must be all lowercase
 static const char *pcd_mame="mame";
 
-static const char *pcf_roms="roms";
-static const char *pcf_romsdir="romsdir";
-static const char *pcf_userdir="userdir";
+static const char *pcf_roms="roms"; // cached list of roms found.
+//static const char *pcf_romsdir="romsdir";
+//static const char *pcf_userdir="userdir";
 static const char *pcf_last="last";
 static const char *pcf_list="list";
-static const char *pcf_display="display";
-static const char *pcf_startwindowed="startwindowed";
+//static const char *pcf_display="display";
+//static const char *pcf_startwindowed="startwindowed";
 int MameConfig::save()
 {
     // note: got to save rom short name id, not driver index ! index evolve with compilation.
@@ -75,26 +77,20 @@ int MameConfig::save()
     xml_data_node *confignode;
     mame_file *file=NULL;
     xml_data_node *display;
-//    config_type *type;
 
     /* if we don't have a root, bail */
     if (!root)
         return 0;
 
     file = mame_fopen("main", 0, FILETYPE_CONFIG, 1);
-    if(!file)  goto error;
-
+    if(!file) {
+        xml_file_free(root);
+        return 0;
+    }
     /* create a config node */
     confignode = xml_add_child(root,pcd_mame, NULL);
-    if (!confignode)
-        goto error;
-    xml_set_attribute_int(confignode, "version", 1);
 
-    /* create a system node */
-   // systemnode = xml_add_child(confignode, "system", NULL);
-//    if (!systemnode)
-//        goto error;
- //   xml_set_attribute(confignode, "name","main" /*(which_type == CONFIG_TYPE_DEFAULT) ? "default" : Machine->gamedrv->name*/);
+    xml_set_attribute_int(confignode, "version", 1);
 
     // save known rom list
     if(_romsFound.size()>0)
@@ -123,12 +119,9 @@ int MameConfig::save()
         if(pn) xml_set_attribute_int(pn,"show",_listShowState);
     }
 
-//    display = xml_add_child(confignode,pcf_display, NULL );
-//    if(display)
-//    {
-//        if(_startWindowed) xml_add_child(confignode,pcf_startwindowed,NULL );
-//        //if(_doubleWindow)  xml_add_child(confignode,pcf_doublewindow,NULL );
-//    }
+    // - - - automatise serialized members:
+    XmlWriter xmlwriter(confignode);
+    serialize(xmlwriter);
 
     /* flush the file */
     xml_file_write(root, file);
@@ -139,13 +132,6 @@ int MameConfig::save()
     if(file) mame_fclose(file);
 
     return 1;
-
-error:
-    xml_file_free(root);
-    if(file) mame_fclose(file);
-    return 0;
-
-
 }
 void MameConfig::resettodefault()
 {
@@ -204,12 +190,6 @@ int MameConfig::load()
         initRomsFoundReverse();
     }
 
-//    node = xml_get_sibling(confignode->child, pcf_romsdir);
-//    if(node && node->value) _romsDir = node->value;
-
-//    node = xml_get_sibling(confignode->child, pcf_userdir);
-//    if(node && node->value) _userDir = node->value;
-
     node = xml_get_sibling(confignode->child, pcf_last);
     if(node && node->value) _activeDriver = _driverIndex.index(node->value);
 
@@ -218,15 +198,11 @@ int MameConfig::load()
     _listShowState = 0;
     if(node) _listShowState = xml_get_attribute_int(node,"show",0);
 
-//    node = xml_get_sibling(confignode->child, pcf_display);
-//    if(node)
-//    {
-//        xml_data_node *subnode= xml_get_sibling(node->child, pcf_startwindowed);
-//        _startWindowed = (int)(subnode!=NULL);
-////        xml_data_node *subnode= xml_get_sibling(node->child, pcf_doublewindow);
-////
-
-//    }
+    // - - - automatise serialized members, same way as write:
+    {
+        XmlReader xmlreader(confignode);
+        serialize(xmlreader);
+    }
 
     xml_file_free(root);
 	mame_fclose(file);
@@ -261,6 +237,11 @@ void MameConfig::toDefault()
 
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
+    serializer("Draw Engine",_drawEngine,{"CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
+    serializer("Rotate Vertical Games",_rotateOnlyVerticalGames);
+    serializer("Rotate",_rotateMode,{"None","+90°","180°","270°"});
+
+    // todo per conf.
 
 }
 void MameConfig::Audio::serialize(ASerializer &serializer)
