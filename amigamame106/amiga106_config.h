@@ -123,7 +123,7 @@ public:
         int _mode=0;
         int _freq=0;
     };
-    Audio &display() { return _audio; }
+    Audio &audio() { return _audio; }
 
     enum class ControlPort :  int
     {
@@ -140,7 +140,8 @@ public:
     struct Controls : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
-        ControlPort _PlayerPort[4],_PlayerPortType[4];
+        ControlPort _PlayerPort[4];
+        int _PlayerPortType[4];
     };
     Controls &controls() { return _controls; }
 

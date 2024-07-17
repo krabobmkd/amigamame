@@ -19,6 +19,8 @@ option(AMIGA_USE_68060 " use 68060" ON)
 
 option(COMPILE_TESTS " compile extra dev tools/ test units" ON)
 
+
+
 # get current git branch id
 execute_process(
   COMMAND git rev-parse --abbrev-ref HEAD
@@ -53,8 +55,11 @@ if(AMIGA)
 	endif()
 
 endif()
-#add_compile_options( -mhard-float -ffast-math )
-#add_link_options( -mhard-float -ffast-math)
+
+# test -fsingle-precision-constant
+# test -mpc32
+list(APPEND AMIGA_COMPILER_OPTIONS -fsingle-precision-constant )
+
 set(COMMONLIBS "../../amigacommonlibs")
 
 add_subdirectory(../mame106 MameLib)

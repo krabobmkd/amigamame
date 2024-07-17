@@ -113,7 +113,19 @@ void directDrawScaleClutT(directDrawScreen *screen ,
                 LONG w ,
                 LONG h ,
                 CLUTTYPE *lut
+                ,int swapflags
             );
+
+template<typename SCREENPIXTYPE,typename CLUTTYPE>
+void directDrawScaleClutTSwapXY(directDrawScreen *screen ,
+                directDrawSource *source, // mame boitmap, not swapped.
+                LONG x1 , // final dest screen, already swapped.
+                LONG y1 ,
+                LONG w , // final dest screen, already swapped.
+                LONG h ,
+                CLUTTYPE *lut
+            );
+
 
 Paletted_CGX::Paletted_CGX(const _osd_create_params *params, int screenPixFmt, int bytesPerPix)
     : _needFirstRemap(1), _pixFmt(screenPixFmt),_bytesPerPix(bytesPerPix)
@@ -424,7 +436,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             {
                 directDrawScaleClutT<UWORD,UWORD>(&ddscreen,&ddsource,0,0,
                     _width,_height,
-                pRemap->_clut16.data());
+                pRemap->_clut16.data(),0);
             } else
             {
                 directDrawClut16(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut16.data());
@@ -437,7 +449,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             // -> now tested by tricking
             directDrawScaleClutT<type24,ULONG>(&ddscreen,&ddsource,0,0,
                 _width,_height,
-            pRemap->_clut32.data());
+            pRemap->_clut32.data(),0);
         }
              break;
          case PIXFMT_ARGB32:case PIXFMT_BGRA32:case PIXFMT_RGBA32:
@@ -447,7 +459,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             {
                 directDrawScaleClutT<ULONG,ULONG>(&ddscreen,&ddsource,0,0,
                     _width,_height,
-                pRemap->_clut32.data());
+                pRemap->_clut32.data(),0);
             } else
             {
 
@@ -871,7 +883,8 @@ void directDrawScaleClutT(directDrawScreen *screen ,
                 LONG y1 ,
                 LONG w ,
                 LONG h ,
-                CLUTTYPE *lut
+                CLUTTYPE *lut,
+                int swapFlags
             )
 {
     UWORD wsobpr = source->_bpr>>1;

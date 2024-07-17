@@ -225,10 +225,11 @@ void MameConfig::toDefault()
     _audio._mode = 0;
     _audio._freq = 22050;
 
-    _controls._PlayerPort[0]=2; _controls._PlayerPortType[0]=1;
-    _controls._PlayerPort[1]=0; _controls._PlayerPortType[1]=0;
-    _controls._PlayerPort[2]=0; _controls._PlayerPortType[2]=0;
-    _controls._PlayerPort[3]=0; _controls._PlayerPortType[3]=0;
+    _controls._PlayerPort[0]=ControlPort::Port2llJoy;
+        _controls._PlayerPortType[0]=1;
+    _controls._PlayerPort[1]=ControlPort::None; _controls._PlayerPortType[1]=0;
+    _controls._PlayerPort[2]=ControlPort::None; _controls._PlayerPortType[2]=0;
+    _controls._PlayerPort[3]=ControlPort::None; _controls._PlayerPortType[3]=0;
 
     _paths._romsPath = "PROGDIR:roms";
     _paths._userPath = "PROGDIR:user";
@@ -275,13 +276,13 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         "Mouse",
         "Joystick(2bt)",
     };
-    serializer("Player1", _PlayerPort[0],ports);
+    serializer("Player1", (int&)_PlayerPort[0],ports);
     serializer("Type1", _PlayerPortType[0],controlerTypesLL);
-    serializer("Player2", _PlayerPort[1],ports);
+    serializer("Player2",  (int&)_PlayerPort[1],ports);
     serializer("Type2", _PlayerPortType[1],controlerTypesLL);
-    serializer("Player3", _PlayerPort[2],ports);
+    serializer("Player3", (int&) _PlayerPort[2],ports);
     serializer("Type3", _PlayerPortType[2],controlerTypesLL);
-    serializer("Player4", _PlayerPort[3],ports);
+    serializer("Player4", (int&) _PlayerPort[3],ports);
     serializer("Type4", _PlayerPortType[3],controlerTypesLL);
 
 //    strcomment c(

@@ -130,7 +130,7 @@ void ConfigureLowLevelLib()
     {
         using cp = MameConfig::ControlPort;
         cp controlPort = configControls._PlayerPort[iplayer];
-        int lowlevelState = configControls._PlayerPortType[iplayer];
+        int lowlevelState = (int)configControls._PlayerPortType[iplayer];
         if(lowlevelState<0) lowlevelState=0; // shouldnt
         if(lowlevelState>3) lowlevelState=3; // shouldnt
         if(controlPort == cp::Port1llMouse ||
@@ -141,7 +141,8 @@ void ConfigureLowLevelLib()
             int iport = (int)controlPort -1; // 0->3
             if(lowlevelState == SJA_TYPE_AUTOSENSE)
             {
-                state = ReadJoyPort(iport)>>28;
+                ULONG state = ReadJoyPort(iport)>>28;
+
             } else
             {
                 SetJoyPortAttrs(iport,SJA_Type,lowlevelState);
@@ -452,8 +453,63 @@ inline unsigned int nameToMameKeyEnum(std::string &s)
 
     return CODE_OTHER_DIGITAL;
 }
-// - - - keyboard keymap management
+// strings kept static, more easy and safe to refer.
+static const char * const padsbtnames[4][11]={
+    {
+        "PAD0 BLUE",
+        "PAD0 RED",
+        "PAD0 YELLOW",
+        "PAD0 GREEN",
+        "PAD0 FORWARD",
+        "PAD0 REVERSE",
+        "PAD0 PLAY",
+        "PAD0 UP",
+        "PAD0 DOWN",
+        "PAD0 LEFT",
+        "PAD0 RIGHT"
+    },
+    {
+        "PAD1 BLUE",
+        "PAD1 RED",
+        "PAD1 YELLOW",
+        "PAD1 GREEN",
+        "PAD1 FORWARD",
+        "PAD1 REVERSE",
+        "PAD1 PLAY",
+        "PAD1 UP",
+        "PAD1 DOWN",
+        "PAD1 LEFT",
+        "PAD1 RIGHT"
+    },
+    {
+        "PAD2 BLUE",
+        "PAD2 RED",
+        "PAD2 YELLOW",
+        "PAD2 GREEN",
+        "PAD2 FORWARD",
+        "PAD2 REVERSE",
+        "PAD2 PLAY",
+        "PAD2 UP",
+        "PAD2 DOWN",
+        "PAD2 LEFT",
+        "PAD2 RIGHT"
+    },
+    {
+        "PAD3 BLUE",
+        "PAD3 RED",
+        "PAD3 YELLOW",
+        "PAD3 GREEN",
+        "PAD3 FORWARD",
+        "PAD3 REVERSE",
+        "PAD3 PLAY",
+        "PAD3 UP",
+        "PAD3 DOWN",
+        "PAD3 LEFT",
+        "PAD3 RIGHT"
+    }
+};
 
+// - - - keyboard keymap management
 void RawKeyMap::init()
 {
    _keymap_inited = true;
@@ -596,31 +652,61 @@ void RawKeyMap::init()
         {
             using cp = MameConfig::ControlPort;
             cp controlPort = configControls._PlayerPort[iplayer];
-            int lowlevelState = configControls._PlayerPortType[iplayer];
+            int lowlevelState = (int) configControls._PlayerPortType[iplayer];
             if(controlPort == cp::Port1llMouse ||
                controlPort == cp::Port2llJoy ||
                controlPort == cp::Port3ll ||
                controlPort == cp::Port4ll )
             {
                 int iport = (int)controlPort -1; // 0->3
-                //
-                TODO
-                vector<os_code_info> kbi2 =
-                {
-                {"PAD1 BLUE",RAWKEY_PORT1_BUTTON_BLUE,JOYCODE_1_BUTTON2},
-                {"PAD1 RED",RAWKEY_PORT1_BUTTON_RED,JOYCODE_1_BUTTON1},
-                {"PAD1 YELLOW",RAWKEY_PORT1_BUTTON_YELLOW,JOYCODE_1_BUTTON3},
-                {"PAD1 GREEN",RAWKEY_PORT1_BUTTON_GREEN,JOYCODE_1_BUTTON4},
-                {"PAD1 FORWARD",RAWKEY_PORT1_BUTTON_FORWARD,JOYCODE_1_BUTTON6},
-                {"PAD1 REVERSE",RAWKEY_PORT1_BUTTON_REVERSE,JOYCODE_1_BUTTON5},
-                {"PAD1 PLAY",RAWKEY_PORT1_BUTTON_PLAY,JOYCODE_1_START},
-                {"PAD1 UP",RAWKEY_PORT1_JOY_UP,JOYCODE_1_UP},
-                {"PAD1 DOWN",RAWKEY_PORT1_JOY_DOWN,JOYCODE_1_DOWN},
-                {"PAD1 LEFT",RAWKEY_PORT1_JOY_LEFT,JOYCODE_1_LEFT},
-                {"PAD1 RIGHT",RAWKEY_PORT1_JOY_RIGHT,JOYCODE_1_RIGHT}
+                int ipshft = iport<<8;
+                const int mamecodeshift =
+                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
+
+              vector<os_code_info> kbi2={
+                {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
+                {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
+                {padsbtnames[iport][2],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
+                {padsbtnames[iport][3],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
+                {padsbtnames[iport][4],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
+                {padsbtnames[iport][5],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
+                {padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
+                {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
+                {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
+                {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
+                {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
                 };
+                _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
 
             } // end if lowlevel rawkey concerned
+            // if parralel port hacks as port 3 and 4.
+           if(controlPort == cp::Para3 ||
+               controlPort == cp::Para4 ||
+               controlPort == cp::Para3Bt4 )
+            {
+                int iport = 2;
+                if(controlPort == cp::Para4) iport=3;
+                int ipshft = iport<<8;
+                const int mamecodeshift =
+                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
+
+            // can only manage 1 or 2 bt pads here...
+              vector<os_code_info> kbi2={
+                {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
+                {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
+                //{padsbtnames[iport][2],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
+                //{padsbtnames[iport][3],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
+                //{padsbtnames[iport][4],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
+                //{padsbtnames[iport][5],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
+                //{padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
+                {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
+                {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
+                {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
+                {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
+                };
+                _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
+
+            } // end if parallel port hacks concerned.
         }
 
     }
