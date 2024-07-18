@@ -240,7 +240,7 @@ void MameConfig::Display::serialize(ASerializer &serializer)
 {
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
     serializer("Rotate Vertical Games",_rotateOnlyVerticalGames);
-    serializer("Rotate",(int &)_rotateMode,{"None","+90°","180°","270°"});
+    serializer("Rotate",(int &)_rotateMode,{"None","+90","+180","-90"});
 
     // todo per conf.
 

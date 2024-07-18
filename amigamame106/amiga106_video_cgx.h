@@ -55,6 +55,7 @@ protected:
     int _width,_height;
     int _dx,_dy; // draw delta (for windows borders)
     int _useScale;
+    int _video_attributes;
     virtual BitMap *bitmap() = 0;
 };
 
@@ -113,7 +114,7 @@ public:
     void open(const _osd_create_params *params,int window, ULONG forcedModeID=~0) override;
     void close() override;
     int good() override;
-    void draw(_mame_display *pmame_display) override;    
+    void draw(_mame_display *pmame_display) override;
     MsgPort *userPort() override;
 //    RastPort *rastPort() override;
     int switchFullscreen() override;

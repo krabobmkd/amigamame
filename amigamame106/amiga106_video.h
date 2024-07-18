@@ -31,7 +31,7 @@ public:
     virtual void WaitFrame() = 0; // either WaitTTOF or Wait beam
 protected:
 };
-
+// experimental trick for leds -> not done
 class ExtraBitmap
 {
 public:

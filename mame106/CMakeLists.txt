@@ -75,21 +75,6 @@ set(MAME_CORE_SRC
 
 set(MAME_INCLUDE_DIRS "src" "../amigamame106" "." "./includes" ${EXPATPATH})
 
-#add_library( mamecore STATIC ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}
-#							  )
-#set_property(TARGET mamecore PROPERTY C_STANDARD 11)
-#set_property(TARGET mamecore PROPERTY CXX_STANDARD 11)
-#target_include_directories(mamecore PUBLIC ${MAME_INCLUDE_DIRS} ${ZLIBPATH} )
-#set(MAME_INLINE "static inline")
-#target_compile_definitions(mamecore PRIVATE INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
-##if(MAME_USE_HARDFLOAT)
-##	target_compile_definitions(mamecore PUBLIC MAME_USE_HARD_FLOAT=1 )
-##endif()
-## -fpermissive
-#message(WARNING "mamecore compiled with options:")
-#target_compile_options(mamecore PRIVATE -O0 ${AMIGA_COMPILER_OPTIONS} )
-
-
 #replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaic16.c" "vidhrdw/segaic16_krb.c")
 #replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaorun.c" "vidhrdw/segaorun_krb.c")
 #replace_list_item(MAME_CORE_SRC "usrintrf.c" "usrintrf_krb.c")

@@ -19,7 +19,7 @@ option(AMIGA_USE_68060 " use 68060" ON)
 
 option(COMPILE_TESTS " compile extra dev tools/ test units" ON)
 
-
+set(MAME_INLINE "static inline")
 
 # get current git branch id
 execute_process(
@@ -58,7 +58,7 @@ endif()
 
 # test -fsingle-precision-constant
 # test -mpc32
-list(APPEND AMIGA_COMPILER_OPTIONS -fsingle-precision-constant )
+#list(APPEND AMIGA_COMPILER_OPTIONS -fsingle-precision-constant )
 
 set(COMMONLIBS "../../amigacommonlibs")
 
@@ -66,9 +66,6 @@ add_subdirectory(../mame106 MameLib)
 
 set(AMIGA_SRC
 	main.cpp
-
-	gui_mui.cpp
-	gui_gadtools.cpp
 	amiga106.cpp
 	amiga106_audiostream.cpp
 	amiga106_filesystem.cpp
@@ -80,15 +77,27 @@ set(AMIGA_SRC
 #	amiga106_video_p96.cpp
 #	amiga106_video_aga.h
 #	amiga106_video_aga.cpp
+	amiga106_video_cgx.h
+	amiga106_video_cgx.cpp
+	amiga106_inputs.h
+	amiga106_inputs.cpp
+	amiga_locale.h
 	amiga_locale.cpp
 
-	${COMMONLIBS}/libserializer/serializer_mui.cpp
-	${COMMONLIBS}/libserializer/serializer_mui.h
-	audio.h
+	amiga_parallelpads.h
+	amiga_parallelpads.c
 
-	amiga_locale.h
-	gui_mui.h
-	gui_gadtools.h
+
+	serializer_mamexml.cpp
+	serializer_mamexml.h
+	audio.h
+		${COMMONLIBS}/libserializer/serializer.h
+		${COMMONLIBS}/libserializer/serializer_mui.h
+		${COMMONLIBS}/libserializer/serializer_mui.cpp
+		gui_gadtools.h
+		gui_gadtools.cpp
+
+
 	mame_ver.h
 	mame_msg.h
 
@@ -102,30 +111,24 @@ set(AMIGA_SRC
 #	cgxhooks.h
 #	cgxhooks_re.s
 	)
-# - - -have some Amiga code using O2
-	add_library(Mame106AmigaO2 STATIC
-		amiga106_video_cgx.h
-		amiga106_video_cgx.cpp
+# - - -have some Amiga code using O0
+	add_library(Mame106AmigaO0 STATIC
 
-		amiga106_inputs.h
-		amiga106_inputs.cpp
-
-		amiga_parallelpads.h
-		amiga_parallelpads.c
-
-		${COMMONLIBS}/libserializer/serializer.h
-		serializer_mamexml.cpp
-		serializer_mamexml.h
+		gui_mui.h
+		gui_mui.cpp
 
 	)
-	set_property(TARGET Mame106AmigaO2 PROPERTY C_STANDARD 11)
-	set_property(TARGET Mame106AmigaO2 PROPERTY CXX_STANDARD 11)
+	set_property(TARGET Mame106AmigaO0 PROPERTY C_STANDARD 11)
+	set_property(TARGET Mame106AmigaO0 PROPERTY CXX_STANDARD 11)
 	if(MAME_USE_HARDFLOAT)
-		target_compile_definitions(Mame106AmigaO2 PRIVATE MAME_USE_HARD_FLOAT=1 )
+		target_compile_definitions(Mame106AmigaO0 PRIVATE MAME_USE_HARD_FLOAT=1 )
 	endif()
-	target_include_directories(Mame106AmigaO2 PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
-	target_compile_options(Mame106AmigaO2 PRIVATE -O2 ${AMIGA_COMPILER_OPTIONS} )
-target_include_directories(Mame106AmigaO2 PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
+	target_include_directories(Mame106AmigaO0 PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
+	target_compile_options(Mame106AmigaO0 PRIVATE -O0 ${AMIGA_COMPILER_OPTIONS} )
+	target_include_directories(Mame106AmigaO0 PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
+	# those for mame includes
+	target_compile_definitions(Mame106AmigaO0 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
+
 # - - - -
 
 set(PROGNAME Mame106)
@@ -137,7 +140,7 @@ if(MAME_USE_HARDFLOAT)
 	target_compile_definitions(${PROGNAME} PRIVATE MAME_USE_HARD_FLOAT=1 )
 endif()
 # the static libs that are part eof this repo:
-target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO2 mamecoreO2 z expat)
+target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO0 mamecoreO2 z expat)
 
 # target_include_directories(${PROGNAME} PUBLIC "../mame037b/src")
 target_include_directories(${PROGNAME} PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
@@ -146,10 +149,10 @@ target_include_directories(${PROGNAME} PUBLIC "../mame106" "${COMMONLIBS}/libser
 target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
 target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/P96/include")
 
-# the MUI code doesn't support -O1 and -O2
-target_compile_options(${PROGNAME} PRIVATE -O0 -Wno-narrowing ${AMIGA_COMPILER_OPTIONS} )
+# sources that doesn't support -O2 are moved to MameXAmigaO0 lib
+target_compile_options(${PROGNAME} PRIVATE -O2 -Wno-narrowing ${AMIGA_COMPILER_OPTIONS} )
 
-target_link_options(${PROGNAME} PRIVATE -O0 -s ${AMIGA_COMPILER_OPTIONS})
+target_link_options(${PROGNAME} PRIVATE -s ${AMIGA_COMPILER_OPTIONS})
 
 # add_executable(cgxhooktest cgxhookstest.c cgxhooks.c cgxhooks.h )
 # set_property(TARGET cgxhooktest PROPERTY C_STANDARD 11)

@@ -31,6 +31,19 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
+// from driver.h
+#ifndef ORIENTATION_MASK
+    #define ORIENTATION_MASK        		0x0007
+    #define	ORIENTATION_FLIP_X				0x0001	/* mirror everything in the X direction */
+    #define	ORIENTATION_FLIP_Y				0x0002	/* mirror everything in the Y direction */
+    #define ORIENTATION_SWAP_XY				0x0004	/* mirror along the top-left/bottom-right diagonal */
+
+    #define	ROT0							0
+    #define	ROT90							(ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X)	/* rotate clockwise 90 degrees */
+    #define	ROT180							(ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y)	/* rotate 180 degrees */
+    #define	ROT270							(ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y)	/* rotate counter-clockwise 90 degrees */
+#endif
+
 //static void waitsec(int s)
 //{
 //    for(int j=0;j<s;j++)
@@ -123,7 +136,8 @@ void directDrawScaleClutTSwapXY(directDrawScreen *screen ,
                 LONG y1 ,
                 LONG w , // final dest screen, already swapped.
                 LONG h ,
-                CLUTTYPE *lut
+                CLUTTYPE *lut,
+                int swapflags
             );
 
 
@@ -367,6 +381,7 @@ void Paletted_CGX::updatePaletteRemap(_mame_display *display)
 IntuitionDrawable::IntuitionDrawable()
 
 : _PixelFmt(0),_PixelBytes(0),_width(0),_height(0),_dx(0),_dy(0),_useScale(0)
+, _video_attributes(0)
 {
 }
 IntuitionDrawable::~IntuitionDrawable()
@@ -436,7 +451,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             {
                 directDrawScaleClutT<UWORD,UWORD>(&ddscreen,&ddsource,0,0,
                     _width,_height,
-                pRemap->_clut16.data(),0);
+                pRemap->_clut16.data(),_video_attributes);
             } else
             {
                 directDrawClut16(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut16.data());
@@ -449,7 +464,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             // -> now tested by tricking
             directDrawScaleClutT<type24,ULONG>(&ddscreen,&ddsource,0,0,
                 _width,_height,
-            pRemap->_clut32.data(),0);
+            pRemap->_clut32.data(),_video_attributes);
         }
              break;
          case PIXFMT_ARGB32:case PIXFMT_BGRA32:case PIXFMT_RGBA32:
@@ -459,7 +474,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             {
                 directDrawScaleClutT<ULONG,ULONG>(&ddscreen,&ddsource,0,0,
                     _width,_height,
-                pRemap->_clut32.data(),0);
+                pRemap->_clut32.data(),_video_attributes);
             } else
             {
 
@@ -504,6 +519,7 @@ Intuition_Screen::Intuition_Screen(const _osd_create_params *params,ULONG forced
     , _fullscreenHeight(0)
     , _pMouseRaster(NULL)
 {
+    _video_attributes = params->video_attributes;
     // may get mode from Cybergraphics...
     if(CyberGfxBase)
     {
@@ -624,7 +640,9 @@ Intuition_Window::Intuition_Window(const _osd_create_params *params) : Intuition
     , _sWbWinSBitmap(NULL)
     , _machineWidth(params->width),_machineHeight(params->height)
     , _maxzoomfactor(1)
-{}
+{
+    _video_attributes = params->video_attributes;
+}
 Intuition_Window::~Intuition_Window()
 {
     close();
@@ -750,10 +768,6 @@ Intuition_ScaleWindow::Intuition_ScaleWindow(const _osd_create_params *params)
     _useScale = 1;
 }
 Intuition_ScaleWindow::~Intuition_ScaleWindow() {}
-//void Intuition_ScaleWindow::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pRemap)
-//{
-
-//}
 
 // ----------------------- end scalable
 Display_CGX::Display_CGX()
@@ -845,11 +859,7 @@ MsgPort *Display_CGX::userPort()
     if(!_drawable) return NULL;
     return _drawable->userPort();
 }
-//RastPort *Display_CGX::rastPort()
-//{
-//    if(!_drawable) return NULL;
-//    return _drawable->rastPort();
-//}
+
 void Display_CGX::WaitFrame()
 {
 //    RastPort *rp = _drawable->rastPort();
@@ -863,19 +873,6 @@ void Display_CGX::WaitFrame()
 
 }
 
-/*
-struct directDrawScreen {
-    void *_base;
-    ULONG _bpr;
-    WORD _clipX1,_clipY1,_clipX2,_clipY2;
-};
-struct directDrawSource {
-    void *_base;
-    ULONG _bpr;
-    WORD _x1,_y1,_x2,_y2; // to be drawn.
-};
-*/
-
 template<typename SCREENPIXTYPE,typename CLUTTYPE>
 void directDrawScaleClutT(directDrawScreen *screen ,
                 directDrawSource *source,
@@ -888,9 +885,7 @@ void directDrawScaleClutT(directDrawScreen *screen ,
             )
 {
     UWORD wsobpr = source->_bpr>>1;
-   // UWORD wscbpr = screen->_bpr>>2;
     UWORD wscbpr = screen->_bpr/sizeof(SCREENPIXTYPE);
-
 
     UWORD *psourcebm = (UWORD *)source->_base;
     psourcebm += (source->_y1 * wsobpr) + source->_x1;
@@ -906,25 +901,19 @@ void directDrawScaleClutT(directDrawScreen *screen ,
     LONG addw = (sourceWidth<<16)/w;
     LONG addh = (sourceHeight<<16)/h;
 
-#ifdef OKFIRSTVERSION
-
-    LONG vh = 0;
-    for(LONG hh=0;hh<h;hh++)
-    {
-        LONG vx = 0;
-        UWORD *psoline = psourcebm + wsobpr*(vh>>16);
-        SCREENPIXTYPE *pscline = pscreenbm;
-        for(LONG ww=0;ww<w;ww++)
-        {
-            *pscline++ = lut[psoline[vx>>16]];
-            vx += addw;
-        }
-        vh += addh;
-        pscreenbm += wscbpr;
-    }
-#else
     // version that tries to do many consecutive lines when they are the same.
     LONG vh = 0;
+    LONG vxStart = 0;
+   if(swapFlags & ORIENTATION_FLIP_Y)
+    {
+        vh = (sourceHeight<<16)-1;
+        addh = -addh;
+    }
+    if(swapFlags & ORIENTATION_FLIP_X)
+    {
+        vxStart = (sourceWidth<<16)-1;
+        addw = -addw;
+    }
     for(LONG hh=0;hh<h;)
     {
         // test if the 3 consecutives lines are the same
@@ -934,7 +923,7 @@ void directDrawScaleClutT(directDrawScreen *screen ,
         if(psoline == psoline3) // means 3 lines are the same.
         {
             SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = 0;
+            LONG vx = vxStart;
             for(LONG ww=0;ww<w;ww++)
             {
                 *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = lut[psoline[(WORD)(vx>>16)]];
@@ -947,7 +936,7 @@ void directDrawScaleClutT(directDrawScreen *screen ,
         } else if(psoline == psoline2) // means 2 lines are the same.
         {
             SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = 0;
+            LONG vx = vxStart;
             for(LONG ww=0;ww<w;ww++)
             {
                 *pscline = pscline[wscbpr] = lut[psoline[(WORD)(vx>>16)]];
@@ -961,7 +950,7 @@ void directDrawScaleClutT(directDrawScreen *screen ,
         {
             // other do normal one line ...
             SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = 0;
+            LONG vx = vxStart;
             for(LONG ww=0;ww<w;ww++)
             {
                 *pscline++ = lut[psoline[(WORD)(vx>>16)]];
@@ -974,200 +963,4 @@ void directDrawScaleClutT(directDrawScreen *screen ,
 
     }
 
-#endif
 }
-
-//void directDrawScaleClut16(directDrawScreen *screen ,
-//                directDrawSource *source,
-//                LONG x1 ,
-//                LONG y1 ,
-//                LONG w ,
-//                LONG h ,
-//                UWORD *lut
-//            )
-//{
-//    UWORD wsobpr = source->_bpr>>1;
-//    UWORD wscbpr = screen->_bpr>>1;
-
-//    UWORD *psourcebm = (UWORD *)source->_base;
-//    psourcebm += (source->_y1 * wsobpr) + source->_x1;
-
-//    UWORD *pscreenbm = (UWORD *)screen->_base;
-//    pscreenbm += (y1 * wscbpr) + x1;
-
-//    LONG sourceHeight = source->_y2 - source->_y1;
-//    if(sourceHeight<=0) return;
-
-//    LONG sourceWidth = source->_x2 - source->_x1;
-//    if(sourceWidth<=0) return;
-
-//    LONG addw = (sourceWidth<<16)/w;
-//    LONG addh = (sourceHeight<<16)/h;
-
-//#ifdef OKFIRSTVERSION
-//    LONG vh = 0;
-//    for(LONG hh=0;hh<h;hh++)
-//    {
-//        LONG vx = 0;
-//        UWORD *psoline = psourcebm + wsobpr*(vh>>16);
-//        UWORD *pscline = pscreenbm;
-//        for(LONG ww=0;ww<w;ww++)
-//        {
-//            *pscline++ = lut[psoline[vx>>16]];
-//            vx += addw;
-//        }
-//        vh += addh;
-//        pscreenbm += wscbpr;
-//    }
-//#else
-//    // version that tries to do many consecutive lines when they are the same.
-//    LONG vh = 0;
-//    for(LONG hh=0;hh<h;hh++)
-//    {
-//        // test if the 3 conecutives lines are the same
-//        UWORD *psoline = psourcebm + wsobpr*(vh>>16);
-//        UWORD *psoline2 = psourcebm + wsobpr*((vh+addh)>>16);
-//        UWORD *psoline3 = psourcebm + wsobpr*((vh+addh+addh)>>16);
-//        if(psoline == psoline3) // means 3 lines are the same.
-//        {
-//            UWORD *pscline = pscreenbm;
-//            LONG vx = 0;
-//            for(LONG ww=0;ww<w;ww++)
-//            {
-//                *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = lut[psoline[vx>>16]];
-//                pscline++;
-//                vx += addw;
-//            }
-//            vh += addh*3;
-//            pscreenbm += wscbpr*3;
-//            hh +=2;
-//        } else if(psoline == psoline2) // means 2 lines are the same.
-//        {
-//            ULONG *pscline = pscreenbm;
-//            LONG vx = 0;
-//            for(LONG ww=0;ww<w;ww++)
-//            {
-//                *pscline = pscline[wscbpr] = lut[psoline[vx>>16]];
-//                pscline++;
-//                vx += addw;
-//            }
-//            vh += addh<<1;
-//            pscreenbm += wscbpr<<1;
-//            hh++;
-//        } else
-//        {
-//            // other do normal one line ...
-//            ULONG *pscline = pscreenbm;
-//            LONG vx = 0;
-//            for(LONG ww=0;ww<w;ww++)
-//            {
-//                *pscline++ = lut[psoline[vx>>16]];
-//                vx += addw;
-//            }
-//            vh += addh;
-//            pscreenbm += wscbpr;
-//        }
-
-//    }
-
-//#endif
-//}
-
-
-
-//void directDrawScaleClut32(directDrawScreen *screen ,
-//                directDrawSource *source,
-//                LONG x1 ,
-//                LONG y1 ,
-//                LONG w ,
-//                LONG h ,
-//                ULONG *lut
-//            )
-//{
-//    UWORD wsobpr = source->_bpr>>1;
-//    UWORD wscbpr = screen->_bpr>>2;
-
-//    UWORD *psourcebm = (UWORD *)source->_base;
-//    psourcebm += (source->_y1 * wsobpr) + source->_x1;
-
-//    ULONG *pscreenbm = (ULONG *)screen->_base;
-//    pscreenbm += (y1 * wscbpr) + x1;
-
-//    LONG sourceHeight = source->_y2 - source->_y1;
-//    if(sourceHeight<=0) return;
-
-//    LONG sourceWidth = source->_x2 - source->_x1;
-//    if(sourceWidth<=0) return;
-//    LONG addw = (sourceWidth<<16)/w;
-//    LONG addh = (sourceHeight<<16)/h;
-
-//#ifdef OKFIRSTVERSION
-
-//    LONG vh = 0;
-//    for(LONG hh=0;hh<h;hh++)
-//    {
-//        LONG vx = 0;
-//        UWORD *psoline = psourcebm + wsobpr*(vh>>16);
-//        ULONG *pscline = pscreenbm;
-//        for(LONG ww=0;ww<w;ww++)
-//        {
-//            *pscline++ = lut[psoline[vx>>16]];
-//            vx += addw;
-//        }
-//        vh += addh;
-//        pscreenbm += wscbpr;
-//    }
-//#else
-//    // version that tries to do many consecutive lines when they are the same.
-//    LONG vh = 0;
-//    for(LONG hh=0;hh<h;hh++)
-//    {
-//        // test if the 3 conecutives lines are the same
-//        UWORD *psoline = psourcebm + wsobpr*(vh>>16);
-//        UWORD *psoline2 = psourcebm + wsobpr*((vh+addh)>>16);
-//        UWORD *psoline3 = psourcebm + wsobpr*((vh+addh+addh)>>16);
-//        if(psoline == psoline3) // means 3 lines are the same.
-//        {
-//            ULONG *pscline = pscreenbm;
-//            LONG vx = 0;
-//            for(LONG ww=0;ww<w;ww++)
-//            {
-//                *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = lut[psoline[vx>>16]];
-//                pscline++;
-//                vx += addw;
-//            }
-//            vh += addh*3;
-//            pscreenbm += wscbpr*3;
-//            hh +=2;
-//        } else if(psoline == psoline2) // means 2 lines are the same.
-//        {
-//            ULONG *pscline = pscreenbm;
-//            LONG vx = 0;
-//            for(LONG ww=0;ww<w;ww++)
-//            {
-//                *pscline = pscline[wscbpr] = lut[psoline[vx>>16]];
-//                pscline++;
-//                vx += addw;
-//            }
-//            vh += addh<<1;
-//            pscreenbm += wscbpr<<1;
-//            hh++;
-//        } else
-//        {
-//            // other do normal one line ...
-//            ULONG *pscline = pscreenbm;
-//            LONG vx = 0;
-//            for(LONG ww=0;ww<w;ww++)
-//            {
-//                *pscline++ = lut[psoline[vx>>16]];
-//                vx += addw;
-//            }
-//            vh += addh;
-//            pscreenbm += wscbpr;
-//        }
-
-//    }
-
-//#endif
-//}
-
