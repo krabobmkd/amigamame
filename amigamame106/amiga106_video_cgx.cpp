@@ -5,6 +5,7 @@
  *************************************************************************/
 
 #include "amiga106_video_cgx.h"
+#include "amiga_video_tracers_clut16.h"
 
 #include <proto/exec.h>
 #include <proto/graphics.h>
@@ -31,29 +32,9 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
-// from driver.h
-#ifndef ORIENTATION_MASK
-    #define ORIENTATION_MASK        		0x0007
-    #define	ORIENTATION_FLIP_X				0x0001	/* mirror everything in the X direction */
-    #define	ORIENTATION_FLIP_Y				0x0002	/* mirror everything in the Y direction */
-    #define ORIENTATION_SWAP_XY				0x0004	/* mirror along the top-left/bottom-right diagonal */
-
-    #define	ROT0							0
-    #define	ROT90							(ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X)	/* rotate clockwise 90 degrees */
-    #define	ROT180							(ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y)	/* rotate 180 degrees */
-    #define	ROT270							(ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y)	/* rotate counter-clockwise 90 degrees */
-#endif
-
-//static void waitsec(int s)
-//{
-//    for(int j=0;j<s;j++)
-//    for(int i=0;i<50;i++)
-//    {
-//        WaitTOF();
-//    }
-//}
-
 extern struct Library *CyberGfxBase;
+
+template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
 // - - - - from driver.h
 /* is the video hardware raser or vector base? */
@@ -67,87 +48,13 @@ extern struct Library *CyberGfxBase;
 /* set this to use a direct RGB bitmap rather than a palettized bitmap */
 #define VIDEO_RGB_DIRECT	 			0x0004
 
-struct directDrawScreen {
-    void *_base;
-    ULONG _bpr;
-    WORD _clipX1,_clipY1,_clipX2,_clipY2;
-};
-struct directDrawSource {
-    void *_base;
-    ULONG _bpr;
-    WORD _x1,_y1,_x2,_y2; // to be drawn.
-};
-
-// to manage 24 bits mode pixel copy without any arse,
-// assume there is a 3 byte length type than can copy its value from a 4 byte type.
-// this is finely used by DrawScale template for 24bits mode.
-struct type24{
-    type24(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
-    char r,g,b;
-};
-
-extern "C" {
-    //extern int asmval,asmval2;
-    // for any of the 8x 16b target mode.
-    void directDrawClut16(register directDrawScreen *screen __asm("a0"),
-                    register directDrawSource *source __asm("a1"),
-                    register LONG x1 __asm("d0"),
-                    register LONG y1 __asm("d1"),
-                    register UWORD *lut __asm("a2")
-                );
-    void directDrawClut32(register directDrawScreen *screen __asm("a0"),
-                    register directDrawSource *source __asm("a1"),
-                    register LONG x1 __asm("d0"),
-                    register LONG y1 __asm("d1"),
-                    register ULONG *lut __asm("a2")
-                );
-//    void directDrawScaleClut16(directDrawScreen *screen ,
-//                    directDrawSource *source,
-//                    LONG x1 ,
-//                    LONG y1 ,
-//                    LONG w ,
-//                    LONG h ,
-//                    UWORD *lut
-//                );
-//    void directDrawScaleClut32(directDrawScreen *screen ,
-//                    directDrawSource *source,
-//                    LONG x1 ,
-//                    LONG y1 ,
-//                    LONG w ,
-//                    LONG h ,
-//                    ULONG *lut
-//                );
-}
-template<typename SCREENPIXTYPE,typename CLUTTYPE>
-void directDrawScaleClutT(directDrawScreen *screen ,
-                directDrawSource *source,
-                LONG x1 ,
-                LONG y1 ,
-                LONG w ,
-                LONG h ,
-                CLUTTYPE *lut
-                ,int swapflags
-            );
-
-template<typename SCREENPIXTYPE,typename CLUTTYPE>
-void directDrawScaleClutTSwapXY(directDrawScreen *screen ,
-                directDrawSource *source, // mame boitmap, not swapped.
-                LONG x1 , // final dest screen, already swapped.
-                LONG y1 ,
-                LONG w , // final dest screen, already swapped.
-                LONG h ,
-                CLUTTYPE *lut,
-                int swapflags
-            );
-
-
-Paletted_CGX::Paletted_CGX(const _osd_create_params *params, int screenPixFmt, int bytesPerPix)
+Paletted_CGX::Paletted_CGX(const AmigaDisplay::params &params, int screenPixFmt, int bytesPerPix)
     : _needFirstRemap(1), _pixFmt(screenPixFmt),_bytesPerPix(bytesPerPix)
 {
     switch(bytesPerPix){
-        case 1: _clut8.reserve(params->colors); break;
-        case 2: _clut16.reserve(params->colors); break;
-        case 3: case 4: _clut32.reserve(params->colors); break;
+        case 1: _clut8.reserve(params._colorsIndexLength); break;
+        case 2: _clut16.reserve(params._colorsIndexLength); break;
+        case 3: case 4: _clut32.reserve(params._colorsIndexLength); break;
     }
 }
 Paletted_CGX::~Paletted_CGX(){}
@@ -376,12 +283,9 @@ void Paletted_CGX::updatePaletteRemap(_mame_display *display)
     _needFirstRemap = 0;
 }
 
-
-
-IntuitionDrawable::IntuitionDrawable()
-
+IntuitionDrawable::IntuitionDrawable(int flags)
 : _PixelFmt(0),_PixelBytes(0),_width(0),_height(0),_dx(0),_dy(0),_useScale(0)
-, _video_attributes(0)
+, _flags(flags)
 {
 }
 IntuitionDrawable::~IntuitionDrawable()
@@ -407,6 +311,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
   //  printf("pixels values:%04x %04x %04x\n",(int)*pp,(int)pp[500],(int)pp[64*512+32]);
     ULONG bmwidth,bmheight;
 
+ printf("bitmap->rowbytes:%d\n",(int)bitmap->rowbytes);
     APTR hdl = LockBitMapTags(pBitmap,
                               LBMI_WIDTH,(ULONG)&bmwidth,
                               LBMI_HEIGHT,(ULONG)&bmheight,
@@ -427,7 +332,6 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
     // +1 because goes 0,319
     int sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
     int sourceheight =( display->game_visible_area.max_y - display->game_visible_area.min_y)+1;
-
 
     int cenx = _width-sourcewidth;
     int ceny = _height-sourceheight;
@@ -451,10 +355,10 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             {
                 directDrawScaleClutT<UWORD,UWORD>(&ddscreen,&ddsource,0,0,
                     _width,_height,
-                pRemap->_clut16.data(),_video_attributes);
+                pRemap->_clut16.data(),_flags);
             } else
             {
-                directDrawClut16(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut16.data());
+                directDrawClut16(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut16.data(),_flags);
             }
          }
             break;
@@ -464,7 +368,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             // -> now tested by tricking
             directDrawScaleClutT<type24,ULONG>(&ddscreen,&ddsource,0,0,
                 _width,_height,
-            pRemap->_clut32.data(),_video_attributes);
+            pRemap->_clut32.data(),_flags);
         }
              break;
          case PIXFMT_ARGB32:case PIXFMT_BGRA32:case PIXFMT_RGBA32:
@@ -474,11 +378,10 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             {
                 directDrawScaleClutT<ULONG,ULONG>(&ddscreen,&ddsource,0,0,
                     _width,_height,
-                pRemap->_clut32.data(),_video_attributes);
+                pRemap->_clut32.data(),_flags);
             } else
             {
-
-                directDrawClut32(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut32.data());
+                directDrawClut32(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut32.data(),_flags);
             }
          }
             break;
@@ -510,23 +413,26 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
 // =========================== new impl
 
 
-Intuition_Screen::Intuition_Screen(const _osd_create_params *params,ULONG forcedModeId) : IntuitionDrawable()
+Intuition_Screen::Intuition_Screen(const AmigaDisplay::params &params)
+    : IntuitionDrawable(params._flags)
     , _pScreen(NULL)
     , _pScreenWindow(NULL)
 
-    , _ScreenModeId(forcedModeId)
+    , _ScreenModeId(params._forcedModeID)
     , _fullscreenWidth(0)
     , _fullscreenHeight(0)
     , _pMouseRaster(NULL)
 {
-    _video_attributes = params->video_attributes;
+    printf(" **** Intuition_Screen SET VIDEO ATTRIBUTES:%08x ****\n",_flags);
     // may get mode from Cybergraphics...
     if(CyberGfxBase)
     {
-        int width = params->width;
-        int height = params->height;
+        int width = params._width;
+        int height = params._height;
+        if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
 
-        int screenDepth = (params->colors<=256)?8:16; // more would be Display_CGX_TrueColor.
+
+        int screenDepth = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
 
         if(_ScreenModeId == INVALID_ID)
         {
@@ -635,13 +541,13 @@ BitMap *Intuition_Screen::bitmap()
     return _pScreen->RastPort.BitMap;
 }
 
-Intuition_Window::Intuition_Window(const _osd_create_params *params) : IntuitionDrawable()
+Intuition_Window::Intuition_Window(const AmigaDisplay::params &params) : IntuitionDrawable(params._flags)
     , _pWbWindow(NULL)
     , _sWbWinSBitmap(NULL)
-    , _machineWidth(params->width),_machineHeight(params->height)
+    , _machineWidth(params._width),_machineHeight(params._height)
     , _maxzoomfactor(1)
 {
-    _video_attributes = params->video_attributes;
+  if(params._flags & ORIENTATION_SWAP_XY) doSwap(_machineWidth,_machineHeight);
 }
 Intuition_Window::~Intuition_Window()
 {
@@ -761,7 +667,7 @@ void Intuition_Window::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pRe
     }
 }
 // ----------------------- scalable
-Intuition_ScaleWindow::Intuition_ScaleWindow(const _osd_create_params *params)
+Intuition_ScaleWindow::Intuition_ScaleWindow(const AmigaDisplay::params &params)
     :Intuition_Window(params)
 {
     _maxzoomfactor = 3;
@@ -774,7 +680,6 @@ Display_CGX::Display_CGX()
 : AmigaDisplay()
 , _drawable(NULL)
 , _remap(NULL)
-, _window(0)
 ,_params({0})
 ,_forcedModeId(~0)
 {
@@ -785,43 +690,44 @@ Display_CGX::~Display_CGX()
     if(_drawable) delete _drawable;
     if(_remap) delete _remap;
 }
-void Display_CGX::open(const _osd_create_params *params,int window, ULONG forcedModeID)
+void Display_CGX::open(const AmigaDisplay::params &pparams)
 {
    if(!CyberGfxBase) return;
    if(_drawable) return;
-   _window = window;
-   _params = *params;
-   _forcedModeId = forcedModeID;
+   _params=pparams;
 
-    if(window)
+    if(_params._flags & DISPFLAG_STARTWITHWINDOW)
     {
-        _drawable = new /*Intuition_Window*/Intuition_ScaleWindow(params);
+        _drawable = new /*Intuition_Window*/Intuition_ScaleWindow(pparams);
     } else
     {
 
-        _drawable = new Intuition_Screen(params,forcedModeID);
+        _drawable = new Intuition_Screen(pparams);
     }
 
     if(!_drawable) return;
+    // must open before computing remap to get correct pixel format.s
     _drawable->open();
 
-    if((params->video_attributes & VIDEO_RGB_DIRECT)==0 &&
-        params->colors>0)
+    if((pparams._video_attributes & VIDEO_RGB_DIRECT)==0 &&
+        pparams._colorsIndexLength>0)
     {
-        _remap = new Paletted_CGX(params,_drawable->pixelFmt(),_drawable->pixelBytes());
+        _remap = new Paletted_CGX(pparams,_drawable->pixelFmt(),_drawable->pixelBytes());
     } else
-    if((params->video_attributes & VIDEO_RGB_DIRECT)!=0 && params->depth == 15)
+    if((pparams._video_attributes & VIDEO_RGB_DIRECT)!=0 && pparams._driverDepth == 15)
     {
-        _remap = new Paletted_CGX(params,_drawable->pixelFmt(),_drawable->pixelBytes());
+        _remap = new Paletted_CGX(pparams,_drawable->pixelFmt(),_drawable->pixelBytes());
         _remap->updatePaletteRemap15b(); // once for all.
     }
+
 
 }
 int Display_CGX::switchFullscreen()
 {
    if(!CyberGfxBase) return -1;
    close();
-   open(&_params,_window==0?1:0,_forcedModeId);
+   _params._flags ^= DISPFLAG_STARTWITHWINDOW; // switch bit.
+   open(_params);
 }
 void Display_CGX::close()
 {
@@ -868,99 +774,7 @@ void Display_CGX::WaitFrame()
          WaitTOF();
          return;
 //    }
-    // would do 60Hz on 60Hz screens...
+    // would theorically do 60Hz on 60Hz screens...
  //   WaitBOVP(rp->S);
-
-}
-
-template<typename SCREENPIXTYPE,typename CLUTTYPE>
-void directDrawScaleClutT(directDrawScreen *screen ,
-                directDrawSource *source,
-                LONG x1 ,
-                LONG y1 ,
-                LONG w ,
-                LONG h ,
-                CLUTTYPE *lut,
-                int swapFlags
-            )
-{
-    UWORD wsobpr = source->_bpr>>1;
-    UWORD wscbpr = screen->_bpr/sizeof(SCREENPIXTYPE);
-
-    UWORD *psourcebm = (UWORD *)source->_base;
-    psourcebm += (source->_y1 * wsobpr) + source->_x1;
-
-    SCREENPIXTYPE *pscreenbm = (SCREENPIXTYPE *)screen->_base;
-    pscreenbm += (y1 * wscbpr) + x1;
-
-    LONG sourceHeight = source->_y2 - source->_y1;
-    if(sourceHeight<=0) return;
-
-    LONG sourceWidth = source->_x2 - source->_x1;
-    if(sourceWidth<=0) return;
-    LONG addw = (sourceWidth<<16)/w;
-    LONG addh = (sourceHeight<<16)/h;
-
-    // version that tries to do many consecutive lines when they are the same.
-    LONG vh = 0;
-    LONG vxStart = 0;
-   if(swapFlags & ORIENTATION_FLIP_Y)
-    {
-        vh = (sourceHeight<<16)-1;
-        addh = -addh;
-    }
-    if(swapFlags & ORIENTATION_FLIP_X)
-    {
-        vxStart = (sourceWidth<<16)-1;
-        addw = -addw;
-    }
-    for(LONG hh=0;hh<h;)
-    {
-        // test if the 3 consecutives lines are the same
-        UWORD *psoline = psourcebm + wsobpr*(vh>>16);
-        UWORD *psoline2 = psourcebm + wsobpr*((vh+addh)>>16);
-        UWORD *psoline3 = psourcebm + wsobpr*((vh+addh+addh)>>16);
-        if(psoline == psoline3) // means 3 lines are the same.
-        {
-            SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = vxStart;
-            for(LONG ww=0;ww<w;ww++)
-            {
-                *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = lut[psoline[(WORD)(vx>>16)]];
-                pscline++;
-                vx += addw;
-            }
-            vh += addh*3;
-            pscreenbm += wscbpr*3;
-            hh +=3;
-        } else if(psoline == psoline2) // means 2 lines are the same.
-        {
-            SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = vxStart;
-            for(LONG ww=0;ww<w;ww++)
-            {
-                *pscline = pscline[wscbpr] = lut[psoline[(WORD)(vx>>16)]];
-                pscline++;
-                vx += addw;
-            }
-            vh += addh<<1;
-            pscreenbm += wscbpr<<1;
-            hh+=2;
-        } else
-        {
-            // other do normal one line ...
-            SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = vxStart;
-            for(LONG ww=0;ww<w;ww++)
-            {
-                *pscline++ = lut[psoline[(WORD)(vx>>16)]];
-                vx += addw;
-            }
-            vh += addh;
-            pscreenbm += wscbpr;
-            hh++;
-        }
-
-    }
 
 }

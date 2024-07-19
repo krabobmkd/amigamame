@@ -23,16 +23,18 @@ extern "C" {
 
     #include <intuition/intuition.h>
     #include <intuition/screens.h>
-
     #include <cybergraphx/cybergraphics.h>
 
 }
+#include "intuiuncollide.h"
 // from mame
 extern "C" {
     #include "osdepend.h"
     #include "video.h"
     // for logerror
     #include "mame.h"
+    // for orientation flags
+    #include "driver.h"
 }
 #include "amiga106_inputs.h"
 #include "amiga106_video.h"
@@ -152,18 +154,27 @@ ULONG GetStartTime=0;
 
 ULONG UseBrakes = 0,UseFrameskip=0;
 
-int osd_create_display(const _osd_create_params *params, UINT32 *rgb_components)
+int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components)
 {      
     if(g_pMameDisplay) osd_close_display();
-    if(!params) return 1; // fail
+    if(!pparams || !Machine || !Machine->gamedrv) return 1; // fail
 
-    if((params->video_attributes &VIDEO_TYPE_VECTOR)==0)
+    if((pparams->video_attributes &VIDEO_TYPE_VECTOR)==0)
     {
+        // keep the 3 orientation bits
+        AmigaDisplay::params params;
+        params._flags = (Machine->gamedrv->flags & ORIENTATION_MASK);
+        params._forcedModeID = ~0; // undefined.
+        params._width = pparams->width;
+        params._height = pparams->height;
+        params._colorsIndexLength = pparams->colors;
+        params._video_attributes = pparams->video_attributes;
+        params._driverDepth = pparams->depth;
         //try RTG  drivers first:
         if(CyberGfxBase)
         {
             g_pMameDisplay = new Display_CGX();
-            g_pMameDisplay->open(params,0);
+            g_pMameDisplay->open(params);
         }
 
     } // end if bitmap

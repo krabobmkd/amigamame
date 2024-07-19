@@ -22,7 +22,7 @@ struct BitMap;
 class Paletted_CGX
 {
 public:
-    Paletted_CGX(const _osd_create_params *params, int screenPixFmt, int bytesPerPix);
+    Paletted_CGX(const AmigaDisplay::params &params, int screenPixFmt, int bytesPerPix);
     ~Paletted_CGX();
     void updatePaletteRemap(_mame_display *display);
     void updatePaletteRemap15b();
@@ -40,7 +40,7 @@ protected:
 
 class IntuitionDrawable {
 public:
-    IntuitionDrawable();
+    IntuitionDrawable(int flags);
     virtual ~IntuitionDrawable();
     virtual void open() = 0;
     virtual void close()= 0;
@@ -55,14 +55,14 @@ protected:
     int _width,_height;
     int _dx,_dy; // draw delta (for windows borders)
     int _useScale;
-    int _video_attributes;
+    int _flags;
     virtual BitMap *bitmap() = 0;
 };
 
 class Intuition_Screen : public IntuitionDrawable
 {
 public:
-    Intuition_Screen(const _osd_create_params *params,ULONG screnModeId=~0);
+    Intuition_Screen(const AmigaDisplay::params &params);
     ~Intuition_Screen();
     void open() override;
     void close() override;
@@ -82,7 +82,7 @@ protected:
 class Intuition_Window : public IntuitionDrawable
 {
 public:
-    Intuition_Window(const _osd_create_params *params);
+    Intuition_Window(const AmigaDisplay::params &params);
     ~Intuition_Window();
     void open() override;
     void close() override;
@@ -99,7 +99,7 @@ protected:
 class Intuition_ScaleWindow : public Intuition_Window
 {
 public:
-    Intuition_ScaleWindow(const _osd_create_params *params);
+    Intuition_ScaleWindow(const AmigaDisplay::params &params);
     ~Intuition_ScaleWindow();
 protected:
     //void synchBmSize();
@@ -111,7 +111,7 @@ class Display_CGX : public AmigaDisplay
 public:
     Display_CGX();
     ~Display_CGX();
-    void open(const _osd_create_params *params,int window, ULONG forcedModeID=~0) override;
+    void open(const params &pparams) override;
     void close() override;
     int good() override;
     void draw(_mame_display *pmame_display) override;
@@ -122,8 +122,7 @@ public:
 protected:
     IntuitionDrawable   *_drawable; // screen or window
     Paletted_CGX        *_remap;    // null if true color app.
-    int     _window; // last param set
-    _osd_create_params _params;
+    params _params; // last params set
     ULONG _forcedModeId;
  //   void drawRastPort(RastPort *pRPort,_mame_display *pmame_display,int dx,int dy);
 };

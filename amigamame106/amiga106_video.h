@@ -21,7 +21,18 @@ class AmigaDisplay
 public:
     AmigaDisplay();
     virtual ~AmigaDisplay();
-    virtual void open(const _osd_create_params *params,int window, ULONG forcedModeID=~0) = 0;
+    // flags are orientations bits + our prefs
+    #define DISPFLAG_STARTWITHWINDOW 8
+
+    struct params {
+        ULONG _flags;
+        ULONG _forcedModeID;
+        int _width,_height;
+        int _colorsIndexLength;
+        int _video_attributes;
+        int _driverDepth;
+    };
+    virtual void open(const params &params) = 0;
     virtual void close()= 0;
     virtual void draw(_mame_display *pmame_display) = 0;
     virtual int good() = 0;

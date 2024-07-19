@@ -77,6 +77,7 @@ set(AMIGA_SRC
 #	amiga106_video_p96.cpp
 #	amiga106_video_aga.h
 #	amiga106_video_aga.cpp
+	amiga_video_tracers_clut16.h
 	amiga106_video_cgx.h
 	amiga106_video_cgx.cpp
 	amiga106_inputs.h
