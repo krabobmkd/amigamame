@@ -108,12 +108,27 @@ public:
         Rot180,
         Rot270
     };
-    struct Display : public ASerializable
+    enum class ScreenModeChoice :  int
+    {
+        Best,
+        Choose
+    };
+    struct Display_PerScreenMode : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
-        DrawEngine _drawEngine = DrawEngine::CgxDirectCpu;
+        void valueUpdated(std::string upatedValue) override;
+        bool isDefault() override;
         RotateMode _rotateMode = RotateMode::Rot0;
-        bool _rotateOnlyVerticalGames=true;
+        ScreenModeChoice _ScreenModeChoice=ScreenModeChoice::Best;
+        ULONG_SCREENMODEID _modeid=~0;
+    };
+    struct Display : public ASerializable
+    {
+        Display();
+        void serialize(ASerializer &serializer) override;
+        DrawEngine _drawEngine = DrawEngine::CgxDirectCpu;
+        std::map<std::string,Display_PerScreenMode> _perScreenMode;
+        ASerializer::StringMap<Display_PerScreenMode> _perScreenModeS;
     };
     Display &display() { return _display; }
 

@@ -222,6 +222,12 @@ void MameConfig::serialize(ASerializer &serializer)
 }
 void MameConfig::toDefault()
 {
+//    _display._modeid = INVALID_ID;
+    _display._drawEngine = DrawEngine::CgxDirectCpu;
+    _display._perScreenMode.clear();
+//    _display._rotateMode = RotateMode::Rot0;
+//    _display._rotateOnlyVerticalGames = true;
+
     _audio._mode = 0;
     _audio._freq = 22050;
 
@@ -236,13 +242,29 @@ void MameConfig::toDefault()
 
 }
 
+void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
+{
+    serializer("Screen Selection",(int &)_ScreenModeChoice,{"Find Best","Select Mode"});
+    serializer("Screen mode",_modeid);
+    serializer("Rotate Screens",(int &)_rotateMode,{"None","+90","180","-90"});
+}
+void MameConfig::Display_PerScreenMode::valueUpdated(std::string upatedValue)
+{
+    if(_ScreenModeChoice == ScreenModeChoice::Best) _modeid = INVALID_ID;
+
+}
+bool MameConfig::Display_PerScreenMode::isDefault()
+{   // will not be written if is default.
+    return (_ScreenModeChoice == ScreenModeChoice::Best &&
+            _rotateMode == RotateMode::Rot0);
+}
+
+MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode)
+{}
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
-    serializer("Rotate Vertical Games",_rotateOnlyVerticalGames);
-    serializer("Rotate",(int &)_rotateMode,{"None","+90°","180°","270°"});
-
-    // todo per conf.
+    serializer("Per Screen Mode",_perScreenModeS);
 
 }
 void MameConfig::Audio::serialize(ASerializer &serializer)
