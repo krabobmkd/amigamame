@@ -19,6 +19,11 @@
 ;	include	graphics/gfx.i
 	include exec/types.i
 
+; from Mame driver.h
+ORIENTATION_FLIP_X equ 1
+ORIENTATION_FLIP_Y equ 2
+ORIENTATION_SWAP_XY equ 4
+
 	STRUCTURE directDrawScreen,0
 		APTR	dsc_base
 		ULONG	dsc_bpr
@@ -52,6 +57,7 @@ directDrawClut16:
 	;a2 lut .w
 	;d0 xstart
 	;d1 ystart
+	; d2 swap flags
  	movem.l	d2-d7/a2-a6,-(sp)
 
 	; - - - - - y
@@ -180,6 +186,7 @@ directDrawClut32:
 	;a2 lut .w
 	;d0 xstart
 	;d1 ystart
+	; d2 swap flags
  	movem.l	d2-d7/a2-a6,-(sp)
 
 	; - - - - - y
@@ -301,21 +308,6 @@ directDrawClut32:
 	rts
 
 
-
-_directScaleDrawClut16:
-directScaleDrawClut16:
-	;a0 dsc_
-	;a1 dso_
-	;a2 lut .w
-	;d0 xstart
-	;d1 ystart
- 	movem.l	d2-d7/a2-a6,-(sp)
-
-.endfunc
-	movem.l	(sp)+,d2-d7/a2-a6
-	rts
-;	XDEF asmval
-;	XDEF _asmval
 
 ;asmval:
 ;_asmval:

@@ -34,7 +34,7 @@ extern "C" {
 #define CATCOMP_NUMBERS
 #include "messages.h"
 
-#include "macros.h"
+#include "asmmacros.h"
 
 extern "C" {
     #include "driver.h"

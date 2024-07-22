@@ -44,7 +44,7 @@ extern "C" {
 extern "C" {
     // all C amiga stuffs should be included from C++ in extern "C" paragraph
     #include <cybergraphx/cybergraphics.h>
-    #include "macros.h"
+    #include "asmmacros.h"
 }
 
 

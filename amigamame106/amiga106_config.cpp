@@ -263,11 +263,8 @@ MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode
 {}
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
-    serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
-
+    serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU","CPU colormap + CGX ScalePix...","CPU Colormap + WritePixelArray8"});
     serializer("Per Screen Mode",_perScreenModeS);
-
-
 
 }
 void MameConfig::Audio::serialize(ASerializer &serializer)
