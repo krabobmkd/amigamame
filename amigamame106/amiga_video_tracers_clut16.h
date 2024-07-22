@@ -259,6 +259,148 @@ void directDrawScaleClutTNoSwap(directDrawScreen *screen ,
 }
 
 template<typename SCREENPIXTYPE,typename CLUTTYPE>
+void directDrawClutTSwapXY(directDrawScreen *screen ,
+                directDrawSource *source, // mame bitmap, not swapped.
+                LONG x1 ,
+                LONG y1 ,
+                CLUTTYPE *lut,
+                int swapFlags
+            )
+{
+
+    int w = source->_y2 - source->_y1;
+    int h = source->_x2 - source->_x1;
+
+    if(y1+h>screen->_clipY2) h=(screen->_clipY2)-y1;
+    if(x1+w>screen->_clipX2) w=(screen->_clipX2)-x1;
+
+    if(x1<screen->_clipX1) { w-=(screen->_clipX1-x1); x1=screen->_clipX1;  }
+    if(y1<screen->_clipY1) { h-=(screen->_clipY1-y1); y1=screen->_clipY1;  }
+
+
+    UWORD wsobpr = source->_bpr>>1;
+    UWORD wscbpr = screen->_bpr/sizeof(SCREENPIXTYPE);
+
+    UWORD *psourcebm = (UWORD *)source->_base;
+    psourcebm += (source->_y1 * wsobpr) + source->_x1;
+
+    SCREENPIXTYPE *pscreenbm = (SCREENPIXTYPE *)screen->_base;
+    pscreenbm += (y1 * wscbpr) + x1;
+
+    LONG sourceHeight = source->_y2 - source->_y1;
+    if(sourceHeight<=0) return;
+
+    LONG sourceWidth = source->_x2 - source->_x1;
+    if(sourceWidth<=0) return;
+    LONG addw = wsobpr; //(sourceHeight<<16)/w; // swapped source size
+    LONG addh = 1; //(sourceWidth<<16)/h; //
+
+    LONG vh = 0;
+    LONG vxStart = 0;
+   if(swapFlags & ORIENTATION_FLIP_Y)
+    {
+        vh = sourceWidth-1;
+        addh = -1;
+    }
+    if(swapFlags & ORIENTATION_FLIP_X)
+    {
+        vxStart = (sourceHeight-1)*wsobpr;
+        addw = -wsobpr;
+    }
+    // dest screen is scanned horizontally, source vertically.
+    for(LONG hh=0;hh<h;)
+    {
+        UWORD *psoline = psourcebm +vh; /* wsobpr*(vh>>16)*/ ;
+        SCREENPIXTYPE *pscline = pscreenbm;
+        LONG vx = vxStart;
+        for(LONG ww=0;ww<w;ww++)
+        {
+            *pscline++ = lut[psoline[vx]];
+            vx += addw;
+        }
+        vh += addh;
+        pscreenbm += wscbpr;
+        hh++;
+    }
+
+}
+
+template<typename SCREENPIXTYPE,typename CLUTTYPE>
+void directDrawClutTNoSwap(directDrawScreen *screen ,
+                directDrawSource *source,
+                LONG x1 ,
+                LONG y1 ,
+
+                CLUTTYPE *lut,
+                int swapFlags
+            )
+{
+    int w = source->_x2 - source->_x1;
+    int h = source->_y2 - source->_y1;
+
+    if(y1+h>screen->_clipY2) h=(screen->_clipY2)-y1;
+    if(x1+w>screen->_clipX2) w=(screen->_clipX2)-x1;
+
+    if(x1<screen->_clipX1) { w-=(screen->_clipX1-x1); x1=screen->_clipX1;  }
+    if(y1<screen->_clipY1) { h-=(screen->_clipY1-y1); y1=screen->_clipY1;  }
+
+    UWORD wsobpr = source->_bpr>>1;
+    UWORD wscbpr = screen->_bpr/sizeof(SCREENPIXTYPE);
+
+    UWORD *psourcebm = (UWORD *)source->_base;
+    psourcebm += (source->_y1 * wsobpr) + source->_x1;
+
+    SCREENPIXTYPE *pscreenbm = (SCREENPIXTYPE *)screen->_base;
+    pscreenbm += (y1 * wscbpr) + x1;
+
+    LONG sourceHeight = source->_y2 - source->_y1;
+    if(sourceHeight<=0) return;
+
+    LONG sourceWidth = source->_x2 - source->_x1;
+    if(sourceWidth<=0) return;
+    LONG addw = 1;// (sourceWidth<<16)/w;
+    LONG addh = wsobpr; // (sourceHeight<<16)/h;
+
+    LONG vh = 0;
+    LONG vxStart = 0;
+   if(swapFlags & ORIENTATION_FLIP_Y)
+    {
+        vh = (sourceHeight-1)*wsobpr;// (sourceHeight<<16)-1;
+        addh = -wsobpr;
+    }
+    if(swapFlags & ORIENTATION_FLIP_X)
+    {
+        vxStart = sourceWidth/*-1*/;
+        addw = -1;
+    }
+    for(LONG hh=0;hh<h;)
+    {
+        UWORD *psoline = psourcebm + vh;
+
+        SCREENPIXTYPE *pscline = pscreenbm;
+        LONG vx = vxStart;
+        if(addw==1)
+        {
+            for(LONG ww=0;ww<w;ww++)
+            {
+                *pscline++ = lut[psoline[vx++]];
+            }
+        } else
+        {   // swap X
+            for(LONG ww=0;ww<w;ww++)
+            {
+                *pscline++ = lut[psoline[--vx]];
+            }
+        }
+        vh += addh;
+        pscreenbm += wscbpr;
+        hh++;
+
+    }
+
+}
+
+template<typename SCREENPIXTYPE,typename CLUTTYPE>
 void directDrawScaleClutT(directDrawScreen *screen ,
                 directDrawSource *source,
                 LONG x1 ,
@@ -293,10 +435,10 @@ void directDrawClutT(directDrawScreen *screen ,
     if(swapFlags & ORIENTATION_SWAP_XY)
     {
         directDrawClutTSwapXY<SCREENPIXTYPE,CLUTTYPE>(
-            screen,source,x1,y1,w,h,lut,swapFlags);
+            screen,source,x1,y1,lut,swapFlags);
     } else
     {
         directDrawClutTNoSwap<SCREENPIXTYPE,CLUTTYPE>(
-            screen,source,x1,y1,w,h,lut,swapFlags);
+            screen,source,x1,y1,lut,swapFlags);
     }
 }

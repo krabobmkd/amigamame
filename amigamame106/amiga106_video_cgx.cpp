@@ -311,7 +311,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
   //  printf("pixels values:%04x %04x %04x\n",(int)*pp,(int)pp[500],(int)pp[64*512+32]);
     ULONG bmwidth,bmheight;
 
- printf("bitmap->rowbytes:%d\n",(int)bitmap->rowbytes);
+ //printf("bitmap->rowbytes:%d\n",(int)bitmap->rowbytes);
     APTR hdl = LockBitMapTags(pBitmap,
                               LBMI_WIDTH,(ULONG)&bmwidth,
                               LBMI_HEIGHT,(ULONG)&bmheight,
@@ -332,6 +332,11 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
     // +1 because goes 0,319
     int sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
     int sourceheight =( display->game_visible_area.max_y - display->game_visible_area.min_y)+1;
+    if(_flags & ORIENTATION_SWAP_XY)
+    {
+        doSwap(sourcewidth,sourceheight);
+    }
+
 
     int cenx = _width-sourcewidth;
     int ceny = _height-sourceheight;
@@ -358,7 +363,9 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
                 pRemap->_clut16.data(),_flags);
             } else
             {
-                directDrawClut16(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut16.data(),_flags);
+                directDrawClutT<UWORD,UWORD>(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,
+                pRemap->_clut16.data(),_flags);
+               // directDrawClut16(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut16.data(),_flags);
             }
          }
             break;
@@ -366,9 +373,16 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
         {
             // theorically, ... untested because rare cgx implementations
             // -> now tested by tricking
-            directDrawScaleClutT<type24,ULONG>(&ddscreen,&ddsource,0,0,
-                _width,_height,
-            pRemap->_clut32.data(),_flags);
+            if((_width>sourcewidth || _height>sourceheight) && _useScale)
+            {
+                directDrawScaleClutT<type24,ULONG>(&ddscreen,&ddsource,0,0,
+                    _width,_height,
+                pRemap->_clut32.data(),_flags);
+            } else
+            {
+                directDrawClutT<type24,ULONG>(&ddscreen,&ddsource,0,0,
+                pRemap->_clut32.data(),_flags);
+            }
         }
              break;
          case PIXFMT_ARGB32:case PIXFMT_BGRA32:case PIXFMT_RGBA32:
@@ -381,7 +395,9 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
                 pRemap->_clut32.data(),_flags);
             } else
             {
-                directDrawClut32(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut32.data(),_flags);
+                directDrawClutT<ULONG,ULONG>(&ddscreen,&ddsource,0,0,
+                pRemap->_clut32.data(),_flags);
+                //directDrawClut32(&ddscreen,&ddsource,cenx+_dx,ceny+_dy,pRemap->_clut32.data(),_flags);
             }
          }
             break;
@@ -547,6 +563,8 @@ Intuition_Window::Intuition_Window(const AmigaDisplay::params &params) : Intuiti
     , _machineWidth(params._width),_machineHeight(params._height)
     , _maxzoomfactor(1)
 {
+   printf(" ***** ** Intuition_Window CREATE:%d %d %08x\n",params._width,params._height,params._flags);
+
   if(params._flags & ORIENTATION_SWAP_XY) doSwap(_machineWidth,_machineHeight);
 }
 Intuition_Window::~Intuition_Window()
@@ -582,7 +600,7 @@ void Intuition_Window::open()
         WA_InnerWidth, _machineWidth,
         WA_InnerHeight, _machineHeight,
         WA_MaxWidth,  _machineWidth*_maxzoomfactor,
-        WA_MaxHeight, _machineWidth*_maxzoomfactor,
+        WA_MaxHeight, _machineHeight*_maxzoomfactor,
         WA_MinWidth, _machineWidth,
         WA_MinHeight, _machineHeight,
         WA_IDCMP,/* IDCMP_GADGETUP | IDCMP_GADGETDOWN |*/IDCMP_MOUSEBUTTONS |  IDCMP_RAWKEY /*|

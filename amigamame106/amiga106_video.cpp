@@ -158,7 +158,7 @@ ULONG UseBrakes = 0,UseFrameskip=0;
 
 static ULONG shiftRotationBits(ULONG orientation, int rotationShift)
 {
-    static const int rots[4]├={ ROT0,ROT90,ROT180,ROT270};
+    static const int rots[4]={ ROT0,ROT90,ROT180,ROT270};
     orientation &= ORIENTATION_MASK;
     int i = 0;
     if(orientation ==ROT90) i=1;
@@ -173,20 +173,21 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     if(g_pMameDisplay) osd_close_display();
     if(!pparams || !Machine || !Machine->gamedrv) return 1; // fail
 
-    MameConfig::Display &config = MameConfig::getMainConfig().display();
-    string screenId,vattribs;
+    MameConfig::Display &config = getMainConfig().display();
+    std::string screenId;
+    int vattribs;
     MameConfig::getDriverScreenModestring(Machine->gamedrv, screenId,vattribs);
 
     MameConfig::Display_PerScreenMode &screenModeConf = config._perScreenMode[screenId];
 
-    if((pparams->video_attributes &VIDEO_TYPE_VECTOR)==0)
+    if((pparams->video_attributes &VIDEO_TYPE_VECTOR)==0) // means not vector,= bitmap
     {
         // keep the 3 orientation bits
         AmigaDisplay::params params;
         params._flags = shiftRotationBits(Machine->gamedrv->flags,(int)screenModeConf._rotateMode);
 
-        if(screenModeConf._ScreenModeChoice == ScreenModeChoice::Choose)
-            params._forcedModeID = screenModeConf._modeid;
+        if(screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose)
+            params._forcedModeID = (ULONG) screenModeConf._modeid;
          else  params._forcedModeID = ~0; // undefined.
 
         params._width = pparams->width;

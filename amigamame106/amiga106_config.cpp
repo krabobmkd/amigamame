@@ -504,7 +504,9 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions)
     options.samplerate = 0;
     options.use_samples = 0;
 
-     printf("MameConfig::applyToMameOptions applied samplerate:%d\n",options.samplerate);
+    // ui_orientation
+
+   //  printf("MameConfig::applyToMameOptions applied samplerate:%d\n",options.samplerate);
 
 //todo/old...
     //   options.ror        = (Config[CFG_ROTATION] == CFGR_RIGHT);

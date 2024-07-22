@@ -47,6 +47,14 @@ void StartGame(void)
     }
 
     conf.applyToMameOptions(options);
+    int gameorientation = drivers[idriver]->flags & ORIENTATION_MASK;
+    int uiorientation = ROT0;
+    if(gameorientation == ROT90) uiorientation=ROT270;
+    if(gameorientation == ROT270) uiorientation=ROT90;
+    if(gameorientation == ROT180) uiorientation=ROT180;
+    // done here
+    if(drivers[idriver])
+        options.ui_orientation = uiorientation;
 
     /* Clear the zip filename caches. */
 
