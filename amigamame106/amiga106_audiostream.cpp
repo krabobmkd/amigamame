@@ -335,8 +335,11 @@ void osd_stop_audio_stream(void)
     printf("osd_stop_audio_stream\n");
     if(pAHIS)
     {
+            printf(" DO cLOSE ??\n");
         AHI_Close(pAHIS);
+            printf(" DO cLOSE2 ??\n");
     	FreeVec(pAHIS);
+            printf(" DO cLOSE3 ??\n");
         pAHIS = NULL;
     }
 

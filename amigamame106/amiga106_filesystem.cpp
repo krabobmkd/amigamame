@@ -212,7 +212,7 @@ void composeFilePath(int pathtype, int pathindex, const char *filename, std::str
         } break;
         default: p.clear(); break;
     }
-    if(p.length()>0 && p.back() != ':') p+= '/';
+    if(p.length()>0 && p.back() != ':' && p.back() != '/') p+= '/';
     p += filename;
 
 }

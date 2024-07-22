@@ -60,8 +60,8 @@ typedef ULONG (*RE_HOOKFUNC)();
 #define MID_About     104
 #define MID_AboutMUI  105
 
-#define SMT_DISPLAYID 0
-#define SMT_DEPTH     1
+//#define SMT_DISPLAYID 0
+//#define SMT_DEPTH     1
 
 #define CFGS_ALL 0
 #define CFGS_FOUND 1
@@ -142,13 +142,6 @@ static Object * BU_Scan=NULL;
 //static Object * CY_Buffering;
 //static Object * CY_Rotation;
 
-// --- controllers
-//static Object * CY_Joy1Type;
-//static Object * CY_Joy2Type;
-//static Object * SL_Joy1ButtonBTime;
-//static Object * SL_Joy1AutoFireRate;
-//static Object * SL_Joy2ButtonBTime;
-//static Object * SL_Joy2AutoFireRate;
 
 
 //static Object * PA_ScreenMode;
@@ -161,7 +154,34 @@ static Object * BU_Quit=NULL;
 static Object * BU_About_OK=NULL;
 static Object * PU_ScreenMode=NULL;
 
-int dummy=0;
+MUISerializer muiConfigCreator;
+
+static ULONG ASM DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG *par REG(a1))
+{
+    if(!par) return 0;
+   // printf("DriverSelect:%d\n",*par);
+    // get(LI_Driver, MUIA_List_Active, &v);
+    int listindex = *par;
+    if(listindex>=0)
+    {
+        const game_driver **ppdrv=NULL; // int entry; // driver ptr ptr
+        DoMethod((Object*)LI_Driver,(ULONG) MUIM_List_GetEntry, (ULONG)listindex, (ULONG)&ppdrv);
+        if(ppdrv && *ppdrv)
+        {
+            //printf("DriverSelect:%s\n",(*ppdrv)->name);
+            std::string screenconf;
+            int videoAttribs=0;
+            MameConfig::getDriverScreenModestring(*ppdrv, screenconf,videoAttribs);
+
+            muiConfigCreator.selectGroup("Display.Per Screen Mode",screenconf);
+
+            //   printf("screen:%s:\n",screenconf.c_str());
+
+        }
+    }
+  return(0);
+}
+static struct Hook DriverSelectHook;
 
 //static UBYTE           DisplayNameBuffer[256];
 std::string DisplayNameBuffer;
@@ -249,8 +269,8 @@ static struct TagItem ScreenModeTags[] =
   { TAG_END }
 };
 
-static struct Hook ScreenModeStartHook;
-static struct Hook ScreenModeStopHook;
+//static struct Hook ScreenModeStartHook;
+//static struct Hook ScreenModeStopHook;
 static struct Hook ScreenTypeNotifyHook;
 static struct Hook DirectModeNotifyHook;
 static struct Hook SoundNotifyHook;
@@ -291,8 +311,8 @@ static void CreateApp(void);
 static void GetOptions(BOOL get_driver);
 static void SetOptions(BOOL set_driver);
 static void SetDisplayName(ULONG);
-static ULONG ASM ScreenModeStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1));
-static ULONG ASM ScreenModeStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1));
+//static ULONG ASM ScreenModeStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1));
+//static ULONG ASM ScreenModeStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1));
 static ULONG ASM ScreenTypeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 static ULONG ASM DirectModeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 static ULONG ASM SoundNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
@@ -680,8 +700,8 @@ void AllocGUI(void)
     for(i = 0; Bufferings[i]; i++)
       Bufferings[i] = GetMessage((LONG) Bufferings[i]);
 
-    ScreenModeStartHook.h_Entry  = (RE_HOOKFUNC) ScreenModeStart;
-    ScreenModeStopHook.h_Entry   = (RE_HOOKFUNC) ScreenModeStop;
+//    ScreenModeStartHook.h_Entry  = (RE_HOOKFUNC) ScreenModeStart;
+//    ScreenModeStopHook.h_Entry   = (RE_HOOKFUNC) ScreenModeStop;
     ScreenTypeNotifyHook.h_Entry = (RE_HOOKFUNC) ScreenTypeNotify;
     DirectModeNotifyHook.h_Entry = (RE_HOOKFUNC) DirectModeNotify;
     SoundNotifyHook.h_Entry      = (RE_HOOKFUNC) SoundNotify;
@@ -968,176 +988,18 @@ Object *createPanel_Drivers()
 //  return w;
 //}
 
-//ULONG createPanel_Sound()
-//{
-//   ULONG w = UMUINO(MUIC_Group,
-//        Child, HVSpace,
-//        Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-//          Child, HSpace(0),
-//          Child, UMUINO(MUIC_Group,MUIA_Group_Columns,4,
-//            MUIA_HorizWeight, 1000,
-//            Child, Label((ULONG)GetMessage(MSG_SOUND)),
-//            Child, CY_Sound =  OMUINO(MUIC_Cycle,
-//              MUIA_Cycle_Entries, (ULONG) Sounds,
-//            TAG_DONE),
-//          TAG_DONE),
-//          Child, HSpace(0),
-//        TAG_DONE),
-////        Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-////          Child, MUI_NewObject(MUIC_Rectangle, TAG_DONE),
-////          Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-////            MUIA_HorizWeight, 1000,
-////            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_0)),
-////            Child, SL_AudioChannel[0] = OMUINO(MUIC_Slider,
-////              MUIA_Slider_Min,    0,
-////              MUIA_Slider_Max,    15,
-////            TAG_DONE),
-////            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_1)),
-////            Child, SL_AudioChannel[1] = OMUINO(MUIC_Slider,
-////              MUIA_Slider_Min,    0,
-////              MUIA_Slider_Max,    15,
-////            TAG_DONE),
-////            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_2)),
-////            Child, SL_AudioChannel[2] = OMUINO(MUIC_Slider,
-////              MUIA_Slider_Min,    0,
-////              MUIA_Slider_Max,    15,
-////            TAG_DONE),
-////            Child, Label((ULONG)GetMessage(MSG_AUDIO_CH_3)),
-////            Child, SL_AudioChannel[3] = OMUINO(MUIC_Slider,
-////              MUIA_Slider_Min,    0,
-////              MUIA_Slider_Max,    15,
-////            TAG_DONE),
-////            Child, Label((ULONG)GetMessage(MSG_MIN_CHIP)),
-////            Child, SL_MinFreeChip = OMUINO(MUIC_Slider,
-////              MUIA_Slider_Min,    0,
-////              MUIA_Slider_Max,    2048,
-////            TAG_DONE),
-////          TAG_DONE),
-////          Child, MUI_NewObject(MUIC_Rectangle, TAG_DONE),
-////        TAG_DONE),
-//        Child, HVSpace,
-//      TAG_DONE);
 
-//  return w;
-//}
-
-//ULONG createPanel_Controls()
-//{
-//    return UMUINO(MUIC_Group,
-//    Child, HVSpace,
-////    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-////      Child, HSpace(0),
-////      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-////        GroupFrameT((ULONG)GetMessage(MSG_PRIMARY_CONTROLLER)),
-////        MUIA_HorizWeight, 1000,
-////        Child, Label((ULONG)GetMessage(MSG_TYPE)),
-////        Child, CY_Joy1Type = OMUINO(MUIC_Cycle,
-////          MUIA_Cycle_Entries, (ULONG) Joy1Types,
-////        TAG_DONE),
-////        Child, Label((ULONG)GetMessage(MSG_BUTTON_B_HOLD_TIME)),
-////        Child, SL_Joy1ButtonBTime = OMUINO(MUIC_Slider,
-////          MUIA_Slider_Min,    0,
-////          MUIA_Slider_Max,    9,
-////        TAG_DONE),
-////        Child, Label((ULONG)GetMessage(MSG_AUTO_FIRE_RATE)),
-////        Child, SL_Joy1AutoFireRate = OMUINO(MUIC_Slider,
-////          MUIA_Slider_Min,    0,
-////          MUIA_Slider_Max,    5,
-////        TAG_DONE),
-////      TAG_DONE),
-////      Child, HSpace(0),
-////    TAG_DONE),
-
-////    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-////      Child, HSpace(0),
-////      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-////        GroupFrameT((ULONG)GetMessage(MSG_SECONDARY_CONTROLLER)),
-////        MUIA_HorizWeight, 1000,
-////        Child, Label((ULONG)GetMessage(MSG_TYPE)),
-////        Child, CY_Joy2Type = OMUINO(MUIC_Cycle,
-////          MUIA_Cycle_Entries, (ULONG) Joy2Types,
-////        TAG_DONE),
-////        Child, Label((ULONG)GetMessage(MSG_BUTTON_B_HOLD_TIME)),
-////        Child, SL_Joy2ButtonBTime = OMUINO(MUIC_Slider,
-////          MUIA_Slider_Min,    0,
-////          MUIA_Slider_Max,    9,
-////        TAG_DONE),
-////        Child, Label((ULONG)GetMessage(MSG_AUTO_FIRE_RATE)),
-////        Child, SL_Joy2AutoFireRate = OMUINO(MUIC_Slider,
-////          MUIA_Slider_Min,    0,
-////          MUIA_Slider_Max,    5,
-////        TAG_DONE),
-////      TAG_DONE),
-////      Child, HSpace(0),
-////    TAG_DONE),
-//    Child, HVSpace,
-//  TAG_DONE);
-//}
-
-//ULONG createPanel_Paths()
-//{
-//    return UMUINO(MUIC_Group,
-//        Child, HVSpace,
-//        Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-//          Child, HSpace(0),
-//          Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-//            MUIA_HorizWeight, 1000,
-//            Child, Label((ULONG)GetMessage(MSG_ROM_PATH)),
-//            Child,(ULONG) (PA_RomPath = MUI_NewObject(MUIC_Popasl,
-//              MUIA_Popstring_String,(ULONG)(ST_RomPath = OString(0, 256)),
-//              MUIA_Popstring_Button, (ULONG)(PopButton(MUII_PopDrawer)),
-//              ASLFR_DrawersOnly,    TRUE,
-//            TAG_DONE)),
-//           /* Child, Label((ULONG)GetMessage(MSG_SAMPLE_PATH)),
-//             Child,(ULONG)(PA_SamplePath = MUI_NewObject(MUIC_Popasl,
-//              MUIA_Popstring_String,(ULONG)(  ST_SamplePath = OString(0, 256)),
-//              MUIA_Popstring_Button,(ULONG)(PopButton(MUII_PopDrawer)),
-//              ASLFR_DrawersOnly,    TRUE,
-//            TAG_DONE)),*/
-//          TAG_DONE),
-//          Child, HSpace(0),
-//        TAG_DONE),
-//        Child, HVSpace,
-//      TAG_DONE);
-//}
-MUISerializer muiConfigCreator;
 
 ULONG createOptionTabGroup()
 {
     MameConfig &config = getMainConfig();
 
- printf("createOptionTabGroup1\n");
- muiConfigCreator("Main",(ASerializable &)config);
- //   config.serialize(muiConfigCreator);// use config definition to create panels.
- printf("createOptionTabGroup2\n");
+    muiConfigCreator("Main",(ASerializable &)config);
+
     muiConfigCreator.insertFirstPanel(createPanel_Drivers(),"Drivers");
- printf("createOptionTabGroup3\n");
+
     RE_Options = muiConfigCreator.compile();
- printf("createOptionTabGroup4:%08x\n",(int)RE_Options);
-    // feed tabs taglist with panels created..
-//    vector<string> panelNames({"Drivers"});
-//    vector<ULONG> register_taglist({MUIA_Register_Titles,(ULONG)panelNames.data()});
 
-//    register_taglist.push_back(TAG_DONE);
-//createPanel_Display
-//    RE_Options = MUI_NewObjectA(MUIC_Register, (struct TagItem *) register_taglist.data());
-/*
-    RE_Options = OMUINO(MUIC_Register,MUIA_Register_Titles,(ULONG)(&RegisterTitles[0]),
-
-                // Tab1: Drivers
-                Child,createPanel_Drivers(),
-                // Tab2: Display
-                Child,createPanel_Display(),
-                //tab 3: Sound
-                Child,createPanel_Sound(),
-               // tab4: controls
-                Child,createPanel_Controls(),
-                //
-                Child,createPanel_Paths() ,
-
-        TAG_DONE);
-        */
-    printf("OptionTabGroup:%08x\n",(int)RE_Options);
     return (ULONG)RE_Options;
 }
 
@@ -1221,6 +1083,10 @@ int MainGUI(void)
 
           DoMethod(LV_Driver, MUIM_Notify,  MUIA_Listview_DoubleClick, TRUE,
                    App, 2, MUIM_Application_ReturnID,  RID_Start);
+
+          DriverSelectHook.h_Entry = (RE_HOOKFUNC) &DriverSelect;
+          DoMethod(LV_Driver, MUIM_Notify,  MUIA_List_Active, MUIV_EveryTime,
+                   LV_Driver,3 , MUIM_CallHook,(ULONG) &DriverSelectHook,  MUIV_TriggerValue);
 
           DoMethod(BU_Start, MUIM_Notify, MUIA_Pressed, FALSE,
                    App, 2, MUIM_Application_ReturnID, RID_Start);
@@ -1650,27 +1516,29 @@ static void SetDisplayName(ULONG displayid)
   set(DisplayName, MUIA_Text_Contents, (ULONG) DisplayNameBuffer.c_str());
 }
 
-static ULONG ASM ScreenModeStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1))
-{
-  LONG  i;
+//static ULONG ASM ScreenModeStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1))
+//{
+//  LONG  i;
 
-  for(i = 0; taglist[i].ti_Tag != TAG_END; i++);
+//  for(i = 0; taglist[i].ti_Tag != TAG_END; i++);
 
-  taglist[i].ti_Tag = TAG_MORE;
-  taglist[i].ti_Data  = (ULONG) ScreenModeTags;
+//  taglist[i].ti_Tag = TAG_MORE;
+//  taglist[i].ti_Data  = (ULONG) ScreenModeTags;
 
-  return(TRUE);
-}
+//  return(TRUE);
+//}
 
-static ULONG ASM ScreenModeStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1))
-{
-  ScreenModeTags[SMT_DISPLAYID].ti_Data = smreq->sm_DisplayID;
-  ScreenModeTags[SMT_DEPTH].ti_Data   = smreq->sm_DisplayDepth;
+//static ULONG ASM ScreenModeStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1))
+//{
+//  ScreenModeTags[SMT_DISPLAYID].ti_Data = smreq->sm_DisplayID;
+//  ScreenModeTags[SMT_DEPTH].ti_Data   = smreq->sm_DisplayDepth;
 
-  SetDisplayName(smreq->sm_DisplayID);
+//  SetDisplayName(smreq->sm_DisplayID);
 
-  return(0);
-}
+//  return(0);
+//}
+// when driver just selected, not double clicked
+
 
 #ifndef MESS
 static ULONG ASM ShowNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
