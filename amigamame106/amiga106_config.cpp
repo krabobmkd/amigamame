@@ -249,10 +249,11 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
     serializer("Rotate Screens",(int &)_rotateMode,{"None","+90","180","-90"});
 
     // want modeid greyed if screen not choosen
-    serializer.listenChange("Screen Selection",[=](ASerializer &serializer)
+    serializer.listenChange("Screen Selection",[](ASerializer &serializer, void *p)
     {
+        ScreenModeChoice *pScreenModeChoice = (ScreenModeChoice *)p;
         printf(" *** DO CONDITION\n");
-        serializer.enable("Display.Per Screen Mode.Screen mode",(_ScreenModeChoice == ScreenModeChoice::Choose)?1:0);
+        serializer.enable("Display.Per Screen Mode.Screen mode",(*pScreenModeChoice == ScreenModeChoice::Choose)?1:0);
     });
 }
 void MameConfig::Display_PerScreenMode::valueUpdated(std::string upatedValue)
