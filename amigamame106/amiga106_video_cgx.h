@@ -11,30 +11,14 @@ extern "C"
 extern "C" {
     #include "osdepend.h"
 }
+#include "amiga_video_remap.h"
+
 struct _osd_create_params;
 struct _mame_display;
 struct Window;
 struct Screen;
 struct RastPort;
 struct BitMap;
-
-/* if game send color indexed bitmap, manage remap to final bitmap pixel format  */
-class Paletted_CGX
-{
-public:
-    Paletted_CGX(const AmigaDisplay::params &params, int screenPixFmt, int bytesPerPix);
-    ~Paletted_CGX();
-    void updatePaletteRemap(_mame_display *display);
-    void updatePaletteRemap15b();
-    int needRemap() const { return _needFirstRemap; }
-
-    std::vector<UBYTE> _clut8;
-    std::vector<USHORT> _clut16;
-    std::vector<ULONG> _clut32;
-protected:
-    int _needFirstRemap;
-    int _pixFmt,_bytesPerPix;
-};
 
 /** virtual, at this level manage screen and window opening, not rendering */
 
@@ -53,7 +37,6 @@ public:
 protected:
     ULONG _PixelFmt,_PixelBytes;
     int _width,_height;
-    int _dx,_dy; // draw delta (for windows borders)
     int _useScale;
     int _flags;
     virtual BitMap *bitmap() = 0;

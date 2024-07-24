@@ -77,7 +77,10 @@ set(AMIGA_SRC
 #	amiga106_video_p96.cpp
 #	amiga106_video_aga.h
 #	amiga106_video_aga.cpp
-	amiga_video_tracers_clut16.h
+#	amiga_video_tracers_clut16.h
+#	amiga_video_tracers_clut16.cpp
+	amiga_video_remap.h
+	amiga_video_remap.cpp
 	amiga106_video_cgx.h
 	amiga106_video_cgx.cpp
 	amiga106_inputs.h
@@ -102,7 +105,7 @@ set(AMIGA_SRC
 	mame_ver.h
 	mame_msg.h
 
-	directdraw.s
+#	directdraw.s
 #	parallelporthandler.s
 	devnotes.txt
 #	c2p.s
@@ -129,6 +132,22 @@ set(AMIGA_SRC
 	target_include_directories(Mame106AmigaO0 PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
 	# those for mame includes
 	target_compile_definitions(Mame106AmigaO0 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
+# - - -have some Amiga code using O3
+	add_library(Mame106AmigaO3 STATIC
+		amiga_video_tracers_clut16.h
+		amiga_video_tracers_clut16.cpp
+	)
+	set_property(TARGET Mame106AmigaO3 PROPERTY C_STANDARD 11)
+	set_property(TARGET Mame106AmigaO3 PROPERTY CXX_STANDARD 11)
+	if(MAME_USE_HARDFLOAT)
+		target_compile_definitions(Mame106AmigaO3 PRIVATE MAME_USE_HARD_FLOAT=1 )
+	endif()
+	target_include_directories(Mame106AmigaO3 PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
+	# -funroll-loops -ftree-loop-ivcanon -ftree-loop-im
+	target_compile_options(Mame106AmigaO3 PRIVATE -O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im ${AMIGA_COMPILER_OPTIONS} )
+	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
+	# those for mame includes
+	target_compile_definitions(Mame106AmigaO3 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
 
 # - - - -
 
@@ -141,7 +160,7 @@ if(MAME_USE_HARDFLOAT)
 	target_compile_definitions(${PROGNAME} PRIVATE MAME_USE_HARD_FLOAT=1 )
 endif()
 # the static libs that are part eof this repo:
-target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO0 mamecoreO2 z expat)
+target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO0 Mame106AmigaO3 mamecoreO2 z expat)
 
 # target_include_directories(${PROGNAME} PUBLIC "../mame037b/src")
 target_include_directories(${PROGNAME} PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
