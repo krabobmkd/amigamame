@@ -1,4 +1,8 @@
 
+
+ - O "configuration for:" ne s'affiche pas forcément
+ - O Mode ID doit ê'tre grisé si pas choose (absolument)
+
  Checkpoint 1  for first beta release:
 
   - All display and rotations modes OK
