@@ -39,6 +39,9 @@ protected:
     int _width,_height;
     int _useScale;
     int _flags;
+    // 8Bits Modes can either have static remaped palette,
+    // or _8BitsHasPaletteMode
+    int _8BitsHasDynamicPalette;
     virtual BitMap *bitmap() = 0;
 };
 

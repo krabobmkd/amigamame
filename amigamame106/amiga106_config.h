@@ -167,6 +167,13 @@ public:
     };
     Paths &paths() { return _paths; }
 
+    // just to have a help panel
+    struct Help : public ASerializable
+    {
+        void serialize(ASerializer &serializer) override;
+        strText _[9];
+    };
+
     void toDefault();
 
 protected:
@@ -177,6 +184,7 @@ protected:
     Audio       _audio;
     Controls    _controls;
     Paths       _paths;
+    Help        _help;
 
     int     _activeDriver;
     int     _listShowState;

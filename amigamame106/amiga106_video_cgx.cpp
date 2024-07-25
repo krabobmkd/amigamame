@@ -52,6 +52,7 @@ template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 IntuitionDrawable::IntuitionDrawable(int flags)
 : _PixelFmt(0),_PixelBytes(0),_width(0),_height(0),_useScale(0)
 , _flags(flags)
+, _8BitsHasDynamicPalette(0)
 {
 }
 IntuitionDrawable::~IntuitionDrawable()
@@ -157,10 +158,19 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             }
             break;
             case PIXFMT_LUT8:
-                //TODO
+            if(_8BitsHasDynamicPalette)
+            {
+                //8Bit using fullscreen with dynamic palette change, should just copy pixels.
+                directDraw_UBYTE_UBYTE(&ddscreen,&ddsource,cenx,ceny,ww,hh);
+            } else {
+                if(pRemap->_clut8.size()>0)
+                {   // 8bit using remap and static palette (like on workbench 8bit)
+                    directDrawClutT_UBYTE_UBYTE(&ddscreen,&ddsource,cenx,ceny,ww,hh,pRemap->_clut8.data());
+                }
+            }
             break;
         default:
-
+            // shouldnt happen.
             break;
         }
     } else

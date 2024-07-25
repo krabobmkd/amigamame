@@ -89,11 +89,8 @@ set_property(TARGET mamecoreO2 PROPERTY CXX_STANDARD 11)
 target_include_directories(mamecoreO2 PUBLIC ${MAME_INCLUDE_DIRS} ${ZLIBPATH} )
 set(MAME_INLINE "static inline")
 target_compile_definitions(mamecoreO2 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
-#if(MAME_USE_HARDFLOAT)
-#	target_compile_definitions(mamecoreO2 PUBLIC MAME_USE_HARD_FLOAT=1 )
-#endif()
 # -fpermissive -Wno-narrowing
- target_compile_options(mamecoreO2 PRIVATE -O2 -fno-tree-vectorize ${AMIGA_COMPILER_OPTIONS} )
+ target_compile_options(mamecoreO2 PRIVATE -O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -fno-tree-vectorize ${AMIGA_COMPILER_OPTIONS} )
 # - - - - - - - - - - same for O3
 
 #add_library( mamecoreO3 STATIC  ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC} )

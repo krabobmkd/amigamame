@@ -219,6 +219,7 @@ void MameConfig::serialize(ASerializer &serializer)
     serializer("Audio",     (ASerializable&)_audio,0);
     serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS);
     serializer("Paths",     (ASerializable&)_paths,0);
+    serializer("Help",     (ASerializable&)_help,0);
 }
 void MameConfig::toDefault()
 {
@@ -252,7 +253,6 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
     serializer.listenChange("Screen Selection",[](ASerializer &serializer, void *p)
     {
         ScreenModeChoice *pScreenModeChoice = (ScreenModeChoice *)p;
-        printf(" *** DO CONDITION\n");
         serializer.enable("Display.Per Screen Mode.Screen mode",(*pScreenModeChoice == ScreenModeChoice::Choose)?1:0);
     });
 }
@@ -328,7 +328,29 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
 void MameConfig::Paths::serialize(ASerializer &serializer)
 {
     serializer("Roms",_romsPath,SERFLAG_STRING_ISPATH);
+}
 
+
+void MameConfig::Help::serialize(ASerializer &serializer)
+{
+_[0] ="       Ingame Keys";
+    serializer(" ",_[0]);
+_[1] ="Player Start 1/2/3/4";
+    serializer("1-4 : ",_[1]);
+_[2] ="Player Coins 1/2/3/4";
+    serializer("5-8 : ",_[2]);
+_[3] ="Pause";
+    serializer("P : ",_[3]);
+_[4] ="Show/Hide Settings";
+    serializer("Tab : ",_[4]);
+_[5] ="Switch Window/Fullscreen";
+    serializer("F10 : ",_[5]);
+_[6] ="Show/Hide Statistics";
+    serializer("Help : ",_[6]);
+_[7] ="Save State +Shift: Load";
+    serializer("F7 : ",_[7]);
+_[8] ="Escape Game";
+    serializer("Esc : ",_[8]);
 }
 
 

@@ -14,7 +14,7 @@ struct type24{
 
 //int tracer_debug=0,tracer_debug2=0;
 
-template<typename SCREENPIXTYPE,typename CLUTTYPE,bool C_swapXY>
+template<typename SCREENPIXTYPE,typename CLUTTYPE,bool C_swapXY,bool useClut>
 void directDrawScaleClutTT(directDrawScreen *screen,
                 directDrawSource *source,
                 LONG x1 ,
@@ -88,7 +88,13 @@ void directDrawScaleClutTT(directDrawScreen *screen,
             LONG vx = vxStart;
             for(WORD ww=0;ww<w;ww++)
             {
-                *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = lut[psoline[((UWORD)(vx>>16))*vmod]];
+                if(useClut)
+                {
+                    *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = lut[psoline[((UWORD)(vx>>16))*vmod]];
+                } else
+                {
+                    *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = (SCREENPIXTYPE)psoline[((UWORD)(vx>>16))*vmod];
+                }
                 pscline++;
                 vx += addw;
             }
@@ -102,7 +108,13 @@ void directDrawScaleClutTT(directDrawScreen *screen,
             LONG vx = vxStart;
             for(WORD ww=0;ww<w;ww++)
             {
-                *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = lut[psoline[((UWORD)(vx>>16))*vmod]];
+                if(useClut)
+                {
+                *pscline = pscline[wscbpr] = lut[psoline[((UWORD)(vx>>16))*vmod]];
+                } else
+                {
+                *pscline = pscline[wscbpr] = (SCREENPIXTYPE)psoline[((UWORD)(vx>>16))*vmod];
+                }
                 pscline++;
                 vx += addw;
             }
@@ -116,7 +128,13 @@ void directDrawScaleClutTT(directDrawScreen *screen,
             LONG vx = vxStart;
             for(WORD ww=0;ww<w;ww++)
             {
-                *pscline++ = lut[psoline[((UWORD)(vx>>16))*vmod]];
+                if(useClut)
+                {
+                    *pscline++ = lut[psoline[((UWORD)(vx>>16))*vmod]];
+                } else
+                {
+                    *pscline++ = (SCREENPIXTYPE) psoline[((UWORD)(vx>>16))*vmod];
+                }
                 vx += addw;
             }
             vh += addh;
@@ -126,7 +144,7 @@ void directDrawScaleClutTT(directDrawScreen *screen,
     } // end loop h
 
 }
-template<typename SCREENPIXTYPE,typename CLUTTYPE,bool C_swapXY>
+template<typename SCREENPIXTYPE,typename CLUTTYPE,bool C_swapXY,bool useClut>
 void directDrawClutTT(directDrawScreen *screen,
                 directDrawSource *source,
                 LONG x1 ,
@@ -186,7 +204,10 @@ void directDrawClutTT(directDrawScreen *screen,
             LONG vx = vxStart;
             for(WORD ww=0;ww<w;ww++)
             {
+                if(useClut)
                 *pscline++ = lut[psoline[vx]];
+                else
+                *pscline++ = (SCREENPIXTYPE) psoline[vx];
                 vx += addw;
             }
             vh += addh;
@@ -218,13 +239,19 @@ void directDrawClutTT(directDrawScreen *screen,
             {
                 for(WORD ww=0;ww<w;ww++)
                 {
+                    if(useClut)
                     *pscline++ = lut[psoline[vx++]];
+                    else
+                    *pscline++ = (SCREENPIXTYPE)psoline[vx++];
                 }
             } else
             {   // swap X
                 for(WORD ww=0;ww<w;ww++)
                 {
+                    if(useClut)
                     *pscline++ = lut[psoline[--vx]];
+                    else
+                    *pscline++ = (SCREENPIXTYPE)psoline[--vx];
                 }
             }
             vh += addh;
@@ -235,7 +262,7 @@ void directDrawClutTT(directDrawScreen *screen,
 }
 
 
-template<typename SCREENPIXTYPE,typename CLUTTYPE>
+template<typename SCREENPIXTYPE,typename CLUTTYPE,bool useClut>
 void directDrawClutT(directDrawScreen *screen,
                 directDrawSource *source,
                 LONG x1 ,
@@ -253,11 +280,11 @@ void directDrawClutT(directDrawScreen *screen,
 
     const bool doScale = ((sourcewidth!=w) || (sourceheight!=h));
     if(doSwapXY)
-        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,true>( screen,source,x1,y1,w,h,lut);
-        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,true>( screen,source,x1,y1,w,h,lut);
+        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,true,useClut>( screen,source,x1,y1,w,h,lut);
+        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,true,useClut>( screen,source,x1,y1,w,h,lut);
     else
-        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,false>( screen,source,x1,y1,w,h,lut);
-        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,false>( screen,source,x1,y1,w,h,lut);
+        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,false,useClut>( screen,source,x1,y1,w,h,lut);
+        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,false,useClut>( screen,source,x1,y1,w,h,lut);
 
 }
 
@@ -265,19 +292,25 @@ void directDrawClutT(directDrawScreen *screen,
 
 void directDrawClutT_UWORD_UWORD(directDrawScreen *screen , directDrawSource *source,LONG x1 ,LONG y1 ,LONG w, LONG h,UWORD *lut)
 {
-    directDrawClutT<UWORD,UWORD>(screen,source,x1,y1,w,h,lut);
+    directDrawClutT<UWORD,UWORD,true>(screen,source,x1,y1,w,h,lut);
 }
 void directDrawClutT_ULONG_ULONG(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h,ULONG *lut)
 {
-    directDrawClutT<ULONG,ULONG>(screen,source,x1,y1,w,h,lut);
+    directDrawClutT<ULONG,ULONG,true>(screen,source,x1,y1,w,h,lut);
 }
 void directDrawClutT_type24_ULONG(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h,ULONG *lut)
 {
-    directDrawClutT<type24,ULONG>(screen,source,x1,y1,w,h,lut);
+    directDrawClutT<type24,ULONG,true>(screen,source,x1,y1,w,h,lut);
 }
 void directDrawClutT_UBYTE_UBYTE(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h,UBYTE *lut)
 {
-    directDrawClutT<UBYTE,UBYTE>(screen,source,x1,y1,w,h,lut);
+    directDrawClutT<UBYTE,UBYTE,true>(screen,source,x1,y1,w,h,lut);
+}
+
+// - - --
+void directDraw_UBYTE_UBYTE(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h)
+{
+    directDrawClutT<UBYTE,UBYTE,false>(screen,source,x1,y1,w,h,0L);
 }
 
 

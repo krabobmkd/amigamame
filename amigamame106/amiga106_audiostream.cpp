@@ -326,7 +326,8 @@ int osd_update_audio_stream(INT16 *buffer)
 
     return pAHIS->m_nextSamples;
 #else
-    return 800;
+    // return  here means "don't use audio at all".
+    return 0;
 #endif
 }
 extern "C" {
