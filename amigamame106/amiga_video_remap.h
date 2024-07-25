@@ -8,22 +8,43 @@ extern "C"
 }
 #include "amiga106_video.h"
 
-/* if game send color indexed bitmap, manage remap to final bitmap pixel format  */
-class Paletted_CGX
+class Paletted
 {
 public:
-    Paletted_CGX(const AmigaDisplay::params &params, int screenPixFmt, int bytesPerPix);
-    ~Paletted_CGX();
-    void updatePaletteRemap(_mame_display *display);
-    void updatePaletteRemap15b();
+    Paletted();
     int needRemap() const { return _needFirstRemap; }
-
+     virtual void updatePaletteRemap(_mame_display *display) = 0;
     std::vector<UBYTE> _clut8;
     std::vector<USHORT> _clut16;
     std::vector<ULONG> _clut32;
 protected:
     int _needFirstRemap;
+};
+
+/* if game send color indexed bitmap, manage remap to final bitmap pixel format  */
+class Paletted_CGX : public Paletted
+{
+public:
+    Paletted_CGX(const AmigaDisplay::params &params, int screenPixFmt, int bytesPerPix);
+    ~Paletted_CGX();
+    void updatePaletteRemap(_mame_display *display) override;
+    void updatePaletteRemap15b();
+
+
+protected:
+
     int _pixFmt,_bytesPerPix;
+};
+
+class Paletted_Screen8 : public Paletted
+{
+ public:
+    Paletted_Screen8(struct Screen *pScreen);
+    void updatePaletteRemap(_mame_display *display) override;
+protected:
+    struct Screen *_pScreen;
+    ULONG _palette[3*32+2];
+
 };
 
 #endif

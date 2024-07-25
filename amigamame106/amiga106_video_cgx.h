@@ -30,18 +30,16 @@ public:
     virtual void close()= 0;
     virtual MsgPort *userPort() = 0;
     virtual RastPort *rastPort() = 0;
+    virtual Screen *screen() { return NULL; }
     inline ULONG pixelFmt() const { return _PixelFmt; }
     inline ULONG pixelBytes() const { return _PixelBytes; }
-
-    virtual void drawRastPort_CGX(_mame_display *display,Paletted_CGX *pRemap);
+    inline int flags() const { return _flags; }
+    virtual void drawRastPort_CGX(_mame_display *display,Paletted *pRemap);
 protected:
     ULONG _PixelFmt,_PixelBytes;
     int _width,_height;
     int _useScale;
     int _flags;
-    // 8Bits Modes can either have static remaped palette,
-    // or _8BitsHasPaletteMode
-    int _8BitsHasDynamicPalette;
     virtual BitMap *bitmap() = 0;
 };
 
@@ -52,6 +50,7 @@ public:
     ~Intuition_Screen();
     void open() override;
     void close() override;
+    Screen *screen() override { return _pScreen; }
     MsgPort *userPort() override;
     RastPort *rastPort() override;
 protected:
@@ -80,7 +79,7 @@ protected:
     int _machineWidth,_machineHeight;
     int _maxzoomfactor;
     BitMap *bitmap() override;
-    void drawRastPort_CGX(_mame_display *display,Paletted_CGX *pRemap) override;
+    void drawRastPort_CGX(_mame_display *display,Paletted *pRemap) override;
 };
 class Intuition_ScaleWindow : public Intuition_Window
 {
@@ -88,8 +87,7 @@ public:
     Intuition_ScaleWindow(const AmigaDisplay::params &params);
     ~Intuition_ScaleWindow();
 protected:
-    //void synchBmSize();
-    //void drawRastPort_CGX(_mame_display *display,Paletted_CGX *pRemap) override;
+
 };
 
 class Display_CGX : public AmigaDisplay
@@ -106,8 +104,8 @@ public:
     int switchFullscreen() override;
     void WaitFrame() override;
 protected:
-    IntuitionDrawable   *_drawable; // screen or window
-    Paletted_CGX        *_remap;    // null if true color app.
+    IntuitionDrawable   *_drawable; // this manages screen or window
+    Paletted        *_remap;    // this manages pixel mode and color remap.
     params _params; // last params set
     ULONG _forcedModeId;
  //   void drawRastPort(RastPort *pRPort,_mame_display *pmame_display,int dx,int dy);

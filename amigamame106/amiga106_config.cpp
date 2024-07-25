@@ -333,6 +333,9 @@ void MameConfig::Paths::serialize(ASerializer &serializer)
 
 void MameConfig::Help::serialize(ASerializer &serializer)
 {
+    // just use the item capabilities of the gui serializer,
+    // to display a short notice.
+    // actually nothing to load/save.
 _[0] ="       Ingame Keys";
     serializer(" ",_[0]);
 _[1] ="Player Start 1/2/3/4";
@@ -349,8 +352,10 @@ _[6] ="Show/Hide Statistics";
     serializer("Help : ",_[6]);
 _[7] ="Save State +Shift: Load";
     serializer("F7 : ",_[7]);
-_[8] ="Escape Game";
-    serializer("Esc : ",_[8]);
+_[8] ="Reset";
+        serializer("F3 : ",_[8]);
+_[9] ="Escape Game";
+    serializer("Esc : ",_[9]);
 }
 
 

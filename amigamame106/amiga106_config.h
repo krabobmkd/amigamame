@@ -171,7 +171,7 @@ public:
     struct Help : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
-        strText _[9];
+        strText _[10];
     };
 
     void toDefault();

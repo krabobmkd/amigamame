@@ -52,7 +52,6 @@ template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 IntuitionDrawable::IntuitionDrawable(int flags)
 : _PixelFmt(0),_PixelBytes(0),_width(0),_height(0),_useScale(0)
 , _flags(flags)
-, _8BitsHasDynamicPalette(0)
 {
 }
 IntuitionDrawable::~IntuitionDrawable()
@@ -61,7 +60,7 @@ IntuitionDrawable::~IntuitionDrawable()
 
 // would draw LUT screens or truecolor, ...
 // _width,_height must be set before call.
-void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pRemap)
+void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted *pRemap)
 {
     if(!CyberGfxBase) return;
     RastPort *pRPort = rastPort();
@@ -77,7 +76,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
     UWORD *pp = (UWORD *)bitmap->base;
   //  printf("pixels values:%04x %04x %04x\n",(int)*pp,(int)pp[500],(int)pp[64*512+32]);
     ULONG bmwidth,bmheight;
-
+ int debugval=0;
  //printf("bitmap->rowbytes:%d\n",(int)bitmap->rowbytes);
     APTR hdl = LockBitMapTags(pBitmap,
                               LBMI_WIDTH,(ULONG)&bmwidth,
@@ -103,8 +102,6 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
     {
         doSwap(sourcewidth,sourceheight);
     }
-
-
 
     // applied width height if using scale or not, and centering.
     int cenx,ceny,ww,hh;
@@ -158,8 +155,8 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             }
             break;
             case PIXFMT_LUT8:
-            if(_8BitsHasDynamicPalette)
-            {
+            if(_flags & DISPFLAG_INTUITIONPALETTE)
+            {               
                 //8Bit using fullscreen with dynamic palette change, should just copy pixels.
                 directDraw_UBYTE_UBYTE(&ddscreen,&ddsource,cenx,ceny,ww,hh);
             } else {
@@ -170,17 +167,19 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
             }
             break;
         default:
+            debugval =2;
             // shouldnt happen.
             break;
         }
     } else
     {
-        printf("Truecolor Todo !!\n");
+        debugval=3;
         //Truecolor (todo)
     }
 
     UnLockBitMap(hdl);
-
+     if(debugval ==2) printf("unknown pixfmt\n");
+    else if(debugval ==3) printf("Truecolor todo\n");
 //    extern int tracer_debug,tracer_debug2;
 //    printf("dbg1:%d dbg2:%d\n",tracer_debug,tracer_debug2);
 
@@ -203,7 +202,7 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pR
 
 
 Intuition_Screen::Intuition_Screen(const AmigaDisplay::params &params)
-    : IntuitionDrawable(params._flags)
+    : IntuitionDrawable((params._flags&15))
     , _pScreen(NULL)
     , _pScreenWindow(NULL)
 
@@ -220,7 +219,6 @@ Intuition_Screen::Intuition_Screen(const AmigaDisplay::params &params)
         int height = params._height;
         if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
 
-
         int screenDepth = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
 
         if(_ScreenModeId == INVALID_ID)
@@ -230,11 +228,8 @@ Intuition_Screen::Intuition_Screen(const AmigaDisplay::params &params)
                     CYBRBIDTG_NominalHeight,height,
                     CYBRBIDTG_Depth,screenDepth,
                     TAG_DONE,0 };
-                 printf("bef BestCModeIDTagList()\n");
-
             _ScreenModeId = BestCModeIDTagList(cgxtags);
-               printf("aft BestCModeIDTagList()\n");
-                   fflush(stdout);
+
         }
         if(_ScreenModeId == INVALID_ID)
         {
@@ -245,7 +240,7 @@ Intuition_Screen::Intuition_Screen(const AmigaDisplay::params &params)
         _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
         _PixelFmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, _ScreenModeId );
         _PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
-
+        if(_PixelFmt == PIXFMT_LUT8) _flags|= DISPFLAG_INTUITIONPALETTE;
     } // end if CGX available
 
 }
@@ -259,12 +254,17 @@ void Intuition_Screen::open()
     if(_pScreenWindow) return; // already open.
     if(_ScreenModeId == INVALID_ID) return; // set by inherited class.
 
+    int depth;
+    if(_PixelFmt == PIXFMT_LUT8) depth=8;
+    else depth=16;
+
     // note: all this is regular OS intuition, no CGX
 	struct ColorSpec colspec[2]={0,0,0,0,-1,0,0,0};
  	_pScreen = OpenScreenTags( NULL,
 			SA_DisplayID,_ScreenModeId,
                         SA_Width, _fullscreenWidth,
                         SA_Height,_fullscreenHeight,
+                        SA_Depth,depth,
 //                        SA_Behind,TRUE,    /* Open behind */
                         SA_Quiet,TRUE,     /* quiet */
 			SA_Type,CUSTOMSCREEN,
@@ -440,7 +440,7 @@ BitMap *Intuition_Window::bitmap()
     return _sWbWinSBitmap;
 }
 
-void Intuition_Window::drawRastPort_CGX(_mame_display *display,Paletted_CGX *pRemap)
+void Intuition_Window::drawRastPort_CGX(_mame_display *display,Paletted *pRemap)
 {
     if(_pWbWindow && _sWbWinSBitmap)
     {
@@ -492,23 +492,30 @@ void Display_CGX::open(const AmigaDisplay::params &pparams)
         _drawable = new /*Intuition_Window*/Intuition_ScaleWindow(pparams);
     } else
     {
-
         _drawable = new Intuition_Screen(pparams);
     }
 
     if(!_drawable) return;
-    // must open before computing remap to get correct pixel format.s
+    // must open before computing remap to get correct pixel format.
     _drawable->open();
 
-    if((pparams._video_attributes & VIDEO_RGB_DIRECT)==0 &&
-        pparams._colorsIndexLength>0)
+    if( (_drawable->flags() & DISPFLAG_INTUITIONPALETTE) && _drawable->screen() )
     {
-        _remap = new Paletted_CGX(pparams,_drawable->pixelFmt(),_drawable->pixelBytes());
+        // means 8bit screen with palette manageable with intuition.
+        _remap = new Paletted_Screen8(_drawable->screen());
     } else
-    if((pparams._video_attributes & VIDEO_RGB_DIRECT)!=0 && pparams._driverDepth == 15)
     {
-        _remap = new Paletted_CGX(pparams,_drawable->pixelFmt(),_drawable->pixelBytes());
-        _remap->updatePaletteRemap15b(); // once for all.
+        if((pparams._video_attributes & VIDEO_RGB_DIRECT)==0 &&
+            pparams._colorsIndexLength>0)
+        {
+            _remap = new Paletted_CGX(pparams,_drawable->pixelFmt(),_drawable->pixelBytes());
+        } else
+        if((pparams._video_attributes & VIDEO_RGB_DIRECT)!=0 && pparams._driverDepth == 15)
+        {
+            Paletted_CGX *p =  new Paletted_CGX(pparams,_drawable->pixelFmt(),_drawable->pixelBytes());
+            _remap =p;
+            p->updatePaletteRemap15b(); // once for all.
+        }
     }
 
 
@@ -544,6 +551,7 @@ void Display_CGX::draw(_mame_display *display)
     if(!_drawable) return;
 
     // - - update palette if exist and is needed.
+
     if(_remap && ((display->changed_flags & GAME_PALETTE_CHANGED) !=0 || _remap->needRemap()))
     {
         _remap->updatePaletteRemap(display);

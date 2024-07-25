@@ -7,9 +7,12 @@
 #include "amiga_video_remap.h"
 #include <stdio.h>
 
+#include <proto/graphics.h>
+
 extern "C" {
     // for pixel formats
     #include <cybergraphx/cybergraphics.h>
+    #include <intuition/screens.h>
 }
 
 extern "C" {
@@ -18,8 +21,13 @@ extern "C" {
     #include "video.h"
 }
 
+Paletted::Paletted() : _needFirstRemap(1)
+{
+
+}
+
 Paletted_CGX::Paletted_CGX(const AmigaDisplay::params &params, int screenPixFmt, int bytesPerPix)
-    : _needFirstRemap(1), _pixFmt(screenPixFmt),_bytesPerPix(bytesPerPix)
+    : Paletted(), _pixFmt(screenPixFmt),_bytesPerPix(bytesPerPix)
 {
     switch(bytesPerPix){
         case 1: _clut8.reserve(params._colorsIndexLength); break;
@@ -252,3 +260,56 @@ void Paletted_CGX::updatePaletteRemap(_mame_display *display)
     }
     _needFirstRemap = 0;
 }
+// - - - - -
+
+Paletted_Screen8::Paletted_Screen8(struct Screen *pScreen)
+    : Paletted(), _pScreen(pScreen) {
+}
+void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
+{
+    if(!_pScreen) return;
+
+
+    const rgb_t *gpal1 = display->game_palette;
+    USHORT nbc = (USHORT)display->game_palette_entries;
+    UINT32 *pdirtrybf =	display->game_palette_dirty;
+    bool ignominiousColorTrick = false;
+    if(nbc==258)
+    {
+        // ignomous trick to add 2 colors for interface :( (slap fight, ...)
+        ignominiousColorTrick = true;
+        rgb_t *g  =const_cast<rgb_t *>(gpal1);
+        g[1] = 0x00ffffff;
+    }
+    if(nbc>256) nbc=256;
+    if(_needFirstRemap)
+    {
+        // on first force all dirty to have all done once.
+        int nbdirstybf = (nbc+31)>>5;
+        for(int i=0;i<nbdirstybf;i++) pdirtrybf[i]=~0;
+    }
+     _needFirstRemap = 0;
+
+     for(int j=0;j<nbc;j+=32)
+     {
+        UINT32 dirtybf = *pdirtrybf++;
+        if(!dirtybf) continue; // superfast escape.
+
+        USHORT iend = 32;
+        if(iend>(nbc-j)) iend=(nbc-j);
+        const rgb_t *gpal = gpal1+j;
+        ULONG *pc = &_palette[0];
+        *pc++ = ((ULONG)iend)<<16 | j;
+
+        for(USHORT i=0;i<iend;i++) {
+            ULONG c = (*gpal++);
+            *pc++= (c<<8) & 0xff000000;
+            *pc++= (c<<16) & 0xff000000;
+            *pc++= (c<<24) & 0xff000000;
+        }
+        *pc = 0; // term.
+        LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &_palette[0]);
+     }
+
+}
+
