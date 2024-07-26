@@ -269,7 +269,6 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
 {
     if(!_pScreen) return;
 
-
     const rgb_t *gpal1 = display->game_palette;
     USHORT nbc = (USHORT)display->game_palette_entries;
     UINT32 *pdirtrybf =	display->game_palette_dirty;
@@ -309,6 +308,72 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
         }
         *pc = 0; // term.
         LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &_palette[0]);
+     }
+
+}
+// - - - - - - --
+Paletted_Pens8::Paletted_Pens8(struct Screen *pScreen)
+    : Paletted(), _pScreen(pScreen)
+{
+
+}
+Paletted_Pens8::~Paletted_Pens8()
+{
+//    if(_pScreen)
+//    {
+//        struct ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
+//        if(pColorMap)
+//        // basically clean like that.
+//        for(ULONG i=0;i<256 ;i++ )
+//        {
+//            ReleasePen(pColorMap,i);
+//        }
+//    }
+}
+void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
+{
+    if(!_pScreen) return;
+    struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
+    if(!pColorMap) return;
+
+    const rgb_t *gpal1 = display->game_palette;
+    USHORT nbc = (USHORT)display->game_palette_entries;
+    UINT32 *pdirtrybf =	display->game_palette_dirty;
+
+    if(_needFirstRemap)
+    {
+        // on first force all dirty to have all done once.
+        int nbdirstybf = (nbc+31)>>5;
+        for(int i=0;i<nbdirstybf;i++) pdirtrybf[i]=~0;
+    }
+    if(_clut8.size()<nbc) _clut8.resize(nbc,0);
+    UBYTE *pclut = _clut8.data();
+
+    _needFirstRemap = 0;
+    for(int j=0;j<nbc;j+=32)
+     {
+        UINT32 dirtybf = *pdirtrybf++;
+        if(!dirtybf) continue; // superfast escape.
+
+        USHORT iend = j+32;
+        if(iend>nbc) iend=nbc;
+        const rgb_t *gpal = gpal1+j;
+        for(USHORT i=j;i<iend;i++) {
+            ULONG c = (*gpal++);
+            if(dirtybf&1)
+            {
+            LONG p = ObtainBestPenA(pColorMap,
+                (c<<8) & 0xff000000,
+                (c<<16) & 0xff000000,
+                (c<<24) & 0xff000000,
+                 NULL);
+              if(p>=0){
+                ReleasePen(pColorMap,p); // test
+                pclut[i] = (UBYTE)p;
+              } else pclut[i] =0;
+            } // end if dirty
+            dirtybf>>=1;
+        } // end loop per 32
      }
 
 }

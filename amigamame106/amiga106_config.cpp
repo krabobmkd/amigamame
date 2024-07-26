@@ -223,13 +223,10 @@ void MameConfig::serialize(ASerializer &serializer)
 }
 void MameConfig::toDefault()
 {
-//    _display._modeid = INVALID_ID;
-    _display._drawEngine = DrawEngine::CgxDirectCpu;
+    _display._drawEngine = DrawEngine::CgxDirectCpuOrWPA8;
     _display._perScreenMode.clear();
-//    _display._rotateMode = RotateMode::Rot0;
-//    _display._rotateOnlyVerticalGames = true;
 
-    _audio._mode = 0;
+    _audio._mode = AudioMode::AHI;
     _audio._freq = 22050;
 
     _controls._PlayerPort[0]=ControlPort::Port2llJoy;
@@ -271,14 +268,14 @@ MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode
 {}
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
-    serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU","CPU colormap + CGX ScalePix...","CPU Colormap + WritePixelArray8"});
+    serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU Or WPA8","( More To Come )"});
     serializer("Per Screen Mode",_perScreenModeS);
 
 }
 void MameConfig::Audio::serialize(ASerializer &serializer)
 {
-    serializer("Mode",_mode,{"None","Paula","AHI"});
-    serializer("Frequency",_freq,0,22050);
+    serializer("Mode",(int &)_mode,{"None","AHI"});
+    serializer("Frequency",_freq,8000,22050);
 
 }
 void MameConfig::Controls::serialize(ASerializer &serializer)

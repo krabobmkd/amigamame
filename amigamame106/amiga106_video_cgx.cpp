@@ -19,6 +19,7 @@ extern "C" {
     #include <intuition/intuition.h>
     #include <intuition/screens.h>
     #include <graphics/modeid.h>
+    #include <graphics/displayinfo.h>
 }
 
 extern "C" {
@@ -53,47 +54,15 @@ IntuitionDrawable::IntuitionDrawable(int flags)
 : _PixelFmt(0),_PixelBytes(0),_width(0),_height(0),_useScale(0)
 , _flags(flags)
 {
+  _trp._checkw=0;
+  _trp._rp.BitMap = NULL;
 }
 IntuitionDrawable::~IntuitionDrawable()
 {
+    if(_trp._rp.BitMap) FreeBitMap(_trp._rp.BitMap);
 }
-
-// would draw LUT screens or truecolor, ...
-// _width,_height must be set before call.
-void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted *pRemap)
+void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,int &ww,int &hh)
 {
-    if(!CyberGfxBase) return;
-    RastPort *pRPort = rastPort();
-
-    BitMap *pBitmap = bitmap();
-    if(!pRPort || !pBitmap) return;
-    mame_bitmap *bitmap = display->game_bitmap;
-
-    directDrawScreen ddscreen;
-
-    int depth,pixfmt,pixbytes,bpr;
-
-    UWORD *pp = (UWORD *)bitmap->base;
-  //  printf("pixels values:%04x %04x %04x\n",(int)*pp,(int)pp[500],(int)pp[64*512+32]);
-    ULONG bmwidth,bmheight;
- int debugval=0;
- //printf("bitmap->rowbytes:%d\n",(int)bitmap->rowbytes);
-    APTR hdl = LockBitMapTags(pBitmap,
-                              LBMI_WIDTH,(ULONG)&bmwidth,
-                              LBMI_HEIGHT,(ULONG)&bmheight,
-                              LBMI_DEPTH,(ULONG)&depth,
-                              LBMI_PIXFMT,(ULONG)&pixfmt,
-                              LBMI_BYTESPERPIX,(ULONG)&pixfmt,
-                              LBMI_BYTESPERROW,(ULONG)&ddscreen._bpr,
-                              LBMI_BASEADDRESS,(ULONG)&ddscreen._base,
-                              TAG_DONE);
-    if(!hdl) return;
-
-    ddscreen._clipX1 = 0;//10;
-    ddscreen._clipY1 = 0; //10;
-
-    ddscreen._clipX2 = (WORD)bmwidth; //-10;
-    ddscreen._clipY2 = (WORD)bmheight; //-10;
 
     // +1 because goes 0,319
     int sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
@@ -102,9 +71,6 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted *pRemap
     {
         doSwap(sourcewidth,sourceheight);
     }
-
-    // applied width height if using scale or not, and centering.
-    int cenx,ceny,ww,hh;
 
     if((_width>sourcewidth || _height>sourceheight) && _useScale)
     {
@@ -125,7 +91,118 @@ void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted *pRemap
         if(ceny<0) ceny = 0;
         cenx>>=1;
         ceny>>=1;
+        if(hh>_height) hh=_height; // fast cheap clipping
+        if(ww>_width) ww=_width;
     }
+
+}
+void IntuitionDrawable::drawRastPortWPA8(_mame_display *display,Paletted *pRemap)
+{
+    RastPort *pRPort = rastPort();
+    if(!pRPort) return;
+   // BitMap *pBitmap = bitmap();
+    mame_bitmap *bitmap = display->game_bitmap;
+
+    int cenx,ceny,ww,hh;
+    getGeometry(display,cenx,ceny,ww,hh);
+    // align on 16
+    int wwal = (ww+15)&0xfffffff0;
+
+    const int bmsize = wwal*hh;
+    if(bmsize != _wpatempbm.size())
+    {
+        _wpatempbm.resize(bmsize);
+    }
+    checkWpa8TmpRp(pRPort,wwal);
+    directDrawScreen ddscreen={
+        _wpatempbm.data(),
+        wwal, // bpr
+        0,0,ww,hh // clip rect
+    };
+
+    directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
+        display->game_visible_area.min_x,display->game_visible_area.min_y,
+        display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
+        _flags
+    };
+    //     if(_PixelFmt == PIXFMT_LUT8) _flags|= DISPFLAG_INTUITIONPALETTE;
+    if(_flags & DISPFLAG_INTUITIONPALETTE)
+    {   // no clut table and use intuition LoadRGB32 to change screen colors
+        // actually does WORD to BYTE conversion with no lut.
+        directDraw_UBYTE_UBYTE(&ddscreen,&ddsource,0,0,ww,hh);
+    } else
+    {   // remap to shared screen colors, need a clut.
+        if(pRemap && pRemap->_clut8.size()>0)
+        {
+            directDrawClutT_UBYTE_UBYTE(&ddscreen,&ddsource,0,0,ww,hh,pRemap->_clut8.data());
+        }
+    }
+    //WritePixelArray8(rp,xstart,ystart,xstop,ystop,array,temprp)
+    WritePixelArray8(pRPort,cenx,ceny,cenx+ww-1,ceny+hh-1,
+        _wpatempbm.data(), &_trp._rp
+        );
+}
+void IntuitionDrawable::checkWpa8TmpRp(RastPort *rp,int linewidth)
+{
+    int bpr = ((linewidth+15)>>4)<<4;
+    if(bpr ==  _trp._checkw) return;
+    if(_trp._rp.BitMap) FreeBitMap(_trp._rp.BitMap);
+
+    memcpy(&_trp,rp,sizeof(RastPort) );
+    _trp._rp.Layer = NULL;
+    _trp._rp.BitMap =AllocBitMap(bpr*8,1,
+            rp->BitMap->Depth,BMF_CLEAR,NULL);
+    if(!_trp._rp.BitMap) return;
+    _trp._checkw=bpr;
+
+}
+// would draw LUT screens or truecolor, ...
+// _width,_height must be set before call.
+void IntuitionDrawable::drawRastPort_CGX(_mame_display *display,Paletted *pRemap)
+{
+    RastPort *pRPort = rastPort();
+
+    BitMap *pBitmap = bitmap();
+    if(!pRPort || !pBitmap) return;
+
+    bool useCgxDirect = (CyberGfxBase && GetCyberMapAttr(pBitmap,CYBRMATTR_ISCYBERGFX));
+    if(!useCgxDirect)
+    {
+        if(_PixelFmt == PIXFMT_LUT8) drawRastPortWPA8(display,pRemap);
+        return;
+    }
+
+
+    mame_bitmap *bitmap = display->game_bitmap;
+
+    directDrawScreen ddscreen;
+
+    int depth,pixfmt,pixbytes,bpr;
+
+    UWORD *pp = (UWORD *)bitmap->base;
+    ULONG bmwidth,bmheight;
+
+int debugval=0;
+    APTR hdl = LockBitMapTags(pBitmap,
+                              LBMI_WIDTH,(ULONG)&bmwidth,
+                              LBMI_HEIGHT,(ULONG)&bmheight,
+                              LBMI_DEPTH,(ULONG)&depth,
+                              LBMI_PIXFMT,(ULONG)&pixfmt,
+                              LBMI_BYTESPERPIX,(ULONG)&pixfmt,
+                              LBMI_BYTESPERROW,(ULONG)&ddscreen._bpr,
+                              LBMI_BASEADDRESS,(ULONG)&ddscreen._base,
+                              TAG_DONE);
+    if(!hdl) return;
+
+    ddscreen._clipX1 = 0;//10;
+    ddscreen._clipY1 = 0; //10;
+
+    ddscreen._clipX2 = (WORD)bmwidth; //-10;
+    ddscreen._clipY2 = (WORD)bmheight; //-10;
+
+    // applied width height if using scale or not, and centering.
+    int cenx,ceny,ww,hh;
+    getGeometry(display,cenx,ceny,ww,hh);
 
     directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
         display->game_visible_area.min_x,display->game_visible_area.min_y,
@@ -211,17 +288,14 @@ Intuition_Screen::Intuition_Screen(const AmigaDisplay::params &params)
     , _fullscreenHeight(0)
     , _pMouseRaster(NULL)
 {
-    printf(" **** Intuition_Screen SET VIDEO ATTRIBUTES:%08x ****\n",_flags);
-    // may get mode from Cybergraphics...
-    if(CyberGfxBase)
+    int width = params._width;
+    int height = params._height;
+    if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
+    int screenDepth = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
+
+    if(_ScreenModeId == INVALID_ID)
     {
-        int width = params._width;
-        int height = params._height;
-        if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
-
-        int screenDepth = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
-
-        if(_ScreenModeId == INVALID_ID)
+        if(CyberGfxBase)
         {
              struct TagItem cgxtags[]={
                     CYBRBIDTG_NominalWidth,width,
@@ -229,30 +303,84 @@ Intuition_Screen::Intuition_Screen(const AmigaDisplay::params &params)
                     CYBRBIDTG_Depth,screenDepth,
                     TAG_DONE,0 };
             _ScreenModeId = BestCModeIDTagList(cgxtags);
+            if(_ScreenModeId == INVALID_ID)
+            {
+                logerror("Can't find cyber screen mode for w%d h%d d%d ",width,height,screenDepth);
+                return;
+            }
 
-        }
-        if(_ScreenModeId == INVALID_ID)
+        } else
         {
-            logerror("Can't find cyber screen mode for w%d h%d d%d ",width,height,screenDepth);
-            return;
+            // using OS3 to find mode.
+            if(screenDepth>8)
+            {
+                logerror("Can't find 16b mode without CGX ");
+                return;
+            }
+            _ScreenModeId = BestModeID(
+                    BIDTAG_Depth,8,
+                    BIDTAG_NominalWidth,width,
+                    BIDTAG_NominalHeight,height,
+                    TAG_DONE );
+            if(_ScreenModeId == INVALID_ID)
+            {
+                logerror("Can't find screen mode for w%d h%d d%d ",width,height,screenDepth);
+                return;
+            }
         }
+    } // end if no mode decided at first
+
+    // inquire mode
+    if(CyberGfxBase && IsCyberModeID(_ScreenModeId) )
+    {
         _fullscreenWidth = GetCyberIDAttr( CYBRIDATTR_WIDTH, _ScreenModeId );
         _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
         _PixelFmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, _ScreenModeId );
         _PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
-        if(_PixelFmt == PIXFMT_LUT8) _flags|= DISPFLAG_INTUITIONPALETTE;
-    } // end if CGX available
+    } else
+    {
+        LONG v;
+        struct DimensionInfo dims;
+        v = GetDisplayInfoData(NULL, (UBYTE *) &dims, sizeof(struct DimensionInfo),
+                     DTAG_DIMS, _ScreenModeId);
+        if(v>0)
+        {
+            _fullscreenWidth = (int)(dims.Nominal.MaxX - dims.Nominal.MinX)+1;
+            _fullscreenHeight = (int)(dims.Nominal.MaxY - dims.Nominal.MinY)+1;
+            // if game screen big, try some oversan conf.
+            if(_fullscreenWidth< width )
+            {
+                _fullscreenWidth = (int)(dims.MaxOScan.MaxX - dims.MaxOScan.MinX)+1;
+            }
+            if(_fullscreenHeight< height )
+            {
+                _fullscreenHeight = (int)(dims.MaxOScan.MaxY - dims.MaxOScan.MinY)+1;
+            }
+        } else
+        {   // shouldnt happen, fallback
+            _fullscreenWidth = width;
+            _fullscreenHeight = height;
+        }
+        // TODO for ECS we can't do depth 8 should be checked
+        _PixelFmt = PIXFMT_LUT8; // will be treated with WritePixelArray8 anyway.
+        _PixelBytes = 1;
+    }
+    // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
+    if(_PixelFmt == PIXFMT_LUT8) _flags|= DISPFLAG_INTUITIONPALETTE;
 
 }
 Intuition_Screen::~Intuition_Screen()
 {
     close();
 }
-void Intuition_Screen::open()
+bool Intuition_Screen::open()
 {
-
-    if(_pScreenWindow) return; // already open.
-    if(_ScreenModeId == INVALID_ID) return; // set by inherited class.
+    if(_pScreenWindow) return true; // already open.
+    if(_ScreenModeId == INVALID_ID)
+    {
+        logerror("Can't find a screen mode ");
+        return false; // set by inherited class.
+     }
 
     int depth;
     if(_PixelFmt == PIXFMT_LUT8) depth=8;
@@ -271,7 +399,7 @@ void Intuition_Screen::open()
 			SA_Colors,(ULONG)&colspec[0],
                         0 );
 
-	if( _pScreen == NULL ) return;
+	if( _pScreen == NULL ) return false;
 
 	// --------- open intuition fullscreen window for this screen:
 
@@ -293,7 +421,7 @@ void Intuition_Screen::open()
 	if( _pScreenWindow ==  NULL )
 	{
         close();
-        return ;
+        return false;
 	}
 	// ------- set invisible mouse pointer:
 	_pMouseRaster =  AllocRaster(8 ,8) ;
@@ -303,6 +431,8 @@ void Intuition_Screen::open()
     }
     _width = _fullscreenWidth;
     _height = _fullscreenHeight;
+
+    return true;
 }
 void Intuition_Screen::close()
 {
@@ -344,12 +474,12 @@ Intuition_Window::~Intuition_Window()
 {
     close();
 }
-void Intuition_Window::open()
+bool Intuition_Window::open()
 {
-    if(_pWbWindow) return;
+    if(_pWbWindow) return true; // already ok
 
     Screen *pWbScreen;
-    if (!(pWbScreen = LockPubScreen(NULL))) return;
+    if (!(pWbScreen = LockPubScreen(NULL))) return false;
 
     int xcen = (pWbScreen->Width - _machineWidth);
     int ycen = (pWbScreen->Height - _machineHeight);
@@ -357,7 +487,7 @@ void Intuition_Window::open()
     xcen>>=1;
     if(ycen<0) ycen=0;
     ycen>>=1;
-    printf("openWindow:_machineWidth:%d _machineHeight:%d xcen:%d ycen:%d \n",_machineWidth,_machineHeight,xcen,ycen);
+//    printf("openWindow:_machineWidth:%d _machineHeight:%d xcen:%d ycen:%d \n",_machineWidth,_machineHeight,xcen,ycen);
 
 // struct BitMap * __stdargs AllocBitMap( ULONG sizex, ULONG sizey, ULONG depth, ULONG flags, CONST struct BitMap *friend_bitmap );
 
@@ -399,22 +529,18 @@ void Intuition_Window::open()
     } // end if sbm ok
     UnlockPubScreen(NULL,pWbScreen);
 
-    if( _pWbWindow == NULL ) return;
+    if( _pWbWindow == NULL ) return false;
 
-
-    //_dx = _pWbWindow->BorderLeft;
-    //_dy = _pWbWindow->BorderTop;
-    // need pixel format at this level
-
-    if(CyberGfxBase)
+    if(CyberGfxBase && _sWbWinSBitmap &&  GetCyberMapAttr(_sWbWinSBitmap,CYBRMATTR_ISCYBERGFX))
     {
-
-        if(_sWbWinSBitmap && GetCyberMapAttr(_sWbWinSBitmap,CYBRMATTR_ISCYBERGFX))
-        {
-            _PixelFmt = GetCyberMapAttr(_sWbWinSBitmap,CYBRMATTR_PIXFMT);
-            _PixelBytes = GetCyberMapAttr(_sWbWinSBitmap,CYBRMATTR_BPPIX);
-        }
+        _PixelFmt = GetCyberMapAttr(_sWbWinSBitmap,CYBRMATTR_PIXFMT);
+        _PixelBytes = GetCyberMapAttr(_sWbWinSBitmap,CYBRMATTR_BPPIX);
+    } else
+    {
+        _PixelFmt = PIXFMT_LUT8;
+        _PixelBytes = 1;
     }
+    return true;
 
 }
 void Intuition_Window::close()
@@ -481,23 +607,26 @@ Display_CGX::~Display_CGX()
     if(_drawable) delete _drawable;
     if(_remap) delete _remap;
 }
-void Display_CGX::open(const AmigaDisplay::params &pparams)
+bool Display_CGX::open(const AmigaDisplay::params &pparams)
 {
-   if(!CyberGfxBase) return;
-   if(_drawable) return;
+   if(_drawable) return true; // already ok
    _params=pparams;
 
     if(_params._flags & DISPFLAG_STARTWITHWINDOW)
     {
-        _drawable = new /*Intuition_Window*/Intuition_ScaleWindow(pparams);
+        _drawable = new Intuition_ScaleWindow(pparams);
     } else
     {
         _drawable = new Intuition_Screen(pparams);
     }
 
-    if(!_drawable) return;
+    if(!_drawable) return false;
     // must open before computing remap to get correct pixel format.
-    _drawable->open();
+    if(!_drawable->open())
+    {
+        close();
+        return false;
+    }
 
     if( (_drawable->flags() & DISPFLAG_INTUITIONPALETTE) && _drawable->screen() )
     {
@@ -505,6 +634,20 @@ void Display_CGX::open(const AmigaDisplay::params &pparams)
         _remap = new Paletted_Screen8(_drawable->screen());
     } else
     {
+        // if is WB window and WB is <=8bit
+        bool remapIsWorkbench=false;
+        if(_params._flags & DISPFLAG_STARTWITHWINDOW  )
+        {
+            Screen *pWbScreen;
+            if ((pWbScreen = LockPubScreen(NULL)) &&
+                pWbScreen->RastPort.BitMap &&
+                pWbScreen->RastPort.BitMap->Depth <=8)
+            {
+                UnlockPubScreen(NULL,pWbScreen);
+                _remap = new Paletted_Pens8(pWbScreen);
+            }
+        }
+        if(!_remap)
         if((pparams._video_attributes & VIDEO_RGB_DIRECT)==0 &&
             pparams._colorsIndexLength>0)
         {
@@ -518,11 +661,10 @@ void Display_CGX::open(const AmigaDisplay::params &pparams)
         }
     }
 
-
+    return true;
 }
 int Display_CGX::switchFullscreen()
 {
-   if(!CyberGfxBase) return -1;
    close();
    _params._flags ^= DISPFLAG_STARTWITHWINDOW; // switch bit.
    open(_params);
@@ -556,8 +698,7 @@ void Display_CGX::draw(_mame_display *display)
     {
         _remap->updatePaletteRemap(display);
     }
-
-    if(CyberGfxBase) _drawable->drawRastPort_CGX(display,_remap);
+    _drawable->drawRastPort_CGX(display,_remap);
 }
 MsgPort *Display_CGX::userPort()
 {

@@ -88,7 +88,7 @@ struct Library      *AslBase    = NULL;
 struct Library      *KeymapBase   = NULL;
 struct Library      *UtilityBase  = NULL;
 struct Library      *CyberGfxBase = NULL;
-struct Library      *P96Base = NULL;
+//struct Library      *P96Base = NULL;
 
 }
 
@@ -120,8 +120,8 @@ int libs_init()
 
     InitLowLevelLib();
     // optional:
-    CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
-    P96Base  = OpenLibrary("Picasso96API.library", 0);
+    CyberGfxBase  = OpenLibrary("cybergraphuucs.library", 1);
+//    P96Base  = OpenLibrary("Picasso96API.library", 0);
     GadToolsBase  = OpenLibrary("gadtools.library", 1);
     // mui is done elsewhere.
 
@@ -158,7 +158,7 @@ void main_close()
     CloseLowLevelLib();
     printf("after  CloseLowLevelLib\n");
     if(GadToolsBase) CloseLibrary(GadToolsBase);
-    if(P96Base) CloseLibrary(P96Base);
+//    if(P96Base) CloseLibrary(P96Base);
     if(CyberGfxBase) CloseLibrary(CyberGfxBase);
 
     if(KeymapBase) CloseLibrary(KeymapBase);

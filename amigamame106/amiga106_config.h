@@ -95,10 +95,11 @@ public:
 
     enum class DrawEngine :  int
     {
-        CgxDirectCpu,
-        CgxScalePixelArray,
-        WritePixelArray8,
-        GLShader
+        CgxDirectCpuOrWPA8,
+        MoreToCome
+       // CgxScalePixelArray,
+       // WritePixelArray8,
+       // GLShader
         // "CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
     };
     enum class RotateMode :  int
@@ -126,16 +127,23 @@ public:
     {
         Display();
         void serialize(ASerializer &serializer) override;
-        DrawEngine _drawEngine = DrawEngine::CgxDirectCpu;
+        DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;
         std::map<std::string,Display_PerScreenMode> _perScreenMode;
         ASerializer::StringMap<Display_PerScreenMode> _perScreenModeS;
     };
     Display &display() { return _display; }
 
+
+
+    enum class AudioMode :  int
+    {
+        None,
+        AHI
+    };
     struct Audio : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
-        int _mode=0;
+        AudioMode _mode = AudioMode::AHI;
         int _freq=0;
     };
     Audio &audio() { return _audio; }

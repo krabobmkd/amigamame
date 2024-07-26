@@ -32,7 +32,7 @@ public:
         int _video_attributes;
         int _driverDepth;
     };
-    virtual void open(const params &params) = 0;
+    virtual bool open(const params &params) = 0;
     virtual void close()= 0;
     virtual void draw(_mame_display *pmame_display) = 0;
     virtual int good() = 0;

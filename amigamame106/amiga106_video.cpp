@@ -196,12 +196,13 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         params._video_attributes = pparams->video_attributes;
         params._driverDepth = pparams->depth;
         //try RTG  drivers first:
-        if(CyberGfxBase)
-        {
-            g_pMameDisplay = new Display_CGX();
-            g_pMameDisplay->open(params);
+        // Display_CGX try RTG then AGA.
+        g_pMameDisplay = new Display_CGX();
+        bool screenok = g_pMameDisplay->open(params);
+        if(!screenok) {
+            logerror("couldn't open screen.");
+            return 1; // fail.
         }
-
     } // end if bitmap
 
 //    if(P96Base)

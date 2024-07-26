@@ -167,7 +167,7 @@ target_include_directories(${PROGNAME} PUBLIC "../mame106" "${COMMONLIBS}/libser
 
 # MUI is not provided by gccbebbo6.5 ndk by default, we have it there:
 target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
-target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/P96/include")
+# target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/P96/include")
 
 # sources that doesn't support -O2 are moved to MameXAmigaO0 lib
 target_compile_options(${PROGNAME} PRIVATE -O2 -Wno-narrowing ${AMIGA_COMPILER_OPTIONS} )
