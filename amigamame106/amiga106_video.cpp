@@ -8,7 +8,7 @@
 //#include <proto/alib.h>
 #include <proto/exec.h>
 #include <proto/graphics.h>
-#include <proto/cybergraphics.h>
+//#include <proto/cybergraphics.h>
 #include <proto/intuition.h>
 
 #include <proto/utility.h>
@@ -23,8 +23,6 @@ extern "C" {
 
     #include <intuition/intuition.h>
     #include <intuition/screens.h>
-    #include <cybergraphx/cybergraphics.h>
-
 }
 #include "intuiuncollide.h"
 // from mame
@@ -39,18 +37,15 @@ extern "C" {
 #include "amiga106_inputs.h"
 #include "amiga106_config.h"
 #include "amiga106_video.h"
-#include "amiga106_video_cgx.h"
+#include "amiga106_video_intuition.h"
 
 /** some abstact display management */
 
 #include <stdio.h>
 
-extern struct Library *CyberGfxBase;
-extern struct Library *P96Base;
-
-AmigaDisplay::AmigaDisplay() {
+AbstractDisplay::AbstractDisplay() {
 }
-AmigaDisplay::~AmigaDisplay(){}
+AbstractDisplay::~AbstractDisplay(){}
 
 // - - - - from driver.h
 /* is the video hardware raser or vector base? */
@@ -96,7 +91,7 @@ AmigaDisplay::~AmigaDisplay(){}
 //        WaitTOF();
 //    }
 //}
-AmigaDisplay *g_pMameDisplay=NULL;
+AbstractDisplay *g_pMameDisplay=NULL;
 
 //struct ledBitmap {
 //    ledBitmap(int nbleds,int ledwidth) {
@@ -183,7 +178,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     if((pparams->video_attributes &VIDEO_TYPE_VECTOR)==0) // means not vector,= bitmap
     {
         // keep the 3 orientation bits
-        AmigaDisplay::params params;
+        AbstractDisplay::params params;
         params._flags = shiftRotationBits(Machine->gamedrv->flags,(int)screenModeConf._rotateMode);
 
         if(screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose)
@@ -195,9 +190,8 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         params._colorsIndexLength = pparams->colors;
         params._video_attributes = pparams->video_attributes;
         params._driverDepth = pparams->depth;
-        //try RTG  drivers first:
-        // Display_CGX try RTG then AGA.
-        g_pMameDisplay = new Display_CGX();
+        // this will decide video implemntation against available hardware and config.
+        g_pMameDisplay = new IntuitionDisplay();
         bool screenok = g_pMameDisplay->open(params);
         if(!screenok) {
             logerror("couldn't open screen.");

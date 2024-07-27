@@ -244,6 +244,7 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
 {
     serializer("Screen Selection",(int &)_ScreenModeChoice,{"Find Best","Select Mode"});
     serializer("Screen mode",_modeid);
+    serializer("Full Screen",(int &)_FSscaleMode,{"Center, No Scale","Scale To Border","Stretch Scale"});
     serializer("Rotate Screens",(int &)_rotateMode,{"None","+90","180","-90"});
 
     // want modeid greyed if screen not choosen
@@ -269,6 +270,7 @@ MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU Or WPA8","( More To Come )"});
+
     serializer("Per Screen Mode",_perScreenModeS);
 
 }

@@ -181,8 +181,6 @@ void CloseLowLevelLib()
         // stops rawkey codes for the joystick/game
         SCON_RemCreateKeys,0,
         SCON_RemCreateKeys,1,
-//        SCON_RemCreateKeys,2,
-//        SCON_RemCreateKeys,3,
         TAG_END,0
         );
     if(LowLevelBase) CloseLibrary(LowLevelBase);

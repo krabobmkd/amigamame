@@ -90,6 +90,7 @@ void osd_exit()
 /* return non-zero to abort loading */
 int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
 {
+    printf("load rom:%d %d\n",romdata->romsloaded,romdata->romstotal);
   return(0);
 }
 // -  - - - -

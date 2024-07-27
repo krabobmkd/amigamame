@@ -120,7 +120,7 @@ int libs_init()
 
     InitLowLevelLib();
     // optional:
-    CyberGfxBase  = OpenLibrary("cybergraphuucs.library", 1);
+    CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
 //    P96Base  = OpenLibrary("Picasso96API.library", 0);
     GadToolsBase  = OpenLibrary("gadtools.library", 1);
     // mui is done elsewhere.

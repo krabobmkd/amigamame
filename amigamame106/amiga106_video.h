@@ -16,11 +16,11 @@ struct RastPort;
 struct BitMap;
 
 /** full virtual */
-class AmigaDisplay
+class AbstractDisplay
 {
 public:
-    AmigaDisplay();
-    virtual ~AmigaDisplay();
+    AbstractDisplay();
+    virtual ~AbstractDisplay();
     // flags are orientations bits + our prefs
     #define DISPFLAG_STARTWITHWINDOW 8
     #define DISPFLAG_INTUITIONPALETTE  16
@@ -42,14 +42,15 @@ public:
     virtual void WaitFrame() = 0; // either WaitTTOF or Wait beam
 protected:
 };
-// experimental trick for leds -> not done
-class ExtraBitmap
-{
-public:
-    int _width;
-    int _height;
-    std::vector<UWORD> _bm; // use the game palette ?
-};
+//// experimental trick for leds -> not done
+//class ExtraBitmap
+//{
+//public:
+//    int _width;
+//    int _height;
+//    std::vector<UWORD> _bm; // use the game palette ?
+//};
+
 
 void SwitchWindowFullscreen();
 

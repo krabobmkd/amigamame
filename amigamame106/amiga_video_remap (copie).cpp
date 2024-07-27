@@ -7,12 +7,9 @@
 #include "amiga_video_remap.h"
 #include <stdio.h>
 
-#include <proto/graphics.h>
-
 extern "C" {
     // for pixel formats
     #include <cybergraphx/cybergraphics.h>
-    #include <intuition/screens.h>
 }
 
 extern "C" {
@@ -21,18 +18,13 @@ extern "C" {
     #include "video.h"
 }
 
-Paletted::Paletted() : _needFirstRemap(1)
-{
-
-}
-
-Paletted_CGX::Paletted_CGX(int colorsIndexLength, int screenPixFmt, int bytesPerPix)
-    : Paletted(), _pixFmt(screenPixFmt),_bytesPerPix(bytesPerPix)
+Paletted_CGX::Paletted_CGX(const AmigaDisplay::params &params, int screenPixFmt, int bytesPerPix)
+    : _needFirstRemap(1), _pixFmt(screenPixFmt),_bytesPerPix(bytesPerPix)
 {
     switch(bytesPerPix){
-        case 1: _clut8.reserve(colorsIndexLength); break;
-        case 2: _clut16.reserve(colorsIndexLength); break;
-        case 3: case 4: _clut32.reserve(colorsIndexLength); break;
+        case 1: _clut8.reserve(params._colorsIndexLength); break;
+        case 2: _clut16.reserve(params._colorsIndexLength); break;
+        case 3: case 4: _clut32.reserve(params._colorsIndexLength); break;
     }
 }
 Paletted_CGX::~Paletted_CGX(){}
@@ -260,124 +252,3 @@ void Paletted_CGX::updatePaletteRemap(_mame_display *display)
     }
     _needFirstRemap = 0;
 }
-// - - - - -
-
-Paletted_Screen8::Paletted_Screen8(struct Screen *pScreen)
-    : Paletted(), _pScreen(pScreen) {
-}
-void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
-{
-    if(!_pScreen) return;
-
-    const rgb_t *gpal1 = display->game_palette;
-    USHORT nbc = (USHORT)display->game_palette_entries;
-    UINT32 *pdirtrybf =	display->game_palette_dirty;
-    bool ignominiousColorTrick = false;
-    if(nbc==258)
-    {
-        // ignomous trick to add 2 colors for interface :( (slap fight, ...)
-        ignominiousColorTrick = true;
-        rgb_t *g  =const_cast<rgb_t *>(gpal1);
-        g[1] = 0x00ffffff;
-    }
-    if(nbc>256) nbc=256;
-    if(_needFirstRemap)
-    {
-        // on first force all dirty to have all done once.
-        int nbdirstybf = (nbc+31)>>5;
-        for(int i=0;i<nbdirstybf;i++) pdirtrybf[i]=~0;
-    }
-     _needFirstRemap = 0;
-
-     for(int j=0;j<nbc;j+=32)
-     {
-        UINT32 dirtybf = *pdirtrybf++;
-        if(!dirtybf) continue; // superfast escape.
-
-        USHORT iend = 32;
-        if(iend>(nbc-j)) iend=(nbc-j);
-        const rgb_t *gpal = gpal1+j;
-        ULONG *pc = &_palette[0];
-        *pc++ = ((ULONG)iend)<<16 | j;
-
-        for(USHORT i=0;i<iend;i++) {
-            ULONG c = (*gpal++);
-            *pc++= (c<<8) & 0xff000000;
-            *pc++= (c<<16) & 0xff000000;
-            *pc++= (c<<24) & 0xff000000;
-        }
-        *pc = 0; // term.
-        LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &_palette[0]);
-     }
-
-}
-// - - - - - - --
-Paletted_Pens8::Paletted_Pens8(struct Screen *pScreen)
-    : Paletted(), _pScreen(pScreen)
-{
-
-}
-Paletted_Pens8::~Paletted_Pens8()
-{
-    printf("~Paletted_Pens8\n");
-//    if(_pScreen)
-//    {
-//        struct ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
-//        if(pColorMap)
-//        // basically clean like that.
-//        for(ULONG i=0;i<256 ;i++ )
-//        {
-//            ReleasePen(pColorMap,i);
-//        }
-//    }
-}
-void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
-{
-    if(!_pScreen) return;
-    struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
-    if(!pColorMap) return;
-
-    const rgb_t *gpal1 = display->game_palette;
-    USHORT nbc = (USHORT)display->game_palette_entries;
-    UINT32 *pdirtrybf =	display->game_palette_dirty;
-
-    if(_needFirstRemap)
-    {
-        // on first force all dirty to have all done once.
-        int nbdirstybf = (nbc+31)>>5;
-        for(int i=0;i<nbdirstybf;i++) pdirtrybf[i]=~0;
-    }
-    if(_clut8.size()<nbc) _clut8.resize(nbc,0);
-    UBYTE *pclut = _clut8.data();
-
-    _needFirstRemap = 0;
-    for(int j=0;j<nbc;j+=32)
-    {
-        UINT32 dirtybf = *pdirtrybf++;
-        if(!dirtybf) continue; // superfast escape.
-
-        USHORT iend = j+32;
-        if(iend>nbc) iend=nbc;
-        const rgb_t *gpal = gpal1+j;
-        for(USHORT i=j;i<iend;i++) {
-
-            if(dirtybf&1)
-            {
-                 ULONG c = *gpal;
-                LONG p = ObtainBestPenA(pColorMap,
-                (c<<8) & 0xff000000,
-                (c<<16) & 0xff000000,
-                (c<<24) & 0xff000000,
-                 NULL);
-              if(p>=0){
-                ReleasePen(pColorMap,p); // test
-                pclut[i] = (UBYTE)p;
-              } else pclut[i] =0;
-            } // end if dirty
-            dirtybf>>=1;
-            gpal++;
-        } // end loop per 32
-     }
-
-}
-

@@ -102,6 +102,12 @@ public:
        // GLShader
         // "CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
     };
+    enum class FSScaleMode :  int
+    {
+        CenterWithNoScale,
+        ScaleToBorder,
+        ScaleToStretch
+    };
     enum class RotateMode :  int
     {
         Rot0,
@@ -121,6 +127,7 @@ public:
         bool isDefault() override;
         RotateMode _rotateMode = RotateMode::Rot0;
         ScreenModeChoice _ScreenModeChoice=ScreenModeChoice::Best;
+        FSScaleMode _FSscaleMode = FSScaleMode::CenterWithNoScale;
         ULONG_SCREENMODEID _modeid=~0;
     };
     struct Display : public ASerializable

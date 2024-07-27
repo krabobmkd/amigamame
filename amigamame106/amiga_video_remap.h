@@ -26,7 +26,7 @@ protected:
 class Paletted_CGX : public Paletted
 {
 public:
-    Paletted_CGX(const AmigaDisplay::params &params, int screenPixFmt, int bytesPerPix);
+    Paletted_CGX(int colorsIndexLength, int screenPixFmt, int bytesPerPix);
     ~Paletted_CGX();
     void updatePaletteRemap(_mame_display *display) override;
     void updatePaletteRemap15b();
