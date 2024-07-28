@@ -96,7 +96,7 @@ void InitLowLevelLib()
         LowLevelBase = OpenLibrary("lowlevel.library", 0);
     }
 }
-
+static int askedPadsRawKey = 0;
 void ConfigureLowLevelLib()
 {
     if(!LowLevelBase) return;
@@ -157,14 +157,14 @@ void ConfigureLowLevelLib()
 
     } // loop by player
 
-
-    SystemControl(
-        SCON_AddCreateKeys,0,
-        SCON_AddCreateKeys,1,
-//        SCON_AddCreateKeys,2,
-//        SCON_AddCreateKeys,3,
-        TAG_END,0);
-
+    if(askedPadsRawKey==0)
+    {
+        SystemControl(
+            SCON_AddCreateKeys,0,
+            SCON_AddCreateKeys,1,
+            TAG_END,0);
+        askedPadsRawKey = 1;
+    }
     // note: if needed
     if(!g_pParallelPads && useParallelExtension)
     {
@@ -177,12 +177,16 @@ void CloseLowLevelLib()
 {
     if(LowLevelBase == NULL) return;
 
-    SystemControl(
-        // stops rawkey codes for the joystick/game
-        SCON_RemCreateKeys,0,
-        SCON_RemCreateKeys,1,
-        TAG_END,0
-        );
+    if(askedPadsRawKey)
+    {
+        SystemControl(
+            // stops rawkey codes for the joystick/game
+            SCON_RemCreateKeys,0,
+            SCON_RemCreateKeys,1,
+            TAG_END,0
+            );
+        askedPadsRawKey = 0;
+    }
     if(LowLevelBase) CloseLibrary(LowLevelBase);
     LowLevelBase = NULL;
 

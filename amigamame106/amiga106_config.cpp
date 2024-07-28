@@ -364,9 +364,10 @@ void MameConfig::init(int argc,char **argv)
 }
 
 // extern const game_driver * const drivers[];
-void MameConfig::getDriverScreenModestring(const _game_driver *drv, std::string &screenid,int &video_attribs)
+void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string &screenid,int &video_attribs)
 {
     struct _machine_config machine;
+    memset(&machine,0,sizeof(machine));
     drv->drv(&machine);
     video_attribs = machine.video_attributes;
 
@@ -395,14 +396,39 @@ int MameConfig::initDriverIndex()
     const game_driver *drv  =drivers[NumDrivers];
     if(drv->flags & (/*GAME_NOT_WORKING|*/NOT_A_DRIVER)) continue;
      _driverIndex.insert(drv->name,NumDrivers);
-     // also get its screen id:
-//    std::string screenmodeId;
-//    int vidattribs;
-//    getDriverScreenModestring(drv,screenmodeId,vidattribs);
+
 
   }
   _NumDrivers =NumDrivers;
+
+    // also get its screen id:
+    _resolutionStrings.reserve(_NumDrivers);
+    _resolutionStrings.resize(_NumDrivers);
+    _videoAttribs.reserve(_NumDrivers);
+    _videoAttribs.resize(_NumDrivers);
+
+    for(NumDrivers = 0; drivers[NumDrivers]; NumDrivers++)
+    {
+        const game_driver *drv  =drivers[NumDrivers];
+        if(drv->flags & (/*GAME_NOT_WORKING|*/NOT_A_DRIVER)) continue;
+
+        getDriverScreenModestringP(drv,_resolutionStrings[NumDrivers],_videoAttribs[NumDrivers]);
+
+    }
 }
+void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs)
+{
+    int idriver = ((int)drv-(int)&drivers[0])/sizeof(const _game_driver *);
+    if(idriver<0 || idriver>=_NumDrivers)
+    {
+        screenid.clear();
+        video_attribs = 0;
+        return;
+    }
+    screenid = _resolutionStrings[idriver];
+    video_attribs = _videoAttribs[idriver];
+}
+
 
 int MameConfig::scanDrivers()
 {

@@ -41,7 +41,7 @@ void Paletted_CGX::updatePaletteRemap15b()
 {
     if(!_needFirstRemap) return;  // done once for all.
 
-    //printf(" * **** FIRST 15b REMAP **** _bytesPerPix:%d\n",_bytesPerPix);
+    printf(" * **** FIRST 15b REMAP **** _bytesPerPix:%d\n",_bytesPerPix);
     const int nbremap = 32768;
     if(_needFirstRemap)
     {
@@ -52,6 +52,7 @@ void Paletted_CGX::updatePaletteRemap15b()
              break;
         }
     }
+    _needFirstRemap =0;
     printf(" _clut32 size:%d\n",_clut32.size());
     USHORT *p16a= _clut16.data();
 
@@ -144,9 +145,6 @@ void Paletted_CGX::updatePaletteRemap15b()
 
     } // end else not 16bspecial
 
-
-
-    _needFirstRemap =0;
 }
 
 void Paletted_CGX::updatePaletteRemap(_mame_display *display)
@@ -154,7 +152,6 @@ void Paletted_CGX::updatePaletteRemap(_mame_display *display)
     const rgb_t *gpal1 = display->game_palette;
     const int nbc = display->game_palette_entries;
     UINT32 *pdirtrybf =	display->game_palette_dirty;
-
     if(_needFirstRemap)
     {
         switch(_bytesPerPix){
@@ -279,8 +276,9 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
         ignominiousColorTrick = true;
         rgb_t *g  =const_cast<rgb_t *>(gpal1);
         g[1] = 0x00ffffff;
+        nbc = 256;
     }
-    if(nbc>256) nbc=256;
+
     if(_needFirstRemap)
     {
         // on first force all dirty to have all done once.
@@ -289,13 +287,17 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
     }
      _needFirstRemap = 0;
 
-     for(int j=0;j<nbc;j+=32)
+     int nbc1 = nbc;
+     if(nbc1>256) nbc1=256;
+     // the 256 first colors are used as intuition color palette.
+     int j=0;
+     for(;j<nbc1;j+=32)
      {
         UINT32 dirtybf = *pdirtrybf++;
         if(!dirtybf) continue; // superfast escape.
 
         USHORT iend = 32;
-        if(iend>(nbc-j)) iend=(nbc-j);
+        if(iend>(nbc1-j)) iend=(nbc1-j);
         const rgb_t *gpal = gpal1+j;
         ULONG *pc = &_palette[0];
         *pc++ = ((ULONG)iend)<<16 | j;
@@ -309,7 +311,14 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
         *pc = 0; // term.
         LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &_palette[0]);
      }
-
+     // todo: if more color, remap to first
+//     for(;j<nbc;j+=32)
+//     {
+//         UINT32 dirtybf = *pdirtrybf++;
+//         if(!dirtybf) continue; // superfast escape.
+//         USHORT iend = 32;
+//         if(iend>(nbc-j)) iend=(nbc1-j);
+//     }
 }
 // - - - - - - --
 Paletted_Pens8::Paletted_Pens8(struct Screen *pScreen)

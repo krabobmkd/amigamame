@@ -168,10 +168,12 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     if(g_pMameDisplay) osd_close_display();
     if(!pparams || !Machine || !Machine->gamedrv) return 1; // fail
 
-    MameConfig::Display &config = getMainConfig().display();
+    MameConfig &mainConfig = getMainConfig();
+    MameConfig::Display &config = mainConfig.display();
+
     std::string screenId;
     int vattribs;
-    MameConfig::getDriverScreenModestring(Machine->gamedrv, screenId,vattribs);
+    MameConfig::getDriverScreenModestringP(Machine->gamedrv, screenId,vattribs);
 
     MameConfig::Display_PerScreenMode &screenModeConf = config._perScreenMode[screenId];
 

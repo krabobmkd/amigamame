@@ -89,7 +89,9 @@ public:
     // apply to mame options
     void applyToMameOptions(_global_options &mameOptions);
 
-    static void getDriverScreenModestring(const _game_driver *drv, std::string &screenid,int &video_attribs);
+    // have an optimized version
+    void getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs);
+    static void getDriverScreenModestringP(const _game_driver *drv, std::string &screenid,int &video_attribs);
 
     void serialize(ASerializer &serializer) override;
 
@@ -221,7 +223,8 @@ protected:
     std::vector<UBYTE> _romsFoundReverse;
     int initDriverIndex();
     int scanDriversRecurse(BPTR lock, FileInfoBlock*fib);
-
+    std::vector<std::string> _resolutionStrings;
+    std::vector<int> _videoAttribs;
     void sortDrivers( std::vector<const _game_driver *const*> &romsFound);
     void initRomsFoundReverse();
 };

@@ -41,6 +41,7 @@ template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
 /* set this to use a direct RGB bitmap rather than a palettized bitmap */
 #define VIDEO_RGB_DIRECT	 			0x0004
+#define VIDEO_NEEDS_6BITS_PER_GUN		0x0008
 
 bool Intuition_Screen_CGX::useForThisMode(ULONG modeID)
 {
@@ -100,6 +101,23 @@ void Drawable_CGX::close()
     _pRemap = NULL;
 
 }
+// dbg
+void countPix(int &zeroes,int &nonzeroes,UWORD &nzval, UWORD *p,ULONG s)
+{
+    while(s>0)
+    {
+        UWORD i =*p++;
+        if(i==0) zeroes++;
+        else
+        {
+            nonzeroes++;
+            nzval = i;
+        }
+        s--;
+    }
+}
+
+
 void Drawable_CGX::drawCGX_DirectCPU(_mame_display *display)
 {
     RastPort *pRPort = _drawable.rastPort();
@@ -125,7 +143,45 @@ void Drawable_CGX::drawCGX_DirectCPU(_mame_display *display)
     UWORD *pp = (UWORD *)bitmap->base;
     ULONG bmwidth,bmheight;
 
+
+
+//        int sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
+//        int sourceheight =( display->game_visible_area.max_y - display->game_visible_area.min_y)+1;
+
+//        int zeroes=0,nonzeoes=0;
+//        UWORD nzval=0;
+//        int y=0;
+//        for(int y=0;y<sourceheight;y++)
+//        {
+////            UWORD *pline = ((UWORD*)bitmap->base)
+////                    +display->game_visible_area.min_x +(display->game_visible_area.min_y*(bitmap->rowbytes>>1))
+////                    +(y*bitmap->rowbytes>>1);
+//            UWORD *pline = ((UWORD*)bitmap->line[y+display->game_visible_area.min_y]);
+//            countPix(zeroes,nonzeoes,nzval,pline,sourcewidth);
+
+//        }
+
+//extern UINT32 backPalette[16];
+//printf("backPalette: %08x %08x %08x %08x\n",backPalette[1],backPalette[2],backPalette[3],backPalette[4]);
+
+//   if(nzval != 0)  printf("zeroes:%d nonzeoes:%d nzval:%04x\n",zeroes,nonzeoes,(int)nzval);
+
+
+    directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
+        display->game_visible_area.min_x,display->game_visible_area.min_y,
+        display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
+        _drawable.flags()
+    };
+//    printf("depth:%d w:%d h:%d\n",bitmap->depth,sourcewidth,sourceheight);
+//    printf("drawable flags:%d rowbytes:%d rowpixels:%d\n",(int)_drawable.flags(),bitmap->rowbytes,bitmap->rowpixels);
+
+//    printf("source size: %d %d\n", display->game_visible_area.max_x-display->game_visible_area.min_x,
+//          display->game_visible_area.max_y-display->game_visible_area.min_y );
+
+
+
 int debugval=0;
+int colorval = 0;
     APTR hdl = LockBitMapTags(pBitmap,
                               LBMI_WIDTH,(ULONG)&bmwidth,
                               LBMI_HEIGHT,(ULONG)&bmheight,
@@ -145,11 +201,8 @@ int debugval=0;
 
 
 
-    directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
-        display->game_visible_area.min_x,display->game_visible_area.min_y,
-        display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
-        _drawable.flags()
-    };
+
+
     if(_pRemap)
     {
         switch(_PixelFmt) {
@@ -158,18 +211,25 @@ int debugval=0;
             if(_pRemap->_clut16.size()>0)
             {
                 directDrawClutT_UWORD_UWORD(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut16.data());
+                 colorval = _pRemap->_clut16[15];
+            } else {
+                debugval = 4;
             }
             break;
             case PIXFMT_RGB24:case PIXFMT_BGR24:
             if(_pRemap->_clut32.size()>0)
             {
                 directDrawClutT_type24_ULONG(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut32.data());
+            }else {
+                debugval = 5;
             }
             break;
             case PIXFMT_ARGB32:case PIXFMT_BGRA32:case PIXFMT_RGBA32:
             if(_pRemap->_clut32.size()>0)
             {
                 directDrawClutT_ULONG_ULONG(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut32.data());
+            }else {
+                debugval = 6;
             }
             break;
             case PIXFMT_LUT8:
@@ -181,6 +241,8 @@ int debugval=0;
                 if(_pRemap->_clut8.size()>0)
                 {   // 8bit using remap and static palette (like on workbench 8bit)
                     directDrawClutT_UBYTE_UBYTE(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut8.data());
+                }else {
+                    debugval = 9;
                 }
             }
             break;
@@ -198,6 +260,8 @@ int debugval=0;
     UnLockBitMap(hdl);
      if(debugval ==2) printf("unknown pixfmt\n");
     else if(debugval ==3) printf("Truecolor todo\n");
+      else if(debugval !=0) printf("TROUBLE:%d\n",debugval);
+//     printf("color test:%08x\n",colorval);
 }
 
 

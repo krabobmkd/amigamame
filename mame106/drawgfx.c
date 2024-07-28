@@ -14,6 +14,7 @@
 #include "driver.h"
 #include "profiler.h"
 
+#include <stdio.h>
 
 /***************************************************************************
     CONSTANTS

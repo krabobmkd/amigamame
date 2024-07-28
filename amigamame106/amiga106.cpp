@@ -47,6 +47,10 @@ void StartGame(void)
     }
 
     conf.applyToMameOptions(options);
+
+    // - - games can have has rotation + we add our explicit rotation ,
+    // and we must rotate the tab steting interface the other way to compensate.
+    // silly isn't it ?
     int gameorientation = drivers[idriver]->flags & ORIENTATION_MASK;
     int uiorientation = ROT0;
     if(gameorientation == ROT90) uiorientation=ROT270;

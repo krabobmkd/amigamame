@@ -52,6 +52,8 @@ Notes:
 #include "driver.h"
 #include "neogeo.h"
 
+#include <stdio.h>
+
 static UINT16 *neogeo_vidram16;
 static UINT16 *neogeo_paletteram16;	/* pointer to 1 of the 2 palette banks */
 static UINT16 *neogeo_palettebank[2]; /* 0x100*16 2 byte palette entries */
@@ -298,7 +300,7 @@ static char zoomx_draw_tables[16][16] =
 static void set_palettebank_on_postload(void)
 {
 	int i;
-
+    printf("set_palettebank_on_postload\n");
 	neogeo_paletteram16 = neogeo_palettebank[neogeo_palette_index];
 
 	for (i = 0; i < 0x2000 >> 1; i++)
@@ -487,21 +489,36 @@ WRITE16_HANDLER( neo_game_fix_16_w )
 
 /******************************************************************************/
 
+// VF debug colors...
+UINT32 backPalette[16]={0};
+int didsprite =0;
+int last_gra =0;
+int lastcol = 0;
 
 static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int sx,int sy,
 		int zx,int yoffs,const rectangle *clip)
 {
 	UINT16 *bm = line[sy]+sx;
-	int col;
+	UINT8 col;
 	int mydword;
 
 	UINT8 *fspr = memory_region_gfx3;
 	const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
+    didsprite = 1;
+last_gra = gfx->color_granularity;
+lastcol = color;
 
 	if (sx <= -16) return;
 
-	/* Safety feature */
+	//
+    for(int i=0;i<16;i++)
+    {
+        backPalette[i]=paldata[i];
+    }
+
+
+    /* Safety feature */
 	code %= no_of_tiles;
 
 	/* Check for total transparency, no need to draw */
@@ -514,7 +531,7 @@ static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 	{
 		if (zx == 0x0f)
 		{
-			mydword = (fspr[4]<<0)|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
+			mydword = (fspr[4])|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
 			col = (mydword>>28)&0xf; if (col) bm[ 0] = paldata[col];
 			col = (mydword>>24)&0xf; if (col) bm[ 1] = paldata[col];
 			col = (mydword>>20)&0xf; if (col) bm[ 2] = paldata[col];
@@ -524,7 +541,7 @@ static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 			col = (mydword>> 4)&0xf; if (col) bm[ 6] = paldata[col];
 			col = (mydword>> 0)&0xf; if (col) bm[ 7] = paldata[col];
 
-			mydword = (fspr[0]<<0)|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
+			mydword = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
 			col = (mydword>>28)&0xf; if (col) bm[ 8] = paldata[col];
 			col = (mydword>>24)&0xf; if (col) bm[ 9] = paldata[col];
 			col = (mydword>>20)&0xf; if (col) bm[10] = paldata[col];
@@ -538,7 +555,7 @@ static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 		{
 			char *zoomx_draw = zoomx_draw_tables[zx];
 
-			mydword = (fspr[4]<<0)|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
+			mydword = (fspr[4])|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
 			if (zoomx_draw[ 0]) { col = (mydword>>28)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[ 1]) { col = (mydword>>24)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[ 2]) { col = (mydword>>20)&0xf; if (col) *bm = paldata[col]; bm++; }
@@ -548,7 +565,7 @@ static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 			if (zoomx_draw[ 6]) { col = (mydword>> 4)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[ 7]) { col = (mydword>> 0)&0xf; if (col) *bm = paldata[col]; bm++; }
 
-			mydword = (fspr[0]<<0)|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
+			mydword = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
 			if (zoomx_draw[ 8]) { col = (mydword>>28)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[ 9]) { col = (mydword>>24)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[10]) { col = (mydword>>20)&0xf; if (col) *bm = paldata[col]; bm++; }
@@ -563,7 +580,7 @@ static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 	{
 		if (zx == 0x0f)		/* fixed */
 		{
-			mydword = (fspr[0]<<0)|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
+			mydword = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
 			col = (mydword>> 0)&0xf; if (col) bm[ 0] = paldata[col];
 			col = (mydword>> 4)&0xf; if (col) bm[ 1] = paldata[col];
 			col = (mydword>> 8)&0xf; if (col) bm[ 2] = paldata[col];
@@ -573,7 +590,7 @@ static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 			col = (mydword>>24)&0xf; if (col) bm[ 6] = paldata[col];
 			col = (mydword>>28)&0xf; if (col) bm[ 7] = paldata[col];
 
-			mydword = (fspr[4]<<0)|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
+			mydword = (fspr[4])|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
 			col = (mydword>> 0)&0xf; if (col) bm[ 8] = paldata[col];
 			col = (mydword>> 4)&0xf; if (col) bm[ 9] = paldata[col];
 			col = (mydword>> 8)&0xf; if (col) bm[10] = paldata[col];
@@ -587,7 +604,7 @@ static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 		{
 			char *zoomx_draw = zoomx_draw_tables[zx];
 
-			mydword = (fspr[0]<<0)|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
+			mydword = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
 			if (zoomx_draw[ 0]) { col = (mydword>> 0)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[ 1]) { col = (mydword>> 4)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[ 2]) { col = (mydword>> 8)&0xf; if (col) *bm = paldata[col]; bm++; }
@@ -597,7 +614,7 @@ static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 			if (zoomx_draw[ 6]) { col = (mydword>>24)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[ 7]) { col = (mydword>>28)&0xf; if (col) *bm = paldata[col]; bm++; }
 
-			mydword = (fspr[4]<<0)|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
+			mydword = (fspr[4])|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
 			if (zoomx_draw[ 8]) { col = (mydword>> 0)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[ 9]) { col = (mydword>> 4)&0xf; if (col) *bm = paldata[col]; bm++; }
 			if (zoomx_draw[10]) { col = (mydword>> 8)&0xf; if (col) *bm = paldata[col]; bm++; }
