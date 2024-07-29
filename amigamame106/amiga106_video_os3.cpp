@@ -75,6 +75,7 @@ void Drawable_OS3::draw_WPA8(_mame_display *display)
         directDraw_UBYTE_UBYTE(&ddscreen,&ddsource,0,0,ww,hh);
     } else
     {   // remap to shared screen colors, need a clut.
+    //TODO
 //        if(pRemap && pRemap->_clut8.size()>0)
 //        {
 //           directDrawClutT_UBYTE_UBYTE(&ddscreen,&ddsource,0,0,ww,hh,pRemap->_clut8.data());
@@ -121,67 +122,6 @@ void Drawable_OS3::close()
      _trp._rp.BitMap=NULL;
 }
 
-
-//void IntuitionDrawable::drawRastPortWPA8(_mame_display *display,Paletted *pRemap)
-//{
-//    RastPort *pRPort = rastPort();
-//    if(!pRPort) return;
-//    mame_bitmap *bitmap = display->game_bitmap;
-
-//    int cenx,ceny,ww,hh;
-//    getGeometry(display,cenx,ceny,ww,hh);
-//    // align on 16
-//    int wwal = (ww+15)&0xfffffff0;
-//  //  printf("init temps: w%d h%d wal:%d bitmap:%08x\n",ww,hh,wwal,(int)bitmap);
-//    const int bmsize = wwal*hh;
-//    if(bmsize != _wpatempbm.size())
-//    {
-//        _wpatempbm.resize(bmsize);
-//    }
-//    checkWpa8TmpRp(pRPort,wwal);
-//    directDrawScreen ddscreen={
-//        _wpatempbm.data(),
-//        wwal, // bpr
-//        0,0,ww,hh // clip rect
-//    };
-
-//    directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
-//        display->game_visible_area.min_x,display->game_visible_area.min_y,
-//        display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
-//        _flags
-//    };
-//    //     if(_PixelFmt == PIXFMT_LUT8) _flags|= DISPFLAG_INTUITIONPALETTE;
-//    if(_flags & DISPFLAG_INTUITIONPALETTE)
-//    {   // no clut table and use intuition LoadRGB32 to change screen colors
-//        // actually does WORD to BYTE conversion with no lut.
-//        directDraw_UBYTE_UBYTE(&ddscreen,&ddsource,0,0,ww,hh);
-//    } else
-//    {   // remap to shared screen colors, need a clut.
-//        if(pRemap && pRemap->_clut8.size()>0)
-//        {
-//           directDrawClutT_UBYTE_UBYTE(&ddscreen,&ddsource,0,0,ww,hh,pRemap->_clut8.data());
-//        }
-//    }
-//    //WritePixelArray8(rp,xstart,ystart,xstop,ystop,array,temprp)
-//    WritePixelArray8(pRPort,cenx,ceny,cenx+ww-1,ceny+hh-1,
-//        _wpatempbm.data(), &_trp._rp
-//        );
-//}
-//void IntuitionDrawable::checkWpa8TmpRp(RastPort *rp,int linewidth)
-//{
-//    int bpr = ((linewidth+15)>>4)<<4;
-//    if(bpr ==  _trp._checkw) return;
-//    if(_trp._rp.BitMap) FreeBitMap(_trp._rp.BitMap);
-
-//    memcpy(&_trp,rp,sizeof(RastPort) );
-//    _trp._rp.Layer = NULL;
-//    _trp._rp.BitMap =AllocBitMap(bpr*8,1,
-//            rp->BitMap->Depth,BMF_CLEAR,rp->BitMap);
-//    if(!_trp._rp.BitMap) return;
-//    _trp._checkw=bpr;
-
-//}
-
 Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params)
     : Intuition_Screen(params), Drawable_OS3((IntuitionDrawable&)*this)
 {
@@ -207,7 +147,7 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
         }
     } // end if no mode decided at first
 
-    // inquire mode
+    // inquire mode metrics
     {
         LONG v;
         struct DimensionInfo dims;
@@ -253,6 +193,7 @@ void Intuition_Screen_OS3::close()
 }
 void Intuition_Screen_OS3::draw(_mame_display *display)
 {
+    // WritePixelArrays is OS3.0, We could use WriteChunkyPixels which is OS3.1.
     Drawable_OS3::draw_WPA8(display);
 }
 
@@ -266,11 +207,8 @@ Intuition_Window_OS3::~Intuition_Window_OS3()
 {
 
 }
+// open() is  Intuition_Window::open()
 
-//bool Intuition_Window_OS3::open()
-//{
-//    return true;
-//}
 void Intuition_Window_OS3::close()
 {
     Intuition_Window::close();
@@ -278,5 +216,7 @@ void Intuition_Window_OS3::close()
 }
 void Intuition_Window_OS3::draw(_mame_display *display)
 {
-
+    // would draw a OS3 window on workbench possibly AGA.
+    //TODO, with the ObtainPen() ans special remap thing.
+    // Drawable_OS3::draw_WPA8(display);
 }

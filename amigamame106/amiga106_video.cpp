@@ -194,6 +194,9 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         params._driverDepth = pparams->depth;
         // this will decide video implemntation against available hardware and config.
         g_pMameDisplay = new IntuitionDisplay();
+
+        params._flags |= DISPFLAG_STARTWITHWINDOW;
+
         bool screenok = g_pMameDisplay->open(params);
         if(!screenok) {
             logerror("couldn't open screen.");
@@ -344,7 +347,7 @@ mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)
 static char perfo_line[28];
 const char *osd_get_fps_text(const performance_info *performance)
 {
-    snprintf(perfo_line,27,"speed:%.01f fps:%.03f",performance->game_speed_percent,
+    snprintf(perfo_line,27,"speed:%.01f%% fps:%.03f",performance->game_speed_percent,
              performance->frames_per_second);
     perfo_line[27]=0;
     return perfo_line;

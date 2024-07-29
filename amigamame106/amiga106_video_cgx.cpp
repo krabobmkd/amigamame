@@ -143,45 +143,12 @@ void Drawable_CGX::drawCGX_DirectCPU(_mame_display *display)
     UWORD *pp = (UWORD *)bitmap->base;
     ULONG bmwidth,bmheight;
 
-
-
-//        int sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
-//        int sourceheight =( display->game_visible_area.max_y - display->game_visible_area.min_y)+1;
-
-//        int zeroes=0,nonzeoes=0;
-//        UWORD nzval=0;
-//        int y=0;
-//        for(int y=0;y<sourceheight;y++)
-//        {
-////            UWORD *pline = ((UWORD*)bitmap->base)
-////                    +display->game_visible_area.min_x +(display->game_visible_area.min_y*(bitmap->rowbytes>>1))
-////                    +(y*bitmap->rowbytes>>1);
-//            UWORD *pline = ((UWORD*)bitmap->line[y+display->game_visible_area.min_y]);
-//            countPix(zeroes,nonzeoes,nzval,pline,sourcewidth);
-
-//        }
-
-//extern UINT32 backPalette[16];
-//printf("backPalette: %08x %08x %08x %08x\n",backPalette[1],backPalette[2],backPalette[3],backPalette[4]);
-
-//   if(nzval != 0)  printf("zeroes:%d nonzeoes:%d nzval:%04x\n",zeroes,nonzeoes,(int)nzval);
-
-
     directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
         display->game_visible_area.min_x,display->game_visible_area.min_y,
         display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
         _drawable.flags()
     };
-//    printf("depth:%d w:%d h:%d\n",bitmap->depth,sourcewidth,sourceheight);
-//    printf("drawable flags:%d rowbytes:%d rowpixels:%d\n",(int)_drawable.flags(),bitmap->rowbytes,bitmap->rowpixels);
 
-//    printf("source size: %d %d\n", display->game_visible_area.max_x-display->game_visible_area.min_x,
-//          display->game_visible_area.max_y-display->game_visible_area.min_y );
-
-
-
-int debugval=0;
-int colorval = 0;
     APTR hdl = LockBitMapTags(pBitmap,
                               LBMI_WIDTH,(ULONG)&bmwidth,
                               LBMI_HEIGHT,(ULONG)&bmheight,
@@ -193,15 +160,11 @@ int colorval = 0;
                               TAG_DONE);
     if(!hdl) return;
 
-    ddscreen._clipX1 = 0;//10;
-    ddscreen._clipY1 = 0; //10;
+    ddscreen._clipX1 = 0;
+    ddscreen._clipY1 = 0;
 
-    ddscreen._clipX2 = (WORD)bmwidth; //-10;
-    ddscreen._clipY2 = (WORD)bmheight; //-10;
-
-
-
-
+    ddscreen._clipX2 = (WORD)bmwidth;
+    ddscreen._clipY2 = (WORD)bmheight;
 
     if(_pRemap)
     {
@@ -211,26 +174,19 @@ int colorval = 0;
             if(_pRemap->_clut16.size()>0)
             {
                 directDrawClutT_UWORD_UWORD(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut16.data());
-                 colorval = _pRemap->_clut16[15];
-            } else {
-                debugval = 4;
             }
             break;
             case PIXFMT_RGB24:case PIXFMT_BGR24:
             if(_pRemap->_clut32.size()>0)
             {
                 directDrawClutT_type24_ULONG(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut32.data());
-            }else {
-                debugval = 5;
             }
             break;
             case PIXFMT_ARGB32:case PIXFMT_BGRA32:case PIXFMT_RGBA32:
             if(_pRemap->_clut32.size()>0)
             {
                 directDrawClutT_ULONG_ULONG(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut32.data());
-            }else {
-                debugval = 6;
-            }
+            }else
             break;
             case PIXFMT_LUT8:
             if(_drawable.flags() & DISPFLAG_INTUITIONPALETTE)
@@ -241,27 +197,25 @@ int colorval = 0;
                 if(_pRemap->_clut8.size()>0)
                 {   // 8bit using remap and static palette (like on workbench 8bit)
                     directDrawClutT_UBYTE_UBYTE(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut8.data());
-                }else {
-                    debugval = 9;
                 }
             }
             break;
         default:
-            debugval =2;
+            //debugval =2;
             // shouldnt happen.
             break;
         }
     } else
     {
-        debugval=3;
+        //debugval=3;
         //Truecolor (todo)
     }
 
     UnLockBitMap(hdl);
-     if(debugval ==2) printf("unknown pixfmt\n");
-    else if(debugval ==3) printf("Truecolor todo\n");
-      else if(debugval !=0) printf("TROUBLE:%d\n",debugval);
-//     printf("color test:%08x\n",colorval);
+//     if(debugval ==2) printf("unknown pixfmt\n");
+//    else if(debugval ==3) printf("Truecolor todo\n");
+//      else if(debugval !=0) printf("TROUBLE:%d\n",debugval);
+
 }
 
 
@@ -293,24 +247,6 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
             return;
         }
 
-//        } else
-//        {
-//            // using OS3 to find mode.
-//            if(screenDepth>8)
-//            {
-//                logerror("Can't find 16b mode without CGX ");
-//                return;
-//            }
-//            _ScreenModeId = BestModeID(
-//                    BIDTAG_Depth,8,
-//                    BIDTAG_NominalWidth,width,
-//                    BIDTAG_NominalHeight,height,
-//                    TAG_DONE );
-//            if(_ScreenModeId == INVALID_ID)
-//            {
-//                logerror("Can't find screen mode for w%d h%d d%d ",width,height,screenDepth);
-//                return;
-//            }
     } // end if no mode decided at first
 
     // inquire mode
@@ -325,34 +261,6 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
     {
         _useIntuitionPalette = true;
     }
-//    else
-//    {
-//        LONG v;
-//        struct DimensionInfo dims;
-//        v = GetDisplayInfoData(NULL, (UBYTE *) &dims, sizeof(struct DimensionInfo),
-//                     DTAG_DIMS, _ScreenModeId);
-//        if(v>0)
-//        {
-//            _fullscreenWidth = (int)(dims.Nominal.MaxX - dims.Nominal.MinX)+1;
-//            _fullscreenHeight = (int)(dims.Nominal.MaxY - dims.Nominal.MinY)+1;
-//            // if game screen big, try some oversan conf.
-//            if(_fullscreenWidth< width )
-//            {
-//                _fullscreenWidth = (int)(dims.MaxOScan.MaxX - dims.MaxOScan.MinX)+1;
-//            }
-//            if(_fullscreenHeight< height )
-//            {
-//                _fullscreenHeight = (int)(dims.MaxOScan.MaxY - dims.MaxOScan.MinY)+1;
-//            }
-//        } else
-//        {   // shouldnt happen, fallback
-//            _fullscreenWidth = width;
-//            _fullscreenHeight = height;
-//        }
-//        // TODO for ECS we can't do depth 8 should be checked
-//        _PixelFmt = PIXFMT_LUT8; // will be treated with WritePixelArray8 anyway.
-//        _PixelBytes = 1;
-//    }
 
 }
 

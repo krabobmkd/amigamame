@@ -429,7 +429,7 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
     const struct _game_driver *drv;
 
     struct ColumnsString {
-          char *_driver,*_screen,*_archive,*_parent,*_comment;
+          char *_driver,*_players,*_screen,*_archive,*_parent,*_comment;
     };
     ColumnsString *pColumns = (ColumnsString *)array;
 
@@ -437,7 +437,7 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
   static char screen[32];
   static char archive[16];
   static char parent[16];
- // static char players[16];
+ static char players[16];
 //  static char comment[128];
  static std::string strComment;
   if(!drv_indirect)
@@ -450,18 +450,18 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
     archive[15]=0;
     snprintf(parent,15,  "\033b\033u%s", String_Parent);
     parent[15]=0;
-//    snprintf(players,15,    "\033b\033u%s", String_Players);
-//    players[15]=0;
+    snprintf(players,15,    "\033b\033u%s", String_Players);
+    players[15]=0;
    // snprintf(comment,127,  "\033b\033u%s", String_Comment);
    // comment[127]=0;
     strComment =  "\033b\033u";
     strComment += String_Comment;
 
     pColumns->_driver = driver;
+    pColumns->_players = players;
     pColumns->_screen = screen;
     pColumns->_archive = archive;
     pColumns->_parent = parent;
-   // pColumns->_players = players;
     pColumns->_comment = (char *)strComment.c_str(); //comment;
     return(0);
   }
@@ -492,6 +492,8 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
    else
     pColumns->_parent = (char*)drv->parent;
 
+
+    pColumns->_players ="1";
 
 //  if(drv->flags & GAME_NOT_WORKING)
 //   pColumns->_comment = NotWorkingString;
@@ -835,7 +837,7 @@ Object *createPanel_Drivers()
           MUIA_Listview_Input,    TRUE,
             MUIA_Listview_List, (ULONG)( LI_Driver = MUINewObject(MUIC_List,
               MUIA_List_Title,    TRUE,
-              MUIA_List_Format,   "BAR,BAR,BAR,BAR,",
+              MUIA_List_Format,   "BAR,BAR,BAR,BAR,BAR,",
               MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
             InputListFrame,
           TAG_DONE)),
@@ -845,7 +847,7 @@ Object *createPanel_Drivers()
           MUIA_Listview_Input, TRUE,
             MUIA_Listview_List, (ULONG)( LI_Driver = MUINewObject(MUIC_List,
               MUIA_List_Title, TRUE,
-              MUIA_List_Format, "BAR,BAR,BAR,BAR,",
+              MUIA_List_Format, "BAR,BAR,BAR,BAR,BAR,",
               MUIA_List_DisplayHook,  &DriverDisplayHook,
             InputListFrame,
           TAG_DONE)),

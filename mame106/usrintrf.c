@@ -382,20 +382,19 @@ static void render_ui(mame_bitmap *dest);
 
 int ui_init(int show_disclaimer, int show_warnings, int show_gameinfo)
 {
-    printf("ui_init %d %d %d\n",show_disclaimer,show_warnings,show_gameinfo);
 	/* load the localization file */
 	if (uistring_init(options.language_file) != 0)
 		fatalerror("uistring_init failed");
 
 	/* build up the font */
 	create_font();
- printf("after create_font\n");
+
 	/* clear the input memory */
 	while (code_read_async() != CODE_NONE) ;
- printf("after code_read\n");
+
 	/* initialize the menu state */
 	ui_menu_stack_reset();
- printf("after ui_menu_stack_reset\n");
+
 	/* initialize the on-screen display system */
 	onscrd_init();
 	therm_state = 0;
@@ -411,22 +410,22 @@ int ui_init(int show_disclaimer, int show_warnings, int show_gameinfo)
 
 	/* before doing anything else, update the video and audio system once */
 	update_video_and_audio();
- printf("ui after first update\n");
+
 	/* if we didn't find a settings file, show the disclaimer */
 	if (show_disclaimer && ui_display_copyright(artwork_get_ui_bitmap()) != 0)
 		return 1;
- printf("after disc\n");
+
 	/* show info about incorrect behaviour (wrong colors etc.) */
 	if (show_warnings && ui_display_game_warnings(artwork_get_ui_bitmap()) != 0)
 		return 1;
- printf("after show_warnings\n");
+
 	/* show info about the game */
 	if (show_gameinfo && ui_display_game_info(artwork_get_ui_bitmap()) != 0)
 		return 1;
- printf("after show_gameinfo\n");
+
 	/* enable artwork now */
 	artwork_enable(TRUE);
- printf("ui ok\n");
+
 	return 0;
 }
 
