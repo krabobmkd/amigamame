@@ -886,11 +886,11 @@ void CLIB_DECL fatalerror(const char *text, ...)
 
 void CLIB_DECL logerror(const char *text, ...)
 {
-    // VF, add error on output
-    va_list arg;
-	va_start(arg, text);
-    vprintf(text, arg);
-    va_end(arg);
+//    // VF, add error on output
+//    va_list arg;
+//	va_start(arg, text);
+//    vprintf(text, arg);
+//    va_end(arg);
 
 	callback_item *cb;
 

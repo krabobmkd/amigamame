@@ -36,7 +36,7 @@ set(MAME_CORE_SRC
 	chdcd.c    mame.c      romload.c   ui_text.c
 	  harddisk.c  mamecore.c  sha1.c      unzip.c
 	cheat.c    hash.c      mamedriv.c  sndintrf.c  usrintrf.c
-	config.c   hiscore.c   md5.c       sound.c     validity.c
+	config.c   hiscore.c   md5.c       sound_krb.c     validity.c
 	cpuexec.c  info.c      memory.c    state.c     version.c
 #  artwork.h
  debugger.h   jedparse.h            png.h        ui_text.h
@@ -50,7 +50,7 @@ set(MAME_CORE_SRC
  cpuint.h     inptport.h   osdepend.h            tilemap.h
  cpuintrf.h   input.h      palette.h             timer.h
 
-
+ sound_krb.h
 	# minimal common driver needs:
 	vidhrdw/generic.c vidhrdw/vector.c
 

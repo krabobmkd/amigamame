@@ -553,15 +553,16 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions)
 {
     memset(&mameOptions, 0,sizeof(_global_options));
 
-    options.cheat=1;
+
+       options.cheat=1;
     options.gui_host=1;
 
     options.pause_bright = 0.5f;
     options.brightness = 1.0f;
     options.gamma=0.5f;
 
-    //Re options.samplerate=(audio())?0:sampleRate();
-    options.samplerate = 0;
+    options.samplerate=(_audio._mode == AudioMode::None)?0:_audio._freq;
+    //options.samplerate = 0;
     options.use_samples = 0;
 
     // ui_orientation

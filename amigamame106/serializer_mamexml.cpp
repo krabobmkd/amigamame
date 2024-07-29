@@ -198,26 +198,20 @@ void XmlReader::operator()(const char *sMemberName, ULONG_SCREENMODEID &v)
 
 void XmlReader::operator()(const char *sMemberName, AStringMap &confmap)
 {
-    printf("read cnofmap\n");
     confmap.clear();
     string name = checkXmlName(sMemberName);
 
     xml_data_node *pmapnode = xml_get_sibling(_recursenode.back()->child, name.c_str());
     if(!pmapnode) return;
-    printf("got %08x from %s\n",(int)pmapnode,name.c_str());
 
     xml_data_node *p = xml_get_sibling(pmapnode->child, "conf");
 
-    printf("got first conf %08x\n",(int)p);
-
-   // printf("XmlReader::operator() got first screen:");
     while(p)
     {
         const char *pScreenConfId = xml_get_attribute_string(p,"n",NULL);
 
         if(pScreenConfId)
         {
-                printf("pScreenConfId %s\n",pScreenConfId);
             // create and get
             ASerializable &s = confmap.get(pScreenConfId);
 
@@ -227,6 +221,5 @@ void XmlReader::operator()(const char *sMemberName, AStringMap &confmap)
 
         }
         p = xml_get_sibling(p->next, "conf");
-         printf("get next conf %08x\n",(int)p);
     }
 }

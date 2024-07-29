@@ -11,6 +11,8 @@
 
 #pragma once
 
+
+
 #ifndef __DRIVER_H__
 #define __DRIVER_H__
 
@@ -81,8 +83,6 @@
 #ifdef MESS
 #include "messdrv.h"
 #endif
-
-
 
 /***************************************************************************
     CONSTANTS
