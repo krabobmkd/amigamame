@@ -1,26 +1,33 @@
 #include "amiga106_audiostream.h"
 #include "sound_krb.h"
-
+#include <stdio.h>
 // return how much done.
 ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
 {
-    UWORD ntodo = pSoundToWrite->m_nbSampleToFill;
+    UWORD ntodo = (UWORD) pSoundToWrite->m_nbSampleToFill;
     WORD *ps = pSoundToWrite->m_pBuffer;
 
     // note: mame frames and AHI buffers are meant to have the exact same size.
 
-    SampleFrame *pFrame = &SampleFrames[currentSampleFrame];
-    if(pFrame->_locked || pFrame->_read ==pFrame->_written )
+    SampleFrame *pFrame = &SampleFrames[(currentSampleFrame-1)&3]; // test if missed previous
+    if(pFrame->_writelock || pFrame->_read>=pFrame->_written)
     {
-//        pFrame = &SampleFrames[(currentSampleFrame-1)&3];
-//        if(pFrame->_written ==0) return pSoundToWrite->m_nbSampleToFill;
-//        pFrame->_read=0;
+        pFrame = &SampleFrames[currentSampleFrame];
+    }
+
+    if(pFrame->_writelock || pFrame->_read >=pFrame->_written )
+    {
+        //pFrame = &SampleFrames[(currentSampleFrame-1)&3];
+        //if(pFrame->_written ==0) return pSoundToWrite->m_nbSampleToFill;
+
         // just mirror alternate buffer if late.
         UWORD lh = ((UWORD) pSoundToWrite->m_nbSampleToFill)>>1;
-        WORD *pr = pSoundToWrite->m_pPrevBuffer;
+        // point end of prev buffer
+
         if(pSoundToWrite->m_stereo)
         {
-            LONG *psl = (LONG *)ps;
+            WORD *pr = pSoundToWrite->m_pPrevBuffer+(pSoundToWrite->m_nbSampleToFill<<1);
+            LONG *psl = (LONG *)ps; // copy 4 bytes
             LONG *prl = (LONG *)pr;
             for(UWORD i=0; i<lh ; i++ )
             {
@@ -32,6 +39,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
             }
         }
         {
+            WORD *pr = pSoundToWrite->m_pPrevBuffer+(pSoundToWrite->m_nbSampleToFill);
             // mono
             for(UWORD i=0; i<lh ; i++ )
             {
@@ -42,18 +50,17 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
                 *ps++ = *pr++;
             }
         }
-
         return pSoundToWrite->m_nbSampleToFill; // this will reuse
     }
-    UWORD minl = ntodo;
-    UWORD sampleleft = (UWORD)(pFrame->_written-pFrame->_read);
-    if(sampleleft<minl) minl=sampleleft;
+    pFrame->_readlock = 1;
+   // UWORD sampleleft = (UWORD)(pFrame->_written-pFrame->_read);
+   // if(sampleleft<minl) minl=sampleleft;
     INT32 *leftmix = pFrame->_leftmix;
     INT32 *rightmix = pFrame->_rightmix;
 
     if(pSoundToWrite->m_stereo)
     {
-        for(UWORD i=0; i<minl ; i++ )
+        for(UWORD i=0; i<ntodo ; i++ )
         {
             /* clamp the left side */
             INT32 samp = leftmix[i];
@@ -75,7 +82,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
 
     } else
     {
-        for(UWORD i=0; i<minl ; i++ )
+        for(UWORD i=0; i<ntodo ; i++ )
         {
             INT32 samp = leftmix[i]+rightmix[i];
             if (samp < -32768)
@@ -85,8 +92,8 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
             *ps++ = 0; // test (WORD)samp;
         }
     }
-    pFrame->_read += minl;
-
+    pFrame->_read = ntodo;
+    pFrame->_readlock = 0;
 
     return pSoundToWrite->m_nbSampleToFill;
 }

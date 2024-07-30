@@ -21,7 +21,7 @@ struct sSoundToWrite
 	ULONG         m_stereo;
 	// Total Amount of sample played from the begining.
 	// seconds should be found with:  m_TotalSampleDone/m_PlayFrequency.
-	unsigned long long	m_TotalSampleDone;
+	//unsigned long long	m_TotalSampleDone;
 };
 
 

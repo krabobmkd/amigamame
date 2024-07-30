@@ -19,8 +19,8 @@ struct SampleFrame
     INT32 *_leftmix, *_rightmix;
     UINT32 _read;
     UINT32 _written;
-    UINT16 _locked;
-    UINT16 _grabulon; // mandatory grabulon. Else, it would have no sense.
+    UINT16 _writelock;
+    UINT16 _readlock; // mandatory grabulon. Else, it would have no sense.
 };
 
 extern int currentSampleFrame;

@@ -76,9 +76,8 @@ struct sAHISoundServer
 	int	m_Error;
 };
 
-//  global
+//  globals
 struct Library *AHIBase=NULL;
-
 sAHISoundServer *pAHIS = NULL;
 int m_ahi_error=0;
 
@@ -135,8 +134,10 @@ static void AHISStaticThread_Close( sAHISoundServer *pAHIS )
 	pAHIS->m_hThread = 0; // really has to be last.
 }
 
+
 static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 {
+    ULONG streamBytes=0;
     printf("crac crac process\n");
     // use global var
     if(pAHIS==NULL || !mainprocess) return 1;
@@ -151,7 +152,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
         if (pAHIS->m_AHIio) {
             pAHIS->m_AHIio->ahir_Version = 4;
             deviceResult =
-                OpenDevice(AHINAME,AHI_NO_UNIT/*0*/, (struct IORequest *)(pAHIS->m_AHIio), 0);
+                OpenDevice(AHINAME,/*AHI_NO_UNIT*/0, (struct IORequest *)(pAHIS->m_AHIio), 0);
         }
 
         if (deviceResult) {
@@ -170,22 +171,26 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
             Signal((struct Task *)mainprocess, SIGF_SINGLE);
             return 1;
         }
+        //CopyMem(pAHIS->m_AHIio, pAHIS->m_AHIio2, sizeof(struct AHIRequest));
+        memcpy(pAHIS->m_AHIio2,pAHIS->m_AHIio,sizeof(struct AHIRequest));
 
-        /** **** !!!! FOR NOW, FORCE MONO
-        */
-        pAHIS->m_stereo = 0;
 
-        CopyMem(pAHIS->m_AHIio, pAHIS->m_AHIio2, sizeof(struct AHIRequest));
-        int stereomult = (pAHIS->m_stereo)?2:1;
-        pAHIS->m_pSBuffAlloc = (SHORT*) AllocVec(pAHIS->m_nextSamples*sizeof(SHORT)*2*stereomult, MEMF_PUBLIC|MEMF_CLEAR);
-        pAHIS->m_pSBuff1 = pAHIS->m_pSBuffAlloc;
-        pAHIS->m_pSBuff2 = pAHIS->m_pSBuffAlloc + pAHIS->m_nextSamples*stereomult;
-        if (!pAHIS->m_pSBuff1) {
+        //pAHIS->m_stereo = 0; // force mono
+
+        streamBytes = pAHIS->m_nextSamples<<1; // *sizeof(SHORT);
+        if(pAHIS->m_stereo) streamBytes<<=1;
+
+        pAHIS->m_pSBuffAlloc = (SHORT*) AllocVec(streamBytes<<1, MEMF_PUBLIC|MEMF_CLEAR);
+        if (!pAHIS->m_pSBuffAlloc) {
             pAHIS->m_Error = eAHIS_NotEnoughMemory;
             AHISStaticThread_Close(pAHIS);
             Signal((struct Task *)mainprocess, SIGF_SINGLE);
             return 1;
         }
+
+        pAHIS->m_pSBuff1 = pAHIS->m_pSBuffAlloc;
+        pAHIS->m_pSBuff2 = pAHIS->m_pSBuffAlloc + (streamBytes>>1);
+
 	//ok for ahi init.
 	} // end of paragraph for init
 
@@ -193,18 +198,16 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 	pAHIS->m_Error = eAHIS_ok;
     Signal((struct Task *)mainprocess, SIGF_SINGLE); // signal end of ok init to main thread, will exit start function.
 
- //   printf(" TTT pAHIS->m_nextSamples:%d stereo:%d freq:%d\n",pAHIS->m_nextSamples, pAHIS->m_stereo,pAHIS->m_freq);
+   // printf(" TTT pAHIS->m_nextSamples:%d stereo:%d freq:%d\n",pAHIS->m_nextSamples, pAHIS->m_stereo,pAHIS->m_freq);
 	{ // paragraph for thread loop & data
 	// prepare struct which is passed to write func:
 	sSoundToWrite soundToWrite;
 	soundToWrite.m_nbSampleToFill = pAHIS->m_nextSamples; // always
 	soundToWrite.m_PlayFrequency = pAHIS->m_freq; // always
-	soundToWrite.m_TotalSampleDone = 0ULL; // 64b.
+	//soundToWrite.m_TotalSampleDone = 0ULL; // 64b.
     soundToWrite.m_stereo =  pAHIS->m_stereo;
+
 	// loop still something ask to stop.
-
-
-
     pAHIS->m_join = NULL; // retain the last one to tell next request we continue this one.
     ULONG iloop=0;
 	while(pAHIS->m_AskThreadDeath == 0 )
@@ -219,9 +222,9 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 		// write the signal:
         if(iloop<2)
         {
-            WORD *ps = soundToWrite.m_pBuffer;
             numSampleWritten = soundToWrite.m_nbSampleToFill;
-            memset(ps,0,numSampleWritten*(soundToWrite.m_stereo+1)<<1);
+            memset(p1,0,streamBytes);
+            iloop++;
         } else
         {
             numSampleWritten = soundMixOnThread( &soundToWrite );
@@ -234,21 +237,24 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
             pAHIS->m_Error = eAHIS_StreamEnd;
             break;
         }
-		soundToWrite.m_TotalSampleDone +=  (long long int)numSampleWritten;
+	//no use	soundToWrite.m_TotalSampleDone +=  (long long int)numSampleWritten;
 		{
 			struct AHIRequest  *AHIio = pAHIS->m_AHIio;
-			AHIio->ahir_Std.io_Message.mn_Node.ln_Pri = 128; //64 //127?
+			AHIio->ahir_Std.io_Message.mn_Node.ln_Pri = 127; //64 //127?
 			AHIio->ahir_Std.io_Command = CMD_WRITE;
 			AHIio->ahir_Std.io_Data = p1;
-			AHIio->ahir_Std.io_Length = (pAHIS->m_stereo)?
-                                    (numSampleWritten<<2) // need byte length.
-                                    :(numSampleWritten<<1);
 			AHIio->ahir_Std.io_Offset = 0;
             AHIio->ahir_Version = 4;
 			AHIio->ahir_Frequency = pAHIS->m_freq;
-			AHIio->ahir_Type = (pAHIS->m_stereo)?AHIST_S16S:AHIST_M16S;
-
-// (md_mode&DMODE_STEREO) ? AHIST_S16S : AHIST_M16S;
+            if(pAHIS->m_stereo)
+            {
+                AHIio->ahir_Type = AHIST_S16S;
+                AHIio->ahir_Std.io_Length = numSampleWritten<<2;
+            } else
+            {   // mono
+                AHIio->ahir_Type = AHIST_M16S;
+                AHIio->ahir_Std.io_Length = numSampleWritten<<1;
+            }
 			//Workout mode to set
 			AHIio->ahir_Volume = 0x010000;
 			AHIio->ahir_Position = 0x8000; // stereo position to the middle, means 0.5.
@@ -270,7 +276,6 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 			pAHIS->m_pSBuff2 = p1;
 
 		} // end of io paragraph
-        iloop++;
 	} // end of life loop
 
 	}// enmainprocessd of paragraph for thread loop & data

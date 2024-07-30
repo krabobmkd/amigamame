@@ -92,7 +92,7 @@ target_compile_definitions(mamecoreO2 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 C
 # -fpermissive -Wno-narrowing
 
 # -O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -fno-tree-vectorize
- target_compile_options(mamecoreO2 PRIVATE -O0 ${AMIGA_COMPILER_OPTIONS} )
+ target_compile_options(mamecoreO2 PRIVATE  -O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -fno-tree-vectorize ${AMIGA_COMPILER_OPTIONS} )
 # - - - - - - - - - - same for O3
 
 #add_library( mamecoreO3 STATIC  ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC} )

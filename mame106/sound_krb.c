@@ -691,11 +691,16 @@ void sound_frame_update(void)
 
 	profiler_mark(PROFILER_SOUND);
 
-    // get current frame
+    // get next frame
     icurrentSampleFrame = (currentSampleFrame+1)& 3;
     pFrame = &SampleFrames[icurrentSampleFrame];
+    if(pFrame->_readlock)
+    {
+        icurrentSampleFrame = (currentSampleFrame+2)& 3;
+        pFrame = &SampleFrames[icurrentSampleFrame];
+    }
    // pFrame->_read = 0;
-    pFrame->_locked =1;
+    pFrame->_writelock =1;
 
 
 	/* reset the mixing streams */
@@ -786,7 +791,7 @@ void sound_frame_update(void)
 	/* play the result */
     pFrame->_read = 0;
     pFrame->_written = samples_this_frame;
-    pFrame->_locked = 0;
+    pFrame->_writelock = 0;
     currentSampleFrame = icurrentSampleFrame;
 
 	//no need samples_this_frame = osd_update_audio_stream(finalmix);
