@@ -277,7 +277,7 @@ void MameConfig::Display::serialize(ASerializer &serializer)
 void MameConfig::Audio::serialize(ASerializer &serializer)
 {
     serializer("Mode",(int &)_mode,{"None","AHI"});
-    serializer("Frequency",_freq,8000,22050);
+    serializer("Frequency",_freq,11025,22050); // not more low hz than 11025 it does too little buffers for AHI.
 
 }
 void MameConfig::Controls::serialize(ASerializer &serializer)
@@ -362,15 +362,29 @@ void MameConfig::init(int argc,char **argv)
 {
 
 }
-
+// from some .h
+struct _input_port_init_params
+{
+    input_port_entry *	ports;		/* base of the port array */
+    int					max_ports;	/* maximum number of ports we can support */
+    int					current_port;/* current port index */
+};
+extern "C"
+{
+    int driverGetNbPlayers(const _game_driver *drv);
+}
 // extern const game_driver * const drivers[];
-void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string &screenid,int &video_attribs)
+void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string &screenid,int &video_attribs/*,int *nbPlayers*/)
 {
     struct _machine_config machine;
     memset(&machine,0,sizeof(machine));
     drv->drv(&machine);
     video_attribs = machine.video_attributes;
 
+//    if(nbPlayers)
+//    {
+//        *nbPlayers = driverGetNbPlayers(drv);
+//    }
     int width = (machine.default_visible_area.max_x - machine.default_visible_area.min_x)+1;
     int height = (machine.default_visible_area.max_y - machine.default_visible_area.min_y)+1;
     if(drv->flags & ORIENTATION_SWAP_XY) {
@@ -406,17 +420,20 @@ int MameConfig::initDriverIndex()
     _resolutionStrings.resize(_NumDrivers);
     _videoAttribs.reserve(_NumDrivers);
     _videoAttribs.resize(_NumDrivers);
+//    _players.reserve(_NumDrivers);
+//    _players.resize(_NumDrivers);
 
     for(NumDrivers = 0; drivers[NumDrivers]; NumDrivers++)
     {
         const game_driver *drv  =drivers[NumDrivers];
         if(drv->flags & (/*GAME_NOT_WORKING|*/NOT_A_DRIVER)) continue;
-
-        getDriverScreenModestringP(drv,_resolutionStrings[NumDrivers],_videoAttribs[NumDrivers]);
+       // int nbp;
+        getDriverScreenModestringP(drv,_resolutionStrings[NumDrivers],_videoAttribs[NumDrivers]/*,&nbp*/);
+      //  _players[NumDrivers] = (UBYTE)nbp;
 
     }
 }
-void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs)
+void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs/*, int &nbp*/)
 {
     int idriver = ((int)drv-(int)&drivers[0])/sizeof(const _game_driver *);
     if(idriver<0 || idriver>=_NumDrivers)
@@ -427,6 +444,7 @@ void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string
     }
     screenid = _resolutionStrings[idriver];
     video_attribs = _videoAttribs[idriver];
+//    nbp = (int)_players[idriver];
 }
 
 

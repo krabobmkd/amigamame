@@ -4,7 +4,7 @@
  *
  *
  *************************************************************************/
-
+#include "amiga106_audiostream.h"
 // from mame:
 extern "C" {
     // contains Machine definition
@@ -40,22 +40,6 @@ extern "C" {
 #include "amiga106_config.h"
 
 
-// describe a sound buffer to write. Passed to a SoundWriter function to create sound.
-// you should only read values from it and write m_pBuffer and maybe m_Volume.
-struct sSoundToWrite
-{	// write: stereo Writing on leftright buffer (signed short*2)table:
-	WORD 	    *m_pBuffer;
-	// write: AHI Volume multiplier. should be 0x00010000; or do not touch.
-	ULONG 	    m_Volume;
-	// read: the amount of data to write in pBuffer. *2 for stereo.
-	ULONG m_nbSampleToFill;
-	// read: play frequency (22050,44100,...) should be the one given with AHIS_Init()
-	ULONG	m_PlayFrequency;
-	ULONG         m_stereo;
-	// Total Amount of sample played from the begining.
-	// seconds should be found with:  m_TotalSampleDone/m_PlayFrequency.
-	unsigned long long	m_TotalSampleDone;
-};
 
 typedef enum {
 	eAHIS_ok=0,
@@ -151,13 +135,8 @@ static void AHISStaticThread_Close( sAHISoundServer *pAHIS )
 	pAHIS->m_hThread = 0; // really has to be last.
 }
 
-// return how much done.
-ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite);
-int audiodbg=0;
-
 static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 {
-audiodbg = 1;
     printf("crac crac process\n");
     // use global var
     if(pAHIS==NULL || !mainprocess) return 1;
@@ -172,7 +151,7 @@ audiodbg = 1;
         if (pAHIS->m_AHIio) {
             pAHIS->m_AHIio->ahir_Version = 4;
             deviceResult =
-                OpenDevice(AHINAME,/*AHI_NO_UNIT*/0, (struct IORequest *)(pAHIS->m_AHIio), 0);
+                OpenDevice(AHINAME,AHI_NO_UNIT/*0*/, (struct IORequest *)(pAHIS->m_AHIio), 0);
         }
 
         if (deviceResult) {
@@ -192,6 +171,10 @@ audiodbg = 1;
             return 1;
         }
 
+        /** **** !!!! FOR NOW, FORCE MONO
+        */
+        pAHIS->m_stereo = 0;
+
         CopyMem(pAHIS->m_AHIio, pAHIS->m_AHIio2, sizeof(struct AHIRequest));
         int stereomult = (pAHIS->m_stereo)?2:1;
         pAHIS->m_pSBuffAlloc = (SHORT*) AllocVec(pAHIS->m_nextSamples*sizeof(SHORT)*2*stereomult, MEMF_PUBLIC|MEMF_CLEAR);
@@ -206,7 +189,6 @@ audiodbg = 1;
 	//ok for ahi init.
 	} // end of paragraph for init
 
-//	audiodbg++;
     printf("send ok signal\n");
 	pAHIS->m_Error = eAHIS_ok;
     Signal((struct Task *)mainprocess, SIGF_SINGLE); // signal end of ok init to main thread, will exit start function.
@@ -227,16 +209,15 @@ audiodbg = 1;
     ULONG iloop=0;
 	while(pAHIS->m_AskThreadDeath == 0 )
 	{
-        audiodbg++;
-    	//WaitTOF();
 		ULONG numSampleWritten;
         SHORT *p1 = pAHIS->m_pSBuff1;
 
 		soundToWrite.m_pBuffer = p1;
+		soundToWrite.m_pPrevBuffer = pAHIS->m_pSBuff2; // for tricks.
 		soundToWrite.m_Volume = 0x00010000;
 
 		// write the signal:
-        if(iloop<4)
+        if(iloop<2)
         {
             WORD *ps = soundToWrite.m_pBuffer;
             numSampleWritten = soundToWrite.m_nbSampleToFill;
@@ -275,11 +256,9 @@ audiodbg = 1;
 //printf(" TTT bef sendio\n");
 			SendIO((struct IORequest *)AHIio);
 //printf(" TTT aft sendio\n");
-	audiodbg++;
 			if (pAHIS->m_join) {
 				WaitIO((struct IORequest *)(pAHIS->m_join));
 				}
-	audiodbg++;
 
     			pAHIS->m_join = AHIio;
 //printf(" TTT doubleb switch\n");
@@ -361,8 +340,8 @@ int osd_start_audio_stream(int stereo)
 
  printf("osd_start_audio_stream ok to start thread\n");
 
-   // let's update sound 20 times pr sec...
-    ULONG updateLength = ((freq*2/ifps)+15)&0xfffffff0;
+   // let's update sound 30 times per sec when 60hz...
+    ULONG updateLength = ((freq*2/ifps)+3)&0xfffffffc;
     // AHI crash if too short it seems
     if(updateLength<256) updateLength=256;
 
@@ -388,7 +367,8 @@ int osd_start_audio_stream(int stereo)
 	{
 		struct TagItem threadTags[] = { NP_Entry,(ULONG) &AHISStaticThread,
 						//	NP_Child, TRUE, // os4 thread thing
-          //Re?              NP_Priority,    60  ,
+          //Re?
+                        NP_Priority,    /*60*/120  ,
                         NP_Name,(ULONG)"MameAHI",
                         NP_Output,(ULONG) mainprocess->pr_COS,
                         NP_CloseOutput,FALSE,
@@ -431,7 +411,6 @@ int osd_update_audio_stream(INT16 *buffer)
 
 void osd_stop_audio_stream(void)
 {
-    printf(" **** osd_stop_audio_stream: audiodbg:%d\n",audiodbg);
     AHIS_Delete();
 }
 
@@ -456,99 +435,4 @@ int osd_get_mastervolume(void)
 void osd_sound_enable(int enable)
 {
     printf(" **** osd_sound_enable:%d\n",enable);
-}
-// return how much done.
-ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
-{
-//    UWORD n = (UWORD) pSoundToWrite->m_TotalSampleDone ;
-    UWORD ntodo = pSoundToWrite->m_nbSampleToFill;
-    WORD *ps = pSoundToWrite->m_pBuffer;
-
-    while(ntodo>0)
-    {
-        SampleFrame *pFrame = &SampleFrames[currentSampleFrame];
-        if(pFrame->_locked || pFrame->_read ==pFrame->_written )
-        {
-            pFrame = &SampleFrames[(currentSampleFrame-1)&3];
-            if(pFrame->_written ==0) return pSoundToWrite->m_nbSampleToFill;
-            pFrame->_read=0;
-            //return pSoundToWrite->m_nbSampleToFill; // this will reuse
-        }
-        UWORD minl = ntodo;
-        UWORD sampleleft = (UWORD)(pFrame->_written-pFrame->_read);
-        if(sampleleft<minl) minl=sampleleft;
-        INT32 *leftmix = pFrame->_leftmix;
-        INT32 *rightmix = pFrame->_rightmix;
-        if(pSoundToWrite->m_stereo)
-        {
-            for(UWORD i=0; i<minl ; i++ )
-            {
-                /* clamp the left side */
-                INT32 samp = leftmix[i];
-                if (samp < -32768)
-                    samp = -32768;
-                else if (samp > 32767)
-                    samp = 32767;
-                *ps++ = (WORD)samp;
-
-                /* clamp the right side */
-                samp = rightmix[i];
-                if (samp < -32768)
-                    samp = -32768;
-                else if (samp > 32767)
-                    samp = 32767;
-                *ps++ = (WORD)samp;
-
-            }
-
-        } else
-        {
-            for(UWORD i=0; i<minl ; i++ )
-            {
-                INT32 samp = leftmix[i]+rightmix[i];
-                if (samp < -32768)
-                    samp = -32768;
-                else if (samp > 32767)
-                    samp = 32767;
-                *ps++ = (WORD)samp;
-            }
-        }
-        pFrame->_read += minl;
-        ntodo -= minl;
-    } // end loop until buffer ok
-
-
-
-
-//    struct SampleFrame
-//    {
-//    //    INT16 *_finalmix;
-//        INT32 *_leftmix, *_rightmix;
-//        UINT8 _free;
-//        UINT8 _written;
-//        UINT8 _read;
-//        UINT8 _grabulon; // mandatory grabulon. Else, it would have no sense.
-//    };
-
-//    extern int currentSampleFrame;
-//    extern struct SampleFrame SampleFrames[];
-    /*
-    if(pSoundToWrite->m_stereo)
-    {
-        for(UWORD i=0; i<ntodo ; i++ )
-        {
-            *ps++ = (n&0x80)?-4000:4000;
-            *ps++ = (n&0x80)?-4000:4000;
-            n++;
-        }
-    } else
-    {
-        for(UWORD i=0; i<ntodo ; i++ )
-        {
-            *ps++ = (n&0x80)?-4000:4000;
-            n++;
-        }
-    }
-*/
-    return pSoundToWrite->m_nbSampleToFill;
 }

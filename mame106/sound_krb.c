@@ -210,7 +210,9 @@ int sound_init(void)
     {
         int i;
         INT32 onelength = Machine->sample_rate * sizeof(INT32);
-        INT32 *pMixmem = auto_malloc(onelength*nbSampleFrame*2);
+        INT32 bigsize = onelength*nbSampleFrame*2;
+        INT32 *pMixmem = auto_malloc(bigsize);
+        memset(pMixmem,0,bigsize);
 
         memset(&SampleFrames[0],0,sizeof(SampleFrames));
         for(int i=0;i<nbSampleFrame;i++)

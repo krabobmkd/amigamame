@@ -1026,6 +1026,67 @@ int input_port_init(void (*construct_ipt)(input_port_init_params *))
 }
 
 
+// just to get nbplayers
+int input_port_init_KRB(void (*construct_ipt)(input_port_init_params *))
+{
+	int ipnum, player;
+
+	/* start with the raw defaults and ask the OSD to customize them in the backup array */
+	memcpy(default_ports_backup, default_ports_builtin, sizeof(default_ports_backup));
+	osd_customize_inputport_list(default_ports_backup);
+
+	/* propogate these changes forward to the final input list */
+	memcpy(default_ports, default_ports_backup, sizeof(default_ports));
+
+	/* make a lookup table mapping type/player to the default port list entry */
+	for (ipnum = 0; ipnum < __ipt_max; ipnum++)
+		for (player = 0; player < MAX_PLAYERS; player++)
+			default_ports_lookup[ipnum][player] = -1;
+	for (ipnum = 0; default_ports[ipnum].type != IPT_END; ipnum++)
+		default_ports_lookup[default_ports[ipnum].type][default_ports[ipnum].player] = ipnum;
+
+	/* reset the port info */
+	memset(port_info, 0, sizeof(port_info));
+
+	/* if we have inputs, process them now */
+	if (construct_ipt)
+	{
+		input_port_entry *port;
+		int portnum;
+
+		/* allocate input ports */
+		Machine->input_ports = input_port_allocate(construct_ipt, NULL);
+		if (!Machine->input_ports)
+			return 1;
+
+		/* allocate default input ports */
+		input_ports_default = input_port_allocate(construct_ipt, NULL);
+		if (!input_ports_default)
+			return 1;
+
+		/* identify all the tagged ports up front so the memory system can access them */
+		portnum = 0;
+		for (port = Machine->input_ports; port->type != IPT_END; port++)
+			if (port->type == IPT_PORT)
+				port_info[portnum++].tag = port->start.tag;
+
+		/* look up all the tags referenced in conditions */
+		for (port = Machine->input_ports; port->type != IPT_END; port++)
+			if (port->condition.tag)
+			{
+				int tag = port_tag_to_index(port->condition.tag);
+				if (tag == -1)
+					fatalerror("Conditional port references invalid tag '%s'", port->condition.tag);
+				port->condition.portnum = tag;
+			}
+	}
+
+	/* register callbacks for when we load configurations */
+//	config_register("input", input_port_load, input_port_save);
+
+	return 0;
+}
+
 
 /*************************************
  *

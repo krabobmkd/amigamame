@@ -67,6 +67,7 @@ add_subdirectory(../mame106 MameLib)
 set(AMIGA_SRC
 	main.cpp
 	amiga106.cpp
+	amiga106_audiostream.h
 	amiga106_audiostream.cpp
 	amiga106_filesystem.cpp
 	amiga106_timer.cpp
@@ -91,7 +92,7 @@ set(AMIGA_SRC
 	amiga106_inputs.cpp
 	amiga_locale.h
 	amiga_locale.cpp
-
+#	inptport_krb.c
 	amiga_parallelpads.h
 	amiga_parallelpads.c
 
@@ -140,6 +141,7 @@ set(AMIGA_SRC
 	add_library(Mame106AmigaO3 STATIC
 		amiga_video_tracers_clut16.h
 		amiga_video_tracers_clut16.cpp
+		amiga_audiomixer.cpp
 	)
 	set_property(TARGET Mame106AmigaO3 PROPERTY C_STANDARD 11)
 	set_property(TARGET Mame106AmigaO3 PROPERTY CXX_STANDARD 11)
