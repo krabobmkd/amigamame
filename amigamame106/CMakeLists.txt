@@ -141,7 +141,7 @@ set(AMIGA_SRC
 	add_library(Mame106AmigaO3 STATIC
 		amiga_video_tracers_clut16.h
 		amiga_video_tracers_clut16.cpp
-
+		amiga_audiomixer.cpp
 	)
 	set_property(TARGET Mame106AmigaO3 PROPERTY C_STANDARD 11)
 	set_property(TARGET Mame106AmigaO3 PROPERTY CXX_STANDARD 11)

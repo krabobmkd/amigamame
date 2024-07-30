@@ -270,15 +270,15 @@ MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU Or WPA8","( More To Come )"});
-
+    serializer("On Workbench",_startOnWorkbench);
     serializer("Per Screen Mode",_perScreenModeS);
 
 }
 void MameConfig::Audio::serialize(ASerializer &serializer)
 {
-    serializer("Mode",(int &)_mode,{"None","AHI"});
+    serializer("Mode",(int &)_mode,{"  None  ","   AHI   "});
     serializer("Frequency",_freq,11025,22050); // not more low hz than 11025 it does too little buffers for AHI.
-
+    serializer("Force Mono",_forceMono);
 }
 void MameConfig::Controls::serialize(ASerializer &serializer)
 {

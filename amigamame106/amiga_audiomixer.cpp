@@ -84,12 +84,12 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
     {
         for(UWORD i=0; i<ntodo ; i++ )
         {
-            INT32 samp = leftmix[i]+rightmix[i];
+            INT32 samp = leftmix[i]; // +rightmix[i];
             if (samp < -32768)
                 samp = -32768;
             else if (samp > 32767)
                 samp = 32767;
-            *ps++ = 0; // test (WORD)samp;
+            *ps++ = (WORD)samp;
         }
     }
     pFrame->_read = ntodo;

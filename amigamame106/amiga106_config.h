@@ -137,6 +137,7 @@ public:
         Display();
         void serialize(ASerializer &serializer) override;
         DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;
+        bool    _startOnWorkbench = false;
         std::map<std::string,Display_PerScreenMode> _perScreenMode;
         ASerializer::StringMap<Display_PerScreenMode> _perScreenModeS;
     };
@@ -154,6 +155,7 @@ public:
         void serialize(ASerializer &serializer) override;
         AudioMode _mode = AudioMode::AHI;
         int _freq=0;
+        bool _forceMono;
     };
     Audio &audio() { return _audio; }
 

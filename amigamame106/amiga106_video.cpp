@@ -195,7 +195,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         // this will decide video implemntation against available hardware and config.
         g_pMameDisplay = new IntuitionDisplay();
 
-        params._flags |= DISPFLAG_STARTWITHWINDOW;
+        if(config._startOnWorkbench) params._flags |= DISPFLAG_STARTWITHWINDOW;
 
         bool screenok = g_pMameDisplay->open(params);
         if(!screenok) {
@@ -326,7 +326,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 */
 int osd_skip_this_frame(void)
 {
-    return 0; //FrameCounterUpdate & 1;
+    return FrameCounterUpdate & 1;
 }
 
 /*

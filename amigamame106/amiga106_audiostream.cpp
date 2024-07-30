@@ -141,6 +141,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
     printf("crac crac process\n");
     // use global var
     if(pAHIS==NULL || !mainprocess) return 1;
+
 	{ // paragraph for continuous double buffer AHI init
         // note: on OS4 the code for this is very different.
 
@@ -151,6 +152,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 
         if (pAHIS->m_AHIio) {
             pAHIS->m_AHIio->ahir_Version = 4;
+            // AHI_NO_UNIT crash on my conf , 0 means "default", looks better
             deviceResult =
                 OpenDevice(AHINAME,/*AHI_NO_UNIT*/0, (struct IORequest *)(pAHIS->m_AHIio), 0);
         }
@@ -175,11 +177,10 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
         memcpy(pAHIS->m_AHIio2,pAHIS->m_AHIio,sizeof(struct AHIRequest));
 
 
-        //pAHIS->m_stereo = 0; // force mono
-
         streamBytes = pAHIS->m_nextSamples<<1; // *sizeof(SHORT);
         if(pAHIS->m_stereo) streamBytes<<=1;
 
+        // then again <<1 * 2 for double buffer
         pAHIS->m_pSBuffAlloc = (SHORT*) AllocVec(streamBytes<<1, MEMF_PUBLIC|MEMF_CLEAR);
         if (!pAHIS->m_pSBuffAlloc) {
             pAHIS->m_Error = eAHIS_NotEnoughMemory;
@@ -315,7 +316,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
   Of course that value is not necessarily an integer so at least a +/- 1
   adjustment is necessary to avoid drifting over time.
 */
-#define START_VALUE_FAIL (22050/60)
+#define START_VALUE_FAIL (11025/60)
 int osd_start_audio_stream(int stereo)
 {
 // return 800;
@@ -330,6 +331,7 @@ int osd_start_audio_stream(int stereo)
         m_ahi_error = eAHIS_DeviceError;
         return START_VALUE_FAIL;
     }
+    if(config._forceMono) stereo=0;
 
     int freq =  config._freq; // Machine->sample_rate;
     int machinefreq = Machine->sample_rate;
@@ -362,7 +364,7 @@ int osd_start_audio_stream(int stereo)
         return START_VALUE_FAIL;
     }
 
-    printf("freq:%d samplelength:%d\n",freq,updateLength);
+   // printf("freq:%d samplelength:%d\n",freq,updateLength);
 	pAHIS->m_Error = eAHIS_Init; // state in which the thread init the AHI device and requests.
     pAHIS->m_freq = freq;
     pAHIS->m_nextSamples = updateLength;

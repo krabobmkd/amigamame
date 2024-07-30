@@ -18,6 +18,7 @@
 
 #include "sound_krb.h"
 
+#include <stdio.h>
 
 /***************************************************************************
     DEBUGGING
@@ -173,16 +174,18 @@ static inline sound_info *find_sound_by_tag(const char *tag)
 
 ***************************************************************************/
 
-/*-------------------------------------------------
+/*-------------------------------------------------22050
     sound_init - start up the sound system
 -------------------------------------------------*/
 
 int sound_init(void)
 {
 	/* handle -nosound */
-	nosound_mode = (Machine->sample_rate == 0);
+     //printf(" **** sound_init:%d\n",Machine->sample_rate);
+
+	nosound_mode = (Machine->sample_rate == 0); // from config.
 	if (nosound_mode)
-		Machine->sample_rate = 11025;
+		Machine->sample_rate = 8000; //  need a low one ?
 
 	/* count the speakers */
 	for (totalspeakers = 0; Machine->drv->speaker[totalspeakers].tag; totalspeakers++) ;
@@ -221,10 +224,6 @@ int sound_init(void)
             pMixmem += Machine->sample_rate;
             SampleFrames[i]._rightmix = pMixmem;
             pMixmem += Machine->sample_rate;
-
-//            leftmix = auto_malloc(Machine->sample_rate * sizeof(*leftmix));
-//            rightmix = auto_malloc(Machine->sample_rate * sizeof(*rightmix));
-//            finalmix = auto_malloc(Machine->sample_rate * sizeof(*finalmix));
         }
         currentSampleFrame = 0;
 
