@@ -440,18 +440,18 @@ static void decode_graphics(const gfx_decode *gfxdecodeinfo)
 
 static void scale_vectorgames(int gfx_width, int gfx_height, int *width, int *height)
 {
-	double x_scale, y_scale, scale;
+	float x_scale, y_scale, scale;
 
 	/* compute the scale values */
-	x_scale = (double)gfx_width  / *width;
-	y_scale = (double)gfx_height / *height;
+	x_scale = (float)gfx_width  / *width;
+	y_scale = (float)gfx_height / *height;
 
 	/* pick the smaller scale factor */
 	scale = (x_scale < y_scale) ? x_scale : y_scale;
 
 	/* compute the new size */
-	*width  = *width  * scale + 0.5;
-	*height = *height * scale + 0.5;
+	*width  = *width  * scale + 0.5f;
+	*height = *height * scale + 0.5f;
 
 	/* round to the nearest 4 pixel value */
 	*width  &= ~3;
@@ -755,12 +755,12 @@ static void recompute_fps(int skipped_it)
 	{
 		cycles_t cps = osd_cycles_per_second();
 		cycles_t curr = osd_cycles();
-		double seconds_elapsed = (double)(curr - last_fps_time) * (1.0 / (double)cps);
-		double frames_per_sec = (double)frames_since_last_fps / seconds_elapsed;
+		float seconds_elapsed = (float)(curr - last_fps_time) * (1.0f / (float)cps);
+		float frames_per_sec = (float)frames_since_last_fps / seconds_elapsed;
 
 		/* compute the performance data */
-		performance.game_speed_percent = 100.0 * frames_per_sec / Machine->refresh_rate;
-		performance.frames_per_second = (double)rendered_frames_since_last_fps / seconds_elapsed;
+		performance.game_speed_percent = 100.0f * frames_per_sec / Machine->refresh_rate;
+		performance.frames_per_second = (float)rendered_frames_since_last_fps / seconds_elapsed;
 
 		/* reset the info */
 		last_fps_time = curr;

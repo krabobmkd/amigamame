@@ -968,7 +968,7 @@ int sound_scalebufferpos(int value)
 	/* clamp to protect against negative time */
 	if (elapsed.seconds < 0)
 		elapsed = time_zero;
-	result = (int)((double)value * mame_time_to_double(elapsed) * Machine->refresh_rate);
+	result = (int)((float)value * mame_time_to_double(elapsed) * Machine->refresh_rate);
 
 	if (value >= 0)
 		return (result < value) ? result : value;

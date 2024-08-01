@@ -326,7 +326,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 */
 int osd_skip_this_frame(void)
 {
-    return FrameCounterUpdate & 1;
+    return 0 ; //FrameCounterUpdate & 1;
 }
 
 /*

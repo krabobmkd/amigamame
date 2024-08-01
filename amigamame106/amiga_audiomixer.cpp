@@ -161,7 +161,8 @@ void resample_input_stream(struct stream_input *input, int samples)
 	}
 
 	/* input is undersampled: use linear interpolation */
-	else if (step < FRAC_ONE)
+    // KRB: actualy is perfect until *2-1
+	else if (step < ((FRAC_ONE<<1)-1))   //was: if (step < FRAC_ONE)
 	{
 		while (samples--)
 		{
@@ -207,7 +208,9 @@ void resample_input_stream(struct stream_input *input, int samples)
 			pos += step;
 		}
 		*/
-		int smallstep = step >> (FRAC_BITS - 8);
+
+#ifdef BIG_INTERPOLATION
+        int smallstep = step >> (FRAC_BITS - 8);
         int divider = (1<<14)/smallstep;
         divider = (divider*gain)>>8;
 
@@ -231,9 +234,40 @@ void resample_input_stream(struct stream_input *input, int samples)
 			// *dest++ = (sample * gain) >> 8;
 
 			*dest++ = (sample * divider) >> 14;
-
-			pos += step;
+            pos += step;
 		}
+#else
+        int hstep = (step >> (1+FRAC_BITS));
+        if(gain== 0x0100)
+        {
+            while (samples--)
+            {
+                UINT32 rpos = pos >> FRAC_BITS;
+                *dest++ = (source[rpos]  + source[rpos+hstep])>>1;
+                pos += step;
+            }
+        } else if(gain == 0x0040)
+        {
+            while (samples--)
+            {
+                UINT32 rpos = pos >> FRAC_BITS;
+                *dest++ = (source[rpos]  + source[rpos+hstep])>>3;
+                pos += step;
+            }
+        } else
+        {
+            UINT16 gain2=gain>>1; // >>1 to avoid one shift
+            while (samples--)
+            {
+                /* compute the sample */
+                UINT32 rpos = pos >> FRAC_BITS;
+                INT32 sample  = (source[rpos]  + source[rpos+hstep]);
+                *dest++ = (sample * gain2) >> 8;
+                pos += step;
+            }
+        }
+#endif
+
 
 	}
 

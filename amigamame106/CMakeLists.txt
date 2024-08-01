@@ -49,7 +49,7 @@ if(AMIGA)
 	endif()
 
 	if(MAME_USE_HARDFLOAT)
-		list(APPEND AMIGA_COMPILER_OPTIONS -mhard-float -ffast-math)
+		list(APPEND AMIGA_COMPILER_OPTIONS -mhard-float -ffast-math -fsingle-precision-constant)
 	else()
 		list(APPEND AMIGA_COMPILER_OPTIONS -msoft-float)
 	endif()

@@ -75,8 +75,8 @@ struct _mame_display
 
 struct _performance_info
 {
-	double			game_speed_percent;			/* % of full speed */
-	double			frames_per_second;			/* actual rendered fps */
+	float			game_speed_percent;			/* % of full speed */
+	float			frames_per_second;			/* actual rendered fps */
 	int				vector_updates_last_second; /* # of vector updates last second */
 	int				partial_updates_this_frame; /* # of partial updates last frame */
 };
