@@ -108,6 +108,11 @@ static INT32 *leftmix, *rightmix;
 static const int nbSampleFrame=4;
 int currentSampleFrame=0;
 struct SampleFrame SampleFrames[4];
+// set when starting machine, before osd_start_audio_stream
+//int sound_machine_is_stereo=0; // 0 mono, 1 stereo.
+//int sound_machine_nb_streams=0; // actual number of things mixed.
+
+
 
 static int samples_this_frame;
 static int global_sound_enabled;
@@ -180,20 +185,32 @@ static inline sound_info *find_sound_by_tag(const char *tag)
 
 int sound_init(void)
 {
+
 	/* handle -nosound */
      //printf(" **** sound_init:%d\n",Machine->sample_rate);
 
 	nosound_mode = (Machine->sample_rate == 0); // from config.
 	if (nosound_mode)
-		Machine->sample_rate = 8000; //  need a low one ?
+		Machine->sample_rate = 11025; //  need a low one ?
 
 	/* count the speakers */
-	for (totalspeakers = 0; Machine->drv->speaker[totalspeakers].tag; totalspeakers++) ;
+	// KRB: also check if stereo
+// set when starting machine, before osd_start_audio_stream
+//    sound_machine_is_stereo=0; // 0 mono, 1 stereo.
+//    sound_machine_nb_streams=0; // actual number of things mixed.
+
+	for (totalspeakers = 0; Machine->drv->speaker[totalspeakers].tag; totalspeakers++)
+	{
+        speaker_config *speaker = &Machine->drv->speaker[totalspeakers];
+      //  if(speaker->x != 0.0f)  sound_machine_is_stereo = 1;
+      //  sound_machine_nb_streams++; // same as totalspeakers
+	}
+//	printf(" **** total speakers = %d  stereo:%d \n",(int)sound_machine_is_stereo);
 	VPRINTF(("total speakers = %d\n", totalspeakers));
 
 	/* initialize the OSD layer */
 	VPRINTF(("osd_start_audio_stream\n"));
-	samples_this_frame = osd_start_audio_stream(1);
+	samples_this_frame = osd_start_audio_stream(1/*sound_machine_is_stereo*/);
 	if (!samples_this_frame)
 		return 1;
 
@@ -214,8 +231,8 @@ int sound_init(void)
         int i;
         // KRB note: this specific amiga implemtation assume frames
         // are fixed length, so alloc size is samples_this_frame.
-        INT32 onelength = /*Machine->sample_rate*/ samples_this_frame * sizeof(INT32);
-        INT32 bigsize = onelength*nbSampleFrame*2;
+        INT32 streambytelength = /*Machine->sample_rate*/ samples_this_frame * sizeof(INT32);
+        INT32 bigsize = streambytelength*nbSampleFrame*2;
         INT32 *pMixmem = auto_malloc(bigsize);
         memset(pMixmem,0,bigsize);
 
@@ -223,9 +240,9 @@ int sound_init(void)
         for(int i=0;i<nbSampleFrame;i++)
         {
             SampleFrames[i]._leftmix = pMixmem;
-            pMixmem += Machine->sample_rate;
+            pMixmem += samples_this_frame;
             SampleFrames[i]._rightmix = pMixmem;
-            pMixmem += Machine->sample_rate;
+            pMixmem += samples_this_frame;
         }
         currentSampleFrame = 0;
 
@@ -733,6 +750,8 @@ void sound_frame_update(void)
 			if (spk->mixer_stream)
 			{
 				stream_buf = stream_consume_output(spk->mixer_stream, 0, samples_this_frame);
+				// krb test: ???
+				//no stream_set_sample_rate(spk->mixer_stream,22050);
 //    nbconsumedStreams++;
 //    lastspeakerDirection = (int)spk->speaker->x;
 //#ifdef MAME_DEBUG
@@ -838,7 +857,7 @@ void sound_frame_update(void)
                                 }
                         }
 
-                    }
+                    } // end if stereo
 
 
 				} // end if enable sound
