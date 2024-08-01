@@ -84,7 +84,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
     {
         for(UWORD i=0; i<ntodo ; i++ )
         {
-            INT32 samp = leftmix[i]; // +rightmix[i];
+            INT32 samp = leftmix[i]; //on mono now, all sounds forced to left. +rightmix[i];
             if (samp < -32768)
                 samp = -32768;
             else if (samp > 32767)

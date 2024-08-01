@@ -29,7 +29,7 @@ set(MAME_CORE_SRC
 
  fileio.c
  artwork.c
-   cpuint.c    inptport.c  palette.c   streams.c   video.c
+   cpuint.c    inptport.c  palette.c   streams_krb.c   video.c
 	cpuintrf.c  input.c     png.c       tilemap.c
 	cdrom.c    drawgfx.c   jedparse.c  timer.c     xml2info.c
 	chd.c      driver.c    jedutil.c   xmlfile.c

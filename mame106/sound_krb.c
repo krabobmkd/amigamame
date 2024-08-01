@@ -212,7 +212,9 @@ int sound_init(void)
 
     {
         int i;
-        INT32 onelength = Machine->sample_rate * sizeof(INT32);
+        // KRB note: this specific amiga implemtation assume frames
+        // are fixed length, so alloc size is samples_this_frame.
+        INT32 onelength = /*Machine->sample_rate*/ samples_this_frame * sizeof(INT32);
         INT32 bigsize = onelength*nbSampleFrame*2;
         INT32 *pMixmem = auto_malloc(bigsize);
         memset(pMixmem,0,bigsize);
@@ -681,8 +683,12 @@ static void sound_save(int config_type, xml_data_node *parentnode)
     its final form and send it to the OSD layer
 -------------------------------------------------*/
 
+extern int amigamame_audio_forcemono;
+
 void sound_frame_update(void)
 {
+	int resetstreamleft=1,resetstreamright=(amigamame_audio_forcemono)?0:1;
+
 	int sample, spknum;
     struct SampleFrame *pFrame;
     int icurrentSampleFrame;
@@ -704,12 +710,17 @@ void sound_frame_update(void)
 
 	/* reset the mixing streams */
     // now left and right are contiguous, need one call.
-	memset(pFrame->_leftmix, 0, samples_this_frame * sizeof(INT32)*2);
+
+//	memset(pFrame->_leftmix, 0, samples_this_frame * sizeof(INT32)*2);
 //	memset(pFrame->_rightmix, 0, samples_this_frame * sizeof(INT32));
+
+    int nbconsumedStreams =0;
+    int lastspeakerDirection=1337;
 
 	/* if we're not paused, keep the sounds going */
 	if (!mame_is_paused())
 	{
+
         INT32 *leftmix = pFrame->_leftmix;
         INT32 *rightmix = pFrame->_rightmix;
 		/* force all the speaker streams to generate the proper number of samples */
@@ -722,45 +733,129 @@ void sound_frame_update(void)
 			if (spk->mixer_stream)
 			{
 				stream_buf = stream_consume_output(spk->mixer_stream, 0, samples_this_frame);
-
-#ifdef MAME_DEBUG
-				/* debug version: keep track of the maximum sample */
-				for (sample = 0; sample < samples_this_frame; sample++)
-				{
-					if (stream_buf[sample] > spk->max_sample)
-						spk->max_sample = stream_buf[sample];
-					else if (-stream_buf[sample] > spk->max_sample)
-						spk->max_sample = -stream_buf[sample];
-					if (stream_buf[sample] > 32767 || stream_buf[sample] < -32768)
-						spk->clipped_samples++;
-					spk->total_samples++;
-				}
-#endif
+//    nbconsumedStreams++;
+//    lastspeakerDirection = (int)spk->speaker->x;
+//#ifdef MAME_DEBUG
+//				/* debug version: keep track of the maximum sample */
+//				for (sample = 0; sample < samples_this_frame; sample++)
+//				{
+//					if (stream_buf[sample] > spk->max_sample)
+//						spk->max_sample = stream_buf[sample];
+//					else if (-stream_buf[sample] > spk->max_sample)
+//						spk->max_sample = -stream_buf[sample];
+//					if (stream_buf[sample] > 32767 || stream_buf[sample] < -32768)
+//						spk->clipped_samples++;
+//					spk->total_samples++;
+//				}
+//#endif
 
 				/* mix if sound is enabled */
 				if (global_sound_enabled && !nosound_mode)
 				{
-					/* if the speaker is centered, send to both left and right */
-					if (spk->speaker->x == 0)
-						for (sample = 0; sample < samples_this_frame; sample++)
-						{
-							leftmix[sample] += stream_buf[sample];
-							rightmix[sample] += stream_buf[sample];
-						}
+                    if(amigamame_audio_forcemono || spk->speaker->x < 0)
+                    { //krb: forced mono from configuration, but machine may be mono.
+                      //krb:  just use left buffer in that case.
+                       if(resetstreamleft)
+                       {    // the first touch is a copy.
+                            memcpy(leftmix,stream_buf,sizeof(INT32)*samples_this_frame);
+                            resetstreamleft=0;
+                       } else {
+                            for (sample = 0; sample < samples_this_frame; sample++)
+                            {
+                                leftmix[sample] += stream_buf[sample];
+                            }
+                        }
+                    } else
+                    { // may be stereo
+                        //ORIGINAL CODE
+                        /* if the speaker is centered, send to both left and right */
+                        if (spk->speaker->x == 0)
+                        {   // just because I absolutely want to avoid an unnecessary pass...
+                            if(resetstreamleft)
+                            {
+                                if(resetstreamright)
+                                {
+                                    for (sample = 0; sample < samples_this_frame; sample++)
+                                    {
+                                        INT32 s=stream_buf[sample];
+                                        leftmix[sample] = s;
+                                        rightmix[sample] = s;
+                                    }
+                                    resetstreamright=0;
+                                } else
+                                {
+                                    for (sample = 0; sample < samples_this_frame; sample++)
+                                    {
+                                        INT32 s=stream_buf[sample];
+                                        leftmix[sample] = s;
+                                        rightmix[sample] += s;
+                                    }
+                                }
+                                resetstreamleft = 0;
+                            } else
+                            {
+                                if(resetstreamright)
+                                {
+                                    for (sample = 0; sample < samples_this_frame; sample++)
+                                    {
+                                        INT32 s=stream_buf[sample];
+                                        leftmix[sample] += s;
+                                        rightmix[sample] = s;
+                                    }
+                                    resetstreamright=0;
+                                } else
+                                {   // classic case
+                                    for (sample = 0; sample < samples_this_frame; sample++)
+                                    {
+                                        INT32 s=stream_buf[sample];
+                                        leftmix[sample] += s;
+                                        rightmix[sample] += s;
+                                    }
 
-					/* if the speaker is to the left, send only to the left */
-					else if (spk->speaker->x < 0)
-						for (sample = 0; sample < samples_this_frame; sample++)
-							leftmix[sample] += stream_buf[sample];
+                                }
+                            } // end off 4 cases
 
-					/* if the speaker is to the right, send only to the right */
-					else
-						for (sample = 0; sample < samples_this_frame; sample++)
-							rightmix[sample] += stream_buf[sample];
-				}
+                        }
+                        /* if the speaker is to the left, send only to the left */
+                        // -> managed like mono now.
+//                        else if (spk->speaker->x < 0)
+//                        {
+//                            for (sample = 0; sample < samples_this_frame; sample++)
+//                                leftmix[sample] += stream_buf[sample];
+//                        }
+                        /* if the speaker is to the right, send only to the right */
+                        else if (spk->speaker->x > 0)
+                        {
+                             if(resetstreamright)
+                               {    // the first touch is a copy.
+                                    memcpy(rightmix,stream_buf,sizeof(INT32)*samples_this_frame);
+                                    resetstreamright=0;
+                               } else {
+                                    for (sample = 0; sample < samples_this_frame; sample++)
+                                    {
+                                        rightmix[sample] += stream_buf[sample];
+                                    }
+                                }
+                        }
+
+                    }
+
+
+				} // end if enable sound
 			}
 		}
 	}
+	// if stream actually not touched.
+	if(resetstreamleft)
+	{
+		memset(pFrame->_leftmix, 0, samples_this_frame * sizeof(INT32));
+	}
+    if(resetstreamright)
+	{
+		memset(pFrame->_rightmix, 0, samples_this_frame * sizeof(INT32));
+	}
+
+//    printf("nbconsumedStreams:%d lastdir:%d\n",nbconsumedStreams,lastspeakerDirection);
 
 //	/* now downmix the final result */
 //	for (sample = 0; sample < samples_this_frame; sample++)
