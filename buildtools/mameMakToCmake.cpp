@@ -130,6 +130,12 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
 
     for(const string &s : machine._sources)
     {
+        if(s == "drivers/model2.c" ||
+            s =="drivers/model3.c")
+            {
+             continue;
+           }
+
         string sourcepath = sourcebase+s;
         ifstream ifssrc(sourcepath);
         if(!ifssrc.good()) {
@@ -295,6 +301,68 @@ int patchMiniMachines(
 //        machinetargets[pkgname]._gamedrivers["tmnt2"] = src._gamedrivers["tmnt2"];
 
     {
+        TMachine  &src=machinetargets["dataeast"];
+        string mname=string("minidtea");
+        TMachine  &m=machinetargets[mname];
+        m._name = mname;
+        m._gamedrivers["supbtime"] = src._gamedrivers["supbtime"];
+        m._gamedrivers["supbtimj"] = src._gamedrivers["supbtimj"];
+        m._gamedrivers["chinatwn"] = src._gamedrivers["chinatwn"];
+
+        m._gamedrivers["karnov"] = src._gamedrivers["karnov"];
+        m._gamedrivers["karnovj"] = src._gamedrivers["karnovj"];
+        m._gamedrivers["wndrplnt"] = src._gamedrivers["wndrplnt"];
+        m._gamedrivers["chelnov"] = src._gamedrivers["chelnov"];
+        m._gamedrivers["chelnovu"] = src._gamedrivers["chelnovu"];
+        m._gamedrivers["chelnovj"] = src._gamedrivers["chelnovj"];
+
+        // dec0 driver
+        m._gamedrivers["hbarrel"] = src._gamedrivers["hbarrel"];
+        m._gamedrivers["hbarrelw"] = src._gamedrivers["hbarrelw"];
+        m._gamedrivers["baddudes"] = src._gamedrivers["baddudes"];
+        m._gamedrivers["drgninja"] = src._gamedrivers["drgninja"];
+        m._gamedrivers["birdtry"] = src._gamedrivers["birdtry"];
+        m._gamedrivers["robocop"] = src._gamedrivers["robocop"];
+        m._gamedrivers["robocopw"] = src._gamedrivers["robocopw"];
+        m._gamedrivers["robocopj"] = src._gamedrivers["robocopj"];
+        m._gamedrivers["robocopu"] = src._gamedrivers["robocopu"];
+
+        m._gamedrivers["robocpu0"] = src._gamedrivers["robocpu0"];
+        m._gamedrivers["robocopb"] = src._gamedrivers["robocopb"];
+
+        m._gamedrivers["hippodrm"] = src._gamedrivers["hippodrm"];
+        m._gamedrivers["ffantasy"] = src._gamedrivers["ffantasy"];
+        m._gamedrivers["ffantasa"] = src._gamedrivers["ffantasa"];
+
+        m._gamedrivers["slyspy"] = src._gamedrivers["slyspy"];
+        m._gamedrivers["slyspy2"] = src._gamedrivers["slyspy2"];
+        m._gamedrivers["secretag"] = src._gamedrivers["secretag"];
+        m._gamedrivers["secretab"] = src._gamedrivers["secretab"];
+        m._gamedrivers["midres"] = src._gamedrivers["midres"];
+        m._gamedrivers["midresu"] = src._gamedrivers["midresu"];
+        m._gamedrivers["midresj"] = src._gamedrivers["midresj"];
+        m._gamedrivers["bouldash"] = src._gamedrivers["bouldash"];
+        m._gamedrivers["bouldshj"] = src._gamedrivers["bouldshj"];
+
+        m._sources = {
+            "drivers/supbtime.c","vidhrdw/supbtime.c","vidhrdw/deco16ic.c",
+            "drivers/karnov.c","vidhrdw/karnov.c",
+            "drivers/dec0.c","machine/dec0.c","vidhrdw/dec0.c"
+        };
+        m._cpu_defs["M68000"]=1;
+        m._cpu_defs["M6502"]=1;
+        m._cpu_defs["H6280"]=1;
+
+        m._sound_defs["YM2203"]=1;
+        m._sound_defs["YM3526"]=1;
+
+        m._sound_defs["YM3812"]=1;
+        m._sound_defs["OKIM6295"]=1;
+
+    } // end mini dteast
+
+
+    {
         TMachine  &src=machinetargets["konami"];
         string mname=string("minikonami");
         TMachine  &m=machinetargets[mname];
@@ -439,6 +507,11 @@ GAME( 1994, nbajamt3, nbajam,  tunit_adpcm, nbajamte, nbajamte, ROT0, "Midway", 
 
 */
     }
+    {
+
+
+
+    }
 
     return 0;
 }
@@ -547,12 +620,14 @@ int createCmake(map<string,TMachine> machinetargets,
         if(upname == "SHARED") onShouldBeDefault=true;
         // this is optional
         if(upname == "SEGA" ) onShouldBeDefault = true;
-        if(upname == "NEOGEO" ) onShouldBeDefault = true;
+       //reactivate when corrected : if(upname == "NEOGEO" ) onShouldBeDefault = false;
         if(upname == "CAPCOM" ) onShouldBeDefault = true;
         if(upname == "TAITO" ) onShouldBeDefault = true;
         // just for rtype, rtypeleo -> THEY DONT WORK !!
 //        if(upname == "IREM" ) onShouldBeDefault = true;
-//        if(upname == "DATAEAST" ) onShouldBeDefault = true;
+//        if(upname == "DATAEAST" ) onShouldBeDefault = true; -> too big/shitty
+        if(upname == "MINIDTEA" ) onShouldBeDefault = true;
+
         // just for buggy boy :) ->DOESNT WORK On 0.106 :(
 //        if(upname == "TATSUMI" ) onShouldBeDefault = true; // tested ok
 
@@ -561,13 +636,16 @@ int createCmake(map<string,TMachine> machinetargets,
 //        // just for gals panic.
         if(upname == "KANEKO" ) onShouldBeDefault = true; // tested ok
 //        // just for paddle mania :)
-//        if(upname == "ALPHA" ) onShouldBeDefault = true; // tested ok
+        if(upname == "ALPHA" ) onShouldBeDefault = true; // tested ok
 //        // just for silkworm and rygar :)  tekhan=tecmo
         if(upname == "TEHKAN" ) onShouldBeDefault = true; // tested ok
 //        // just for  snow bros and slap fight :)
         if(upname == "TOAPLAN" ) onShouldBeDefault = true;
         // konami is huge, need ninja turtles and simpsons.
         if(upname == "MINIKONAMI" ) onShouldBeDefault = true;
+
+        // toki & cabal
+        if(upname == "TAD" ) onShouldBeDefault = true;
 
         // some midway machines, mk mk2 nbajam
         if(upname == "MIDWAYTUNIT" ) onShouldBeDefault = true;
@@ -1055,6 +1133,23 @@ void removeInVector(vector<string> &v, string s)
     }
 }
 
+
+void removeSegaModel23(TMachine &m)
+{
+//    m._sources.erase("drivers/model2.c");
+    std::remove(m._sources.begin(), m._sources.end(), "drivers/model2.c");
+    std::remove(m._sources.begin(), m._sources.end(), "drivers/model3.c");
+    std::remove(m._sources.begin(), m._sources.end(), "vidhrdw/model3.c");
+    std::remove(m._sources.begin(), m._sources.end(), "machine/model3.c");
+
+//    m._gamedrivers.erase(""); // drivers for model2 model3 empeached earlier.
+
+    m._cpu_defs.erase("I960"); // intel only used in model2, doesnt work on 0.106
+    m._cpu_defs.erase("ADSP21062");   // "sharc" only used in model2
+    m._cpu_defs.erase("PPC603");   //  only used in model3
+
+}
+
 void completeDefinitionsByHand(
             map<string,TMachine> &machinetargets,
             map<string,TChip> &cpusources
@@ -1063,6 +1158,16 @@ void completeDefinitionsByHand(
     machinetargets["sega"]._sound_defs["YM3438"]=1;
     machinetargets["sega"]._cpu_defs["I8039"]=1; // sound cpu ? ->no.
     machinetargets["sega"]._cpu_defs["ADSP21062"]=1; // cpu
+
+    removeInVector(machinetargets["shared"]._sources,"vidhrdw/voodoo.c");
+
+    machinetargets["shared"]._cpu_defs["ADSP21062"]=1; // cpu
+
+
+    // on 106, all sega model2 and 3 are not working, just model1/ vfighter may work.
+    removeSegaModel23(machinetargets["sega"]);
+
+
 
     machinetargets["neogeo"]._sound_defs["YM2610B"]=1;
 
@@ -1097,9 +1202,16 @@ void completeDefinitionsByHand(
     machinetargets["dataeast"]._cpu_defs["DECO16"]=1; // m6502 variant, need HAS_DECO16.
     machinetargets["dataeast"]._cpu_defs["M65C02"]=1;
 
+    // TAD
+    machinetargets["tad"]._sources.push_back("sndhrdw/seibu.c");
+
+//
+
+//
     // - - - - - - --  -technos:
     // we can remove specific driver that way:
     auto &technossrc =  machinetargets["technos"]._sources;
+
 
 
 //    machinetargets["technos"]._gamedrivers.erase("renegade"); // need YM3526
@@ -1165,7 +1277,7 @@ int main(int argc, char **argv)
 
     createMameDrivc(machinetargets);
 
-    cout << "\nEverything went extremely well :).\n" << endl;
+    cout << "\nEverything went extremely well, gamedrivers.cmake and mamedriv.c generated, may copy it into mame106/ :).\n" << endl;
 
     return EXIT_SUCCESS;
 }
