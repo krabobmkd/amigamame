@@ -2948,6 +2948,40 @@ const game_driver * const drivers[] =
 	DRIVER( trogp ) /* 1990 "Midway" "Trog (prototype */
 	DRIVER( trogpa6 ) /* 1990 "Midway" "Trog (rev PA6-PAC 09/09/90)" */
 #endif
+#ifdef LINK_MINIDTEA
+	DRIVER( baddudes ) /* 1988 "Data East USA" "Bad Dudes vs. Dragonninja (US)" */
+	DRIVER( birdtry ) /* 1988 "Data East Corporation" "Birdie Try (Japan)" */
+	DRIVER( bouldash ) /* 1990 "Data East Corporation (licensed from First Star)" "Boulder Dash / Boulder Dash Part 2 (World)" */
+	DRIVER( bouldshj ) /* 1990 "Data East Corporation (licensed from First Star)" "Boulder Dash / Boulder Dash Part 2 (Japan)" */
+	DRIVER( chelnov ) /* 1988 "Data East Corporation" "Chelnov - Atomic Runner (World)" */
+	DRIVER( chelnovj ) /* 1988 "Data East Corporation" "Chelnov - Atomic Runner (Japan)" */
+	DRIVER( chelnovu ) /* 1988 "Data East USA" "Chelnov - Atomic Runner (US)" */
+	DRIVER( chinatwn ) /* 1991 "Data East Corporation" "China Town (Japan)" */
+	DRIVER( drgninja ) /* 1988 "Data East Corporation" "Dragonninja (Japan)" */
+	DRIVER( ffantasa ) /* 1989 "Data East Corporation" "Fighting Fantasy (Japan)" */
+	DRIVER( ffantasy ) /* 1989 "Data East Corporation" "Fighting Fantasy (Japan revision 2)" */
+	DRIVER( hbarrel ) /* 1987 "Data East USA" "Heavy Barrel (US)" */
+	DRIVER( hbarrelw ) /* 1987 "Data East Corporation" "Heavy Barrel (World)" */
+	DRIVER( hippodrm ) /* 1989 "Data East USA" "Hippodrome (US)" */
+	DRIVER( karnov ) /* 1987 "Data East USA" "Karnov (US)" */
+	DRIVER( karnovj ) /* 1987 "Data East Corporation" "Karnov (Japan)" */
+	DRIVER( midres ) /* 1989 "Data East Corporation" "Midnight Resistance (World)" */
+	DRIVER( midresj ) /* 1989 "Data East Corporation" "Midnight Resistance (Japan)" */
+	DRIVER( midresu ) /* 1989 "Data East USA" "Midnight Resistance (US)" */
+	DRIVER( robocop ) /* 1988 "Data East Corporation" "Robocop (World revision 4)" */
+	DRIVER( robocopb ) /* 1988 "bootleg" "Robocop (World bootleg)" */
+	DRIVER( robocopj ) /* 1988 "Data East Corporation" "Robocop (Japan)" */
+	DRIVER( robocopu ) /* 1988 "Data East USA" "Robocop (US revision 1)" */
+	DRIVER( robocopw ) /* 1988 "Data East Corporation" "Robocop (World revision 3)" */
+	DRIVER( robocpu0 ) /* 1988 "Data East USA" "Robocop (US revision 0)" */
+	DRIVER( secretab ) /* 1989 "bootleg" "Secret Agent (bootleg)" */
+	DRIVER( secretag ) /* 1989 "Data East Corporation" "Secret Agent (World)" */
+	DRIVER( slyspy ) /* 1989 "Data East USA" "Sly Spy (US revision 3)" */
+	DRIVER( slyspy2 ) /* 1989 "Data East USA" "Sly Spy (US revision 2)" */
+	DRIVER( supbtime ) /* 1990 "Data East Corporation" "Super Burger Time (World)" */
+	DRIVER( supbtimj ) /* 1990 "Data East Corporation" "Super Burger Time (Japan)" */
+	DRIVER( wndrplnt ) /* 1987 "Data East Corporation" "Wonder Planet (Japan)" */
+#endif
 #ifdef LINK_MINIKONAMI
 	DRIVER( blswhstl ) /* 1991 "Konami" "Bells & Whistles (Version L)" */
 	DRIVER( detatwin ) /* 1991 "Konami" "Detana!! Twin Bee (Japan ver. J)" */
@@ -3666,6 +3700,7 @@ const game_driver * const drivers[] =
 	DRIVER( aof2a ) /* 1994 "SNK" "Art of Fighting 2 / Ryuuko no Ken 2 (set 2)" */
 	DRIVER( aof3 ) /* 1996 "SNK" "Art of Fighting 3 - The Path of the Warrior / Art of Fighting - Ryuuko no Ken Gaiden" */
 	DRIVER( aof3k ) /* 1996 "SNK" "Art of Fighting 3 - The Path of the Warrior (Korean release)" */
+	DRIVER( b2b ) /* 1994 "Visco" "Bang Bang Busters (2010 NCI release)" */
 	DRIVER( bakatono ) /* 1991 "Monolith Corp." "Bakatonosama Mahjong Manyuki" */
 	DRIVER( bangbead ) /* 2000 "Visco" "Bang Bead" */
 	DRIVER( bjourney ) /* 1990 "Alpha Denshi Co." "Blue's Journey / Raguy" */
@@ -3703,6 +3738,7 @@ const game_driver * const drivers[] =
 	DRIVER( gowcaizr ) /* 1995 "Technos" "Voltage Fighter - Gowcaizer / Choujin Gakuen Gowcaizer" */
 	DRIVER( gpilots ) /* 1991 "SNK" "Ghost Pilots" */
 	DRIVER( gururin ) /* 1994 "Face" "Gururin" */
+	DRIVER( ironclad ) /* 1996 "Saurus" "Choutetsu Brikin'ger - Ironclad (Prototype)" */
 	DRIVER( irrmaze ) /* 1997 "SNK / Saurus" "The Irritating Maze / Ultra Denryu Iraira Bou" */
 	DRIVER( janshin ) /* 1994 "Aicom" "Jyanshin Densetsu - Quest of Jongmaster" */
 	DRIVER( jockeygp ) /* 2001 "Sun Amusement / BrezzaSoft" "Jockey Grand Prix" */
@@ -4562,14 +4598,12 @@ const game_driver * const drivers[] =
 	DRIVER( aurail1 ) /* 1990 "Sega / Westone" "Aurail (set 2 */
 	DRIVER( aurailj ) /* 1990 "Sega / Westone" "Aurail (set 1 */
 	DRIVER( bakubaku ) /* 1996 "Sega" "Baku Baku Animal (J 950407 V1.000)" */
-	DRIVER( bass ) /* 1997 "Sega" "Sega Bass Fishing" */
 	DRIVER( batmanfr ) /* 1996 "Acclaim" "Batman Forever (JUE 960507 V1.000)" */
 	DRIVER( bayrout1 ) /* 1989 "Sunsoft / Sega" "Bay Route (set 1 */
 	DRIVER( bayroute ) /* 1989 "Sunsoft / Sega" "Bay Route (set 3 */
 	DRIVER( bayroutj ) /* 1989 "Sunsoft / Sega" "Bay Route (set 2 */
 	DRIVER( bayrtbl1 ) /* 1989 "bootleg" "Bay Route (bootleg set 1)" */
 	DRIVER( bayrtbl2 ) /* 1989 "bootleg" "Bay Route (bootleg set 2)" */
-	DRIVER( bel ) /* 1998 "Sega/EPL Productions" "Behind Enemy Lines" */
 	DRIVER( blasto ) /* 1978 "Gremlin" "Blasto" */
 	DRIVER( blckgalb ) /* 1987 "bootleg" "Block Gal (bootleg)" */
 	DRIVER( blockade ) /* 1976 "Gremlin" "Blockade" */
@@ -4623,11 +4657,6 @@ const game_driver * const drivers[] =
 	DRIVER( danchih ) /* 1999 "Altron (Tecmo license)" "Danchi de Hanafuoda (J 990607 V1.400)" */
 	DRIVER( darkedge ) /* 1992 "Sega" "Dark Edge (World)" */
 	DRIVER( darkedgj ) /* 1992 "Sega" "Dark Edge (Japan)" */
-	DRIVER( dayto2pe ) /* 1998 "Sega" "Daytona USA 2 Power Edition" */
-	DRIVER( daytona ) /* 1993 "Sega" "Daytona USA (Japan)" */
-	DRIVER( daytona2 ) /* 1998 "Sega" "Daytona USA 2" */
-	DRIVER( daytonam ) /* 1993 "Sega" "Daytona USA (Japan */
-	DRIVER( daytonat ) /* 1993 "Sega" "Daytona USA (Japan */
 	DRIVER( dbzvrvs ) /* 1994 "Sega / Banpresto" "Dragon Ball Z V.R.V.S." */
 	DRIVER( dcclub ) /* 1991 "Sega" "Dynamic Country Club" */
 	DRIVER( dcclubfd ) /* 1991 "Sega" "Dynamic Country Club (Floppy DS3-5000-09d */
@@ -4643,24 +4672,14 @@ const game_driver * const drivers[] =
 	DRIVER( defense ) /* 1987 "Sega" "Defense (System 16B */
 	DRIVER( depthch ) /* 1977 "Gremlin" "Depthcharge" */
 	DRIVER( depthv1 ) /* 1977 "Gremlin" "Depthcharge (older)" */
-	DRIVER( desert ) /* 1994 "Sega/Martin Marietta" "Desert Tank" */
 	DRIVER( desertbr ) /* 1992 "Sega" "Desert Breaker (FD1094 317-0196)" */
 	DRIVER( diehard ) /* 1996 "Sega" "Die Hard Arcade (UET 960515 V1.000)" */
 	DRIVER( digger ) /* 1980 "Sega" "Digger" */
-	DRIVER( dirtdvla ) /* 1998 "Sega" "Dirt Devils (alt)" */
-	DRIVER( dirtdvls ) /* 1998 "Sega" "Dirt Devils" */
 	DRIVER( dnmtdeka ) /* 1996 "Sega" "Dynamite Deka (J 960515 V1.000)" */
-	DRIVER( doa ) /* 1996 "Sega" "Dead or Alive (Model 2B)" */
-	DRIVER( doaa ) /* 1996 "Sega" "Dead or Alive (Model 2A)" */
 	DRIVER( dotriku2 ) /* 1990 "Sega" "Dottori Kun (old version)" */
 	DRIVER( dotrikun ) /* 1990 "Sega" "Dottori Kun (new version)" */
 	DRIVER( dumpmtmt ) /* 1986 "Sega" "Dump Matsumoto (Japan */
 	DRIVER( dunkshot ) /* 1986 "Sega" "Dunk Shot (FD1089 317-0022)" */
-	DRIVER( dynabb ) /* 1996 "Sega" "Dynamite Baseball '97" */
-	DRIVER( dynamcop ) /* 1996 "Sega" "Dynamite Cop (Model 2A)" */
-	DRIVER( dyndeka2 ) /* 1996 "Sega" "Dynamite Deka 2 (Japan */
-	DRIVER( dynmcopb ) /* 1996 "Sega" "Dynamite Cop (Model 2B)" */
-	DRIVER( eca ) /* 1999 "Sega" "Emergency Call Ambulance" */
 	DRIVER( ejihon ) /* 1995 "Sega" "Ejihon Tantei Jimusyo (J 950613 V1.000)" */
 	DRIVER( elandore ) /* 1998 "Sai-Mate" "Elan Doree - Legend of Dragon (JUET 980922 V1.006)" */
 	DRIVER( elim2 ) /* 1981 "Gremlin" "Eliminator (2 Players */
@@ -4694,15 +4713,12 @@ const game_driver * const drivers[] =
 	DRIVER( fpointbl ) /* 1989 "bootleg" "Flash Point (World */
 	DRIVER( frogs ) /* 1978 "Gremlin" "Frogs" */
 	DRIVER( futspy ) /* 1984 "Sega" "Future Spy" */
-	DRIVER( fvipers ) /* 1995 "Sega" "Fighting Vipers" */
-	DRIVER( fvipers2 ) /* 1998 "Sega" "Fighting Vipers 2" */
 	DRIVER( ga2 ) /* 1992 "Sega" "Golden Axe: The Revenge of Death Adder (World)" */
 	DRIVER( ga2j ) /* 1992 "Sega" "Golden Axe: The Revenge of Death Adder (Japan)" */
 	DRIVER( ga2u ) /* 1992 "Sega" "Golden Axe: The Revenge of Death Adder (US)" */
 	DRIVER( gardia ) /* 1986 "Sega / Coreland" "Gardia" */
 	DRIVER( gardiab ) /* 1986 "bootleg" "Gardia (bootleg)" */
 	DRIVER( gaxeduel ) /* 1994 "Sega" "Golden Axe - The Duel (JUETL 950117 V1.000)" */
-	DRIVER( getbass ) /* 1997 "Sega" "Get Bass" */
 	DRIVER( gforce2 ) /* 1988 "Sega" "Galaxy Force 2" */
 	DRIVER( gforce2j ) /* 1988 "Sega" "Galaxy Force 2 (Japan)" */
 	DRIVER( gground ) /* 1988 "Sega" "Gain Ground (FD1094 317-0058-03?)" */
@@ -4719,19 +4735,16 @@ const game_driver * const drivers[] =
 	DRIVER( gprider1 ) /* 1990 "Sega" "GP Rider (set 1 */
 	DRIVER( grdforce ) /* 1998 "Success" "Guardian Force (JUET 980318 V0.105)" */
 	DRIVER( groovef ) /* 1996 "Atlus" "Power Instinct 3 - Groove On Fight (J 970416 V1.001)" */
-	DRIVER( gunblade ) /* 1995 "Sega" "Gunblade NY" */
 	DRIVER( hanagumi ) /* 1998 "Sega" "Hanagumi Taisen Columns - Sakura Wars (J 971007 V1.010)" */
 	DRIVER( hangon ) /* 1985 "Sega" "Hang-On" */
 	DRIVER( hangonjr ) /* 1985 "Sega" "Hang-On Jr." */
 	DRIVER( harddunj ) /* 1994 "Sega" "Hard Dunk (Japan)" */
 	DRIVER( harddunk ) /* 1994 "Sega" "Hard Dunk (World)" */
-	DRIVER( harley ) /* 1997 "Sega" "Harley-Davidson and L.A. Riders" */
 	DRIVER( headon ) /* 1979 "Gremlin" "Head On (2 players)" */
 	DRIVER( headon2 ) /* 1979 "Sega" "Head On 2" */
 	DRIVER( headonb ) /* 1979 "Gremlin" "Head On (1 player)" */
 	DRIVER( heiankyo ) /* 1979 "Denki Onkyo" "Heiankyo Alien" */
 	DRIVER( holo ) /* 1992 "Sega" "Holosseum (US)" */
-	DRIVER( hotd ) /* 1997 "Sega" "House of the Dead" */
 	DRIVER( hotrod ) /* 1988 "Sega" "Hot Rod (World */
 	DRIVER( hotroda ) /* 1988 "Sega" "Hot Rod (World */
 	DRIVER( hotrodj ) /* 1988 "Sega" "Hot Rod (Japan */
@@ -4744,7 +4757,6 @@ const game_driver * const drivers[] =
 	DRIVER( ichirk ) /* 1994 "Sega" "Puzzle & Action: Ichidant-R (Korea)" */
 	DRIVER( imsorry ) /* 1985 "Coreland / Sega" "I'm Sorry (US)" */
 	DRIVER( imsorryj ) /* 1985 "Coreland / Sega" "Gonbee no I'm Sorry (Japan)" */
-	DRIVER( indy500 ) /* 1995 "Sega" "Indianapolis 500" */
 	DRIVER( introdon ) /* 1996 "Sunsoft / Success" "Karaoke Quiz Intro Don Don! (J 960213 V1.000)" */
 	DRIVER( invds ) /* 1979 "Sega" "Invinco / Deep Scan" */
 	DRIVER( invho2 ) /* 1979 "Sega" "Invinco / Head On 2" */
@@ -4755,9 +4767,6 @@ const game_driver * const drivers[] =
 	DRIVER( karianx ) /* 1996 "Deniam" "Karian Cross (Rev. 1.0)" */
 	DRIVER( kiwames ) /* 1995 "Athena" "Pro Mahjong Kiwame S (J 951020 V1.208)" */
 	DRIVER( kopunch ) /* 1981 "Sega" "KO Punch" */
-	DRIVER( lastbrnj ) /* 1996 "Sega" "Last Bronx (Japan */
-	DRIVER( lastbrnx ) /* 1996 "Sega" "Last Bronx (Export */
-	DRIVER( lemans24 ) /* 1997 "Sega" "LeMans 24" */
 	DRIVER( lghost ) /* 1990 "Sega" "Laser Ghost (set 2 */
 	DRIVER( lghostu ) /* 1990 "Sega" "Laser Ghost (set 1 */
 	DRIVER( loffire ) /* 1989 "Sega" "Line of Fire / Bakudan Yarou (World */
@@ -4765,10 +4774,8 @@ const game_driver * const drivers[] =
 	DRIVER( loffireu ) /* 1989 "Sega" "Line of Fire / Bakudan Yarou (US */
 	DRIVER( logicpr2 ) /* 1997 "Deniam" "Logic Pro 2 (Japan)" */
 	DRIVER( logicpro ) /* 1996 "Deniam" "Logic Pro (Japan)" */
-	DRIVER( lostwsga ) /* 1997 "Sega" "The Lost World" */
 	DRIVER( mahmajn ) /* 1992 "Sega" "Tokoro San no MahMahjan" */
 	DRIVER( mahmajn2 ) /* 1994 "Sega" "Tokoro San no MahMahjan 2" */
-	DRIVER( manxtt ) /* 1995 "Sega" "Manx TT Superbike" */
 	DRIVER( maruchan ) /* 1997 "Sega / Toyosuisan" "Maru-Chan de Goo! (J 971216 V1.000)" */
 	DRIVER( mausuke ) /* 1995 "Data East" "Mausuke no Ojama the World (J 960314 V1.000)" */
 	DRIVER( megaplay ) /* 1993 "Sega" "Mega Play BIOS" */
@@ -4849,7 +4856,6 @@ const game_driver * const drivers[] =
 	DRIVER( outrun1 ) /* 1986 "Sega" "Out Run (set 1 */
 	DRIVER( outrun2 ) /* 1986 "Sega" "Out Run (set 2)" */
 	DRIVER( outrunb ) /* 1986 "bootleg" "Out Run (bootleg)" */
-	DRIVER( overrev ) /* 1997 "Jaleco" "Over Rev" */
 	DRIVER( passht4b ) /* 1988 "bootleg" "Passing Shot (4 Players) (bootleg)" */
 	DRIVER( passsht ) /* 1988 "Sega" "Passing Shot (World */
 	DRIVER( passshta ) /* 1988 "Sega" "Passing Shot (World */
@@ -4867,8 +4873,6 @@ const game_driver * const drivers[] =
 	DRIVER( pignewta ) /* 1983 "Sega" "Pig Newton (version A)" */
 	DRIVER( pitfall2 ) /* 1985 "Sega" "Pitfall II" */
 	DRIVER( pitfallu ) /* 1985 "Sega" "Pitfall II (not encrypted)" */
-	DRIVER( pltkids ) /* 1998 "Psikyo" "Pilot Kids (Model 2B)" */
-	DRIVER( pltkidsa ) /* 1998 "Psikyo" "Pilot Kids (Model 2A)" */
 	DRIVER( pontoon ) /* 1989 "Sega" "Pontoon" */
 	DRIVER( potopoto ) /* 1994 "Sega" "Poto Poto (Japan)" */
 	DRIVER( prikura ) /* 1996 "Atlus" "Princess Clara Daisakusen (J 960910 V1.000)" */
@@ -4909,11 +4913,7 @@ const game_driver * const drivers[] =
 	DRIVER( samurai ) /* 1980 "Sega" "Samurai" */
 	DRIVER( sandor ) /* 1995 "Sega" "Sando-R (J 951114 V1.000)" */
 	DRIVER( sassisu ) /* 1996 "Sega" "Taisen Tanto-R Sashissu!! (J 980216 V1.000)" */
-	DRIVER( schamp ) /* 1996 "Sega" "Sonic The Fighters" */
 	DRIVER( scross ) /* 1992 "Sega" "Stadium Cross (World)" */
-	DRIVER( scud ) /* 1996 "Sega" "Scud Race (Australia)" */
-	DRIVER( scuda ) /* 1996 "Sega" "Scud Race (Export)" */
-	DRIVER( scudp ) /* 1997 "Sega" "Scud Race Plus" */
 	DRIVER( sdi ) /* 1987 "Sega" "SDI - Strategic Defense Initiative (Europe */
 	DRIVER( sdib ) /* 1987 "Sega" "SDI - Strategic Defense Initiative (System 16B */
 	DRIVER( sdibl ) /* 1987 "bootleg" "SDI - Strategic Defense Initiative (bootleg)" */
@@ -4925,7 +4925,6 @@ const game_driver * const drivers[] =
 	DRIVER( sgmast ) /* 1989 "Sega" "Super Masters Golf (FD1094 317-0058-05d?)" */
 	DRIVER( sgmastc ) /* 1989 "Sega" "Jumbo Ozaki Super Masters Golf (World */
 	DRIVER( sgmastj ) /* 1989 "Sega" "Jumbo Ozaki Super Masters Golf (Japan */
-	DRIVER( sgt24h ) /* 1996 "Jaleco" "Super GT 24h" */
 	DRIVER( shangnle ) /* 1991 "Sega" "Limited Edition Hang-On" */
 	DRIVER( shangon ) /* 1987 "Sega" "Super Hang-On (set 4 */
 	DRIVER( shangon1 ) /* 1987 "Sega" "Super Hang-On (set 1 */
@@ -4950,8 +4949,6 @@ const game_driver * const drivers[] =
 	DRIVER( sindbadm ) /* 1983 "Sega" "Sindbad Mystery" */
 	DRIVER( sjryuko ) /* 1987 "White Board" "Sukeban Jansi Ryuko (set 2 */
 	DRIVER( sjryuko1 ) /* 1987 "White Board" "Sukeban Jansi Ryuko (set 1 */
-	DRIVER( skisuprg ) /* 1996 "Sega" "Sega Ski Super G" */
-	DRIVER( skytargt ) /* 1995 "Sega" "Sky Target" */
 	DRIVER( slipstrm ) /* 1995 "Capcom" "Slipstream" */
 	DRIVER( smgp ) /* 1989 "Sega" "Super Monaco GP (set 8 */
 	DRIVER( smgp5 ) /* 1989 "Sega" "Super Monaco GP (set 6 */
@@ -4975,12 +4972,7 @@ const game_driver * const drivers[] =
 	DRIVER( spcpostn ) /* 1986 "Sega / Nasco" "Space Position (Japan)" */
 	DRIVER( spidman ) /* 1991 "Sega" "Spider-Man: The Videogame (World)" */
 	DRIVER( spidmanu ) /* 1991 "Sega" "Spider-Man: The Videogame (US)" */
-	DRIVER( spikeofe ) /* 1998 "Sega" "Spikeout Final Edition" */
-	DRIVER( spikeout ) /* 1998 "Sega" "Spikeout" */
 	DRIVER( sptrekct ) /* 1980 "Sega" "Space Trek (cocktail)" */
-	DRIVER( srally2 ) /* 1998 "Sega" "Sega Rally 2" */
-	DRIVER( srallyc ) /* 1995 "Sega" "Sega Rally Championship" */
-	DRIVER( sraly2dx ) /* 1998 "Sega" "Sega Rally 2 DX" */
 	DRIVER( ssanchan ) /* 1984 "Sega" "Sanrin San Chan (Japan)" */
 	DRIVER( sscandal ) /* 1985 "Coreland / Sega" "Seishun Scandal (Japan)" */
 	DRIVER( sspacaho ) /* 1979 "Sega" "Space Attack / Head On" */
@@ -4996,7 +4988,6 @@ const game_driver * const drivers[] =
 	DRIVER( starjack ) /* 1983 "Sega" "Star Jacker (Sega)" */
 	DRIVER( starjacs ) /* 1983 "Stern" "Star Jacker (Stern)" */
 	DRIVER( startrek ) /* 1982 "Sega" "Star Trek" */
-	DRIVER( stcc ) /* 1996 "Sega" "Sega Touring Car Championship" */
 	DRIVER( stkclmnj ) /* 1994 "Sega" "Stack Columns (Japan)" */
 	DRIVER( stkclmns ) /* 1994 "Sega" "Stack Columns (World)" */
 	DRIVER( strkfgtr ) /* 1991 "Sega" "Strike Fighter (Japan)" */
@@ -5010,8 +5001,6 @@ const game_driver * const drivers[] =
 	DRIVER( svs ) /* 1994 "Sega" "Super Visual Soccer: Sega Cup (US)" */
 	DRIVER( swa ) /* 1993 "Sega" "Star Wars Arcade" */
 	DRIVER( swat ) /* 1984 "Coreland / Sega" "SWAT" */
-	DRIVER( swtrilga ) /* 1998 "Sega/LucasArts" "Star Wars Trilogy" */
-	DRIVER( swtrilgy ) /* 1998 "Sega/LucasArts" "Star Wars Trilogy (ver A)" */
 	DRIVER( szaxxon ) /* 1982 "Sega" "Super Zaxxon" */
 	DRIVER( tacscan ) /* 1982 "Sega" "Tac/Scan" */
 	DRIVER( tantr ) /* 1992 "Sega" "Puzzle & Action: Tant-R (Japan)" */
@@ -5040,7 +5029,6 @@ const game_driver * const drivers[] =
 	DRIVER( titlefu ) /* 1992 "Sega" "Title Fight (US)" */
 	DRIVER( tokisens ) /* 1987 "Sega" "Toki no Senshi - Chrono Soldier" */
 	DRIVER( topshoot ) /* 1995 "Sun Mixing" "Top Shooter" */
-	DRIVER( topskatr ) /* 1997 "Sega" "Top Skater" */
 	DRIVER( toryumon ) /* 1994 "Sega" "Toryumon" */
 	DRIVER( toutrun ) /* 1989 "Sega" "Turbo Out Run (set 3 */
 	DRIVER( toutrun1 ) /* 1989 "Sega" "Turbo Out Run (set 1 */
@@ -5059,31 +5047,12 @@ const game_driver * const drivers[] =
 	DRIVER( ufosensi ) /* 1988 "Sega" "Ufo Senshi Yohko Chan" */
 	DRIVER( upndown ) /* 1983 "Sega" "Up'n Down" */
 	DRIVER( upndownu ) /* 1983 "Sega" "Up'n Down (not encrypted)" */
-	DRIVER( vcop ) /* 1994 "Sega" "Virtua Cop" */
-	DRIVER( vcop2 ) /* 1995 "Sega" "Virtua Cop 2" */
 	DRIVER( vf ) /* 1993 "Sega" "Virtua Fighter" */
-	DRIVER( vf2 ) /* 1995 "Sega" "Virtua Fighter 2 (ver 2.1)" */
-	DRIVER( vf2b ) /* 1995 "Sega" "Virtua Fighter 2 (ver B)" */
-	DRIVER( vf2o ) /* 1995 "Sega" "Virtua Fighter 2 (original)" */
-	DRIVER( vf3 ) /* 1996 "Sega" "Virtua Fighter 3" */
-	DRIVER( vf3tb ) /* 1996 "Sega" "Virtua Fighter 3 Team Battle" */
 	DRIVER( vfkids ) /* 1996 "Sega" "Virtua Fighter Kids (JUET 960319 V0.000)" */
 	DRIVER( vformula ) /* 1993 "Sega" "Virtua Formula" */
 	DRIVER( vfremix ) /* 1995 "Sega" "Virtua Fighter Remix (JUETBKAL 950428 V1.000)" */
 	DRIVER( vmahjong ) /* 1997 "Micronet" "Virtual Mahjong (J 961214 V1.000)" */
-	DRIVER( von ) /* 1996 "Sega" "Virtual On Cyber Troopers (Japan)" */
-	DRIVER( von2 ) /* 1998 "Sega" "Virtual On 2: Oratorio Tangram" */
-	DRIVER( von254g ) /* 1998 "Sega" "Virtual On 2: Oratorio Tangram (ver 5.4g)" */
-	DRIVER( vonusa ) /* 1996 "Sega" "Virtual On Cyber Troopers (US)" */
 	DRIVER( vr ) /* 1992 "Sega" "Virtua Racing" */
-	DRIVER( vs2 ) /* 1997 "Sega" "Virtua Striker 2 (Step 2.0)" */
-	DRIVER( vs215 ) /* 1997 "Sega" "Virtua Striker 2 (Step 1.5)" */
-	DRIVER( vs298 ) /* 1998 "Sega" "Virtua Striker 2 '98 (Step 2.0)" */
-	DRIVER( vs29815 ) /* 1998 "Sega" "Virtua Striker 2 '98 (Step 1.5)" */
-	DRIVER( vs299 ) /* 1999 "Sega" "Virtua Striker 2 '99" */
-	DRIVER( vs2v991 ) /* 1999 "Sega" "Virtua Striker 2 '99.1" */
-	DRIVER( vstriker ) /* 1994 "Sega" "Virtua Striker" */
-	DRIVER( vstrikra ) /* 1994 "Sega" "Virtua Striker (Rev A)" */
 	DRIVER( wb3 ) /* 1988 "Sega / Westone" "Wonder Boy III - Monster Lair (set 5 */
 	DRIVER( wb31 ) /* 1988 "Sega / Westone" "Wonder Boy III - Monster Lair (set 1 */
 	DRIVER( wb32 ) /* 1988 "Sega / Westone" "Wonder Boy III - Monster Lair (set 2 */
@@ -5115,9 +5084,6 @@ const game_driver * const drivers[] =
 	DRIVER( zaxxon2 ) /* 1982 "Sega" "Zaxxon (set 2)" */
 	DRIVER( zaxxonb ) /* 1982 "bootleg" "Jackson" */
 	DRIVER( zektor ) /* 1982 "Sega" "Zektor (revision B)" */
-	DRIVER( zerogun ) /* 1997 "Psikyo" "Zero Gunner (Model 2B)" */
-	DRIVER( zeroguna ) /* 1997 "Psikyo" "Zero Gunner (Model 2A)" */
-	DRIVER( zerogunj ) /* 1997 "Psikyo" "Zero Gunner (Japan Model 2B)" */
 	DRIVER( znpwfv ) /* 1997 "Sega" "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)" */
 	DRIVER( zoom909 ) /* 1982 "Sega" "Zoom 909" */
 	DRIVER( zunkyou ) /* 1994 "Sega" "Zunzunkyou No Yabou (Japan)" */

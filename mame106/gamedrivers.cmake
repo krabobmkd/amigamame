@@ -1,6 +1,6 @@
 option(OPT_ALBA "" OFF)
 option(OPT_ALLIEDL "" OFF)
-option(OPT_ALPHA "" OFF)
+option(OPT_ALPHA "" ON)
 option(OPT_AMIGA "" OFF)
 option(OPT_ATARI "" OFF)
 option(OPT_ATLUS "" OFF)
@@ -36,11 +36,12 @@ option(OPT_MIDCOIN "" OFF)
 option(OPT_MIDW8080 "" OFF)
 option(OPT_MIDWAY "" OFF)
 option(OPT_MIDWAYTUNIT "" ON)
+option(OPT_MINIDTEA "" ON)
 option(OPT_MINIKONAMI "" ON)
 option(OPT_MISC "" OFF)
 option(OPT_NAMCO "" OFF)
 option(OPT_NASCO "" OFF)
-option(OPT_NEOGEO "" ON)
+option(OPT_NEOGEO "" OFF)
 option(OPT_NICHIBUT "" OFF)
 option(OPT_NINTENDO "" OFF)
 option(OPT_NIX "" OFF)
@@ -65,7 +66,7 @@ option(OPT_SNK "" OFF)
 option(OPT_STERN "" OFF)
 option(OPT_SUN "" OFF)
 option(OPT_SUNA "" OFF)
-option(OPT_TAD "" OFF)
+option(OPT_TAD "" ON)
 option(OPT_TAITO "" ON)
 option(OPT_TATSUMI "" OFF)
 option(OPT_TCH "" OFF)
@@ -915,6 +916,25 @@ if(OPT_MIDWAYTUNIT)
 		HAS_ADSP2115=1 HAS_ADSP2181=1 HAS_M6800=1 HAS_M6808=1 
 		HAS_M6809=1 HAS_TMS34010=1 	)
 endif()
+if(OPT_MINIDTEA)
+	add_compile_definitions(LINK_MINIDTEA=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/supbtime.c vidhrdw/supbtime.c vidhrdw/deco16ic.c drivers/karnov.c 
+		vidhrdw/karnov.c drivers/dec0.c machine/dec0.c vidhrdw/dec0.c 
+	)
+	set(MSND_OKIM6295 ON)
+	set(MSND_YM2203 ON)
+	set(MSND_YM3526 ON)
+	set(MSND_YM3812 ON)
+	set(MCPU_H6280 ON)
+	set(MCPU_M6502 ON)
+	set(MCPU_M68000 ON)
+	list(APPEND CPU_DEFS
+		HAS_OKIM6295=1 HAS_YM2203=1 HAS_YM3526=1 HAS_YM3812=1 
+	)
+	list(APPEND CPU_DEFS
+		HAS_H6280=1 HAS_M6502=1 HAS_M68000=1 	)
+endif()
 if(OPT_MINIKONAMI)
 	add_compile_definitions(LINK_MINIKONAMI=1)
 	list(APPEND MAME_DRIVERS_SRC
@@ -1337,7 +1357,6 @@ if(OPT_SEGA)
 		vidhrdw/deniam.c drivers/dotrikun.c vidhrdw/dotrikun.c drivers/genesis.c 
 		vidhrdw/genesis.c drivers/kopunch.c vidhrdw/kopunch.c drivers/megaplay.c 
 		drivers/megatech.c drivers/model1.c machine/model1.c vidhrdw/model1.c 
-		drivers/model2.c drivers/model3.c vidhrdw/model3.c machine/model3.c 
 		drivers/puckpkmn.c drivers/sega.c sndhrdw/sega.c vidhrdw/sega.c 
 		drivers/segac2.c drivers/segahang.c vidhrdw/segahang.c drivers/segaorun.c 
 		vidhrdw/segaorun.c drivers/segar.c machine/segar.c sndhrdw/segar.c 
@@ -1357,7 +1376,8 @@ if(OPT_SEGA)
 		machine/s16fd.c machine/s24fd.c machine/scudsp.c machine/segaic16.c 
 		sndhrdw/carnival.c sndhrdw/depthch.c sndhrdw/invinco.c sndhrdw/pulsar.c 
 		sndhrdw/segasnd.c vidhrdw/segaic16.c vidhrdw/segaic24.c vidhrdw/stvvdp1.c 
-		vidhrdw/stvvdp2.c 	)
+		vidhrdw/stvvdp2.c    
+		 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
 	set(MSND_DISCRETE ON)
@@ -1377,9 +1397,7 @@ if(OPT_SEGA)
 	set(MSND_YM2413 ON)
 	set(MSND_YM3438 ON)
 	set(MSND_YM3812 ON)
-	set(MCPU_ADSP21062 ON)
 	set(MCPU_I8039 ON)
-	set(MCPU_I960 ON)
 	set(MCPU_M68000 ON)
 	set(MCPU_SH2 ON)
 	set(MCPU_Z80 ON)
@@ -1390,8 +1408,8 @@ if(OPT_SEGA)
 		HAS_TMS36XX=1 HAS_UPD7759=1 HAS_YM2151=1 HAS_YM2203=1 
 		HAS_YM2413=1 HAS_YM3438=1 HAS_YM3812=1 	)
 	list(APPEND CPU_DEFS
-		HAS_ADSP21062=1 HAS_I8039=1 HAS_I960=1 HAS_M68000=1 
-		HAS_SH2=1 HAS_Z80=1 	)
+		HAS_I8039=1 HAS_M68000=1 HAS_SH2=1 HAS_Z80=1 
+	)
 endif()
 if(OPT_SEIBU)
 	add_compile_definitions(LINK_SEIBU=1)
@@ -1461,10 +1479,11 @@ if(OPT_SHARED)
 		machine/ticket.c machine/timekpr.c machine/tmp68301.c machine/z80ctc.c 
 		machine/z80pio.c machine/z80sio.c vidhrdw/crtc6845.c vidhrdw/avgdvg.c 
 		vidhrdw/poly.c vidhrdw/res_net.c vidhrdw/tlc34076.c vidhrdw/tms34061.c 
-		vidhrdw/voodoo.c 	)
+	)
+	set(MCPU_ADSP21062 ON)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
-		HAS_Z80=1 	)
+		HAS_ADSP21062=1 HAS_Z80=1 	)
 endif()
 if(OPT_SIGMA)
 	add_compile_definitions(LINK_SIGMA=1)
@@ -1566,7 +1585,7 @@ if(OPT_TAD)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/bloodbro.c vidhrdw/bloodbro.c drivers/cabal.c vidhrdw/cabal.c 
 		drivers/goal92.c vidhrdw/goal92.c drivers/legionna.c vidhrdw/legionna.c 
-		drivers/toki.c vidhrdw/toki.c 	)
+		drivers/toki.c vidhrdw/toki.c sndhrdw/seibu.c 	)
 	set(MSND_MSM5205 ON)
 	set(MSND_OKIM6295 ON)
 	set(MSND_YM2151 ON)
