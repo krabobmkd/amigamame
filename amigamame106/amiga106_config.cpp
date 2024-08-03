@@ -48,10 +48,12 @@ void MameConfig::setActiveDriver(int indexInDriverList)
     if(indexInDriverList<0 || indexInDriverList>=_NumDrivers)
     {
         _activeDriver = -1;
+        _display._perScreenModeS.setActive("");
         return;
     }
 
     _activeDriver = indexInDriverList;
+    _display._perScreenModeS.setActive( _resolutionStrings[indexInDriverList]);
 
 }
 void MameConfig::setDriverListState(int listState)
@@ -71,7 +73,7 @@ static const char *pcf_list="list";
 int MameConfig::save()
 {
     // note: got to save rom short name id, not driver index ! index evolve with compilation.
-    printf("MameConfig::save\n");
+    //printf("MameConfig::save\n");
 
     xml_data_node *root = xml_file_create();
     xml_data_node *confignode;
@@ -140,7 +142,8 @@ void MameConfig::resettodefault()
     _romsFound.clear();
     _romsFoundReverse.clear();
     _activeDriver =-1;
-
+    // need to be done even if load fail.
+    initRomsFoundReverse();
 }
 
 int MameConfig::load()
@@ -149,7 +152,7 @@ int MameConfig::load()
 	const char *srcfile;
 	int version, count;
 	mame_file *file=NULL;
-    printf("MameConfig::load\n");
+
     // resolve short name to index after load, like scan does.
 
     resettodefault();
@@ -228,6 +231,7 @@ void MameConfig::toDefault()
 
     _audio._mode = AudioMode::AHI;
     _audio._freq = 22050;
+    _audio._forceMono = true;
 
     _controls._PlayerPort[0]=ControlPort::Port2llJoy;
         _controls._PlayerPortType[0]=1;
@@ -244,7 +248,7 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
 {
     serializer("Screen Selection",(int &)_ScreenModeChoice,{"Find Best","Select Mode"});
     serializer("Screen mode",_modeid);
-    serializer("Full Screen",(int &)_FSscaleMode,{"Center, No Scale","Scale To Border","Stretch Scale"});
+    serializer("Full Screen",(int &)_FSscaleMode,{"Center, No Scale (Faster)","Scale To Border","Stretch Scale"});
     serializer("Rotate Screens",(int &)_rotateMode,{"None","+90","180","-90"});
 
     // want modeid greyed if screen not choosen
@@ -274,11 +278,16 @@ void MameConfig::Display::serialize(ASerializer &serializer)
     serializer("Per Screen Mode",_perScreenModeS);
 
 }
+MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
+{
+    return _perScreenModeS.getActive();
+}
+
 void MameConfig::Audio::serialize(ASerializer &serializer)
 {
     serializer("Mode",(int &)_mode,{"  None  ","   AHI   "});
     serializer("Frequency",_freq,11025,22050); // not more low hz than 11025 it does too little buffers for AHI.
-    serializer("Force Mono",_forceMono);
+  //hide this for the moment  serializer("Force Mono",_forceMono);
 }
 void MameConfig::Controls::serialize(ASerializer &serializer)
 {
@@ -335,7 +344,7 @@ void MameConfig::Help::serialize(ASerializer &serializer)
     // just use the item capabilities of the gui serializer,
     // to display a short notice.
     // actually nothing to load/save.
-_[0] ="       Ingame Keys";
+_[0] ="       Ingame Keys\n";
     serializer(" ",_[0]);
 _[1] ="Player Start 1/2/3/4";
     serializer("1-4 : ",_[1]);
@@ -343,18 +352,26 @@ _[2] ="Player Coins 1/2/3/4";
     serializer("5-8 : ",_[2]);
 _[3] ="Pause";
     serializer("P : ",_[3]);
-_[4] ="Show/Hide Settings";
+_[4] ="Show / Hide Settings";
     serializer("Tab : ",_[4]);
-_[5] ="Switch Window/Fullscreen";
+_[5] ="Switch Window / Fullscreen";
     serializer("F10 : ",_[5]);
-_[6] ="Show/Hide Statistics";
+_[6] ="Show / Hide Statistics";
     serializer("Help : ",_[6]);
-_[7] ="Save State +Shift: Load";
+_[7] ="Save State  ...  F7+Shift: Load State";
     serializer("F7 : ",_[7]);
 _[8] ="Reset";
         serializer("F3 : ",_[8]);
 _[9] ="Escape Game";
     serializer("Esc : ",_[9]);
+// - - - - --
+_[10] ="\n- Copy some Mame106 zip archive in 'roms' dir and press scan.";
+            serializer(" ",_[10]);
+_[11] ="- Don't try to run games tagged 'not working'";
+        serializer(" ",_[11]);
+_[12] ="- Games with parent archive need their parent,\n   non working games may have a working parent.";
+        serializer(" ",_[12]);
+
 }
 
 
@@ -450,10 +467,10 @@ void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string
 
 int MameConfig::scanDrivers()
 {
-  printf(" *** ScanDrivers: _romsDir:%s\n", _paths._romsPath.c_str());
+//  printf(" *** ScanDrivers: _romsDir:%s\n", _paths._romsPath.c_str());
   _romsFound.clear();
   if(_paths._romsPath.empty()) return 0;
-  printf(" *** ScanDrivers 1\n");
+//  printf(" *** ScanDrivers 1\n");
 
     struct FileInfoBlock *fib;
     fib = (struct FileInfoBlock *)AllocDosObject(DOS_FIB, NULL);
@@ -469,7 +486,7 @@ int MameConfig::scanDrivers()
     FreeDosObject(DOS_FIB,fib);
 
     sortDrivers(_romsFound);
-    printf(" *** ScanDrivers end\n");
+//    printf(" *** ScanDrivers end\n");
     initRomsFoundReverse();
     return (int)_romsFound.size();
 }

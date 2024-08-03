@@ -138,8 +138,11 @@ public:
         void serialize(ASerializer &serializer) override;
         DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;
         bool    _startOnWorkbench = false;
+        Display_PerScreenMode &getActiveMode();
+     protected:
         std::map<std::string,Display_PerScreenMode> _perScreenMode;
         ASerializer::StringMap<Display_PerScreenMode> _perScreenModeS;
+        friend class MameConfig;
     };
     Display &display() { return _display; }
 
@@ -155,7 +158,7 @@ public:
         void serialize(ASerializer &serializer) override;
         AudioMode _mode = AudioMode::AHI;
         int _freq=0;
-        bool _forceMono;
+        bool _forceMono=true;
     };
     Audio &audio() { return _audio; }
 
@@ -190,7 +193,7 @@ public:
     struct Help : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
-        strText _[10];
+        strText _[10+4];
     };
 
     void toDefault();
@@ -206,6 +209,7 @@ protected:
     Help        _help;
 
     int     _activeDriver;
+
     int     _listShowState;
 
 //    ScreenConf _defaultscreenconf;

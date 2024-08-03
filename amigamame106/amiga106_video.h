@@ -53,5 +53,6 @@ protected:
 
 
 void SwitchWindowFullscreen();
+void ResetWatchTimer();
 
 #endif

@@ -39,7 +39,7 @@ void StartGame(void)
 {
     MameConfig &conf = getMainConfig();
     int idriver = conf.activeDriver();
-    printf(" ***** StartGame:%d\n",idriver);
+//    printf(" ***** StartGame:%d\n",idriver);
     if(idriver<0)
     {
       //logerror no driver
@@ -63,10 +63,10 @@ void StartGame(void)
     /* Clear the zip filename caches. */
 
     osd_set_mastervolume(0);
-    printf("before run_game\n");
+//    printf("before run_game\n");
 
     run_game(idriver);
-    printf("after run_game\n");
+//    printf("after run_game\n");
 
     unzip_cache_clear();
     mame_pause(0);// remove pause that could be set while quiting previous game.
@@ -94,8 +94,15 @@ void osd_exit()
 /* return non-zero to abort loading */
 int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
 {
-    printf("load rom:%d %d\n",romdata->romsloaded,romdata->romstotal);
-  return(0);
+    // 9B [N] 46 "\x1b[\x9b\x01m"
+   // if(romdata->romsloaded>1) printf("\r");
+    printf("load rom: %d/%d\r",romdata->romsloaded,romdata->romstotal);
+    fflush(stdout);
+    if(romdata->romsloaded == romdata->romstotal)
+    {
+        printf("\n");
+    }
+   return(0);
 }
 // -  - - - -
 

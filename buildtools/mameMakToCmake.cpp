@@ -284,6 +284,16 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
 //    machinetargets[pkgname]._gamedrivers["tmnt2"] = src._gamedrivers["tmnt2"];
 //}
 
+
+void copyDrivers(TMachine  &m,TMachine  &msrc,std::vector<std::string> drivers)
+{
+    for(string &name : drivers)
+    {
+        m._gamedrivers[name] = msrc._gamedrivers[name];
+    }
+
+}
+
 // post read_mak_machines
 int patchMiniMachines(
             map<string,vector<string>> &vars,
@@ -299,6 +309,31 @@ int patchMiniMachines(
 //        machinetargets[pkgname]._name = pkgname;
 //        machinetargets[pkgname]._gamedrivers["tmnt"] = src._gamedrivers["tmnt"];
 //        machinetargets[pkgname]._gamedrivers["tmnt2"] = src._gamedrivers["tmnt2"];
+
+    {
+        TMachine  &namco=machinetargets["namco"];
+        string mname=string("justgalaga");
+        TMachine  &m=machinetargets[mname];
+
+        copyDrivers(m,namco,{
+"bosco","boscoo","boscoo2","boscomd","boscomdo",
+"galaga","galagao","galagamw","galagamk","gallag","gatsbee",
+"xevious","xeviousa","xeviousb","xeviousc","xevios","battles","sxevious",
+"digdug","digdugb","digdugat","digduga1","dzigzag"
+});
+        m._sources={
+            "drivers/galaga.c","vidhrdw/galaga.c",
+            "vidhrdw/bosco.c",
+            "machine/namcoio.c",
+            "machine/xevious.c","vidhrdw/xevious.c","vidhrdw/digdug.c",
+            "machine/atari_vg.c",
+            "sound/namco52.c","sound/namco54.c",
+            "sound/namco.c",
+            "sound/filter.c"
+        };
+
+    }
+
 
     {
         TMachine  &src=machinetargets["dataeast"];
@@ -623,6 +658,10 @@ int createCmake(map<string,TMachine> machinetargets,
        //reactivate when corrected : if(upname == "NEOGEO" ) onShouldBeDefault = false;
         if(upname == "CAPCOM" ) onShouldBeDefault = true;
         if(upname == "TAITO" ) onShouldBeDefault = true;
+ //       if(upname == "NAMCO" ) onShouldBeDefault = true; -> too horizontaly dependent.
+ //       if(upname == "PACMAN" ) onShouldBeDefault = true;
+        if(upname == "IREM" ) onShouldBeDefault = true;
+ // problem with filter       if(upname == "JUSTGALAGA" ) onShouldBeDefault = true;
         // just for rtype, rtypeleo -> THEY DONT WORK !!
 //        if(upname == "IREM" ) onShouldBeDefault = true;
 //        if(upname == "DATAEAST" ) onShouldBeDefault = true; -> too big/shitty
@@ -1201,6 +1240,14 @@ void completeDefinitionsByHand(
     machinetargets["taito"]._gamedrivers.erase("rollace2");
     machinetargets["dataeast"]._cpu_defs["DECO16"]=1; // m6502 variant, need HAS_DECO16.
     machinetargets["dataeast"]._cpu_defs["M65C02"]=1;
+
+    // namco
+    // HD63701
+    machinetargets["namco"]._cpu_defs["HD63701"]=1;
+    machinetargets["namco"]._cpu_defs["HD63705"]=1;
+    // namco  wants some code from KONAMI !!
+   // machinetargets["namco"]._sources.push_back("drivers/scramble.c");
+    machinetargets["namco"]._sources.push_back("machine/scramble.c");
 
     // TAD
     machinetargets["tad"]._sources.push_back("sndhrdw/seibu.c");

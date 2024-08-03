@@ -84,14 +84,14 @@ int m_ahi_error=0;
 
 void AHIS_Delete()
 {
-    printf(" AHIS_Delete:%08x\n",(int)_pThreadAHI);
+//    printf(" AHIS_Delete:%08x\n",(int)_pThreadAHI);
     if(!_pThreadAHI) return;
     if(_pThreadAHI->m_Error == eAHIS_ok ) // if thread running
     {
-    printf(" set signal\n");
+//    printf(" set signal\n");
         ULONG oldSignals = SetSignal(0L, SIGF_SINGLE);        /* Use SIGF_SINGLE only after */
         _pThreadAHI->m_AskThreadDeath = 1;                                   /* clearing it.               */
-    printf(" wait, oldSignals:%08x\n",oldSignals);
+//    printf(" wait, oldSignals:%08x\n",oldSignals);
         Wait(SIGF_SINGLE);     /* Only use SIGF_SINGLE for Wait()ing and */
         SetSignal(oldSignals, oldSignals);
     }
@@ -102,7 +102,7 @@ void AHIS_Delete()
 // used by thread itself
 static void AHISStaticThread_Close( sAHISoundServer *pAHIS )
 {
-    printf("AHISStaticThread_Close\n");
+    //printf("AHISStaticThread_Close\n");
     int k;
     	// close ahi
 	if(pAHIS->m_join) {
@@ -112,13 +112,13 @@ static void AHISStaticThread_Close( sAHISoundServer *pAHIS )
            }
 		WaitIO((struct IORequest *)(pAHIS->m_join));
 	}
-    printf("AHISStaticThread_Close 2\n");
+    //printf("AHISStaticThread_Close 2\n");
 	if(pAHIS->m_AHIio){
 		CloseDevice((struct IORequest *)(pAHIS->m_AHIio));
  		DeleteExtIO((struct IORequest *)(pAHIS->m_AHIio));
         pAHIS->m_AHIio= NULL;
 		}
-    printf("AHISStaticThread_Close 3\n");
+    //printf("AHISStaticThread_Close 3\n");
 	if(pAHIS->m_AHIio2){
         DeleteExtIO((struct IORequest *)(pAHIS->m_AHIio2));
  		pAHIS->m_AHIio2= NULL;
@@ -127,10 +127,10 @@ static void AHISStaticThread_Close( sAHISoundServer *pAHIS )
         DeletePort(pAHIS->m_AHImp);
  		pAHIS->m_AHImp= NULL;
 		}
-    printf("AHISStaticThread_Close 4\n");
+    //printf("AHISStaticThread_Close 4\n");
     // then close buffers
 	if(pAHIS->m_pSBuffAlloc){ FreeVec(pAHIS->m_pSBuffAlloc); pAHIS->m_pSBuffAlloc=NULL; }
-    printf("AHISStaticThread_Close 5\n");
+    //printf("AHISStaticThread_Close 5\n");
     pAHIS->m_AskThreadDeath = 0;
 	pAHIS->m_hThread = 0; // really has to be last.
 }
@@ -138,7 +138,7 @@ static LONG AHISStaticThread_Open( sAHISoundServer *pAHIS )
 {
     if(pAHIS==NULL || !mainprocess) return 1;
 
- printf("ahi init 1\n");
+// printf("ahi init\n");
     BYTE deviceResult;
     pAHIS->m_AHImp = CreatePort(NULL,0);
     pAHIS->m_AHIio = (struct AHIRequest*)CreateExtIO(pAHIS->m_AHImp ,sizeof(struct AHIRequest));
@@ -149,7 +149,6 @@ static LONG AHISStaticThread_Open( sAHISoundServer *pAHIS )
         deviceResult =
             OpenDevice(AHINAME,/*AHI_NO_UNIT*/0, (struct IORequest *)(pAHIS->m_AHIio), 0);
     }
- printf("ahi init 2\n");
     if (deviceResult) {
         pAHIS->m_Error = eAHIS_DeviceError;
         AHISStaticThread_Close(pAHIS);
@@ -167,7 +166,6 @@ static LONG AHISStaticThread_Open( sAHISoundServer *pAHIS )
     //CopyMem(pAHIS->m_AHIio, pAHIS->m_AHIio2, sizeof(struct AHIRequest));
     memcpy(pAHIS->m_AHIio2,pAHIS->m_AHIio,sizeof(struct AHIRequest));
 
- printf("ahi init 3\n");
     ULONG streamBytes = pAHIS->m_nextSamples<<1; // *sizeof(SHORT);
     if(pAHIS->m_stereo) streamBytes<<=1;
 
@@ -181,7 +179,7 @@ static LONG AHISStaticThread_Open( sAHISoundServer *pAHIS )
 
     pAHIS->m_pSBuff1 = pAHIS->m_pSBuffAlloc;
     pAHIS->m_pSBuff2 = pAHIS->m_pSBuffAlloc + (streamBytes>>1);
- printf("ahi init 4\n");
+
     pAHIS->m_Error = eAHIS_ok;
     return 0;
 	//ok for ahi init.
@@ -189,7 +187,6 @@ static LONG AHISStaticThread_Open( sAHISoundServer *pAHIS )
 
 static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 {
-    printf("crac crac process\n");
     // use global var
 //    if(_pAHIS==NULL || !mainprocess) return 1;
 
@@ -197,7 +194,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
     if(_pThreadAHI) res = AHISStaticThread_Open(_pThreadAHI);
 
     // must be done in all wase, calling process must be waiting.
-    printf("send ok signal res:%d\n",res);
+    //printf("send ok signal res:%d\n",res);
     if(mainprocess) Signal((struct Task *)mainprocess, SIGF_SINGLE);
     if(res!=0) return res;
 
@@ -224,7 +221,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 
 		soundToWrite.m_pBuffer = p1;
 		soundToWrite.m_pPrevBuffer = _pThreadAHI->m_pSBuff2; // for tricks.
-		soundToWrite.m_Volume = 0x00010000;
+		soundToWrite.m_Volume = 0x00020000; // 0x00010000;
 
 		// write the signal:
         if(iloop<2)
@@ -289,10 +286,10 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 //    //PutStr("  thread die, close AHI\n");
 //    //Flush(Output());
 //	// assume thread is dead if we reach here:
-    printf(" close AHI\n");
+   // printf(" close AHI\n");
 	 AHISStaticThread_Close(_pThreadAHI);
 
-    printf("send exit signal\n");
+   // printf("send exit signal\n");
     if(mainprocess)
     {
     	Signal((struct Task *)mainprocess, SIGF_SINGLE);
@@ -329,7 +326,7 @@ int osd_start_audio_stream(int stereo)
 {
 
 
- printf("osd_start_audio_stream\n");
+// printf("osd_start_audio_stream\n");
     if(_pThreadAHI) osd_stop_audio_stream();
 
     if(!Machine) return 0; // driver and machine are already inited during this call
@@ -349,7 +346,7 @@ int osd_start_audio_stream(int stereo)
 
     int freq =  config._freq; // Machine->sample_rate;
     int machinefreq = Machine->sample_rate;
- printf("config freq:%d machine freq:%d\n",freq,machinefreq);
+ // printf("config freq:%d machine freq:%d\n",freq,machinefreq);
 
     if(machinefreq<freq) freq =machinefreq;
     if(freq == 0)
@@ -359,7 +356,7 @@ int osd_start_audio_stream(int stereo)
     }
     int ifps = (int) Machine->drv->frames_per_second;
 
- printf("osd_start_audio_stream ok to start thread\n");
+ // printf("osd_start_audio_stream ok to start thread\n");
 
    // let's update sound 30 times per sec when 60hz...
     ULONG updateLength = ((freq*2/ifps)+3)&0xfffffffc;
@@ -389,7 +386,7 @@ int osd_start_audio_stream(int stereo)
 		struct TagItem threadTags[] = { NP_Entry,(ULONG) &AHISStaticThread,
 						//	NP_Child, TRUE, // os4 thread thing
           //Re?
-                        NP_Priority,    /*60*/120  ,
+                        NP_Priority,    /*60*/-64  , // int8; -128 .. 127
                         NP_Name,(ULONG)"MameAHI",
                         NP_Output,(ULONG) mainprocess->pr_COS,
                         NP_CloseOutput,FALSE,
@@ -407,18 +404,18 @@ int osd_start_audio_stream(int stereo)
         m_ahi_error = eAHIS_DeviceError;
         return START_VALUE_FAIL;
 	}
- printf("wait for thread init oldsignals:%08x\n");
+// printf("wait for thread init oldsignals:%08x\n");
 	// wait for thread to finish AHI init
     Wait(SIGF_SINGLE);
     SetSignal(oldsignals, oldsignals); // old signals back
- printf("after wait: err:%d\n",(int)_pThreadAHI->m_Error);
+// printf("after wait: err:%d\n",(int)_pThreadAHI->m_Error);
 	if(_pThreadAHI->m_Error != eAHIS_ok )
 	{
     	m_ahi_error = _pThreadAHI->m_Error;
 		AHIS_Delete();
 		return START_VALUE_FAIL;
 	}
- printf("sound thread ok, samples:%d\n",_pThreadAHI->m_nextSamples);
+// printf("sound thread ok, samples:%d\n",_pThreadAHI->m_nextSamples);
     // must return samples to do next.
     return _pThreadAHI->m_nextSamples;
 
@@ -455,5 +452,5 @@ int osd_get_mastervolume(void)
 
 void osd_sound_enable(int enable)
 {
-    printf(" **** osd_sound_enable:%d\n",enable);
+   // printf(" **** osd_sound_enable:%d\n",enable);
 }

@@ -646,8 +646,11 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
 void AllocGUI(void)
 {
     MUIMasterBase = OpenLibrary("muimaster.library", 16);
-    if(!MUIMasterBase) return;
-
+    if(!MUIMasterBase)
+    {
+        printf(" no MUI interface found\n install MUI or launch a game installed in roms/romname.zip with:\n>Mame106 romname\n\n");
+        return;
+    }
     LONG  i;
 
 //  for(NumDrivers = 0; Drivers[NumDrivers]; NumDrivers++);
@@ -1017,22 +1020,22 @@ int MainGUI(void)
   BOOL  loop  = TRUE;
 
   MameConfig &config = getMainConfig();
-  printf("MainGUI: MUIMasterBase:%08x\n",(int)MUIMasterBase);
+//  printf("MainGUI: MUIMasterBase:%08x\n",(int)MUIMasterBase);
 //
   if(MUIMasterBase)
   {
     if(!App)
       CreateApp();
-  printf("after CreateApp()\n");
+//  printf("after CreateApp()\n");
     if(App)
     {
       if(!MainWin)
       {
 //static  std::string appName(APPNAME);
-  printf("go MUINewObject()\n");
+//  printf("go MUINewObject()\n");
       //  MainWin =  MUINewObject(MUIC_Window,
         struct TagItem mainwintags[] = {
-          {MUIA_Window_Title,(ULONG)APPNAME},
+          {MUIA_Window_Title,(ULONG)APPNAMEA},
           {MUIA_Window_ID   , MAKE_ID('M','A','I','N')},
 
         {MUIA_Window_Menustrip, UMUINO(MUIC_Menustrip,
@@ -1068,7 +1071,7 @@ int MainGUI(void)
           TAG_DONE,0)},
         TAG_DONE,0};
         MainWin =  MUI_NewObjectA(MUIC_Window, (struct TagItem *) &mainwintags[0]);// MUINewObject(MUIC_Window,
-        printf("after MUINewObject():%08x\n",(int)MainWin);
+//        printf("after MUINewObject():%08x\n",(int)MainWin);
 
         if(MainWin)
         {
@@ -1132,10 +1135,10 @@ int MainGUI(void)
 //                   CY_Joy2Type, SL_Joy2ButtonBTime, SL_Joy2AutoFireRate, ST_RomPath, PA_RomPath,
 //                   ST_SamplePath,/* PA_SamplePath,*/ RE_Options, NULL);
 
-        printf("before UpdateUIToConfig\n");
+//        printf("before UpdateUIToConfig\n");
 
          UpdateUIToConfig();
-        printf("after UpdateUIToConfig\n");
+//        printf("after UpdateUIToConfig\n");
 
         }
       }

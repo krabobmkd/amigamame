@@ -15,9 +15,16 @@ extern "C" {
     #include "osdepend.h"
     #include "palette.h"
 }
-#include <stdio.h>
-#include <stdlib.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 
+//void waitsecs(int s)
+//{
+//    for(int i=0;i<50*s;i++)
+//    {
+//        WaitTOF();
+//    }
+//}
 
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
@@ -51,7 +58,7 @@ void Drawable_OS3::draw_WPA8(_mame_display *display)
 
     // align on 16
     int wwal = (ww+15)&0xfffffff0;
-    const int bmsize = wwal*hh;
+    const int bmsize = wwal*(hh+2); // +2 because this looks very messy
     if(bmsize != _wpatempbm.size())
     {
         _wpatempbm.resize(bmsize);
@@ -82,22 +89,30 @@ void Drawable_OS3::draw_WPA8(_mame_display *display)
 //        }
     }
     //WritePixelArray8(rp,xstart,ystart,xstop,ystop,array,temprp)
-    WritePixelArray8(pRPort,cenx,ceny,cenx+ww-1,ceny+hh-1,
+
+  if(_trp._rp.BitMap)
+  {
+        WritePixelArray8(pRPort,cenx,ceny,cenx+ww-1,ceny+hh-1,
         _wpatempbm.data(), &_trp._rp
         );
+  }
+
 }
 void Drawable_OS3::checkWpa8TmpRp(RastPort *rp,int linewidth)
 {
-    int bpr = ((linewidth+15)>>4)<<4;
-    if(bpr ==  _trp._checkw) return;
+    // sizex = the width (in pixels) desired for the bitmap data.
+    if(linewidth==0) return;
+    int pixelwidth = ((linewidth+15)&0xfffffff0); // align to 16
+    if(pixelwidth ==  _trp._checkw && _trp._rp.BitMap != NULL) return;
     if(_trp._rp.BitMap) FreeBitMap(_trp._rp.BitMap);
 
     memcpy(&_trp,rp,sizeof(RastPort) );
     _trp._rp.Layer = NULL;
-    _trp._rp.BitMap =AllocBitMap(bpr*8,1,
-            rp->BitMap->Depth,BMF_CLEAR,rp->BitMap);
+    _trp._rp.BitMap =AllocBitMap(
+                pixelwidth,2, // it's one but...
+            /*rp->BitMap->Depth*/8,BMF_CLEAR,/*rp->BitMap*/ NULL);
     if(!_trp._rp.BitMap) return;
-    _trp._checkw=bpr;
+    _trp._checkw=pixelwidth;
 
 }
 
@@ -120,6 +135,7 @@ void Drawable_OS3::close()
     _wpatempbm.clear();
      if(_trp._rp.BitMap) FreeBitMap(_trp._rp.BitMap);
      _trp._rp.BitMap=NULL;
+     _trp._checkw=0;
 }
 
 Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params)

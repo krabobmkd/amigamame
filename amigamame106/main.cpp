@@ -138,25 +138,24 @@ void mameExitCleanCtrlC(void);
 // exit code that is called from any exit() and ctrl-c breaks:
 void main_close()
 {
-    printf("does main_close\n");
-
+   // printf("does main_close\n");
 
     mameExitCleanCtrlC(); // flush game allocs, ahcked from mame.c, in case stopped during game.
     osd_close_display(); // also useful when ctrl-C
     osd_stop_audio_stream();
-    printf("after  osd_stop_audio_stream\n");
+//    printf("after  osd_stop_audio_stream\n");
     unzip_cache_clear();
-    printf("after  unzip_cache_clear\n");
+//    printf("after  unzip_cache_clear\n");
     closeTimers();
-    printf("after  closeTimers\n");
+//    printf("after  closeTimers\n");
     FreeGUI();
-    printf("after  FreeGUI\n");
+//    printf("after  FreeGUI\n");
    // FreeConfig(); -> static destructor in _config.
 
     gui_gadtools_close();
-    printf("after  gui_gadtools_close\n");
+//    printf("after  gui_gadtools_close\n");
     CloseLowLevelLib();
-    printf("after  CloseLowLevelLib\n");
+//    printf("after  CloseLowLevelLib\n");
     if(GadToolsBase) CloseLibrary(GadToolsBase);
 //    if(P96Base) CloseLibrary(P96Base);
     if(CyberGfxBase) CloseLibrary(CyberGfxBase);

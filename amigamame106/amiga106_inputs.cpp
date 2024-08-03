@@ -114,7 +114,7 @@ void ConfigureLowLevelLib()
 //#define SJA_TYPE_MOUSE	   2
 //#define SJA_TYPE_JOYSTK    3
 
-    printf("configure lowlevel\n");
+//    printf("configure lowlevel\n");
 
     MameConfig::Controls &configControls = getMainConfig().controls();
 
@@ -310,9 +310,18 @@ void UpdateInputs(struct MsgPort *pMsgPort)
             break;
         case IDCMP_MOUSEBUTTONS:
             break;
-            default:
+        case IDCMP_CHANGEWINDOW:
+            // after system bloqued everythi ng for an amount of time,
+            // need to not upset a timer.
+            extern void ResetWatchTimer();
+            ResetWatchTimer();
+            break;
+        case IDCMP_NEWSIZE:
+
+            break;
+         default:
             // class 8: IDCMP_MOUSEBUTTONS
-                printf("getmsg() unmanaged: class:%d\n",(int)imclass);
+          //      printf("getmsg() unmanaged: class:%d\n",(int)imclass);
             break;
 
 
@@ -530,12 +539,14 @@ void RawKeyMap::init()
 
         {"SPACE",0x40,KEYCODE_SPACE},
 
-        {"LSHIFT",0x60,KEYCODE_LSHIFT},
-        {"RSHIFT",0x61,KEYCODE_RSHIFT},
-        {"LALT",0x64,KEYCODE_LALT},
-        {"RALT",0x65,KEYCODE_RALT},
-        {"LAMIGA",0x66,KEYCODE_LWIN},
-        {"RAMIGA",0x67,KEYCODE_RWIN},
+        {"L SHIFT",0x60,KEYCODE_LSHIFT},
+        {"R SHIFT",0x61,KEYCODE_RSHIFT},
+        {"L ALT",0x64,KEYCODE_LALT},
+        {"R ALT",0x65,KEYCODE_RALT},
+        {"L AMIGA",0x66,KEYCODE_LWIN},
+        {"R AMIGA",0x67,KEYCODE_RWIN},
+
+         {">",0x30,AMIGA_GREATERTHAN},
 
         {"ENTER",0x44,KEYCODE_ENTER},
 
@@ -593,6 +604,7 @@ void RawKeyMap::init()
         // mame codes is missing keypad '.'
         {". PAD",0x3C,CODE_OTHER_DIGITAL},
         {"ENTER PAD",0x43,KEYCODE_ENTER_PAD},
+
 
         // and then CD32 pads in lowlevel.library state of the art
         // we consider mame port 1 is second port, port2 is mouse, then the 2 parallel ports
@@ -738,6 +750,8 @@ void RawKeyMap::init()
         if( keystodo[i]==26) {
             mkm._name = "?";  // MapRawKey doesnt get this one well.
         }
+
+
         if(mkm._name.length()>0)
         {
             unsigned int mamekc = nameToMameKeyEnum(mkm._name);
@@ -751,6 +765,20 @@ void RawKeyMap::init()
         // printf("code with no name:%d\n",keystodo[i]);
         }
     }
+    // then add those which need a rawkey mapped to a mame constant, with varying name
+
+    static string key3a_name;
+    mapRawKeyToString((UWORD)0x003A,key3a_name);
+    _kbi.push_back({key3a_name.c_str(),0x3A,AMIGA_SPECIAL_RAWKEY_3A});
+
+    static string key2a_name;
+    mapRawKeyToString((UWORD)0x002A,key2a_name);
+    _kbi.push_back({key2a_name.c_str(),0x2A,AMIGA_SPECIAL_RAWKEY_2A});
+
+    static string key2b_name;
+    mapRawKeyToString((UWORD)0x002B,key2b_name);
+    _kbi.push_back({key2b_name.c_str(),0x2B,AMIGA_SPECIAL_RAWKEY_2B});
+
     // end
     _kbi.push_back({NULL,0,0});
 }
@@ -762,7 +790,7 @@ void RawKeyMap::init()
 */
 const os_code_info *osd_get_code_list(void)
 {
-    printf(" * * * ** osd_get_key_list  * * * *  *\n");
+//    printf(" * * * ** osd_get_key_list  * * * *  *\n");
 
     if(!rawkeymap._keymap_inited)
     {

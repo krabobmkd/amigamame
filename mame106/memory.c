@@ -97,7 +97,7 @@
 #include "debug/debugcpu.h"
 #endif
 #include <stdarg.h>
-#include <stdio.h>
+
 
 #define MEM_DUMP		(0)
 #define VERBOSE			(0)
@@ -418,7 +418,6 @@ static void mem_dump(void)
 int memory_init(void)
 {
 	int i;
-	printf("memory_init\n");
 
 	for (i = 0; i < ADDRESS_SPACES; i++)
 		log_unmap[i] = 1;
@@ -438,8 +437,6 @@ int memory_init(void)
 	/* init the CPUs */
 	if (!init_cpudata())
 		return 1;
-
-	printf("memory_init() a\n");
 	add_exit_callback(memory_exit);
 
 	/* preflight the memory handlers and check banks */
@@ -449,7 +446,7 @@ int memory_init(void)
 	/* then fill in the tables */
 	if (!populate_memory())
 		return 1;
-	printf("memory_init() b\n");
+
 	/* allocate any necessary memory */
 	if (!allocate_memory())
 		return 1;
@@ -458,11 +455,8 @@ int memory_init(void)
 	if (!find_memory())
 		return 1;
 
-	printf("memory_init() c\n");
 	/* dump the final memory configuration */
 	mem_dump();
-
-	printf("memory_init() end\n");
 	return 0;
 }
 
@@ -1168,7 +1162,6 @@ static int init_cpudata(void)
 				return 0;
 		cpudata[cpunum].op_mask = cpudata[cpunum].space[ADDRESS_SPACE_PROGRAM].mask;
 	}
-
 	return 1;
 }
 
@@ -1178,7 +1171,7 @@ static int init_cpudata(void)
     given address space in a standard fashion
 -------------------------------------------------*/
 
-static inline void adjust_addresses(addrspace_data *space, int ismatchmask, offs_t *start, offs_t *end, offs_t *mask, offs_t *mirror)
+INLINE void adjust_addresses(addrspace_data *space, int ismatchmask, offs_t *start, offs_t *end, offs_t *mask, offs_t *mirror)
 {
 	/* adjust start/end/mask values */
 	if (!*mask) *mask = space->rawmask;
@@ -1203,7 +1196,6 @@ static inline void adjust_addresses(addrspace_data *space, int ismatchmask, offs
 
 static int init_addrspace(UINT8 cpunum, UINT8 spacenum)
 {
-
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	int cputype = Machine->drv->cpu[cpunum].cpu_type;
 	int abits = cputype_addrbus_width(cputype, spacenum);
@@ -1309,7 +1301,6 @@ static int init_addrspace(UINT8 cpunum, UINT8 spacenum)
 	/* initialize everything to unmapped */
 	memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
 	memset(space->write.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
-
 	return 1;
 }
 

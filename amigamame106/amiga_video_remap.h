@@ -45,6 +45,7 @@ protected:
     ULONG _palette[3*32+2]; // LOADRGB32 format.
 };
 
+// beta experimental
 class Paletted_Pens8 : public Paletted
 {
  public:

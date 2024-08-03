@@ -3,10 +3,7 @@
 #include "osdepend.h"
 
 #include "mame_ver.h"
-#ifndef BETA
-#define APPNAMEA  "MAME 0." REVISION
-#else
-#define APPNAMEA  "MAME 0."REVISION" BETA"
-#endif
+
+#define APPNAMEA  "Mame 0.106 MiniMix 2024 Beta1"
 
 #endif

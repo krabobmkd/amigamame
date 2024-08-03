@@ -474,6 +474,10 @@ enum
 	MOUSECODE_8_ANALOG_Z,
 #define __code_relative_analog_end MOUSECODE_8_ANALOG_Z
 
+    AMIGA_SPECIAL_RAWKEY_3A,
+    AMIGA_SPECIAL_RAWKEY_2A,
+    AMIGA_SPECIAL_RAWKEY_2B,
+    AMIGA_GREATERTHAN,
 	__code_max,					/* Temination of standard code */
 
 	/* special */

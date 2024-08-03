@@ -198,11 +198,5 @@ if(COMPILE_TESTS)
 	set_property(TARGET testparpads PROPERTY C_STANDARD 11)
 	set_property(TARGET testparpads PROPERTY CXX_STANDARD 11)
 
-	add_executable(testfloats
-		testfloats.cpp
-		)
-	set_property(TARGET testfloats PROPERTY C_STANDARD 11)
-	set_property(TARGET testfloats PROPERTY CXX_STANDARD 11)
-	target_compile_options(testfloats PRIVATE -O3 ${AMIGA_COMPILER_OPTIONS} )
 endif()
 

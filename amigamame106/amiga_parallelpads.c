@@ -122,7 +122,7 @@ struct ParallelPads *createParallelPads()
 //		//success = -2;
 //		goto error;
 //	}
-    printf("OpenResource(CIAANAME) ok\n");
+//    printf("OpenResource(CIAANAME) ok\n");
 
     // - - - - acquire parallel port
     //Disable();
@@ -132,7 +132,7 @@ struct ParallelPads *createParallelPads()
         pparpads->_parallelBitsOK = (UWORD)(AllocMiscResource(MR_PARALLELBITS,allocname)==NULL);
         if(!pparpads->_parallelBitsOK) { Enable(); goto error; }
 
-    printf("Parallel acquired ok\n");
+//    printf("Parallel acquired ok\n");
 
     // - - - - - install interupt
 //	flag_interrupt.is_Node.ln_Name = (char *)spi_lib_name;
@@ -153,7 +153,7 @@ struct ParallelPads *createParallelPads()
 //	SetICR(ciaabase, CIAICRF_FLG);
 //	Enable();
 
-   printf("interupt installed ok\n");
+//   printf("interupt installed ok\n");
 
 // from sd adapter:
 //	*cia_b_pra = (*cia_b_pra & ~ACT_MASK) | (REQ_MASK | CLK_MASK);

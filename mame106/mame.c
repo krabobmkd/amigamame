@@ -262,26 +262,23 @@ static void logfile_callback(const char *buffer);
 
 int run_game(int game)
 {
-    printf("\n\n * * * * run_game:%d * * * **\n\n",game);
+//    printf("\n\n * * * * run_game:%d * * * **\n\n",game);
 	callback_item *cb;
 	int error = 0;
 
 	/* start in the "pre-init phase" */
 	current_phase = MAME_PHASE_PREINIT;
 
-    printf("run_game:a\n");
 	/* perform validity checks before anything else */
 	/*re krb
 	if (mame_validitychecks(game) != 0)
 		return 1;
     */
-    printf("run_game:b before loop\n");
+
 	/* loop across multiple hard resets */
 	exit_pending = FALSE;
 	while (error == 0 && !exit_pending)
 	{
- printf("run_game hardreset ...\n");
-
 		/* use setjmp/longjmp for deep error recovery */
 		fatal_error_jmpbuf_valid = TRUE;
 		error = setjmp(fatal_error_jmpbuf);
@@ -306,16 +303,12 @@ int run_game(int game)
 			/* then finish setting up our local machine */
 			init_machine();
 
-            printf("config_load_settings() \n");
 			/* load the configuration settings and NVRAM */
 			settingsloaded = config_load_settings();
-            printf("after config_load_settings():%d \n",settingsloaded);
 			nvram_load();
-            printf("after nvram_load() \n");
 			/* initialize the UI and display the startup screens */
 			if (ui_init(!settingsloaded && !options.skip_disclaimer, !options.skip_warnings, !options.skip_gameinfo) != 0)
 				fatalerror("User cancelled");
-            printf("after ui_init() \n");
 			/* ensure we don't show the opening screens on a reset */
 			options.skip_disclaimer = options.skip_warnings = options.skip_gameinfo = TRUE;
 
@@ -323,11 +316,8 @@ int run_game(int game)
 			/* call end_resource_tracking followed by begin_resource_tracking */
 			/* to clear out resources allocated between resets */
 			begin_resource_tracking();
-            printf("after begin_resource_tracking() \n");
 			/* perform a soft reset -- this takes us to the running phase */
 			soft_reset(0);
-
-            printf("run_game before cpu loop ...\n");
 
 			/* run the CPUs until a reset or exit */
 			hard_reset_pending = FALSE;
@@ -353,7 +343,7 @@ int run_game(int game)
 
 				profiler_mark(PROFILER_END);
 			}
-                printf("after cpu loop...\n");
+
 			/* and out via the exit phase */
 			current_phase = MAME_PHASE_EXIT;
 
@@ -364,7 +354,6 @@ int run_game(int game)
 			nvram_save();
 			config_save_settings();
 		}
-        printf("after cpu loop, do close list...\n");
 
 		fatal_error_jmpbuf_valid = FALSE;
 
@@ -381,8 +370,6 @@ int run_game(int game)
 		free_callback_list(&reset_callback_list);
 		free_callback_list(&pause_callback_list);
 	}
-
-        printf("run_game, return %d\n",error);
 	/* return an error */
 	return error;
 }
@@ -1068,9 +1055,6 @@ static void destroy_machine(void)
 static void init_machine(void)
 {
 	int num;
-
-	printf("\n ***** init_machine ***** \n\n");
-
 	/* initialize basic can't-fail systems here */
 	cpuintrf_init();
 	sndintrf_init();
@@ -1113,13 +1097,9 @@ static void init_machine(void)
 	if (memory_init() != 0)
 		fatalerror("memory_init failed");
 
-	printf("before cpuexec_init()\n");
-
 	/* now set up all the CPUs */
 	if (cpuexec_init() != 0)
 		fatalerror("cpuexec_init failed");
-
-	printf("before cpuint_init()\n");
 
 	if (cpuint_init() != 0)
 		fatalerror("cpuint_init failed");
@@ -1129,15 +1109,12 @@ static void init_machine(void)
 	if (devices_init(Machine->gamedrv))
 		fatalerror("devices_init failed");
 #endif
-printf("before hiscore_init()\n");
 	/* start the hiscore system -- remove me */
 	hiscore_init(Machine->gamedrv->name);
-printf("before saveload_init()\n");
+
 	/* start the save/load system */
 	saveload_init();
 
-
-printf("before gamedrv->driver_init()\n");
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */
 	/* so this location in the init order is important */
@@ -1145,12 +1122,12 @@ printf("before gamedrv->driver_init()\n");
 		(*Machine->gamedrv->driver_init)();
 
 	/* start the audio system */
-printf("before sound_init()\n");
+
 	if (sound_init() != 0)
 		fatalerror("sound_init failed");
 
 	/* start the video hardware */
-printf("before video_init()\n");
+
 	if (video_init() != 0)
 		fatalerror("video_init failed");
 
@@ -1158,10 +1135,10 @@ printf("before video_init()\n");
 
 	if (options.cheat)
 	{
-printf("before cheat_init()\n");
+
 		cheat_init();
     }
-printf("driver's _START callbacks \n");
+
 	/* call the driver's _START callbacks */
 	if (Machine->drv->machine_start != NULL && (*Machine->drv->machine_start)() != 0)
 		fatalerror("Unable to start machine emulation");
@@ -1170,12 +1147,11 @@ printf("driver's _START callbacks \n");
 	if (Machine->drv->video_start != NULL && (*Machine->drv->video_start)() != 0)
 		fatalerror("Unable to start video emulation");
 
-printf("REGIONFLAG_DISPOSE \n");
 	/* free memory regions allocated with REGIONFLAG_DISPOSE (typically gfx roms) */
 	for (num = 0; num < MAX_MEMORY_REGIONS; num++)
 		if (mem_region[num].flags & ROMREGION_DISPOSE)
 			free_memory_region(num);
-printf("init_machine() end\n");
+
 #ifdef MAME_DEBUG
 	/* initialize the debugger */
 	if (Machine->debug_mode)

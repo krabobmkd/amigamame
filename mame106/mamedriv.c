@@ -2014,6 +2014,31 @@ const game_driver * const drivers[] =
 	DRIVER( valtric ) /* 1986 "[NMK] (Jaleco license)" "Valtric" */
 	DRIVER( wildplt ) /* 1992 "Jaleco" "Wild Pilot" */
 #endif
+#ifdef LINK_JUSTGALAGA
+	DRIVER( battles ) /* 1982 "bootleg" "Battles" */
+	DRIVER( bosco ) /* 1981 "Namco" "Bosconian (new version)" */
+	DRIVER( boscomd ) /* 1981 "[Namco] (Midway license)" "Bosconian (Midway */
+	DRIVER( boscomdo ) /* 1981 "[Namco] (Midway license)" "Bosconian (Midway */
+	DRIVER( boscoo ) /* 1981 "Namco" "Bosconian (old version)" */
+	DRIVER( boscoo2 ) /* 1981 "Namco" "Bosconian (older version)" */
+	DRIVER( digdug ) /* 1982 "Namco" "Dig Dug (rev 2)" */
+	DRIVER( digduga1 ) /* 1982 "[Namco] (Atari license)" "Dig Dug (Atari */
+	DRIVER( digdugat ) /* 1982 "[Namco] (Atari license)" "Dig Dug (Atari */
+	DRIVER( digdugb ) /* 1982 "Namco" "Dig Dug (rev 1)" */
+	DRIVER( dzigzag ) /* 1982 "bootleg" "Zig Zag (Dig Dug hardware)" */
+	DRIVER( galaga ) /* 1981 "Namco" "Galaga (Namco rev. B)" */
+	DRIVER( galagamk ) /* 1981 "[Namco] (Midway license)" "Galaga (Midway set 2)" */
+	DRIVER( galagamw ) /* 1981 "[Namco] (Midway license)" "Galaga (Midway set 1)" */
+	DRIVER( galagao ) /* 1981 "Namco" "Galaga (Namco)" */
+	DRIVER( gallag ) /* 1981 "bootleg" "Gallag" */
+	DRIVER( gatsbee ) /* 1984 "hack" "Gatsbee" */
+	DRIVER( sxevious ) /* 1984 "Namco" "Super Xevious" */
+	DRIVER( xevios ) /* 1982 "bootleg" "Xevios" */
+	DRIVER( xevious ) /* 1982 "Namco" "Xevious (Namco)" */
+	DRIVER( xeviousa ) /* 1982 "Namco (Atari license)" "Xevious (Atari set 1)" */
+	DRIVER( xeviousb ) /* 1982 "Namco (Atari license)" "Xevious (Atari set 2)" */
+	DRIVER( xeviousc ) /* 1982 "Namco (Atari license)" "Xevious (Atari set 3)" */
+#endif
 #ifdef LINK_KANEKO
 	DRIVER( airbustj ) /* 1990 "Kaneko (Namco license)" "Air Buster: Trouble Specialty Raid Unit (Japan)" */
 	DRIVER( airbustr ) /* 1990 "Kaneko (Namco license)" "Air Buster: Trouble Specialty Raid Unit (World)" */

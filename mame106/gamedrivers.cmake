@@ -24,9 +24,10 @@ option(OPT_GAMETRON "" OFF)
 option(OPT_GOTTLIEB "" OFF)
 option(OPT_GREYHND "" OFF)
 option(OPT_IGS "" OFF)
-option(OPT_IREM "" OFF)
+option(OPT_IREM "" ON)
 option(OPT_ITECH "" OFF)
 option(OPT_JALECO "" OFF)
+option(OPT_JUSTGALAGA "" OFF)
 option(OPT_KANEKO "" ON)
 option(OPT_KONAMI "" OFF)
 option(OPT_MEADOWS "" OFF)
@@ -687,6 +688,14 @@ if(OPT_JALECO)
 	list(APPEND CPU_DEFS
 		HAS_Z80=1 	)
 endif()
+if(OPT_JUSTGALAGA)
+	add_compile_definitions(LINK_JUSTGALAGA=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/galaga.c vidhrdw/galaga.c vidhrdw/bosco.c machine/namcoio.c 
+		machine/xevious.c vidhrdw/xevious.c vidhrdw/digdug.c machine/atari_vg.c 
+		sound/namco52.c sound/namco54.c sound/namco.c sound/filter.c 
+	)
+endif()
 if(OPT_KANEKO)
 	add_compile_definitions(LINK_KANEKO=1)
 	list(APPEND MAME_DRIVERS_SRC
@@ -1056,7 +1065,7 @@ if(OPT_NAMCO)
 		vidhrdw/toypop.c drivers/warpwarp.c sndhrdw/warpwarp.c vidhrdw/warpwarp.c 
 		machine/namcoio.c sndhrdw/geebee.c sndhrdw/namcoc7x.c vidhrdw/bosco.c 
 		vidhrdw/digdug.c machine/psx.c vidhrdw/psx.c machine/xevious.c 
-		vidhrdw/xevious.c 	)
+		vidhrdw/xevious.c machine/scramble.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_C140 ON)
 	set(MSND_C352 ON)
@@ -1068,6 +1077,8 @@ if(OPT_NAMCO)
 	set(MSND_SN76496 ON)
 	set(MSND_YM2151 ON)
 	set(MCPU_H83002 ON)
+	set(MCPU_HD63701 ON)
+	set(MCPU_HD63705 ON)
 	set(MCPU_I960 ON)
 	set(MCPU_M37710 ON)
 	set(MCPU_M6502 ON)
@@ -1084,10 +1095,10 @@ if(OPT_NAMCO)
 		HAS_DAC=1 HAS_NAMCO=1 HAS_NAMCONA=1 HAS_SAMPLES=1 
 		HAS_SN76496=1 HAS_YM2151=1 	)
 	list(APPEND CPU_DEFS
-		HAS_H83002=1 HAS_I960=1 HAS_M37710=1 HAS_M6502=1 
-		HAS_M6800=1 HAS_M68000=1 HAS_M6805=1 HAS_M6809=1 
-		HAS_S2650=1 HAS_TMS32025=1 HAS_Z80=1 HAS_Z8000=1 
-	)
+		HAS_H83002=1 HAS_HD63701=1 HAS_HD63705=1 HAS_I960=1 
+		HAS_M37710=1 HAS_M6502=1 HAS_M6800=1 HAS_M68000=1 
+		HAS_M6805=1 HAS_M6809=1 HAS_S2650=1 HAS_TMS32025=1 
+		HAS_Z80=1 HAS_Z8000=1 	)
 endif()
 if(OPT_NASCO)
 	add_compile_definitions(LINK_NASCO=1)
@@ -2208,6 +2219,12 @@ if(MCPU_H83002)
 endif()
 if(MCPU_HD6309)
 	list(APPEND MAME_CPU_SRC cpu/hd6309/hd6309.c )
+endif()
+if(MCPU_HD63701)
+	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c )
+endif()
+if(MCPU_HD63705)
+	list(APPEND MAME_CPU_SRC cpu/m6805/m6805.c )
 endif()
 if(MCPU_I386)
 	list(APPEND MAME_CPU_SRC cpu/i386/i386.c )

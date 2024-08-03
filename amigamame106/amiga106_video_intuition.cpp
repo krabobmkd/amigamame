@@ -2,11 +2,13 @@
 
 #include "amiga106_video_os3.h"
 #include "amiga106_video_cgx.h"
+#include "amiga106_config.h"
 
 #include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
 
+#include "version.h"
 // Amiga
 extern "C" {
     #include <intuition/intuition.h>
@@ -26,6 +28,8 @@ extern "C" {
 //    #include "driver.h"
 }
 
+#include <stdio.h>
+#include <stdlib.h>
 // from driver.h
 #ifndef ORIENTATION_MASK
     #define ORIENTATION_MASK        		0x0007
@@ -91,7 +95,7 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
     }
 
     if((_width>sourcewidth || _height>sourceheight) && _useScale)
-    {
+    {   // like window mode or perfect screen fit.
         ww = _width;
         hh = _height;
         // let's consider scale always take all available screen,
@@ -99,20 +103,65 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
         cenx = 0;
         ceny = 0;
     } else
-    {
-        ww = sourcewidth;
-        hh = sourceheight;
+    {   // screen mode: it's better keep pixel per pixel resolution and create adapted picasso modes.
+        MameConfig::Display_PerScreenMode &config = getMainConfig().display().getActiveMode();
 
-        cenx = _width-sourcewidth;
-        ceny = _height-sourceheight;
-        if(cenx<0) cenx = 0;
-        if(ceny<0) ceny = 0;
-        cenx>>=1;
-        ceny>>=1;
-        if(hh>_height) hh=_height; // fast cheap clipping
-        if(ww>_width) ww=_width;
+        if(config._FSscaleMode == MameConfig::FSScaleMode::ScaleToBorder)
+        {
+            int sourceratio = (sourcewidth<<16)/sourceheight;
+            int screenratio = (_width<<16)/_height;
+            if(sourceratio==screenratio)
+            {   // like scaletostretch
+                ww = _width;
+                hh = _height;
+                cenx = 0;
+                ceny = 0;
+            }else if(sourceratio<screenratio)
+            {
+//                printf("vertical border touch: sourcewidth:%d  sourceheight:%d _width:%d _height:%d\n"
+//                       ,sourcewidth,sourceheight,_width,_height);
+                // vertical border touch
+                ceny = 0;
+                hh = _height;
+                ww = sourcewidth*_height/sourceheight;
+                cenx = _width-ww;
+                cenx>>=1;
+//                printf("ww:%d  hh:%d cenx:%d ceny:%d\n"
+//                       ,ww,hh,cenx,ceny);
+            } else
+            {
+                // horizontal border touch
+                ww = _width;
+                cenx = 0;
+                hh = sourceheight*_width/sourcewidth;
+                ceny = _height-hh;
+                ceny>>=1;
+            }
+        } else if(config._FSscaleMode == MameConfig::FSScaleMode::ScaleToStretch)
+        {
+            ww = _width;
+            hh = _height;
+            cenx = 0;
+            ceny = 0;
+        } else
+            // that, or default.
+       // if(config._FSscaleMode == MameConfig::FSScaleMode::CenterWithNoScale)
+        {
+            ww = sourcewidth;
+            hh = sourceheight;
+
+            cenx = _width-sourcewidth;
+            ceny = _height-sourceheight;
+            cenx>>=1;
+            ceny>>=1;
+        }
+
     }
-
+    // could happen if screen more little than source.
+    if(cenx<0) cenx=0;
+    if(ceny<0) ceny=0;
+    if(hh+ceny>_height){ hh=_height; ceny=0; }// fast cheap clipping
+    if(ww+cenx>_width) { ww=_width; cenx=0; }
 }
 // - - - - - - - - -
 Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
@@ -126,85 +175,6 @@ Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
     , _screenDepthAsked(8) // default.
     , _pMouseRaster(NULL)
 {
-//    int width = params._width;
-//    int height = params._height;
-//    if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
-//    int screenDepth = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
-
-//    if(_ScreenModeId == INVALID_ID)
-//    {
-//        if(CyberGfxBase)
-//        {
-//             struct TagItem cgxtags[]={
-//                    CYBRBIDTG_NominalWidth,width,
-//                    CYBRBIDTG_NominalHeight,height,
-//                    CYBRBIDTG_Depth,screenDepth,
-//                    TAG_DONE,0 };
-//            _ScreenModeId = BestCModeIDTagList(cgxtags);
-//            if(_ScreenModeId == INVALID_ID)
-//            {
-//                logerror("Can't find cyber screen mode for w%d h%d d%d ",width,height,screenDepth);
-//                return;
-//            }
-
-//        } else
-//        {
-//            // using OS3 to find mode.
-//            if(screenDepth>8)
-//            {
-//                logerror("Can't find 16b mode without CGX ");
-//                return;
-//            }
-//            _ScreenModeId = BestModeID(
-//                    BIDTAG_Depth,8,
-//                    BIDTAG_NominalWidth,width,
-//                    BIDTAG_NominalHeight,height,
-//                    TAG_DONE );
-//            if(_ScreenModeId == INVALID_ID)
-//            {
-//                logerror("Can't find screen mode for w%d h%d d%d ",width,height,screenDepth);
-//                return;
-//            }
-//        }
-//    } // end if no mode decided at first
-
-//    // inquire mode
-//    if(CyberGfxBase && IsCyberModeID(_ScreenModeId) )
-//    {
-//        _fullscreenWidth = GetCyberIDAttr( CYBRIDATTR_WIDTH, _ScreenModeId );
-//        _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
-//        _PixelFmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, _ScreenModeId );
-//        _PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
-//    } else
-//    {
-//        LONG v;
-//        struct DimensionInfo dims;
-//        v = GetDisplayInfoData(NULL, (UBYTE *) &dims, sizeof(struct DimensionInfo),
-//                     DTAG_DIMS, _ScreenModeId);
-//        if(v>0)
-//        {
-//            _fullscreenWidth = (int)(dims.Nominal.MaxX - dims.Nominal.MinX)+1;
-//            _fullscreenHeight = (int)(dims.Nominal.MaxY - dims.Nominal.MinY)+1;
-//            // if game screen big, try some oversan conf.
-//            if(_fullscreenWidth< width )
-//            {
-//                _fullscreenWidth = (int)(dims.MaxOScan.MaxX - dims.MaxOScan.MinX)+1;
-//            }
-//            if(_fullscreenHeight< height )
-//            {
-//                _fullscreenHeight = (int)(dims.MaxOScan.MaxY - dims.MaxOScan.MinY)+1;
-//            }
-//        } else
-//        {   // shouldnt happen, fallback
-//            _fullscreenWidth = width;
-//            _fullscreenHeight = height;
-//        }
-//        // TODO for ECS we can't do depth 8 should be checked
-//        _PixelFmt = PIXFMT_LUT8; // will be treated with WritePixelArray8 anyway.
-//        _PixelBytes = 1;
-//    }
-//    // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
-//    if(_PixelFmt == PIXFMT_LUT8) _flags|= DISPFLAG_INTUITIONPALETTE;
 
 }
 
@@ -221,6 +191,7 @@ bool Intuition_Screen::open()
 	struct ColorSpec colspec[2]={0,0,0,0,-1,0,0,0};
  	_pScreen = OpenScreenTags( NULL,
 			SA_DisplayID,_ScreenModeId,
+                        SA_Title, (ULONG)"MAME", // used as ID by promotion tools and else ?
                         SA_Width, _fullscreenWidth,
                         SA_Height,_fullscreenHeight,
                         SA_Depth,_screenDepthAsked,
@@ -299,7 +270,7 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params) : Intu
     , _machineWidth(params._width),_machineHeight(params._height)
     , _maxzoomfactor(1)
 {
-   printf(" ***** ** Intuition_Window CREATE:%d %d %08x\n",params._width,params._height,params._flags);
+//   printf(" ***** ** Intuition_Window CREATE:%d %d %08x\n",params._width,params._height,params._flags);
 
   if(params._flags & ORIENTATION_SWAP_XY) doSwap(_machineWidth,_machineHeight);
 
@@ -345,8 +316,9 @@ bool Intuition_Window::open()
         WA_MaxHeight, _machineHeight*_maxzoomfactor,
         WA_MinWidth, _machineWidth,
         WA_MinHeight, _machineHeight,
-        WA_IDCMP,/* IDCMP_GADGETUP | IDCMP_GADGETDOWN |*/IDCMP_MOUSEBUTTONS |  IDCMP_RAWKEY /*|
-            IDCMP_NEWSIZE*/ /*| IDCMP_INTUITICKS*/ | IDCMP_CLOSEWINDOW,
+        WA_IDCMP,/* IDCMP_GADGETUP | IDCMP_GADGETDOWN |*/
+            IDCMP_MOUSEBUTTONS |  IDCMP_RAWKEY | IDCMP_CHANGEWINDOW |
+            IDCMP_NEWSIZE /*| IDCMP_INTUITICKS*/ | IDCMP_CLOSEWINDOW,
 
         WA_Flags, /*WFLG_SIZEGADGET*/ /*| WFLG_SIZEBRIGHT | WFLG_SIZEBBOTTOM |
 
@@ -358,7 +330,7 @@ bool Intuition_Window::open()
             //| WFLG_SIMPLE_REFRESH
              | ((_maxzoomfactor>1)?WFLG_SIZEGADGET:0)
             ,
-        WA_Title,(ULONG) "Mame 0.106 Krb ", /* take title from version string */
+        WA_Title,(ULONG)APPNAMEA, /* take title from version string */
         WA_PubScreen, (ULONG)pWbScreen,
 
         TAG_DONE

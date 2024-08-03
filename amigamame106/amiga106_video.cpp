@@ -132,6 +132,11 @@ AbstractDisplay *g_pMameDisplay=NULL;
 //    int _ledmarge;
 
 //};
+static ULONG FrameCounterUpdate=0;
+static INT64 FrameCounter=0;
+INT64 StartTime = 0;
+ULONG GetStartTime=0;
+//ULONG UseBrakes = 0,UseFrameskip=0;
 
 //ledBitmap _ledBitmap(3,4); // nbleds, ledwidth
 void SwitchWindowFullscreen()
@@ -139,16 +144,15 @@ void SwitchWindowFullscreen()
     if(!g_pMameDisplay) return;
     g_pMameDisplay->switchFullscreen();
 }
-static ULONG FrameCounterUpdate=0;
-static INT64 FrameCounter=0;
-//
-//static ULONG FastFrameTarget=0;
-//static ULONG FastFrameStep=0; // if 0, slow, if >0 emu is faster than original game.
-//static ULONG FastFrameCounter=0;
-INT64 StartTime = 0;
-ULONG GetStartTime=0;
+void ResetWatchTimer()
+{
+    FrameCounterUpdate = 0;
+    FrameCounter = 0;
+    StartTime = 0;
+    GetStartTime = 1;
+}
 
-ULONG UseBrakes = 0,UseFrameskip=0;
+
 
 
 static ULONG shiftRotationBits(ULONG orientation, int rotationShift)
@@ -171,11 +175,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     MameConfig &mainConfig = getMainConfig();
     MameConfig::Display &config = mainConfig.display();
 
-    std::string screenId;
-    int vattribs;
-    MameConfig::getDriverScreenModestringP(Machine->gamedrv, screenId,vattribs);
-
-    MameConfig::Display_PerScreenMode &screenModeConf = config._perScreenMode[screenId];
+    MameConfig::Display_PerScreenMode &screenModeConf = config.getActiveMode();
 
     if((pparams->video_attributes &VIDEO_TYPE_VECTOR)==0) // means not vector,= bitmap
     {
@@ -222,8 +222,6 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     FrameCounter = 0;
     StartTime = 0;
     GetStartTime = 1;
-    UseBrakes = 0;
-    UseFrameskip = 0;
     return 0; // success
 
 }
@@ -270,14 +268,24 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
    // if(UseBrakes>0)
     {
-        INT64 framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/osd_cycles_per_second();
+        // 1000000LL aka osd_cycles_per_second()
+        const UINT64 cyclespersec = 1000000LL;
+        //if(inow==0) inow=1;
+        INT64 framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
+
+        // if OS paused (window moving, menu bt, intuition hogs, reset timer)
+        if(FrameCounter+(igamefps>>1)<framesThatShouldbeNow)
+        {
+            ResetWatchTimer();
+        }
+
         while(framesThatShouldbeNow<FrameCounter)
         {
             // something known to actually does pass priority to system
             // and waits between 1/50 hz or less.
             g_pMameDisplay->WaitFrame();
 
-            framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/osd_cycles_per_second();
+            framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
         }
     }
 
