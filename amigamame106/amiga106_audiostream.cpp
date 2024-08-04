@@ -138,7 +138,7 @@ static LONG AHISStaticThread_Open( sAHISoundServer *pAHIS )
 {
     if(pAHIS==NULL || !mainprocess) return 1;
 
-// printf("ahi init\n");
+ //printf("ahi init\n");
     BYTE deviceResult;
     pAHIS->m_AHImp = CreatePort(NULL,0);
     pAHIS->m_AHIio = (struct AHIRequest*)CreateExtIO(pAHIS->m_AHImp ,sizeof(struct AHIRequest));
@@ -386,7 +386,7 @@ int osd_start_audio_stream(int stereo)
 		struct TagItem threadTags[] = { NP_Entry,(ULONG) &AHISStaticThread,
 						//	NP_Child, TRUE, // os4 thread thing
           //Re?
-                        NP_Priority,    /*60*/-64  , // int8; -128 .. 127
+                        NP_Priority,    60  , // int8; -128 .. 127
                         NP_Name,(ULONG)"MameAHI",
                         NP_Output,(ULONG) mainprocess->pr_COS,
                         NP_CloseOutput,FALSE,
