@@ -812,6 +812,29 @@ void program_write_word_64le(offs_t address, UINT16 data);
 void program_write_dword_64le(offs_t address, UINT32 data);
 void program_write_qword_64le(offs_t address, UINT64 data);
 
+/* -----SPECIAL KRB for Z80 repeater ops ----- */
+// LDIR CPIR INIR OTIR
+// LDIR, copy mem
+void program_copy(UINT16 readAddress,UINT16 writeAddress,UINT16 n );
+// CPIR find the occurence of A and stop, or counter (BC) is 0
+void program_find(UINT16 startAdress,UINT8 a,UINT16 n );
+// INIR Reads from the (C) port, then writes to (HL). HL is incremented and B is decremented. Repeats until B = 0.
+void io_copy_to_program(UINT8 port,UINT16 writeAddress, UINT8 n);
+// OTIR Reads from (HL) and writes to the (C) port. HL is incremented and B is decremented. Repeats until B = 0.
+void program_copy_to_io(UINT8 port,UINT16 readAddress, UINT8 n);
+
+//  LDDR CPDR INDR OTDR
+// LDDR copy from end, point first copied. Does a LD (DE),(HL) and decrements each of DE, HL, and BC) until BC=0.
+void program_rcopy(UINT16 readAddress,UINT16 writeAddress,UINT16 n );
+// CPDR rfind
+// in that case adress is decreased first ? -> no test then dec.
+void program_rfind(UINT16 startAdress,UINT8 a,UINT16 n );
+// INDR   Reads the (C) port and writes the result to (HL). HL and B are decremented. Repeats until B = 0.
+void io_rcopy_to_program(UINT8 port,UINT16 writeAddress, UINT8 n);
+//OTDR  Reads from (HL) and writes to the (C) port. HL and B are then decremented. Repeats until B = 0.
+void program_rcopy_to_io(UINT8 port,UINT16 readAddress, UINT8 n);
+
+
 /* ----- declare data address space handlers ----- */
 UINT8 data_read_byte_8(offs_t address);
 void data_write_byte_8(offs_t address, UINT8 data);
