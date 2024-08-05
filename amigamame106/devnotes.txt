@@ -1,70 +1,42 @@
 
-
- - O "configuration for:" ne s'affiche pas forcément
- - O Mode ID doit ê'tre grisé si pas choose (absolument)
-
- Checkpoint 1  for first beta release:
-
-  - All display and rotations modes OK
-  - All configs applied.
+ Done form Beta 1 to Beta 2:
+  - Operation thunderbolt and games with flags ORIENTATION_FLIP_X or ORIENTATION_FLIP_Y
+		are now displayed the right way.
 
 
-TODOLIST before tests
 
- SHOW ALL/FOUND selection
-
- - X corriger touche OK
- - X switch window/fullscreen
- - X avoir load xml fonctionnel.
- - X Stack watch
- - X os frameskip when too fast (uae)
-
- - O default pads OK.
-
- - X coin1 & start1 by default. -> done on num keys by mame presets.
-
- frameskip
-
-	- O emu frameskip when too slow -> irrelevant because would gain 20% for half frames.
-
- - O tag "beta" before lending to anyone
- - O audio
- - O neogeo ? -> mode 15b -> toujours pas.
- - O gestion rotation jeux ROT90 ROT270 , ...
+ For beta 2 in term of priorities :
 
 
- link drivers issues...
-  - O remove S-TV , too much non working drivers.
+  - O optimise memory write/read calls for z80/68k
+  - O Implement CGX/ScalePixelArray() for drawing
+  - O Implement Triple buffer (with ChangeScreen or else ?)
+  - O implement WriteChunkyPixels instead of WPA8 when os>=3.1
+  - O try to optimise sound chips with ridiculously high timing & cpu use (YM2151 ?)
 
- - X do save/load state
+  Games not working when should:
+  - O neogeo ? -> investigate init error
+  - O arkanoid 1 -> investigate init error
+  - O all rtypes ? -> wrong roms ?
+
+ - - - - -
+ - O ui: want number of players per games so much.
+ - O frameskip -> simple
  - O do save screenshot
- - O nicer mame menu
 
- - X mui list: mettre "nOT working" sur le titre
- - O mui list: avoir un id conf graphique "320x224_16b_r90"
- - X mui list: avoir show all fonctionnel.
+ - O remove S-TV , too much non working drivers.
  - O mui list avoir année et entreprise en colonne
  - O mui list: have a column for nb players -> where to get that ?
  - O allow sorting by columns
  - O finish drawing leds, test with a driver that lag while booting if it helps
 
- config from ui
-  - O ...endless things...
-
-
  -  command line
 	- O liste roms
-	- O lancer rom direct avec ligne commande ou tooltip.
+	- X lancer rom direct avec ligne commande ou tooltip.
 
- - O test memory leaks with mublabla -> muGuardianAngel with UAE & OS3.2 does nothing ????
+ - O test memory leaks and hits with muGuardianAngel & else -> muGuardianAngel with UAE & OS3.2 does nothing ????
  - O verif GetCatalogStr , -> REMOVE ugly locale/catcomp engine that looks like leaking (no close calls ?), reintegrate later maybe.
 
-
-
-
-
-
-IPT_UI_SHOW_PROFILER   seq: 46 96
 
 
 

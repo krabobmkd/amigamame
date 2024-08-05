@@ -102,20 +102,20 @@ void Drawable_CGX::close()
 
 }
 // dbg
-void countPix(int &zeroes,int &nonzeroes,UWORD &nzval, UWORD *p,ULONG s)
-{
-    while(s>0)
-    {
-        UWORD i =*p++;
-        if(i==0) zeroes++;
-        else
-        {
-            nonzeroes++;
-            nzval = i;
-        }
-        s--;
-    }
-}
+//void countPix(int &zeroes,int &nonzeroes,UWORD &nzval, UWORD *p,ULONG s)
+//{
+//    while(s>0)
+//    {
+//        UWORD i =*p++;
+//        if(i==0) zeroes++;
+//        else
+//        {
+//            nonzeroes++;
+//            nzval = i;
+//        }
+//        s--;
+//    }
+//}
 
 
 void Drawable_CGX::drawCGX_DirectCPU(_mame_display *display)

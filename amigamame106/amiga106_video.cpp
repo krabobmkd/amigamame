@@ -33,6 +33,7 @@ extern "C" {
     #include "mame.h"
     // for orientation flags
     #include "driver.h"
+    #include "memory.h"
 }
 #include "amiga106_inputs.h"
 #include "amiga106_config.h"
@@ -181,7 +182,19 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     {
         // keep the 3 orientation bits
         AbstractDisplay::params params;
+
+
+        // if just flip and no rot at start, special case
+        UINT32 startflags = Machine->gamedrv->flags & 7;
+        UINT32 reportFlags = 0;  // swaps that are not rotation must be reported
+        UINT32 actualRotation = 0;
+        if(startflags == ORIENTATION_FLIP_X || startflags == ORIENTATION_FLIP_Y )
+        {
+            reportFlags = startflags;
+            actualRotation = 0;
+        }
         params._flags = shiftRotationBits(Machine->gamedrv->flags,(int)screenModeConf._rotateMode);
+        params._flags ^= reportFlags;
 
         if(screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose)
             params._forcedModeID = (ULONG) screenModeConf._modeid;
@@ -360,3 +373,36 @@ const char *osd_get_fps_text(const performance_info *performance)
     perfo_line[27]=0;
     return perfo_line;
 }
+// memory.c 2569
+// #define WRITEBYTE8(name,spacenum)
+//  WRITEBYTE8(program_write_byte_8,     ADDRESS_SPACE_PROGRAM)
+//  WRITEBYTE8(data_write_byte_8,     ADDRESS_SPACE_DATA)
+
+//#define ADDRESS_SPACES			3						/* maximum number of address spaces */
+//#define ADDRESS_SPACE_PROGRAM	0						/* program address space */
+//#define ADDRESS_SPACE_DATA		1						/* data address space */
+//#define ADDRESS_SPACE_IO		2						/* I/O address space */
+//struct _address_space
+//{
+//	offs_t				addrmask;			/* address mask */
+//	UINT8 *				readlookup;			/* read table lookup */
+//	UINT8 *				writelookup;		/* write table lookup */
+//	handler_data *		readhandlers;		/* read handlers */
+//	handler_data *		writehandlers;		/* write handlers */
+//	data_accessors *	accessors;			/* pointers to the data access handlers */
+//};
+//extern "C" {
+//void mywrite8(UINT32 adress,UINT8 data)
+//{
+//    struct _address_space &space = [ADDRESS_SPACE_PROGRAM];
+//    /* perform lookup */
+//    // PERFORM_LOOKUP(lookup,space,extraand)
+//    // PERFORM_LOOKUP(writelookup,active_address_space[spacenum],~0);
+//	address &= space.addrmask & extraand;
+//	entry = space.lookup[LEVEL1_INDEX(address)];
+//	if (entry >= SUBTABLE_BASE)
+//		entry = space.lookup[LEVEL2_INDEX(entry,address)];
+
+//}
+
+//}

@@ -522,6 +522,10 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
       if(orientation == ROT90)  strComment += " ROT90";
       if(orientation == ROT180)  strComment += " ROT180";
       if(orientation == ROT270)  strComment += " ROT270";
+      if(orientation == ORIENTATION_FLIP_X)  strComment += " FLIPX";
+      if(orientation == ORIENTATION_FLIP_Y)  strComment += " FLIPY";
+      if(orientation == ORIENTATION_SWAP_XY)  strComment += " SWAPXY";
+
      }
    pColumns->_comment = (char *)strComment.c_str(); //comment;
   return(0);
