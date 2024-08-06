@@ -209,6 +209,8 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         g_pMameDisplay = new IntuitionDisplay();
 
         if(config._startOnWorkbench) params._flags |= DISPFLAG_STARTWITHWINDOW;
+        if(config._drawEngine == MameConfig::DrawEngine::CgxScalePixelArray)
+                params._flags |= DISPFLAG_USESCALEPIXARRAY;
 
         bool screenok = g_pMameDisplay->open(params);
         if(!screenok) {

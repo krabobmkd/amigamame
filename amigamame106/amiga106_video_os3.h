@@ -55,8 +55,6 @@ public:
     void close() override;
     void draw(_mame_display *display) override;
 
-//    MsgPort *userPort() override;
-//    RastPort *rastPort() override;
 protected:
 
 };

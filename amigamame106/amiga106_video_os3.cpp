@@ -52,9 +52,9 @@ void Drawable_OS3::draw_WPA8(_mame_display *display)
     {
         _pRemap->updatePaletteRemap(display);
     }
-
+    int sourcewidth,sourceheight;
     int cenx,ceny,ww,hh;
-    _drawable.getGeometry(display,cenx,ceny,ww,hh);
+    _drawable.getGeometry(display,cenx,ceny,ww,hh,sourcewidth,sourceheight);
 
     // align on 16
     int wwal = (ww+15)&0xfffffff0;

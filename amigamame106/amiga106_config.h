@@ -98,8 +98,7 @@ public:
     enum class DrawEngine :  int
     {
         CgxDirectCpuOrWPA8,
-        MoreToCome
-       // CgxScalePixelArray,
+        CgxScalePixelArray,
        // WritePixelArray8,
        // GLShader
         // "CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});

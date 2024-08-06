@@ -77,18 +77,13 @@ IntuitionDrawable::~IntuitionDrawable()
 {
     close();
 }
-//void IntuitionDrawable::close()
-//{
-////    if(_trp._rp.BitMap) FreeBitMap(_trp._rp.BitMap);
-////    _trp._checkw=0;
-////    _trp._rp.BitMap = NULL;
-//}
-void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,int &ww,int &hh)
+
+void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,int &ww,int &hh, int &sourcewidth, int &sourceheight)
 {
 
     // +1 because goes 0,319
-    int sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
-    int sourceheight =( display->game_visible_area.max_y - display->game_visible_area.min_y)+1;
+    sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
+    sourceheight =( display->game_visible_area.max_y - display->game_visible_area.min_y)+1;
     if(_flags & ORIENTATION_SWAP_XY)
     {
         doSwap(sourcewidth,sourceheight);
@@ -382,16 +377,32 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
     {
         // type of window depends of the WB nature.
         bool useCgxForWB = Intuition_Window_CGX::useForWbWindow();
-        _drawable =(useCgxForWB)?((IntuitionDrawable *)new Intuition_Window_CGX(pparams) ):
-                             ((IntuitionDrawable *)new Intuition_Window_OS3(pparams));
+        if(useCgxForWB)
+        {
+            if(_params._flags & DISPFLAG_USESCALEPIXARRAY)
+                _drawable =(IntuitionDrawable *)new Intuition_Window_CGXScale(pparams);
+            else
+                _drawable =(IntuitionDrawable *)new Intuition_Window_CGX(pparams);
+        } else
+        {
+            _drawable =(IntuitionDrawable *)new Intuition_Window_OS3(pparams);
+        }
+
     } else
     {   // open full screen
         // if cgx present
         bool useCgx = Intuition_Screen_CGX::useForThisMode(pparams._forcedModeID);
 
-        _drawable =(useCgx)? ((IntuitionDrawable *)new Intuition_Screen_CGX(pparams)) :
-                             ((IntuitionDrawable *)new Intuition_Screen_OS3(pparams));
-
+        if(useCgx)
+        {
+            if(_params._flags & DISPFLAG_USESCALEPIXARRAY)
+                _drawable =(IntuitionDrawable *) new Intuition_Screen_CGXScale(pparams);
+            else
+                _drawable =(IntuitionDrawable *) new Intuition_Screen_CGX(pparams);
+        } else
+        {
+            _drawable =(IntuitionDrawable *)new Intuition_Screen_OS3(pparams);
+        }
     }
 
     if(!_drawable) return false;

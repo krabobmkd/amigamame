@@ -131,8 +131,9 @@ void Drawable_CGX::drawCGX_DirectCPU(_mame_display *display)
     }
 
     // applied width height if using scale or not, and centering.
+    int sourcewidth,sourceheight;
     int cenx,ceny,ww,hh;
-    _drawable.getGeometry(display,cenx,ceny,ww,hh);
+    _drawable.getGeometry(display,cenx,ceny,ww,hh,sourcewidth,sourceheight);
 
     mame_bitmap *bitmap = display->game_bitmap;
 
@@ -279,78 +280,6 @@ void Intuition_Screen_CGX::close()
     Intuition_Screen::close();
     Drawable_CGX::close();
 }
-//bool Intuition_Screen_CGX::open()
-//{
-//    if(_pScreenWindow) return true; // already open.
-//    if(_ScreenModeId == INVALID_ID)
-//    {
-//        logerror("Can't find a screen mode ");
-//        return false; // set by inherited class.
-//     }
-
-//    int depth;
-//    if(_PixelFmt == PIXFMT_LUT8) depth=8;
-//    else depth=16;
-
-//    // note: all this is regular OS intuition, no CGX
-//	struct ColorSpec colspec[2]={0,0,0,0,-1,0,0,0};
-// 	_pScreen = OpenScreenTags( NULL,
-//			SA_DisplayID,_ScreenModeId,
-//                        SA_Width, _fullscreenWidth,
-//                        SA_Height,_fullscreenHeight,
-//                        SA_Depth,depth,
-////                        SA_Behind,TRUE,    /* Open behind */
-//                        SA_Quiet,TRUE,     /* quiet */
-//			SA_Type,CUSTOMSCREEN,
-//			SA_Colors,(ULONG)&colspec[0],
-//                        0 );
-
-//	if( _pScreen == NULL ) return false;
-
-//	// --------- open intuition fullscreen window for this screen:
-
-//    _pScreenWindow = OpenWindowTags(/*&screenwin*/NULL,
-//        WA_CustomScreen,(ULONG)_pScreen,
-//                    WA_Backdrop,FALSE,
-//                    WA_Borderless,TRUE,
-//                    WA_Activate,TRUE,
-//                    WA_RMBTrap,TRUE,
-//                    WA_ReportMouse,0,
-//                    WA_SizeGadget,0,
-//                    WA_DepthGadget,0,
-//                    WA_CloseGadget,0,
-//                    WA_DragBar,0,
-//          WA_GimmeZeroZero,FALSE, // test
-//                    WA_IDCMP,IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY ,
-//                    0 );
-
-//	if( _pScreenWindow ==  NULL )
-//	{
-//        close();
-//        return false;
-//	}
-//	// ------- set invisible mouse pointer:
-//	_pMouseRaster =  AllocRaster(8 ,8) ;
-//	if(_pMouseRaster)
-//	{
-//        SetPointer( _pScreenWindow ,(UWORD *) _pMouseRaster, 0,1,0,0);
-//    }
-//    _width = _fullscreenWidth;
-//    _height = _fullscreenHeight;
-
-//    return true;
-//}
-//void Intuition_Screen::close()
-//{
-//    IntuitionDrawable::close();
-//    if(_pScreenWindow) CloseWindow(_pScreenWindow);
-//    if(_pScreen) CloseScreen(_pScreen);
-//    if(_pMouseRaster) FreeRaster( (PLANEPTR) _pMouseRaster ,8,8);
-
-//    _pScreenWindow = NULL;
-//    _pScreen = NULL;
-//    _pMouseRaster = NULL;
-//}
 
 void Intuition_Screen_CGX::draw(_mame_display *display)
 {
@@ -363,19 +292,19 @@ Intuition_Window_CGX::Intuition_Window_CGX(const AbstractDisplay::params &params
     _colorsIndexLength = params._colorsIndexLength;
     _video_attributes = params._video_attributes;
 }
-Intuition_Window_CGX::~Intuition_Window_CGX()
-{}
+//Intuition_Window_CGX::~Intuition_Window_CGX()
+//{}
 void Intuition_Window_CGX::draw(_mame_display *display)
 {
      if(!_pWbWindow || !_sWbWinSBitmap) return;
 
-    // will draw on fiend bitmap _sWbWinSBitmap to the current size.
+    // will draw on friend bitmap _sWbWinSBitmap to the current size.
     _width = (int)(_pWbWindow->GZZWidth);
     _height = (int)(_pWbWindow->GZZHeight);
     // use cpu direct copy
     drawCGX_DirectCPU(display);
 
-    // then use os copy to window, it manages layers, easy way.
+    // then use os copy to window, it manages layers, slow because 2 pass but easy way.
     BltBitMapRastPort( _sWbWinSBitmap,//CONST struct BitMap *srcBitMap,
            0,0, //LONG xSrc, LONG ySrc,
            _pWbWindow->RPort,//struct RastPort *destRP,
@@ -427,4 +356,175 @@ void Intuition_Window_CGX::close()
 BitMap *Intuition_Window_CGX::bitmap()
 {
     return _sWbWinSBitmap;
+}
+// =================================
+
+Drawable_CGXScalePixelArray::Drawable_CGXScalePixelArray(IntuitionDrawable &drawable)
+ : _drawable(drawable),_pRemap(NULL),_useIntuitionPalette(false)
+ , _colorsIndexLength(0)
+ , _video_attributes(0)
+{
+
+}
+Drawable_CGXScalePixelArray::~Drawable_CGXScalePixelArray()
+{
+    if(_pRemap) delete _pRemap;
+}
+
+void Drawable_CGXScalePixelArray::drawCGX_scale(_mame_display *display)
+{
+    RastPort *pRPort = _drawable.rastPort();
+    if(!pRPort) return;
+    mame_bitmap *bitmap = display->game_bitmap;
+    // - - update palette if exist and is needed.
+    if(_pRemap && ((display->changed_flags & GAME_PALETTE_CHANGED) !=0 || _pRemap->needRemap()))
+    {
+        _pRemap->updatePaletteRemap(display);
+    }
+    int sourcewidth,sourceheight;
+    int cenx,ceny,ww,hh;
+    _drawable.getGeometry(display,cenx,ceny,ww,hh,sourcewidth,sourceheight);
+
+    // whatever happens we render the source size.
+    ULONG bmsize = sourcewidth*sourceheight;
+    if(bmsize != _bm.size())
+    {
+        _bm.reserve(bmsize); // I live in the belief that is forces a "exact" alloc in all cases.
+        _bm.resize(bmsize);
+    }
+
+    directDrawScreen ddscreen={
+        _bm.data(),
+        sourcewidth*sizeof(ULONG), // bpr
+        0,0,sourcewidth,sourceheight // clip rect
+    };
+
+    directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
+        display->game_visible_area.min_x,display->game_visible_area.min_y,
+        display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
+        _drawable.flags()
+    };
+    // remap in unscaled true color buffer.
+    // note should work with 24b, test that.
+    // cgx XXXPixelArray only support 24 or 32b format RECTFMT_ARGB
+    directDrawClutT_ULONG_ULONG(&ddscreen,&ddsource,0,0,sourcewidth,sourceheight,_pRemap->_clut32.data());
+
+    // let Gfx acceleration do its job (hopefully ;)
+    ScalePixelArray(_bm.data(),sourcewidth,sourceheight,ddscreen._bpr,pRPort,
+    cenx,ceny,ww,hh,RECTFMT_ARGB ); // also RECTFMT_RGB  RECTFMT_RGBA and RECTFMT_LUT8
+
+}
+
+void Drawable_CGXScalePixelArray::initRemapTable()
+{
+    if((_video_attributes & VIDEO_RGB_DIRECT)==0 &&
+        _colorsIndexLength>0)
+    {
+        _pRemap = new Paletted_CGX(_colorsIndexLength,PIXFMT_ARGB32,4);
+    } else
+    if((_video_attributes & VIDEO_RGB_DIRECT)!=0 /*&& params._driverDepth == 15*/)
+    {
+        Paletted_CGX *p =  new Paletted_CGX(_colorsIndexLength,PIXFMT_ARGB32,4);
+        _pRemap = p;
+        p->updatePaletteRemap15b(); // once for all.
+    }
+}
+void Drawable_CGXScalePixelArray::close()
+{
+    if(_pRemap) delete _pRemap;
+    _pRemap = NULL;
+}
+// - - - -
+
+Intuition_Screen_CGXScale::Intuition_Screen_CGXScale(const AbstractDisplay::params &params)
+    : Intuition_Screen(params) , Drawable_CGXScalePixelArray((IntuitionDrawable&)*this)
+{
+    _colorsIndexLength = params._colorsIndexLength;
+    _video_attributes = params._video_attributes;
+    if(!CyberGfxBase) return; // this is all the point and shouldnt happen.
+    int width = params._width;
+    int height = params._height;
+    if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
+    _screenDepthAsked = 32; // or 16?
+
+    if(_ScreenModeId == INVALID_ID)
+    {
+        struct TagItem cgxtags[]={
+                CYBRBIDTG_NominalWidth,width,
+                CYBRBIDTG_NominalHeight,height,
+                CYBRBIDTG_Depth,_screenDepthAsked,
+                TAG_DONE,0 };
+        _ScreenModeId = BestCModeIDTagList(cgxtags);
+        if(_ScreenModeId == INVALID_ID)
+        {
+            logerror("Can't find cyber screen mode for w%d h%d d%d ",width,height,_screenDepthAsked);
+            return;
+        }
+
+    } // end if no mode decided at first
+
+    // inquire mode
+    if( IsCyberModeID(_ScreenModeId) )
+    {
+        _fullscreenWidth = GetCyberIDAttr( CYBRIDATTR_WIDTH, _ScreenModeId );
+        _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
+        //_PixelFmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, _ScreenModeId );
+        //_PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
+    }
+
+}
+
+bool Intuition_Screen_CGXScale::open()
+{
+    bool ok = Intuition_Screen::open();
+    if(!ok) return false;
+
+    // after Screen is open, may create create color remap table for clut.
+    initRemapTable();
+
+    return true;
+}
+void Intuition_Screen_CGXScale::close()
+{
+    Intuition_Screen::close();
+    Drawable_CGXScalePixelArray::close();
+}
+
+void Intuition_Screen_CGXScale::draw(_mame_display *display)
+{
+    drawCGX_scale(display);
+}
+
+// - - -- -  - - --
+Intuition_Window_CGXScale::Intuition_Window_CGXScale(const AbstractDisplay::params &params)
+ :Intuition_Window(params), Drawable_CGXScalePixelArray((IntuitionDrawable&)*this)
+{
+    _colorsIndexLength = params._colorsIndexLength;
+    _video_attributes = params._video_attributes;
+}
+
+void Intuition_Window_CGXScale::draw(_mame_display *display)
+{
+     if(!_pWbWindow) return;
+
+    // will draw on friend bitmap _sWbWinSBitmap to the current size.
+    _width = (int)(_pWbWindow->GZZWidth);
+    _height = (int)(_pWbWindow->GZZHeight);
+
+     drawCGX_scale(display);
+}
+bool Intuition_Window_CGXScale::open()
+{
+    if(_pWbWindow) return true; // already ok
+    bool ok = Intuition_Window::open();
+    if(!ok) return false;
+
+    initRemapTable();
+
+    return true;
+}
+void Intuition_Window_CGXScale::close()
+{
+    Intuition_Window::close();
+    Drawable_CGXScalePixelArray::close();
 }

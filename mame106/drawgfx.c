@@ -1417,8 +1417,6 @@ void fillbitmap(mame_bitmap *dest,pen_t pen,const rectangle *clip)
 	}
 }
 
-
-
 static inline void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,

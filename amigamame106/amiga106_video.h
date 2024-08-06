@@ -24,6 +24,7 @@ public:
     // flags are orientations bits + our prefs
     #define DISPFLAG_STARTWITHWINDOW 8
     #define DISPFLAG_INTUITIONPALETTE  16
+    #define DISPFLAG_USESCALEPIXARRAY  32
     struct params {
         ULONG _flags;
         ULONG _forcedModeID;

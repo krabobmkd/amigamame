@@ -31,7 +31,7 @@ public:
     //inline ULONG pixelFmt() const { return _PixelFmt; }
     //inline ULONG pixelBytes() const { return _PixelBytes; }
     inline int flags() const { return _flags; }
-    void getGeometry(_mame_display *display,int &cenx,int &ceny,int &ww,int &hh);
+    void getGeometry(_mame_display *display,int &cenx,int &ceny,int &ww,int &hh, int &sourceWidth,int &sourceHeight);
   //  virtual void drawRastPort_CGX(_mame_display *display,Paletted *pRemap);
   //   void drawRastPortWPA8(_mame_display *display,Paletted *pRemap);
 protected:
@@ -93,11 +93,9 @@ public:
     RastPort *rastPort() override;
 protected:
     Window *_pWbWindow;
-//    BitMap *_sWbWinSBitmap;
+
     int _machineWidth,_machineHeight;
     int _maxzoomfactor;
-  //  BitMap *bitmap() override;
-  //  void drawRastPort_CGX(_mame_display *display,Paletted *pRemap) override;
 };
 
 
