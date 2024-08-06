@@ -66,6 +66,14 @@ void XmlWriter::operator()(const char *sMemberName, int &v, int min, int max)
     if(p) xml_set_attribute_int(p,"v",v);
 
 }
+void XmlWriter::operator()(const char *sMemberName, float &v, float min, float max,float step,float defval)
+{
+    string name = checkXmlName(sMemberName);
+    xml_data_node *p = xml_add_child(_recursenode.back(),name.c_str(),  NULL );
+    if(p) xml_set_attribute_float(p,"v",v);
+}
+
+
 void XmlWriter::operator()(const char *sMemberName, int &v,const std::vector<std::string> &values)
 {
     string name = checkXmlName(sMemberName);
@@ -158,8 +166,20 @@ void XmlReader::operator()(const char *sMemberName, int &v, int min, int max)
         if(vv>max) vv=max;
         v = vv;
     }
-
 }
+void XmlReader::operator()(const char *sMemberName,  float &v, float min, float max,float step,float defval )
+{
+    string name = checkXmlName(sMemberName);
+    xml_data_node *p = xml_get_sibling(_recursenode.back()->child, name.c_str());
+    if(p)
+    {
+        float vv =  xml_get_attribute_float(p,"v",defval);
+        if(vv<min) vv=min;
+        if(vv>max) vv=max;
+        v = vv;
+    }
+}
+
 void XmlReader::operator()(const char *sMemberName, int &v,const std::vector<std::string> &values)
 {
     string name = checkXmlName(sMemberName);

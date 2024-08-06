@@ -74,8 +74,8 @@ public:
     int scanDrivers();
     //int allDrivers();
     // - - path to main dirs --
-    const char *getUserDir() const {return _paths._userPath.c_str(); }
-    const char *getRomsDir() const {return _paths._romsPath.c_str(); }
+    const char *getUserDir() const {return _misc._userPath.c_str(); }
+    const char *getRomsDir() const {return _misc._romsPath.c_str(); }
 
     const std::vector<const _game_driver *const*> &romsFound() const { return _romsFound; };
     // do not keep that table...
@@ -142,6 +142,8 @@ public:
      protected:
         std::map<std::string,Display_PerScreenMode> _perScreenMode;
         ASerializer::StringMap<Display_PerScreenMode> _perScreenModeS;
+        float _color_brightness=1.0f;
+        float _color_gamma=1.0f;
         friend class MameConfig;
     };
     Display &display() { return _display; }
@@ -182,12 +184,14 @@ public:
     };
     Controls &controls() { return _controls; }
 
-    struct Paths : public ASerializable
+    struct Misc : public ASerializable
     {
         void serialize(ASerializer &serializer) override;        
         std::string _romsPath,_userPath;
+        bool    _useCheatCodeFile = false;
+        std::string _cheatFilePath="PROGDIR:cheat.dat";
     };
-    Paths &paths() { return _paths; }
+    Misc &misc() { return _misc; }
 
     // just to have a help panel
     struct Help : public ASerializable
@@ -205,7 +209,7 @@ protected:
     Display     _display;
     Audio       _audio;
     Controls    _controls;
-    Paths       _paths;
+    Misc       _misc;
     Help        _help;
 
     int     _activeDriver;

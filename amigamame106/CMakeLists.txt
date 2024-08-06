@@ -137,7 +137,7 @@ set(AMIGA_SRC
 	target_compile_options(Mame106AmigaO0 PRIVATE -O0 ${AMIGA_COMPILER_OPTIONS} )
 	target_include_directories(Mame106AmigaO0 PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
 	# those for mame includes
-	target_compile_definitions(Mame106AmigaO0 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
+	target_compile_definitions(Mame106AmigaO0 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 MUISERIALIZER_USES_FLOAT=1  ${CPU_DEFS} )
 # - - -have some Amiga code using O3
 	add_library(Mame106AmigaO3 STATIC
 		amiga_video_tracers_clut16.h
@@ -156,7 +156,7 @@ set(AMIGA_SRC
 	  ${AMIGA_COMPILER_OPTIONS} )
 	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
 	# those for mame includes
-	target_compile_definitions(Mame106AmigaO3 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
+	target_compile_definitions(Mame106AmigaO3 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 MUISERIALIZER_USES_FLOAT=1 ${CPU_DEFS} )
 
 # - - - -
 
@@ -164,7 +164,7 @@ set(PROGNAME Mame106)
 add_executable(${PROGNAME} ${AMIGA_SRC} )
 set_property(TARGET ${PROGNAME} PROPERTY C_STANDARD 11)
 set_property(TARGET ${PROGNAME} PROPERTY CXX_STANDARD 11)
-target_compile_definitions(${PROGNAME} PUBLIC MAMEVERSION=106 ZIP_CACHE=1 GIT_BRANCH="${GIT_BRANCH}" )
+target_compile_definitions(${PROGNAME} PUBLIC MAMEVERSION=106 ZIP_CACHE=1 MUISERIALIZER_USES_FLOAT=1 GIT_BRANCH="${GIT_BRANCH}" )
 if(MAME_USE_HARDFLOAT)
 	target_compile_definitions(${PROGNAME} PRIVATE MAME_USE_HARD_FLOAT=1 )
 endif()

@@ -221,13 +221,15 @@ void MameConfig::serialize(ASerializer &serializer)
     serializer("Display",   (ASerializable&)_display,0);
     serializer("Audio",     (ASerializable&)_audio,0);
     serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS);
-    serializer("Paths",     (ASerializable&)_paths,0);
+    serializer("Misc",     (ASerializable&)_misc,0);
     serializer("Help",     (ASerializable&)_help,0);
 }
 void MameConfig::toDefault()
 {
     _display._drawEngine = DrawEngine::CgxDirectCpuOrWPA8;
     _display._perScreenMode.clear();
+    _display._color_brightness = 1.0f;
+    _display._color_gamma = 1.0f;
 
     _audio._mode = AudioMode::AHI;
     _audio._freq = 22050;
@@ -239,8 +241,10 @@ void MameConfig::toDefault()
     _controls._PlayerPort[2]=ControlPort::None; _controls._PlayerPortType[2]=0;
     _controls._PlayerPort[3]=ControlPort::None; _controls._PlayerPortType[3]=0;
 
-    _paths._romsPath = "PROGDIR:roms";
-    _paths._userPath = "PROGDIR:user";
+    _misc._romsPath = "PROGDIR:roms";
+    _misc._userPath = "PROGDIR:user";
+    _misc._useCheatCodeFile = false;
+    _misc._cheatFilePath = "PROGDIR:cheat.dat";
 
 }
 
@@ -275,6 +279,11 @@ void MameConfig::Display::serialize(ASerializer &serializer)
 {
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU Or WPA8","( More To Come )"});
     serializer("On Workbench",_startOnWorkbench);
+                                            // min,max,step, default
+    serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
+                                         // min,max,step, default
+    serializer("Gamma",_color_gamma,0.125f,1.0f,0.0625f,1.0f);
+
     serializer("Per Screen Mode",_perScreenModeS);
 
 }
@@ -333,9 +342,12 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
 //    serializer((const char *)NULL,c);
 
 }
-void MameConfig::Paths::serialize(ASerializer &serializer)
+void MameConfig::Misc::serialize(ASerializer &serializer)
 {
-    serializer("Roms",_romsPath,SERFLAG_STRING_ISPATH);
+    serializer("Roms",_romsPath,SERFLAG_STRING_ISPATH);    
+    serializer("Use Cheat Code File",_useCheatCodeFile);
+    serializer("Cheat Code File",_cheatFilePath,SERFLAG_STRING_ISPATH);
+
 }
 
 
@@ -347,12 +359,12 @@ void MameConfig::Help::serialize(ASerializer &serializer)
 _[0] ="       Ingame Keys\n";
     serializer(" ",_[0]);
 _[1] ="Player Start 1/2/3/4";
-    serializer("1-4 : ",_[1]);
+    serializer("1-4 (upper row): ",_[1]);
 _[2] ="Player Coins 1/2/3/4";
-    serializer("5-8 : ",_[2]);
+    serializer("5-8 (upper row): ",_[2]);
 _[3] ="Pause";
     serializer("P : ",_[3]);
-_[4] ="Show / Hide Settings";
+_[4] ="Show / Hide Mame Settings";
     serializer("Tab : ",_[4]);
 _[5] ="Switch Window / Fullscreen";
     serializer("F10 : ",_[5]);
@@ -469,14 +481,14 @@ int MameConfig::scanDrivers()
 {
 //  printf(" *** ScanDrivers: _romsDir:%s\n", _paths._romsPath.c_str());
   _romsFound.clear();
-  if(_paths._romsPath.empty()) return 0;
+  if(_misc._romsPath.empty()) return 0;
 //  printf(" *** ScanDrivers 1\n");
 
     struct FileInfoBlock *fib;
     fib = (struct FileInfoBlock *)AllocDosObject(DOS_FIB, NULL);
     if(!fib) return 0;
 
-    BPTR lock = Lock( _paths._romsPath.c_str(), ACCESS_READ);
+    BPTR lock = Lock( _misc._romsPath.c_str(), ACCESS_READ);
     if(lock)
     {
         scanDriversRecurse(lock,fib);
@@ -582,19 +594,28 @@ void MameConfig::buildAllRomsVector(std::vector<const _game_driver *const*> &v)
     }
     sortDrivers(v);
 }
-
+// from cheat.c
+extern "C" {
+    extern const char	* cheatfile;
+}
 // apply to mame options
 void MameConfig::applyToMameOptions(_global_options &mameOptions)
 {
     memset(&mameOptions, 0,sizeof(_global_options));
 
-
-       options.cheat=1;
+    options.cheat = (int)( _misc._useCheatCodeFile && _misc._cheatFilePath.length()>0 );
+    if(options.cheat)
+    {
+        cheatfile = _misc._cheatFilePath.c_str();
+    } else
+    {
+       cheatfile = NULL;
+    }
     options.gui_host=1;
 
-    options.pause_bright = 0.5f;
-    options.brightness = 1.0f;
-    options.gamma=0.5f;
+    options.pause_bright = _display._color_brightness * 0.5f;
+    options.brightness =   _display._color_brightness;
+    options.gamma= _display._color_gamma;
 
     options.samplerate=(_audio._mode == AudioMode::None)?0:_audio._freq;
     //options.samplerate = 0;

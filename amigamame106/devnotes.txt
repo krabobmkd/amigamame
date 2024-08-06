@@ -1,8 +1,10 @@
 
- Done form Beta 1 to Beta 2:
+ Done from Beta 1 to Beta 2:
+  - Default color Gamma is now 1.0 and not 0.5, .. i've been told it was too dark,
+    + gamma and brightness available in configuration
+  - Cheat mode file explicit in configuration.
   - Operation thunderbolt and games with flags ORIENTATION_FLIP_X or ORIENTATION_FLIP_Y
-		are now displayed the right way.
-
+		are now displayed the right way (hopefully, no flipY games works).
 
 
  For beta 2 in term of priorities :
@@ -17,21 +19,22 @@
   Games not working when should:
   - O neogeo ? -> investigate init error
   - O arkanoid 1 -> investigate init error
-  - O all rtypes ? -> wrong roms ?
+  - O all rtypes ? -> am I using wrong roms ?
 
  - - - - -
  - O ui: want number of players per games so much.
  - O frameskip -> simple
- - O do save screenshot
+ - O do save screenshot -> who care ?
 
  - O remove S-TV , too much non working drivers.
  - O mui list avoir année et entreprise en colonne
  - O mui list: have a column for nb players -> where to get that ?
  - O allow sorting by columns
  - O finish drawing leds, test with a driver that lag while booting if it helps
+ - O a rom load progress bar somewhere.
 
  -  command line
-	- O liste roms
+    - O have most of the regular mame command options to list available roms.
 	- X lancer rom direct avec ligne commande ou tooltip.
 
  - O test memory leaks and hits with muGuardianAngel & else -> muGuardianAngel with UAE & OS3.2 does nothing ????

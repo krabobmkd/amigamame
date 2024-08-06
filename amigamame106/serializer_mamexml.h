@@ -19,6 +19,8 @@ struct XmlWriter : public ASerializer {
     void operator()(const char *sMemberName, bool &v) override;
     void operator()(const char *sMemberName, ULONG_SCREENMODEID &v) override;
     void operator()(const char *sMemberName, AStringMap &m) override;
+    void operator()(const char *sMemberName, float &v, float min, float max,float step,float defval) override;
+
 
     std::vector<xml_data_node *> _recursenode;
     int                     _error;
@@ -34,6 +36,7 @@ struct XmlReader : public ASerializer {
     void operator()(const char *sMemberName, bool &v) override;
     void operator()(const char *sMemberName, ULONG_SCREENMODEID &v) override;
     void operator()(const char *sMemberName, AStringMap &m) override;
+    void operator()(const char *sMemberName, float &v, float min, float max,float step,float defval) override;
 
     std::vector<xml_data_node *> _recursenode;
     int                     _error;

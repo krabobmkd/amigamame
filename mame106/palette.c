@@ -145,9 +145,9 @@ int palette_start(void)
 
 	shadow_factor = (int)(PALETTE_DEFAULT_SHADOW_FACTOR * (double)(1 << PEN_BRIGHTNESS_BITS));
 	highlight_factor = (int)(PALETTE_DEFAULT_HIGHLIGHT_FACTOR * (double)(1 << PEN_BRIGHTNESS_BITS));
-	global_brightness = (options.brightness > .001) ? options.brightness : 1.0;
-	global_brightness_adjust = 1.0;
-	global_gamma = (options.gamma > .001) ? options.gamma : 1.0;
+	global_brightness = (options.brightness > .001f) ? options.brightness : 1.0f;
+	global_brightness_adjust = 1.0f;
+	global_gamma = (options.gamma > .001f) ? options.gamma : 1.0f;
 
 	/* determine the color mode */
 	if (Machine->color_depth == 15)
