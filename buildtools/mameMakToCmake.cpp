@@ -23,14 +23,19 @@ class TGameDriver {
      string _company;
      string _fullname;
      string _flags;
+    // these ones are parsed from MDRV_ macros and should be quite exact.
+    map<string,int>  _sound_defs;
+    map<string,int>  _cpu_defs;
 };
 
-
+// actully more "per constructor" list of many machines.
 class TMachine {
     public:
     string          _name;
     vector<string>  _sources;
     map<string,TGameDriver>  _gamedrivers;
+    map<string,TGameDriver>  _machinedrivers; // some machines are not gamedrivers.
+    // these ones are by
     map<string,int>  _sound_defs;
     map<string,int>  _cpu_defs;
 };
@@ -122,6 +127,26 @@ string rgetline(istream &ifs)
     return s;
 }
 
+string getMacroFirstParam(string line,string macroname)
+{
+    size_t i =line.find(macroname);
+    if(i == string::npos) return string();
+
+    size_t ifp = line.find_first_not_of(" \t(",i+macroname.length());
+    if(ifp == string::npos) return string();
+
+    size_t ifpe = line.find_first_of(" ,\t)",ifp);
+    if(ifpe == string::npos) return string();
+
+    return line.substr(ifp,ifpe-ifp);
+
+}
+
+// just for information
+map<string,int> _cpustats;
+map<string,int> _soundchipstats;
+map<string,vector<string>> _cpu_use;
+map<string,vector<string>> _soundchip_use;
 
 int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
 {
@@ -130,6 +155,7 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
 
     for(const string &s : machine._sources)
     {
+        // these are heavy non working beta codes in v0.106, do not implement.
         if(s == "drivers/model2.c" ||
             s =="drivers/model3.c")
             {
@@ -142,12 +168,48 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
             cout << "didn't find source: " << sourcepath << endl;
             continue;
         }
+        std::string currentMachineDefInStream;
+
         while(!ifssrc.eof())
         {
             string line = rgetline(ifssrc);
             trim(line);
-            size_t isComment = line.find("//");
+            size_t isComment = line.find("//");            
             if(isComment == 0) continue; // quick escape
+
+            // simply parse official mame macros to know machine dfinition
+            // MACHINE_DRIVER_START( drvname )
+            //  MDRV_CPU_ADD(Z80,
+            // MDRV_SOUND_ADD(
+            // MACHINE_DRIVER_END
+            string machineStart = getMacroFirstParam(line,"MACHINE_DRIVER_START");
+            if(!machineStart.empty()) currentMachineDefInStream = machineStart;
+            if(line.find("MACHINE_DRIVER_END")!= string::npos) currentMachineDefInStream.clear();
+            if(!currentMachineDefInStream.empty())
+            {
+                string addcpu = getMacroFirstParam(line,"MDRV_CPU_ADD(");
+                if(!addcpu.empty()) {
+                    toUpper(addcpu);
+                    // note: may be not a game:
+                  machine._machinedrivers[currentMachineDefInStream]._cpu_defs[addcpu] = 1;
+                     // but a dependency for sure:
+                     machine._cpu_defs[addcpu] = 1;
+                     _cpustats[addcpu]++;
+                     _cpu_use[addcpu].push_back(currentMachineDefInStream);
+                }
+                string addsound = getMacroFirstParam(line,"MDRV_SOUND_ADD(");
+                if(!addsound.empty()) {
+                    toUpper(addsound);
+                     // note: may be not a game:
+                     machine._machinedrivers[currentMachineDefInStream]._sound_defs[addsound] = 1;
+                     // but a dependency for sure:
+                     machine._sound_defs[addsound] = 1;
+                     _soundchipstats[addsound]++;
+                     _soundchip_use[addsound].push_back(currentMachineDefInStream);
+                }
+            }
+
+            // ----------------- old parsing always OK
             size_t isgamedriverline =line.find("GAME(");
             size_t isgamedriverlineb =line.find("GAMEB(");
             size_t is_soundinclude =line.find("\"sound/");
@@ -228,7 +290,7 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
                     {
                         if(sounditem == soundh) {isInDefs = true; break;}
                     }
-                    cout << "got sound:"<<soundh << " isin: "<< (isInDefs?"OK":"--")<< endl;
+                  //  cout << "got sound:"<<soundh << " isin: "<< (isInDefs?"OK":"--")<< endl;
                     if(isInDefs) {
                         machine._sound_defs[soundh]=1;
                     } else {
@@ -249,7 +311,7 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
                     {
                         if(cpuitem == cpuh) {isInDefs = true; break;}
                     }
-                    cout << "got cpu:"<<cpuh << " isin: "<< (isInDefs?"OK":"--")<< endl;
+                 //   cout << "got cpu:"<<cpuh << " isin: "<< (isInDefs?"OK":"--")<< endl;
                     if(isInDefs) {
                         machine._cpu_defs[cpuh]=1;
                     }
@@ -1288,12 +1350,12 @@ void completeDefinitionsByHand(
     // - - - - - - end technos
 
     // thekan/tecmo (silkworm,...)
-    machinetargets["tehkan"]._sound_defs["YM2608"]=1;
+//    machinetargets["tehkan"]._sound_defs["YM2608"]=1;
 
     // irem
-    machinetargets["irem"]._cpu_defs["M6803"]=1;
-    machinetargets["irem"]._cpu_defs["V30"]=1;
-    machinetargets["irem"]._cpu_defs["V33"]=1;
+//    machinetargets["irem"]._cpu_defs["M6803"]=1;
+//    machinetargets["irem"]._cpu_defs["V30"]=1;
+//    machinetargets["irem"]._cpu_defs["V33"]=1;
     // try patch just a package
     /*todo, good idea
     {
@@ -1330,6 +1392,16 @@ int main(int argc, char **argv)
     createCmake(machinetargets,soundsources,cpusources);
 
     createMameDrivc(machinetargets);
+
+//    {
+//        for(const auto &p : _soundchipstats)
+//        cout << "soundchip: "<<p.first <<"\t nb: "<< p.second<< endl;
+
+//        for(const auto &p : _cpustats)
+//        cout << "cpu: "<<p.first <<"\t nb: "<< p.second<< endl;
+
+//    }
+
 
     cout << "\nEverything went extremely well, gamedrivers.cmake and mamedriv.c generated, may copy it into mame106/ :).\n" << endl;
 
