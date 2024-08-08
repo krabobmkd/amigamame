@@ -1221,12 +1221,18 @@ void completeDefinitionsByHand(
     // taito
     machinetargets["taito"]._cpu_defs["M6802"]=1;
     machinetargets["taito"]._sound_defs["YM2610B"]=1;
-    machinetargets["taito"]._sound_defs["YM3526"]=1;
+    machinetargets["taito"]._sound_defs["YM3526"]=1; // bubblbobbl
+   machinetargets["taito"]._cpu_defs["M68705"]=1; // arkanoid need this controller
 
     //
     machinetargets["taito"]._sources.push_back("drivers/seta.c"); // needed by taito_x.c
     machinetargets["taito"]._sources.push_back("vidhrdw/seta.c");
     machinetargets["taito"]._sound_defs["YM3438"]=1;
+
+    // the special ddragon cpu
+    machinetargets["technos"]._cpu_defs["HD6309"]=1;
+
+
     //
     // wiz is actually in "seibu", rollrace picks in it.
    // machinetargets["taito"]._sources.push_back("vidhrdw/wiz.c");
@@ -1286,7 +1292,8 @@ void completeDefinitionsByHand(
 
     // irem
     machinetargets["irem"]._cpu_defs["M6803"]=1;
-
+    machinetargets["irem"]._cpu_defs["V30"]=1;
+    machinetargets["irem"]._cpu_defs["V33"]=1;
     // try patch just a package
     /*todo, good idea
     {

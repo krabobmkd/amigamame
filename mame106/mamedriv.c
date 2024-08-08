@@ -3725,7 +3725,6 @@ const game_driver * const drivers[] =
 	DRIVER( aof2a ) /* 1994 "SNK" "Art of Fighting 2 / Ryuuko no Ken 2 (set 2)" */
 	DRIVER( aof3 ) /* 1996 "SNK" "Art of Fighting 3 - The Path of the Warrior / Art of Fighting - Ryuuko no Ken Gaiden" */
 	DRIVER( aof3k ) /* 1996 "SNK" "Art of Fighting 3 - The Path of the Warrior (Korean release)" */
-	DRIVER( b2b ) /* 1994 "Visco" "Bang Bang Busters (2010 NCI release)" */
 	DRIVER( bakatono ) /* 1991 "Monolith Corp." "Bakatonosama Mahjong Manyuki" */
 	DRIVER( bangbead ) /* 2000 "Visco" "Bang Bead" */
 	DRIVER( bjourney ) /* 1990 "Alpha Denshi Co." "Blue's Journey / Raguy" */
@@ -3763,7 +3762,6 @@ const game_driver * const drivers[] =
 	DRIVER( gowcaizr ) /* 1995 "Technos" "Voltage Fighter - Gowcaizer / Choujin Gakuen Gowcaizer" */
 	DRIVER( gpilots ) /* 1991 "SNK" "Ghost Pilots" */
 	DRIVER( gururin ) /* 1994 "Face" "Gururin" */
-	DRIVER( ironclad ) /* 1996 "Saurus" "Choutetsu Brikin'ger - Ironclad (Prototype)" */
 	DRIVER( irrmaze ) /* 1997 "SNK / Saurus" "The Irritating Maze / Ultra Denryu Iraira Bou" */
 	DRIVER( janshin ) /* 1994 "Aicom" "Jyanshin Densetsu - Quest of Jongmaster" */
 	DRIVER( jockeygp ) /* 2001 "Sun Amusement / BrezzaSoft" "Jockey Grand Prix" */
@@ -5507,6 +5505,7 @@ const game_driver * const drivers[] =
 	DRIVER( arkbl3 ) /* 1986 "bootleg" "Arkanoid (Japanese bootleg Set 3)" */
 	DRIVER( arkbloc2 ) /* 1986 "bootleg" "Block (Game Corporation bootleg)" */
 	DRIVER( arkblock ) /* 1986 "bootleg" "Block (bootleg */
+	DRIVER( arkcrsn5 ) /* 2023 "Abyss leader of the 80's" "Cruisin'5 Demo By Abyss (2023 */
 	DRIVER( arknid2j ) /* 1987 "Taito Corporation" "Arkanoid - Revenge of DOH (Japan)" */
 	DRIVER( arknid2u ) /* 1987 "Taito America Corporation (Romstar license)" "Arkanoid - Revenge of DOH (US)" */
 	DRIVER( arknoid2 ) /* 1987 "Taito Corporation Japan" "Arkanoid - Revenge of DOH (World)" */
