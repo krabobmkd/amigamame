@@ -135,8 +135,11 @@ public:
     {
         Display();
         void serialize(ASerializer &serializer) override;
-        DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;
-        bool    _startOnWorkbench = false;
+        DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;        
+#define CONFDISPLAYFLAGS_ONWORKBENCH 1
+#define CONFDISPLAYFLAGS_FRAMESKIP 2
+        ULONG_FLAGS _flags = 0;
+        //bool    _startOnWorkbench = false;
         Display_PerScreenMode &getActiveMode();
      protected:
         std::map<std::string,Display_PerScreenMode> _perScreenMode;

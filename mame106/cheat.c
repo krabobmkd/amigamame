@@ -399,6 +399,8 @@ is selected
 #include "artwork.h"
 #include "machine/eeprom.h"
 #include <ctype.h>
+#include "osdepend.h"
+#include <stdio.h>
 
 #ifdef MESS
 #include "cheatms.h"
@@ -8501,7 +8503,9 @@ static void LoadCheatFile(char * fileName)
 	char		buf[2048];
 	int			recordNames = 0;
 
-	theFile = mame_fopen(NULL, fileName, FILETYPE_CHEAT, 0);
+    printf("try: mame_fopen %s\n",fileName);
+
+	 theFile = mame_fopen(NULL, fileName, FILETYPE_CHEAT, 0);
 
 	if(!theFile)
 		return;

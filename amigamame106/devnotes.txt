@@ -1,5 +1,9 @@
 
  Done from Beta 1 to Beta 2:
+  - Corrected a bug on joystick config SetJoyPortAttrs(): missing the final TAG_DONE.
+     What a silly mistake: It is not tagged "Beta" for nothing.
+	 This actually was prone to freeze game initialisation. -> CORRECTED
+
   - Default color Gamma is now 1.0 and not 0.5, .. i've been told it was too dark,
     + gamma and brightness available in configuration
   - Cheat mode file explicit in configuration.

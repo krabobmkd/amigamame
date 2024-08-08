@@ -18,6 +18,8 @@ struct XmlWriter : public ASerializer {
     void operator()(const char *sMemberName, int &v,const std::vector<std::string> &values) override;
     void operator()(const char *sMemberName, bool &v) override;
     void operator()(const char *sMemberName, ULONG_SCREENMODEID &v) override;
+    void operator()(const char *sMemberName, ULONG_FLAGS &v,ULONG_FLAGS valdef,const std::vector<std::string> &values)override;
+
     void operator()(const char *sMemberName, AStringMap &m) override;
     void operator()(const char *sMemberName, float &v, float min, float max,float step,float defval) override;
 
@@ -35,6 +37,8 @@ struct XmlReader : public ASerializer {
     void operator()(const char *sMemberName, int &v,const std::vector<std::string> &values) override;
     void operator()(const char *sMemberName, bool &v) override;
     void operator()(const char *sMemberName, ULONG_SCREENMODEID &v) override;
+    void operator()(const char *sMemberName, ULONG_FLAGS &v,ULONG_FLAGS valdef,const std::vector<std::string> &values)override;
+
     void operator()(const char *sMemberName, AStringMap &m) override;
     void operator()(const char *sMemberName, float &v, float min, float max,float step,float defval) override;
 

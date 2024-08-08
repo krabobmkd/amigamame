@@ -145,7 +145,7 @@ void ConfigureLowLevelLib()
 
             } else
             {
-                SetJoyPortAttrs(iport,SJA_Type,lowlevelState);
+                SetJoyPortAttrs(iport,SJA_Type,lowlevelState,TAG_DONE);
             }
         }
         if(controlPort == cp::Para3 ||
@@ -210,7 +210,7 @@ void FreeInputs()
 {
     if(LowLevelBase)
     {   // back to mouse ?
-        SetJoyPortAttrs(0,SJA_Type,SJA_TYPE_MOUSE);
+        SetJoyPortAttrs(0,SJA_Type,SJA_TYPE_MOUSE,TAG_DONE);
     }
 
     if(g_pParallelPads)

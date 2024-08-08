@@ -169,7 +169,7 @@ static ULONG shiftRotationBits(ULONG orientation, int rotationShift)
 }
 
 int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components)
-{      
+{
     if(g_pMameDisplay) osd_close_display();
     if(!pparams || !Machine || !Machine->gamedrv) return 1; // fail
 
@@ -208,7 +208,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         // this will decide video implemntation against available hardware and config.
         g_pMameDisplay = new IntuitionDisplay();
 
-        if(config._startOnWorkbench) params._flags |= DISPFLAG_STARTWITHWINDOW;
+        if(config._flags & CONFDISPLAYFLAGS_ONWORKBENCH ) params._flags |= DISPFLAG_STARTWITHWINDOW;
         if(config._drawEngine == MameConfig::DrawEngine::CgxScalePixelArray)
                 params._flags |= DISPFLAG_USESCALEPIXARRAY;
 
@@ -349,7 +349,9 @@ void osd_update_video_and_audio(struct _mame_display *display)
 */
 int osd_skip_this_frame(void)
 {
-    return 0 ; //FrameCounterUpdate & 1;
+    MameConfig::Display &config = getMainConfig().display();
+    if(config._flags & CONFDISPLAYFLAGS_FRAMESKIP) return FrameCounterUpdate & 1;
+    return 0 ;
 }
 
 /*

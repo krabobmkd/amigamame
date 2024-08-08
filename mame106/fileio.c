@@ -17,6 +17,8 @@
 #include "hash.h"
 #include "unzip.h"
 
+#include <stdio.h>
+
 #ifdef MESS
 #include "image.h"
 #endif
@@ -1038,13 +1040,26 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 	/* loop over paths */
 	for (pathindex = pathstart; pathindex != pathstop; pathindex += pathinc)
 	{
-		char name[1024];
+		char name[2048];
 
 		/* ----------------- STEP 1: OPEN THE FILE RAW -------------------- */
 
 		/* first look for path/gamename as a directory */
 		compose_path(name, sizeof(name), gamename, NULL, NULL);
-		VPRINTF(("Trying %s\n", name));
+
+        if(pathtype == FILETYPE_CHEAT)
+        {   // open it straight
+            printf("load cheat straight:%s\n",filename);
+            file.type = PLAIN_FILE;
+            file.file = osd_fopen(pathtype, 0, filename,"r", error);
+            if (file.file != NULL)
+                break;
+            if (*error != FILEERR_NOT_FOUND)
+            {
+                pathindex = pathstop;	/* acknowledges the error */
+                break;
+            }
+        }
 
 #ifdef MESS
 		if (is_absolute_path)
@@ -1052,12 +1067,11 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 			*name = 0;
 		}
 #endif
-// VF: no need
-//		if (flags & FILEFLAG_CREATE_GAMEDIR)
-//		{
-//			if (osd_get_path_info(pathtype, pathindex, name) == PATH_NOT_FOUND)
-//				osd_create_directory(pathtype, pathindex, name);
-//		}
+		if (flags & FILEFLAG_CREATE_GAMEDIR)
+		{
+			if (osd_get_path_info(pathtype, pathindex, name) == PATH_NOT_FOUND)
+				osd_create_directory(pathtype, pathindex, name);
+		}
 
 		/* if the directory exists, proceed */
 		if (*name == 0 || osd_get_path_info(pathtype, pathindex, name) == PATH_IS_DIRECTORY)

@@ -874,11 +874,12 @@ void CLIB_DECL fatalerror(const char *text, ...)
 void CLIB_DECL logerror(const char *text, ...)
 {
 //    // VF, add error on output
+//    printf("\r"); // rewrite line
 //    va_list arg;
 //	va_start(arg, text);
 //    vprintf(text, arg);
 //    va_end(arg);
-
+//    printf("                       ");
 	callback_item *cb;
 
 	/* process only if there is a target */

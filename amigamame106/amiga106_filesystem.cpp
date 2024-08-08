@@ -223,7 +223,7 @@ osd_file *osd_fopen(int pathtype, int pathindex, const char *filename, const cha
     string spath;
     composeFilePath(pathtype,pathindex,filename,spath);
 
-// printf("osd_fopen: mode:%s file:%s\n",mode,spath.c_str());
+ printf("osd_fopen:%d mode:%s file:%s\n",pathtype,mode,spath.c_str());
 
     _osd_file *posd = new _osd_file();
     if(!posd) return NULL;
@@ -309,10 +309,11 @@ int osd_get_path_info(int pathtype, int pathindex, const char *filename)
 }
 
 /* Create a directory if it doesn't already exist */
-// VF: no need actually.
-//int osd_create_directory(int pathtype, int pathindex, const char *dirname)
-//{
-//    int
-//    return 0;
-//}
+int osd_create_directory(int pathtype, int pathindex, const char *dirname)
+{
+    string spath;
+    composeFilePath(pathtype,pathindex,dirname,spath);
+    assumeDirectory(spath.c_str());
+    return 0;
+}
 

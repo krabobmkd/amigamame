@@ -95,6 +95,18 @@ void XmlWriter::operator()(const char *sMemberName, bool &v)
         xml_add_child(_recursenode.back(),name.c_str(),NULL );
     }
 }
+void XmlWriter::operator()(const char *sMemberName, ULONG_FLAGS &v,ULONG_FLAGS valdef,const std::vector<std::string> &values)
+{
+    UINT32 ib=1;
+    for(int i=0;i<values.size() ;i++)
+    {
+        string name = checkXmlName(values[i].c_str());
+        if(ib & v) xml_add_child(_recursenode.back(),name.c_str(),NULL );
+        ib<<=1;
+    }
+}
+
+
 void XmlWriter::operator()(const char *sMemberName, ULONG_SCREENMODEID &v)
 {
     string name = checkXmlName(sMemberName);
@@ -212,6 +224,22 @@ void XmlReader::operator()(const char *sMemberName, ULONG_SCREENMODEID &v)
             if(done ==1) v=vv;
         }
     }
+}
+void XmlReader::operator()(const char *sMemberName, ULONG_FLAGS &v,ULONG_FLAGS valdef,const std::vector<std::string> &values)
+{
+    UINT32 ib=1;
+    ULONG_FLAGS fv=0;
+    for(int i=0;i<values.size() ;i++)
+    {
+        string name = checkXmlName(values[i].c_str());
+        xml_data_node *p = xml_get_sibling(_recursenode.back()->child, name.c_str());
+        if(p)
+        {   // means on
+            fv |=ib;
+        }
+        ib<<=1;
+    }
+    v = fv;
 }
 
 // per optional subconf
