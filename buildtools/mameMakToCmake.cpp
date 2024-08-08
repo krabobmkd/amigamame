@@ -141,6 +141,27 @@ string getMacroFirstParam(string line,string macroname)
     return line.substr(ifp,ifpe-ifp);
 
 }
+string getMacroSecondParam(string line,string macroname)
+{
+    size_t i =line.find(macroname);
+    if(i == string::npos) return string();
+
+    size_t ifp = line.find_first_not_of(" \t(",i+macroname.length());
+    if(ifp == string::npos) return string();
+
+    size_t ifp2 = line.find_first_of(",",ifp);
+    if(ifp2 == string::npos) return string();
+
+    size_t ifp3 = line.find_first_not_of(" \t",ifp2+1);
+    if(ifp3 == string::npos) return string();
+
+    size_t ifpe = line.find_first_of(" ,\t)",ifp3);
+    if(ifpe == string::npos) return string();
+
+    return line.substr(ifp3,ifpe-ifp3);
+
+}
+
 
 // just for information
 map<string,int> _cpustats;
@@ -188,6 +209,18 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
             if(!currentMachineDefInStream.empty())
             {
                 string addcpu = getMacroFirstParam(line,"MDRV_CPU_ADD(");
+                if(!addcpu.empty()) {
+                    toUpper(addcpu);
+                    // note: may be not a game:
+                  machine._machinedrivers[currentMachineDefInStream]._cpu_defs[addcpu] = 1;
+                     // but a dependency for sure:
+                     machine._cpu_defs[addcpu] = 1;
+                     _cpustats[addcpu]++;
+                     _cpu_use[addcpu].push_back(currentMachineDefInStream);
+                }
+                // this also
+                //
+                addcpu = getMacroSecondParam(line,"MDRV_CPU_ADD_TAG(");
                 if(!addcpu.empty()) {
                     toUpper(addcpu);
                     // note: may be not a game:
