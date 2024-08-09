@@ -10,6 +10,8 @@
   - Operation thunderbolt and games with flags ORIENTATION_FLIP_X or ORIENTATION_FLIP_Y
 		are now displayed the right way (hopefully, no flipY games works).
 
+  - X Implement CGX/ScalePixelArray() for drawing
+
 
  For beta 2 in term of priorities :
 
@@ -21,13 +23,13 @@
   - O try to optimise sound chips with ridiculously high timing & cpu use (YM2151 ?)
 
   Games not working when should:
-  - O neogeo ? -> investigate init error
-  - O arkanoid 1 -> investigate init error
-  - O all rtypes ? -> am I using wrong roms ?
+  - X neogeo ? -> investigate init error   -> OK
+  - X arkanoid 1 -> investigate init error  ->OK
+  - X all rtypes ? -> am I using wrong roms ? ->OK
 
  - - - - -
  - O ui: want number of players per games so much.
- - O frameskip -> simple
+ - O frameskip -> simple ->No
  - O do save screenshot -> who care ?
 
  - O remove S-TV , too much non working drivers.

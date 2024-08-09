@@ -8494,7 +8494,7 @@ static void HandleLocalCommandCheat(UINT32 type, UINT32 address, UINT32 data, UI
 			break;
 	}
 }
-int isOpeningCheat=0;
+
 static void LoadCheatFile(char * fileName)
 {
 	mame_file	* theFile;
@@ -8503,11 +8503,8 @@ static void LoadCheatFile(char * fileName)
 	char		buf[2048];
 	int			recordNames = 0;
 
-    printf("try: mame_fopen %s\n",fileName);
-isOpeningCheat=1;
 	 theFile = mame_fopen(NULL, fileName, FILETYPE_CHEAT, 0);
-isOpeningCheat=0;
-    printf("cheat theFile: %08x\n",theFile);
+
 	if(!theFile)
 		return;
 

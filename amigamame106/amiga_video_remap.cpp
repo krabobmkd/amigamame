@@ -41,7 +41,6 @@ void Paletted_CGX::updatePaletteRemap15b()
 {
     if(!_needFirstRemap) return;  // done once for all.
 
-    printf(" * **** FIRST 15b REMAP **** _bytesPerPix:%d\n",_bytesPerPix);
     const int nbremap = 32768;
     if(_needFirstRemap)
     {
@@ -53,7 +52,6 @@ void Paletted_CGX::updatePaletteRemap15b()
         }
     }
     _needFirstRemap =0;
-    printf(" _clut32 size:%d\n",_clut32.size());
     USHORT *p16a= _clut16.data();
 
     if(_pixFmt == PIXFMT_RGB15)
