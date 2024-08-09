@@ -4,6 +4,6 @@
 
 #include "mame_ver.h"
 
-#define APPNAMEA  "Mame 0.106 MiniMix 2024 Beta1"
+#define APPNAMEA  "Mame 0.106 MiniMix 2024 Beta2"
 
 #endif

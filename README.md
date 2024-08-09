@@ -1,5 +1,7 @@
 # amigamame
 
+ Hello, It's Beta2 now, binaries will be soon on aminet.
+
  This is a Port of Mame106 (2006) to Amiga classic 68060, using bebbo gcc6.5 crosscompiler and cmake.
  would only work on very fast Amigas with more than 64Mo. For the moment it also needs Cybergraphics or Picasso, and >=OS3.1. This is hugely based on Mame060 from triumph for the MUI part. All these are under GPL licences.
  
@@ -48,9 +50,6 @@
  Efforts are focused on translating original makefiles to more configurable cmake files in order to enable or disable drivers at linking , having no bugs or memory leak. Only most popular drivers are there. This project Also focus on having 4 players with lowlevel.library and parallel port pads.
 
  Everything is still slow ,(between 40% and 60% of native speed) on a pistorm 3, only "dino" is likely playable.
- - audio disabled (no use if per are not 100%.)
- - neogeo non working (because i dont know ) 
- - rotations and flip modes unmanaged on this version.
  
  You can switch on and off the linking of drivers with cmake options on top of: mame106\gamedrivers.cmake,
  which makes things very handy. This .cmake is generated with buildtools/mameMakToCmake that allows that. Not all switch are tested and some sub-configurations may have some missing defines. In that case the correction should be made in mameMakToCmake, not the .cmake itself.
