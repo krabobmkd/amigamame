@@ -234,7 +234,7 @@ osd_file *osd_fopen(int pathtype, int pathindex, const char *filename, const cha
     string spath;
     composeFilePath(pathtype,pathindex,filename,spath);
 
- printf("osd_fopen:%d mode:%s file:%s\n",pathtype,mode,spath.c_str());
+// printf("osd_fopen:%d mode:%s file:%s\n",pathtype,mode,spath.c_str());
 
     _osd_file *posd = new _osd_file();
     if(!posd) return NULL;
