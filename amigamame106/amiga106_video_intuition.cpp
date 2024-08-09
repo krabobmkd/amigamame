@@ -448,6 +448,31 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
 
     return true;
 }
+// needed for RGB mode.
+void IntuitionDisplay::init_rgb_components(unsigned int *rgbcomponents)
+{   // we could reach no-clut, full pixel copy with RGB32, butit would empeach screen/window switch in RGB modes :)
+    // because this is inited once at game start, so pixel mode coulen't be changed during play
+    // like with clut modes.
+    // ... yet 16b modes are more cache safe than 32 bits ones.
+    // so for speed sake let's force 16bit fullscreen and map this like clut modes.
+
+//		if (video_depth == 32)
+//		{
+//			rgbcomponents[0] = 0x00ff0000;
+//			rgbcomponents[1] = 0x0000ff00;
+//			rgbcomponents[2] = 0x000000ff;
+//		}
+//		else
+//		{
+
+        // hello, I'm a R5G5B5 pixel mode screen. I swear.
+			rgbcomponents[0] = 0x00007c00;
+			rgbcomponents[1] = 0x000003e0;
+			rgbcomponents[2] = 0x0000001f;
+//		}
+
+
+}
 int IntuitionDisplay::switchFullscreen()
 {
    close();

@@ -105,6 +105,7 @@ public:
     IntuitionDisplay();
     ~IntuitionDisplay();
     bool open(const params &pparams) override;
+    void init_rgb_components(unsigned int *rgbcomponents) override; // needed for RGB mode.
     void close() override;
     int good() override;
     void draw(_mame_display *pmame_display) override;

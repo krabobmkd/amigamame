@@ -15,6 +15,8 @@
 #include "debug/mamedbg.h"
 #endif
 
+#include <stdio.h>
+
 #define VERBOSE 0
 
 
@@ -670,6 +672,9 @@ int palette_init(void)
 {
 	int i;
 
+printf("===========================\n");
+printf("==  palette_init colormode:%d\n",colormode);
+
 	/* recompute the default palette and initalize the color correction table */
 	recompute_adjusted_palette(1);
 
@@ -708,6 +713,8 @@ int palette_init(void)
 		/* 15-bit direct case */
 		case DIRECT_15BIT:
 		{
+printf("remap the game palette into direct RGB pens\n",colormode);
+
 			/* remap the game palette into direct RGB pens */
 			for (i = 0; i < total_colors; i++)
 				Machine->pens[i] = rgb_to_direct15(game_palette[i]);

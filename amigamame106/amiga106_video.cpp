@@ -219,15 +219,16 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         }
     } // end if bitmap
 
-//    if(P96Base)
-//    {
-//        g_pMameDisplay = new Display_P96(params->width, params->height);
-//    }
     if(!g_pMameDisplay || !g_pMameDisplay->good())
     {
         //
         logerror("couldn't find a graphic mode.");
         return 1; // fail.
+    }
+    // for drivers with RGB modes, we have to describe our pixel format
+    if((pparams->video_attributes & VIDEO_RGB_DIRECT) && (rgb_components))
+    {
+        g_pMameDisplay->init_rgb_components(rgb_components);
     }
 
 

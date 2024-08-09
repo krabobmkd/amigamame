@@ -514,8 +514,12 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
      else
         strComment.clear();
 
-     if(video_attribs & VIDEO_RGB_DIRECT) strComment += " RGB";
-     if(video_attribs & VIDEO_NEEDS_6BITS_PER_GUN) strComment += " HighColors";
+     if(video_attribs & VIDEO_RGB_DIRECT)
+     {
+        if(video_attribs & VIDEO_NEEDS_6BITS_PER_GUN)
+            strComment += " RGB32";
+        else  strComment += " RGB15";
+      }
      int orientation = drv->flags & ORIENTATION_MASK;
      if(orientation)
      {

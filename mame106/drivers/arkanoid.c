@@ -668,4 +668,4 @@ GAME( 1986, arkangc,  arkanoid, bootleg,  arknoidj, 0,       ROT90, "bootleg", "
 GAME( 1987, arkatour, arkanoid, arkanoid, arkanoid, 0,       ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE )
 GAME( 19??, tetrsark, 0,        bootleg,  tetrsark, tetrsark,ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
 
-GAME( 2023, arkcrsn5, 0,        arkanoid, arkanoid, 0,       ROT90, "Abyss leader of the 80's", "Cruisin'5 Demo By Abyss (2023,W0rld) oO", GAME_SUPPORTS_SAVE )
+GAME( 2023, arkcrsn5, 0,        arkanoid, arkanoid, 0,       ROT90, "Abyss leader of the 80's", "Cruisin'5 Demo (Arkanoid Hw) By Abyss (2023,W0rld) oO", GAME_SUPPORTS_SAVE )
