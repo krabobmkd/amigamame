@@ -41,10 +41,32 @@ struct directDrawSource {
 
 
 extern "C" {
+// all these use 16b color index or RGB15, used by most games
 void directDrawClutT_UWORD_UWORD(directDrawScreen *screen , directDrawSource *source,LONG x1 ,LONG y1 ,LONG w, LONG h,UWORD *lut);
 void directDrawClutT_ULONG_ULONG(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h,ULONG *lut);
 void directDrawClutT_type24_ULONG(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h,ULONG *lut);
 void directDrawClutT_UBYTE_UBYTE(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h,UBYTE *lut);
 void directDraw_UBYTE_UBYTE(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+
+// added for ARGB32 modes (only games RGB highcolor, not using clut.
+// manage all CGX screen pixel modes
+
+void directDraw_RGB15_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+void directDraw_BGR15_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+void directDraw_RGB15PC_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+void directDraw_BGR15PC_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+
+void directDraw_RGB16_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+void directDraw_BGR16_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+void directDraw_RGB16PC_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+void directDraw_BGR16PC_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+
+void directDraw_type24_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+
+void directDrawARGB32_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+void directDrawBGRA32_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+void directDrawRGBA32_ARGB32(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+
+
 
 }

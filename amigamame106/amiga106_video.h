@@ -38,7 +38,7 @@ public:
     virtual void close()= 0;
     virtual void draw(_mame_display *pmame_display) = 0;
     virtual int good() = 0;
-    virtual int switchFullscreen() = 0;
+    virtual bool switchFullscreen() = 0;
     virtual MsgPort *userPort() = 0;
 //    virtual RastPort *rastPort() = 0;
     virtual void WaitFrame() = 0; // either WaitTTOF or Wait beam
@@ -54,7 +54,7 @@ protected:
 //};
 
 
-void SwitchWindowFullscreen();
+bool SwitchWindowFullscreen();
 void ResetWatchTimer();
 
 #endif

@@ -175,7 +175,7 @@ Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
 
 bool Intuition_Screen::open()
 {
-    if(_pScreenWindow) return true; // already open.
+     if(_pScreenWindow) return true; // already open.
     if(_ScreenModeId == INVALID_ID)
     {
         logerror("Can't find a screen mode ");
@@ -195,7 +195,7 @@ bool Intuition_Screen::open()
 			SA_Type,CUSTOMSCREEN,
 			SA_Colors,(ULONG)&colspec[0],
                         0 );
-
+//    printf("screen:%08x\n",(int)_pScreen);
 	if( _pScreen == NULL ) return false;
 
 	// --------- open intuition fullscreen window for this screen:
@@ -413,71 +413,29 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
         return false;
     }
 
-//    if( (_drawable->flags() & DISPFLAG_INTUITIONPALETTE) && _drawable->screen() )
-//    {
-//        // means 8bit screen with palette manageable with intuition.
-//        _remap = new Paletted_Screen8(_drawable->screen());
-//    } else
-//    {
-//        // if is WB window and WB is <=8bit
-//        bool remapIsWorkbench=false;
-//        if(_params._flags & DISPFLAG_STARTWITHWINDOW  )
-//        {
-//            Screen *pWbScreen;
-//            if ((pWbScreen = LockPubScreen(NULL)) &&
-//                pWbScreen->RastPort.BitMap &&
-//                pWbScreen->RastPort.BitMap->Depth <=8)
-//            {
-//                UnlockPubScreen(NULL,pWbScreen);
-//                _remap = new Paletted_Pens8(pWbScreen);
-//            }
-//        }
-//        if(!_remap)
-//        if((pparams._video_attributes & VIDEO_RGB_DIRECT)==0 &&
-//            pparams._colorsIndexLength>0)
-//        {
-//            _remap = new Paletted_CGX(pparams,_drawable->pixelFmt(),_drawable->pixelBytes());
-//        } else
-//        if((pparams._video_attributes & VIDEO_RGB_DIRECT)!=0 && pparams._driverDepth == 15)
-//        {
-//            Paletted_CGX *p =  new Paletted_CGX(pparams,_drawable->pixelFmt(),_drawable->pixelBytes());
-//            _remap =p;
-//            p->updatePaletteRemap15b(); // once for all.
-//        }
-//    }
-
     return true;
 }
 // needed for RGB mode.
 void IntuitionDisplay::init_rgb_components(unsigned int *rgbcomponents)
-{   // we could reach no-clut, full pixel copy with RGB32, butit would empeach screen/window switch in RGB modes :)
-    // because this is inited once at game start, so pixel mode coulen't be changed during play
-    // like with clut modes.
-    // ... yet 16b modes are more cache safe than 32 bits ones.
-    // so for speed sake let's force 16bit fullscreen and map this like clut modes.
-
-//		if (video_depth == 32)
-//		{
-//			rgbcomponents[0] = 0x00ff0000;
-//			rgbcomponents[1] = 0x0000ff00;
-//			rgbcomponents[2] = 0x000000ff;
-//		}
-//		else
-//		{
-
-        // hello, I'm a R5G5B5 pixel mode screen. I swear.
-			rgbcomponents[0] = 0x00007c00;
-			rgbcomponents[1] = 0x000003e0;
-			rgbcomponents[2] = 0x0000001f;
-//		}
-
-
+{
+    const ULONG fritata = (VIDEO_RGB_DIRECT|VIDEO_NEEDS_6BITS_PER_GUN );
+    if(  (_params._video_attributes & fritata) == fritata)
+    {
+        rgbcomponents[0] = 0x00ff0000;
+        rgbcomponents[1] = 0x0000ff00;
+        rgbcomponents[2] = 0x000000ff;
+    } else
+    {
+        rgbcomponents[0] = 0x00007c00;
+        rgbcomponents[1] = 0x000003e0;
+        rgbcomponents[2] = 0x0000001f;
+    }
 }
-int IntuitionDisplay::switchFullscreen()
+bool IntuitionDisplay::switchFullscreen()
 {
    close();
    _params._flags ^= DISPFLAG_STARTWITHWINDOW; // switch bit.
-   open(_params);
+   return open(_params);
 }
 void IntuitionDisplay::close()
 {

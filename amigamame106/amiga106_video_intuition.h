@@ -16,6 +16,11 @@ struct Screen;
 struct RastPort;
 struct BitMap;
 
+
+// - - - - from driver.h
+#define VIDEO_RGB_DIRECT	 			0x0004
+#define VIDEO_NEEDS_6BITS_PER_GUN		0x0008
+
 // this differenciate Screen and Windows
 class IntuitionDrawable {
 public:
@@ -34,6 +39,7 @@ public:
     void getGeometry(_mame_display *display,int &cenx,int &ceny,int &ww,int &hh, int &sourceWidth,int &sourceHeight);
   //  virtual void drawRastPort_CGX(_mame_display *display,Paletted *pRemap);
   //   void drawRastPortWPA8(_mame_display *display,Paletted *pRemap);
+
 protected:
     int _width,_height;
     int _useScale;
@@ -110,8 +116,9 @@ public:
     int good() override;
     void draw(_mame_display *pmame_display) override;
     MsgPort *userPort() override;
-    int switchFullscreen() override;
+    bool switchFullscreen() override;
     void WaitFrame() override;
+
 protected:
     IntuitionDrawable   *_drawable; // this manages screen or window opening
  //   IntuitionDrawer     *_drawer; // this manages drawing API.

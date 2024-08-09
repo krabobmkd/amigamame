@@ -140,10 +140,15 @@ ULONG GetStartTime=0;
 //ULONG UseBrakes = 0,UseFrameskip=0;
 
 //ledBitmap _ledBitmap(3,4); // nbleds, ledwidth
-void SwitchWindowFullscreen()
+bool SwitchWindowFullscreen()
 {
-    if(!g_pMameDisplay) return;
-    g_pMameDisplay->switchFullscreen();
+    if(!g_pMameDisplay) return false;
+    bool didit = g_pMameDisplay->switchFullscreen();
+    if(!didit)
+    {   // fail, try to get back.
+        didit = g_pMameDisplay->switchFullscreen();
+    }
+    return didit;
 }
 void ResetWatchTimer()
 {
