@@ -349,7 +349,7 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
 {
     serializer("Roms",_romsPath,SERFLAG_STRING_ISPATH);    
     serializer("Use Cheat Code File",_useCheatCodeFile);
-    serializer("Cheat Code File",_cheatFilePath,SERFLAG_STRING_ISPATH);
+    serializer("Cheat Code File",_cheatFilePath,SERFLAG_STRING_ISFILE);
 
 }
 

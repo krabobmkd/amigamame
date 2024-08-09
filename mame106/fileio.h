@@ -16,6 +16,9 @@
 
 #include "mamecore.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* file types */
 enum
@@ -86,5 +89,9 @@ UINT64 mame_ftell(mame_file *file);
 
 int mame_fputs(mame_file *f, const char *s);
 int CLIB_DECL mame_fprintf(mame_file *f, const char *fmt, ...) ATTR_PRINTF(2,3);
+
+#ifdef __cplusplus
+ }
+#endif
 
 #endif	/* __FILEIO_H__ */

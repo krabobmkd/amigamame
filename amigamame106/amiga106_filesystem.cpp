@@ -71,11 +71,16 @@ enum
     AFT_ROM, // ROM and sample
     AFT_SAMPLE,
     AFT_USER, // writable, configs, ...
+    AFT_ABSOLUTE // to search for cheat file
 };
 
 // shortlist this enum:
 int getAmigaFileType(int mameFileType)
 {
+    if(mameFileType == FILETYPE_CHEAT )
+    {
+        return AFT_ABSOLUTE;
+    }
     if(mameFileType == FILETYPE_ROM )
     {
         return AFT_ROM;
@@ -191,6 +196,7 @@ int osd_get_path_count(int pathtype)
 
     switch( getAmigaFileType(pathtype))
     {
+        case AFT_ABSOLUTE: return 1;
         case AFT_ROM: return 1;
         case AFT_USER: return 1;
         default: return 0;
@@ -210,6 +216,11 @@ void composeFilePath(int pathtype, int pathindex, const char *filename, std::str
             p = conf.getUserDir();
             assumeDirectory(p.c_str()); // would makedir if not done.
         } break;
+        case AFT_ABSOLUTE:
+        {
+            p = filename;
+            return;
+        }
         default: p.clear(); break;
     }
     if(p.length()>0 && p.back() != ':' && p.back() != '/') p+= '/';

@@ -27,7 +27,7 @@ set(MAME_CORE_SRC
 # chdman.c is an external tool !
 # romcmp.c  is an external tool !
 
- fileio.c
+ fileio.cpp
  artwork.c
    cpuint.c    inptport.c  palette.c   streams_krb.c   video.c
 	cpuintrf.c  input.c     png.c       tilemap.c

@@ -9,20 +9,26 @@
 
 ***************************************************************************/
 
-#include <zlib.h>
+extern "C" {
 
-#include "osdepend.h"
-#include "driver.h"
-#include "chd.h"
-#include "hash.h"
-#include "unzip.h"
+    #include <zlib.h>
 
-#include <stdio.h>
+    #include "osdepend.h"
+    #include "driver.h"
+    #include "chd.h"
+    #include "hash.h"
+    #include "unzip.h"
 
-#ifdef MESS
-#include "image.h"
-#endif
+    #include <stdio.h>
 
+    #ifdef MESS
+    #include "image.h"
+    #endif
+}
+
+#include <string>
+#include <sstream>
+using namespace std;
 
 /***************************************************************************
     DEBUGGING
@@ -735,7 +741,7 @@ UINT32 mame_fread_swap(mame_file *file, void *buffer, UINT32 length)
 	res = mame_fread(file, buffer, length);
 
 	/* swap the result */
-	buf = buffer;
+	buf = (UINT8 *)buffer;
 	for (i = 0; i < res; i += 2)
 	{
 		temp = buf[i];
@@ -888,6 +894,26 @@ INLINE void compose_path(char *output, size_t outputlen, const char *gamename, c
 }
 
 
+
+INLINE void compose_pathStr(std::string &str, const char *gamename, const char *filename, const char *extension)
+{
+    stringstream ss;
+    if(gamename) ss<< gamename;
+    if(gamename && filename) {
+        ss<< "/";
+    }
+    if(filename) ss << filename;
+
+	/* if there's no extension in the filename, add the extension */
+	if (extension && str.rfind(".")==string::npos)
+	{
+    	ss <<"." << extension;
+	}
+	str = ss.str();
+}
+
+
+
 /*-------------------------------------------------
     get_extension_for_filetype - return extension
     for a given file type
@@ -991,7 +1017,6 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 	int pathcount = osd_get_path_count(pathtype);
 	int pathindex, pathstart, pathstop, pathinc;
 	mame_file file, *newfile;
-	char tempname[256];
 	osd_file_error dummy;
 
 #ifdef MESS
@@ -1012,7 +1037,7 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 		error = &dummy;
 	*error = FILEERR_SUCCESS;
 
-	VPRINTF(("generic_fopen(%d, %s, %s, %s, %X)\n", pathcount, gamename, filename, extension, flags));
+	//printf("generic_fopen(%d, %s, %s, %s, %X)\n", pathcount, gamename, filename, extension, flags);
 
 	/* reset the file handle */
 	memset(&file, 0, sizeof(file));
@@ -1040,49 +1065,36 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 	/* loop over paths */
 	for (pathindex = pathstart; pathindex != pathstop; pathindex += pathinc)
 	{
-		char name[2048];
+		std::string strname;
+
 
 		/* ----------------- STEP 1: OPEN THE FILE RAW -------------------- */
 
 		/* first look for path/gamename as a directory */
-		compose_path(name, sizeof(name), gamename, NULL, NULL);
-
-        if(pathtype == FILETYPE_CHEAT)
-        {   // open it straight
-            printf("load cheat straight:%s\n",filename);
-            file.type = PLAIN_FILE;
-            file.file = osd_fopen(pathtype, 0, filename,"r", error);
-            if (file.file != NULL)
-                break;
-            if (*error != FILEERR_NOT_FOUND)
-            {
-                pathindex = pathstop;	/* acknowledges the error */
-                break;
-            }
-        }
+		compose_pathStr(strname, gamename, NULL, NULL);
 
 #ifdef MESS
 		if (is_absolute_path)
 		{
-			*name = 0;
+			strname.clear() = 0;
 		}
 #endif
 		if (flags & FILEFLAG_CREATE_GAMEDIR)
 		{
-			if (osd_get_path_info(pathtype, pathindex, name) == PATH_NOT_FOUND)
-				osd_create_directory(pathtype, pathindex, name);
+			if (osd_get_path_info(pathtype, pathindex, strname.c_str()) == PATH_NOT_FOUND)
+				osd_create_directory(pathtype, pathindex,  strname.c_str());
 		}
 
 		/* if the directory exists, proceed */
-		if (*name == 0 || osd_get_path_info(pathtype, pathindex, name) == PATH_IS_DIRECTORY)
+		if (strname.length() == 0 || osd_get_path_info(pathtype, pathindex, strname.c_str()) == PATH_IS_DIRECTORY)
 		{
 			/* now look for path/gamename/filename.ext */
-			compose_path(name, sizeof(name), gamename, filename, extension);
+			compose_pathStr(strname, gamename, filename, extension);
 
 			/* if we need checksums, load it into RAM and compute it along the way */
 			if (flags & FILEFLAG_HASH)
 			{
-				if (checksum_file(pathtype, pathindex, name, &file.data, &file.length, file.hash) == 0)
+				if (checksum_file(pathtype, pathindex, strname.c_str(), &file.data, &file.length, file.hash) == 0)
 				{
 					file.type = RAM_FILE;
 					break;
@@ -1093,13 +1105,17 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 			else
 			{
 				file.type = PLAIN_FILE;
-				file.file = osd_fopen(pathtype, pathindex, name, access_modes[flags & 7], error);
+				file.file = osd_fopen(pathtype, pathindex, strname.c_str(), access_modes[flags & 7], error);
 				if (file.file == NULL && (flags & (3 | FILEFLAG_MUST_EXIST)) == 3)
-					file.file = osd_fopen(pathtype, pathindex, name, "w+b", error);
+					file.file = osd_fopen(pathtype, pathindex, strname.c_str(), "w+b", error);
 				if (file.file != NULL)
+				{
 					break;
+                }
+
 				if (*error != FILEERR_NOT_FOUND)
 				{
+
 					pathindex = pathstop;	/* acknowledges the error */
 					break;
 				}
@@ -1173,16 +1189,17 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 		if (!(flags & (FILEFLAG_OPENWRITE | FILEFLAG_NOZIP)))
 		{
 			/* first look for path/gamename.zip */
-			compose_path(name, sizeof(name), gamename, NULL, "zip");
+			compose_pathStr(strname, gamename, NULL, "zip");
 			VPRINTF(("Trying %s file\n", name));
 
 			/* if the ZIP file exists, proceed */
-			if (osd_get_path_info(pathtype, pathindex, name) == PATH_IS_FILE)
+			if (osd_get_path_info(pathtype, pathindex, strname.c_str()) == PATH_IS_FILE)
 			{
-				UINT32 ziplength;
 
+				UINT32 ziplength;
+                string tempnamestr;
 				/* if the file was able to be extracted from the ZIP, continue */
-				compose_path(tempname, sizeof(tempname), NULL, filename, extension);
+				compose_pathStr(tempnamestr, NULL, filename, extension);
 
 				/* verify-only case */
 				if (flags & FILEFLAG_VERIFY_ONLY)
@@ -1205,7 +1222,7 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 
 					hash_data_clear(file.hash);
 
-					if (checksum_zipped_file(pathtype, pathindex, name, tempname, &ziplength, &crc) == 0)
+					if (checksum_zipped_file(pathtype, pathindex, strname.c_str(), tempnamestr.c_str(), &ziplength, &crc) == 0)
 					{
 						file.length = ziplength;
 						file.type = UNLOADED_ZIPPED_FILE;
@@ -1223,9 +1240,8 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 				else
 				{
 					int err;
-
 					/* Try loading the file */
-					err = load_zipped_file(pathtype, pathindex, name, tempname, &file.data, &ziplength);
+					err = load_zipped_file(pathtype, pathindex, strname.c_str(),  tempnamestr.c_str(), &file.data, &ziplength);
 
 					/* If it failed, since this is a ZIP file, we can try to load by CRC
                        if an expected hash has been provided. unzip.c uses this ugly hack
@@ -1235,7 +1251,7 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 						char crcn[9];
 
 						if (hash_data_extract_printable_checksum(hash, HASH_CRC, crcn) != 0)
-							err = load_zipped_file(pathtype, pathindex, name, crcn, &file.data, &ziplength);
+							err = load_zipped_file(pathtype, pathindex, strname.c_str(), crcn, &file.data, &ziplength);
 					}
 
 					if (err == 0)
@@ -1268,7 +1284,7 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 	}
 
 	/* otherwise, duplicate the file */
-	newfile = malloc(sizeof(file));
+	newfile =(mame_file *) malloc(sizeof(file));
 	if (newfile)
 	{
 		*newfile = file;
@@ -1313,7 +1329,7 @@ static int checksum_file(int pathtype, int pathindex, const char *file, UINT8 **
 	}
 
 	/* allocate space for entire file */
-	data = malloc(length);
+	data = (UINT8 *) malloc(length);
 	if (!data)
 	{
 		osd_fclose(f);
@@ -1372,7 +1388,7 @@ chd_interface_file *chd_open_cb(const char *filename, const char *mode)
 		{
 			void *file = mame_fopen(drv->name, filename, FILETYPE_IMAGE, 0);
 			if (file != NULL)
-				return file;
+				return (chd_interface_file *)file;
 		}
 		return NULL;
 	}
