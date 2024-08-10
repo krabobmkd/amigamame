@@ -323,7 +323,7 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
         _PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
 
         _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
-        printf("Intuition_Screen_CGX corrected depth:%d\n",_screenDepthAsked);
+       // printf("Intuition_Screen_CGX corrected depth:%d\n",_screenDepthAsked);
     }
     if(_PixelFmt == PIXFMT_LUT8)
     {
@@ -428,7 +428,6 @@ bool Intuition_Window_CGX::open()
 
     if(isSourceRGBA32())
     {
-         printf("");
         initARGB32DrawFunctionFromPixelFormat();
     } else
     {
@@ -579,7 +578,6 @@ Intuition_Screen_CGXScale::Intuition_Screen_CGXScale(const AbstractDisplay::para
         _fullscreenWidth = GetCyberIDAttr( CYBRIDATTR_WIDTH, _ScreenModeId );
         _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
         _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
-        printf("Intuition_Screen_CGXScale corrected depth:%d\n",_screenDepthAsked);
     }
 //    printf("dim found: %d %d\n",_fullscreenWidth,_fullscreenHeight);
 
