@@ -4,6 +4,12 @@
 
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
+#ifdef __GNUC__
+#define ASM
+#define REG(r) __asm(#r)
+#endif
+
+
 // to manage 24 bits mode pixel copy without any arse,
 // assume there is a 3 byte length type than can copy its value from a 4 byte type.
 // this is finely used by following templates for 24bits mode.
@@ -60,40 +66,66 @@ struct typeBGR15PC{
 //    union { typeRGB16 a; USHORT b;};
 //}; // sizeof() ==2 , always.
 
-// version 2 hope to be faster
-// -> no 1 lsr.l 2 bins 2 bfextu !!! ugly.
-/*
+// - - - IMPORTANT NOTES FOR 68000 INLINE ASM
+//  For example, on the 68000, I is defined to stand for the range of values 1 to 8. This is the range permitted as a shift count in the shift instructions.
+// =  Means that this operand is written to by this instruction: the previous value is discarded and replaced by new data.
+//+  Means that this operand is both read and written by the instruction.
+// & earlyclobber before output
+// d a floating point
+// Motorola 680x0—config/m68k/constraints.md
+// a adress register
+// d data register
+// f 68881 float
+// I integer range 1->8
+// J 16b signed
+// K signed number
+// L integer -8 -1
+
 struct typeRGB16PC{
-    typeRGB16PC(ULONG argb) {
-        b = (char)argb>>3;
-        UBYTE g=(char)(argb>>(8+2));
-       g2=g<<3; g1=g>>3;
-        r = (char)(argb>>(16+3));
-    }
-    USHORT  g2:3,b:5,r:5,g1:3; // just so you know this is R5G6B5 with then bytes swapped.
-}; // sizeof() ==2
-*/
-// version 3, do not char cast and factorize, and in order
-// -> worst version, 4 lsr, 4 bfins. byte writes.
-struct typeRGB16PC{
-    typeRGB16PC(ULONG argb) {
-        struct vbits {
-            USHORT  g2:3,b:5,r:5,g1:3;
-        };
-        union vvv {
-            vbits vb ;
-            USHORT v;
-        };
-        vvv w;
-        w.vb.g2= argb>>(8+2-3);
-        w.vb.b = argb>>3;
-        w.vb.r = argb>>(16+3);
-        w.vb.g1= argb>>(8+2+3);
-        v = w.v;
-    }
+    typeRGB16PC( unsigned int argb)
+    {
+        // 0000 00000  rrrr r___  GGGg gg__  bbbb b___
+        //                        gggb bbbb  rrrr rGGG
+        // r >>16
+        // b << 5
+        // GGG >>13 (ou rol.w 3
+        // ggg<<3
+        // this was done only to remove bfins and move.b, which does extra slowdown.
+       // volatile ULONG t __asm("d1");
+        asm volatile(
+           "move.l %0,d1\n\t"
+           "swap %0\n\t"
+           // "lsr.l #8,%0\n\t"  // better than swap for emu ?
+           // "lsr.l #8,%0\n\t"
+           "and.w #0x00f8,%0\n\t"   // rrrr r___ ok
+
+           "move.w d1,d2\n\t"
+           "rol.w #3,d2\n\t"
+           "and.b #0x07,d2\n\t"
+           "or.b  d2,%0\n\t"      // rrrr rGGG
+
+            "move.w d1,d2\n\t"
+            "lsl.w #3,d2\n\t"
+            "and.w #0xe000,d2\n\t"
+            "or.w  d2,%0\n\t"      // ggg____ rrrr rGGG
+
+            "lsl.w #5,d1\n\t"
+            "and.w #0x1f00,d1\n\t"
+            "or.w  d1,%0\n\t"      // ggg____ rrrr rGGG
+           "\n\t"
+// this syntax is a hell, I hope you like pain.
+// it is "asm code" : (outputs) : (inputs) : (extra register used)
+//  'd' for d0->d7 'a' for a0->a7 , also can put constants
+           : "=d"( argb)
+           : "d" ( argb)
+           : "d1","d2"
+           );
+        v = (USHORT)argb;
+    } //  "=g" (t)
     USHORT v;
     //USHORT  g2:3,b:5,r:5,g1:3; // just so you know this is R5G6B5 with then bytes swapped.
 }; // sizeof() ==2
+
 
 struct typeBGR16PC{
     typeBGR16PC(ULONG argb) : a(argb){

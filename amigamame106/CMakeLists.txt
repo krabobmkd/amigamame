@@ -149,9 +149,10 @@ set(AMIGA_SRC
 	endif()
 	target_include_directories(Mame106AmigaO3 PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
 	# -funroll-loops -ftree-loop-ivcanon -ftree-loop-im
-	target_compile_options(Mame106AmigaO3 PRIVATE
-			 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -DNDEBUG>
-	  ${AMIGA_COMPILER_OPTIONS} )
+	target_compile_options(Mame106AmigaO3 PRIVATE -O3 -funroll-loops -ftree-loop-ivcanon -DNDEBUG  ${AMIGA_COMPILER_OPTIONS} )
+#	 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im
+#			 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -DNDEBUG>
+#	  ${AMIGA_COMPILER_OPTIONS} )
 	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
 	# those for mame includes
 	target_compile_definitions(Mame106AmigaO3 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 MUISERIALIZER_USES_FLOAT=1 ${CPU_DEFS} )
