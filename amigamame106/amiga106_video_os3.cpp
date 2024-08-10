@@ -79,7 +79,8 @@ void Drawable_OS3::draw_WPA8(_mame_display *display)
     if(_useIntuitionPalette)
     {   // no clut table and use intuition LoadRGB32 to change screen colors
         // actually does WORD to BYTE conversion with no lut.
-        directDraw_UBYTE_UBYTE(&ddscreen,&ddsource,0,0,ww,hh);
+        directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
+        directDraw_UBYTE_UBYTE(&p);
     } else
     {   // remap to shared screen colors, need a clut.
     //TODO

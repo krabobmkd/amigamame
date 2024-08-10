@@ -18,7 +18,6 @@ extern "C" {
 //from this project
 //#include "file.h"
 // from project from this repos, static zlib:
-#include "zlib.h"
 
 #include <string>
 // for memcpy

@@ -6,6 +6,7 @@
 
 #include "amiga106_video_cgx.h"
 #include "amiga_video_tracers_clut16.h"
+#include "amiga_video_tracers_argb32.h"
 #include "amiga_video_remap.h"
 
 #include <proto/exec.h>
@@ -148,35 +149,36 @@ void Drawable_CGX::drawCGX_DirectCPU16(_mame_display *display)
 
     if(_pRemap)
     {
+        directDrawParams p{&ddscreen,&ddsource,cenx,ceny,ww,hh};
         switch(_PixelFmt) {
             case PIXFMT_RGB15:case PIXFMT_BGR15:case PIXFMT_RGB15PC:case PIXFMT_BGR15PC:
             case PIXFMT_RGB16:case PIXFMT_BGR16:case PIXFMT_RGB16PC:case PIXFMT_BGR16PC:
             if(_pRemap->_clut16.size()>0)
             {
-                directDrawClutT_UWORD_UWORD(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut16.data());
+                directDrawClutT_UWORD_UWORD(&p,_pRemap->_clut16.data());
             }
             break;
             case PIXFMT_RGB24:case PIXFMT_BGR24:
             if(_pRemap->_clut32.size()>0)
             {
-                directDrawClutT_type24_ULONG(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut32.data());
+                directDrawClutT_type24_ULONG(&p,_pRemap->_clut32.data());
             }
             break;
             case PIXFMT_ARGB32:case PIXFMT_BGRA32:case PIXFMT_RGBA32:
             if(_pRemap->_clut32.size()>0)
             {
-                directDrawClutT_ULONG_ULONG(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut32.data());
+                directDrawClutT_ULONG_ULONG(&p,_pRemap->_clut32.data());
             }
             break;
             case PIXFMT_LUT8:
             if(_drawable.flags() & DISPFLAG_INTUITIONPALETTE)
             {
                 //8Bit using fullscreen with dynamic palette change, should just copy pixels.
-                directDraw_UBYTE_UBYTE(&ddscreen,&ddsource,cenx,ceny,ww,hh);
+                directDraw_UBYTE_UBYTE(&p);
             } else {
                 if(_pRemap->_clut8.size()>0)
                 {   // 8bit using remap and static palette (like on workbench 8bit)
-                    directDrawClutT_UBYTE_UBYTE(&ddscreen,&ddsource,cenx,ceny,ww,hh,_pRemap->_clut8.data());
+                    directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
                 }
             }
             break;
@@ -242,7 +244,8 @@ void Drawable_CGX::drawCGX_DirectCPU32(_mame_display *display)
     ddscreen._clipY2 = (WORD)bmheight;
 
     // this function pointer has been choosen for the right _PixelFmt and avoid an ugly switch.
-    directDrawARGB32(&ddscreen,&ddsource,cenx,ceny,ww,hh);
+    directDrawParams p{ &ddscreen,&ddsource,cenx,ceny,ww,hh};
+    directDrawARGB32(&p);
 
     UnLockBitMap(hdl);
 
@@ -485,10 +488,11 @@ void Drawable_CGXScalePixelArray::drawCGX_scale(_mame_display *display)
         display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
         _drawable.flags()
     };
+    directDrawParams p{&ddscreen,&ddsource,0,0,sourcewidth,sourceheight};
     if(isSourceRGBA32())
     {
         // it could be a copy in some case, but we still have to manage rotations
-        directDrawARGB32_ARGB32(&ddscreen,&ddsource,0,0,sourcewidth,sourceheight);
+        directDrawARGB32_ARGB32(&p);
 
     } else
     {   // clut mode, or RGB15 , to RGBA
@@ -496,7 +500,7 @@ void Drawable_CGXScalePixelArray::drawCGX_scale(_mame_display *display)
         // remap in unscaled true color buffer.
         // note should work with 24b, test that.
         // cgx XXXPixelArray only support 24 or 32b format RECTFMT_ARGB
-        directDrawClutT_ULONG_ULONG(&ddscreen,&ddsource,0,0,sourcewidth,sourceheight,_pRemap->_clut32.data());
+        directDrawClutT_ULONG_ULONG(&p,_pRemap->_clut32.data());
     }
 
     // let Gfx acceleration do its job (hopefully ;)

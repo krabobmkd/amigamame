@@ -75,37 +75,24 @@ set(MAME_CORE_SRC
 
 set(MAME_INCLUDE_DIRS "src" "../amigamame106" "." "./includes" ${EXPATPATH})
 
+# force specific implementation of drivers like this:
+
 #replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaic16.c" "vidhrdw/segaic16_krb.c")
 #replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaorun.c" "vidhrdw/segaorun_krb.c")
 #replace_list_item(MAME_CORE_SRC "usrintrf.c" "usrintrf_krb.c")
 #replace_list_item(MAME_CORE_SRC "palette.c" "palette_krb.c")
 #replace_list_item(MAME_CORE_SRC "mame.c" "mame_krb.c")
 
-# - - - - - - --  - -same for O2
-
-add_library( mamecoreO2 STATIC  ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC})
-set_property(TARGET mamecoreO2 PROPERTY C_STANDARD 11)
-set_property(TARGET mamecoreO2 PROPERTY CXX_STANDARD 11)
-target_include_directories(mamecoreO2 PUBLIC ${MAME_INCLUDE_DIRS} ${ZLIBPATH} )
+add_library( mamecore STATIC  ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC})
+set_property(TARGET mamecore PROPERTY C_STANDARD 11)
+set_property(TARGET mamecore PROPERTY CXX_STANDARD 11)
+target_include_directories(mamecore PUBLIC ${MAME_INCLUDE_DIRS} ${ZLIBPATH} )
 set(MAME_INLINE "static inline")
-target_compile_definitions(mamecoreO2 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
+target_compile_definitions(mamecore PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
 # -fpermissive -Wno-narrowing
 
-# -O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -fno-tree-vectorize
- target_compile_options(mamecoreO2 PRIVATE  -O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -fno-tree-vectorize ${AMIGA_COMPILER_OPTIONS} )
-# - - - - - - - - - - same for O3
-
-#add_library( mamecoreO3 STATIC  ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC} )
-#set_property(TARGET mamecoreO3 PROPERTY C_STANDARD 11)
-#set_property(TARGET mamecoreO3 PROPERTY CXX_STANDARD 11)
-#target_include_directories(mamecoreO3 PUBLIC ${MAME_INCLUDE_DIRS} ${ZLIBPATH} )
-#set(MAME_INLINE "static inline")
-#target_compile_definitions(mamecoreO3 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 ${CPU_DEFS} )
-#if(MAME_USE_HARDFLOAT)
-#	target_compile_definitions(mamecoreO3 PUBLIC MAME_USE_HARD_FLOAT=1 )
-#endif()
-## -fpermissive  -Wno-narrowing
-#target_compile_options(mamecoreO3 PUBLIC -O3 )
-
-
-
+ target_compile_options(mamecore PRIVATE ${AMIGA_COMPILER_OPTIONS} )
+#it's all O3 for release only
+ target_compile_options(mamecore PRIVATE
+		 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -fno-tree-vectorize -DNDEBUG>
+		  )

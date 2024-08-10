@@ -15,8 +15,7 @@ extern "C"
 //    #include "osdepend.h"
 //}
 
-struct directDrawScreen;
-struct directDrawSource;
+struct directDrawParams;
 
 class Drawable_CGX {
 public:
@@ -38,7 +37,7 @@ protected:
   ULONG _PixelFmt,_PixelBytes; // CGX values, from screen or window bitmap.
 
   // function pointer to draw32 drawCGX_DirectCPU32
-  void (*directDrawARGB32)(directDrawScreen *screen , directDrawSource *source,LONG x1, LONG y1 ,LONG w, LONG h);
+  void (*directDrawARGB32)(directDrawParams *p);
 
   void initARGB32DrawFunctionFromPixelFormat();
 
