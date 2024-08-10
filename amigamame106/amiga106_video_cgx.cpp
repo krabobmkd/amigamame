@@ -290,8 +290,12 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
     int width = params._width;
     int height = params._height;
     if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
-    if(params._video_attributes & VIDEO_RGB_DIRECT)_screenDepthAsked= 16;
-    else
+    if(params._video_attributes & VIDEO_RGB_DIRECT)
+    {
+        if(params._video_attributes &VIDEO_NEEDS_6BITS_PER_GUN)
+            _screenDepthAsked= 32;
+        else _screenDepthAsked= 16;
+    }else
         _screenDepthAsked = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
 
     if(_ScreenModeId == INVALID_ID)
@@ -317,6 +321,9 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
         _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
         _PixelFmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, _ScreenModeId );
         _PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
+
+        _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
+        printf("Intuition_Screen_CGX corrected depth:%d\n",_screenDepthAsked);
     }
     if(_PixelFmt == PIXFMT_LUT8)
     {
@@ -538,7 +545,14 @@ Intuition_Screen_CGXScale::Intuition_Screen_CGXScale(const AbstractDisplay::para
     int width = params._width;
     int height = params._height;
     if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
-    _screenDepthAsked = 16;  // or 16? -> problems with 32 ??? why ?
+
+//    if(isSourceRGBA32())
+//    {
+//            _screenDepthAsked= 32;
+//        else _screenDepthAsked= 16;
+//    }else
+
+    _screenDepthAsked = 32;  // or 16? -> problems with 32 ??? why ?
 
 //printf("Intuition_Screen_CGXScale %08x\n",_ScreenModeId);
 
@@ -564,6 +578,8 @@ Intuition_Screen_CGXScale::Intuition_Screen_CGXScale(const AbstractDisplay::para
     {
         _fullscreenWidth = GetCyberIDAttr( CYBRIDATTR_WIDTH, _ScreenModeId );
         _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
+        _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
+        printf("Intuition_Screen_CGXScale corrected depth:%d\n",_screenDepthAsked);
     }
 //    printf("dim found: %d %d\n",_fullscreenWidth,_fullscreenHeight);
 

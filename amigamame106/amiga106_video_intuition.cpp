@@ -184,6 +184,9 @@ bool Intuition_Screen::open()
 
    // note: all this is regular OS intuition, no CGX
 	struct ColorSpec colspec[2]={0,0,0,0,-1,0,0,0};
+    // that stupid OS function (or driver) want SA_Depth,24 for 32bit depth, or fail.
+    if(_screenDepthAsked == 32 )_screenDepthAsked =24;
+
  	_pScreen = OpenScreenTags( NULL,
 			SA_DisplayID,_ScreenModeId,
                         SA_Title, (ULONG)"MAME", // used as ID by promotion tools and else ?

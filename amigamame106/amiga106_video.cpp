@@ -137,7 +137,7 @@ static ULONG FrameCounterUpdate=0;
 static INT64 FrameCounter=0;
 INT64 StartTime = 0;
 ULONG GetStartTime=0;
-//ULONG UseBrakes = 0,UseFrameskip=0;
+
 
 //ledBitmap _ledBitmap(3,4); // nbleds, ledwidth
 bool SwitchWindowFullscreen()
@@ -286,8 +286,6 @@ void osd_update_video_and_audio(struct _mame_display *display)
     // apply eventual hard beam waiting (if too fast) just before draw.
     int igamefps = (int) display->game_refresh_rate;
 
-
-   // if(UseBrakes>0)
     {
         // 1000000LL aka osd_cycles_per_second()
         const UINT64 cyclespersec = 1000000LL;
@@ -314,27 +312,6 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
     MsgPort *userport = g_pMameDisplay->userPort();
     if(userport) UpdateInputs(userport);
-
-    // - - - - -auto fps management, analysis
-
-//    if(FrameCounterUpdate>=igamefps>>2)
-//    {
-//        FrameCounterUpdate -=igamefps>>2;
-//        // performance are already computed by mame.
-//        const performance_info *perfs = mame_get_performance_info();
-//        if(perfs)
-//        {
-//            int icurrentfps = (int)perfs->frames_per_second;
-
-//            // manage when too fast (uae jit)
-////            UseBrakes = (int)( icurrentfps+1 > igamefps);
-////            if(!UseBrakes && icurrentfps<igamefps-1)
-////            {
-////                // most amigas...
-////                UseFrameskip = 1;
-////            }
-//        }
-//    }
 
     // - - - -
     FrameCounterUpdate++;

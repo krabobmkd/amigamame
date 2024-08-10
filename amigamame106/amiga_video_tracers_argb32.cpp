@@ -47,21 +47,60 @@ struct typeBGR15PC{
     }
     union { typeBGR15 a; USHORT b;};
 };
+//  NOTE: RGB16PC is the only one pistorm picasso actually use for 16bits pixels.
+/* works, version 1, generate 2 bfins + 1 bfextu,
+ * which, as I understand, are possibly "remanaged by the OS 68040 library" thus does horrible code
+ * before being remapped by emu68, if I get it. fine bitswapping is problemtaic on this hardware.
+  normaly R8G8B8A to A8R8G8B8 should be very fine.
+*/
+//struct typeRGB16PC{
+//    typeRGB16PC(ULONG argb) : a(argb){
+//        b = (b<<8) |(b>>8);
+//    }
+//    union { typeRGB16 a; USHORT b;};
+//}; // sizeof() ==2 , always.
 
-
+// version 2 hope to be faster
+// -> no 1 lsr.l 2 bins 2 bfextu !!! ugly.
+/*
 struct typeRGB16PC{
-    typeRGB16PC(ULONG argb) : a(argb){
-        b = (b<<8) |(b>>8);
+    typeRGB16PC(ULONG argb) {
+        b = (char)argb>>3;
+        UBYTE g=(char)(argb>>(8+2));
+       g2=g<<3; g1=g>>3;
+        r = (char)(argb>>(16+3));
     }
-    union { typeRGB16 a; USHORT b;};
-};
+    USHORT  g2:3,b:5,r:5,g1:3; // just so you know this is R5G6B5 with then bytes swapped.
+}; // sizeof() ==2
+*/
+// version 3, do not char cast and factorize, and in order
+// -> worst version, 4 lsr, 4 bfins. byte writes.
+struct typeRGB16PC{
+    typeRGB16PC(ULONG argb) {
+        struct vbits {
+            USHORT  g2:3,b:5,r:5,g1:3;
+        };
+        union vvv {
+            vbits vb ;
+            USHORT v;
+        };
+        vvv w;
+        w.vb.g2= argb>>(8+2-3);
+        w.vb.b = argb>>3;
+        w.vb.r = argb>>(16+3);
+        w.vb.g1= argb>>(8+2+3);
+        v = w.v;
+    }
+    USHORT v;
+    //USHORT  g2:3,b:5,r:5,g1:3; // just so you know this is R5G6B5 with then bytes swapped.
+}; // sizeof() ==2
 
 struct typeBGR16PC{
     typeBGR16PC(ULONG argb) : a(argb){
        b = (b<<8) |(b>>8);
     }
     union { typeBGR16 a; USHORT b;};
-};
+}; // sizeof() ==2
 
 typedef ULONG typeARGB32;
 
