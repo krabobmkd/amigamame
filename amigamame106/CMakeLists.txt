@@ -84,6 +84,8 @@ set(AMIGA_SRC
 	amiga106_video_os3.cpp
 	amiga106_video_cgx.h
 	amiga106_video_cgx.cpp
+	amiga106_video_cgxscalepixelarray.h
+	amiga106_video_cgxscalepixelarray.cpp
 	amiga106_inputs.h
 	amiga106_inputs.cpp
 	amiga_locale.h

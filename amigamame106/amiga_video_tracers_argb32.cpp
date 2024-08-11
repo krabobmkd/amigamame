@@ -94,10 +94,10 @@ struct typeRGB16PC{
        // volatile ULONG t __asm("d1");
         asm volatile(
            "move.l %0,d1\n\t"
-           "swap %0\n\t"
-           // "lsr.l #8,%0\n\t"  // better than swap for emu ?
-           // "lsr.l #8,%0\n\t"
-           "and.w #0x00f8,%0\n\t"   // rrrr r___ ok
+           //"swap %0\n\t"
+            "lsr.l #8,%0\n\t"  // better than swap for emu ? gcc never uses swap.
+            "lsr.w #8,%0\n\t"
+           "and.b #0xf8,%0\n\t"   // ________ rrrr r___ ok
 
            "move.w d1,d2\n\t"
            "rol.w #3,d2\n\t"
@@ -113,8 +113,8 @@ struct typeRGB16PC{
             "and.w #0x1f00,d1\n\t"
             "or.w  d1,%0\n\t"      // ggg____ rrrr rGGG
            "\n\t"
-// this syntax is a hell, I hope you like pain.
-// it is "asm code" : (outputs) : (inputs) : (extra register used)
+// this syntax is a hell, I hope you like pain .
+// it is "asm code" : "spec"(varoutput) : "spec"(varinput), : (extra register used)
 //  'd' for d0->d7 'a' for a0->a7 , also can put constants
            : "=d"( argb)
            : "d" ( argb)
