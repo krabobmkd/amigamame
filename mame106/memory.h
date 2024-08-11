@@ -14,6 +14,9 @@
 
 #include "mamecore.h"
 
+#ifdef __GNUC__
+#define REG(r) __asm(#r)
+#endif
 
 
 /***************************************************************************
@@ -50,12 +53,12 @@
 typedef UINT32			offs_t;
 
 /* ----- typedefs for the various common data access handlers ----- */
-typedef UINT8			(*read8_handler)  (ATTR_UNUSED offs_t offset);
-typedef void			(*write8_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
-typedef UINT16			(*read16_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
-typedef void			(*write16_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
-typedef UINT32			(*read32_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
-typedef void			(*write32_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
+typedef UINT8			(*read8_handler)  (ATTR_UNUSED offs_t offset REG(d0));
+typedef void			(*write8_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT8 data REG(d1));
+typedef UINT16			(*read16_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT16 mem_mask REG(d1));
+typedef void			(*write16_handler)(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT16 data REG(d1), ATTR_UNUSED UINT16 mem_mask REG(d2));
+typedef UINT32			(*read32_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 mem_mask REG(d1));
+typedef void			(*write32_handler)(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 data REG(d1), ATTR_UNUSED UINT32 mem_mask REG(d2));
 typedef UINT64			(*read64_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
 typedef void			(*write64_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
 typedef offs_t			(*opbase_handler) (ATTR_UNUSED offs_t address);
@@ -63,15 +66,15 @@ typedef offs_t			(*opbase_handler) (ATTR_UNUSED offs_t address);
 /* ----- this struct contains pointers to the live read/write routines ----- */
 struct _data_accessors
 {
-	UINT8			(*read_byte)(offs_t offset);
-	UINT16			(*read_word)(offs_t offset);
-	UINT32			(*read_dword)(offs_t offset);
-	UINT64			(*read_qword)(offs_t offset);
+	UINT8			(*read_byte)(offs_t offset REG(d0));
+	UINT16			(*read_word)(offs_t offset REG(d0));
+	UINT32			(*read_dword)(offs_t offset REG(d0));
+	UINT64			(*read_qword)(offs_t offset );
 
-	void			(*write_byte)(offs_t offset, UINT8 data);
-	void			(*write_word)(offs_t offset, UINT16 data);
-	void			(*write_dword)(offs_t offset, UINT32 data);
-	void			(*write_qword)(offs_t offset, UINT64 data);
+	void			(*write_byte)(offs_t offset REG(d0), UINT8 data REG(d1));
+	void			(*write_word)(offs_t offset REG(d0), UINT16 data REG(d1));
+	void			(*write_dword)(offs_t offset REG(d0), UINT32 data REG(d1));
+	void			(*write_qword)(offs_t offset , UINT64 data);
 };
 typedef struct _data_accessors data_accessors;
 
@@ -84,12 +87,12 @@ typedef struct _data_accessors data_accessors;
 ***************************************************************************/
 
 /* ----- macros for declaring the various common data access handlers ----- */
-#define READ8_HANDLER(name) 	UINT8  name(ATTR_UNUSED offs_t offset)
-#define WRITE8_HANDLER(name) 	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
-#define READ16_HANDLER(name)	UINT16 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
-#define WRITE16_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
-#define READ32_HANDLER(name)	UINT32 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
-#define WRITE32_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
+#define READ8_HANDLER(name) 	UINT8  name(ATTR_UNUSED offs_t offset REG(d0))
+#define WRITE8_HANDLER(name) 	void   name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT8 data REG(d1))
+#define READ16_HANDLER(name)	UINT16 name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT16 mem_mask REG(d1))
+#define WRITE16_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT16 data REG(d1), ATTR_UNUSED UINT16 mem_mask REG(d2))
+#define READ32_HANDLER(name)	UINT32 name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 mem_mask REG(d1) )
+#define WRITE32_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 data REG(d1), ATTR_UNUSED UINT32 mem_mask REG(d2))
 #define READ64_HANDLER(name)	UINT64 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
 #define WRITE64_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
 #define OPBASE_HANDLER(name)	offs_t name(ATTR_UNUSED offs_t address)
@@ -765,52 +768,56 @@ extern const char *address_space_names[ADDRESS_SPACES];
     Function prototypes for core readmem/writemem routines
 
 ***************************************************************************/
+// krb added for 8bit 16 acess
+UINT8 s16program_read_byte_8(offs_t address REG(d0));
+void s16program_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1));
+
 
 /* ----- declare program address space handlers ----- */
-UINT8 program_read_byte_8(offs_t address);
-void program_write_byte_8(offs_t address, UINT8 data);
+UINT8 program_read_byte_8(offs_t address REG(d0));
+void program_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1));
 
-UINT8 program_read_byte_16be(offs_t address);
-UINT16 program_read_word_16be(offs_t address);
-void program_write_byte_16be(offs_t address, UINT8 data);
-void program_write_word_16be(offs_t address, UINT16 data);
+UINT8 program_read_byte_16be(offs_t address REG(d0));
+UINT16 program_read_word_16be(offs_t address REG(d0));
+void program_write_byte_16be(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_16be(offs_t address REG(d0), UINT16 data REG(d1));
 
-UINT8 program_read_byte_16le(offs_t address);
-UINT16 program_read_word_16le(offs_t address);
-void program_write_byte_16le(offs_t address, UINT8 data);
-void program_write_word_16le(offs_t address, UINT16 data);
+UINT8 program_read_byte_16le(offs_t address REG(d0));
+UINT16 program_read_word_16le(offs_t address REG(d0));
+void program_write_byte_16le(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_16le(offs_t address REG(d0), UINT16 data REG(d1));
 
-UINT8 program_read_byte_32be(offs_t address);
-UINT16 program_read_word_32be(offs_t address);
-UINT32 program_read_dword_32be(offs_t address);
-void program_write_byte_32be(offs_t address, UINT8 data);
-void program_write_word_32be(offs_t address, UINT16 data);
-void program_write_dword_32be(offs_t address, UINT32 data);
+UINT8 program_read_byte_32be(offs_t address REG(d0));
+UINT16 program_read_word_32be(offs_t address REG(d0));
+UINT32 program_read_dword_32be(offs_t address REG(d0));
+void program_write_byte_32be(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_32be(offs_t address REG(d0), UINT16 data REG(d1));
+void program_write_dword_32be(offs_t address REG(d0), UINT32 data REG(d1));
 
-UINT8 program_read_byte_32le(offs_t address);
-UINT16 program_read_word_32le(offs_t address);
-UINT32 program_read_dword_32le(offs_t address);
-void program_write_byte_32le(offs_t address, UINT8 data);
-void program_write_word_32le(offs_t address, UINT16 data);
-void program_write_dword_32le(offs_t address, UINT32 data);
+UINT8 program_read_byte_32le(offs_t address REG(d0));
+UINT16 program_read_word_32le(offs_t address REG(d0));
+UINT32 program_read_dword_32le(offs_t address REG(d0));
+void program_write_byte_32le(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_32le(offs_t address REG(d0), UINT16 data REG(d1));
+void program_write_dword_32le(offs_t address REG(d0), UINT32 data REG(d1));
 
-UINT8 program_read_byte_64be(offs_t address);
-UINT16 program_read_word_64be(offs_t address);
-UINT32 program_read_dword_64be(offs_t address);
-UINT64 program_read_qword_64be(offs_t address);
-void program_write_byte_64be(offs_t address, UINT8 data);
-void program_write_word_64be(offs_t address, UINT16 data);
-void program_write_dword_64be(offs_t address, UINT32 data);
-void program_write_qword_64be(offs_t address, UINT64 data);
+UINT8 program_read_byte_64be(offs_t address REG(d0));
+UINT16 program_read_word_64be(offs_t address REG(d0));
+UINT32 program_read_dword_64be(offs_t address REG(d0));
+UINT64 program_read_qword_64be(offs_t address REG(d0));
+void program_write_byte_64be(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_64be(offs_t address REG(d0), UINT16 data REG(d1));
+void program_write_dword_64be(offs_t address REG(d0), UINT32 data REG(d1));
+void program_write_qword_64be(offs_t address REG(d0), UINT64 data);
 
-UINT8 program_read_byte_64le(offs_t address);
-UINT16 program_read_word_64le(offs_t address);
-UINT32 program_read_dword_64le(offs_t address);
-UINT64 program_read_qword_64le(offs_t address);
-void program_write_byte_64le(offs_t address, UINT8 data);
-void program_write_word_64le(offs_t address, UINT16 data);
-void program_write_dword_64le(offs_t address, UINT32 data);
-void program_write_qword_64le(offs_t address, UINT64 data);
+UINT8 program_read_byte_64le(offs_t address REG(d0));
+UINT16 program_read_word_64le(offs_t address REG(d0));
+UINT32 program_read_dword_64le(offs_t address REG(d0));
+UINT64 program_read_qword_64le(offs_t address REG(d0));
+void program_write_byte_64le(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_64le(offs_t address REG(d0), UINT16 data REG(d1));
+void program_write_dword_64le(offs_t address REG(d0), UINT32 data REG(d1));
+void program_write_qword_64le(offs_t address REG(d0), UINT64 data);
 
 /* -----SPECIAL KRB for Z80 repeater ops ----- */
 // LDIR CPIR INIR OTIR
@@ -836,96 +843,96 @@ void program_rcopy_to_io(UINT8 port,UINT16 readAddress, UINT8 n);
 
 
 /* ----- declare data address space handlers ----- */
-UINT8 data_read_byte_8(offs_t address);
-void data_write_byte_8(offs_t address, UINT8 data);
+UINT8 data_read_byte_8(offs_t address REG(d0));
+void data_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1));
 
-UINT8 data_read_byte_16be(offs_t address);
-UINT16 data_read_word_16be(offs_t address);
-void data_write_byte_16be(offs_t address, UINT8 data);
-void data_write_word_16be(offs_t address, UINT16 data);
+UINT8 data_read_byte_16be(offs_t address REG(d0));
+UINT16 data_read_word_16be(offs_t address REG(d0));
+void data_write_byte_16be(offs_t address REG(d0), UINT8 data);
+void data_write_word_16be(offs_t address REG(d0), UINT16 data);
 
-UINT8 data_read_byte_16le(offs_t address);
-UINT16 data_read_word_16le(offs_t address);
-void data_write_byte_16le(offs_t address, UINT8 data);
-void data_write_word_16le(offs_t address, UINT16 data);
+UINT8 data_read_byte_16le(offs_t address REG(d0));
+UINT16 data_read_word_16le(offs_t address REG(d0));
+void data_write_byte_16le(offs_t address REG(d0), UINT8 data);
+void data_write_word_16le(offs_t address REG(d0), UINT16 data);
 
-UINT8 data_read_byte_32be(offs_t address);
-UINT16 data_read_word_32be(offs_t address);
-UINT32 data_read_dword_32be(offs_t address);
-void data_write_byte_32be(offs_t address, UINT8 data);
-void data_write_word_32be(offs_t address, UINT16 data);
-void data_write_dword_32be(offs_t address, UINT32 data);
+UINT8 data_read_byte_32be(offs_t address REG(d0));
+UINT16 data_read_word_32be(offs_t address REG(d0));
+UINT32 data_read_dword_32be(offs_t address REG(d0));
+void data_write_byte_32be(offs_t address REG(d0), UINT8 data);
+void data_write_word_32be(offs_t address REG(d0), UINT16 data);
+void data_write_dword_32be(offs_t address REG(d0), UINT32 data);
 
-UINT8 data_read_byte_32le(offs_t address);
-UINT16 data_read_word_32le(offs_t address);
-UINT32 data_read_dword_32le(offs_t address);
-void data_write_byte_32le(offs_t address, UINT8 data);
-void data_write_word_32le(offs_t address, UINT16 data);
-void data_write_dword_32le(offs_t address, UINT32 data);
+UINT8 data_read_byte_32le(offs_t address REG(d0));
+UINT16 data_read_word_32le(offs_t address REG(d0));
+UINT32 data_read_dword_32le(offs_t address REG(d0));
+void data_write_byte_32le(offs_t address REG(d0), UINT8 data);
+void data_write_word_32le(offs_t address REG(d0), UINT16 data);
+void data_write_dword_32le(offs_t address REG(d0), UINT32 data);
 
-UINT8 data_read_byte_64be(offs_t address);
-UINT16 data_read_word_64be(offs_t address);
-UINT32 data_read_dword_64be(offs_t address);
-UINT64 data_read_qword_64be(offs_t address);
-void data_write_byte_64be(offs_t address, UINT8 data);
-void data_write_word_64be(offs_t address, UINT16 data);
-void data_write_dword_64be(offs_t address, UINT32 data);
-void data_write_qword_64be(offs_t address, UINT64 data);
+UINT8 data_read_byte_64be(offs_t offset REG(d0));
+UINT16 data_read_word_64be(offs_t offset REG(d0));
+UINT32 data_read_dword_64be(offs_t offset REG(d0));
+UINT64 data_read_qword_64be(offs_t offset REG(d0));
+void data_write_byte_64be(offs_t offset REG(d0), UINT8 data);
+void data_write_word_64be(offs_t offset REG(d0), UINT16 data);
+void data_write_dword_64be(offs_t offset REG(d0), UINT32 data);
+void data_write_qword_64be(offs_t offset REG(d0), UINT64 data);
 
-UINT8 data_read_byte_64le(offs_t address);
-UINT16 data_read_word_64le(offs_t address);
-UINT32 data_read_dword_64le(offs_t address);
-UINT64 data_read_qword_64le(offs_t address);
-void data_write_byte_64le(offs_t address, UINT8 data);
-void data_write_word_64le(offs_t address, UINT16 data);
-void data_write_dword_64le(offs_t address, UINT32 data);
-void data_write_qword_64le(offs_t address, UINT64 data);
+UINT8 data_read_byte_64le(offs_t offset REG(d0));
+UINT16 data_read_word_64le(offs_t offset REG(d0));
+UINT32 data_read_dword_64le(offs_t offset REG(d0));
+UINT64 data_read_qword_64le(offs_t offset REG(d0));
+void data_write_byte_64le(offs_t offset REG(d0), UINT8 data);
+void data_write_word_64le(offs_t offset REG(d0), UINT16 data);
+void data_write_dword_64le(offs_t offset REG(d0), UINT32 data);
+void data_write_qword_64le(offs_t offset REG(d0), UINT64 data);
 
 /* ----- declare I/O address space handlers ----- */
-UINT8 io_read_byte_8(offs_t address);
-void io_write_byte_8(offs_t address, UINT8 data);
+UINT8 io_read_byte_8(offs_t address REG(d0));
+void io_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1));
 
-UINT8 io_read_byte_16be(offs_t address);
-UINT16 io_read_word_16be(offs_t address);
-void io_write_byte_16be(offs_t address, UINT8 data);
-void io_write_word_16be(offs_t address, UINT16 data);
+UINT8 io_read_byte_16be(offs_t address REG(d0));
+UINT16 io_read_word_16be(offs_t address REG(d0));
+void io_write_byte_16be(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_16be(offs_t address REG(d0), UINT16 data REG(d1));
 
-UINT8 io_read_byte_16le(offs_t address);
-UINT16 io_read_word_16le(offs_t address);
-void io_write_byte_16le(offs_t address, UINT8 data);
-void io_write_word_16le(offs_t address, UINT16 data);
+UINT8 io_read_byte_16le(offs_t address REG(d0));
+UINT16 io_read_word_16le(offs_t address REG(d0));
+void io_write_byte_16le(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_16le(offs_t address REG(d0), UINT16 data REG(d1));
 
-UINT8 io_read_byte_32be(offs_t address);
-UINT16 io_read_word_32be(offs_t address);
-UINT32 io_read_dword_32be(offs_t address);
-void io_write_byte_32be(offs_t address, UINT8 data);
-void io_write_word_32be(offs_t address, UINT16 data);
-void io_write_dword_32be(offs_t address, UINT32 data);
+UINT8 io_read_byte_32be(offs_t address REG(d0));
+UINT16 io_read_word_32be(offs_t address REG(d0));
+UINT32 io_read_dword_32be(offs_t address REG(d0));
+void io_write_byte_32be(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_32be(offs_t address REG(d0), UINT16 data REG(d1));
+void io_write_dword_32be(offs_t address REG(d0), UINT32 data REG(d1));
 
-UINT8 io_read_byte_32le(offs_t address);
-UINT16 io_read_word_32le(offs_t address);
-UINT32 io_read_dword_32le(offs_t address);
-void io_write_byte_32le(offs_t address, UINT8 data);
-void io_write_word_32le(offs_t address, UINT16 data);
-void io_write_dword_32le(offs_t address, UINT32 data);
+UINT8 io_read_byte_32le(offs_t address REG(d0));
+UINT16 io_read_word_32le(offs_t address REG(d0));
+UINT32 io_read_dword_32le(offs_t address REG(d0));
+void io_write_byte_32le(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_32le(offs_t address REG(d0), UINT16 data REG(d1));
+void io_write_dword_32le(offs_t address REG(d0), UINT32 data REG(d1));
 
-UINT8 io_read_byte_64be(offs_t address);
-UINT16 io_read_word_64be(offs_t address);
-UINT32 io_read_dword_64be(offs_t address);
-UINT64 io_read_qword_64be(offs_t address);
-void io_write_byte_64be(offs_t address, UINT8 data);
-void io_write_word_64be(offs_t address, UINT16 data);
-void io_write_dword_64be(offs_t address, UINT32 data);
-void io_write_qword_64be(offs_t address, UINT64 data);
+UINT8 io_read_byte_64be(offs_t address REG(d0));
+UINT16 io_read_word_64be(offs_t address REG(d0));
+UINT32 io_read_dword_64be(offs_t address REG(d0));
+UINT64 io_read_qword_64be(offs_t address REG(d0));
+void io_write_byte_64be(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_64be(offs_t address REG(d0), UINT16 data REG(d1));
+void io_write_dword_64be(offs_t address REG(d0), UINT32 data REG(d1));
+void io_write_qword_64be(offs_t address REG(d0), UINT64 data);
 
-UINT8 io_read_byte_64le(offs_t address);
-UINT16 io_read_word_64le(offs_t address);
-UINT32 io_read_dword_64le(offs_t address);
-UINT64 io_read_qword_64le(offs_t address);
-void io_write_byte_64le(offs_t address, UINT8 data);
-void io_write_word_64le(offs_t address, UINT16 data);
-void io_write_dword_64le(offs_t address, UINT32 data);
-void io_write_qword_64le(offs_t address, UINT64 data);
+UINT8 io_read_byte_64le(offs_t address REG(d0));
+UINT16 io_read_word_64le(offs_t address REG(d0));
+UINT32 io_read_dword_64le(offs_t address REG(d0));
+UINT64 io_read_qword_64le(offs_t address REG(d0));
+void io_write_byte_64le(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_64le(offs_t address REG(d0), UINT16 data REG(d1));
+void io_write_dword_64le(offs_t address REG(d0), UINT32 data REG(d1));
+void io_write_qword_64le(offs_t address REG(d0), UINT64 data);
 
 
 

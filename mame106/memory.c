@@ -2376,12 +2376,60 @@ static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t of
 		entry = space.lookup[LEVEL2_INDEX(entry,address)];								\
 
 
+// - -- - - - KRB
+
+UINT8 s16program_read_byte_8(UINT32 address REG(d0))
+{
+	UINT32 entry;
+
+    /* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+
+	PERFORM_LOOKUP(readlookup,active_address_space[0],~0);
+
+	/* handle banks inline */
+	address = (address - active_address_space[0].readhandlers[entry].offset)
+            & active_address_space[0].readhandlers[entry].mask;
+	if (entry < STATIC_RAM)
+		return(bank_ptr[entry][address]);
+
+	/* fall back to the handler */
+	else
+		return((*active_address_space[0].readhandlers[entry].handler.read.handler8)
+                (address));
+	return 0;
+}
+
+void s16program_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1))
+{
+	UINT32 entry;
+    /* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
+
+	/* handle banks inline */
+	address = (address - active_address_space[0].writehandlers[entry].offset) & active_address_space[0].writehandlers[entry].mask;
+	if (entry < STATIC_RAM)
+		bank_ptr[entry][address] = data;
+
+	/* fall back to the handler */
+	else
+		(*active_address_space[0].writehandlers[entry].handler.write.handler8)(address, data);
+}
+
+
 /*-------------------------------------------------
     READBYTE - generic byte-sized read handler
 -------------------------------------------------*/
 
+
 #define READBYTE8(name,spacenum)														\
-UINT8 name(offs_t address)																\
+UINT8 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2400,7 +2448,7 @@ UINT8 name(offs_t address)																\
 }																						\
 
 #define READBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
-UINT8 name(offs_t address)																\
+UINT8 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2435,7 +2483,7 @@ UINT8 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define READWORD16(name,spacenum)														\
-UINT16 name(offs_t address)																\
+UINT16 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2454,7 +2502,7 @@ UINT16 name(offs_t address)																\
 }																						\
 
 #define READWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
-UINT16 name(offs_t address)																\
+UINT16 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2487,7 +2535,7 @@ UINT16 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define READDWORD32(name,spacenum)														\
-UINT32 name(offs_t address)																\
+UINT32 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2506,7 +2554,7 @@ UINT32 name(offs_t address)																\
 }																						\
 
 #define READDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-UINT32 name(offs_t address)																\
+UINT32 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2537,7 +2585,7 @@ UINT32 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define READQWORD64(name,spacenum)														\
-UINT64 name(offs_t address)																\
+UINT64 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2561,7 +2609,7 @@ UINT64 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define WRITEBYTE8(name,spacenum)														\
-void name(offs_t address, UINT8 data)													\
+void name(offs_t address REG(d0), UINT8 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2579,7 +2627,7 @@ void name(offs_t address, UINT8 data)													\
 }																						\
 
 #define WRITEBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address, UINT8 data)													\
+void name(offs_t address REG(d0), UINT8 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2613,7 +2661,7 @@ void name(offs_t address, UINT8 data)													\
 -------------------------------------------------*/
 
 #define WRITEWORD16(name,spacenum)														\
-void name(offs_t address, UINT16 data)													\
+void name(offs_t address REG(d0), UINT16 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2631,7 +2679,7 @@ void name(offs_t address, UINT16 data)													\
 }																						\
 
 #define WRITEWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address, UINT16 data)													\
+void name(offs_t address REG(d0), UINT16 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2663,7 +2711,7 @@ void name(offs_t address, UINT16 data)													\
 -------------------------------------------------*/
 
 #define WRITEDWORD32(name,spacenum)														\
-void name(offs_t address, UINT32 data)													\
+void name(offs_t address REG(d0), UINT32 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2681,7 +2729,7 @@ void name(offs_t address, UINT32 data)													\
 }																						\
 
 #define WRITEDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address, UINT32 data)													\
+void name(offs_t address REG(d0), UINT32 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2711,7 +2759,7 @@ void name(offs_t address, UINT32 data)													\
 -------------------------------------------------*/
 
 #define WRITEQWORD64(name,spacenum)														\
-void name(offs_t address, UINT64 data)													\
+void name(offs_t address REG(d0), UINT64 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2727,6 +2775,53 @@ void name(offs_t address, UINT64 data)													\
 	else																				\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handler64)(address >> 3, data, 0));\
 }																						\
+
+
+/* -----SPECIAL KRB for Z80 repeater ops ----- */
+// LDIR CPIR INIR OTIR
+// LDIR, copy mem
+void program_copy(UINT16 readAddress,UINT16 writeAddress,UINT16 n )
+{
+
+}
+// CPIR find the occurence of A and stop, or counter (BC) is 0
+void program_find(UINT16 startAdress,UINT8 a,UINT16 n )
+{
+
+}
+// INIR Reads from the (C) port, then writes to (HL). HL is incremented and B is decremented. Repeats until B = 0.
+void io_copy_to_program(UINT8 port,UINT16 writeAddress, UINT8 n)
+{
+
+}
+// OTIR Reads from (HL) and writes to the (C) port. HL is incremented and B is decremented. Repeats until B = 0.
+void program_copy_to_io(UINT8 port,UINT16 readAddress, UINT8 n)
+{
+
+}
+
+//  LDDR CPDR INDR OTDR
+// LDDR copy from end, point first copied. Does a LD (DE),(HL) and decrements each of DE, HL, and BC) until BC=0.
+void program_rcopy(UINT16 readAddress,UINT16 writeAddress,UINT16 n )
+{
+
+}
+// CPDR rfind
+// in that case adress is decreased first ? -> no test then dec.
+void program_rfind(UINT16 startAdress,UINT8 a,UINT16 n )
+{
+
+}
+// INDR   Reads the (C) port and writes the result to (HL). HL and B are decremented. Repeats until B = 0.
+void io_rcopy_to_program(UINT8 port,UINT16 writeAddress, UINT8 n)
+{
+
+}
+//OTDR  Reads from (HL) and writes to the (C) port. HL and B are then decremented. Repeats until B = 0.
+void program_rcopy_to_io(UINT8 port,UINT16 readAddress, UINT8 n)
+{
+
+}
 
 
 /*-------------------------------------------------
