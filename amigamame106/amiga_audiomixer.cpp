@@ -61,37 +61,122 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
 
     if(pSoundToWrite->m_stereo)
     {
-        for(UWORD i=0; i<ntodo ; i++ )
-        {
-            /* clamp the left side */
-            INT32 samp = leftmix[i];
-            if (samp < -32768)
-                samp = -32768;
-            else if (samp > 32767)
-                samp = 32767;
-            *ps++ = (WORD)samp;
+        asm volatile(
+           "move.l #-32768,d1\n"
+           "\tmove.l #32767,d2\n"
+           ".loop:\n"
+           "\tmove.l (%0)+,d3\n"
+           "\tmove.l (%1)+,d4\n"
 
-            /* clamp the right side */
-            samp = rightmix[i];
-            if (samp < -32768)
-                samp = -32768;
-            else if (samp > 32767)
-                samp = 32767;
-            *ps++ = (WORD)samp;
+           "\tcmp.l d1,d3\n"
+           "\tbge.b .ncl1\n"
+           "\tmove.l d1,d3\n"
+           ".ncl1:\n"
 
-        }
+           "\tcmp.l d2,d3\n"
+           "\tble.b .ncl2\n"
+           "\tmove.l d2,d3\n"
+           ".ncl2:\n"
+
+           "\tswap d3\n"
+
+           "\tcmp.l d1,d4\n"
+           "\tbge.b .ncl3\n"
+           "\tmove.l d1,d4\n"
+           ".ncl3:\n"
+
+           "\tcmp.l d2,d4\n"
+           "\tble.b .ncl4\n"
+           "\tmove.l d2,d4\n"
+           ".ncl4:\n"
+           "\tmove.w d4,d3\n"
+           "\tmove.l d3,(%2)+\n"
+
+           "\tdbf %3,.loop\n"
+           "\n\t"
+// this syntax is a hell, I hope you like pain .
+// it is "asm code" : "spec"(varoutput) : "spec"(varinput), : (extra register used)
+//  'd' for d0->d7 'a' for a0->a7 , also can put constants
+           :
+           : "a" (leftmix), "a" (rightmix),"a"(ps), "d"(ntodo)
+           : "d1","d2","d3","d4"
+           );
+
+//        LONG cmin =-32768;
+//        LONG cmax =32767;
+//        for(UWORD i=0; i<ntodo ; i++ )
+//        {
+//            /* clamp the left side */
+//            INT32 samp = leftmix[i];
+//            if (samp < cmin)
+//                samp = cmin;
+//            else if (samp > cmax)
+//                samp = cmax;
+//            *ps++ = (WORD)samp;
+
+//            /* clamp the right side */
+//            samp = rightmix[i];
+//            if (samp < cmin)
+//                samp = cmin;
+//            else if (samp > cmax)
+//                samp = cmax;
+//            *ps++ = (WORD)samp;
+//        }
 
     } else
     {
-        for(UWORD i=0; i<ntodo ; i++ )
-        {
-            INT32 samp = leftmix[i]; //on mono now, all sounds forced to left. +rightmix[i];
-            if (samp < -32768)
-                samp = -32768;
-            else if (samp > 32767)
-                samp = 32767;
-            *ps++ = (WORD)samp;
-        }
+        asm volatile(
+           "move.l #-32768,d1\n"
+           "\tmove.l #32767,d2\n"
+           "\tlsr.w #1,%2\n"
+           ".loopb:\n"
+           "\tmove.l (%0)+,d3\n"
+           "\tmove.l (%0)+,d4\n"
+
+           "\tcmp.l d1,d3\n"
+           "\tbge.b .ncl1b\n"
+           "\tmove.l d1,d3\n"
+           ".ncl1b:\n"
+
+           "\tcmp.l d2,d3\n"
+           "\tble.b .ncl2b\n"
+           "\tmove.l d2,d3\n"
+           ".ncl2b:\n"
+
+           "\tswap d3\n"
+
+           "\tcmp.l d1,d4\n"
+           "\tbge.b .ncl3b\n"
+           "\tmove.l d1,d4\n"
+           ".ncl3b:\n"
+
+           "\tcmp.l d2,d4\n"
+           "\tble.b .ncl4b\n"
+           "\tmove.l d2,d4\n"
+           ".ncl4b:\n"
+           "\tmove.w d4,d3\n"
+           "\tmove.l d3,(%1)+\n"
+
+           "\tdbf %2,.loopb\n"
+           "\n\t"
+           :
+           : "a" (leftmix), "a"(ps), "d"(ntodo)
+           : "d1","d2","d3","d4"
+           );
+
+//        LONG cmin =-32768;
+//        LONG cmax =32767;
+//        for(UWORD i=0; i<ntodo ; i++ )
+//        {
+//            INT32 samp = leftmix[i]; //on mono now, all sounds forced to left. +rightmix[i];
+//            if (samp < cmin)
+//                samp = cmin;
+//            else if (samp > cmax)
+//                samp = cmax;
+//            *ps++ = (WORD)samp;
+
+
+//        }
     }
     pFrame->_read = ntodo;
     pFrame->_readlock = 0;
