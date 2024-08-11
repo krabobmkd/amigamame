@@ -93,7 +93,6 @@ set(AMIGA_SRC
 #	inptport_krb.c
 	amiga_parallelpads.h
 	amiga_parallelpads.c
-		amiga_audiomixer.cpp
 
 	serializer_mamexml.cpp
 	serializer_mamexml.h
