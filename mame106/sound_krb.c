@@ -199,18 +199,24 @@ int sound_init(void)
 //    sound_machine_is_stereo=0; // 0 mono, 1 stereo.
 //    sound_machine_nb_streams=0; // actual number of things mixed.
 
-	for (totalspeakers = 0; Machine->drv->speaker[totalspeakers].tag; totalspeakers++)
-	{
-        speaker_config *speaker = &Machine->drv->speaker[totalspeakers];
-      //  if(speaker->x != 0.0f)  sound_machine_is_stereo = 1;
-      //  sound_machine_nb_streams++; // same as totalspeakers
-	}
+//	for (totalspeakers = 0; Machine->drv->speaker[totalspeakers].tag; totalspeakers++)
+//	{
+//        speaker_config *speaker = &Machine->drv->speaker[totalspeakers];
+//      //  if(speaker->x != 0.0f)  sound_machine_is_stereo = 1;
+//      //  sound_machine_nb_streams++; // same as totalspeakers
+//	}
 //	printf(" **** total speakers = %d  stereo:%d \n",(int)sound_machine_is_stereo);
 	VPRINTF(("total speakers = %d\n", totalspeakers));
 
 	/* initialize the OSD layer */
 	VPRINTF(("osd_start_audio_stream\n"));
-	samples_this_frame = osd_start_audio_stream(1/*sound_machine_is_stereo*/);
+    // normal cod for stereo/mono switch look likes:
+      	samples_this_frame = osd_start_audio_stream(0);
+
+    // patched code to force mono looks like:
+//	samples_this_frame = osd_start_audio_stream(0);
+    // - - - - -
+
 	if (!samples_this_frame)
 		return 1;
 
