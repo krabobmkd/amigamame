@@ -138,7 +138,8 @@ public:
         DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;        
 #define CONFDISPLAYFLAGS_ONWORKBENCH 1
 #define CONFDISPLAYFLAGS_FRAMESKIP 2
-        ULONG_FLAGS _flags = 0;
+#define CONFDISPLAYFLAGS_TRIPLEBUFFER 4
+        ULONG_FLAGS _flags = CONFDISPLAYFLAGS_TRIPLEBUFFER;
         //bool    _startOnWorkbench = false;
         Display_PerScreenMode &getActiveMode();
      protected:

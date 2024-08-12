@@ -230,6 +230,7 @@ void MameConfig::toDefault()
     _display._perScreenMode.clear();
     _display._color_brightness = 1.0f;
     _display._color_gamma = 1.0f;
+    _display._flags = CONFDISPLAYFLAGS_TRIPLEBUFFER;
 
     _audio._mode = AudioMode::AHI;
     _audio._freq = 22050;

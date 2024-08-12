@@ -354,6 +354,7 @@ void Intuition_Screen_CGX::close()
 
 void Intuition_Screen_CGX::draw(_mame_display *display)
 {
+    if(!beforeBufferDrawn()) return;
     if(isSourceRGBA32() )
     {
         drawCGX_DirectCPU32(display);
@@ -362,6 +363,7 @@ void Intuition_Screen_CGX::draw(_mame_display *display)
     {
         drawCGX_DirectCPU16(display);
     }
+   if(_sbDrawn) afterBufferDrawn();
 
 }
 // - - -- -  - - --

@@ -169,9 +169,11 @@ Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
     , _fullscreenWidth(0)
     , _fullscreenHeight(0)
     , _screenDepthAsked(8) // default.
-    , _pMouseRaster(NULL)
+    , _pMouseRaster(NULL)    
+    , _tripleBufferInitOk(0)
+    , _lastIndexDrawn(0),_indexToDraw(1)
 {
-
+    memset(&_screenBuffer[0],0,sizeof(_screenBuffer));
 }
 
 bool Intuition_Screen::open()
@@ -233,13 +235,72 @@ bool Intuition_Screen::open()
     _width = _fullscreenWidth;
     _height = _fullscreenHeight;
 
+    if(_flags & CONFDISPLAYFLAGS_TRIPLEBUFFER)
+    {
+        initTripleBuffer(); // could fail, in which case back to direct rendering
+    }
+
     return true;
 }
+int Intuition_Screen::initTripleBuffer()
+{
+    _tripleBufferInitOk = 0;
+    if(!_pScreen) return 0;
+
+    if(_screenBuffer[0]._pScreenBuffer ||
+         _screenBuffer[1]._pScreenBuffer ||
+         _screenBuffer[2]._pScreenBuffer)
+            closeTripleBuffer();
+
+    // the AGA/CGX unified os3 way
+    _screenBuffer[0]._pScreenBuffer = AllocScreenBuffer(_pScreen,NULL,SB_SCREEN_BITMAP);
+    if(!_screenBuffer[0]._pScreenBuffer) return 0;
+
+    for(int i=0; i<3 ;i++)
+    {
+        if(!_screenBuffer[i]._pScreenBuffer)
+            _screenBuffer[i]._pScreenBuffer = AllocScreenBuffer(_pScreen,NULL,SB_COPY_BITMAP );
+        if(! _screenBuffer[i]._pScreenBuffer)
+        {
+            closeTripleBuffer();
+            return 0;
+        }
+        // init rastport
+        // " Initialize a RastPort structure to standard values."
+        // I feel super 100% reasured by this marvellous function.
+        InitRastPort( &_screenBuffer[i]._rport );
+        _screenBuffer[i]._rport.BitMap = _screenBuffer[i]._pScreenBuffer->sb_BitMap;
+        _screenBuffer[i]._pScreenBuffer->sb_DBufInfo.dbi_UserData1 = i;
+        // myDBI->dbi_DispMessage.mn_ReplyPort=ports[1];
+    }
+    _lastIndexDrawn = 0;
+    _indexToDraw = 1;
+    _tripleBufferInitOk = 1;
+    return 1;
+}
+void Intuition_Screen::closeTripleBuffer()
+{
+    if(!_pScreen) return; // must be closed before screen !!
+    // set the screen initial bitmap back to screen, else not sure what heresia could happen.
+//    if(_screenBuffer[0]._pScreenBuffer)
+//        ChangeScreenBuffer(_pScreen,_screenBuffer[0]._pScreenBuffer);
+
+    for(int i=2;i>=0;i--)
+    {
+        if(_screenBuffer[i]._pScreenBuffer) FreeScreenBuffer(_pScreen,_screenBuffer[i]._pScreenBuffer);
+        _screenBuffer[i]._pScreenBuffer = NULL;
+    }
+}
+
 void Intuition_Screen::close()
 {
     IntuitionDrawable::close();
+    closeTripleBuffer();
+
     if(_pScreenWindow) CloseWindow(_pScreenWindow);
     _pScreenWindow = NULL;
+
+
     if(_pScreen) CloseScreen(_pScreen);
     _pScreen = NULL;
     if(_pMouseRaster) FreeRaster( (PLANEPTR) _pMouseRaster ,8,8);
@@ -253,14 +314,42 @@ MsgPort *Intuition_Screen::userPort()
 RastPort *Intuition_Screen::rastPort()
 {
     if(!_pScreen) return NULL;
-    return &_pScreen->RastPort;
+    // may use triple buffer
+   if(_tripleBufferInitOk)
+        return &_screenBuffer[_indexToDraw]._rport;
+
+   return &_pScreen->RastPort;
 }
 Screen *Intuition_Screen::screen()
 { return _pScreen;
 }
 BitMap *Intuition_Screen::bitmap()
-{
+{    
+   if(_tripleBufferInitOk)  // may use triple buffer
+       return _screenBuffer[_indexToDraw]->_pScreenBuffer->sb_BitMap;
+
     return _pScreen->RastPort.BitMap;
+}
+int Intuition_Screen::beforeBufferDrawn()
+{
+    if(_tripleBufferInitOk)
+    {
+        // check last changescreen message ?
+
+
+        // could mean last frame not shown yet, do not draw.
+        return (int)(_lastIndexDrawn != _indexToDraw);
+    }
+    return 1;// ok, do draw
+}
+void Intuition_Screen::afterBufferDrawn()
+{
+    // may apply double buffer
+    if(_tripleBufferInitOk)
+    {
+        ChangeScreen(_pScreen,_screenBuffer[_indexToDraw]->_pScreenBuffer);
+        _lastIndexDrawn = _indexToDraw;
+    }
 }
 // - - - - - - - - -
 
@@ -459,6 +548,7 @@ void IntuitionDisplay::draw(_mame_display *display)
 {
     if(!_drawable) return;
     _drawable->draw(display);
+
 }
 MsgPort *IntuitionDisplay::userPort()
 {

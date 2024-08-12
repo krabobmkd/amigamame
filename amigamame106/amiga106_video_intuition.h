@@ -5,17 +5,17 @@
 #include "amiga106_video.h"
 #include "amiga_video_remap.h"
 
-//extern "C"
-//{
-//    #include <exec/ports.h>
-//    #include <graphics/rastport.h>
-//}
+extern "C"
+{
+   // #include <exec/ports.h>
+    #include <graphics/rastport.h>
+}
 
 struct Window;
 struct Screen;
 struct RastPort;
 struct BitMap;
-
+struct ScreenBuffer;
 
 // - - - - from driver.h
 #define VIDEO_RGB_DIRECT	 			0x0004
@@ -85,8 +85,20 @@ protected:
     int _screenDepthAsked; // 8 or 16, needed for screen opening.
     void *_pMouseRaster;
 
-   // BitMap *bitmap() override;
+    // - - -triple buffer management
+    struct SBuffer {
+         ScreenBuffer *_pScreenBuffer;
+         struct RastPort _rport;  // may need this per screen buffer for special draw func.
+    };
 
+    SBuffer _screenBuffer[3];
+    int _tripleBufferInitOk;
+    int _lastIndexDrawn,_indexToDraw;
+
+    int initTripleBuffer();
+    void closeTripleBuffer();
+    int beforeBufferDrawn();
+    void afterBufferDrawn();
 };
 class Intuition_Window : public IntuitionDrawable
 {

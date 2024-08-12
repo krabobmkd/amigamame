@@ -31,7 +31,7 @@ public:
         int _width,_height;
         int _colorsIndexLength;
         int _video_attributes;
-        int _driverDepth;
+        int _driverDepth;        
     };
     virtual bool open(const params &params) = 0;
     virtual void init_rgb_components(unsigned int *rgbcomponents) = 0; // needed for RGB mode.
