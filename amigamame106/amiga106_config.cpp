@@ -281,7 +281,7 @@ void MameConfig::Display::serialize(ASerializer &serializer)
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU Or WPA8",
                                                  "CPU Remap+ScalePixelArray"});
     serializer(" ",_flags,0,{
-               "On Workbench","Bad FrameSkip"/*,"Triple Buffer"*/
+               "On Workbench","Bad FrameSkip","Triple Buffer"
                });
                                             // min,max,step, default
     serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);

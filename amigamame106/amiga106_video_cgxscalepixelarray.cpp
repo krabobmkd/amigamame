@@ -217,9 +217,9 @@ void Intuition_Screen_CGXScale::close()
 
 void Intuition_Screen_CGXScale::draw(_mame_display *display)
 {
-    if(!beforeBufferDrawn()) return;
+    if(_tripleBufferInitOk && !beforeBufferDrawn()) return;
     drawCGX_scale(display);
-    if(_sbDrawn) afterBufferDrawn();
+    if(_tripleBufferInitOk) afterBufferDrawn();
 }
 
 // - - -- -  - - --

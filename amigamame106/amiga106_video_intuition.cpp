@@ -161,7 +161,7 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
 }
 // - - - - - - - - -
 Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
-    : IntuitionDrawable((params._flags&15))
+    : IntuitionDrawable((params._flags/*&15*/))
     , _pScreen(NULL)
     , _pScreenWindow(NULL)
 
@@ -235,8 +235,10 @@ bool Intuition_Screen::open()
     _width = _fullscreenWidth;
     _height = _fullscreenHeight;
 
-    if(_flags & CONFDISPLAYFLAGS_TRIPLEBUFFER)
+    printf("FLAGS:%08x\n",_flags);
+    if(_flags & DISPFLAG_USETRIPLEBUFFER)
     {
+        printf("initTripleBuffer\n");
         initTripleBuffer(); // could fail, in which case back to direct rendering
     }
 
@@ -270,7 +272,10 @@ int Intuition_Screen::initTripleBuffer()
         // I feel super 100% reasured by this marvellous function.
         InitRastPort( &_screenBuffer[i]._rport );
         _screenBuffer[i]._rport.BitMap = _screenBuffer[i]._pScreenBuffer->sb_BitMap;
-        _screenBuffer[i]._pScreenBuffer->sb_DBufInfo.dbi_UserData1 = i;
+        _screenBuffer[i]._pScreenBuffer->sb_DBufInfo->dbi_UserData1 = (APTR)i;
+    //    printf("msgport at init:%08x\n",_screenBuffer[i]._pScreenBuffer->sb_DBufInfo->dbi_DispMessage);
+    // we have to fill the port to receive "displayed screen buffer" message
+
         // myDBI->dbi_DispMessage.mn_ReplyPort=ports[1];
     }
     _lastIndexDrawn = 0;
@@ -326,7 +331,7 @@ Screen *Intuition_Screen::screen()
 BitMap *Intuition_Screen::bitmap()
 {    
    if(_tripleBufferInitOk)  // may use triple buffer
-       return _screenBuffer[_indexToDraw]->_pScreenBuffer->sb_BitMap;
+       return _screenBuffer[_indexToDraw]._pScreenBuffer->sb_BitMap;
 
     return _pScreen->RastPort.BitMap;
 }
@@ -335,8 +340,8 @@ int Intuition_Screen::beforeBufferDrawn()
     if(_tripleBufferInitOk)
     {
         // check last changescreen message ?
-
-
+        _indexToDraw++; // simple test
+        if(_indexToDraw == 3 ) _indexToDraw = 0;
         // could mean last frame not shown yet, do not draw.
         return (int)(_lastIndexDrawn != _indexToDraw);
     }
@@ -347,7 +352,10 @@ void Intuition_Screen::afterBufferDrawn()
     // may apply double buffer
     if(_tripleBufferInitOk)
     {
-        ChangeScreen(_pScreen,_screenBuffer[_indexToDraw]->_pScreenBuffer);
+        auto success =  ChangeScreenBuffer(_pScreen,_screenBuffer[_indexToDraw]._pScreenBuffer);
+        if(!success) {
+            printf("failed !\n");
+        }
         _lastIndexDrawn = _indexToDraw;
     }
 }

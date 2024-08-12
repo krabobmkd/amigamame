@@ -2,6 +2,13 @@
 #include "sound_krb.h"
 #include "streams.h"
 #include <stdio.h>
+
+extern "C" {
+    #include "osdepend.h"
+}
+
+extern  cycles_t  lastSoundFrameUpdate;// = osd_cycles();
+
 // return how much done.
 ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
 {
@@ -9,6 +16,23 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
     WORD *ps = pSoundToWrite->m_pBuffer;
 
     // note: mame frames and AHI buffers are meant to have the exact same size.
+    cycles_t delta = (osd_cycles()-lastSoundFrameUpdate);
+    if(delta>(1000000LL>>2)) // 0.25 sec
+    {
+        // the engine looks blocked, what happens when window resize. fill blank.
+        UWORD lh = ((UWORD) pSoundToWrite->m_nbSampleToFill);
+        LONG *psl = (LONG *)ps; // copy 4 bytes
+        if(pSoundToWrite->m_stereo)
+        {
+            for(UWORD i=0; i<lh ; i++ ) *psl++ = 0;
+        } else
+        {
+            lh>>=1;
+            // mono
+            for(UWORD i=0; i<lh ; i++ ) *psl++ = 0;
+        }
+        return pSoundToWrite->m_nbSampleToFill;
+    }
 
     SampleFrame *pFrame = &SampleFrames[(currentSampleFrame-1)&3]; // test if missed previous
     if(pFrame->_writelock || pFrame->_read>=pFrame->_written)
@@ -38,7 +62,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
             {
                 *psl++ = *prl++;
             }
-        }
+        } else
         {
             WORD *pr = pSoundToWrite->m_pPrevBuffer+(pSoundToWrite->m_nbSampleToFill);
             // mono

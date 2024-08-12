@@ -55,6 +55,10 @@ if(AMIGA)
 		list(APPEND AMIGA_COMPILER_OPTIONS -msoft-float)
 	endif()
 
+	# can't use  -malign-int with code that call os.
+	# -mnobitfield
+	# test -msep-data
+	list(APPEND AMIGA_COMPILER_OPTIONS -mnobitfield)
 endif()
 
 # test -fsingle-precision-constant

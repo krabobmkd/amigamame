@@ -702,9 +702,13 @@ static void sound_save(int config_type, xml_data_node *parentnode)
 
 extern int amigamame_audio_forcemono;
 
+cycles_t lastSoundFrameUpdate = 0;
+
 void sound_frame_update(void)
 {
 	int resetstreamleft=1,resetstreamright=(amigamame_audio_forcemono)?0:1;
+
+    lastSoundFrameUpdate = osd_cycles();
 
 	int sample, spknum;
     struct SampleFrame *pFrame;

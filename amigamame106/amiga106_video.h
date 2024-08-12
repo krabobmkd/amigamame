@@ -25,6 +25,7 @@ public:
     #define DISPFLAG_STARTWITHWINDOW 8
     #define DISPFLAG_INTUITIONPALETTE  16
     #define DISPFLAG_USESCALEPIXARRAY  32
+    #define DISPFLAG_USETRIPLEBUFFER  64
     struct params {
         ULONG _flags;
         ULONG _forcedModeID;
