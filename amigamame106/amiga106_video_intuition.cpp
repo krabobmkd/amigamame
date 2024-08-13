@@ -235,10 +235,8 @@ bool Intuition_Screen::open()
     _width = _fullscreenWidth;
     _height = _fullscreenHeight;
 
-    printf("FLAGS:%08x\n",_flags);
     if(_flags & DISPFLAG_USETRIPLEBUFFER)
     {
-        printf("initTripleBuffer\n");
         initTripleBuffer(); // could fail, in which case back to direct rendering
     }
 

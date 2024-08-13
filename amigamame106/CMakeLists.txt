@@ -56,9 +56,10 @@ if(AMIGA)
 	endif()
 
 	# can't use  -malign-int with code that call os.
+	# or between libs that uses structs not completely 4b aligned.
 	# -mnobitfield
 	# test -msep-data
-	list(APPEND AMIGA_COMPILER_OPTIONS -mnobitfield)
+	#list(APPEND AMIGA_COMPILER_OPTIONS -mnobitfield)
 endif()
 
 # test -fsingle-precision-constant

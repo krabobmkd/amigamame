@@ -132,39 +132,71 @@ void ConfigureLowLevelLib()
         WaitTOF();
         WaitTOF();
     }
-    bool useParallelExtension=false;
+
     useAnyMouse=0;
-    for(int iplayer=0;iplayer<4;iplayer++) // actually 2
+    for(int iLLPort=0;iLLPort<4;iLLPort++) // actually 2
     {
-        using cp = MameConfig::ControlPort;
-        cp controlPort = configControls._PlayerPort[iplayer];
-        int lowlevelState = (int)configControls._PlayerPortType[iplayer];
+        int iPlayer = configControls._llPort_Player[iLLPort] ;
+        printf("iPlayer:%d\n",iPlayer);
+        if( iPlayer == 0) continue;
+
+        int lowlevelState = configControls._llPort_Type[iLLPort];
+                printf("type:%d\n",lowlevelState);
         if(lowlevelState<0) lowlevelState=0; // shouldnt
         if(lowlevelState>3) lowlevelState=3; // shouldnt
-        if(controlPort == cp::Port1llMouse ||
-           controlPort == cp::Port2llJoy ||
-           controlPort == cp::Port3ll ||
-           controlPort == cp::Port4ll )
-        {
-            int iport = (int)controlPort -1; // 0->3
-            if(lowlevelState == SJA_TYPE_AUTOSENSE)
-            {
-                ULONG state = ReadJoyPort(iport)>>28;
+//        if(lowlevelState == SJA_TYPE_AUTOSENSE)
+//        {
+//            //lowlevelState = ReadJoyPort(iLLPort)>>28;
+//            //configControls._llPort_Type[iLLPort] = lowlevelState;
+//        }
 
-            } else
-            {
-                if(lowlevelState == SJA_TYPE_MOUSE) useAnyMouse = 1;
-                SetJoyPortAttrs(iport,SJA_Type,lowlevelState,TAG_DONE);
-            }
-        }
-        if(controlPort == cp::Para3 ||
-           controlPort == cp::Para4 ||
-           controlPort == cp::Para3Bt4 )
+        if(lowlevelState != SJA_TYPE_AUTOSENSE)
         {
-            useParallelExtension = true;
+            if(lowlevelState == SJA_TYPE_MOUSE) useAnyMouse = 1;
+            SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
         }
 
-    } // loop by player
+//        int controlPort = configControls._PlayerPort[iplayer];
+//        int lowlevelState = (int)configControls._PlayerPortType[iLLPort];
+//        if(lowlevelState<0) lowlevelState=0; // shouldnt
+//        if(lowlevelState>3) lowlevelState=3; // shouldnt
+//        if(controlPort == cp::Port1llMouse ||
+//           controlPort == cp::Port2llJoy ||
+//           controlPort == cp::Port3ll ||
+//           controlPort == cp::Port4ll )
+//        {
+//            int iport = (int)controlPort -1; // 0->3
+//            if(lowlevelState == SJA_TYPE_AUTOSENSE)
+//            {
+//                ULONG state = ReadJoyPort(iport)>>28;
+
+//            } else
+//            {
+//                if(lowlevelState == SJA_TYPE_MOUSE) useAnyMouse = 1;
+//                SetJoyPortAttrs(iport,SJA_Type,lowlevelState,TAG_DONE);
+//            }
+//        }
+//        if(controlPort == cp::Para3 ||
+//           controlPort == cp::Para4 ||
+//           controlPort == cp::Para3Bt4 )
+//        {
+//            useParallelExtension = true;
+//        }
+
+    } // loop by ll port
+
+    bool useParallelExtension=false;
+    // loop for parallel port
+    for(int ipar=0 ; ipar<2 ;ipar++)
+    {
+        int iPlayer = configControls._parallelPort_Player[ipar] ;
+        if( iPlayer == 0 ) continue;
+        int type = configControls._parallel_type[ipar];
+        if(type == 0 ) continue;
+
+        useParallelExtension = true;
+    }
+
 
     if(askedPadsRawKey==0)
     {
@@ -230,6 +262,7 @@ void FreeInputs()
 
     if(g_pInputs) free(g_pInputs);
     g_pInputs = NULL;
+    _keepMouseNames.clear();
 }
 // called from video
 void UpdateInputs(struct MsgPort *pMsgPort)
@@ -365,25 +398,21 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     if(useAnyMouse)
     {
         MameConfig::Controls &configControls = getMainConfig().controls();
-        using cp = MameConfig::ControlPort;
 
-        for(int iplayer=0;iplayer<4;iplayer++) // actually 2
+        for(int iLLPort=0;iLLPort<4;iLLPort++) // actually 2
         {
-            cp controlPort = configControls._PlayerPort[iplayer];
-            if(controlPort == cp::Port1llMouse || // api says "all 4 ll ports"
-                controlPort == cp::Port2llJoy ||
-                controlPort == cp::Port3ll || // the 2 enigmatic ports that may be hacked by USB trident.
-                controlPort == cp::Port4ll
-            )
+            int iplayer = configControls._llPort_Player[iLLPort];
+            if(iplayer ==0) continue;
+            int itype = configControls._llPort_Type[iLLPort];
+            if(itype != SJA_TYPE_MOUSE ) continue;
+
+            ULONG state = ReadJoyPort( iLLPort);
+            if(state>>28 == SJA_TYPE_MOUSE)
             {
-                ULONG state = ReadJoyPort( (int)controlPort -1 );
-                if(state>>28 == SJA_TYPE_MOUSE)
-                {
-                   g_pInputs->_mousestate[iplayer]= state;
-                    //#define JP_MHORZ_MASK	(255<<0)	/* horzizontal position */
-                    //#define JP_MVERT_MASK	(255<<8)	/* vertical position	*/
-                    //#define JP_MOUSE_MASK	(JP_MHORZ_MASK|JP_MVERT_MASK)
-                }
+               g_pInputs->_mousestate[iLLPort]= state;
+                //#define JP_MHORZ_MASK	(255<<0)	/* horzizontal position */
+                //#define JP_MVERT_MASK	(255<<8)	/* vertical position	*/
+                //#define JP_MOUSE_MASK	(JP_MHORZ_MASK|JP_MVERT_MASK)
             }
         } // loop by player
     }
@@ -641,17 +670,16 @@ void RawKeyMap::init()
     // lowlevel send rawkeys for each CD32 pads.
     {
         MameConfig::Controls &configControls = getMainConfig().controls();
-        for(int iplayer=0;iplayer<4;iplayer++) // actually 2
+        for(int iLLPort=0;iLLPort<4;iLLPort++) // actually 2
         {
-            using cp = MameConfig::ControlPort;
-            cp controlPort = configControls._PlayerPort[iplayer];
-            int lowlevelState = (int) configControls._PlayerPortType[iplayer];
-            if(controlPort == cp::Port1llMouse ||
-               controlPort == cp::Port2llJoy ||
-               controlPort == cp::Port3ll ||
-               controlPort == cp::Port4ll )
-            {
-                int iport = (int)controlPort -1; // 0->3
+            int iplayer = configControls._llPort_Player[iLLPort];
+            if(iplayer == 0) continue;
+            int itype = configControls._llPort_Type[iLLPort];
+            if(itype == 0) continue; //still not inited
+//            cp controlPort = configControls._PlayerPort[iplayer];
+//            int lowlevelState = (int) configControls._PlayerPortType[iLLPort];
+
+                int iport = iLLPort; // 0->3
                 int ipshft = iport<<8;
                 const int mamecodeshift =
                     ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
@@ -671,76 +699,104 @@ void RawKeyMap::init()
                 };
                 _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
 
-            } // end if lowlevel rawkey concerned
-            // if parralel port hacks as port 3 and 4.
-           if(controlPort == cp::Para3 ||
-               controlPort == cp::Para4 ||
-               controlPort == cp::Para3Bt4 )
-            {
-                int iport = 2;
-                if(controlPort == cp::Para4) iport=3;
-                int ipshft = iport<<8;
-                const int mamecodeshift =
-                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
 
-            // joystick are not CD32 pads, can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
-              vector<os_code_info> kbi2={
-                {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
-                {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
-                //{padsbtnames[iport][2],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
-                //{padsbtnames[iport][3],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
-                //{padsbtnames[iport][4],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
-                //{padsbtnames[iport][5],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
-                //{padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
-                {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
-                {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
-                {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
-                {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
-                };
-                _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
+//            // if parralel port hacks as port 3 and 4.
+//           if(controlPort == cp::Para3 ||
+//               controlPort == cp::Para4 ||
+//               controlPort == cp::Para3Bt4 )
+//            {
+//                int iport = 2;
+//                if(controlPort == cp::Para4) iport=3;
+//                int ipshft = iport<<8;
+//                const int mamecodeshift =
+//                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iLLPort ;
 
-            } // end if parallel port hacks concerned.
-        }
+//            // joystick are not CD32 pads, can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
+//              vector<os_code_info> kbi2={
+//                {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
+//                {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
+//                //{padsbtnames[iport][2],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
+//                //{padsbtnames[iport][3],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
+//                //{padsbtnames[iport][4],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
+//                //{padsbtnames[iport][5],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
+//                //{padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
+//                {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
+//                {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
+//                {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
+//                {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
+//                };
+//                _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
+
+//            } // end if parallel port hacks concerned.
+        } // end loop by port
+        for(int ipar=0;ipar<2;ipar++) // actually 2
+        {
+            int iplayer = configControls._parallelPort_Player[ipar];
+            if(iplayer == 0) continue;
+            int itype = configControls._parallel_type[ipar];
+            if(itype == 0) continue; //still not inited
+
+            int iport = 2+ipar; // we hack parallel pads as Lowlevel Pads3 and 4 !!!
+            int ipshft = iport<<8;
+            const int mamecodeshift =
+                ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
+
+        // joystick are not CD32 pads, can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
+          vector<os_code_info> kbi2={
+            {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
+            {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
+            //{padsbtnames[iport][2],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
+            //{padsbtnames[iport][3],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
+            //{padsbtnames[iport][4],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
+            //{padsbtnames[iport][5],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
+            //{padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
+            {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
+            {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
+            {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
+            {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
+            };
+            _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
+
+        } // end loop per par
 
     }
     // then may add analog controls
     _keepMouseNames.clear();
     if(useAnyMouse)
     {
+        printf("USE ANY MOUSE\n");
         MameConfig::Controls &configControls = getMainConfig().controls();
-        using cp = MameConfig::ControlPort;
-        for(int iplayer=0;iplayer<4;iplayer++) // actually 2
-        {
-            cp controlPort = configControls._PlayerPort[iplayer];
-            if( configControls._PlayerPortType[iplayer] == SJA_TYPE_MOUSE &&
-            (
-                controlPort == cp::Port1llMouse || // api says "all 4 ll ports"
-                controlPort == cp::Port2llJoy ||
-                controlPort == cp::Port3ll || // the 2 enigmatic ports that may be hacked by USB trident.
-                controlPort == cp::Port4ll)
-            )
-            {
-                int mameAnlgSizePerPl = ((int)MOUSECODE_2_ANALOG_X-(int)MOUSECODE_1_ANALOG_X);
-                {
-                stringstream ss;
-                ss << "Mouse"<<((int)controlPort)<<  " X";
-                _keepMouseNames.push_back(ss.str());
-                _kbi.push_back({_keepMouseNames.back().c_str(),
-                                ANALOG_CODESTART+(iplayer*2)+0,
-                                MOUSECODE_1_ANALOG_X+(iplayer*mameAnlgSizePerPl) });
-                }
-                {
-                stringstream ss;
-                ss << "Mouse"<<((int)controlPort) <<  " Y";
-                _keepMouseNames.push_back(ss.str());
-                _kbi.push_back({_keepMouseNames.back().c_str(),
-                                ANALOG_CODESTART+(iplayer*2)+1,
-                                MOUSECODE_1_ANALOG_Y+(iplayer*mameAnlgSizePerPl) });
-                }
 
-                                // MOUSECODE_1_BUTTON1
+        for(int iport=0;iport<4;iport++) // actually 2
+        {
+            int iplayer = configControls._llPort_Player[iport];
+            if(iplayer == 0) continue;
+            int itype = configControls._llPort_Type[iport];
+            if(itype != SJA_TYPE_MOUSE) continue; //still not inited
+
+            int mameAnlgSizePerPl = ((int)MOUSECODE_2_ANALOG_X-(int)MOUSECODE_1_ANALOG_X);
+            {
+                stringstream ss;
+                ss << "Mouse"<<(iport+1)<<  " X";
+                _keepMouseNames.push_back(ss.str());
+                _kbi.push_back({_keepMouseNames.back().c_str(),
+                                ANALOG_CODESTART+(iport*2)+0,
+                                MOUSECODE_1_ANALOG_X+(iport*mameAnlgSizePerPl) });
             }
+            {
+                stringstream ss;
+                ss << "Mouse"<<(iport+1)<<  " Y";
+                _keepMouseNames.push_back(ss.str());
+                _kbi.push_back({_keepMouseNames.back().c_str(),
+                                ANALOG_CODESTART+(iport*2)+1,
+                                MOUSECODE_1_ANALOG_Y+(iport*mameAnlgSizePerPl) });
+            }
+
+
         } // loop by player
+    } else
+    {
+                printf("USE NO MOUSE\n");
     }
 
 

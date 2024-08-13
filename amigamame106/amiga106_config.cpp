@@ -236,11 +236,31 @@ void MameConfig::toDefault()
     _audio._freq = 22050;
     _audio._forceMono = true;
 
-    _controls._PlayerPort[0]=ControlPort::Port2llJoy;
-        _controls._PlayerPortType[0]=1;
-    _controls._PlayerPort[1]=ControlPort::None; _controls._PlayerPortType[1]=0;
-    _controls._PlayerPort[2]=ControlPort::None; _controls._PlayerPortType[2]=0;
-    _controls._PlayerPort[3]=ControlPort::None; _controls._PlayerPortType[3]=0;
+
+    #define SJA_TYPE_AUTOSENSE 0
+    #define SJA_TYPE_GAMECTLR  1
+    #define SJA_TYPE_MOUSE	   2
+    #define SJA_TYPE_JOYSTK    3
+//    _controls._PlayerPort[0]=ControlPortLL::Port2llJoy;
+//        _controls._PlayerPortType[0]=1;
+//    _controls._PlayerPort[1]=ControlPortLL::None; _controls._PlayerPortType[1]=0;
+//    _controls._PlayerPort[2]=ControlPortLL::None; _controls._PlayerPortType[2]=0;
+//    _controls._PlayerPort[3]=ControlPortLL::None; _controls._PlayerPortType[3]=0;
+    _controls._llPort_Player[0] = 1;
+    _controls._llPort_Type[0] = SJA_TYPE_MOUSE; // SJA_TYPE_AUTOSENSE
+
+    _controls._llPort_Player[1] = 1;
+    _controls._llPort_Type[1] = SJA_TYPE_GAMECTLR;
+
+    _controls._llPort_Player[2] = 0;
+    _controls._llPort_Type[2] = 0;
+    _controls._llPort_Player[3] = 0;
+    _controls._llPort_Type[3] = 0;
+
+    _controls._parallelPort_Player[0]=0;
+    _controls._parallel_type[0]=0;
+    _controls._parallelPort_Player[1]=0;
+    _controls._parallel_type[1]=0;
 
     _misc._romsPath = "PROGDIR:roms";
     _misc._userPath = "PROGDIR:user";
@@ -304,46 +324,80 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
 }
 void MameConfig::Controls::serialize(ASerializer &serializer)
 {
-
-
-    vector<string> ports={
+    static const vector<string> strPlayers={
         "None",
-        "Port 1(Mouse)",
-        "Port 2(Joy)",
-        "Port 3 Lowlevel.lib",
-        "Port 4 Lowlevel.lib",
-        "Parallel Port3(1bt)",
-        "Parallel Port4(1bt)",
-        "Parallel Port3(2bt)"
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4"
     };
-//#define SJA_TYPE_AUTOSENSE 0
-//#define SJA_TYPE_GAMECTLR  1
-//#define SJA_TYPE_MOUSE	   2
-//#define SJA_TYPE_JOYSTK    3
-    // lowlevel
-    vector<string> controlerTypesLL={
-        "Auto Sense",
+    static const vector<string> strLLTypes={
+        "None", //"Auto Sense",  now ask explicit config.
         "CD32 7bt Pad",
         "Mouse",
         "Joystick(2bt)",
     };
-    serializer("Player1", (int&)_PlayerPort[0],ports);
-    serializer("Type1", _PlayerPortType[0],controlerTypesLL);
-    serializer("Player2",  (int&)_PlayerPort[1],ports);
-    serializer("Type2", _PlayerPortType[1],controlerTypesLL);
-    serializer("Player3", (int&) _PlayerPort[2],ports);
-    serializer("Type3", _PlayerPortType[2],controlerTypesLL);
-    serializer("Player4", (int&) _PlayerPort[3],ports);
-    serializer("Type4", _PlayerPortType[3],controlerTypesLL);
+    static const vector<string> strPrlTypes={
+        "None",
+        "Joystick(1bt)",
+    };
 
-//    strcomment c(
-//"Port 1->4 are managed by lowlevel.library\n"
-//"SMS 2 buttons pads & CD32 7bt can be used\n"
-//"on Amiga port 1&2,\n"
-//"Parallel port3&4 extension only have 1 bt\n"
-//"Poseidon USB can patch 4 USB pads on lowlevel\n"
-//                );
-//    serializer((const char *)NULL,c);
+    serializer("Mouse Port 1", (int&)_llPort_Player[0],strPlayers);
+    serializer("Types P1", (int&)_llPort_Type[0],strLLTypes);
+
+    serializer("Joy Port 2", (int&)_llPort_Player[1],strPlayers);
+    serializer("Types P2", (int&)_llPort_Type[1],strLLTypes);
+
+//    _ll = "These two mysterious 3/4 ports was defined for CD32\n"
+//          " and are actually used by some USB stack.";
+//    serializer(" ", _ll);
+
+    serializer("Lowlevel Port 3", (int&)_llPort_Player[2],strPlayers);
+    serializer("Types P3", (int&)_llPort_Type[2],strLLTypes);
+
+    serializer("Lowlevel Port 4", (int&)_llPort_Player[3],strPlayers);
+    serializer("Types P4", (int&)_llPort_Type[3],strLLTypes);
+
+    // - - - -
+//    _pr = "These other two need a parallel port extension\n"
+//          " and can only manage one button joystick.";
+//    serializer(" ", _pr);
+
+    serializer("Parallel Port 3", (int&)_parallelPort_Player[0],strPlayers);
+    serializer("Types Pr3", (int&)_parallel_type[0],strPrlTypes);
+    serializer("Parallel Port 4", (int&)_parallelPort_Player[1],strPlayers);
+    serializer("Types Pr4", (int&)_parallel_type[1],strPrlTypes);
+
+//old
+//    vector<string> ports={
+//        "None",
+//        "Port 1(Mouse)",
+//        "Port 2(Joy)",
+//        "Port 3 Lowlevel.lib",
+//        "Port 4 Lowlevel.lib",
+//        "Parallel Port3(1bt)",
+//        "Parallel Port4(1bt)",
+//        "Parallel Port3(2bt)"
+//    };
+////#define SJA_TYPE_AUTOSENSE 0
+////#define SJA_TYPE_GAMECTLR  1
+////#define SJA_TYPE_MOUSE	   2
+////#define SJA_TYPE_JOYSTK    3
+//    // lowlevel
+//    vector<string> controlerTypesLL={
+//        "Auto Sense",
+//        "CD32 7bt Pad",
+//        "Mouse",
+//        "Joystick(2bt)",
+//    };
+//    serializer("Player1", (int&)_PlayerPort[0],ports);
+//    serializer("Type1", _PlayerPortType[0],controlerTypesLL);
+//    serializer("Player2",  (int&)_PlayerPort[1],ports);
+//    serializer("Type2", _PlayerPortType[1],controlerTypesLL);
+//    serializer("Player3", (int&) _PlayerPort[2],ports);
+//    serializer("Type3", _PlayerPortType[2],controlerTypesLL);
+//    serializer("Player4", (int&) _PlayerPort[3],ports);
+//    serializer("Type4", _PlayerPortType[3],controlerTypesLL);
 
 }
 void MameConfig::Misc::serialize(ASerializer &serializer)
