@@ -24,16 +24,14 @@ extern "C" {
     #include <libraries/lowlevel.h>
 }
 
-//#include <devices/keyboard.h>
-//#include <devices/keymap.h>
-
 #include <vector>
+#include <sstream>
+#include <string>
 // from mame:
 extern "C" {
     #include "osdepend.h"
     #include "input.h"
     // for schedule_exit()
-
     #include "mame.h"
 }
 
@@ -42,9 +40,15 @@ extern "C" {
 #include "amiga106_video.h"
 #include "amiga_parallelpads.h"
 
+
+using namespace std;
+
 #include <stdio.h>
-#include <string>
+
 #include <stdlib.h>
+
+// set than after the extended lowlevel rawkey codes.
+#define ANALOG_CODESTART 1024
 
 // we don't even need to publish it:
 struct MameInputs
@@ -53,7 +57,8 @@ struct MameInputs
     int         _NbKeysUpStack;
     BYTE         _Keys[256*4]; // bools state for actual keyboard rawkeys + lowlevel pads code
     UWORD        _NextKeysUpStack[256]; // delay event between frame to not loose keys.
-
+    // - - mouse states for 4 players, remapped from any ll ports.
+    ULONG _mousestate[4];
 };
 
 
@@ -78,6 +83,7 @@ class RawKeyMap
 
     void init();
 };
+std::vector<std::string> _keepMouseNames;
 
 RawKeyMap   rawkeymap;
 
@@ -96,7 +102,8 @@ void InitLowLevelLib()
         LowLevelBase = OpenLibrary("lowlevel.library", 0);
     }
 }
-static int askedPadsRawKey = 0;
+static USHORT askedPadsRawKey = 0;
+static USHORT useAnyMouse = 0;
 void ConfigureLowLevelLib()
 {
     if(!LowLevelBase) return;
@@ -126,6 +133,7 @@ void ConfigureLowLevelLib()
         WaitTOF();
     }
     bool useParallelExtension=false;
+    useAnyMouse=0;
     for(int iplayer=0;iplayer<4;iplayer++) // actually 2
     {
         using cp = MameConfig::ControlPort;
@@ -145,6 +153,7 @@ void ConfigureLowLevelLib()
 
             } else
             {
+                if(lowlevelState == SJA_TYPE_MOUSE) useAnyMouse = 1;
                 SetJoyPortAttrs(iport,SJA_Type,lowlevelState,TAG_DONE);
             }
         }
@@ -242,12 +251,6 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     }
     g_pInputs->_NbKeysUpStack = 0;
 
-//    if(LowLevelBase)
-//    {
-//        ULONG j2  =ReadJoyPort(2);
-//        ULONG j3  =ReadJoyPort(3);
-//        printf("j2:%08x  j3:%08x\n",j2,j3);
-//    }
     // - - - -
     while((im = (struct IntuiMessage *) GetMsg(pMsgPort)))
     {
@@ -255,8 +258,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
         UWORD imcode  = im->Code;
         UWORD imqual  = im->Qualifier;
 
-        ReplyMsg((struct Message *) im);
-
+        ReplyMsg((struct Message *) im); // the faster the better.
 
         switch(imclass)
         {
@@ -358,6 +360,35 @@ void UpdateInputs(struct MsgPort *pMsgPort)
 //          CallHook(inputs->IDCMPHook, NULL, imclass);
         }
     }
+    // if any mouse (or anything that needs direct joyport ?)
+    // no rawkey for this
+    if(useAnyMouse)
+    {
+        MameConfig::Controls &configControls = getMainConfig().controls();
+        using cp = MameConfig::ControlPort;
+
+        for(int iplayer=0;iplayer<4;iplayer++) // actually 2
+        {
+            cp controlPort = configControls._PlayerPort[iplayer];
+            if(controlPort == cp::Port1llMouse || // api says "all 4 ll ports"
+                controlPort == cp::Port2llJoy ||
+                controlPort == cp::Port3ll || // the 2 enigmatic ports that may be hacked by USB trident.
+                controlPort == cp::Port4ll
+            )
+            {
+                ULONG state = ReadJoyPort( (int)controlPort -1 );
+                if(state>>28 == SJA_TYPE_MOUSE)
+                {
+                   g_pInputs->_mousestate[iplayer]= state;
+                    //#define JP_MHORZ_MASK	(255<<0)	/* horzizontal position */
+                    //#define JP_MVERT_MASK	(255<<8)	/* vertical position	*/
+                    //#define JP_MOUSE_MASK	(JP_MHORZ_MASK|JP_MVERT_MASK)
+                }
+            }
+        } // loop by player
+    }
+
+
     // apply change from parallel pads to player 3 & 4
     if(g_pParallelPads && g_pParallelPads->_ppidata->_last_checked_changes )
     {
@@ -605,58 +636,6 @@ void RawKeyMap::init()
         {". PAD",0x3C,CODE_OTHER_DIGITAL},
         {"ENTER PAD",0x43,KEYCODE_ENTER_PAD},
 
-
-        // and then CD32 pads in lowlevel.library state of the art
-        // we consider mame port 1 is second port, port2 is mouse, then the 2 parallel ports
-        /*
-        {"PAD0 BLUE",RAWKEY_PORT0_BUTTON_BLUE,JOYCODE_2_BUTTON2},
-        {"PAD0 RED",RAWKEY_PORT0_BUTTON_RED,JOYCODE_2_BUTTON1},
-        {"PAD0 YELLOW",RAWKEY_PORT0_BUTTON_YELLOW,JOYCODE_2_BUTTON3},
-        {"PAD0 GREEN",RAWKEY_PORT0_BUTTON_GREEN,JOYCODE_2_BUTTON4},
-        {"PAD0 FORWARD",RAWKEY_PORT0_BUTTON_FORWARD,JOYCODE_2_BUTTON6},
-        {"PAD0 REVERSE",RAWKEY_PORT0_BUTTON_REVERSE,JOYCODE_2_BUTTON5},
-        {"PAD0 PLAY",RAWKEY_PORT0_BUTTON_PLAY,JOYCODE_2_START},
-        {"PAD0 UP",RAWKEY_PORT0_JOY_UP,JOYCODE_2_UP},
-        {"PAD0 DOWN",RAWKEY_PORT0_JOY_DOWN,JOYCODE_2_DOWN},
-        {"PAD0 LEFT",RAWKEY_PORT0_JOY_LEFT,JOYCODE_2_LEFT},
-        {"PAD0 RIGHT",RAWKEY_PORT0_JOY_RIGHT,JOYCODE_2_RIGHT},
-
-        {"PAD1 BLUE",RAWKEY_PORT1_BUTTON_BLUE,JOYCODE_1_BUTTON2},
-        {"PAD1 RED",RAWKEY_PORT1_BUTTON_RED,JOYCODE_1_BUTTON1},
-        {"PAD1 YELLOW",RAWKEY_PORT1_BUTTON_YELLOW,JOYCODE_1_BUTTON3},
-        {"PAD1 GREEN",RAWKEY_PORT1_BUTTON_GREEN,JOYCODE_1_BUTTON4},
-        {"PAD1 FORWARD",RAWKEY_PORT1_BUTTON_FORWARD,JOYCODE_1_BUTTON6},
-        {"PAD1 REVERSE",RAWKEY_PORT1_BUTTON_REVERSE,JOYCODE_1_BUTTON5},
-        {"PAD1 PLAY",RAWKEY_PORT1_BUTTON_PLAY,JOYCODE_1_START},
-        {"PAD1 UP",RAWKEY_PORT1_JOY_UP,JOYCODE_1_UP},
-        {"PAD1 DOWN",RAWKEY_PORT1_JOY_DOWN,JOYCODE_1_DOWN},
-        {"PAD1 LEFT",RAWKEY_PORT1_JOY_LEFT,JOYCODE_1_LEFT},
-        {"PAD1 RIGHT",RAWKEY_PORT1_JOY_RIGHT,JOYCODE_1_RIGHT},
-
-        {"PAD2 BLUE",RAWKEY_PORT2_BUTTON_BLUE,JOYCODE_3_BUTTON2},
-        {"PAD2 RED",RAWKEY_PORT2_BUTTON_RED,JOYCODE_3_BUTTON1},
-        {"PAD2 YELLOW",RAWKEY_PORT2_BUTTON_YELLOW,JOYCODE_3_BUTTON3},
-        {"PAD2 GREEN",RAWKEY_PORT2_BUTTON_GREEN,JOYCODE_3_BUTTON4},
-        {"PAD2 FORWARD",RAWKEY_PORT2_BUTTON_FORWARD,JOYCODE_3_BUTTON6},
-        {"PAD2 REVERSE",RAWKEY_PORT2_BUTTON_REVERSE,JOYCODE_3_BUTTON5},
-        {"PAD2 PLAY",RAWKEY_PORT2_BUTTON_PLAY,JOYCODE_3_START},
-        {"PAD2 UP",RAWKEY_PORT2_JOY_UP,JOYCODE_3_UP},
-        {"PAD2 DOWN",RAWKEY_PORT2_JOY_DOWN,JOYCODE_3_DOWN},
-        {"PAD2 LEFT",RAWKEY_PORT2_JOY_LEFT,JOYCODE_3_LEFT},
-        {"PAD2 RIGHT",RAWKEY_PORT2_JOY_RIGHT,JOYCODE_3_RIGHT},
-
-        {"PAD3 BLUE",RAWKEY_PORT3_BUTTON_BLUE,JOYCODE_4_BUTTON2},
-        {"PAD3 RED",RAWKEY_PORT3_BUTTON_RED,JOYCODE_4_BUTTON1},
-        {"PAD3 YELLOW",RAWKEY_PORT3_BUTTON_YELLOW,JOYCODE_4_BUTTON3},
-        {"PAD3 GREEN",RAWKEY_PORT3_BUTTON_GREEN,JOYCODE_4_BUTTON4},
-        {"PAD3 FORWARD",RAWKEY_PORT3_BUTTON_FORWARD,JOYCODE_4_BUTTON6},
-        {"PAD3 REVERSE",RAWKEY_PORT3_BUTTON_REVERSE,JOYCODE_4_BUTTON5},
-        {"PAD3 PLAY",RAWKEY_PORT3_BUTTON_PLAY,JOYCODE_4_START},
-        {"PAD3 UP",RAWKEY_PORT3_JOY_UP,JOYCODE_4_UP},
-        {"PAD3 DOWN",RAWKEY_PORT3_JOY_DOWN,JOYCODE_4_DOWN},
-        {"PAD3 LEFT",RAWKEY_PORT3_JOY_LEFT,JOYCODE_4_LEFT},
-        {"PAD3 RIGHT",RAWKEY_PORT3_JOY_RIGHT,JOYCODE_4_RIGHT},
-        */
     };
     // then add player to paddle according to conf.    
     // lowlevel send rawkeys for each CD32 pads.
@@ -704,7 +683,7 @@ void RawKeyMap::init()
                 const int mamecodeshift =
                     ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
 
-            // can only manage 1 or 2 bt pads here...
+            // joystick are not CD32 pads, can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
               vector<os_code_info> kbi2={
                 {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
                 {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
@@ -723,6 +702,45 @@ void RawKeyMap::init()
             } // end if parallel port hacks concerned.
         }
 
+    }
+    // then may add analog controls
+    _keepMouseNames.clear();
+    if(useAnyMouse)
+    {
+        MameConfig::Controls &configControls = getMainConfig().controls();
+        using cp = MameConfig::ControlPort;
+        for(int iplayer=0;iplayer<4;iplayer++) // actually 2
+        {
+            cp controlPort = configControls._PlayerPort[iplayer];
+            if( configControls._PlayerPortType[iplayer] == SJA_TYPE_MOUSE &&
+            (
+                controlPort == cp::Port1llMouse || // api says "all 4 ll ports"
+                controlPort == cp::Port2llJoy ||
+                controlPort == cp::Port3ll || // the 2 enigmatic ports that may be hacked by USB trident.
+                controlPort == cp::Port4ll)
+            )
+            {
+                int mameAnlgSizePerPl = ((int)JOYCODE_2_ANALOG_X-(int)JOYCODE_1_ANALOG_X);
+                {
+                stringstream ss;
+                ss << "Mouse"<<((int)controlPort)<<  " X";
+                _keepMouseNames.push_back(ss.str());
+                _kbi.push_back({_keepMouseNames.back().c_str(),
+                                ANALOG_CODESTART+(iplayer*2)+0,
+                                JOYCODE_1_ANALOG_X+(iplayer*mameAnlgSizePerPl) });
+                }
+                {
+                stringstream ss;
+                ss << "Mouse"<<((int)controlPort) <<  " Y";
+                _keepMouseNames.push_back(ss.str());
+                _kbi.push_back({_keepMouseNames.back().c_str(),
+                                ANALOG_CODESTART+(iplayer*2)+1,
+                                JOYCODE_1_ANALOG_Y+(iplayer*mameAnlgSizePerPl) });
+                }
+
+                                // MOUSECODE_1_BUTTON1
+            }
+        } // loop by player
     }
 
 
@@ -766,7 +784,7 @@ void RawKeyMap::init()
         }
     }
     // then add those which need a rawkey mapped to a mame constant, with varying name
-
+    // mame enum was modified for this.
     static string key3a_name;
     mapRawKeyToString((UWORD)0x003A,key3a_name);
     _kbi.push_back({key3a_name.c_str(),0x3A,AMIGA_SPECIAL_RAWKEY_3A});
@@ -794,7 +812,7 @@ const os_code_info *osd_get_code_list(void)
 
     if(!rawkeymap._keymap_inited)
     {
-        rawkeymap.init();
+        rawkeymap.init(); // this si done once at each gamestart.
     }
     return rawkeymap._kbi.data();
 
@@ -814,7 +832,7 @@ INT32 osd_get_code_value(os_code oscode)
 {
     // now , always rawkey.
     if(!g_pInputs) return 0;
-    if(oscode<(256*4))
+    if(oscode<(256*4)) // 256*4 is lowlevel extended rawkey range.
     {
        // printf("ASKED :%04x\n",(int)oscode);
 //        if(g_pInputs->_Keys[oscode])
@@ -822,7 +840,28 @@ INT32 osd_get_code_value(os_code oscode)
 //            printf("ASKED AND GOT KEY:%d\n",(int)oscode);
 //        }
         return (int)g_pInputs->_Keys[oscode];
+    } else
+    {
+        // does analog like this
+        // 1024: analog player1
+        //
+        oscode -= ANALOG_CODESTART;
+        int iplayer = oscode>>1;
+        if(iplayer>=4) return 0;
+
+        UBYTE isy = (UBYTE)oscode &1;
+        ULONG state = g_pInputs->_mousestate[iplayer];
+        if(isy) return  ((state>>8) & 255);
+        else return (state & 255);
+//	            If type = JP_TYPE_MOUSE the bit map of portState is:
+//	                JPF_BUTTON_BLUE         Right mouse
+//	                JPF_BUTTON_RED          Left mouse
+//	                JPF_BUTTON_PLAY         Middle mouse
+//	                JP_MVERT_MASK           Mask for vertical counter
+//	                JP_MHORZ_MASK           Mask for horizontal counter
     }
+
+
     return 0;
 }
 
