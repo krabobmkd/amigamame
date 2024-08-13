@@ -720,14 +720,14 @@ void RawKeyMap::init()
                 controlPort == cp::Port4ll)
             )
             {
-                int mameAnlgSizePerPl = ((int)JOYCODE_2_ANALOG_X-(int)JOYCODE_1_ANALOG_X);
+                int mameAnlgSizePerPl = ((int)MOUSECODE_2_ANALOG_X-(int)MOUSECODE_1_ANALOG_X);
                 {
                 stringstream ss;
                 ss << "Mouse"<<((int)controlPort)<<  " X";
                 _keepMouseNames.push_back(ss.str());
                 _kbi.push_back({_keepMouseNames.back().c_str(),
                                 ANALOG_CODESTART+(iplayer*2)+0,
-                                JOYCODE_1_ANALOG_X+(iplayer*mameAnlgSizePerPl) });
+                                MOUSECODE_1_ANALOG_X+(iplayer*mameAnlgSizePerPl) });
                 }
                 {
                 stringstream ss;
@@ -735,7 +735,7 @@ void RawKeyMap::init()
                 _keepMouseNames.push_back(ss.str());
                 _kbi.push_back({_keepMouseNames.back().c_str(),
                                 ANALOG_CODESTART+(iplayer*2)+1,
-                                JOYCODE_1_ANALOG_Y+(iplayer*mameAnlgSizePerPl) });
+                                MOUSECODE_1_ANALOG_Y+(iplayer*mameAnlgSizePerPl) });
                 }
 
                                 // MOUSECODE_1_BUTTON1
