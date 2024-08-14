@@ -47,7 +47,7 @@ using namespace std;
 
 #include <stdlib.h>
 
-// set than after the extended lowlevel rawkey codes.
+// extend amiga os code given to mame after "lowlevel rawkey codes".
 #define ANALOG_CODESTART 1024
 
 // we don't even need to publish it:
@@ -57,8 +57,11 @@ struct MameInputs
     int         _NbKeysUpStack;
     BYTE         _Keys[256*4]; // bools state for actual keyboard rawkeys + lowlevel pads code
     UWORD        _NextKeysUpStack[256]; // delay event between frame to not loose keys.
-    // - - mouse states for 4 players, remapped from any ll ports.
+    // - - mouse states for 4 players, remapped from any ll ports.   
     ULONG _mousestate[4];
+    // because mame mouse want delta:
+    BYTE _lastMouseStateX[4]; // actually signed ?
+    BYTE _lastMouseStateY[4];
 };
 
 
@@ -83,7 +86,17 @@ class RawKeyMap
 
     void init();
 };
-std::vector<std::string> _keepMouseNames;
+static std::vector<std::string> _keepMouseNames=
+{
+    "Mouse1 X",
+    "Mouse1 Y",
+    "Mouse2 X",
+    "Mouse2 Y",
+    "Mouse3 X",
+    "Mouse3 Y",
+    "Mouse4 X",
+    "Mouse4 Y"
+};
 
 RawKeyMap   rawkeymap;
 
@@ -106,6 +119,7 @@ static USHORT askedPadsRawKey = 0;
 static USHORT useAnyMouse = 0;
 void ConfigureLowLevelLib()
 {
+printf(" ***** ConfigureLowLevelLib\n");
     if(!LowLevelBase) return;
 
     /*
@@ -142,8 +156,8 @@ void ConfigureLowLevelLib()
 
         int lowlevelState = configControls._llPort_Type[iLLPort];
                 printf("type:%d\n",lowlevelState);
-        if(lowlevelState<0) lowlevelState=0; // shouldnt
-        if(lowlevelState>3) lowlevelState=3; // shouldnt
+        if(lowlevelState<0 || lowlevelState>3) continue; // shouldnt
+
 //        if(lowlevelState == SJA_TYPE_AUTOSENSE)
 //        {
 //            //lowlevelState = ReadJoyPort(iLLPort)>>28;
@@ -155,34 +169,6 @@ void ConfigureLowLevelLib()
             if(lowlevelState == SJA_TYPE_MOUSE) useAnyMouse = 1;
             SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
         }
-
-//        int controlPort = configControls._PlayerPort[iplayer];
-//        int lowlevelState = (int)configControls._PlayerPortType[iLLPort];
-//        if(lowlevelState<0) lowlevelState=0; // shouldnt
-//        if(lowlevelState>3) lowlevelState=3; // shouldnt
-//        if(controlPort == cp::Port1llMouse ||
-//           controlPort == cp::Port2llJoy ||
-//           controlPort == cp::Port3ll ||
-//           controlPort == cp::Port4ll )
-//        {
-//            int iport = (int)controlPort -1; // 0->3
-//            if(lowlevelState == SJA_TYPE_AUTOSENSE)
-//            {
-//                ULONG state = ReadJoyPort(iport)>>28;
-
-//            } else
-//            {
-//                if(lowlevelState == SJA_TYPE_MOUSE) useAnyMouse = 1;
-//                SetJoyPortAttrs(iport,SJA_Type,lowlevelState,TAG_DONE);
-//            }
-//        }
-//        if(controlPort == cp::Para3 ||
-//           controlPort == cp::Para4 ||
-//           controlPort == cp::Para3Bt4 )
-//        {
-//            useParallelExtension = true;
-//        }
-
     } // loop by ll port
 
     bool useParallelExtension=false;
@@ -239,11 +225,9 @@ void AllocInputs()
     g_pInputs = (MameInputs *)calloc(1,sizeof(MameInputs));
     if(!g_pInputs) return;
 
-    ConfigureLowLevelLib();
+  // now done from get key list call
 
     rawkeymap.clear(); // will make the rawkey table again using conf.
-
-
 
 }
 
@@ -262,7 +246,6 @@ void FreeInputs()
 
     if(g_pInputs) free(g_pInputs);
     g_pInputs = NULL;
-    _keepMouseNames.clear();
 }
 // called from video
 void UpdateInputs(struct MsgPort *pMsgPort)
@@ -409,6 +392,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
             ULONG state = ReadJoyPort( iLLPort);
             if(state>>28 == SJA_TYPE_MOUSE)
             {
+           //validated ok printf("g_pInputs->_mousestate %d %08x\n",iLLPort,state);
                g_pInputs->_mousestate[iLLPort]= state;
                 //#define JP_MHORZ_MASK	(255<<0)	/* horzizontal position */
                 //#define JP_MVERT_MASK	(255<<8)	/* vertical position	*/
@@ -682,7 +666,7 @@ void RawKeyMap::init()
                 int iport = iLLPort; // 0->3
                 int ipshft = iport<<8;
                 const int mamecodeshift =
-                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
+                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *(iplayer-1) ;
 
               vector<os_code_info> kbi2={
                 {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
@@ -739,7 +723,7 @@ void RawKeyMap::init()
             int iport = 2+ipar; // we hack parallel pads as Lowlevel Pads3 and 4 !!!
             int ipshft = iport<<8;
             const int mamecodeshift =
-                ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
+                ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *(iplayer-1) ;
 
         // joystick are not CD32 pads, can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
           vector<os_code_info> kbi2={
@@ -761,42 +745,33 @@ void RawKeyMap::init()
 
     }
     // then may add analog controls
-    _keepMouseNames.clear();
     if(useAnyMouse)
     {
-        printf("USE ANY MOUSE\n");
         MameConfig::Controls &configControls = getMainConfig().controls();
-
+       // printf("***  USE ANY MOUSE \n");
         for(int iport=0;iport<4;iport++) // actually 2
         {
             int iplayer = configControls._llPort_Player[iport];
             if(iplayer == 0) continue;
             int itype = configControls._llPort_Type[iport];
+          //  printf("iport:%d itype:%d\n",iport,itype);
             if(itype != SJA_TYPE_MOUSE) continue; //still not inited
 
             int mameAnlgSizePerPl = ((int)MOUSECODE_2_ANALOG_X-(int)MOUSECODE_1_ANALOG_X);
             {
-                stringstream ss;
-                ss << "Mouse"<<(iport+1)<<  " X";
-                _keepMouseNames.push_back(ss.str());
-                _kbi.push_back({_keepMouseNames.back().c_str(),
+                _kbi.push_back({_keepMouseNames[(iport*2)+0].c_str(),
                                 ANALOG_CODESTART+(iport*2)+0,
-                                MOUSECODE_1_ANALOG_X+(iport*mameAnlgSizePerPl) });
+                                MOUSECODE_1_ANALOG_X+((iplayer-1)*mameAnlgSizePerPl) });
+                //printf("added code: %s\n",_keepMouseNames.back().c_str());
             }
             {
-                stringstream ss;
-                ss << "Mouse"<<(iport+1)<<  " Y";
-                _keepMouseNames.push_back(ss.str());
-                _kbi.push_back({_keepMouseNames.back().c_str(),
+                _kbi.push_back({_keepMouseNames[(iport*2)+1].c_str(),
                                 ANALOG_CODESTART+(iport*2)+1,
-                                MOUSECODE_1_ANALOG_Y+(iport*mameAnlgSizePerPl) });
+                                MOUSECODE_1_ANALOG_Y+((iplayer-1)*mameAnlgSizePerPl) });
+                // printf("added code Y: %s\n",_keepMouseNames.back().c_str());
             }
 
-
         } // loop by player
-    } else
-    {
-                printf("USE NO MOUSE\n");
     }
 
 
@@ -864,7 +839,9 @@ void RawKeyMap::init()
 */
 const os_code_info *osd_get_code_list(void)
 {
-//    printf(" * * * ** osd_get_key_list  * * * *  *\n");
+    printf(" * * * ** osd_get_key_list  * * * *  *\n");
+
+    ConfigureLowLevelLib();
 
     if(!rawkeymap._keymap_inited)
     {
@@ -899,16 +876,32 @@ INT32 osd_get_code_value(os_code oscode)
     } else
     {
         // does analog like this
-        // 1024: analog player1
+        // 1024: analog ll port1
         //
         oscode -= ANALOG_CODESTART;
-        int iplayer = oscode>>1;
-        if(iplayer>=4) return 0;
+        int illport = oscode>>1;
+        if(illport>=4) return 0;
 
         UBYTE isy = (UBYTE)oscode &1;
-        ULONG state = g_pInputs->_mousestate[iplayer];
-        if(isy) return  ((state>>8) & 255);
-        else return (state & 255);
+        ULONG state = g_pInputs->_mousestate[illport];
+        // get 0->255 in lowlevel meaning
+        BYTE s;
+        if(isy)
+        {
+            s = (BYTE)(state>>8);
+            INT32 dd = ((INT32)s)-((INT32)g_pInputs->_lastMouseStateY[illport]);
+            g_pInputs->_lastMouseStateY[illport] = s;
+            return (dd<<2);
+        }
+        else
+        {
+            s = (BYTE)state ;
+            INT32 dd = ((INT32)s)-((INT32)g_pInputs->_lastMouseStateX[illport]);
+            g_pInputs->_lastMouseStateX[illport] = s;
+            return (dd<<2);
+        }
+
+
 //	            If type = JP_TYPE_MOUSE the bit map of portState is:
 //	                JPF_BUTTON_BLUE         Right mouse
 //	                JPF_BUTTON_RED          Left mouse
