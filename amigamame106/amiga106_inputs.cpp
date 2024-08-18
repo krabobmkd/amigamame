@@ -58,10 +58,15 @@ struct MameInputs
     BYTE         _Keys[256*4]; // bools state for actual keyboard rawkeys + lowlevel pads code
     UWORD        _NextKeysUpStack[256]; // delay event between frame to not loose keys.
     // - - mouse states for 4 players, remapped from any ll ports.   
-    ULONG _mousestate[4];
-    // because mame mouse want delta:
-    BYTE _lastMouseStateX[4]; // actually signed ?
-    BYTE _lastMouseStateY[4];
+    struct LLMouse {
+        ULONG _mousestate; // high bytes are sadly clamped, but would work for 2+ mouses.
+        //
+        UBYTE _lastMouseStateX;
+        UBYTE _lastMouseStateY;
+        WORD _d;
+    };
+    LLMouse _mstate[4];
+
 };
 
 
@@ -90,12 +95,32 @@ static std::vector<std::string> _keepMouseNames=
 {
     "Mouse1 X",
     "Mouse1 Y",
+    "Mouse1 Bt1",
+    "Mouse1 Bt2",
+    "Mouse1 Bt3",
+    "","","",
+
     "Mouse2 X",
     "Mouse2 Y",
+    "Mouse2 Bt1",
+    "Mouse2 Bt2",
+    "Mouse2 Bt3",
+    "","","",
+
     "Mouse3 X",
     "Mouse3 Y",
+    "Mouse3 Bt1",
+    "Mouse3 Bt2",
+    "Mouse3 Bt3",
+    "","","",
+
     "Mouse4 X",
-    "Mouse4 Y"
+    "Mouse4 Y",
+    "Mouse4 Bt1",
+    "Mouse4 Bt2",
+    "Mouse4 Bt3",
+    "","","",
+
 };
 
 RawKeyMap   rawkeymap;
@@ -392,8 +417,18 @@ void UpdateInputs(struct MsgPort *pMsgPort)
             ULONG state = ReadJoyPort( iLLPort);
             if(state>>28 == SJA_TYPE_MOUSE)
             {
-           //validated ok printf("g_pInputs->_mousestate %d %08x\n",iLLPort,state);
-               g_pInputs->_mousestate[iLLPort]= state;
+           //validated ok
+               // printf("g_pInputs->_mousestate %d %08x\n",iLLPort,(int)state);
+               g_pInputs->_mstate[iLLPort]._mousestate = state;
+
+//#define MOUSEBTMASK (JPF_BUTTON_RED|JPF_BUTTON_BLUE|JPF_BUTTON_PLAY)
+               // gt to rdirect mouse buttons in that case, to shot in arkanoid for example.
+               int playershift = (iplayer-1)<<8;
+               // not perfect to do here because could jump a slow frame
+               g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+playershift] = (int)((state & JPF_BUTTON_RED)!=0);
+               g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_BLUE+playershift] = (int)((state & JPF_BUTTON_BLUE)!=0);
+               g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_PLAY+playershift] = (int)((state & JPF_BUTTON_PLAY)!=0);
+
                 //#define JP_MHORZ_MASK	(255<<0)	/* horzizontal position */
                 //#define JP_MVERT_MASK	(255<<8)	/* vertical position	*/
                 //#define JP_MOUSE_MASK	(JP_MHORZ_MASK|JP_MVERT_MASK)
@@ -758,19 +793,33 @@ void RawKeyMap::init()
             if(itype != SJA_TYPE_MOUSE) continue; //still not inited
 
             int mameAnlgSizePerPl = ((int)MOUSECODE_2_ANALOG_X-(int)MOUSECODE_1_ANALOG_X);
+            int mameMouseBtSizePerPl = ((int)MOUSECODE_2_BUTTON1-(int)MOUSECODE_1_BUTTON1);
             {
-                _kbi.push_back({_keepMouseNames[(iport*2)+0].c_str(),
-                                ANALOG_CODESTART+(iport*2)+0,
+                _kbi.push_back({_keepMouseNames[(iport*8)+0].c_str(),
+                                ANALOG_CODESTART+(iport*8)+0,
                                 MOUSECODE_1_ANALOG_X+((iplayer-1)*mameAnlgSizePerPl) });
-                //printf("added code: %s\n",_keepMouseNames.back().c_str());
             }
             {
-                _kbi.push_back({_keepMouseNames[(iport*2)+1].c_str(),
-                                ANALOG_CODESTART+(iport*2)+1,
+                _kbi.push_back({_keepMouseNames[(iport*8)+1].c_str(),
+                                ANALOG_CODESTART+(iport*8)+1,
                                 MOUSECODE_1_ANALOG_Y+((iplayer-1)*mameAnlgSizePerPl) });
-                // printf("added code Y: %s\n",_keepMouseNames.back().c_str());
             }
-
+            // mouse buttons
+            {
+                _kbi.push_back({_keepMouseNames[(iport*8)+2].c_str(),
+                                ANALOG_CODESTART+(iport*8)+2,
+                                MOUSECODE_1_BUTTON1+((iplayer-1)*mameMouseBtSizePerPl) });
+            }
+            {
+                _kbi.push_back({_keepMouseNames[(iport*8)+3].c_str(),
+                                ANALOG_CODESTART+(iport*8)+3,
+                                MOUSECODE_1_BUTTON2+((iplayer-1)*mameMouseBtSizePerPl) });
+            }
+            {
+                _kbi.push_back({_keepMouseNames[(iport*8)+4].c_str(),
+                                ANALOG_CODESTART+(iport*8)+4,
+                                MOUSECODE_1_BUTTON3+((iplayer-1)*mameMouseBtSizePerPl) });
+            }
         } // loop by player
     }
 
@@ -879,27 +928,48 @@ INT32 osd_get_code_value(os_code oscode)
         // 1024: analog ll port1
         //
         oscode -= ANALOG_CODESTART;
-        int illport = oscode>>1;
+        int illport = oscode>>3; // /8
         if(illport>=4) return 0;
+        UINT8 shortcode = ((UINT8)oscode) & 7;
 
-        UBYTE isy = (UBYTE)oscode &1;
-        ULONG state = g_pInputs->_mousestate[illport];
-        // get 0->255 in lowlevel meaning
-        BYTE s;
-        if(isy)
+        MameInputs::LLMouse &llm = g_pInputs->_mstate[illport]; // mousestate[illport];
+        UINT32 state = llm._mousestate;
+        const INT32 minswitch = 128;
+
+        switch(shortcode)
         {
-            s = (BYTE)(state>>8);
-            INT32 dd = ((INT32)s)-((INT32)g_pInputs->_lastMouseStateY[illport]);
-            g_pInputs->_lastMouseStateY[illport] = s;
-            return (dd<<2);
-        }
-        else
+        case 0: // mouse x
         {
-            s = (BYTE)state ;
-            INT32 dd = ((INT32)s)-((INT32)g_pInputs->_lastMouseStateX[illport]);
-            g_pInputs->_lastMouseStateX[illport] = s;
-            return (dd<<2);
+            BYTE s = (BYTE)state ; // get 0->255 X in lowlevel meaning
+            INT32 delta = ((INT32)s)-((INT32)llm._lastMouseStateX);
+            llm._lastMouseStateX = s;
+            if(delta<-minswitch) delta +=256;
+            else if(delta>minswitch) delta -=256;
+            return delta<<9;
         }
+        case 1: // mouse y
+        {
+            BYTE s = (BYTE)(state>>8); // get 0->255 Y in lowlevel meaning
+            INT32 delta = ((INT32)s)-((INT32)llm._lastMouseStateY);
+            llm._lastMouseStateY = s;
+            // delta should be some pixels ...
+            if(delta<-minswitch) delta +=256;
+            else if(delta>minswitch) delta -=256;
+            return delta<<9;
+        }
+        case 2: // mouse bt 1
+            return (state &JPF_BUTTON_RED)!=0 ;
+        case 3: // mouse bt 2
+            return (state &JPF_BUTTON_BLUE)!=0 ;
+        case 4: // mouse bt 3
+            return (state &JPF_BUTTON_PLAY)!=0 ;
+
+        }
+
+        //UBYTE isy = (UBYTE)oscode &1;
+
+        // lowlevel only gives 8 low bits of mouse position.
+        // This circus is for re-applying coordinates with highter bits.
 
 
 //	            If type = JP_TYPE_MOUSE the bit map of portState is:
