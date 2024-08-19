@@ -1000,7 +1000,6 @@ UINT32 mame_rand(void)
 
 static void create_machine(int game)
 {
-    printf("");
 	/* first give the machine a good cleaning */
 	Machine = &active_machine;
 	memset(Machine, 0, sizeof(*Machine));

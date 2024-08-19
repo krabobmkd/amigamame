@@ -1,9 +1,18 @@
-#include "amiga106_config.h"
+#include "lconfig.h"
 
 #include <sstream>
 #include <algorithm>
-#include <proto/exec.h>
-#include <proto/dos.h>
+#include  <string.h>
+
+#ifndef stricmp
+#define stricmp strcasecmp
+#endif
+
+#ifdef _MSC_VER
+//not #if defined(_WIN32) || defined(_WIN64) because we have strncasecmp in mingw
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#endif
 
 // from mame
 extern "C" {
@@ -285,7 +294,7 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
 }
 void MameConfig::Display_PerScreenMode::valueUpdated(std::string upatedValue)
 {
-    if(_ScreenModeChoice == ScreenModeChoice::Best) _modeid = INVALID_ID;
+    if(_ScreenModeChoice == ScreenModeChoice::Best) _modeid = ~0;
 
 }
 bool MameConfig::Display_PerScreenMode::isDefault()
@@ -519,10 +528,11 @@ void MameConfig::initDriverIndex()
       //  _players[NumDrivers] = (UBYTE)nbp;
 
     }
+
 }
 void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs/*, int &nbp*/)
 {
-    int idriver = ((int)drv-(int)&drivers[0])/sizeof(const _game_driver *);
+    int idriver = ((int64_t)drv-(int64_t)&drivers[0])/sizeof(const _game_driver *);
     if(idriver<0 || idriver>=_NumDrivers)
     {
         screenid.clear();
@@ -535,78 +545,78 @@ void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string
 }
 
 
-int MameConfig::scanDrivers()
-{
-//  printf(" *** ScanDrivers: _romsDir:%s\n", _paths._romsPath.c_str());
-  _romsFound.clear();
-  if(_misc._romsPath.empty()) return 0;
-//  printf(" *** ScanDrivers 1\n");
+//int MameConfig::scanDrivers()
+//{
+////  printf(" *** ScanDrivers: _romsDir:%s\n", _paths._romsPath.c_str());
+//  _romsFound.clear();
+//  if(_misc._romsPath.empty()) return 0;
+////  printf(" *** ScanDrivers 1\n");
 
-    struct FileInfoBlock *fib;
-    fib = (struct FileInfoBlock *)AllocDosObject(DOS_FIB, NULL);
-    if(!fib) return 0;
+//    struct FileInfoBlock *fib;
+//    fib = (struct FileInfoBlock *)AllocDosObject(DOS_FIB, NULL);
+//    if(!fib) return 0;
 
-    BPTR lock = Lock( _misc._romsPath.c_str(), ACCESS_READ);
-    if(lock)
-    {
-        scanDriversRecurse(lock,fib);
-        UnLock(lock);
-    }
+//    BPTR lock = Lock( _misc._romsPath.c_str(), ACCESS_READ);
+//    if(lock)
+//    {
+//        scanDriversRecurse(lock,fib);
+//        UnLock(lock);
+//    }
 
-    FreeDosObject(DOS_FIB,fib);
+//    FreeDosObject(DOS_FIB,fib);
 
-    sortDrivers(_romsFound);
-//    printf(" *** ScanDrivers end\n");
-    initRomsFoundReverse();
-    return (int)_romsFound.size();
-}
-int MameConfig::scanDriversRecurse(BPTR lock, FileInfoBlock*fib)
-{
-    if(!Examine(lock, fib)) return 0;
+//    sortDrivers(_romsFound);
+////    printf(" *** ScanDrivers end\n");
+//    initRomsFoundReverse();
+//    return (int)_romsFound.size();
+//}
+//int MameConfig::scanDriversRecurse(BPTR lock, FileInfoBlock*fib)
+//{
+//    if(!Examine(lock, fib)) return 0;
 
-    if(fib->fib_DirEntryType <= 0) return 0; // if >0, a directory
+//    if(fib->fib_DirEntryType <= 0) return 0; // if >0, a directory
 
-    while(ExNext(lock, fib))
-    {
-        // trick: force lowercase at this level
-        int i=0;
-        char c;
-        while((c=fib->fib_FileName[i])!=0) {
-            if(c>='A' && c<='Z') c=fib->fib_FileName[i]+= 32;
-            i++;
-        }
-        if(fib->fib_DirEntryType > 0) // if >0, a directory
-        { // sub is a dir.
-            // could be unzip roms or a subdir
-           int idriver = _driverIndex.index(fib->fib_FileName);
-           if(idriver >= 0)
-           {
-                _romsFound.push_back(&drivers[idriver]);
-           }
-           else
-           {    // subdir ?
-                //TODO or not.
-           }
-        } else
-        {   // is a file.
-            // if end with zip
-            // fast, no alloc version
-            char *p = fib->fib_FileName;
-            int l =strlen(p);
-            if(l>4 && p[l-4]=='.' && p[l-3]=='z' && p[l-2]=='i' && p[l-1]=='p')
-            {
-                p[l-4] = 0;
-                int idriver = _driverIndex.index(p);
-                if(idriver >= 0)
-                {
-                    _romsFound.push_back(&drivers[idriver]);
-                }
-            }
-        } // end if is file.
+//    while(ExNext(lock, fib))
+//    {
+//        // trick: force lowercase at this level
+//        int i=0;
+//        char c;
+//        while((c=fib->fib_FileName[i])!=0) {
+//            if(c>='A' && c<='Z') c=fib->fib_FileName[i]+= 32;
+//            i++;
+//        }
+//        if(fib->fib_DirEntryType > 0) // if >0, a directory
+//        { // sub is a dir.
+//            // could be unzip roms or a subdir
+//           int idriver = _driverIndex.index(fib->fib_FileName);
+//           if(idriver >= 0)
+//           {
+//                _romsFound.push_back(&drivers[idriver]);
+//           }
+//           else
+//           {    // subdir ?
+//                //TODO or not.
+//           }
+//        } else
+//        {   // is a file.
+//            // if end with zip
+//            // fast, no alloc version
+//            char *p = fib->fib_FileName;
+//            int l =strlen(p);
+//            if(l>4 && p[l-4]=='.' && p[l-3]=='z' && p[l-2]=='i' && p[l-1]=='p')
+//            {
+//                p[l-4] = 0;
+//                int idriver = _driverIndex.index(p);
+//                if(idriver >= 0)
+//                {
+//                    _romsFound.push_back(&drivers[idriver]);
+//                }
+//            }
+//        } // end if is file.
 
-    } // end loop per dir file
+//    } // end loop per dir file
 
-}
+//}
 static int DriverCompareNames(struct _game_driver ***drv1, struct _game_driver ***drv2)
 {
   return(stricmp((**drv1)->description, (**drv2)->description));
@@ -630,13 +640,13 @@ void MameConfig::initRomsFoundReverse()
     _romsFoundReverse.resize(nbSlots,0);
     for(const _game_driver *const*drv : _romsFound)
     {
-        int idriver = ((int)drv-(int)&drivers[0])/sizeof(const _game_driver *);
+        int idriver = ((int64_t)drv-(int64_t)&drivers[0])/sizeof(const _game_driver *);
         _romsFoundReverse[idriver>>3] |= (1<<(idriver & 7));
     }
 }
 int MameConfig::isDriverFound(const _game_driver *const*drv)
 {
-    int idriver = ((int)drv-(int)&drivers[0])/sizeof(const _game_driver *);
+    int idriver = ((int64_t)drv-(int64_t)&drivers[0])/sizeof(const _game_driver *);
     if(idriver<=0 || idriver >=_NumDrivers) return 0;
     return (int)((_romsFoundReverse[idriver>>3] & (1<<(idriver & 7))) !=0);
 }

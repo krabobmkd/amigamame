@@ -110,7 +110,6 @@ struct _rectangle
 typedef union
 {
 #ifdef LSB_FIRST
-    not amiga
 	struct { UINT8 l,h,h2,h3; } b;
 	struct { UINT16 l,h; } w;
 #else

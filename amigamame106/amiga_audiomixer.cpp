@@ -2,6 +2,13 @@
 #include "sound_krb.h"
 #include "streams.h"
 #include <stdio.h>
+
+extern "C" {
+    #include "osdepend.h"
+}
+
+extern  cycles_t  lastSoundFrameUpdate;// = osd_cycles();
+
 // return how much done.
 ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
 {
@@ -9,6 +16,23 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
     WORD *ps = pSoundToWrite->m_pBuffer;
 
     // note: mame frames and AHI buffers are meant to have the exact same size.
+    cycles_t delta = (osd_cycles()-lastSoundFrameUpdate);
+    if(delta>(1000000LL>>2)) // 0.25 sec
+    {
+        // the engine looks blocked, what happens when window resize. fill blank.
+        UWORD lh = ((UWORD) pSoundToWrite->m_nbSampleToFill);
+        LONG *psl = (LONG *)ps; // copy 4 bytes
+        if(pSoundToWrite->m_stereo)
+        {
+            for(UWORD i=0; i<lh ; i++ ) *psl++ = 0;
+        } else
+        {
+            lh>>=1;
+            // mono
+            for(UWORD i=0; i<lh ; i++ ) *psl++ = 0;
+        }
+        return pSoundToWrite->m_nbSampleToFill;
+    }
 
     SampleFrame *pFrame = &SampleFrames[(currentSampleFrame-1)&3]; // test if missed previous
     if(pFrame->_writelock || pFrame->_read>=pFrame->_written)
@@ -38,7 +62,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
             {
                 *psl++ = *prl++;
             }
-        }
+        } else
         {
             WORD *pr = pSoundToWrite->m_pPrevBuffer+(pSoundToWrite->m_nbSampleToFill);
             // mono
@@ -64,6 +88,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
         asm volatile(
            "move.l #-32768,d1\n"
            "\tmove.l #32767,d2\n"
+           "\tsubq.l #1,%3\n" // because dbf loop
            ".loop:\n"
            "\tmove.l (%0)+,d3\n"
            "\tmove.l (%1)+,d4\n"
@@ -71,6 +96,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
            "\tcmp.l d1,d3\n"
            "\tbge.b .ncl1\n"
            "\tmove.l d1,d3\n"
+           "\tbra.b .ncl2\n"
            ".ncl1:\n"
 
            "\tcmp.l d2,d3\n"
@@ -83,6 +109,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
            "\tcmp.l d1,d4\n"
            "\tbge.b .ncl3\n"
            "\tmove.l d1,d4\n"
+           "\tbra.b .ncl4\n"
            ".ncl3:\n"
 
            "\tcmp.l d2,d4\n"
@@ -93,7 +120,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
            "\tmove.l d3,(%2)+\n"
 
            "\tdbf %3,.loop\n"
-           "\n\t"
+           "\n"
 // this syntax is a hell, I hope you like pain .
 // it is "asm code" : "spec"(varoutput) : "spec"(varinput), : (extra register used)
 //  'd' for d0->d7 'a' for a0->a7 , also can put constants
@@ -129,6 +156,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
            "move.l #-32768,d1\n"
            "\tmove.l #32767,d2\n"
            "\tlsr.w #1,%2\n"
+           "\tsubq.l #1,%2\n" // because dbf loop
            ".loopb:\n"
            "\tmove.l (%0)+,d3\n"
            "\tmove.l (%0)+,d4\n"
@@ -136,6 +164,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
            "\tcmp.l d1,d3\n"
            "\tbge.b .ncl1b\n"
            "\tmove.l d1,d3\n"
+           "\tbra.b .ncl2b\n"
            ".ncl1b:\n"
 
            "\tcmp.l d2,d3\n"
@@ -148,6 +177,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
            "\tcmp.l d1,d4\n"
            "\tbge.b .ncl3b\n"
            "\tmove.l d1,d4\n"
+           "\tbra.b .ncl4b\n"
            ".ncl3b:\n"
 
            "\tcmp.l d2,d4\n"
@@ -158,7 +188,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
            "\tmove.l d3,(%1)+\n"
 
            "\tdbf %2,.loopb\n"
-           "\n\t"
+           "\n"
            :
            : "a" (leftmix), "a"(ps), "d"(ntodo)
            : "d1","d2","d3","d4"

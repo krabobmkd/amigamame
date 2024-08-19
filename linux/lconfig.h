@@ -1,17 +1,16 @@
-#ifndef AMIGA_MAME_CONFIG_H
-#define AMIGA_MAME_CONFIG_H
-extern "C"
-{
-    #include <exec/types.h>
-}
+#ifndef L_MAME_CONFIG_H
+#define L_MAME_CONFIG_H
+
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "serializer.h"
 
-typedef long BPTR;
-struct FileInfoBlock;
+#ifndef UBYTE
+typedef unsigned char UBYTE;
+#endif
+
 struct _game_driver;
 struct _global_options;
 
@@ -37,11 +36,6 @@ public:
 
     std::unordered_map<char,std::unordered_map<std::string,int>> _m;
 };
-/*
-struct ScreenConf {
-     ULONG _modeID;
-};
-*/
 
 /** Main configuration.
  *  Mame106 core manage itself default and per driver configuration.
@@ -71,7 +65,7 @@ public:
     int driverListstate() const {return _listShowState; }
 
     // - -  update detected rom list - - -
-    int scanDrivers();
+//    int scanDrivers();
     //int allDrivers();
     // - - path to main dirs --
     const char *getUserDir() const {return _misc._userPath.c_str(); }
@@ -239,7 +233,7 @@ protected:
     std::vector<const _game_driver *const*> _romsFound;
     std::vector<UBYTE> _romsFoundReverse;
     void initDriverIndex();
-    int scanDriversRecurse(BPTR lock, FileInfoBlock*fib);
+   // int scanDriversRecurse(BPTR lock, FileInfoBlock*fib);
 
     std::vector<std::string> _resolutionStrings;
     std::vector<int> _videoAttribs;

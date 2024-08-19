@@ -417,16 +417,17 @@ int osd_start_audio_stream(int stereo)
 	}
 // printf("sound thread ok, samples:%d\n",_pThreadAHI->m_nextSamples);
     // must return samples to do next.
-    return _pThreadAHI->m_nextSamples;
+    return _pThreadAHI->m_nextSamples; // * (stereo+1);
 
 }
 
 // from mame main thread engine.
+/* this is useless due to mixer rewrite in sound_krb.c
 int osd_update_audio_stream(INT16 *buffer)
 {
     return (_pThreadAHI)?_pThreadAHI->m_nextSamples:0;
 }
-
+*/
 void osd_stop_audio_stream(void)
 {
     AHIS_Delete();
