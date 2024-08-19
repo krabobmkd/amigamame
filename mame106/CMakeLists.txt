@@ -93,6 +93,8 @@ target_compile_definitions(mamecore PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRL
 
  target_compile_options(mamecore PRIVATE ${AMIGA_COMPILER_OPTIONS} )
 #it's all O3 for release only
+if(AMIGA)
  target_compile_options(mamecore PRIVATE
 		 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -fno-tree-vectorize -DNDEBUG>
 		  )
+endif()

@@ -1,5 +1,5 @@
-#ifndef __OSstatic inline__
-#define __OSstatic inline__
+#ifndef __OSSTINLINE__
+#define __OSSTINLINE__
 
 #define osd_mark_vector_dirty(x,y)
 
