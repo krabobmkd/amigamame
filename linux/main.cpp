@@ -35,6 +35,9 @@ void StartGame(int idriver)
     // done here
 //    if(drivers[idriver])
         options.ui_orientation = uiapplied &ORIENTATION_MASK;  // uiorientation;
+options.skip_disclaimer = 1;
+options.skip_gameinfo = 1;
+options.skip_warnings = 1;
 
     /* Clear the zip filename caches. */
 
@@ -65,7 +68,7 @@ int main(int argc, char **argv)
 
     int idriver = -1;
     // test if just "mame romname".
-    int itest = getMainConfig().driverIndex().index("devilw");
+    int itest = getMainConfig().driverIndex().index("demonwld");
     if(itest>0) idriver= itest;
 
 
@@ -113,11 +116,11 @@ const char *osd_get_fps_text(const performance_info *performance)
 extern "C" { int amigamame_audio_forcemono=0;  }
 int osd_start_audio_stream(int stereo)
 {
-    return 0;
+    return 800;
 }
 int osd_update_audio_stream(INT16 *buffer)
 {
-    return 0;
+    return 800;
 }
 void osd_stop_audio_stream(void)
 {

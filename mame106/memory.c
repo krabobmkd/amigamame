@@ -97,7 +97,7 @@
 #include "debug/debugcpu.h"
 #endif
 #include <stdarg.h>
-
+#include <stdio.h>
 
 #define MEM_DUMP		(0)
 #define VERBOSE			(0)
@@ -135,11 +135,44 @@
 
 ***************************************************************************/
 
+//FILE *fmemlog = NULL;
+//unsigned int logcount=0;
+//void initLog() {
+//    if(fmemlog) return;
+//    fmemlog = fopen("memlog.txt","wb");
+//}
+//void logcountpp()
+//{
+//    if(logcount == 0x000e03ed)
+//    {
+//      printf("this is it.\n");
+//    }
+//    if(logcount == 0x000e03ed +2)
+//    {
+//        exit(0);
+//    }
+//    logcount++;
+//}
+
 /* macros for the profiler */
-#define MEMREADSTART()			do { profiler_mark(PROFILER_MEMREAD); } while (0)
+//#define MEMREADSTART()			do { profiler_mark(PROFILER_MEMREAD); } while (0)
+// initLog(); fprintf(fmemlog,"r c:%08x o:%08x\n",(unsigned int)logcount,(unsigned int)address);
+#define MEMREADSTART()
+// fprintf(fmemlog,"r c:%08x o:%08x\n",(unsigned int)logcount,(unsigned int)address);  logcountpp();
+
+//#define MEMREADEND(ret)		{ INT32 r = ret; initLog(); fprintf(fmemlog,"r c:%08x o:%08x  d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)(r) );  logcountpp();	 return r; }
 #define MEMREADEND(ret)			do { profiler_mark(PROFILER_END); return ret; } while (0)
-#define MEMWRITESTART()			do { profiler_mark(PROFILER_MEMWRITE); } while (0)
+//#define MEMREADEND(ret)			do { INT32 r = ret; initLog();  fprintf(fmemlog,"r c:%08x o:%08x  d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)(r) );  logcountpp();  return r; } while (0)
+
+
+
+//#define MEMWRITESTART()			do { profiler_mark(PROFILER_MEMWRITE); } while (0)
+#define MEMWRITESTART()
+//  initLog(); fprintf(fmemlog,"w c:%08x o:%08x d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)data);
+//#define MEMWRITESTART()  {initLog(); fprintf(fmemlog,"w c:%08x o:%08x d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)data);  logcountpp();}
+
 #define MEMWRITEEND(ret)		do { (ret); profiler_mark(PROFILER_END); return; } while (0)
+
 
 /* helper macros */
 #define HANDLER_IS_RAM(h)		((FPTR)(h) == STATIC_RAM)

@@ -16,7 +16,7 @@
 
 
 #include "cpuintrf.h"
-
+#include "memory.h"
 
 
 /**************************************************************************
@@ -57,6 +57,10 @@ enum {
 /****************************************************************************
  *  Public Functions
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void tms32010_get_info(UINT32 state, union cpuinfo *info);
 
@@ -135,6 +139,10 @@ void tms32010_get_info(UINT32 state, union cpuinfo *info);
 
 #ifdef	MAME_DEBUG
 extern unsigned Dasm32010(char *buffer, unsigned pc);
+#endif
+
+#ifdef __cplusplus
+};
 #endif
 
 #endif	/* _TMS32010_H */

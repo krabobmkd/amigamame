@@ -14,11 +14,11 @@
 
 #include "mamecore.h"
 
-#if defined(__GNUC__) && defined(AMIGA)
+//#if defined(__GNUC__) && defined(__AMIGA__)
 #define REG(r) __asm(#r)
-#else
-#define REG(r)
-#endif
+//#else
+//#define REG(r)
+//#endif
 
 
 /***************************************************************************
@@ -61,8 +61,8 @@ typedef UINT16			(*read16_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUS
 typedef void			(*write16_handler)(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT16 data REG(d1), ATTR_UNUSED UINT16 mem_mask REG(d2));
 typedef UINT32			(*read32_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 mem_mask REG(d1));
 typedef void			(*write32_handler)(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 data REG(d1), ATTR_UNUSED UINT32 mem_mask REG(d2));
-typedef UINT64			(*read64_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
-typedef void			(*write64_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+typedef UINT64			(*read64_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT64 mem_mask);
+typedef void			(*write64_handler)(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
 typedef offs_t			(*opbase_handler) (ATTR_UNUSED offs_t address);
 
 /* ----- this struct contains pointers to the live read/write routines ----- */
@@ -76,7 +76,7 @@ struct _data_accessors
 	void			(*write_byte)(offs_t offset REG(d0), UINT8 data REG(d1));
 	void			(*write_word)(offs_t offset REG(d0), UINT16 data REG(d1));
 	void			(*write_dword)(offs_t offset REG(d0), UINT32 data REG(d1));
-	void			(*write_qword)(offs_t offset , UINT64 data);
+	void			(*write_qword)(offs_t offset REG(d0), UINT64 data);
 };
 typedef struct _data_accessors data_accessors;
 
@@ -89,15 +89,15 @@ typedef struct _data_accessors data_accessors;
 ***************************************************************************/
 
 /* ----- macros for declaring the various common data access handlers ----- */
-#define READ8_HANDLER(name) 	UINT8  name(ATTR_UNUSED offs_t offset REG(d0))
-#define WRITE8_HANDLER(name) 	void   name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT8 data REG(d1))
-#define READ16_HANDLER(name)	UINT16 name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT16 mem_mask REG(d1))
-#define WRITE16_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT16 data REG(d1), ATTR_UNUSED UINT16 mem_mask REG(d2))
-#define READ32_HANDLER(name)	UINT32 name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 mem_mask REG(d1) )
-#define WRITE32_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 data REG(d1), ATTR_UNUSED UINT32 mem_mask REG(d2))
-#define READ64_HANDLER(name)	UINT64 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
-#define WRITE64_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
-#define OPBASE_HANDLER(name)	offs_t name(ATTR_UNUSED offs_t address)
+#define READ8_HANDLER(name) 	UINT8  name(offs_t offset REG(d0))
+#define WRITE8_HANDLER(name) 	void   name(offs_t offset REG(d0), UINT8 data REG(d1))
+#define READ16_HANDLER(name)	UINT16 name(offs_t offset REG(d0), UINT16 mem_mask REG(d1))
+#define WRITE16_HANDLER(name)	void   name(offs_t offset REG(d0), UINT16 data REG(d1), UINT16 mem_mask REG(d2))
+#define READ32_HANDLER(name)	UINT32 name(offs_t offset REG(d0), UINT32 mem_mask REG(d1) )
+#define WRITE32_HANDLER(name)	void   name(offs_t offset REG(d0), UINT32 data REG(d1), UINT32 mem_mask REG(d2))
+#define READ64_HANDLER(name)	UINT64 name(offs_t offset, UINT64 mem_mask)
+#define WRITE64_HANDLER(name)	void   name(offs_t offset, UINT64 data, UINT64 mem_mask)
+#define OPBASE_HANDLER(name)	offs_t name(offs_t address)
 
 /* ----- macros for accessing bytes and words within larger chunks ----- */
 #ifdef LSB_FIRST
