@@ -14,8 +14,10 @@
 
 #include "mamecore.h"
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && defined(AMIGA)
 #define REG(r) __asm(#r)
+#else
+#define REG(r)
 #endif
 
 
@@ -69,7 +71,7 @@ struct _data_accessors
 	UINT8			(*read_byte)(offs_t offset REG(d0));
 	UINT16			(*read_word)(offs_t offset REG(d0));
 	UINT32			(*read_dword)(offs_t offset REG(d0));
-	UINT64			(*read_qword)(offs_t offset );
+	UINT64			(*read_qword)(offs_t offset  REG(d0));
 
 	void			(*write_byte)(offs_t offset REG(d0), UINT8 data REG(d1));
 	void			(*write_word)(offs_t offset REG(d0), UINT16 data REG(d1));
@@ -1097,35 +1099,35 @@ extern address_map *	construct_map_0(address_map *map);
 	_memory_install_write64_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
 
 /* ----- generic memory access ----- */
-INLINE UINT8  program_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_byte)(offset); }
-INLINE UINT16 program_read_word (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_word)(offset); }
-INLINE UINT32 program_read_dword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_dword)(offset); }
-INLINE UINT64 program_read_qword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_qword)(offset); }
+INLINE UINT8  program_read_byte (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_byte)(offset); }
+INLINE UINT16 program_read_word (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_word)(offset); }
+INLINE UINT32 program_read_dword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_dword)(offset); }
+INLINE UINT64 program_read_qword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_qword)(offset); }
 
-INLINE void	program_write_byte (offs_t offset, UINT8  data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_byte)(offset, data); }
-INLINE void	program_write_word (offs_t offset, UINT16 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_word)(offset, data); }
-INLINE void	program_write_dword(offs_t offset, UINT32 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_dword)(offset, data); }
-INLINE void	program_write_qword(offs_t offset, UINT64 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_qword)(offset, data); }
+INLINE void	program_write_byte (offs_t offset REG(d0), UINT8 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_byte)(offset, data); }
+INLINE void	program_write_word (offs_t offset REG(d0), UINT16 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_word)(offset, data); }
+INLINE void	program_write_dword(offs_t offset REG(d0), UINT32 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_dword)(offset, data); }
+INLINE void	program_write_qword(offs_t offset REG(d0), UINT64 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_qword)(offset, data); }
 
-INLINE UINT8  data_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_byte)(offset); }
-INLINE UINT16 data_read_word (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_word)(offset); }
-INLINE UINT32 data_read_dword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_dword)(offset); }
-INLINE UINT64 data_read_qword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_qword)(offset); }
+INLINE UINT8  data_read_byte (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_byte)(offset); }
+INLINE UINT16 data_read_word (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_word)(offset); }
+INLINE UINT32 data_read_dword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_dword)(offset); }
+INLINE UINT64 data_read_qword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_qword)(offset); }
 
-INLINE void	data_write_byte (offs_t offset, UINT8  data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_byte)(offset, data); }
-INLINE void	data_write_word (offs_t offset, UINT16 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_word)(offset, data); }
-INLINE void	data_write_dword(offs_t offset, UINT32 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_dword)(offset, data); }
-INLINE void	data_write_qword(offs_t offset, UINT64 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_qword)(offset, data); }
+INLINE void	data_write_byte (offs_t offset REG(d0), UINT8  data REG(d1)) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_byte)(offset, data); }
+INLINE void	data_write_word (offs_t offset REG(d0), UINT16 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_word)(offset, data); }
+INLINE void	data_write_dword(offs_t offset REG(d0), UINT32 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_dword)(offset, data); }
+INLINE void	data_write_qword(offs_t offset REG(d0), UINT64 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_qword)(offset, data); }
 
-INLINE UINT8  io_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_byte)(offset); }
-INLINE UINT16 io_read_word (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_word)(offset); }
-INLINE UINT32 io_read_dword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_dword)(offset); }
-INLINE UINT64 io_read_qword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_qword)(offset); }
+INLINE UINT8  io_read_byte (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_byte)(offset); }
+INLINE UINT16 io_read_word (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_word)(offset); }
+INLINE UINT32 io_read_dword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_dword)(offset); }
+INLINE UINT64 io_read_qword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_qword)(offset); }
 
-INLINE void	io_write_byte (offs_t offset, UINT8  data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_byte)(offset, data); }
-INLINE void	io_write_word (offs_t offset, UINT16 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_word)(offset, data); }
-INLINE void	io_write_dword(offs_t offset, UINT32 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_dword)(offset, data); }
-INLINE void	io_write_qword(offs_t offset, UINT64 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_qword)(offset, data); }
+INLINE void	io_write_byte (offs_t offset REG(d0), UINT8  data REG(d1)) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_byte)(offset, data); }
+INLINE void	io_write_word (offs_t offset REG(d0), UINT16 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_word)(offset, data); }
+INLINE void	io_write_dword(offs_t offset REG(d0), UINT32 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_dword)(offset, data); }
+INLINE void	io_write_qword(offs_t offset REG(d0), UINT64 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_qword)(offset, data); }
 
 /* ----- safe opcode and opcode argument reading ----- */
 UINT8	cpu_readop_safe(offs_t offset);
