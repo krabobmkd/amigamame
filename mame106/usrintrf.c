@@ -2838,6 +2838,31 @@ static void showcharset(mame_bitmap *bitmap)
 					flipx = 0;
 					flipy = 0;
 
+                    struct drawgfxParams dgp={
+                           bitmap, // mame_bitmap *dest;
+                           Machine->gfx[bank], // const gfx_element *gfx;
+                          0, //changed  i+firstdrawn, // unsigned int code;
+                          color, //  unsigned int color;
+                            flipx,flipy, // int flipx,flipy;
+                           0,0, //change bounds.min_x, bounds.min_y,// int sx,sy;
+                            NULL,// const rectangle *clip;
+                            Machine->gfx[bank]->colortable ? TRANSPARENCY_NONE : TRANSPARENCY_NONE_RAW, //int transparency;
+                            0, //int transparent_color;
+                            // drawgfxParams
+                            //  - - - -int scalex,scaley unused;
+                            1<<16,1<<16,
+                            // - - - - --
+                            NULL, // mame_bitmap *pri_buffer; // optional
+                            0 //UINT32 priority_mask;
+                    };
+                     /*sprite num, color*/
+                    /*
+                    bitmap,Machine->gfx[bank],
+								i+firstdrawn,color,
+								flipx,flipy,bounds.min_x,bounds.min_y,
+								0,Machine->gfx[bank]->colortable ? TRANSPARENCY_NONE : TRANSPARENCY_NONE_RAW,0
+                    */
+
 					for (i = 0; i+firstdrawn < Machine->gfx[bank]->total_elements && i<cpx*cpy; i++)
 					{
 						rectangle bounds;
@@ -2847,10 +2872,10 @@ static void showcharset(mame_bitmap *bitmap)
 						bounds.max_y = bounds.min_y + crotheight - 1;
 						ui_rot2raw_rect(&bounds);
 
-						drawgfx(bitmap,Machine->gfx[bank],
-								i+firstdrawn,color,  /*sprite num, color*/
-								flipx,flipy,bounds.min_x,bounds.min_y,
-								0,Machine->gfx[bank]->colortable ? TRANSPARENCY_NONE : TRANSPARENCY_NONE_RAW,0);
+						dgp.code = i+firstdrawn;
+                        dgp.sx = bounds.min_x;
+                        dgp.sy = bounds.min_y;
+						drawgfx(&dgp);
 
 						lastdrawn = i+firstdrawn;
 					}
@@ -4068,6 +4093,27 @@ static void render_ui(mame_bitmap *dest)
 	uirotfont->colortable[2] = get_white_pen();
 	uirotfont->colortable[3] = get_black_pen();
 
+    struct drawgfxParams dgp={
+           dest, // mame_bitmap *dest;
+           uirotfont, // const gfx_element *gfx;
+          0, //changed elem->type, // unsigned int code;
+          0, // changed  elem->color ? 0 : 1,// unsigned int color;
+            0,0, // int flipx,flipy;
+           0,0,//change bounds.min_x, bounds.min_y,// int sx,sy;
+            &uirawbounds,// const rectangle *clip;
+            TRANSPARENCY_PEN, //int transparency;
+            0, //int transparent_color;
+            // drawgfxParams
+            //  - - - -int scalex,scaley unused;
+            1<<16,1<<16,
+            // - - - - --
+            NULL, // mame_bitmap *pri_buffer; // optional
+            0 //UINT32 priority_mask;
+    };
+
+// dest, uirotfont, elem->type, elem->color ? 0 : 1, 0, 0, bounds.min_x, bounds.min_y, &uirawbounds, TRANSPARENCY_PEN, 0
+
+
 	for (i = 0; i < elemindex; i++)
 	{
 		render_element *elem = &elemlist[i];
@@ -4094,7 +4140,13 @@ static void render_ui(mame_bitmap *dest)
 				bounds.max_x = bounds.min_x + uirotcharwidth - 1;
 				bounds.max_y = bounds.min_y + uirotcharheight - 1;
 				ui_rot2raw_rect(&bounds);
-				drawgfx(dest, uirotfont, elem->type, elem->color ? 0 : 1, 0, 0, bounds.min_x, bounds.min_y, &uirawbounds, TRANSPARENCY_PEN, 0);
+
+                dgp.code = elem->type;
+                dgp.color = elem->color ? 0 : 1;
+                dgp.sx = bounds.min_x; // start x
+                dgp.sy = bounds.min_y;
+				drawgfx(&dgp);
+				//drawgfx(dest, uirotfont, elem->type, elem->color ? 0 : 1, 0, 0, bounds.min_x, bounds.min_y, &uirawbounds, TRANSPARENCY_PEN, 0);
 				break;
 		}
 	}

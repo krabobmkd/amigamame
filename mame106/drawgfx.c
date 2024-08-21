@@ -923,88 +923,90 @@ static inline UINT32 SHADOW32(UINT32 c) {
 
 ***************************************************************************/
 
-static inline void common_drawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		mame_bitmap *pri_buffer,UINT32 pri_mask)
+//was: static inline void common_drawgfx(struct drawgfxParams *p DGREG(a0))
+void drawgfx(struct drawgfxParams *p DGREG(a0))
 {
-	assert_always(gfx, "drawgfx() gfx == 0");
-	assert_always(gfx->colortable || is_raw[transparency], "drawgfx() gfx->colortable == 0");
+//	assert(p->gfx, "drawgfx() gfx == 0");
+//	assert(p->gfx->colortable || is_raw[p->transparency], "drawgfx() gfx->colortable == 0");
 
-	code %= gfx->total_elements;
-	if (!is_raw[transparency])
-		color %= gfx->total_colors;
+	p->code %= p->gfx->total_elements;
+	if (!is_raw[p->transparency])
+		p->color %= p->gfx->total_colors;
 
 	if (!(Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
-		(transparency == TRANSPARENCY_ALPHAONE || transparency == TRANSPARENCY_ALPHA || transparency == TRANSPARENCY_ALPHARANGE))
+		(p->transparency == TRANSPARENCY_ALPHAONE ||
+		p->transparency == TRANSPARENCY_ALPHA ||
+		p->transparency == TRANSPARENCY_ALPHARANGE))
 	{
-		if (transparency == TRANSPARENCY_ALPHAONE && (cpu_getcurrentframe() & 1))
+		if (p->transparency == TRANSPARENCY_ALPHAONE && (cpu_getcurrentframe() & 1))
 		{
-			transparency = TRANSPARENCY_PENS;
-			transparent_color = (1 << (transparent_color & 0xff))|(1 << (transparent_color >> 8));
+			p->transparency = TRANSPARENCY_PENS;
+			p->transparent_color = (1 << (p->transparent_color & 0xff))|(1 << (p->transparent_color >> 8));
 		}
 		else
 		{
-			transparency = TRANSPARENCY_PEN;
-			transparent_color &= 0xff;
+			p->transparency = TRANSPARENCY_PEN;
+			p->transparent_color &= 0xff;
 		}
 	}
 
-	if (gfx->pen_usage && (transparency == TRANSPARENCY_PEN || transparency == TRANSPARENCY_PENS))
+	if (p->gfx->pen_usage && (p->transparency == TRANSPARENCY_PEN ||
+                                p->transparency == TRANSPARENCY_PENS))
 	{
 		int transmask = 0;
 
-		if (transparency == TRANSPARENCY_PEN)
+		if (p->transparency == TRANSPARENCY_PEN)
 		{
-			transmask = 1 << (transparent_color & 0xff);
+			transmask = 1 << (p->transparent_color & 0xff);
 		}
 		else	/* transparency == TRANSPARENCY_PENS */
 		{
-			transmask = transparent_color;
+			transmask = p->transparent_color;
 		}
 
-		if ((gfx->pen_usage[code] & ~transmask) == 0)
+		if ((p->gfx->pen_usage[p->code] & ~transmask) == 0)
 			/* character is totally transparent, no need to draw */
 			return;
-		else if ((gfx->pen_usage[code] & transmask) == 0)
+		else if ((p->gfx->pen_usage[p->code] & transmask) == 0)
 			/* character is totally opaque, can disable transparency */
-			transparency = TRANSPARENCY_NONE;
+			p->transparency = TRANSPARENCY_NONE;
 	}
 
-	if (dest->depth == 8)
-		drawgfx_core8(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
-	else if(dest->depth == 15 || dest->depth == 16)
-		drawgfx_core16(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
-	else
-		drawgfx_core32(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
+//	if (dest->depth == 8)
+//		drawgfx_core8(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
+//	else if(dest->depth == 15 || dest->depth == 16)
+//		drawgfx_core8(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
+//	else
+//		drawgfx_core8(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
+
+// dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask
+    drawgfx_core8(p);
 }
 
-void drawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,NULL,0);
-	profiler_mark(PROFILER_END);
-}
+//void drawgfx(struct drawgfxParams *p DGREG(a0))
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,NULL,0);
+//	profiler_mark(PROFILER_END);
+//}
 
-void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,priority_bitmap,priority_mask | (1<<31));
-	profiler_mark(PROFILER_END);
-}
+//void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,priority_bitmap,priority_mask | (1<<31));
+//	profiler_mark(PROFILER_END);
+//}
 
-void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,priority_bitmap,priority_mask);
-	profiler_mark(PROFILER_END);
-}
+//void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,priority_bitmap,priority_mask);
+//	profiler_mark(PROFILER_END);
+//}
 
 
 /***************************************************************************
@@ -1417,2127 +1419,2127 @@ void fillbitmap(mame_bitmap *dest,pen_t pen,const rectangle *clip)
 	}
 }
 
-static inline void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		int scalex, int scaley,mame_bitmap *pri_buffer,UINT32 pri_mask)
-{
-	rectangle myclip;
-	int alphapen = 0;
-
-	UINT8 ah, al;
-
-	al = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
-
-	if (!scalex || !scaley) return;
-
-	if (scalex == 0x10000 && scaley == 0x10000)
-	{
-		common_drawgfx(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
-		return;
-	}
-
-	if (transparency != TRANSPARENCY_PEN && transparency != TRANSPARENCY_PEN_RAW
-			&& transparency != TRANSPARENCY_PENS && transparency != TRANSPARENCY_COLOR
-			&& transparency != TRANSPARENCY_PEN_TABLE && transparency != TRANSPARENCY_PEN_TABLE_RAW
-			&& transparency != TRANSPARENCY_BLEND_RAW && transparency != TRANSPARENCY_ALPHAONE
-			&& transparency != TRANSPARENCY_ALPHA && transparency != TRANSPARENCY_ALPHARANGE
-			&& transparency != TRANSPARENCY_NONE)
-	{
-		ui_popup("drawgfxzoom unsupported trans %02x",transparency);
-		return;
-	}
-
-	if (!(Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
-		(transparency == TRANSPARENCY_ALPHAONE || transparency == TRANSPARENCY_ALPHA || transparency == TRANSPARENCY_ALPHARANGE))
-	{
-		transparency = TRANSPARENCY_PEN;
-		transparent_color &= 0xff;
-	}
-
-	if (transparency == TRANSPARENCY_ALPHAONE)
-	{
-		alphapen = transparent_color >> 8;
-		transparent_color &= 0xff;
-	}
-
-	if (transparency == TRANSPARENCY_COLOR)
-		transparent_color = Machine->pens[transparent_color];
-
-
-	/*
-    scalex and scaley are 16.16 fixed point numbers
-    1<<15 : shrink to 50%
-    1<<16 : uniform scale
-    1<<17 : double to 200%
-    */
-
-
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	if(clip)
-	{
-		myclip.min_x = clip->min_x;
-		myclip.max_x = clip->max_x;
-		myclip.min_y = clip->min_y;
-		myclip.max_y = clip->max_y;
-
-		if (myclip.min_x < 0) myclip.min_x = 0;
-		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width-1;
-		if (myclip.min_y < 0) myclip.min_y = 0;
-		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
-
-		clip=&myclip;
-	}
-
-
-	/* ASG 980209 -- added 16-bit version */
-	if (dest_bmp->depth == 8)
-	{
-		if( gfx && gfx->colortable )
-		{
-			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
-			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
-
-			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
-			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
-
-			if (sprite_screen_width && sprite_screen_height)
-			{
-				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width<<16)/sprite_screen_width;
-				int dy = (gfx->height<<16)/sprite_screen_height;
-
-				int ex = sx+sprite_screen_width;
-				int ey = sy+sprite_screen_height;
-
-				int x_index_base;
-				int y_index;
-
-				if( flipx )
-				{
-					x_index_base = (sprite_screen_width-1)*dx;
-					dx = -dx;
-				}
-				else
-				{
-					x_index_base = 0;
-				}
-
-				if( flipy )
-				{
-					y_index = (sprite_screen_height-1)*dy;
-					dy = -dy;
-				}
-				else
-				{
-					y_index = 0;
-				}
-
-				if( clip )
-				{
-					if( sx < clip->min_x)
-					{ /* clip left */
-						int pixels = clip->min_x-sx;
-						sx += pixels;
-						x_index_base += pixels*dx;
-					}
-					if( sy < clip->min_y )
-					{ /* clip top */
-						int pixels = clip->min_y-sy;
-						sy += pixels;
-						y_index += pixels*dy;
-					}
-					/* NS 980211 - fixed incorrect clipping */
-					if( ex > clip->max_x+1 )
-					{ /* clip right */
-						int pixels = ex-clip->max_x-1;
-						ex -= pixels;
-					}
-					if( ey > clip->max_y+1 )
-					{ /* clip bottom */
-						int pixels = ey-clip->max_y-1;
-						ey -= pixels;
-					}
-				}
-
-				if( ex>sx )
-				{ /* skip if inner loop doesn't draw anything */
-					int y;
-
-					/* case 0: TRANSPARENCY_NONE */
-					if (transparency == TRANSPARENCY_NONE)
-					{
-						if (pri_buffer)
-						{
-							if (gfx->flags & GFX_PACKED)
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT8 *dest = dest_bmp->line[y];
-									UINT8 *pri = pri_buffer->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
-										pri[x] = 31;
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-							else
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT8 *dest = dest_bmp->line[y];
-									UINT8 *pri = pri_buffer->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[source[x_index>>16]];
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-						}
-						else
-						{
-							if (gfx->flags & GFX_PACKED)
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT8 *dest = dest_bmp->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-							else
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT8 *dest = dest_bmp->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										dest[x] = pal[source[x_index>>16]];
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-						}
-					}
-
-					/* case 1: TRANSPARENCY_PEN */
-					if (transparency == TRANSPARENCY_PEN)
-					{
-						if (pri_buffer)
-						{
-							if (gfx->flags & GFX_PACKED)
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT8 *dest = dest_bmp->line[y];
-									UINT8 *pri = pri_buffer->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
-										if( c != transparent_color )
-										{
-											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = pal[c];
-											pri[x] = 31;
-										}
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-							else
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT8 *dest = dest_bmp->line[y];
-									UINT8 *pri = pri_buffer->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										int c = source[x_index>>16];
-										if( c != transparent_color )
-										{
-											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = pal[c];
-											pri[x] = 31;
-										}
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-						}
-						else
-						{
-							if (gfx->flags & GFX_PACKED)
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT8 *dest = dest_bmp->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
-										if( c != transparent_color ) dest[x] = pal[c];
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-							else
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT8 *dest = dest_bmp->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										int c = source[x_index>>16];
-										if( c != transparent_color ) dest[x] = pal[c];
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-						}
-					}
-
-					/* case 1b: TRANSPARENCY_PEN_RAW */
-					if (transparency == TRANSPARENCY_PEN_RAW)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = color + c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = color + c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 1c: TRANSPARENCY_BLEND_RAW */
-					if (transparency == TRANSPARENCY_BLEND_RAW)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] |= (color + c);
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] |= (color + c);
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 2: TRANSPARENCY_PENS */
-					if (transparency == TRANSPARENCY_PENS)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if (((1 << c) & transparent_color) == 0)
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[c];
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if (((1 << c) & transparent_color) == 0)
-										dest[x] = pal[c];
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 3: TRANSPARENCY_COLOR */
-					else if (transparency == TRANSPARENCY_COLOR)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color ) dest[x] = c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 4: TRANSPARENCY_PEN_TABLE */
-					if (transparency == TRANSPARENCY_PEN_TABLE)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										switch(gfx_drawmode_table[c])
-										{
-										case DRAWMODE_SOURCE:
-											if (((1 << (pri[x] & 0x1f)) & pri_mask) == 0)
-											{
-												if (pri[x] & 0x80)
-													dest[x] = palette_shadow_table[pal[c]];
-												else
-													dest[x] = pal[c];
-											}
-											pri[x] = (pri[x] & 0x7f) | 31;
-											break;
-										case DRAWMODE_SHADOW:
-											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = palette_shadow_table[dest[x]];
-											pri[x] |= al;
-											break;
-										}
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										switch(gfx_drawmode_table[c])
-										{
-										case DRAWMODE_SOURCE:
-											dest[x] = pal[c];
-											break;
-										case DRAWMODE_SHADOW:
-											dest[x] = palette_shadow_table[dest[x]];
-											break;
-										}
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 4b: TRANSPARENCY_PEN_TABLE_RAW */
-					if (transparency == TRANSPARENCY_PEN_TABLE_RAW)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										switch(gfx_drawmode_table[c])
-										{
-										case DRAWMODE_SOURCE:
-											if (((1 << (pri[x] & 0x1f)) & pri_mask) == 0)
-											{
-												if (pri[x] & 0x80)
-													dest[x] = palette_shadow_table[color + c];
-												else
-													dest[x] = color + c;
-											}
-											pri[x] = (pri[x] & 0x7f) | 31;
-											break;
-										case DRAWMODE_SHADOW:
-											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = palette_shadow_table[dest[x]];
-											pri[x] |= al;
-											break;
-										}
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										switch(gfx_drawmode_table[c])
-										{
-										case DRAWMODE_SOURCE:
-											dest[x] = color + c;
-											break;
-										case DRAWMODE_SHADOW:
-											dest[x] = palette_shadow_table[dest[x]];
-											break;
-										}
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/* ASG 980209 -- new 16-bit part */
-	else if (dest_bmp->depth == 15 || dest_bmp->depth == 16)
-	{
-		if( gfx && gfx->colortable )
-		{
-			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
-			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
-
-			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
-			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
-
-			if (sprite_screen_width && sprite_screen_height)
-			{
-				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width<<16)/sprite_screen_width;
-				int dy = (gfx->height<<16)/sprite_screen_height;
-
-				int ex = sx+sprite_screen_width;
-				int ey = sy+sprite_screen_height;
-
-				int x_index_base;
-				int y_index;
-
-				if( flipx )
-				{
-					x_index_base = (sprite_screen_width-1)*dx;
-					dx = -dx;
-				}
-				else
-				{
-					x_index_base = 0;
-				}
-
-				if( flipy )
-				{
-					y_index = (sprite_screen_height-1)*dy;
-					dy = -dy;
-				}
-				else
-				{
-					y_index = 0;
-				}
-
-				if( clip )
-				{
-					if( sx < clip->min_x)
-					{ /* clip left */
-						int pixels = clip->min_x-sx;
-						sx += pixels;
-						x_index_base += pixels*dx;
-					}
-					if( sy < clip->min_y )
-					{ /* clip top */
-						int pixels = clip->min_y-sy;
-						sy += pixels;
-						y_index += pixels*dy;
-					}
-					/* NS 980211 - fixed incorrect clipping */
-					if( ex > clip->max_x+1 )
-					{ /* clip right */
-						int pixels = ex-clip->max_x-1;
-						ex -= pixels;
-					}
-					if( ey > clip->max_y+1 )
-					{ /* clip bottom */
-						int pixels = ey-clip->max_y-1;
-						ey -= pixels;
-					}
-				}
-
-				if( ex>sx )
-				{ /* skip if inner loop doesn't draw anything */
-					int y;
-
-					/* case 0: TRANSPARENCY_NONE */
-					if (transparency == TRANSPARENCY_NONE)
-					{
-						if (pri_buffer)
-						{
-							if (gfx->flags & GFX_PACKED)
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-									UINT8 *pri = pri_buffer->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
-										pri[x] = 31;
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-							else
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-									UINT8 *pri = pri_buffer->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[source[x_index>>16]];
-										pri[x] = 31;
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-						}
-						else
-						{
-							if (gfx->flags & GFX_PACKED)
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-							else
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										dest[x] = pal[source[x_index>>16]];
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-						}
-					}
-
-					/* case 1: TRANSPARENCY_PEN */
-					if (transparency == TRANSPARENCY_PEN)
-					{
-						if (pri_buffer)
-						{
-							if (gfx->flags & GFX_PACKED)
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-									UINT8 *pri = pri_buffer->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
-										if( c != transparent_color )
-										{
-											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = pal[c];
-											pri[x] = 31;
-										}
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-							else
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-									UINT8 *pri = pri_buffer->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										int c = source[x_index>>16];
-										if( c != transparent_color )
-										{
-											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = pal[c];
-											pri[x] = 31;
-										}
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-						}
-						else
-						{
-							if (gfx->flags & GFX_PACKED)
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
-										if( c != transparent_color ) dest[x] = pal[c];
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-							else
-							{
-								for( y=sy; y<ey; y++ )
-								{
-									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-									int x, x_index = x_index_base;
-									for( x=sx; x<ex; x++ )
-									{
-										int c = source[x_index>>16];
-										if( c != transparent_color ) dest[x] = pal[c];
-										x_index += dx;
-									}
-
-									y_index += dy;
-								}
-							}
-						}
-					}
-
-					/* case 1b: TRANSPARENCY_PEN_RAW */
-					if (transparency == TRANSPARENCY_PEN_RAW)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = color + c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = color + c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 1c: TRANSPARENCY_BLEND_RAW */
-					if (transparency == TRANSPARENCY_BLEND_RAW)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] |= color + c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] |= color + c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 2: TRANSPARENCY_PENS */
-					if (transparency == TRANSPARENCY_PENS)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if (((1 << c) & transparent_color) == 0)
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[c];
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if (((1 << c) & transparent_color) == 0)
-										dest[x] = pal[c];
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 3: TRANSPARENCY_COLOR */
-					else if (transparency == TRANSPARENCY_COLOR)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color ) dest[x] = c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 4: TRANSPARENCY_PEN_TABLE */
-					if (transparency == TRANSPARENCY_PEN_TABLE)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										switch(gfx_drawmode_table[c])
-										{
-										case DRAWMODE_SOURCE:
-											ah = pri[x];
-											if (((1 << (ah & 0x1f)) & pri_mask) == 0)
-											{
-												if (ah & 0x80)
-													dest[x] = palette_shadow_table[pal[c]];
-												else
-													dest[x] = pal[c];
-											}
-											pri[x] = (ah & 0x7f) | 31;
-											break;
-										case DRAWMODE_SHADOW:
-											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = palette_shadow_table[dest[x]];
-											pri[x] |= al;
-											break;
-										}
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										switch(gfx_drawmode_table[c])
-										{
-										case DRAWMODE_SOURCE:
-											dest[x] = pal[c];
-											break;
-										case DRAWMODE_SHADOW:
-											dest[x] = palette_shadow_table[dest[x]];
-											break;
-										}
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 4b: TRANSPARENCY_PEN_TABLE_RAW */
-					if (transparency == TRANSPARENCY_PEN_TABLE_RAW)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										switch(gfx_drawmode_table[c])
-										{
-										case DRAWMODE_SOURCE:
-											ah = pri[x];
-											if (((1 << (ah & 0x1f)) & pri_mask) == 0)
-											{
-												if (ah & 0x80)
-													dest[x] = palette_shadow_table[color + c];
-												else
-													dest[x] = color + c;
-											}
-											pri[x] = (ah & 0x7f) | 31;
-											break;
-										case DRAWMODE_SHADOW:
-											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = palette_shadow_table[dest[x]];
-											pri[x] |= al;
-											break;
-										}
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										switch(gfx_drawmode_table[c])
-										{
-										case DRAWMODE_SOURCE:
-											dest[x] = color + c;
-											break;
-										case DRAWMODE_SHADOW:
-											dest[x] = palette_shadow_table[dest[x]];
-											break;
-										}
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 5: TRANSPARENCY_ALPHAONE */
-					if (transparency == TRANSPARENCY_ALPHAONE)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-										{
-											if( c == alphapen)
-												dest[x] = alpha_blend16(dest[x], pal[c]);
-											else
-												dest[x] = pal[c];
-										}
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if( c == alphapen)
-											dest[x] = alpha_blend16(dest[x], pal[c]);
-										else
-											dest[x] = pal[c];
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 6: TRANSPARENCY_ALPHA */
-					if (transparency == TRANSPARENCY_ALPHA)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = alpha_blend16(dest[x], pal[c]);
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = alpha_blend16(dest[x], pal[c]);
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* pjp 31/5/02 */
-					/* case 7: TRANSPARENCY_ALPHARANGE */
-					if (transparency == TRANSPARENCY_ALPHARANGE)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-										{
-											if( gfx_alpharange_table[c] == 0xff )
-												dest[x] = pal[c];
-											else
-												dest[x] = alpha_blend_r16(dest[x], pal[c], gfx_alpharange_table[c]);
-										}
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if( gfx_alpharange_table[c] == 0xff )
-											dest[x] = pal[c];
-										else
-											dest[x] = alpha_blend_r16(dest[x], pal[c], gfx_alpharange_table[c]);
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		if( gfx && gfx->colortable )
-		{
-			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
-			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
-
-			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
-			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
-
-			if (sprite_screen_width && sprite_screen_height)
-			{
-				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width<<16)/sprite_screen_width;
-				int dy = (gfx->height<<16)/sprite_screen_height;
-
-				int ex = sx+sprite_screen_width;
-				int ey = sy+sprite_screen_height;
-
-				int x_index_base;
-				int y_index;
-
-				if( flipx )
-				{
-					x_index_base = (sprite_screen_width-1)*dx;
-					dx = -dx;
-				}
-				else
-				{
-					x_index_base = 0;
-				}
-
-				if( flipy )
-				{
-					y_index = (sprite_screen_height-1)*dy;
-					dy = -dy;
-				}
-				else
-				{
-					y_index = 0;
-				}
-
-				if( clip )
-				{
-					if( sx < clip->min_x)
-					{ /* clip left */
-						int pixels = clip->min_x-sx;
-						sx += pixels;
-						x_index_base += pixels*dx;
-					}
-					if( sy < clip->min_y )
-					{ /* clip top */
-						int pixels = clip->min_y-sy;
-						sy += pixels;
-						y_index += pixels*dy;
-					}
-					/* NS 980211 - fixed incorrect clipping */
-					if( ex > clip->max_x+1 )
-					{ /* clip right */
-						int pixels = ex-clip->max_x-1;
-						ex -= pixels;
-					}
-					if( ey > clip->max_y+1 )
-					{ /* clip bottom */
-						int pixels = ey-clip->max_y-1;
-						ey -= pixels;
-					}
-				}
-
-				if( ex>sx )
-				{ /* skip if inner loop doesn't draw anything */
-					int y;
-
-					/* case 0: TRANSPARENCY_NONE */
-					if (transparency == TRANSPARENCY_NONE)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									if (((1 << pri[x]) & pri_mask) == 0)
-										dest[x] = pal[source[x_index>>16]];
-									pri[x] = 31;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									dest[x] = pal[source[x_index>>16]];
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 1: TRANSPARENCY_PEN */
-					if (transparency == TRANSPARENCY_PEN)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[c];
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = pal[c];
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 1b: TRANSPARENCY_PEN_RAW */
-					if (transparency == TRANSPARENCY_PEN_RAW)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = color + c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = color + c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 1c: TRANSPARENCY_BLEND_RAW */
-					if (transparency == TRANSPARENCY_BLEND_RAW)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] |= color + c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] |= color + c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 2: TRANSPARENCY_PENS */
-					if (transparency == TRANSPARENCY_PENS)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if (((1 << c) & transparent_color) == 0)
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[c];
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if (((1 << c) & transparent_color) == 0)
-										dest[x] = pal[c];
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 3: TRANSPARENCY_COLOR */
-					else if (transparency == TRANSPARENCY_COLOR)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color ) dest[x] = c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 4: TRANSPARENCY_PEN_TABLE */
-					if (transparency == TRANSPARENCY_PEN_TABLE)
-					{
-						UINT8 *source, *pri;
-						UINT32 *dest;
-						int c, x, x_index;
-
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								source = source_base + (y_index>>16) * gfx->line_modulo;
-								y_index += dy;
-								dest = (UINT32 *)dest_bmp->line[y];
-								pri = pri_buffer->line[y];
-								x_index = x_index_base;
-
-								for( x=sx; x<ex; x++ )
-								{
-									int ebx = x_index;
-									x_index += dx;
-									ebx >>= 16;
-									al = pri[x];
-									c = source[ebx];
-									ah = al;
-									al &= 0x1f;
-
-									if (gfx_drawmode_table[c] == DRAWMODE_NONE) continue;
-
-									if (!(1<<al & pri_mask))
-									{
-										if (gfx_drawmode_table[c] == DRAWMODE_SOURCE)
-										{
-											ah &= 0x7f;
-											ebx = pal[c];
-											ah |= 0x1f;
-											dest[x] = ebx;
-											pri[x] = ah;
-										}
-										else if (!(ah & 0x80))
-										{
-											ebx = SHADOW32(dest[x]);
-											pri[x] |= 0x80;
-											dest[x] = ebx;
-										}
-									}
-								}
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								source = source_base + (y_index>>16) * gfx->line_modulo;
-								y_index += dy;
-								dest = (UINT32 *)dest_bmp->line[y];
-								x_index = x_index_base;
-
-								for( x=sx; x<ex; x++ )
-								{
-									c = source[x_index>>16];
-									x_index += dx;
-
-									if (gfx_drawmode_table[c] == DRAWMODE_NONE) continue;
-									if (gfx_drawmode_table[c] == DRAWMODE_SOURCE)
-										dest[x] = pal[c];
-									else
-										dest[x] = SHADOW32(dest[x]);
-								}
-							}
-						}
-					}
-
-					/* case 4b: TRANSPARENCY_PEN_TABLE_RAW */
-					if (transparency == TRANSPARENCY_PEN_TABLE_RAW)
-					{
-						UINT8 *source, *pri;
-						UINT32 *dest;
-						int c, x, x_index;
-
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								source = source_base + (y_index>>16) * gfx->line_modulo;
-								y_index += dy;
-								dest = (UINT32 *)dest_bmp->line[y];
-								pri = pri_buffer->line[y];
-								x_index = x_index_base;
-
-								for( x=sx; x<ex; x++ )
-								{
-									int ebx = x_index;
-									x_index += dx;
-									ebx >>= 16;
-									al = pri[x];
-									c = source[ebx];
-									ah = al;
-									al &= 0x1f;
-
-									if (gfx_drawmode_table[c] == DRAWMODE_NONE) continue;
-
-									if (!(1<<al & pri_mask))
-									{
-										if (gfx_drawmode_table[c] == DRAWMODE_SOURCE)
-										{
-											ah &= 0x7f;
-											ebx = color + c;
-											ah |= 0x1f;
-											dest[x] = ebx;
-											pri[x] = ah;
-										}
-										else if (!(ah & 0x80))
-										{
-											ebx = SHADOW32(dest[x]);
-											pri[x] |= 0x80;
-											dest[x] = ebx;
-										}
-									}
-								}
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								source = source_base + (y_index>>16) * gfx->line_modulo;
-								y_index += dy;
-								dest = (UINT32 *)dest_bmp->line[y];
-								x_index = x_index_base;
-
-								for( x=sx; x<ex; x++ )
-								{
-									c = source[x_index>>16];
-									x_index += dx;
-
-									if (gfx_drawmode_table[c] == DRAWMODE_NONE) continue;
-									if (gfx_drawmode_table[c] == DRAWMODE_SOURCE)
-										dest[x] = color + c;
-									else
-										dest[x] = SHADOW32(dest[x]);
-								}
-							}
-						}
-					}
-
-
-					/* case 5: TRANSPARENCY_ALPHAONE */
-					if (transparency == TRANSPARENCY_ALPHAONE)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-										{
-											if( c == alphapen)
-												dest[x] = alpha_blend32(dest[x], pal[c]);
-											else
-												dest[x] = pal[c];
-										}
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if( c == alphapen)
-											dest[x] = alpha_blend32(dest[x], pal[c]);
-										else
-											dest[x] = pal[c];
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 6: TRANSPARENCY_ALPHA */
-					if (transparency == TRANSPARENCY_ALPHA)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = alpha_blend32(dest[x], pal[c]);
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = alpha_blend32(dest[x], pal[c]);
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* pjp 31/5/02 */
-					/* case 7: TRANSPARENCY_ALPHARANGE */
-					if (transparency == TRANSPARENCY_ALPHARANGE)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-								UINT8 *pri = pri_buffer->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-										{
-											if( gfx_alpharange_table[c] == 0xff )
-												dest[x] = pal[c];
-											else
-												dest[x] = alpha_blend_r32(dest[x], pal[c], gfx_alpharange_table[c]);
-										}
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
-									{
-										if( gfx_alpharange_table[c] == 0xff )
-											dest[x] = pal[c];
-										else
-											dest[x] = alpha_blend_r32(dest[x], pal[c], gfx_alpharange_table[c]);
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
-			clip,transparency,transparent_color,scalex,scaley,NULL,0);
-	profiler_mark(PROFILER_END);
-}
-
-void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
-		UINT32 priority_mask)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
-			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask | (1<<31));
-	profiler_mark(PROFILER_END);
-}
-
-void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
-		UINT32 priority_mask)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
-			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask);
-	profiler_mark(PROFILER_END);
-}
+//static inline void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,
+//		int scalex, int scaley,mame_bitmap *pri_buffer,UINT32 pri_mask)
+//{
+//	rectangle myclip;
+//	int alphapen = 0;
+
+//	UINT8 ah, al;
+
+//	al = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
+
+//	if (!scalex || !scaley) return;
+
+//	if (scalex == 0x10000 && scaley == 0x10000)
+//	{
+//		common_drawgfx(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
+//		return;
+//	}
+
+//	if (transparency != TRANSPARENCY_PEN && transparency != TRANSPARENCY_PEN_RAW
+//			&& transparency != TRANSPARENCY_PENS && transparency != TRANSPARENCY_COLOR
+//			&& transparency != TRANSPARENCY_PEN_TABLE && transparency != TRANSPARENCY_PEN_TABLE_RAW
+//			&& transparency != TRANSPARENCY_BLEND_RAW && transparency != TRANSPARENCY_ALPHAONE
+//			&& transparency != TRANSPARENCY_ALPHA && transparency != TRANSPARENCY_ALPHARANGE
+//			&& transparency != TRANSPARENCY_NONE)
+//	{
+//		ui_popup("drawgfxzoom unsupported trans %02x",transparency);
+//		return;
+//	}
+
+//	if (!(Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
+//		(transparency == TRANSPARENCY_ALPHAONE || transparency == TRANSPARENCY_ALPHA || transparency == TRANSPARENCY_ALPHARANGE))
+//	{
+//		transparency = TRANSPARENCY_PEN;
+//		transparent_color &= 0xff;
+//	}
+
+//	if (transparency == TRANSPARENCY_ALPHAONE)
+//	{
+//		alphapen = transparent_color >> 8;
+//		transparent_color &= 0xff;
+//	}
+
+//	if (transparency == TRANSPARENCY_COLOR)
+//		transparent_color = Machine->pens[transparent_color];
+
+
+//	/*
+//    scalex and scaley are 16.16 fixed point numbers
+//    1<<15 : shrink to 50%
+//    1<<16 : uniform scale
+//    1<<17 : double to 200%
+//    */
+
+
+//	/* KW 991012 -- Added code to force clip to bitmap boundary */
+//	if(clip)
+//	{
+//		myclip.min_x = clip->min_x;
+//		myclip.max_x = clip->max_x;
+//		myclip.min_y = clip->min_y;
+//		myclip.max_y = clip->max_y;
+
+//		if (myclip.min_x < 0) myclip.min_x = 0;
+//		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width-1;
+//		if (myclip.min_y < 0) myclip.min_y = 0;
+//		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
+
+//		clip=&myclip;
+//	}
+
+
+//	/* ASG 980209 -- added 16-bit version */
+//	if (dest_bmp->depth == 8)
+//	{
+//		if( gfx && gfx->colortable )
+//		{
+//			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
+//			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+
+//			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
+//			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+
+//			if (sprite_screen_width && sprite_screen_height)
+//			{
+//				/* compute sprite increment per screen pixel */
+//				int dx = (gfx->width<<16)/sprite_screen_width;
+//				int dy = (gfx->height<<16)/sprite_screen_height;
+
+//				int ex = sx+sprite_screen_width;
+//				int ey = sy+sprite_screen_height;
+
+//				int x_index_base;
+//				int y_index;
+
+//				if( flipx )
+//				{
+//					x_index_base = (sprite_screen_width-1)*dx;
+//					dx = -dx;
+//				}
+//				else
+//				{
+//					x_index_base = 0;
+//				}
+
+//				if( flipy )
+//				{
+//					y_index = (sprite_screen_height-1)*dy;
+//					dy = -dy;
+//				}
+//				else
+//				{
+//					y_index = 0;
+//				}
+
+//				if( clip )
+//				{
+//					if( sx < clip->min_x)
+//					{ /* clip left */
+//						int pixels = clip->min_x-sx;
+//						sx += pixels;
+//						x_index_base += pixels*dx;
+//					}
+//					if( sy < clip->min_y )
+//					{ /* clip top */
+//						int pixels = clip->min_y-sy;
+//						sy += pixels;
+//						y_index += pixels*dy;
+//					}
+//					/* NS 980211 - fixed incorrect clipping */
+//					if( ex > clip->max_x+1 )
+//					{ /* clip right */
+//						int pixels = ex-clip->max_x-1;
+//						ex -= pixels;
+//					}
+//					if( ey > clip->max_y+1 )
+//					{ /* clip bottom */
+//						int pixels = ey-clip->max_y-1;
+//						ey -= pixels;
+//					}
+//				}
+
+//				if( ex>sx )
+//				{ /* skip if inner loop doesn't draw anything */
+//					int y;
+
+//					/* case 0: TRANSPARENCY_NONE */
+//					if (transparency == TRANSPARENCY_NONE)
+//					{
+//						if (pri_buffer)
+//						{
+//							if (gfx->flags & GFX_PACKED)
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT8 *dest = dest_bmp->line[y];
+//									UINT8 *pri = pri_buffer->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
+//										pri[x] = 31;
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//							else
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT8 *dest = dest_bmp->line[y];
+//									UINT8 *pri = pri_buffer->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = pal[source[x_index>>16]];
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//						}
+//						else
+//						{
+//							if (gfx->flags & GFX_PACKED)
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT8 *dest = dest_bmp->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//							else
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT8 *dest = dest_bmp->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										dest[x] = pal[source[x_index>>16]];
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//						}
+//					}
+
+//					/* case 1: TRANSPARENCY_PEN */
+//					if (transparency == TRANSPARENCY_PEN)
+//					{
+//						if (pri_buffer)
+//						{
+//							if (gfx->flags & GFX_PACKED)
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT8 *dest = dest_bmp->line[y];
+//									UINT8 *pri = pri_buffer->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
+//										if( c != transparent_color )
+//										{
+//											if (((1 << pri[x]) & pri_mask) == 0)
+//												dest[x] = pal[c];
+//											pri[x] = 31;
+//										}
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//							else
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT8 *dest = dest_bmp->line[y];
+//									UINT8 *pri = pri_buffer->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										int c = source[x_index>>16];
+//										if( c != transparent_color )
+//										{
+//											if (((1 << pri[x]) & pri_mask) == 0)
+//												dest[x] = pal[c];
+//											pri[x] = 31;
+//										}
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//						}
+//						else
+//						{
+//							if (gfx->flags & GFX_PACKED)
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT8 *dest = dest_bmp->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
+//										if( c != transparent_color ) dest[x] = pal[c];
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//							else
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT8 *dest = dest_bmp->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										int c = source[x_index>>16];
+//										if( c != transparent_color ) dest[x] = pal[c];
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//						}
+//					}
+
+//					/* case 1b: TRANSPARENCY_PEN_RAW */
+//					if (transparency == TRANSPARENCY_PEN_RAW)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = color + c;
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color ) dest[x] = color + c;
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 1c: TRANSPARENCY_BLEND_RAW */
+//					if (transparency == TRANSPARENCY_BLEND_RAW)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] |= (color + c);
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color ) dest[x] |= (color + c);
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 2: TRANSPARENCY_PENS */
+//					if (transparency == TRANSPARENCY_PENS)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if (((1 << c) & transparent_color) == 0)
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = pal[c];
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if (((1 << c) & transparent_color) == 0)
+//										dest[x] = pal[c];
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 3: TRANSPARENCY_COLOR */
+//					else if (transparency == TRANSPARENCY_COLOR)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = pal[source[x_index>>16]];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = c;
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = pal[source[x_index>>16]];
+//									if( c != transparent_color ) dest[x] = c;
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 4: TRANSPARENCY_PEN_TABLE */
+//					if (transparency == TRANSPARENCY_PEN_TABLE)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										switch(gfx_drawmode_table[c])
+//										{
+//										case DRAWMODE_SOURCE:
+//											if (((1 << (pri[x] & 0x1f)) & pri_mask) == 0)
+//											{
+//												if (pri[x] & 0x80)
+//													dest[x] = palette_shadow_table[pal[c]];
+//												else
+//													dest[x] = pal[c];
+//											}
+//											pri[x] = (pri[x] & 0x7f) | 31;
+//											break;
+//										case DRAWMODE_SHADOW:
+//											if (((1 << pri[x]) & pri_mask) == 0)
+//												dest[x] = palette_shadow_table[dest[x]];
+//											pri[x] |= al;
+//											break;
+//										}
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										switch(gfx_drawmode_table[c])
+//										{
+//										case DRAWMODE_SOURCE:
+//											dest[x] = pal[c];
+//											break;
+//										case DRAWMODE_SHADOW:
+//											dest[x] = palette_shadow_table[dest[x]];
+//											break;
+//										}
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 4b: TRANSPARENCY_PEN_TABLE_RAW */
+//					if (transparency == TRANSPARENCY_PEN_TABLE_RAW)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										switch(gfx_drawmode_table[c])
+//										{
+//										case DRAWMODE_SOURCE:
+//											if (((1 << (pri[x] & 0x1f)) & pri_mask) == 0)
+//											{
+//												if (pri[x] & 0x80)
+//													dest[x] = palette_shadow_table[color + c];
+//												else
+//													dest[x] = color + c;
+//											}
+//											pri[x] = (pri[x] & 0x7f) | 31;
+//											break;
+//										case DRAWMODE_SHADOW:
+//											if (((1 << pri[x]) & pri_mask) == 0)
+//												dest[x] = palette_shadow_table[dest[x]];
+//											pri[x] |= al;
+//											break;
+//										}
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT8 *dest = dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										switch(gfx_drawmode_table[c])
+//										{
+//										case DRAWMODE_SOURCE:
+//											dest[x] = color + c;
+//											break;
+//										case DRAWMODE_SHADOW:
+//											dest[x] = palette_shadow_table[dest[x]];
+//											break;
+//										}
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+
+//	/* ASG 980209 -- new 16-bit part */
+//	else if (dest_bmp->depth == 15 || dest_bmp->depth == 16)
+//	{
+//		if( gfx && gfx->colortable )
+//		{
+//			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
+//			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+
+//			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
+//			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+
+//			if (sprite_screen_width && sprite_screen_height)
+//			{
+//				/* compute sprite increment per screen pixel */
+//				int dx = (gfx->width<<16)/sprite_screen_width;
+//				int dy = (gfx->height<<16)/sprite_screen_height;
+
+//				int ex = sx+sprite_screen_width;
+//				int ey = sy+sprite_screen_height;
+
+//				int x_index_base;
+//				int y_index;
+
+//				if( flipx )
+//				{
+//					x_index_base = (sprite_screen_width-1)*dx;
+//					dx = -dx;
+//				}
+//				else
+//				{
+//					x_index_base = 0;
+//				}
+
+//				if( flipy )
+//				{
+//					y_index = (sprite_screen_height-1)*dy;
+//					dy = -dy;
+//				}
+//				else
+//				{
+//					y_index = 0;
+//				}
+
+//				if( clip )
+//				{
+//					if( sx < clip->min_x)
+//					{ /* clip left */
+//						int pixels = clip->min_x-sx;
+//						sx += pixels;
+//						x_index_base += pixels*dx;
+//					}
+//					if( sy < clip->min_y )
+//					{ /* clip top */
+//						int pixels = clip->min_y-sy;
+//						sy += pixels;
+//						y_index += pixels*dy;
+//					}
+//					/* NS 980211 - fixed incorrect clipping */
+//					if( ex > clip->max_x+1 )
+//					{ /* clip right */
+//						int pixels = ex-clip->max_x-1;
+//						ex -= pixels;
+//					}
+//					if( ey > clip->max_y+1 )
+//					{ /* clip bottom */
+//						int pixels = ey-clip->max_y-1;
+//						ey -= pixels;
+//					}
+//				}
+
+//				if( ex>sx )
+//				{ /* skip if inner loop doesn't draw anything */
+//					int y;
+
+//					/* case 0: TRANSPARENCY_NONE */
+//					if (transparency == TRANSPARENCY_NONE)
+//					{
+//						if (pri_buffer)
+//						{
+//							if (gfx->flags & GFX_PACKED)
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//									UINT8 *pri = pri_buffer->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
+//										pri[x] = 31;
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//							else
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//									UINT8 *pri = pri_buffer->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = pal[source[x_index>>16]];
+//										pri[x] = 31;
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//						}
+//						else
+//						{
+//							if (gfx->flags & GFX_PACKED)
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//							else
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										dest[x] = pal[source[x_index>>16]];
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//						}
+//					}
+
+//					/* case 1: TRANSPARENCY_PEN */
+//					if (transparency == TRANSPARENCY_PEN)
+//					{
+//						if (pri_buffer)
+//						{
+//							if (gfx->flags & GFX_PACKED)
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//									UINT8 *pri = pri_buffer->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
+//										if( c != transparent_color )
+//										{
+//											if (((1 << pri[x]) & pri_mask) == 0)
+//												dest[x] = pal[c];
+//											pri[x] = 31;
+//										}
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//							else
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//									UINT8 *pri = pri_buffer->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										int c = source[x_index>>16];
+//										if( c != transparent_color )
+//										{
+//											if (((1 << pri[x]) & pri_mask) == 0)
+//												dest[x] = pal[c];
+//											pri[x] = 31;
+//										}
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//						}
+//						else
+//						{
+//							if (gfx->flags & GFX_PACKED)
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
+//										if( c != transparent_color ) dest[x] = pal[c];
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//							else
+//							{
+//								for( y=sy; y<ey; y++ )
+//								{
+//									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//									UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//									int x, x_index = x_index_base;
+//									for( x=sx; x<ex; x++ )
+//									{
+//										int c = source[x_index>>16];
+//										if( c != transparent_color ) dest[x] = pal[c];
+//										x_index += dx;
+//									}
+
+//									y_index += dy;
+//								}
+//							}
+//						}
+//					}
+
+//					/* case 1b: TRANSPARENCY_PEN_RAW */
+//					if (transparency == TRANSPARENCY_PEN_RAW)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = color + c;
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color ) dest[x] = color + c;
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 1c: TRANSPARENCY_BLEND_RAW */
+//					if (transparency == TRANSPARENCY_BLEND_RAW)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] |= color + c;
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color ) dest[x] |= color + c;
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 2: TRANSPARENCY_PENS */
+//					if (transparency == TRANSPARENCY_PENS)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if (((1 << c) & transparent_color) == 0)
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = pal[c];
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if (((1 << c) & transparent_color) == 0)
+//										dest[x] = pal[c];
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 3: TRANSPARENCY_COLOR */
+//					else if (transparency == TRANSPARENCY_COLOR)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = pal[source[x_index>>16]];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = c;
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = pal[source[x_index>>16]];
+//									if( c != transparent_color ) dest[x] = c;
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 4: TRANSPARENCY_PEN_TABLE */
+//					if (transparency == TRANSPARENCY_PEN_TABLE)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										switch(gfx_drawmode_table[c])
+//										{
+//										case DRAWMODE_SOURCE:
+//											ah = pri[x];
+//											if (((1 << (ah & 0x1f)) & pri_mask) == 0)
+//											{
+//												if (ah & 0x80)
+//													dest[x] = palette_shadow_table[pal[c]];
+//												else
+//													dest[x] = pal[c];
+//											}
+//											pri[x] = (ah & 0x7f) | 31;
+//											break;
+//										case DRAWMODE_SHADOW:
+//											if (((1 << pri[x]) & pri_mask) == 0)
+//												dest[x] = palette_shadow_table[dest[x]];
+//											pri[x] |= al;
+//											break;
+//										}
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										switch(gfx_drawmode_table[c])
+//										{
+//										case DRAWMODE_SOURCE:
+//											dest[x] = pal[c];
+//											break;
+//										case DRAWMODE_SHADOW:
+//											dest[x] = palette_shadow_table[dest[x]];
+//											break;
+//										}
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 4b: TRANSPARENCY_PEN_TABLE_RAW */
+//					if (transparency == TRANSPARENCY_PEN_TABLE_RAW)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										switch(gfx_drawmode_table[c])
+//										{
+//										case DRAWMODE_SOURCE:
+//											ah = pri[x];
+//											if (((1 << (ah & 0x1f)) & pri_mask) == 0)
+//											{
+//												if (ah & 0x80)
+//													dest[x] = palette_shadow_table[color + c];
+//												else
+//													dest[x] = color + c;
+//											}
+//											pri[x] = (ah & 0x7f) | 31;
+//											break;
+//										case DRAWMODE_SHADOW:
+//											if (((1 << pri[x]) & pri_mask) == 0)
+//												dest[x] = palette_shadow_table[dest[x]];
+//											pri[x] |= al;
+//											break;
+//										}
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										switch(gfx_drawmode_table[c])
+//										{
+//										case DRAWMODE_SOURCE:
+//											dest[x] = color + c;
+//											break;
+//										case DRAWMODE_SHADOW:
+//											dest[x] = palette_shadow_table[dest[x]];
+//											break;
+//										}
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 5: TRANSPARENCY_ALPHAONE */
+//					if (transparency == TRANSPARENCY_ALPHAONE)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//										{
+//											if( c == alphapen)
+//												dest[x] = alpha_blend16(dest[x], pal[c]);
+//											else
+//												dest[x] = pal[c];
+//										}
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if( c == alphapen)
+//											dest[x] = alpha_blend16(dest[x], pal[c]);
+//										else
+//											dest[x] = pal[c];
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 6: TRANSPARENCY_ALPHA */
+//					if (transparency == TRANSPARENCY_ALPHA)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = alpha_blend16(dest[x], pal[c]);
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color ) dest[x] = alpha_blend16(dest[x], pal[c]);
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* pjp 31/5/02 */
+//					/* case 7: TRANSPARENCY_ALPHARANGE */
+//					if (transparency == TRANSPARENCY_ALPHARANGE)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//										{
+//											if( gfx_alpharange_table[c] == 0xff )
+//												dest[x] = pal[c];
+//											else
+//												dest[x] = alpha_blend_r16(dest[x], pal[c], gfx_alpharange_table[c]);
+//										}
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if( gfx_alpharange_table[c] == 0xff )
+//											dest[x] = pal[c];
+//										else
+//											dest[x] = alpha_blend_r16(dest[x], pal[c], gfx_alpharange_table[c]);
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+//	else
+//	{
+//		if( gfx && gfx->colortable )
+//		{
+//			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
+//			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+
+//			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
+//			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+
+//			if (sprite_screen_width && sprite_screen_height)
+//			{
+//				/* compute sprite increment per screen pixel */
+//				int dx = (gfx->width<<16)/sprite_screen_width;
+//				int dy = (gfx->height<<16)/sprite_screen_height;
+
+//				int ex = sx+sprite_screen_width;
+//				int ey = sy+sprite_screen_height;
+
+//				int x_index_base;
+//				int y_index;
+
+//				if( flipx )
+//				{
+//					x_index_base = (sprite_screen_width-1)*dx;
+//					dx = -dx;
+//				}
+//				else
+//				{
+//					x_index_base = 0;
+//				}
+
+//				if( flipy )
+//				{
+//					y_index = (sprite_screen_height-1)*dy;
+//					dy = -dy;
+//				}
+//				else
+//				{
+//					y_index = 0;
+//				}
+
+//				if( clip )
+//				{
+//					if( sx < clip->min_x)
+//					{ /* clip left */
+//						int pixels = clip->min_x-sx;
+//						sx += pixels;
+//						x_index_base += pixels*dx;
+//					}
+//					if( sy < clip->min_y )
+//					{ /* clip top */
+//						int pixels = clip->min_y-sy;
+//						sy += pixels;
+//						y_index += pixels*dy;
+//					}
+//					/* NS 980211 - fixed incorrect clipping */
+//					if( ex > clip->max_x+1 )
+//					{ /* clip right */
+//						int pixels = ex-clip->max_x-1;
+//						ex -= pixels;
+//					}
+//					if( ey > clip->max_y+1 )
+//					{ /* clip bottom */
+//						int pixels = ey-clip->max_y-1;
+//						ey -= pixels;
+//					}
+//				}
+
+//				if( ex>sx )
+//				{ /* skip if inner loop doesn't draw anything */
+//					int y;
+
+//					/* case 0: TRANSPARENCY_NONE */
+//					if (transparency == TRANSPARENCY_NONE)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									if (((1 << pri[x]) & pri_mask) == 0)
+//										dest[x] = pal[source[x_index>>16]];
+//									pri[x] = 31;
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									dest[x] = pal[source[x_index>>16]];
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 1: TRANSPARENCY_PEN */
+//					if (transparency == TRANSPARENCY_PEN)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = pal[c];
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color ) dest[x] = pal[c];
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 1b: TRANSPARENCY_PEN_RAW */
+//					if (transparency == TRANSPARENCY_PEN_RAW)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = color + c;
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color ) dest[x] = color + c;
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 1c: TRANSPARENCY_BLEND_RAW */
+//					if (transparency == TRANSPARENCY_BLEND_RAW)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] |= color + c;
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color ) dest[x] |= color + c;
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 2: TRANSPARENCY_PENS */
+//					if (transparency == TRANSPARENCY_PENS)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if (((1 << c) & transparent_color) == 0)
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = pal[c];
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if (((1 << c) & transparent_color) == 0)
+//										dest[x] = pal[c];
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 3: TRANSPARENCY_COLOR */
+//					else if (transparency == TRANSPARENCY_COLOR)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = pal[source[x_index>>16]];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = c;
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = pal[source[x_index>>16]];
+//									if( c != transparent_color ) dest[x] = c;
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 4: TRANSPARENCY_PEN_TABLE */
+//					if (transparency == TRANSPARENCY_PEN_TABLE)
+//					{
+//						UINT8 *source, *pri;
+//						UINT32 *dest;
+//						int c, x, x_index;
+
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								source = source_base + (y_index>>16) * gfx->line_modulo;
+//								y_index += dy;
+//								dest = (UINT32 *)dest_bmp->line[y];
+//								pri = pri_buffer->line[y];
+//								x_index = x_index_base;
+
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int ebx = x_index;
+//									x_index += dx;
+//									ebx >>= 16;
+//									al = pri[x];
+//									c = source[ebx];
+//									ah = al;
+//									al &= 0x1f;
+
+//									if (gfx_drawmode_table[c] == DRAWMODE_NONE) continue;
+
+//									if (!(1<<al & pri_mask))
+//									{
+//										if (gfx_drawmode_table[c] == DRAWMODE_SOURCE)
+//										{
+//											ah &= 0x7f;
+//											ebx = pal[c];
+//											ah |= 0x1f;
+//											dest[x] = ebx;
+//											pri[x] = ah;
+//										}
+//										else if (!(ah & 0x80))
+//										{
+//											ebx = SHADOW32(dest[x]);
+//											pri[x] |= 0x80;
+//											dest[x] = ebx;
+//										}
+//									}
+//								}
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								source = source_base + (y_index>>16) * gfx->line_modulo;
+//								y_index += dy;
+//								dest = (UINT32 *)dest_bmp->line[y];
+//								x_index = x_index_base;
+
+//								for( x=sx; x<ex; x++ )
+//								{
+//									c = source[x_index>>16];
+//									x_index += dx;
+
+//									if (gfx_drawmode_table[c] == DRAWMODE_NONE) continue;
+//									if (gfx_drawmode_table[c] == DRAWMODE_SOURCE)
+//										dest[x] = pal[c];
+//									else
+//										dest[x] = SHADOW32(dest[x]);
+//								}
+//							}
+//						}
+//					}
+
+//					/* case 4b: TRANSPARENCY_PEN_TABLE_RAW */
+//					if (transparency == TRANSPARENCY_PEN_TABLE_RAW)
+//					{
+//						UINT8 *source, *pri;
+//						UINT32 *dest;
+//						int c, x, x_index;
+
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								source = source_base + (y_index>>16) * gfx->line_modulo;
+//								y_index += dy;
+//								dest = (UINT32 *)dest_bmp->line[y];
+//								pri = pri_buffer->line[y];
+//								x_index = x_index_base;
+
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int ebx = x_index;
+//									x_index += dx;
+//									ebx >>= 16;
+//									al = pri[x];
+//									c = source[ebx];
+//									ah = al;
+//									al &= 0x1f;
+
+//									if (gfx_drawmode_table[c] == DRAWMODE_NONE) continue;
+
+//									if (!(1<<al & pri_mask))
+//									{
+//										if (gfx_drawmode_table[c] == DRAWMODE_SOURCE)
+//										{
+//											ah &= 0x7f;
+//											ebx = color + c;
+//											ah |= 0x1f;
+//											dest[x] = ebx;
+//											pri[x] = ah;
+//										}
+//										else if (!(ah & 0x80))
+//										{
+//											ebx = SHADOW32(dest[x]);
+//											pri[x] |= 0x80;
+//											dest[x] = ebx;
+//										}
+//									}
+//								}
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								source = source_base + (y_index>>16) * gfx->line_modulo;
+//								y_index += dy;
+//								dest = (UINT32 *)dest_bmp->line[y];
+//								x_index = x_index_base;
+
+//								for( x=sx; x<ex; x++ )
+//								{
+//									c = source[x_index>>16];
+//									x_index += dx;
+
+//									if (gfx_drawmode_table[c] == DRAWMODE_NONE) continue;
+//									if (gfx_drawmode_table[c] == DRAWMODE_SOURCE)
+//										dest[x] = color + c;
+//									else
+//										dest[x] = SHADOW32(dest[x]);
+//								}
+//							}
+//						}
+//					}
+
+
+//					/* case 5: TRANSPARENCY_ALPHAONE */
+//					if (transparency == TRANSPARENCY_ALPHAONE)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//										{
+//											if( c == alphapen)
+//												dest[x] = alpha_blend32(dest[x], pal[c]);
+//											else
+//												dest[x] = pal[c];
+//										}
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if( c == alphapen)
+//											dest[x] = alpha_blend32(dest[x], pal[c]);
+//										else
+//											dest[x] = pal[c];
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* case 6: TRANSPARENCY_ALPHA */
+//					if (transparency == TRANSPARENCY_ALPHA)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//											dest[x] = alpha_blend32(dest[x], pal[c]);
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color ) dest[x] = alpha_blend32(dest[x], pal[c]);
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+
+//					/* pjp 31/5/02 */
+//					/* case 7: TRANSPARENCY_ALPHARANGE */
+//					if (transparency == TRANSPARENCY_ALPHARANGE)
+//					{
+//						if (pri_buffer)
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+//								UINT8 *pri = pri_buffer->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if (((1 << pri[x]) & pri_mask) == 0)
+//										{
+//											if( gfx_alpharange_table[c] == 0xff )
+//												dest[x] = pal[c];
+//											else
+//												dest[x] = alpha_blend_r32(dest[x], pal[c], gfx_alpharange_table[c]);
+//										}
+//										pri[x] = 31;
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//						else
+//						{
+//							for( y=sy; y<ey; y++ )
+//							{
+//								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+//								UINT32 *dest = (UINT32 *)dest_bmp->line[y];
+
+//								int x, x_index = x_index_base;
+//								for( x=sx; x<ex; x++ )
+//								{
+//									int c = source[x_index>>16];
+//									if( c != transparent_color )
+//									{
+//										if( gfx_alpharange_table[c] == 0xff )
+//											dest[x] = pal[c];
+//										else
+//											dest[x] = alpha_blend_r32(dest[x], pal[c], gfx_alpharange_table[c]);
+//									}
+//									x_index += dx;
+//								}
+
+//								y_index += dy;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+//}
+
+//void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
+//			clip,transparency,transparent_color,scalex,scaley,NULL,0);
+//	profiler_mark(PROFILER_END);
+//}
+
+//void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
+//		UINT32 priority_mask)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
+//			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask | (1<<31));
+//	profiler_mark(PROFILER_END);
+//}
+
+//void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
+//		UINT32 priority_mask)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
+//			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask);
+//	profiler_mark(PROFILER_END);
+//}
 
 static inline void plotclip(mame_bitmap *bitmap,int x,int y,int pen,const rectangle *clip)
 {
@@ -5128,27 +5130,34 @@ DECLARE(blockmove_NtoN_blend_remap_flipx,(
 	}
 })
 
-
-
-
+//    int transparency = p->transparency;
+//    int transparent_color = p->transparent_color;
+//    mame_bitmap *pri_buffer = p->pri_buffer; // optional
+//    UINT32 priority_mask = p->priority_mask;
+//    mame_bitmap *dest = p->dest;
+//    unsigned int code = p->code;
+//    unsigned int color = p->color;
+//    int flipx = p->flipx,flipy = p->flipy;
 
 DECLARE(drawgfx_core,(
-		mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		mame_bitmap *pri_buffer,UINT32 pri_mask),
+    struct drawgfxParams *p DGREG(a0)),
 {
+    mame_bitmap *dest = p->dest;
+    const gfx_element *gfx = p->gfx;
+    int sx = p->sx;
+    int sy = p->sy;
+    const rectangle *clip = p->clip;
+
 	int ox;
 	int oy;
 	int ex;
 	int ey;
 
-
 	/* check bounds */
-	ox = sx;
-	oy = sy;
+	ox = p->sx;
+	oy = p->sy;
 
-	ex = sx + gfx->width-1;
+	ex = sx + p->gfx->width-1;
 	if (sx < 0) sx = 0;
 	if (clip && sx < clip->min_x) sx = clip->min_x;
 	if (ex >= dest->width) ex = dest->width-1;
@@ -5163,6 +5172,9 @@ DECLARE(drawgfx_core,(
 	if (sy > ey) return;
 
 	{
+        const unsigned int code = p->code;
+        unsigned int color = p->color;
+
 		UINT8 *sd = gfx->gfxdata + code * gfx->char_modulo;		/* source data */
 		int sw = gfx->width;									/* source width */
 		int sh = gfx->height;									/* source height */
@@ -5174,7 +5186,9 @@ DECLARE(drawgfx_core,(
 		int dh = ey-sy+1;										/* dest height */
 		int dm = ((DATA_TYPE *)dest->line[1])-((DATA_TYPE *)dest->line[0]);	/* dest modulo */
 		const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
-		UINT8 *pribuf = (pri_buffer) ? ((UINT8 *)pri_buffer->line[sy]) + sx : NULL;
+		UINT8 *pribuf = (p->pri_buffer) ? ((UINT8 *)p->pri_buffer->line[sy]) + sx : NULL;
+
+        int transparency = p->transparency;
 
 		/* optimizations for 1:1 mapping */
 		if (Machine->drv->color_table_len == 0 &&
