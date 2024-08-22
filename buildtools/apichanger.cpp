@@ -61,6 +61,7 @@ vector<string> splitt(const string &s, const string sep)
     } while(i != string::npos);
     return v;
 }
+
 string replace(const string &s, const string orig, const string rep)
 {
     stringstream ss;
@@ -75,6 +76,24 @@ string replace(const string &s, const string orig, const string rep)
     } while(i != string::npos);
     return ss.str();
 }
+vector<string> splitt_trim(const string &s, const string sep)
+{
+    vector<string> v;
+    size_t i=0;
+    size_t in = s.find(sep);
+    do {
+        string ss = s.substr(i,in-i);
+        ss = replace(ss,"\r","");
+        ss = replace(ss,"\n","");
+        ss = trim(ss);
+        v.push_back(ss);
+        if(in == string::npos) break;
+        i = in+sep.length();
+        in = s.find(sep,i+sep.length());
+    } while(i != string::npos);
+    return v;
+}
+
 // caution, sucks.
 string trimquotes(std::string s)
 {
@@ -153,9 +172,22 @@ enum class ParType : int {
     eFoundCall
 };
 // - - - - - - - - - -
+struct ModifiedFuncParam {
+    int   _callindex;
+    string _name;
+    int    _factorize;
+    int    _extra;
+    string _extraDefaultValue;
+};
+
 struct CFileModifier {
     std::string _func; // drawgfx ()
+    std::string _structtype;
+    std::string _structbasename;
     std::string _replacement;
+
+    vector<ModifiedFuncParam> _params;
+
     mutable int64_t _nbfuncfound;
 };
 
@@ -403,9 +435,6 @@ struct CFileParse {
     void modify(const fstr &sfile);
     void apply(ostream &ofs,const fstr &sfile);
 
-    void parse_correct_do_bound(const fstr &sfile);
-    void parse_correct_while_bound(const fstr &sfile);
-    void parse_correct_for_bound(const fstr &sfile);
 
     int _type;
     //std::string _content;
@@ -418,21 +447,33 @@ struct CFileParse {
     //recurse
     vector<CFileParse> _parts;
     string _indent;
-    string _prepatch,_postpatch;
+    string _prepatch,_postpatch,_replacement;
 
+    // if foundcall, parse params
+    vector<string> _callParams;
+    vector<int> _callParamsConstant;
+    void testIfParamsConstant();
+
+    // applied modifier if any
     const CFileModifier *_pmodsel;
 };
-
-void CFileParse::parse_correct_do_bound(const fstr &sfile)
+int isOnlyNumbers(const string &s)
 {
-
+    for(char c : s)
+    {
+        if(c<'0' || c >'9') return 0;
+    }
+    return 1;
 }
-void CFileParse::parse_correct_while_bound(const fstr &sfile)
-{
 
-}
-void CFileParse::parse_correct_for_bound(const fstr &sfile)
+void CFileParse::testIfParamsConstant()
 {
+    _callParamsConstant.resize(_callParams.size());
+    for(size_t i=0;i<_callParams.size();i++)
+    {
+        // easy way
+        _callParamsConstant[i] = isOnlyNumbers(_callParams[i]);
+    }
 
 }
 
@@ -474,12 +515,14 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
                  _parts.push_back(CFileParse());
                 CFileParse &b=_parts.back();
                 b._type = TYPE_PAR;
+                size_t startpar = icn;
                 b._start = icn;
                 b._end = icn; // will be corrected in parseStruct() recusion.
                 b._pParent = this;
                 string par_prepend;
                 b._parType = sfile.rfindTagBeforePar(par_prepend,b._start,b._pmodsel,icn,m);
                 icn = b.parseStruct(sfile,icn+1,recurse+1,m);
+                size_t endpar = icn;
                 // got to have englobing bounds for loop
                if( b._parType == ParType::eWhile ||
                     b._parType == ParType::eFor
@@ -503,7 +546,13 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
 
                 if(b._parType == ParType::eFoundCall)
                 {
+                    size_t linestart = sfile.rfind_first_of("\r\n",b._start-1);
+                    if(linestart != string::npos) b._indent =sfile.substr(linestart+1,b._start-(linestart+1));
+
                     // treated on modify()
+                    string params = sfile.substr(startpar+1,(endpar-startpar)-2);
+                    b._callParams = splitt_trim(params, ",");
+                    b.testIfParamsConstant();
                 }
             }
             if(sfile[icn]=='{' ) {
@@ -558,12 +607,12 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
         if(typefound > 3)
         {
             //printf("found drawgfx\n");
-            m[typefound-4]._nbfuncfound++;
+          //  m[typefound-4]._nbfuncfound++;
 
             icn++; // no, parse func call then jump all call.
         }
         else {
-            printf("end file\n");
+           // printf("end file\n");
            _parts.push_back({TYPE_BULK,ic,sfile.length(),this});
            icn = sfile.length();
         }
@@ -607,15 +656,65 @@ void CFileParse::modify(const fstr &sfile)
             }
             break;
         }
+
         // actually patch pPrevParent
-        pPrevParent->_prepatch = "\n";
-        pPrevParent->_prepatch += pPrevParent->_indent +"{ struct drawgfxParams dgp={\n";
+        stringstream ssp;
+        ssp <<  "\n" << pPrevParent->_indent << "{ "<< _pmodsel->_structtype << " "
+             << _pmodsel->_structbasename << _pmodsel->_nbfuncfound << "={\n";
+                // struct drawgfxParams dgp={\n";
+        for(size_t i=0;i<_pmodsel->_params.size() ;i++)
+        {
+             const ModifiedFuncParam &prm = _pmodsel->_params[i];
+             int icallindex = prm._callindex;
+             ssp << pPrevParent->_indent << "\t";
+             if( prm._factorize || ((icallindex!=-1) && _callParamsConstant[icallindex]) ) {
+                 if(icallindex>=_callParams.size() || icallindex==-1)
+                 {
+                     ssp << prm._extraDefaultValue;
+                 } else
+                 {
+                    ssp << _callParams[icallindex];
+                    // ignoble hack to have pdraw value:   param |(1<<31)
+                    // should have a flag to append default ?
+                    if(prm._extraDefaultValue.size()>0 &&
+                        prm._extraDefaultValue[0]=='|' ) ssp <<prm._extraDefaultValue;
+                 }
+             } else {
+                 ssp << prm._extraDefaultValue;
+             }
+             if(i<_pmodsel->_params.size()-1) ssp << ",";
+             ssp << "\n";
+//             string _name;
+//             int    _factorize;
+//             int    _extra;
+//             string _extraDefaultValue;
+        }
         //....
-         pPrevParent->_prepatch += pPrevParent->_indent+ "  };\n";
-    pPrevParent->_prepatch += pPrevParent->_indent;
+        ssp << pPrevParent->_indent << "  };\n";
+        ssp << pPrevParent->_indent ;
 
-        pPrevParent->_postpatch += string("\n")+ pPrevParent->_indent+ "} // end of patch paragraph\n";
+        pPrevParent->_prepatch = ssp.str() + pPrevParent->_prepatch;
+        // - - -
+        stringstream sspo;
+        sspo << "\n" <<pPrevParent->_indent<<"} // end of patch paragraph\n";
+        pPrevParent->_postpatch += sspo.str();
 
+         stringstream ssr;
+         ssr << "\n";
+         // do the update for dynamic members
+         for(size_t i=0;i<_pmodsel->_params.size() ;i++)
+         {
+              const ModifiedFuncParam &prm = _pmodsel->_params[i];
+                int icallindex = prm._callindex;
+              if( prm._factorize ==0 && (icallindex !=-1 &&_callParamsConstant[icallindex]==0) ) {
+                 ssr << _indent << _pmodsel->_structbasename << _pmodsel->_nbfuncfound
+                     << "."<< prm._name << " = " << _callParams[icallindex] << ";\n";
+              }
+         }
+         ssr << _indent << _pmodsel->_replacement << "(&" << _pmodsel->_structbasename << _pmodsel->_nbfuncfound << ")";
+        _replacement = ssr.str();
+
+        _pmodsel->_nbfuncfound++;
     } // end if this is patchable call.
 
 }
@@ -645,10 +744,8 @@ void CFileParse::apply(ostream &ofs,const fstr &sfile)
         {
             if( p._pmodsel)
             {
-                ofs << p._pmodsel->_replacement;
+                ofs << p._replacement ;
             }
-            //
-            //ofs << "BLUBLU";
         } else{
             p.apply(ofs,sfile);
         }
@@ -661,8 +758,6 @@ void CFileParse::apply(ostream &ofs,const fstr &sfile)
     }
     if(_postpatch.length()>0) ofs << _postpatch;
 }
-
-
 
 
 int  changeapi(std::string ofilepath,std::string nfilepath)
@@ -686,23 +781,149 @@ int  changeapi(std::string ofilepath,std::string nfilepath)
     //buffer << ifs.rdbuf();
     //string sfile = buffer.str();
 
-    vector<CFileModifier> modifiers=
-    {
-  //       {"mdrawgfx","drawgfx(&dgp)",0},
-  //      {"pdrawgfx","drawgfx(&dgp)",0},
-        {"drawgfx","drawgfx(&dgp)",0},
+    /*
+    struct ModifiedFuncParam {
+        string _name;
+        int    _factorize;
+        int    _extra;
+        string _extraDefaultValue;
     };
 
+    struct CFileModifier {
+        std::string _func; // drawgfx ()
+        std::string _replacement;
+
+        vector<ModifiedFuncParam> _params;
+
+        mutable int64_t _nbfuncfound;
+    };
+    */
+    vector<CFileModifier> modifiers;
+
+    /*
+    void drawgfx(mame_bitmap *dest,const gfx_element *gfx,
+            unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+            const rectangle *clip,int transparency,int transparent_color);
+
+    void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+            unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+            const rectangle *clip,int transparency,int transparent_color,
+
+            UINT32 priority_mask);
+
+    void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+            unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+            const rectangle *clip,int transparency,int transparent_color,
+
+            UINT32 priority_mask);
+    */
+    {
+        CFileModifier pdrawgfxModifier;
+        pdrawgfxModifier._func = "pdrawgfx";
+        pdrawgfxModifier._structtype = "struct drawgfxParams";
+        pdrawgfxModifier._structbasename = "dgp";
+        pdrawgfxModifier._replacement = "drawgfx";
+        pdrawgfxModifier._nbfuncfound = 0;
+        pdrawgfxModifier._params = {
+            // index in call,name in struct, forcefactorize, isextra, defaultval.
+            {0,"dest",1,0,"NULL"},
+            {1,"gfx",1,0,"NULL"},
+            {2,"code",0,0,"0"},
+            {3,"color",0,0,"0"},
+            {4,"flipx",0,0,"0"},
+            {5,"flipy",0,0,"0"},
+            {6,"sx",0,0,"0"},
+            {7,"sy",0,0,"0"},
+            {8,"clip",1,0,"NULL"},
+            {9,"transparency",1,0,"TRANSPARENCY_NONE"},
+            {10,"transparent_color",1,0,"0"},
+            // extra params used or not
+            {-1,"scalex",1,1,"0"}, // for scale draw else not used
+            {-1,"scaley",1,1,"0"},
+
+            {-1,"pri_buffer",1,1,"priority_bitmap"}, // priority_bitmap,priority_mask | (1<<31)
+            {11,"priority_mask",1,1,"| (1<<31)"},
+        };
+
+        modifiers.push_back(pdrawgfxModifier);
+    }
+    {
+        CFileModifier mdrawgfxModifier;
+        mdrawgfxModifier._func = "pdrawgfx";
+        mdrawgfxModifier._structtype = "struct drawgfxParams";
+        mdrawgfxModifier._structbasename = "dgp";
+        mdrawgfxModifier._replacement = "drawgfx";
+        mdrawgfxModifier._nbfuncfound = 0;
+        mdrawgfxModifier._params = {
+            // index in call,name in struct, forcefactorize, isextra, defaultval.
+            {0,"dest",1,0,"NULL"},
+            {1,"gfx",1,0,"NULL"},
+            {2,"code",0,0,"0"},
+            {3,"color",0,0,"0"},
+            {4,"flipx",0,0,"0"},
+            {5,"flipy",0,0,"0"},
+            {6,"sx",0,0,"0"},
+            {7,"sy",0,0,"0"},
+            {8,"clip",1,0,"NULL"},
+            {9,"transparency",1,0,"TRANSPARENCY_NONE"},
+            {10,"transparent_color",1,0,"0"},
+            // extra params used or not
+            {-1,"scalex",1,1,"0"}, // for scale draw else not used
+            {-1,"scaley",1,1,"0"},
+
+            {-1,"pri_buffer",1,1,"priority_bitmap"}, // priority_bitmap,priority_mask | (1<<31)
+            {11,"priority_mask",1,1,""},
+        };
+
+        modifiers.push_back(mdrawgfxModifier);
+    }
+    {
+        CFileModifier drawgfxModifier;
+        drawgfxModifier._func = "drawgfx";
+        drawgfxModifier._structtype = "struct drawgfxParams";
+        drawgfxModifier._structbasename = "dgp";
+        drawgfxModifier._replacement = "drawgfx";
+        drawgfxModifier._nbfuncfound = 0;
+        drawgfxModifier._params = {
+            // index in call,name in struct, forcefactorize, isextra, defaultval.
+            {0,"dest",1,0,"NULL"},
+            {1,"gfx",1,0,"NULL"},
+            {2,"code",0,0,"0"},
+            {3,"color",0,0,"0"},
+            {4,"flipx",0,0,"0"},
+            {5,"flipy",0,0,"0"},
+            {6,"sx",0,0,"0"},
+            {7,"sy",0,0,"0"},
+            {8,"clip",1,0,"NULL"},
+            {9,"transparency",1,0,"TRANSPARENCY_NONE"},
+            {10,"transparent_color",1,0,"0"},
+            // extra params used or not
+            {-1,"scalex",1,1,"0"}, // for scale draw else not used
+            {-1,"scaley",1,1,"0"},
+
+            {-1,"pri_buffer",1,1,"NULL"},
+            {-1,"priority_mask",1,1,"0"},
+        };
+
+        modifiers.push_back(drawgfxModifier);
+    }
     CFileParse fp;
     fp._type = TYPE_MAIN;
     fp._start = 0;
     fp._end = bfile._b.size()-1;
     fp.parseStruct(bfile,0,0,modifiers);
 
-    ofstream ofs(nfilepath);
     fp.modify(bfile);
-    fp.apply(ofs,bfile);
-
+    bool didchange=false;
+    for(const CFileModifier &m : modifiers)
+    {
+        if(m._nbfuncfound>0) didchange=true;
+    }
+    if(didchange)
+    {
+        ofstream ofs(nfilepath);
+        fp.apply(ofs,bfile);
+    }
     return 0;
 }
 
@@ -722,8 +943,8 @@ int main(int argc, char **argv)
         break; // test
     }*/
 
-    string ofilepath = sourcebase+"vidhrdw/" + "1111.c";
-    string nfilepath = sourcebase+"vidhrdw/" + "1111n.c";
+    string ofilepath = sourcebase+"vidhrdw/" + "tecmo16.c";
+    string nfilepath = sourcebase+"vidhrdw/" + "tecmo16n.c";
     changeapi(ofilepath,nfilepath);
 
 //#else
