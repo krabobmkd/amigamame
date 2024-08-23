@@ -412,6 +412,34 @@ size_t findNextOfInterest(int &type,const fstr &s, size_t istart,const vector<CF
 
 }
 
+// describe a struct actually prepended to a paragraph
+// this is used to look if we can re-use the samefor multiple calls.
+struct AppliedPatch {
+    const CFileModifier *_pmodifier; // because of this one.
+    string _name; // applied unique struct name.
+    // mirror struct member list _pmodifier->_params
+    // we can only reuse same struct if factorized the same way.
+    vector<int> _paramFactorized;
+    // we must keep caller values for factorized params
+    vector<string> _paramCallerValue;
+
+    bool operator==( const AppliedPatch&l) const {
+        if(_pmodifier->_structtype != l._pmodifier->_structtype) return false;
+        if(_paramFactorized.size() != l._paramFactorized.size()) return false;
+        for(size_t i=0;i<_paramFactorized.size();i++)
+        {
+            if(_paramFactorized[i] != l._paramFactorized[i]) return false;
+            if(_paramFactorized[i])
+            {
+                if(_paramCallerValue[i] != l._paramCallerValue[i]) return false;
+            }
+        }
+        return true;
+    }
+};
+
+
+
 #define TYPE_MAIN 0
 #define TYPE_BULK 1
 #define TYPE_BRACE 2
@@ -447,7 +475,12 @@ struct CFileParse {
     //recurse
     vector<CFileParse> _parts;
     string _indent;
+
+   // used to modify:
+    vector<AppliedPatch> _appliedPatches;
     string _prepatch,_postpatch,_replacement;
+
+    void generatePatches();
 
     // if foundcall, parse params
     vector<string> _callParams;
@@ -456,7 +489,62 @@ struct CFileParse {
 
     // applied modifier if any
     const CFileModifier *_pmodsel;
+
+
 };
+
+/*
+pPrevParent->_prepatch,  pPrevParent->_postpatch,
+                pPrevParent->_indent,
+               pPrevParent->_appliedPatches
+*/
+void CFileParse::generatePatches()
+{
+    _prepatch.clear();
+    _postpatch.clear();
+    if(_appliedPatches.size()==0) return;
+
+   // prepend a paragraph
+    stringstream ssp;
+    ssp <<  "\n" << _indent << "{ \n";
+
+    // add as many structs
+    for(AppliedPatch &ptch : _appliedPatches)
+    {
+        const CFileModifier *pmd = ptch._pmodifier;
+        ssp << _indent << pmd->_structtype << " " << ptch._name << "={\n";
+        for(size_t i=0;i<pmd->_params.size() ;i++)
+        {
+            const ModifiedFuncParam &prm = pmd->_params[i];
+            int icallindex = prm._callindex;
+            ssp << _indent << "\t";
+            if( prm._factorize && ptch._paramCallerValue[i].length()>0 ) {
+                ssp << ptch._paramCallerValue[i];
+             } else {
+                 ssp << prm._extraDefaultValue;
+             }
+             if(i<pmd->_params.size()-1) ssp << ",";
+             // add name of members in comment will ease things
+             ssp << " \t// " << prm._name;
+
+             ssp << "\n";
+        }
+        ssp << _indent << "  };\n";
+    } // end by struct
+
+    //....
+    ssp << _indent ;
+
+    _prepatch = ssp.str();
+
+    // - - -
+    stringstream sspo;
+    sspo << "\n" <<_indent<<"} // end of patch paragraph\n";
+    _postpatch = sspo.str();
+
+}
+
+
 int isOnlyNumbers(const string &s)
 {
     for(char c : s)
@@ -658,46 +746,52 @@ void CFileParse::modify(const fstr &sfile)
         }
 
         // actually patch pPrevParent
-        stringstream ssp;
-        ssp <<  "\n" << pPrevParent->_indent << "{ "<< _pmodsel->_structtype << " "
-             << _pmodsel->_structbasename << _pmodsel->_nbfuncfound << "={\n";
-                // struct drawgfxParams dgp={\n";
+        AppliedPatch structpatch;
+
+        // - - - -describe what the patch should look like
+        structpatch._pmodifier = _pmodsel;
+        stringstream sspname;
+        sspname << _pmodsel->_structbasename <<  _pmodsel->_nbfuncfound ;
+        structpatch._name = sspname.str();
+        structpatch._paramFactorized.resize(_pmodsel->_params.size());
+        structpatch._paramCallerValue.resize(_pmodsel->_params.size());
         for(size_t i=0;i<_pmodsel->_params.size() ;i++)
         {
-             const ModifiedFuncParam &prm = _pmodsel->_params[i];
-             int icallindex = prm._callindex;
-             ssp << pPrevParent->_indent << "\t";
-             if( prm._factorize || ((icallindex!=-1) && _callParamsConstant[icallindex]) ) {
-                 if(icallindex>=_callParams.size() || icallindex==-1)
-                 {
-                     ssp << prm._extraDefaultValue;
-                 } else
-                 {
-                    ssp << _callParams[icallindex];
-                    // ignoble hack to have pdraw value:   param |(1<<31)
-                    // should have a flag to append default ?
-                    if(prm._extraDefaultValue.size()>0 &&
-                        prm._extraDefaultValue[0]=='|' ) ssp <<prm._extraDefaultValue;
-                 }
-             } else {
-                 ssp << prm._extraDefaultValue;
-             }
-             if(i<_pmodsel->_params.size()-1) ssp << ",";
-             ssp << "\n";
-//             string _name;
-//             int    _factorize;
-//             int    _extra;
-//             string _extraDefaultValue;
-        }
-        //....
-        ssp << pPrevParent->_indent << "  };\n";
-        ssp << pPrevParent->_indent ;
+            const ModifiedFuncParam &prm = _pmodsel->_params[i];
+            int icallindex = prm._callindex;
+            if( prm._factorize ==0 && (icallindex !=-1 &&_callParamsConstant[icallindex]==0) ) {
 
-        pPrevParent->_prepatch = ssp.str() + pPrevParent->_prepatch;
-        // - - -
-        stringstream sspo;
-        sspo << "\n" <<pPrevParent->_indent<<"} // end of patch paragraph\n";
-        pPrevParent->_postpatch += sspo.str();
+//                ssr << _indent << _pmodsel->_structbasename << _pmodsel->_nbfuncfound
+//                 << "."<< prm._name << " = " << _callParams[icallindex] << ";\n";
+                structpatch._paramFactorized[i]=0;
+            } else structpatch._paramFactorized[i]=1;
+
+            if( prm._factorize ==1 && (icallindex !=-1 && icallindex<_callParams.size()) ) {
+                structpatch._paramCallerValue[i] = _callParams[icallindex];
+            }
+        }
+        // - -- - look if there is already something that match
+        AppliedPatch *pActuallyUsed=&structpatch;
+
+        for(AppliedPatch &ptch : pPrevParent->_appliedPatches)
+        {
+            if(ptch == structpatch) {
+                pActuallyUsed = &ptch;
+
+                break;
+            }
+        }
+        if(pActuallyUsed == &structpatch)
+        {   // if wasn't replace, add to list
+            pPrevParent->_appliedPatches.push_back(structpatch);
+        }
+
+        // note: will be regenerated with more structs or not if change,
+        // before being applied in apply().
+        pPrevParent->generatePatches();
+
+        // - - - -
+
 
          stringstream ssr;
          ssr << "\n";
@@ -707,11 +801,11 @@ void CFileParse::modify(const fstr &sfile)
               const ModifiedFuncParam &prm = _pmodsel->_params[i];
                 int icallindex = prm._callindex;
               if( prm._factorize ==0 && (icallindex !=-1 &&_callParamsConstant[icallindex]==0) ) {
-                 ssr << _indent << _pmodsel->_structbasename << _pmodsel->_nbfuncfound
+                 ssr << _indent << pActuallyUsed->_name
                      << "."<< prm._name << " = " << _callParams[icallindex] << ";\n";
               }
          }
-         ssr << _indent << _pmodsel->_replacement << "(&" << _pmodsel->_structbasename << _pmodsel->_nbfuncfound << ")";
+         ssr << _indent << _pmodsel->_replacement << "(&" << pActuallyUsed->_name << ")";
         _replacement = ssr.str();
 
         _pmodsel->_nbfuncfound++;
@@ -760,7 +854,7 @@ void CFileParse::apply(ostream &ofs,const fstr &sfile)
 }
 
 
-int  changeapi(std::string ofilepath,std::string nfilepath)
+bool  changeapi(std::string ofilepath,std::string nfilepath)
 {
     fstr bfile;
     { //
@@ -921,31 +1015,57 @@ int  changeapi(std::string ofilepath,std::string nfilepath)
     }
     if(didchange)
     {
+        cout << "modify: " << nfilepath ;
+        for(const CFileModifier &m : modifiers)
+        {
+            if(m._nbfuncfound>0)
+            {
+              cout << "   "<<m._func<<": "<<m._nbfuncfound;
+            }
+        }
+        cout << endl;
+    }
+    if(didchange)
+    {
         ofstream ofs(nfilepath);
         fp.apply(ofs,bfile);
     }
-    return 0;
+    return didchange;
 }
 
 int main(int argc, char **argv)
 {
 
 //#if (__cplusplus > 201402L)
-    string sdir =sourcebase+"vidhrdw";
-    /*ok
+    string sdir =sourcebase+"vidhrdw2";
+   // stringstream ssgit;
+   ofstream gitofs("gitcommands.sh");
+
     for (const auto & entry : fs::directory_iterator(sdir))
     {
         string sname =  entry.path().filename().string();
+        if(sname == "battlane.c" ||
+sname == "bogeyman.c" ||
+sname == "ddragon.c" ||
+sname == "ddragon3.c" ||
+sname == "dogfgt.c" ||
+//sname == "generic.c" ||
+sname == "matmania.c"
+        ) continue;
+//        "battlane.c","bogeyman.c","ddragon.c","ddragon3.c","dogfgt.c","generic.c","matmania.c",
         if(sname.rfind(".c") != sname.length()-2) continue;
-        string ofilepath = sourcebase+"vidhrdw/" + sname;
-        string nfilepath = sourcebase+"vidhrdw2/" + sname;
-        changeapi(ofilepath,nfilepath);
-        break; // test
-    }*/
+        string ofilepath = sourcebase+"vidhrdw2/" + sname;
+        string nfilepath = sourcebase+"vidhrdw/" + sname;
+        bool didchange = changeapi(ofilepath,nfilepath);
+        if(didchange) {
+            gitofs << "git add vidhrdw/"<<sname<<"\n";
+        }
 
-    string ofilepath = sourcebase+"vidhrdw/" + "tecmo16.c";
-    string nfilepath = sourcebase+"vidhrdw/" + "tecmo16n.c";
-    changeapi(ofilepath,nfilepath);
+    }
+
+//    string ofilepath = sourcebase+"vidhrdw/" + "tecmo16.c";
+//    string nfilepath = sourcebase+"vidhrdw/" + "tecmo16n.c";
+//    changeapi(ofilepath,nfilepath);
 
 //#else
 //    DIR *dir;
