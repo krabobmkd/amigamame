@@ -52,20 +52,10 @@ static void aquarium_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 
 			for (chain_pos = chain;chain_pos >= 0;chain_pos--)
 			{
-				drawgfx(bitmap, Machine->gfx[0],
-						code,
-						col,
-						flipx, flipy,
-						curx,cury,
-						cliprect,TRANSPARENCY_PEN,0);
+				;
 
 				/* wrap around y */
-				drawgfx(bitmap, Machine->gfx[0],
-						code,
-						col,
-						flipx, flipy,
-						curx,cury+256,
-						cliprect,TRANSPARENCY_PEN,0);
+				;
 
 				code++;
 

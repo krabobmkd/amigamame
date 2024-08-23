@@ -88,12 +88,7 @@ static void draw_chars(mame_bitmap *bitmap, int priority)
 			scroll = ~scroll - 1;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				code,
-				(col & 0x0f) | ((*ambush_colorbank & 0x03) << 4),
-				flip_screen,flip_screen,
-				8*sx, (8*sy + scroll) & 0xff,
-				&Machine->visible_area,transparency,0);
+		;
 	}
 }
 
@@ -167,11 +162,7 @@ VIDEO_UPDATE( ambush )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code, col | ((*ambush_colorbank & 0x03) << 4),
-				flipx, flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		;
 	}
 
 

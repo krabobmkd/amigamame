@@ -103,18 +103,8 @@ static void arkanoid_draw_sprites( mame_bitmap *bitmap )
 
 		code = spriteram[offs + 3] + ((spriteram[offs + 2] & 0x03) << 8) + 1024 * gfxbank;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				2 * code,
-				((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank,
-				flip_screen_x,flip_screen_y,
-				sx,sy + (flip_screen_y ? 8 : -8),
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
-		drawgfx(bitmap,Machine->gfx[0],
-				2 * code + 1,
-				((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank,
-				flip_screen_x,flip_screen_y,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		;
+		;
 	}
 }
 

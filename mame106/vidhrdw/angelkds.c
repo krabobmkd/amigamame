@@ -190,53 +190,17 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int en
 
 	if (enable & enable_n)
 	{
-			drawgfx(
-					bitmap,
-					gfx,
-					tile_no,
-					color*4,
-					flipx,flipy,
-					xpos,ypos,
-					cliprect,
-					TRANSPARENCY_PEN,15
-					);
+			;
 			/* wraparound */
 			if (xpos > 240)
-				drawgfx(
-						bitmap,
-						gfx,
-						tile_no,
-						color*4,
-						flipx,flipy,
-						xpos-256,ypos,
-						cliprect,
-						TRANSPARENCY_PEN,15
-						);
+				;
 			/* wraparound */
 			if (ypos > 240)
 			{
-				drawgfx(
-						bitmap,
-						gfx,
-						tile_no,
-						color*4,
-						flipx,flipy,
-						xpos,ypos-256,
-						cliprect,
-						TRANSPARENCY_PEN,15
-						);
+				;
 				/* wraparound */
 				if (xpos > 240)
-							drawgfx(
-									bitmap,
-									gfx,
-									tile_no,
-									color*4,
-									flipx,flipy,
-									xpos-256,ypos-256,
-									cliprect,
-									TRANSPARENCY_PEN,15
-									);
+							;
 			}
 
 	}

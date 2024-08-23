@@ -221,12 +221,7 @@ VIDEO_UPDATE( actfancr )
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[1],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+			;
 			multi--;
 		}
 	}
@@ -235,6 +230,83 @@ VIDEO_UPDATE( actfancr )
 }
 
 VIDEO_UPDATE( triothep )
+{
+	int offs,i,mult;
+	int scrollx=(actfancr_control_1[0x10]+(actfancr_control_1[0x11]<<8));
+	int scrolly=(actfancr_control_1[0x12]+(actfancr_control_1[0x13]<<8));
+
+	/* Draw playfield */
+	flipscreen=actfancr_control_2[0]&0x80;
+	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+
+	if (actfancr_control_2[0]&0x4) {
+		tilemap_set_scroll_rows(pf1_tilemap,32);
+		tilemap_set_scrolly( pf1_tilemap,0, scrolly );
+		for (i=0; i<32; i++)
+			tilemap_set_scrollx( pf1_tilemap,i, scrollx+(actfancr_pf1_rowscroll_data[i*2] | actfancr_pf1_rowscroll_data[i*2+1]<<8) );
+	}
+	else {
+		tilemap_set_scroll_rows(pf1_tilemap,1);
+		tilemap_set_scrollx( pf1_tilemap,0, scrollx );
+		tilemap_set_scrolly( pf1_tilemap,0, scrolly );
+	}
+
+	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
+
+	/* Sprites */
+	for (offs = 0;offs < 0x800;offs += 8)
+	{
+		int x,y,sprite,colour,multi,fx,fy,inc,flash;
+
+		y=buffered_spriteram[offs]+(buffered_spriteram[offs+1]<<8);
+ 		if ((y&0x8000) == 0) continue;
+		x = buffered_spriteram[offs+4]+(buffered_spriteram[offs+5]<<8);
+		colour = ((x & 0xf000) >> 12);
+		flash=x&0x800;
+		if (flash && (cpu_getcurrentframe() & 1)) continue;
+
+		fx = y & 0x2000;
+		fy = y & 0x4000;
+		multi = (1 << ((y & 0x1800) >> 11)) - 1;	/* 1x, 2x, 4x, 8x height */
+
+											/* multi = 0   1   3   7 */
+		sprite = buffered_spriteram[offs+2]+(buffered_spriteram[offs+3]<<8);
+		sprite &= 0x0fff;
+
+		x = x & 0x01ff;
+		y = y & 0x01ff;
+		if (x >= 256) x -= 512;
+		if (y >= 256) y -= 512;
+		x = 240 - x;
+		y = 240 - y;
+
+		sprite &= ~multi;
+		if (fy)
+			inc = -1;
+		else
+		{
+			sprite += multi;
+			inc = 1;
+		}
+
+		if (flipscreen) {
+			y=240-y;
+			x=240-x;
+			if (fx) fx=0; else fx=1;
+			if (fy) fy=0; else fy=1;
+			mult=16;
+		}
+		else mult=-16;
+
+		while (multi >= 0)
+		{
+			;
+			multi--;
+		}
+	}
+
+	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
+}
 {
 	int offs,i,mult;
 	int scrollx=(actfancr_control_1[0x10]+(actfancr_control_1[0x11]<<8));

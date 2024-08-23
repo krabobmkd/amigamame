@@ -232,16 +232,14 @@ static void c1943_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, 
 		{
 			if (color != 0x0a && color != 0x0b)
 			{
-				drawgfx(bitmap, Machine->gfx[3], code, color, flip_screen, flip_screen,
-					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+				;
 			}
 		}
 		else
 		{
 			if (color == 0x0a || color == 0x0b)
 			{
-				drawgfx(bitmap, Machine->gfx[3], code, color, flip_screen, flip_screen,
-					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+				;
 			}
 		}
 	}

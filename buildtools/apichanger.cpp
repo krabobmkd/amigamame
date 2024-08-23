@@ -394,8 +394,10 @@ size_t findNextOfInterest(int &type,const fstr &s, size_t istart,const vector<CF
         {"{(",true},
         {"})",true},
     };
-    size_t ires=string::npos;
-    int ityperes=-1;
+    blabla
+ //   size_t ires=string::npos;
+    size_t bestindex=string::npos;
+    int besttype=-1;
     int itype=0;
     for(const CMultiSearchPart &p : l)
     {
@@ -442,8 +444,8 @@ size_t findNextOfInterest(int &type,const fstr &s, size_t istart,const vector<CF
         }
         itype++;
     }
-    type = ityperes;
-    return ires;
+    type = besttype;
+    return bestindex;
 
 }
 
@@ -1071,7 +1073,7 @@ cout << "check: " <<ofilepath << endl;
     fp._end = bfile._b.size()-1;
     fp.parseStruct(bfile,0,0,modifiers);
 
-    fp.modify(bfile);
+//Re    fp.modify(bfile);
     bool didchange=false;
     for(const CFileModifier &m : modifiers)
     {
@@ -1089,7 +1091,7 @@ cout << "check: " <<ofilepath << endl;
         }
         cout << endl;
     }
-    if(didchange)
+ //   if(didchange)
     {
         ofstream ofs(nfilepath);
         fp.apply(ofs,bfile);
@@ -1106,31 +1108,31 @@ int main(int argc, char **argv)
    ofstream gitofs("gitcommands.sh");
 
 //re
-    for (const auto & entry : fs::directory_iterator(sdir))
-    {
-        string sname =  entry.path().filename().string();
-        if(sname == "battlane.c" ||
-sname == "bogeyman.c" ||
-sname == "ddragon.c" ||
-sname == "ddragon3.c" ||
-sname == "dogfgt.c" ||
-//sname == "generic.c" ||
-sname == "matmania.c"
-        ) continue;
-//        "battlane.c","bogeyman.c","ddragon.c","ddragon3.c","dogfgt.c","generic.c","matmania.c",
-        if(sname.rfind(".c") != sname.length()-2) continue;
-        string ofilepath = sourcebase+"vidhrdw2/" + sname;
-        string nfilepath = sourcebase+"vidhrdw/" + sname;
-        bool didchange = changeapi(ofilepath,nfilepath);
-        if(didchange) {
-            gitofs << "git add vidhrdw/"<<sname<<"\n";
-        }
+//    for (const auto & entry : fs::directory_iterator(sdir))
+//    {
+//        string sname =  entry.path().filename().string();
+//        if(sname == "battlane.c" ||
+//sname == "bogeyman.c" ||
+//sname == "ddragon.c" ||
+//sname == "ddragon3.c" ||
+//sname == "dogfgt.c" ||
+////sname == "generic.c" ||
+//sname == "matmania.c"
+//        ) continue;
+////        "battlane.c","bogeyman.c","ddragon.c","ddragon3.c","dogfgt.c","generic.c","matmania.c",
+//        if(sname.rfind(".c") != sname.length()-2) continue;
+//        string ofilepath = sourcebase+"vidhrdw2/" + sname;
+//        string nfilepath = sourcebase+"vidhrdw/" + sname;
+//        bool didchange = changeapi(ofilepath,nfilepath);
+//        if(didchange) {
+//            gitofs << "git add vidhrdw/"<<sname<<"\n";
+//        }
 
-    }
+//    }
 
-//    string ofilepath = sourcebase+"vidhrdw2/" + "test.c";
-//    string nfilepath = sourcebase+"vidhrdw/" + "test.c";
-//    changeapi(ofilepath,nfilepath);
+    string ofilepath = sourcebase+"vidhrdw2/" + "40love.c";
+    string nfilepath = sourcebase+"vidhrdw/" + "40love.c";
+    changeapi(ofilepath,nfilepath);
 
 //#else
 //    DIR *dir;

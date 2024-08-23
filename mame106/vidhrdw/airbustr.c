@@ -218,8 +218,7 @@ static void airbustr_draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[1], code, color, flipx, flipy, sx, sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+			;
 
 			// let's get back to normal to support multi sprites
 			if (flip_screen)
