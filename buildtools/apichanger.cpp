@@ -203,7 +203,21 @@ struct fstr {
         }
         return s;
     }
-
+    void getPosition(size_t &line,size_t &col,size_t i) const
+     {
+        line = 0;
+        col=0;
+        while( i>0 && _b[i] != '\n' )
+        {
+            col++;
+            i--;
+        }
+        while( i>0 )
+        {
+            if( _b[i] == '\n' ) line++;
+            i--;
+        }
+     }
 
     size_t find_first_of(const char *ps,size_t i=0, size_t imax=string::npos) const {
         size_t si = i;
@@ -267,6 +281,7 @@ struct fstr {
         return _b[i];
     }
     // special: search if this parentesis belong to a loop or a call.
+    // this is sourceof bug if comment
     ParType rfindTagBeforePar(std::string &s,size_t &wordStart,const CFileModifier *&modifierSelcted, size_t ipar,const vector<CFileModifier> &extralist) const {
         modifierSelcted = nullptr;
         if(ipar<2) return  ParType::eNone;
@@ -275,12 +290,28 @@ struct fstr {
         while(ipar>4)
         {
             char c = _b[ipar];
+            if( c=='\n' || c=='\r')
+            {
+                // special case if // comment
+                ipar--;
+                if(ipar>0 && _b[ipar]=='\r' ) ipar--;
+                bool hascpcomment=false;
+                size_t ipp = ipar-1;
+                while(ipp>0 && _b[ipp] != '\n')
+                {
+                    if(_b[ipp]=='/' && _b[ipp+1]=='/') return  ParType::eNone;
+                    ipp--;
+                }
+                continue;
+            }
+
             if(c ==' ' || c=='\t'|| c=='\n' || c=='\r')
             {
                 ipar --;
                 continue;
             }
-            if(c =='(' || c==')'|| c=='{' || c=='}')
+            if(c =='(' || c==')'|| c=='{' || c=='}' || c=='/' || c==','|| c==';'
+                        || c=='=') // '/' because of '*/'
             {   // means not a loop parenthesis
                 return ParType::eNone;
             }
@@ -289,11 +320,15 @@ struct fstr {
         size_t ilast=ipar;
         ilast++;
         ipar--;
-        // should start an expression
-        while(ipar>4)
+        // should start an expression... or not.
+        while(ipar>0)
         {
             char c = _b[ipar];
-            if(c ==' ' || c=='\t'|| c=='\n' || c=='\r')
+            if(c ==' ' || c=='\t'|| c=='\n' || c=='\r'
+                || c=='/'|| c=='=' || c==')'|| c=='('
+                || c=='}'|| c=='{'|| c=='='|| c==','
+                || c==';'
+            )
             {
                 ipar++;
                 break;
@@ -676,7 +711,21 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
                 {
                    _end = icn+1;
                 } else {
-                    printf("parenthesis mixup\n");
+                    size_t line,col, line_s,col_s;
+                    sfile.getPosition(line,col,icn);
+                    sfile.getPosition(line_s,col_s,_start);
+                    cout << "parenthesis end mixup: l:"<<line <<" c:"<<col << endl;
+                     cout << "start l:"<<line_s <<" c:"<<col_s << endl;
+                    if(_pParent)
+                    {
+                        size_t linep1,colp1; size_t linep2,colp2;
+                        sfile.getPosition(linep1,colp1,_pParent->_start);
+                        sfile.getPosition(linep2,colp2,_pParent->_end);
+                        cout << "parent: start l:"<<linep1 << " c:"<<colp1 << endl;
+                        cout << "parent: end l:"<<linep2 << " c:"<<colp2 << endl;
+
+
+                    }
                 }
                 return icn+1;
                // _parts.push_back({TYPE_COMMENT,sfile.substr(i+1}
@@ -687,7 +736,21 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
                 {
                    _end = icn+1;
                 } else {
-                    printf("brace mixup\n");
+                    size_t line,col, line_s,col_s;
+                    sfile.getPosition(line,col,icn);
+                    sfile.getPosition(line_s,col_s,_start);
+                    cout << "brace end mixup: l:"<<line <<" c:"<<col << endl;
+                     cout << "start l:"<<line_s <<" c:"<<col_s << endl;
+                    if(_pParent)
+                    {
+                        size_t linep1,colp1; size_t linep2,colp2;
+                        sfile.getPosition(linep1,colp1,_pParent->_start);
+                        sfile.getPosition(linep2,colp2,_pParent->_end);
+                        cout << "parent: start l:"<<linep1 << " c:"<<colp1 << endl;
+                        cout << "parent: end l:"<<linep2 << " c:"<<colp2 << endl;
+
+
+                    }
                 }
                 return icn+1;
             }
@@ -856,6 +919,7 @@ void CFileParse::apply(ostream &ofs,const fstr &sfile)
 
 bool  changeapi(std::string ofilepath,std::string nfilepath)
 {
+cout << "check: " <<ofilepath << endl;
     fstr bfile;
     { //
         ifstream ifs(ofilepath);
@@ -1041,6 +1105,7 @@ int main(int argc, char **argv)
    // stringstream ssgit;
    ofstream gitofs("gitcommands.sh");
 
+//re
     for (const auto & entry : fs::directory_iterator(sdir))
     {
         string sname =  entry.path().filename().string();
@@ -1063,8 +1128,8 @@ sname == "matmania.c"
 
     }
 
-//    string ofilepath = sourcebase+"vidhrdw/" + "tecmo16.c";
-//    string nfilepath = sourcebase+"vidhrdw/" + "tecmo16n.c";
+//    string ofilepath = sourcebase+"vidhrdw2/" + "test.c";
+//    string nfilepath = sourcebase+"vidhrdw/" + "test.c";
 //    changeapi(ofilepath,nfilepath);
 
 //#else
