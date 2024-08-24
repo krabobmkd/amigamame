@@ -164,7 +164,26 @@ static void perfrman_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		int sx, sy;
 
 		if ((buffered_spriteram[offs+2] & 0x80) == priority_to_display)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			if (flipscreen)
 			{
 				sx = 265 - buffered_spriteram[offs+1];
@@ -176,16 +195,17 @@ static void perfrman_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 				sx = buffered_spriteram[offs+1] + 3;
 				sy = buffered_spriteram[offs+3] - 1;
 			}
-			drawgfx(bitmap,Machine->gfx[1],
-				buffered_spriteram[offs],
-				((buffered_spriteram[offs+2] >> 1) & 3)
-					+ ((buffered_spriteram[offs+2] << 2) & 4)
-//                  + ((buffered_spriteram[offs+2] >> 2) & 8)
-				,
-				flipscreen, flipscreen,
-				sx, sy,
-				cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = buffered_spriteram[offs];
+			dgp0.color = ((buffered_spriteram[offs+2] >> 1) & 3)					+ ((buffered_spriteram[offs+2] << 2) & 4)//                  + ((buffered_spriteram[offs+2] >> 2) & 8);
+			dgp0.flipx = flipscreen;
+			dgp0.flipy = flipscreen;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 }
 
@@ -241,23 +261,44 @@ VIDEO_UPDATE( slapfight )
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 
 	/* Draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		if (flipscreen)
-			drawgfx(bitmap,Machine->gfx[2],
-				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
-				(buffered_spriteram[offs+2] & 0x1e) >> 1,
-				1,1,
-				288-(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) +18,240-buffered_spriteram[offs+3],
-				cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp1.code = buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2);
+			dgp1.color = (buffered_spriteram[offs+2] & 0x1e) >> 1;
+			dgp1.sx = 288-(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) +18;
+			dgp1.sy = 240-buffered_spriteram[offs+3];
+			drawgfx(&dgp1);
 		else
-			drawgfx(bitmap,Machine->gfx[2],
-				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
-				(buffered_spriteram[offs+2] & 0x1e) >> 1,
-				0,0,
-				(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) - 13,buffered_spriteram[offs+3],
-				cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp1.code = buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2);
+			dgp1.color = (buffered_spriteram[offs+2] & 0x1e) >> 1;
+			dgp1.sx = (buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) - 13;
+			dgp1.sy = buffered_spriteram[offs+3];
+			drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 

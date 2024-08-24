@@ -125,6 +125,25 @@ VIDEO_UPDATE( drmicro )
 
 	/* draw sprites */
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[3-g], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (g=0;g<2;g++)
 	{
 		adr = 0x800*g;
@@ -148,23 +167,50 @@ VIDEO_UPDATE( drmicro )
 			else
 				x = (240-x) & 0xff;
 
-			drawgfx(bitmap,Machine->gfx[3-g],
-					chr,
-					col,
-					fx,fy,
-					x,y,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = chr;
+			dgp0.color = col;
+			dgp0.flipx = fx;
+			dgp0.flipy = fy;
+			dgp0.sx = x;
+			dgp0.sy = y;
+			drawgfx(&dgp0);
 
 			if (x>240)
-			{
-				drawgfx(bitmap,Machine->gfx[3-g],
-						chr,
-						col,
-						fx,fy,
-						x-256,y,
-						cliprect,TRANSPARENCY_PEN,0);
+			
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[3-g], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+				
+				dgp1.code = chr;
+				dgp1.color = col;
+				dgp1.flipx = fx;
+				dgp1.flipy = fy;
+				dgp1.sx = x-256;
+				dgp1.sy = y;
+				drawgfx(&dgp1);
 			}
+} // end of patch paragraph
+
 		}
 	}
+	} // end of patch paragraph
+
 }
 

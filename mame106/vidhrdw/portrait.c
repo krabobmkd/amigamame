@@ -105,6 +105,25 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	UINT8 *source = spriteram;
 	UINT8 *finish = source + 0x200;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source < finish )
 	{
 		int sy      = source[0];
@@ -147,14 +166,18 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				tilenum,color,
-				0,fy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = tilenum;
+		dgp0.color = color;
+		dgp0.flipy = fy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 
 		source += 0x10;
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( portrait )

@@ -233,21 +233,43 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				case 0x3: priority_mask = 0xf0|0xcc|0xaa; break; /* obscured by bg and fg */
 			}
 
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				Machine->gfx[1], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				priority_bitmap, 	// pri_buffer
+				priority_mask 	// priority_mask
+			  };
 			for (y = 0;y < size;y++)
 			{
 				for (x = 0;x < size;x++)
 				{
 					int sx = xpos + 8*(flipx?(size-1-x):x);
 					int sy = ypos + 8*(flipy?(size-1-y):y);
-					pdrawgfx(bitmap,Machine->gfx[1],
-							code + layout[y][x],
-							flags & 0xf,
-							flipx,flipy,
-							sx,sy,
-							cliprect,TRANSPARENCY_PEN,0,
-							priority_mask);
+					
+					dgp0.code = code + layout[y][x];
+					dgp0.color = flags & 0xf;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx;
+					dgp0.sy = sy;
+					drawgfx(&dgp0);
 				}
 			}
+			} // end of patch paragraph
+
 		}
 	}
 }

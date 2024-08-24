@@ -61,19 +61,54 @@ int SpriteCollision(int first,int second)
 	int x,y;
 
     if((s2636ram[first * 0x10 + 10] < 0xf0) && (s2636ram[second * 0x10 + 10] < 0xf0))
-    {
+    
+{ 
+struct drawgfxParams dgp0={
+	spritebitmap, 	// dest
+	Machine->gfx[expand], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	spritebitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
     	int fx     = (s2636ram[first * 0x10 + 10] * 4)-22;
         int fy     = (s2636ram[first * 0x10 + 12] * 3)+3;
 		int expand = (first==1) ? 2 : 1;
 
         /* Draw first sprite */
 
-	    drawgfx(spritebitmap,Machine->gfx[expand],
-			    first * 2,
-			    0,
-			    0,0,
-			    fx,fy,
-			    0, TRANSPARENCY_NONE, 0);
+	    
+	    dgp0.code = first * 2;
+	    dgp0.sx = fx;
+	    dgp0.sy = fy;
+	    drawgfx(&dgp0);
 
         /* Get fingerprint */
 
@@ -95,12 +130,11 @@ int SpriteCollision(int first,int second)
 
         /* Blackout second sprite */
 
-	    drawgfx(spritebitmap,Machine->gfx[1],
-			    second * 2,
-			    1,
-			    0,0,
-			    (s2636ram[second * 0x10 + 10] * 4)-22,(s2636ram[second * 0x10 + 12] * 3) + 3,
-			    0, TRANSPARENCY_PEN, 0);
+	    
+	    dgp1.code = second * 2;
+	    dgp1.sx = (s2636ram[second * 0x10 + 10] * 4)-22;
+	    dgp1.sy = (s2636ram[second * 0x10 + 12] * 3) + 3;
+	    drawgfx(&dgp1);
 
         /* Remove fingerprint */
 
@@ -122,13 +156,14 @@ int SpriteCollision(int first,int second)
 
         /* Zero bitmap */
 
-	    drawgfx(spritebitmap,Machine->gfx[expand],
-			    first * 2,
-			    1,
-			    0,0,
-			    fx,fy,
-			    0, TRANSPARENCY_NONE, 0);
+	    
+	    dgp0.code = first * 2;
+	    dgp0.sx = fx;
+	    dgp0.sy = fy;
+	    drawgfx(&dgp0);
     }
+} // end of patch paragraph
+
 
 	return Checksum;
 }
@@ -180,7 +215,26 @@ static void tinvader_draw_sprites( mame_bitmap *bitmap )
     for(offs=0;offs<0x50;offs+=0x10)
     {
     	if((s2636ram[offs+10]<0xF0) && (offs!=0x30))
-		{
+		
+{ 
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	Machine->gfx[expand], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
             int spriteno = (offs / 8);
 			int expand   = ((s2636ram[0xc0] & (spriteno*2))!=0) ? 2 : 1;
             int bx       = (s2636ram[offs+10] * 4) - 22;
@@ -199,12 +253,11 @@ static void tinvader_draw_sprites( mame_bitmap *bitmap )
             }
 
             /* Sprite->Background collision detection */
-			drawgfx(bitmap,Machine->gfx[expand],
-				    spriteno,
-					1,
-				    0,0,
-				    bx,by,
-				    0, TRANSPARENCY_PEN, 0);
+			
+			dgp3.code = spriteno;
+			dgp3.sx = bx;
+			dgp3.sy = by;
+			drawgfx(&dgp3);
 
 	        for (x = bx; x < bx + Machine->gfx[expand]->width; x++)
 	        {
@@ -226,13 +279,14 @@ static void tinvader_draw_sprites( mame_bitmap *bitmap )
                 }
 	        }
 
-			drawgfx(bitmap,Machine->gfx[expand],
-				    spriteno,
-					0,
-				    0,0,
-				    bx,by,
-				    0, TRANSPARENCY_PEN, 0);
+			
+			dgp3.code = spriteno;
+			dgp3.sx = bx;
+			dgp3.sy = by;
+			drawgfx(&dgp3);
         }
+} // end of patch paragraph
+
     }
 
     /* Sprite->Sprite collision detection */

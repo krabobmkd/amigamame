@@ -38,7 +38,26 @@ VIDEO_UPDATE( pkunwar )
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -49,13 +68,17 @@ VIDEO_UPDATE( pkunwar )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					videoram[offs] + ((colorram[offs] & 0x07) << 8),
-					(colorram[offs] & 0xf0) >> 4,
-					flipscreen[0],flipscreen[1],
-					8*sx,8*sy,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = videoram[offs] + ((colorram[offs] & 0x07) << 8);
+			dgp0.color = (colorram[offs] & 0xf0) >> 4;
+			dgp0.flipx = flipscreen[0];
+			dgp0.flipy = flipscreen[1];
+			dgp0.sx = 8*sx;
+			dgp0.sy = 8*sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 
 	/* copy the character mapped graphics */
@@ -63,6 +86,25 @@ VIDEO_UPDATE( pkunwar )
 
 
 	/* Draw the sprites. */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 32)
 	{
 		int sx,sy,flipx,flipy;
@@ -83,20 +125,43 @@ VIDEO_UPDATE( pkunwar )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
-				((spriteram[offs] & 0xfc) >> 2) + ((spriteram[offs + 3] & 0x07) << 6),
-				(spriteram[offs + 3] & 0xf0) >> 4,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = ((spriteram[offs] & 0xfc) >> 2) + ((spriteram[offs + 3] & 0x07) << 6);
+		dgp1.color = (spriteram[offs + 3] & 0xf0) >> 4;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 
 
 	/* redraw characters which have priority over sprites */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (colorram[offs] & 0x08)
-		{
+		
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -105,12 +170,16 @@ VIDEO_UPDATE( pkunwar )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(bitmap,Machine->gfx[0],
-					videoram[offs] + ((colorram[offs] & 0x07) << 8),
-					(colorram[offs] & 0xf0) >> 4,
-					flipscreen[0],flipscreen[1],
-					8*sx,8*sy,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp2.code = videoram[offs] + ((colorram[offs] & 0x07) << 8);
+			dgp2.color = (colorram[offs] & 0xf0) >> 4;
+			dgp2.flipx = flipscreen[0];
+			dgp2.flipy = flipscreen[1];
+			dgp2.sx = 8*sx;
+			dgp2.sy = 8*sy;
+			drawgfx(&dgp2);
 		}
+} // end of patch paragraph
+
 	}
 }

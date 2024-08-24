@@ -219,6 +219,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0x0f, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 2)
 	{
 		int sx = spriteram[offs + 1] - 1;
@@ -227,13 +246,17 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		int flipy = spriteram[offs] & 2;
 		if (flip_screen) sx += 32-2;
 
-		drawgfx(bitmap,Machine->gfx[1],
-				(spriteram[offs] & 0xfc) >> 2,
-				spriteram_2[offs + 1] & 0x3f,
-				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,0x0f);
+		
+		dgp0.code = (spriteram[offs] & 0xfc) >> 2;
+		dgp0.color = spriteram_2[offs + 1] & 0x3f;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -241,6 +264,25 @@ static void draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 4; offs < 0x10;offs++)
 	{
 		int x,y;
@@ -249,13 +291,14 @@ static void draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect )
 		y = 253 - bosco_radary[offs];
 		if (flip_screen) x -= 3;
 
-		drawgfx(bitmap,Machine->gfx[2],
-				((bosco_radarattr[offs] & 0x0e) >> 1) ^ 0x07,
-				0,
-				0,0,
-				x,y,
-				cliprect,TRANSPARENCY_COLOR,0);
+		
+		dgp1.code = ((bosco_radarattr[offs] & 0x0e) >> 1) ^ 0x07;
+		dgp1.sx = x;
+		dgp1.sy = y;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 

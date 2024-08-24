@@ -44,19 +44,39 @@ static void sbrkout_draw_balls( mame_bitmap *bitmap )
 {
 	int ball;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (ball=2; ball>=0; ball--)
 	{
 		int code = ((sbrkout_vert_ram[ball * 2 + 1] & 0x80) >> 7);
 		int sx = 31 * 8 - sbrkout_horiz_ram[ball * 2];
 		int sy = 30 * 8 - sbrkout_vert_ram[ball * 2];
 
-		drawgfx(bitmap, Machine->gfx[1],
-			code, 0,
-			0, 0,
-			sx, sy,
-			&Machine->visible_area,
-			TRANSPARENCY_PEN, 0);
+		
+		dgp0.code = code;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( sbrkout )

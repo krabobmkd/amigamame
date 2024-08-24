@@ -258,19 +258,42 @@ static void tp84_draw_sprites(mame_bitmap *bitmap)
 				sy = 240 - sr[offs + 3];
 
 				if (sy > line-16 && sy <= line)
-				{
+				
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 					code = sr[offs + 1];
 					color = (sr[offs + 2] & 0x0f) + coloffset;
 					flipx = ~sr[offs + 2] & 0x40;
 					flipy = sr[offs + 2] & 0x80;
 
-					drawgfx(bitmap,gfx,
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							&clip,TRANSPARENCY_COLOR,0);
+					
+					dgp0.code = code;
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx;
+					dgp0.sy = sy;
+					drawgfx(&dgp0);
 				}
+} // end of patch paragraph
+
 			}
 		}
 	}

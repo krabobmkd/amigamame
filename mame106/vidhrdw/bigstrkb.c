@@ -24,6 +24,25 @@ static void bigstrkb_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 	UINT16 *source = bigstrkb_spriteram;
 	UINT16 *finish = source + 0x800/2;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int xpos, ypos, num, attr;
@@ -44,9 +63,17 @@ static void bigstrkb_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 		flipx = attr & 0x0100;
 		col = attr & 0x000f;
 
-		drawgfx(bitmap,gfx,num,col,flipx,0,xpos,ypos,cliprect,TRANSPARENCY_PEN,15);
+		
+		dgp0.code = num;
+		dgp0.color = col;
+		dgp0.flipx = flipx;
+		dgp0.sx = xpos;
+		dgp0.sy = ypos;
+		drawgfx(&dgp0);
 		source+=8;
 	}
+	} // end of patch paragraph
+
 }
 
 /* Tilemaps */

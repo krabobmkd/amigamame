@@ -107,7 +107,26 @@ VIDEO_UPDATE( lazercmd )
 	for (i = 0; i < (VERT_RES - 1) * HORZ_RES; i++)
 	{
 		if (dirtybuffer[i])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 			dirtybuffer[i] = 0;
@@ -118,12 +137,15 @@ VIDEO_UPDATE( lazercmd )
 			sx *= HORZ_CHR;
 			sy *= VERT_CHR;
 
-			drawgfx(tmpbitmap, Machine->gfx[0],
-					videoram[i], video_inverted ? 1 : 0,
-					0,0,
-					sx,sy,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = videoram[i];
+			dgp0.color = video_inverted ? 1 : 0;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE,0);
 

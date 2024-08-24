@@ -131,6 +131,25 @@ static void oneshot_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect 
 
 	int xpos,ypos;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int blockx,blocky;
@@ -155,31 +174,23 @@ static void oneshot_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect 
 			for (blocky = 0; blocky<ysize;blocky++) {
 
 
-				drawgfx(
-						bitmap,
-						gfx,
-						num+(blocky*xsize)+blockx,
-						1,
-						0,0,
-						xpos+blockx*8,ypos+blocky*8,
-						cliprect,
-						TRANSPARENCY_PEN,0
-						);
+				
+				dgp0.code = num+(blocky*xsize)+blockx;
+				dgp0.sx = xpos+blockx*8;
+				dgp0.sy = ypos+blocky*8;
+				drawgfx(&dgp0);
 
-				drawgfx(
-						bitmap,
-						gfx,
-						num+(blocky*xsize)+blockx,
-						1,
-						0,0,
-						xpos+blockx*8-0x200,ypos+blocky*8,
-						cliprect,
-						TRANSPARENCY_PEN,0
-						);
+				
+				dgp0.code = num+(blocky*xsize)+blockx;
+				dgp0.sx = xpos+blockx*8-0x200;
+				dgp0.sy = ypos+blocky*8;
+				drawgfx(&dgp0);
 			}
 		}
 		source += 0x4;
 	}
+	} // end of patch paragraph
+
 
 }
 

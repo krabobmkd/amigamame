@@ -287,6 +287,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int re
 		inc	   = -4;
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source != finish )
 	{
 		int sx,sy,flipx,flipy;
@@ -316,15 +335,19 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int re
 		color = source[2] & 0x0f;
 
 
-        drawgfx(bitmap, Machine->gfx[1],
-				code | (gfxbank << 6),
-				color,
-				flipx, flipy,
-				sx,sy,
-				cliprect, TRANSPARENCY_PEN,0);
+        
+        dgp0.code = code | (gfxbank << 6);
+        dgp0.color = color;
+        dgp0.flipx = flipx;
+        dgp0.flipy = flipy;
+        dgp0.sx = sx;
+        dgp0.sy = sy;
+        drawgfx(&dgp0);
 
 		source += inc;
     }
+	} // end of patch paragraph
+
 }
 
 

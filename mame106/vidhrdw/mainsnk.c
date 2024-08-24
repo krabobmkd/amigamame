@@ -119,6 +119,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int sc
 	source =  spriteram;
 	finish =  source + 0x64;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		7, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int attributes = source[3];
@@ -130,15 +149,17 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int sc
 
 		tile_number |= attributes<<4 & 0x300;
 
-		drawgfx( bitmap,gfx,
-			tile_number,
-			color,
-			0,0,
-			256-sx+mainsnk_offset,sy,
-			cliprect,TRANSPARENCY_PEN,7);
+		
+		dgp0.code = tile_number;
+		dgp0.color = color;
+		dgp0.sx = 256-sx+mainsnk_offset;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 
 		source+=4;
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -147,6 +168,25 @@ static void draw_status( mame_bitmap *bitmap, const rectangle *cliprect,int dx,i
 	const UINT8 *base = me_fgram+off;
 	const gfx_element *gfx = Machine->gfx[0];
 	int row;
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0xf, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( row=0; row<4; row++ )
 	{
 		int sy,sx = (row&1)*8;
@@ -163,14 +203,16 @@ static void draw_status( mame_bitmap *bitmap, const rectangle *cliprect,int dx,i
 		for( sy=0; sy<256; sy+=8 )
 		{
 			int tile_number = *source++;
-			drawgfx( bitmap, gfx,
-			    tile_number, tile_number>>5,
-			    0,0,
-			    sx+dx,sy,
-			    cliprect,
-			    TRANSPARENCY_NONE, 0xf );
+			
+			dgp1.code = tile_number;
+			dgp1.color = tile_number>>5;
+			dgp1.sx = sx+dx;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE(mainsnk)

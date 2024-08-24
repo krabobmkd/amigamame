@@ -172,6 +172,25 @@ void skyfox_draw_sprites(mame_bitmap *bitmap)
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
 	int shift	=	(skyfox_bg_ctrl & 0x80) ? (4-1) : 4;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		\				&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0xff, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < spriteram_size; offs += 4)
 	{
 		int xstart, ystart, xend, yend;
@@ -197,12 +216,14 @@ void skyfox_draw_sprites(mame_bitmap *bitmap)
 		}
 
 #define DRAW_SPRITE(DX,DY,CODE) \
-		drawgfx(bitmap,Machine->gfx[0], \
-				(CODE), \
-				0, \
-				flipx,flipy, \
-				x + (DX),y + (DY), \
-				&Machine->visible_area,TRANSPARENCY_PEN, 0xff); \
+		
+		dgp0.code = \				(CODE);
+		dgp0.color = \				0;
+		dgp0.flipx = \				flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = \				x + (DX);
+		dgp0.sy = y + (DY);
+		drawgfx(&dgp0); \
 
 		if (skyfox_bg_ctrl & 1)	// flipscreen
 		{
@@ -229,6 +250,8 @@ void skyfox_draw_sprites(mame_bitmap *bitmap)
 			if (n==2)	code+=2;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

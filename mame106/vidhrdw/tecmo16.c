@@ -431,6 +431,25 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 			{
 				color |= 0x80;
 
+				
+				{ 
+				struct drawgfxParams dgp0={
+					bitmap, 	// dest
+					Machine->gfx[2], 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					cliprect, 	// clip
+					TRANSPARENCY_PEN, 	// transparency
+					0, 	// transparent_color
+					0, 	// scalex
+					0, 	// scaley
+					priority_bitmap, 	// pri_buffer
+					priority_mask 	// priority_mask
+				  };
 				for (y = 0;y < sizey;y++)
 				{
 					for (x = 0;x < sizex;x++)
@@ -445,38 +464,62 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx(bitmap,Machine->gfx[2],
-								code + layout[y][x],
-								color,
-								flipx,flipy,
-								sx,sy,
-								cliprect,TRANSPARENCY_PEN,0,
-								priority_mask);
+						
+						dgp0.code = code + layout[y][x];
+						dgp0.color = color;
+						dgp0.flipx = flipx;
+						dgp0.flipy = flipy;
+						dgp0.sx = sx;
+						dgp0.sy = sy;
+						drawgfx(&dgp0);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,Machine->gfx[2],
-								code + layout[y][x],
-								color,
-								flipx,flipy,
-								sx-512,sy,
-								cliprect,TRANSPARENCY_PEN,0,
-								priority_mask);
+						
+						dgp0.code = code + layout[y][x];
+						dgp0.color = color;
+						dgp0.flipx = flipx;
+						dgp0.flipy = flipy;
+						dgp0.sx = sx-512;
+						dgp0.sy = sy;
+						drawgfx(&dgp0);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,Machine->gfx[2],
-								code + layout[y][x],
-								color,
-								flipx,flipy,
-								sx+512,sy,
-								cliprect,TRANSPARENCY_PEN,0,
-								priority_mask);
+						
+						dgp0.code = code + layout[y][x];
+						dgp0.color = color;
+						dgp0.flipx = flipx;
+						dgp0.flipy = flipy;
+						dgp0.sx = sx+512;
+						dgp0.sy = sy;
+						drawgfx(&dgp0);
 					}
 				}
+				} // end of patch paragraph
+
 			}
 			else
 			{
 				bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
 
+				
+				{ 
+				struct drawgfxParams dgp3={
+					bitmap, 	// dest
+					Machine->gfx[2], 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					cliprect, 	// clip
+					TRANSPARENCY_PEN, 	// transparency
+					0, 	// transparent_color
+					0, 	// scalex
+					0, 	// scaley
+					priority_bitmap, 	// pri_buffer
+					priority_mask 	// priority_mask
+				  };
 				for (y = 0;y < sizey;y++)
 				{
 					for (x = 0;x < sizex;x++)
@@ -491,33 +534,38 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx(bitmap,Machine->gfx[2],
-								code + layout[y][x],
-								color,
-								flipx,flipy,
-								sx,sy,
-								cliprect,TRANSPARENCY_PEN,0,
-								priority_mask);
+						
+						dgp3.code = code + layout[y][x];
+						dgp3.color = color;
+						dgp3.flipx = flipx;
+						dgp3.flipy = flipy;
+						dgp3.sx = sx;
+						dgp3.sy = sy;
+						drawgfx(&dgp3);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,Machine->gfx[2],
-								code + layout[y][x],
-								color,
-								flipx,flipy,
-								sx-512,sy,
-								cliprect,TRANSPARENCY_PEN,0,
-								priority_mask);
+						
+						dgp3.code = code + layout[y][x];
+						dgp3.color = color;
+						dgp3.flipx = flipx;
+						dgp3.flipy = flipy;
+						dgp3.sx = sx-512;
+						dgp3.sy = sy;
+						drawgfx(&dgp3);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,Machine->gfx[2],
-								code + layout[y][x],
-								color,
-								flipx,flipy,
-								sx+512,sy,
-								cliprect,TRANSPARENCY_PEN,0,
-								priority_mask);
+						
+						dgp3.code = code + layout[y][x];
+						dgp3.color = color;
+						dgp3.flipx = flipx;
+						dgp3.flipy = flipy;
+						dgp3.sx = sx+512;
+						dgp3.sy = sy;
+						drawgfx(&dgp3);
 					}
 				}
+				} // end of patch paragraph
+
 			}
 		}
 	}

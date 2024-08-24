@@ -88,6 +88,25 @@ void tnzs_vh_draw_background(mame_bitmap *bitmap,unsigned char *m)
 
 	upperbits = tnzs_objctrl[2] + tnzs_objctrl[3] * 256;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (column = 0;column < tot;column++)
 	{
 		scrollx = tnzs_scrollram[column*16+4] - ((upperbits & 0x01) * 256);
@@ -117,26 +136,32 @@ void tnzs_vh_draw_background(mame_bitmap *bitmap,unsigned char *m)
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flipx,flipy,
-						sx + scrollx,(sy + scrolly) & 0xff,
-						0,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx + scrollx;
+				dgp0.sy = (sy + scrolly) & 0xff;
+				drawgfx(&dgp0);
 
 				/* wrap around x */
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flipx,flipy,
-						sx + 512 + scrollx,(sy + scrolly) & 0xff,
-						0,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx + 512 + scrollx;
+				dgp0.sy = (sy + scrolly) & 0xff;
+				drawgfx(&dgp0);
 			}
 		}
 
 
 		upperbits >>= 1;
 	}
+	} // end of patch paragraph
+
 }
 
 void tnzs_vh_draw_foreground(mame_bitmap *bitmap,
@@ -160,6 +185,25 @@ void tnzs_vh_draw_foreground(mame_bitmap *bitmap,
 
 
 	/* Draw all 512 sprites */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i=0x1ff;i >= 0;i--)
 	{
 		int code,color,sx,sy,flipx,flipy;
@@ -179,21 +223,27 @@ void tnzs_vh_draw_foreground(mame_bitmap *bitmap,
 			if ((sy == 0) && (code == 0)) sy += 240;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy+2,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx;
+		dgp2.sy = sy+2;
+		drawgfx(&dgp2);
 
 		/* wrap around x */
-		drawgfx(bitmap,Machine->gfx[0],
-				code,
-				color,
-				flipx,flipy,
-				sx + 512,sy+2,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx + 512;
+		dgp2.sy = sy+2;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( tnzs )

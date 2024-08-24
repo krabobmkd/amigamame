@@ -44,21 +44,41 @@ static void canyon_draw_sprites(mame_bitmap *bitmap, const rectangle* cliprect)
 {
 	int i;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 2; i++)
 	{
 		int x = canyon_videoram[0x3d0 + 2 * i + 0x1];
 		int y = canyon_videoram[0x3d0 + 2 * i + 0x8];
 		int c = canyon_videoram[0x3d0 + 2 * i + 0x9];
 
-		drawgfx(bitmap, Machine->gfx[1],
-			c >> 3,
-			i,
-			!(c & 0x80), 0,
-			224 - x,
-			240 - y,
-			cliprect,
-			TRANSPARENCY_PEN, 0);
+		
+		dgp0.code = c >> 3;
+		dgp0.color = i;
+		dgp0.flipx = !(c & 0x80);
+		dgp0.sx = 224 - x;
+		dgp0.sy = 240 - y;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 

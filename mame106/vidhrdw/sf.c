@@ -152,7 +152,26 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		int flipy = attr & 0x0200;
 
 		if (attr & 0x400)	/* large sprite */
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int c1,c2,c3,c4,t;
 
 			if (flip_screen)
@@ -179,36 +198,61 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				t = c2; c2 = c4; c4 = t;
 			}
 
-			drawgfx(bitmap,
-					Machine->gfx[2],
-					sf_invert(c1),
-					color,
-					flipx,flipy,
-					sx,sy,
-					cliprect, TRANSPARENCY_PEN, 15);
-			drawgfx(bitmap,
-					Machine->gfx[2],
-					sf_invert(c2),
-					color,
-					flipx,flipy,
-					sx+16,sy,
-					cliprect, TRANSPARENCY_PEN, 15);
-			drawgfx(bitmap,
-					Machine->gfx[2],
-					sf_invert(c3),
-					color,
-					flipx,flipy,
-					sx,sy+16,
-					cliprect, TRANSPARENCY_PEN, 15);
-			drawgfx(bitmap,
-					Machine->gfx[2],
-					sf_invert(c4),
-					color,
-					flipx,flipy,
-					sx+16,sy+16,
-					cliprect, TRANSPARENCY_PEN, 15);
+			
+			dgp0.code = sf_invert(c1);
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
+			
+			dgp0.code = sf_invert(c2);
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx+16;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
+			
+			dgp0.code = sf_invert(c3);
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy+16;
+			drawgfx(&dgp0);
+			
+			dgp0.code = sf_invert(c4);
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx+16;
+			dgp0.sy = sy+16;
+			drawgfx(&dgp0);
 		}
-		else
+} // end of patch paragraph
+
+		
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 		{
 			if (flip_screen)
 			{
@@ -218,14 +262,17 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,
-					Machine->gfx[2],
-					sf_invert(c),
-					color,
-					flipx,flipy,
-					sx,sy,
-					cliprect, TRANSPARENCY_PEN, 15);
+			
+			dgp4.code = sf_invert(c);
+			dgp4.color = color;
+			dgp4.flipx = flipx;
+			dgp4.flipy = flipy;
+			dgp4.sx = sx;
+			dgp4.sy = sy;
+			drawgfx(&dgp4);
 		}
+} // end of patch paragraph
+
 	}
 }
 

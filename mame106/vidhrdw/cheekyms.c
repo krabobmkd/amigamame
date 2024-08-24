@@ -148,34 +148,77 @@ VIDEO_UPDATE( cheekyms )
 		code = (~v1 << 1) & 0x1f;
 
 		if (v1 & 0x80)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			if (!flip_screen)
 			{
 				code++;
 			}
 
-			drawgfx(bitmap,Machine->gfx[1],
-					code,col,
-					0,0,
-					sx,sy,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = code;
+			dgp0.color = col;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
-		else
-		{
-			drawgfx(bitmap,Machine->gfx[1],
-					code + 0x20,
-					col,
-					0,0,
-					sx,sy,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+} // end of patch paragraph
 
-			drawgfx(bitmap,Machine->gfx[1],
-					code + 0x21,
-					col,
-					0,0,
-					sx + 8*(v1 & 2),sy + 8*(~v1 & 2),
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
+		{
+			
+			dgp1.code = code + 0x20;
+			dgp1.color = col;
+			dgp1.sx = sx;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
+
+			
+			dgp1.code = code + 0x21;
+			dgp1.color = col;
+			dgp1.sx = sx + 8*(v1 & 2);
+			dgp1.sy = sy + 8*(~v1 & 2);
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 
 	/* for every character in the Video RAM, check if it has been modified */
@@ -198,7 +241,26 @@ VIDEO_UPDATE( cheekyms )
 
 		if (dirtybuffer[offs] ||
 			(redraw_man && man_area))
-		{
+		
+{ 
+struct drawgfxParams dgp3={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			dirtybuffer[offs] = 0;
 
 			if (flip_screen)
@@ -207,13 +269,17 @@ VIDEO_UPDATE( cheekyms )
 				sy = 31 - sy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					videoram[offs],
-					0 + char_palette,
-					flip_screen,flip_screen,
-					8*sx, 8*sy - (man_area ? man_scroll : 0),
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp3.code = videoram[offs];
+			dgp3.color = 0 + char_palette;
+			dgp3.flipx = flip_screen;
+			dgp3.flipy = flip_screen;
+			dgp3.sx = 8*sx;
+			dgp3.sy = 8*sy - (man_area ? man_scroll : 0);
+			drawgfx(&dgp3);
 		}
+} // end of patch paragraph
+
 	}
 
 	redraw_man = 0;

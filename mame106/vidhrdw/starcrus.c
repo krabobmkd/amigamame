@@ -195,6 +195,42 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w )
 }
 
 int starcrus_collision_check_s1s2(void)
+
+{ 
+struct drawgfxParams dgp0={
+	ship1_vid, 	// dest
+	Machine->gfx[8+((s1_sprite&0x04)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	ship2_vid, 	// dest
+	Machine->gfx[10+((s2_sprite&0x04)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int org_x, org_y;
 	int sx, sy;
@@ -214,26 +250,22 @@ int starcrus_collision_check_s1s2(void)
 	org_y = s1_y;
 
 	/* Draw ship 1 */
-    drawgfx(ship1_vid,
-            Machine->gfx[8+((s1_sprite&0x04)>>2)],
-            (s1_sprite&0x03)^0x03,
-            0,
-            (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
-            s1_x-org_x,s1_y-org_y,
-            &clip,
-            TRANSPARENCY_NONE,
-            0);
+    
+    dgp0.code = (s1_sprite&0x03)^0x03;
+    dgp0.flipx = (s1_sprite&0x08)>>3;
+    dgp0.flipy = (s1_sprite&0x10)>>4;
+    dgp0.sx = s1_x-org_x;
+    dgp0.sy = s1_y-org_y;
+    drawgfx(&dgp0);
 
 	/* Draw ship 2 */
-    drawgfx(ship2_vid,
-            Machine->gfx[10+((s2_sprite&0x04)>>2)],
-            (s2_sprite&0x03)^0x03,
-            0,
-            (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
-            s2_x-org_x,s2_y-org_y,
-            &clip,
-            TRANSPARENCY_NONE,
-            0);
+    
+    dgp1.code = (s2_sprite&0x03)^0x03;
+    dgp1.flipx = (s2_sprite&0x08)>>3;
+    dgp1.flipy = (s2_sprite&0x10)>>4;
+    dgp1.sx = s2_x-org_x;
+    dgp1.sy = s2_y-org_y;
+    drawgfx(&dgp1);
 
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
@@ -251,6 +283,8 @@ int starcrus_collision_check_s1s2(void)
 
     return 0;
 }
+} // end of patch paragraph
+
 
 int starcrus_collision_check_p1p2(void)
 {
@@ -279,32 +313,66 @@ int starcrus_collision_check_p1p2(void)
 	org_y = p1_y;
 
 	if (p1_sprite & 0x08)	/* if p1 is a projectile */
-	{
+	
+{ 
+struct drawgfxParams dgp2={
+	proj1_vid, 	// dest
+	Machine->gfx[(p1_sprite&0x0c)>>2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		/* Draw score/projectile 1 */
-		drawgfx(proj1_vid,
-				Machine->gfx[(p1_sprite&0x0c)>>2],
-				(p1_sprite&0x03)^0x03,
-				0,
-				0,0,
-				p1_x-org_x,p1_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+		
+		dgp2.code = (p1_sprite&0x03)^0x03;
+		dgp2.sx = p1_x-org_x;
+		dgp2.sy = p1_y-org_y;
+		drawgfx(&dgp2);
 	}
+} // end of patch paragraph
+
 
 	if (p2_sprite & 0x08)	/* if p2 is a projectile */
-	{
+	
+{ 
+struct drawgfxParams dgp3={
+	proj2_vid, 	// dest
+	Machine->gfx[4+((p2_sprite&0x0c)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		/* Draw score/projectile 2 */
-		drawgfx(proj2_vid,
-				Machine->gfx[4+((p2_sprite&0x0c)>>2)],
-				(p2_sprite&0x03)^0x03,
-				0,
-				0,0,
-				p2_x-org_x,p2_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+		
+		dgp3.code = (p2_sprite&0x03)^0x03;
+		dgp3.sx = p2_x-org_x;
+		dgp3.sy = p2_y-org_y;
+		drawgfx(&dgp3);
 	}
+} // end of patch paragraph
+
 
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
@@ -324,6 +392,25 @@ int starcrus_collision_check_p1p2(void)
 }
 
 int starcrus_collision_check_s1p1p2(void)
+
+{ 
+struct drawgfxParams dgp4={
+	ship1_vid, 	// dest
+	Machine->gfx[8+((s1_sprite&0x04)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int org_x, org_y;
 	int sx, sy;
@@ -351,43 +438,75 @@ int starcrus_collision_check_s1p1p2(void)
 	org_y = s1_y;
 
 	/* Draw ship 1 */
-    drawgfx(ship1_vid,
-            Machine->gfx[8+((s1_sprite&0x04)>>2)],
-            (s1_sprite&0x03)^0x03,
-            0,
-            (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
-            s1_x-org_x,s1_y-org_y,
-            &clip,
-            TRANSPARENCY_NONE,
-            0);
+    
+    dgp4.code = (s1_sprite&0x03)^0x03;
+    dgp4.flipx = (s1_sprite&0x08)>>3;
+    dgp4.flipy = (s1_sprite&0x10)>>4;
+    dgp4.sx = s1_x-org_x;
+    dgp4.sy = s1_y-org_y;
+    drawgfx(&dgp4);
 
 	if (p1_sprite & 0x08)	/* if p1 is a projectile */
-	{
+	
+{ 
+struct drawgfxParams dgp5={
+	proj1_vid, 	// dest
+	Machine->gfx[(p1_sprite&0x0c)>>2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		/* Draw projectile 1 */
-		drawgfx(proj1_vid,
-				Machine->gfx[(p1_sprite&0x0c)>>2],
-				(p1_sprite&0x03)^0x03,
-				0,
-				0,0,
-				p1_x-org_x,p1_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+		
+		dgp5.code = (p1_sprite&0x03)^0x03;
+		dgp5.sx = p1_x-org_x;
+		dgp5.sy = p1_y-org_y;
+		drawgfx(&dgp5);
 	}
+} // end of patch paragraph
+
 
 	if (p2_sprite & 0x08)	/* if p2 is a projectile */
-	{
+	
+{ 
+struct drawgfxParams dgp6={
+	proj2_vid, 	// dest
+	Machine->gfx[4+((p2_sprite&0x0c)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		/* Draw projectile 2 */
-		drawgfx(proj2_vid,
-				Machine->gfx[4+((p2_sprite&0x0c)>>2)],
-				(p2_sprite&0x03)^0x03,
-				0,
-				0,0,
-				p2_x-org_x,p2_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+		
+		dgp6.code = (p2_sprite&0x03)^0x03;
+		dgp6.sx = p2_x-org_x;
+		dgp6.sy = p2_y-org_y;
+		drawgfx(&dgp6);
 	}
+} // end of patch paragraph
+
 
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
@@ -408,8 +527,29 @@ int starcrus_collision_check_s1p1p2(void)
 
     return 0;
 }
+} // end of patch paragraph
+
 
 int starcrus_collision_check_s2p1p2(void)
+
+{ 
+struct drawgfxParams dgp7={
+	ship2_vid, 	// dest
+	Machine->gfx[10+((s2_sprite&0x04)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int org_x, org_y;
 	int sx, sy;
@@ -437,43 +577,75 @@ int starcrus_collision_check_s2p1p2(void)
 	org_y = s2_y;
 
 	/* Draw ship 2 */
-    drawgfx(ship2_vid,
-            Machine->gfx[10+((s2_sprite&0x04)>>2)],
-            (s2_sprite&0x03)^0x03,
-            0,
-            (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
-            s2_x-org_x,s2_y-org_y,
-            &clip,
-            TRANSPARENCY_NONE,
-            0);
+    
+    dgp7.code = (s2_sprite&0x03)^0x03;
+    dgp7.flipx = (s2_sprite&0x08)>>3;
+    dgp7.flipy = (s2_sprite&0x10)>>4;
+    dgp7.sx = s2_x-org_x;
+    dgp7.sy = s2_y-org_y;
+    drawgfx(&dgp7);
 
 	if (p1_sprite & 0x08)	/* if p1 is a projectile */
-	{
+	
+{ 
+struct drawgfxParams dgp8={
+	proj1_vid, 	// dest
+	Machine->gfx[(p1_sprite&0x0c)>>2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		/* Draw projectile 1 */
-		drawgfx(proj1_vid,
-				Machine->gfx[(p1_sprite&0x0c)>>2],
-				(p1_sprite&0x03)^0x03,
-				0,
-				0,0,
-				p1_x-org_x,p1_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+		
+		dgp8.code = (p1_sprite&0x03)^0x03;
+		dgp8.sx = p1_x-org_x;
+		dgp8.sy = p1_y-org_y;
+		drawgfx(&dgp8);
 	}
+} // end of patch paragraph
+
 
 	if (p2_sprite & 0x08)	/* if p2 is a projectile */
-	{
+	
+{ 
+struct drawgfxParams dgp9={
+	proj2_vid, 	// dest
+	Machine->gfx[4+((p2_sprite&0x0c)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		/* Draw projectile 2 */
-		drawgfx(proj2_vid,
-				Machine->gfx[4+((p2_sprite&0x0c)>>2)],
-				(p2_sprite&0x03)^0x03,
-				0,
-				0,0,
-				p2_x-org_x,p2_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+		
+		dgp9.code = (p2_sprite&0x03)^0x03;
+		dgp9.sx = p2_x-org_x;
+		dgp9.sy = p2_y-org_y;
+		drawgfx(&dgp9);
 	}
+} // end of patch paragraph
+
 
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
@@ -494,54 +666,114 @@ int starcrus_collision_check_s2p1p2(void)
 
     return 0;
 }
+} // end of patch paragraph
+
 
 VIDEO_UPDATE( starcrus )
+
+{ 
+struct drawgfxParams dgp10={
+	bitmap, 	// dest
+	Machine->gfx[8+((s1_sprite&0x04)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp11={
+	bitmap, 	// dest
+	Machine->gfx[10+((s2_sprite&0x04)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp12={
+	bitmap, 	// dest
+	Machine->gfx[(p1_sprite&0x0c)>>2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp13={
+	bitmap, 	// dest
+	Machine->gfx[4+((p2_sprite&0x0c)>>2)], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
     fillbitmap(bitmap,Machine->pens[0],&Machine->visible_area);
 
 	/* Draw ship 1 */
-    drawgfx(bitmap,
-            Machine->gfx[8+((s1_sprite&0x04)>>2)],
-            (s1_sprite&0x03)^0x03,
-            0,
-            (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
-            s1_x,s1_y,
-            &Machine->visible_area,
-            TRANSPARENCY_PEN,
-            0);
+    
+    dgp10.code = (s1_sprite&0x03)^0x03;
+    dgp10.flipx = (s1_sprite&0x08)>>3;
+    dgp10.flipy = (s1_sprite&0x10)>>4;
+    dgp10.sx = s1_x;
+    dgp10.sy = s1_y;
+    drawgfx(&dgp10);
 
 	/* Draw ship 2 */
-    drawgfx(bitmap,
-            Machine->gfx[10+((s2_sprite&0x04)>>2)],
-            (s2_sprite&0x03)^0x03,
-            0,
-            (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
-            s2_x,s2_y,
-            &Machine->visible_area,
-            TRANSPARENCY_PEN,
-            0);
+    
+    dgp11.code = (s2_sprite&0x03)^0x03;
+    dgp11.flipx = (s2_sprite&0x08)>>3;
+    dgp11.flipy = (s2_sprite&0x10)>>4;
+    dgp11.sx = s2_x;
+    dgp11.sy = s2_y;
+    drawgfx(&dgp11);
 
 	/* Draw score/projectile 1 */
-	drawgfx(bitmap,
-            Machine->gfx[(p1_sprite&0x0c)>>2],
-            (p1_sprite&0x03)^0x03,
-            0,
-            0,0,
-            p1_x,p1_y,
-            &Machine->visible_area,
-            TRANSPARENCY_PEN,
-            0);
+	
+	dgp12.code = (p1_sprite&0x03)^0x03;
+	dgp12.sx = p1_x;
+	dgp12.sy = p1_y;
+	drawgfx(&dgp12);
 
 	/* Draw score/projectile 2 */
-	drawgfx(bitmap,
-            Machine->gfx[4+((p2_sprite&0x0c)>>2)],
-            (p2_sprite&0x03)^0x03,
-            0,
-            0,0,
-            p2_x,p2_y,
-            &Machine->visible_area,
-            TRANSPARENCY_PEN,
-            0);
+	
+	dgp13.code = (p2_sprite&0x03)^0x03;
+	dgp13.sx = p2_x;
+	dgp13.sy = p2_y;
+	drawgfx(&dgp13);
 
     /* Collision detection */
 
@@ -570,6 +802,8 @@ VIDEO_UPDATE( starcrus )
     }
 
 }
+} // end of patch paragraph
+
 
 READ8_HANDLER( starcrus_coll_det_r )
 {

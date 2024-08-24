@@ -380,7 +380,7 @@ struct fstr {
 
 
 
-size_t findNextOfInterest(int &type,const fstr &s, size_t istart,const vector<CFileModifier> &extralist)
+size_t findNextOfInterest(int &type,const fstr &s, size_t istart)
 {
     struct CMultiSearchPart {
        std::string _s;
@@ -393,57 +393,40 @@ size_t findNextOfInterest(int &type,const fstr &s, size_t istart,const vector<CF
         {"//",false},
         {"{(",true},
         {"})",true},
+        {"\"",false},
     };
-    blabla
+
  //   size_t ires=string::npos;
     size_t bestindex=string::npos;
     int besttype=-1;
-    int itype=0;
+
+    int icurrenttestedtype=0;
     for(const CMultiSearchPart &p : l)
     {
         size_t ti;
         if(p._anyof)
         {
-            ti = s.find_first_of(p._s,istart,ires);
+            ti = s.find_first_of(p._s,istart,bestindex);
         } else
         {
-            ti = s.find(p._s,istart,ires);
+            ti = s.find(p._s,istart,bestindex);
         }
         if(ti != string::npos) {
-            if(ires == string::npos) {
-                ires = ti;
-                ityperes = itype;
+            if(bestindex == string::npos) {
+                bestindex = ti;
+                besttype = icurrenttestedtype;
             }else
             {
-                if(ti<ires)
+                if(ti<bestindex)
                 {
-                    ires = ti;
-                    ityperes = itype;
+                    bestindex = ti;
+                    besttype = icurrenttestedtype;
                 }
             }
         }
-        itype++;
+        icurrenttestedtype++;
     }
-    for(const CFileModifier &md : extralist)
-    {
-        size_t ti;
-        ti = s.find(md._func,istart,ires);
 
-        if(ti != string::npos) {
-            if(ires == string::npos) {
-                ires = ti;
-                ityperes = itype;
-            }else
-            {
-                if(ti<ires)
-                {
-                    ires = ti;
-                    ityperes = itype;
-                }
-            }
-        }
-        itype++;
-    }
     type = besttype;
     return bestindex;
 
@@ -475,37 +458,37 @@ struct AppliedPatch {
     }
 };
 
-
-
-#define TYPE_MAIN 0
-#define TYPE_BULK 1
-#define TYPE_BRACE 2
-#define TYPE_PAR 3
-#define TYPE_COMMENT 4
-#define TYPE_REPLACEABLECALL 5
-
+enum class BaseType : int {
+    eMain=0,
+    eBulk,
+    eBrace,
+    ePar,
+    eComment,
+    eQuote,
+    eReplaceableCall
+};
 
 struct CFileParse {
-    CFileParse() : _type(TYPE_MAIN)
+    CFileParse() : _type(BaseType::eMain)
     ,_start(0),_end(0),_parType(ParType::eNone)
     , _pParent(nullptr),_pmodsel(nullptr)
     {}
-    CFileParse(int _type, size_t istart, size_t iend,CFileParse *parent)
-     : _type(TYPE_MAIN)
+    CFileParse(BaseType type, size_t istart, size_t iend,CFileParse *parent)
+     : _type(type)
     ,_start(istart),_end(iend),_parType(ParType::eNone)
     , _pParent(parent),_pmodsel(nullptr)
     {}
     size_t parseStruct(const fstr &sfile,size_t ic,int recurse,const vector<CFileModifier> &m);
 
     void modify(const fstr &sfile);
-    void apply(ostream &ofs,const fstr &sfile);
+    void apply(ostream &ofs,const fstr &sfile,size_t imin);
 
 
-    int _type;
+    BaseType _type;
     //std::string _content;
     size_t _start;
     size_t _end;
-    //  if _type == TYPE_PAR, we want to tag "for","while"
+    //  if _type == BaseType::ePar, we want to tag "for","while"
     // if type ==brace , we want to tag "do"
     ParType _parType;
     CFileParse *_pParent;
@@ -604,42 +587,35 @@ void CFileParse::testIfParamsConstant()
 
 size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vector<CFileModifier> &m)
 {
-//    size_t startpar = string::npos;
-//    size_t startbra = string::npos;
-
     while(ic<sfile.length())
     {
-//        size_t i1 = sfile.find("/*",ic);
-//        size_t i2 = sfile.find("//",ic);
-//        size_t i = sfile.find_first_of("{(",ic);
-//        size_t j = sfile.find_first_of("})",ic);
-//        size_t mi = sfile.find(m._func,ic);
-        int typefound;
-        size_t icn = findNextOfInterest(typefound,sfile,ic,{});
+        int typefound; //0 comment 1 comment, 2 par/brace open  3 parbrace close.
+        size_t icn = findNextOfInterest(typefound,sfile,ic);
 
-// i1 != string::npos && i1<i2 && i1<i && i1<j
-        if(typefound == 0)
+        if(typefound == 0) // comment
         {   // comment1 on the way
-            _parts.push_back({TYPE_BULK,ic,icn,this});
+           // if(icn>ic) _parts.push_back({TYPE_BULK,ic,icn,this});
             size_t iend = sfile.find("*/",icn+2);
-            if(iend != string::npos) { _parts.push_back({TYPE_COMMENT,icn,iend+2,this});
-                    icn = iend+2; } else icn = sfile.length();
+            if(iend != string::npos) {
+                _parts.push_back({BaseType::eComment,icn,iend+2,this});
+                    icn = iend+2;
+            } else icn = sfile.length();
         } else
-        if(typefound == 1)
-       // if(i2 != string::npos && i2<i1 && i2<i && i2<j)
+        if(typefound == 1) // comment
         {   // comment2 on the way
-            _parts.push_back({TYPE_BULK,ic,icn,this});
+           // if(icn>ic) _parts.push_back({TYPE_BULK,ic,icn,this});
             size_t iend = sfile.find("\n",icn+2);
-            if(iend != string::npos) { _parts.push_back({TYPE_COMMENT,icn,iend+1,this});
-                    icn = iend+1; } else icn = sfile.length();
+            if(iend != string::npos) {
+                _parts.push_back({BaseType::eComment,icn,iend+1,this});
+                    icn = iend+1;
+            } else icn = sfile.length();
         } else
-        if(typefound == 2)
-       // if(i != string::npos && i<i1 && i<i2 && i<j)
+        if(typefound == 2) // par/brace open
         {   // either ( ot {
             if(sfile[icn]=='(' ) {
                  _parts.push_back(CFileParse());
                 CFileParse &b=_parts.back();
-                b._type = TYPE_PAR;
+                b._type = BaseType::ePar;
                 size_t startpar = icn;
                 b._start = icn;
                 b._end = icn; // will be corrected in parseStruct() recusion.
@@ -657,16 +633,31 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
                     size_t linestart = sfile.rfind_first_of("\r\n",b._start-1);
                     if(linestart != string::npos) b._indent =sfile.substr(linestart+1,b._start-(linestart+1));
 
-                    // got to extend this to next brace.
-                    size_t nextbrace = sfile.find("{",b._end);
-                    if(nextbrace != string::npos)
-                    {
-                        b._type = TYPE_BRACE;
+                    // got to extend this to next brace.... if this loop use brace.
+                    // important to not treat "for() i++;" as recursive
+                    // this was very wrong:
+                   // size_t nextbrace = sfile.find("{",b._end);
+                    //if(nextbrace != string::npos)
+
+                     size_t inextbrace = b._end;
+                     char c = sfile[inextbrace];
+                     while(c == ' ' ||
+                           c == '\t' ||
+                           c == '\r' ||
+                          c == '\n'
+                           )
+                     {  inextbrace++;
+                         c =  sfile[inextbrace];
+                     }
+
+                    if(sfile[inextbrace] == '{') {
+                        b._type = BaseType::eBrace;
                         //  b._parType will keep "for" and "while" spec.
                         // this will move b._end accordingly matching comments and recursion:
-                        icn = b.parseStruct(sfile,nextbrace+1,recurse+1,m);
-
+                        icn = b.parseStruct(sfile,inextbrace+1,recurse+1,m);
                     }
+
+
                }
 
                 if(b._parType == ParType::eFoundCall)
@@ -683,7 +674,7 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
             if(sfile[icn]=='{' ) {
                 _parts.push_back(CFileParse());
                CFileParse &b=_parts.back();
-               b._type = TYPE_BRACE;
+               b._type = BaseType::eBrace;
                b._start = icn;
                b._end = icn; // will be corrected in parseStruct() recusion.
                b._pParent = this;
@@ -705,13 +696,13 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
 
         } // end if ({
         else
-        if(typefound == 3)
-        //if(j != string::npos && j<i1 && j<i2 && j<i)
+        if(typefound == 3) //  par/brace close
         {   // either ( ot {
             if(sfile[icn]==')' ) {
-                if(_type == TYPE_PAR)
+                if(_type == BaseType::ePar)
                 {
                    _end = icn+1;
+
                 } else {
                     size_t line,col, line_s,col_s;
                     sfile.getPosition(line,col,icn);
@@ -727,14 +718,15 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
                         cout << "parent: end l:"<<linep2 << " c:"<<colp2 << endl;
 
 
-                    }
+                    }                                        
                 }
+
                 return icn+1;
-               // _parts.push_back({TYPE_COMMENT,sfile.substr(i+1}
+               // _parts.push_back({BaseType::eComment,sfile.substr(i+1}
               //  startpar = i;
             }
             if(sfile[icn]=='}' ) {
-                if(_type == TYPE_BRACE)
+                if(_type == BaseType::eBrace)
                 {
                    _end = icn+1;
                 } else {
@@ -756,8 +748,15 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
                 }
                 return icn+1;
             }
+        } else if(typefound == 4) // quotes
+        {
+            //
+         //no need  if(icn>ic) _parts.push_back({TYPE_BULK,ic,icn,this}); // put what was before
+            size_t iend = sfile.find("\"",icn+1); // find end of quote
+            if(iend != string::npos) { _parts.push_back({BaseType::eQuote,icn,iend+1,this});
+                    icn = iend+1; } else icn = sfile.length();
         } else
-        if(typefound > 3)
+        if(typefound > 4)
         {
             //printf("found drawgfx\n");
           //  m[typefound-4]._nbfuncfound++;
@@ -766,7 +765,7 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
         }
         else {
            // printf("end file\n");
-           _parts.push_back({TYPE_BULK,ic,sfile.length(),this});
+           _parts.push_back({BaseType::eBulk,ic,sfile.length(),this});
            icn = sfile.length();
         }
         ic = icn;
@@ -782,7 +781,7 @@ void CFileParse::modify(const fstr &sfile)
         p._pParent = this;
         p.modify(sfile);
     }
-    if(_type == TYPE_PAR &&
+    if(_type == BaseType::ePar &&
         _parType == ParType::eFoundCall)
     {
         // search immediate external loop
@@ -879,11 +878,26 @@ void CFileParse::modify(const fstr &sfile)
 }
 
 // recreate source with modifiers.
-void CFileParse::apply(ostream &ofs,const fstr &sfile)
+void CFileParse::apply(ostream &ofs,const fstr &sfile,size_t imin)
 {
     if(_prepatch.length()>0) ofs << _prepatch;
 
+    // dbg
+    if(_pParent)
+    {
+        if(_start<_pParent->_start )
+        {
+            cout << "woot?" << endl;
+        }
+        if(_end>_pParent->_end )
+        {
+            cout << "rewoot?" << endl;
+        }
+    }
+
+
     size_t i=_start;
+    if(imin>i) i=imin;
     if(_parts.size()==0)
     {
         for( ; i<_end ; i++)
@@ -906,7 +920,7 @@ void CFileParse::apply(ostream &ofs,const fstr &sfile)
                 ofs << p._replacement ;
             }
         } else{
-            p.apply(ofs,sfile);
+            p.apply(ofs,sfile,i);
         }
         i = p._end;
     }
@@ -1068,12 +1082,12 @@ cout << "check: " <<ofilepath << endl;
         modifiers.push_back(drawgfxModifier);
     }
     CFileParse fp;
-    fp._type = TYPE_MAIN;
+    fp._type = BaseType::eMain;
     fp._start = 0;
     fp._end = bfile._b.size()-1;
     fp.parseStruct(bfile,0,0,modifiers);
 
-//Re    fp.modify(bfile);
+    fp.modify(bfile);
     bool didchange=false;
     for(const CFileModifier &m : modifiers)
     {
@@ -1091,10 +1105,10 @@ cout << "check: " <<ofilepath << endl;
         }
         cout << endl;
     }
- //   if(didchange)
+    if(didchange)
     {
         ofstream ofs(nfilepath);
-        fp.apply(ofs,bfile);
+        fp.apply(ofs,bfile,0);
     }
     return didchange;
 }
@@ -1103,36 +1117,40 @@ int main(int argc, char **argv)
 {
 
 //#if (__cplusplus > 201402L)
-    string sdir =sourcebase+"vidhrdw2";
+    string sdir =sourcebase+"drivers2";
    // stringstream ssgit;
    ofstream gitofs("gitcommands.sh");
 
 //re
-//    for (const auto & entry : fs::directory_iterator(sdir))
-//    {
-//        string sname =  entry.path().filename().string();
-//        if(sname == "battlane.c" ||
-//sname == "bogeyman.c" ||
-//sname == "ddragon.c" ||
-//sname == "ddragon3.c" ||
-//sname == "dogfgt.c" ||
-////sname == "generic.c" ||
-//sname == "matmania.c"
-//        ) continue;
-////        "battlane.c","bogeyman.c","ddragon.c","ddragon3.c","dogfgt.c","generic.c","matmania.c",
-//        if(sname.rfind(".c") != sname.length()-2) continue;
-//        string ofilepath = sourcebase+"vidhrdw2/" + sname;
-//        string nfilepath = sourcebase+"vidhrdw/" + sname;
-//        bool didchange = changeapi(ofilepath,nfilepath);
-//        if(didchange) {
-//            gitofs << "git add vidhrdw/"<<sname<<"\n";
-//        }
+    for (const auto & entry : fs::directory_iterator(sdir))
+    {
+        string sname =  entry.path().filename().string();
+        if(sname == "battlane.c" ||
+sname == "bogeyman.c" ||
+sname == "ddragon.c" ||
+sname == "ddragon3.c" ||
+sname == "dogfgt.c" ||
+//sname == "generic.c" ||
+sname == "matmania.c"
+        ) continue;
+//        "battlane.c","bogeyman.c","ddragon.c","ddragon3.c","dogfgt.c","generic.c","matmania.c",
+        if(sname.rfind(".c") != sname.length()-2) continue;
+        string ofilepath = sourcebase+"drivers2/" + sname;
+        string nfilepath = sourcebase+"drivers/" + sname;
+        bool didchange = changeapi(ofilepath,nfilepath);
+        if(didchange) {
+            gitofs << "git add drivers/"<<sname<<"\n";
+        }
 
-//    }
+    }
 
-    string ofilepath = sourcebase+"vidhrdw2/" + "40love.c";
-    string nfilepath = sourcebase+"vidhrdw/" + "40love.c";
-    changeapi(ofilepath,nfilepath);
+//    string ofilepath = sourcebase+"vidhrdw2/" + "40love.c";
+//    string nfilepath = sourcebase+"vidhrdw/" + "40love.c";
+
+//    string ofilepath = sourcebase+"vidhrdw/" + "test.c";
+//    string nfilepath = sourcebase+"vidhrdw/" + "testn.c";
+
+//    changeapi(ofilepath,nfilepath);
 
 //#else
 //    DIR *dir;

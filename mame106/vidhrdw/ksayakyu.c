@@ -73,7 +73,26 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	const unsigned char *finish = spriteram;
 
 	while( source>=finish ) /* is order correct ? */
-	{
+	
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		int sx=source[2];
 		int sy=240-source[1];
 		int attributes=source[3];
@@ -91,15 +110,19 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 			flipy^=1;
 		}
 
-			drawgfx(bitmap,gfx,
-				tile&0x7f,
-				(attributes) & 7,
-				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0 );
+			
+			dgp0.code = tile&0x7f;
+			dgp0.color = (attributes) & 7;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 
 		source -= 4;
 	}
+} // end of patch paragraph
+
 }
 
 VIDEO_START(ksayakyu)

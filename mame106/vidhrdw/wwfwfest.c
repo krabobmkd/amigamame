@@ -205,17 +205,129 @@ static void wwfwfest_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 
 			for (count=0;count<chain;count++) {
 				if (flip_screen) {
-					if (!flipy) {
-						drawgfx(bitmap,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+(16*(chain-1))-(16*count),cliprect,TRANSPARENCY_PEN,0);
-					} else {
-						drawgfx(bitmap,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+16*count,cliprect,TRANSPARENCY_PEN,0);
+					if (!flipy) 
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+						
+						dgp0.code = number+count;
+						dgp0.color = colourbank;
+						dgp0.flipx = flipx;
+						dgp0.flipy = flipy;
+						dgp0.sx = xpos;
+						dgp0.sy = ypos+(16*(chain-1))-(16*count);
+						drawgfx(&dgp0);
 					}
+} // end of patch paragraph
+ 
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else {
+						
+						dgp1.code = number+count;
+						dgp1.color = colourbank;
+						dgp1.flipx = flipx;
+						dgp1.flipy = flipy;
+						dgp1.sx = xpos;
+						dgp1.sy = ypos+16*count;
+						drawgfx(&dgp1);
+					}
+} // end of patch paragraph
+
 				} else {
-						if (flipy) {
-						drawgfx(bitmap,gfx,number+count,colourbank,flipx,flipy,xpos,ypos-(16*(chain-1))+(16*count),cliprect,TRANSPARENCY_PEN,0);
-					} else {
-						drawgfx(bitmap,gfx,number+count,colourbank,flipx,flipy,xpos,ypos-16*count,cliprect,TRANSPARENCY_PEN,0);
+						if (flipy) 
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+						
+						dgp2.code = number+count;
+						dgp2.color = colourbank;
+						dgp2.flipx = flipx;
+						dgp2.flipy = flipy;
+						dgp2.sx = xpos;
+						dgp2.sy = ypos-(16*(chain-1))+(16*count);
+						drawgfx(&dgp2);
 					}
+} // end of patch paragraph
+ 
+{ 
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else {
+						
+						dgp3.code = number+count;
+						dgp3.color = colourbank;
+						dgp3.flipx = flipx;
+						dgp3.flipy = flipy;
+						dgp3.sx = xpos;
+						dgp3.sy = ypos-16*count;
+						drawgfx(&dgp3);
+					}
+} // end of patch paragraph
+
 				}
 			}
 		}

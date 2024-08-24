@@ -279,6 +279,25 @@ WRITE8_HANDLER( mpatrol_flipscreen_w )
 
 
 static void draw_background(mame_bitmap *bitmap, int xpos, int ypos, int image)
+
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[image], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	rectangle rect;
 
@@ -288,23 +307,19 @@ static void draw_background(mame_bitmap *bitmap, int xpos, int ypos, int image)
 		ypos = 255 - ypos - BGHEIGHT;
 	}
 
-	drawgfx(bitmap, Machine->gfx[image],
-		0, 0,
-		flip_screen,
-		flip_screen,
-		xpos,
-		ypos,
-		&Machine->visible_area,
-		TRANSPARENCY_PEN, 0);
+	
+	dgp0.flipx = flip_screen;
+	dgp0.flipy = flip_screen;
+	dgp0.sx = xpos;
+	dgp0.sy = ypos;
+	drawgfx(&dgp0);
 
-	drawgfx(bitmap, Machine->gfx[image],
-		0, 0,
-		flip_screen,
-		flip_screen,
-		xpos - 256,
-		ypos,
-		&Machine->visible_area,
-		TRANSPARENCY_PEN, 0);
+	
+	dgp0.flipx = flip_screen;
+	dgp0.flipy = flip_screen;
+	dgp0.sx = xpos - 256;
+	dgp0.sy = ypos;
+	drawgfx(&dgp0);
 
 	rect.min_x = Machine->visible_area.min_x;
 	rect.max_x = Machine->visible_area.max_x;
@@ -322,6 +337,8 @@ static void draw_background(mame_bitmap *bitmap, int xpos, int ypos, int image)
 
 	fillbitmap(bitmap, Machine->gfx[image]->colortable[3], &rect);
 }
+} // end of patch paragraph
+
 
 
 
@@ -353,6 +370,25 @@ VIDEO_UPDATE( mpatrol )
 
 	/* draw the sprites */
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		512+32, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
@@ -377,11 +413,15 @@ VIDEO_UPDATE( mpatrol )
 
 		sy++; /* odd */
 
-		drawgfx(bitmap, Machine->gfx[1],
-			spriteram[offs + 2],
-			spriteram[offs + 1] & 0x3f,
-			flipx, flipy,
-			sx, sy,
-			cliprect, TRANSPARENCY_COLOR, 512+32);
+		
+		dgp2.code = spriteram[offs + 2];
+		dgp2.color = spriteram[offs + 1] & 0x3f;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }

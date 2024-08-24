@@ -107,6 +107,25 @@ static void srmp2_draw_sprites(mame_bitmap *bitmap)
 	xoffs	=	flip ? 0x10 : 0x10;
 	yoffs	=	flip ? 0x05 : 0x07;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = (0x400-2)/2; offs >= 0/2; offs -= 2/2)
 	{
 		int code	=	src[offs + 0x000/2];
@@ -130,14 +149,17 @@ static void srmp2_draw_sprites(mame_bitmap *bitmap)
 
 		if (srmp2_color_bank) color |= 0x20;
 
-		drawgfx(bitmap, Machine->gfx[0],
-				code,
-				color,
-				flipx, flipy,
-				(x + xoffs) & 0x1ff,
-				max_y - ((y + yoffs) & 0x0ff),
-				&Machine->visible_area, TRANSPARENCY_PEN, 15);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = (x + xoffs) & 0x1ff;
+		dgp0.sy = max_y - ((y + yoffs) & 0x0ff);
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -165,6 +187,25 @@ static void srmp3_draw_sprites_map(mame_bitmap *bitmap)
 	if (numcol == 1)	numcol = 16;
 
 	/* The first column is the frontmost, see twineagl test mode */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		\					&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (col = numcol - 1; col >= 0; col--)
 	{
 		int x	=	spriteram[(col * 0x20 + 0x08 + 0x400)/2] & 0xff;
@@ -196,12 +237,14 @@ static void srmp3_draw_sprites_map(mame_bitmap *bitmap)
 			code = code & 0x1fff;
 
 #define DRAWTILE(_x_, _y_)  \
-			drawgfx(bitmap, Machine->gfx[0], \
-					code, \
-					color, \
-					flipx, flipy, \
-					_x_, _y_, \
-					&Machine->visible_area, TRANSPARENCY_PEN, 0);
+			
+			dgp1.code = \					code;
+			dgp1.color = \					color;
+			dgp1.flipx = \					flipx;
+			dgp1.flipy = flipy;
+			dgp1.sx = \					_x_;
+			dgp1.sy = _y_;
+			drawgfx(&dgp1);
 
 			DRAWTILE(sx - 0x000, sy + 0x000)
 			DRAWTILE(sx - 0x200, sy + 0x000)
@@ -211,6 +254,8 @@ static void srmp3_draw_sprites_map(mame_bitmap *bitmap)
 		}
 		/* next column */
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -264,6 +309,25 @@ static void srmp3_draw_sprites(mame_bitmap *bitmap)
 	xoffs	=	flip ? 0x10 : 0x10;
 	yoffs	=	flip ? 0x06 : 0x06;
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x200 - 1; offs >= 0; offs--)
 	{
 		int code	=	(((spriteram_3[offs + 0x000] & 0xff) << 8) + (spriteram_2[offs + 0x000] & 0xff));
@@ -287,14 +351,17 @@ static void srmp3_draw_sprites(mame_bitmap *bitmap)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				code,
-				color,
-				flipx, flipy,
-				(x + xoffs) & 0x1ff,
-				max_y - ((y + yoffs) & 0x0ff),
-				&Machine->visible_area, TRANSPARENCY_PEN, 0);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = (x + xoffs) & 0x1ff;
+		dgp2.sy = max_y - ((y + yoffs) & 0x0ff);
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -327,6 +394,25 @@ static void mjyuugi_draw_sprites_map(mame_bitmap *bitmap)
 	if (numcol == 1)	numcol = 16;
 
 	/* The first column is the frontmost, see twineagl test mode */
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		\					&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (col = numcol - 1; col >= 0; col--)
 	{
 		int x	=	spriteram16[(col * 0x20 + 0x08 + 0x400)/2] & 0xff;
@@ -360,12 +446,14 @@ static void mjyuugi_draw_sprites_map(mame_bitmap *bitmap)
 			code	=	(code & 0x3fff) + (gfxbank ? 0x4000 : 0);
 
 #define DRAWTILE(_x_, _y_)  \
-			drawgfx(bitmap, Machine->gfx[0], \
-					code, \
-					color, \
-					flipx, flipy, \
-					_x_, _y_, \
-					&Machine->visible_area, TRANSPARENCY_PEN, 0);
+			
+			dgp3.code = \					code;
+			dgp3.color = \					color;
+			dgp3.flipx = \					flipx;
+			dgp3.flipy = flipy;
+			dgp3.sx = \					_x_;
+			dgp3.sy = _y_;
+			drawgfx(&dgp3);
 
 			DRAWTILE(sx - 0x000, sy + 0x000)
 			DRAWTILE(sx - 0x200, sy + 0x000)
@@ -375,6 +463,8 @@ static void mjyuugi_draw_sprites_map(mame_bitmap *bitmap)
 		}
 		/* next column */
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -420,6 +510,25 @@ static void mjyuugi_draw_sprites(mame_bitmap *bitmap)
 	xoffs	=	flip ? 0x10 : 0x10;
 	yoffs	=	flip ? 0x06 : 0x06;
 
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = (0x400 - 6) / 2; offs >= 0 / 2; offs -= 2 / 2)
 	{
 		int code	=	src[offs + 0x000 / 2];
@@ -444,14 +553,17 @@ static void mjyuugi_draw_sprites(mame_bitmap *bitmap)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				code,
-				color,
-				flipx, flipy,
-				(x + xoffs) & 0x1ff,
-				max_y - ((y + yoffs) & 0x0ff),
-				&Machine->visible_area, TRANSPARENCY_PEN, 0);
+		
+		dgp4.code = code;
+		dgp4.color = color;
+		dgp4.flipx = flipx;
+		dgp4.flipy = flipy;
+		dgp4.sx = (x + xoffs) & 0x1ff;
+		dgp4.sy = max_y - ((y + yoffs) & 0x0ff);
+		drawgfx(&dgp4);
 	}
+	} // end of patch paragraph
+
 }
 
 

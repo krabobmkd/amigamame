@@ -95,6 +95,25 @@ static void draw_layer(mame_bitmap *bitmap,int gfx,const unsigned char *scroll,
 	scrollx = scroll[0] + (scroll[1] << 8);
 	scrolly = scroll[3] + (scroll[4] << 8);
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		transparency, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x100;offs += 2)
 	{
 		int sx,sy,code,color,attr,flipx,flipy;
@@ -115,23 +134,50 @@ static void draw_layer(mame_bitmap *bitmap,int gfx,const unsigned char *scroll,
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,transparency,15);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		{
-			drawgfx(bitmap,Machine->gfx[gfx],
-					code,
-					color,
-					flipx,flipy,
-					sx,((sy + 0x20) & 0xff) - 0x20,
-					&Machine->visible_area,transparency,15);
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[gfx], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	transparency, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp1.code = code;
+			dgp1.color = color;
+			dgp1.flipx = flipx;
+			dgp1.flipy = flipy;
+			dgp1.sx = sx;
+			dgp1.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
+	} // end of patch paragraph
+
 }
 
 static void bluehawk_draw_layer(mame_bitmap *bitmap,int gfx,const unsigned char *scroll,
@@ -143,6 +189,25 @@ static void bluehawk_draw_layer(mame_bitmap *bitmap,int gfx,const unsigned char 
 	scrollx = scroll[0] + (scroll[1] << 8);
 	scrolly = scroll[3] + (scroll[4] << 8);
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		transparency, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x100;offs += 2)
 	{
 		int sx,sy,code,color,attr,flipx,flipy;
@@ -163,23 +228,50 @@ static void bluehawk_draw_layer(mame_bitmap *bitmap,int gfx,const unsigned char 
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,transparency,15);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		{
-			drawgfx(bitmap,Machine->gfx[gfx],
-					code,
-					color,
-					flipx,flipy,
-					sx,((sy + 0x20) & 0xff) - 0x20,
-					&Machine->visible_area,transparency,15);
+		
+{ 
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	Machine->gfx[gfx], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	transparency, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp3.code = code;
+			dgp3.color = color;
+			dgp3.flipx = flipx;
+			dgp3.flipy = flipy;
+			dgp3.sx = sx;
+			dgp3.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp3);
 		}
+} // end of patch paragraph
+
 	}
+	} // end of patch paragraph
+
 }
 
 static void bluehawk_draw_layer2(mame_bitmap *bitmap,int gfx,const unsigned char *scroll,
@@ -191,6 +283,25 @@ static void bluehawk_draw_layer2(mame_bitmap *bitmap,int gfx,const unsigned char
 	scrollx = scroll[0] + (scroll[1] << 8);
 	scrolly = scroll[3] + (scroll[4] << 8);
 
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		transparency, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x100;offs += 2)
 	{
 		int sx,sy,code,color,attr,flipx,flipy;
@@ -211,23 +322,50 @@ static void bluehawk_draw_layer2(mame_bitmap *bitmap,int gfx,const unsigned char
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,transparency,15);
+		
+		dgp4.code = code;
+		dgp4.color = color;
+		dgp4.flipx = flipx;
+		dgp4.flipy = flipy;
+		dgp4.sx = sx;
+		dgp4.sy = sy;
+		drawgfx(&dgp4);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		{
-			drawgfx(bitmap,Machine->gfx[gfx],
-					code,
-					color,
-					flipx,flipy,
-					sx,((sy + 0x20) & 0xff) - 0x20,
-					&Machine->visible_area,transparency,15);
+		
+{ 
+struct drawgfxParams dgp5={
+	bitmap, 	// dest
+	Machine->gfx[gfx], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	transparency, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp5.code = code;
+			dgp5.color = color;
+			dgp5.flipx = flipx;
+			dgp5.flipy = flipy;
+			dgp5.sx = sx;
+			dgp5.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp5);
 		}
+} // end of patch paragraph
+
 	}
+	} // end of patch paragraph
+
 }
 
 static void rshark_draw_layer(mame_bitmap *bitmap,int gfx,UINT16 *scroll,
@@ -239,6 +377,25 @@ static void rshark_draw_layer(mame_bitmap *bitmap,int gfx,UINT16 *scroll,
 	scrollx = (scroll[0]&0xff) + ((scroll[1]&0xff) << 8);
 	scrolly = (scroll[3]&0xff) + ((scroll[4]&0xff) << 8);
 
+	
+	{ 
+	struct drawgfxParams dgp6={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		transparency, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x800;offs += 2)
 	{
 		int sx,sy,code,color,attr,attr2,flipx,flipy;
@@ -261,13 +418,17 @@ static void rshark_draw_layer(mame_bitmap *bitmap,int gfx,UINT16 *scroll,
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,transparency,15);
+		
+		dgp6.code = code;
+		dgp6.color = color;
+		dgp6.flipx = flipx;
+		dgp6.flipy = flipy;
+		dgp6.sx = sx;
+		dgp6.sy = sy;
+		drawgfx(&dgp6);
 	}
+	} // end of patch paragraph
+
 }
 
 static void popbingo_draw_layer(mame_bitmap *bitmap,int gfx,UINT16 *scroll,
@@ -280,6 +441,25 @@ static void popbingo_draw_layer(mame_bitmap *bitmap,int gfx,UINT16 *scroll,
 	scrollx = scroll[0] + (scroll[1] << 8);
 	scrolly = scroll[3] + (scroll[4] << 8);
 
+	
+	{ 
+	struct drawgfxParams dgp7={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		transparency, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x100;offs += 2)
 	{
 		int sx,sy,code,color,attr,flipx,flipy;
@@ -300,23 +480,50 @@ static void popbingo_draw_layer(mame_bitmap *bitmap,int gfx,UINT16 *scroll,
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,transparency,15);
+		
+		dgp7.code = code;
+		dgp7.color = color;
+		dgp7.flipx = flipx;
+		dgp7.flipy = flipy;
+		dgp7.sx = sx;
+		dgp7.sy = sy;
+		drawgfx(&dgp7);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		{
-			drawgfx(bitmap,Machine->gfx[gfx],
-					code,
-					color,
-					flipx,flipy,
-					sx,((sy + 0x20) & 0xff) - 0x20,
-					&Machine->visible_area,transparency,15);
+		
+{ 
+struct drawgfxParams dgp8={
+	bitmap, 	// dest
+	Machine->gfx[gfx], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	transparency, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp8.code = code;
+			dgp8.color = color;
+			dgp8.flipx = flipx;
+			dgp8.flipy = flipy;
+			dgp8.sx = sx;
+			dgp8.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp8);
 		}
+} // end of patch paragraph
+
 	}
+	} // end of patch paragraph
+
 
 }
 
@@ -330,6 +537,25 @@ static void flytiger_draw_layer2(mame_bitmap *bitmap,int gfx,const unsigned char
 	scrollx = scroll[0] + (scroll[1] << 8);
 	scrolly = scroll[3] + (scroll[4] << 8);
 
+	
+	{ 
+	struct drawgfxParams dgp9={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		transparency, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x100;offs += 2)
 	{
 		int sx,sy,code,color,attr,flipx,flipy;
@@ -351,29 +577,75 @@ static void flytiger_draw_layer2(mame_bitmap *bitmap,int gfx,const unsigned char
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,transparency,15);
+		
+		dgp9.code = code;
+		dgp9.color = color;
+		dgp9.flipx = flipx;
+		dgp9.flipy = flipy;
+		dgp9.sx = sx;
+		dgp9.sy = sy;
+		drawgfx(&dgp9);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		{
-			drawgfx(bitmap,Machine->gfx[gfx],
-					code,
-					color,
-					flipx,flipy,
-					sx,((sy + 0x20) & 0xff) - 0x20,
-					&Machine->visible_area,transparency,15);
+		
+{ 
+struct drawgfxParams dgp10={
+	bitmap, 	// dest
+	Machine->gfx[gfx], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	transparency, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp10.code = code;
+			dgp10.color = color;
+			dgp10.flipx = flipx;
+			dgp10.flipy = flipy;
+			dgp10.sx = sx;
+			dgp10.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp10);
 		}
+} // end of patch paragraph
+
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_tx(mame_bitmap *bitmap,int yoffset)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp11={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x800;offs++)
 	{
 		int sx,sy,attr;
@@ -387,19 +659,42 @@ static void draw_tx(mame_bitmap *bitmap,int yoffset)
 			sy = 31 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				lastday_txvideoram[offs] | ((attr & 0x0f) << 8),
-				(attr & 0xf0) >> 4,
-				flip_screen,flip_screen,
-				8*sx,8*(sy + yoffset),
-				&Machine->visible_area,TRANSPARENCY_PEN,15);
+		
+		dgp11.code = lastday_txvideoram[offs] | ((attr & 0x0f) << 8);
+		dgp11.color = (attr & 0xf0) >> 4;
+		dgp11.flipx = flip_screen;
+		dgp11.flipy = flip_screen;
+		dgp11.sx = 8*sx;
+		dgp11.sy = 8*(sy + yoffset);
+		drawgfx(&dgp11);
 	}
+	} // end of patch paragraph
+
 }
 
 static void bluehawk_draw_tx(mame_bitmap *bitmap)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp12={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x1000;offs += 2)
 	{
 		int sx,sy,attr;
@@ -413,19 +708,42 @@ static void bluehawk_draw_tx(mame_bitmap *bitmap)
 			sy = 31 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				lastday_txvideoram[offs] | ((attr & 0x0f) << 8),
-				(attr & 0xf0) >> 4,
-				flip_screen,flip_screen,
-				8*sx,8*sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,15);
+		
+		dgp12.code = lastday_txvideoram[offs] | ((attr & 0x0f) << 8);
+		dgp12.color = (attr & 0xf0) >> 4;
+		dgp12.flipx = flip_screen;
+		dgp12.flipy = flip_screen;
+		dgp12.sx = 8*sx;
+		dgp12.sy = 8*sy;
+		drawgfx(&dgp12);
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_sprites(mame_bitmap *bitmap,int pollux_extensions)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp13={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size-32;offs >= 0;offs -= 32)
 	{
 		int sx,sy,code,color;
@@ -475,14 +793,18 @@ static void draw_sprites(mame_bitmap *bitmap,int pollux_extensions)
 
 		for (y = 0;y <= height;y++)
 		{
-			drawgfx(bitmap,Machine->gfx[1],
-					code+y,
-					color,
-					flipx,flipy,
-					sx,flipy ? sy + 16*(height-y) : sy + 16*y,
-					&Machine->visible_area,TRANSPARENCY_PEN,15);
+			
+			dgp13.code = code+y;
+			dgp13.color = color;
+			dgp13.flipx = flipx;
+			dgp13.flipy = flipy;
+			dgp13.sx = sx;
+			dgp13.sy = flipy ? sy + 16*(height-y) : sy + 16*y;
+			drawgfx(&dgp13);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void rshark_draw_sprites(mame_bitmap *bitmap)
@@ -511,21 +833,43 @@ static void rshark_draw_sprites(mame_bitmap *bitmap)
 				flipy = !flipy;
 			}
 
+			
+			{ 
+			struct drawgfxParams dgp14={
+				bitmap, 	// dest
+				Machine->gfx[0], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				&Machine->visible_area, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				15, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (y = 0;y <= height;y++)
 			{
 				for (x = 0;x <= width;x++)
 				{
-					drawgfx(bitmap,Machine->gfx[0],
-							code,
-							color,
-							flipx,flipy,
-							flipx ? sx + 16*(width-x) : sx + 16*x,
-							flipy ? sy + 16*(height-y) : sy + 16*y,
-							&Machine->visible_area,TRANSPARENCY_PEN,15);
+					
+					dgp14.code = code;
+					dgp14.color = color;
+					dgp14.flipx = flipx;
+					dgp14.flipy = flipy;
+					dgp14.sx = flipx ? sx + 16*(width-x) : sx + 16*x;
+					dgp14.sy = flipy ? sy + 16*(height-y) : sy + 16*y;
+					drawgfx(&dgp14);
 
 					code++;
 				}
 			}
+			} // end of patch paragraph
+
 		}
 	}
 }

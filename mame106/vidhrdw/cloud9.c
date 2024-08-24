@@ -255,6 +255,25 @@ VIDEO_UPDATE( cloud9 )
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE,0);
 
 	/* draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 20;offs++)
 	{
 		int spritenum;
@@ -270,13 +289,17 @@ VIDEO_UPDATE( cloud9 )
 		x = spriteram[offs + 0x60];
 		y = 240 - spriteram[offs];
 
-		drawgfx(bitmap,Machine->gfx[2],
-				spritenum,
-				1 + ((*cloud9_color_bank & 0x80) >> 6),
-				xflip,yflip,
-				x,y,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = spritenum;
+		dgp0.color = 1 + ((*cloud9_color_bank & 0x80) >> 6);
+		dgp0.flipx = xflip;
+		dgp0.flipy = yflip;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_START( cloud9 )

@@ -141,6 +141,25 @@ static void psikyosh_drawbglayer( int layer, mame_bitmap *bitmap, const rectangl
 
 	if((bank>=0x0c) && (bank<=0x1f)) /* shouldn't happen, 20 banks of 0x800 bytes */
 	{
+		
+		{ 
+		struct drawgfxParams dgp0={
+			bitmap, 	// dest
+			gfx, 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			trans, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (sy=0; sy<size; sy++)
 		{
 			for (sx=0; sx<32; sx++)
@@ -150,17 +169,39 @@ static void psikyosh_drawbglayer( int layer, mame_bitmap *bitmap, const rectangl
 				tileno = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 				colour = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0xff000000) >> 24;
 
-				drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* normal */
+				
+				dgp0.code = tileno;
+				dgp0.color = colour;
+				dgp0.sx = (16*sx+scrollx)&0x1ff;
+				dgp0.sy = ((16*sy+scrolly)&(width-1));
+				drawgfx(&dgp0); /* normal */
 				if(scrollx)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* wrap x */
+					
+					dgp0.code = tileno;
+					dgp0.color = colour;
+					dgp0.sx = ((16*sx+scrollx)&0x1ff)-0x200;
+					dgp0.sy = ((16*sy+scrolly)&(width-1));
+					drawgfx(&dgp0); /* wrap x */
 				if(scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap y */
+					
+					dgp0.code = tileno;
+					dgp0.color = colour;
+					dgp0.sx = (16*sx+scrollx)&0x1ff;
+					dgp0.sy = ((16*sy+scrolly)&(width-1))-width;
+					drawgfx(&dgp0); /* wrap y */
 				if(scrollx && scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap xy */
+					
+					dgp0.code = tileno;
+					dgp0.color = colour;
+					dgp0.sx = ((16*sx+scrollx)&0x1ff)-0x200;
+					dgp0.sy = ((16*sy+scrolly)&(width-1))-width;
+					drawgfx(&dgp0); /* wrap xy */
 
 				offs++;
 			}
 		}
+		} // end of patch paragraph
+
 	}
 }
 
@@ -198,6 +239,25 @@ static void psikyosh_drawbglayertext( int layer, mame_bitmap *bitmap, const rect
 
 	if((bank>=0x0c) && (bank<=0x1f)) { /* shouldn't happen, 20 banks of 0x800 bytes */
 		offs=0;
+		
+		{ 
+		struct drawgfxParams dgp4={
+			bitmap, 	// dest
+			gfx, 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			trans, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for ( sy=0; sy<size; sy++) {
 			for (sx=0; sx<32; sx++)	{
 				int tileno, colour;
@@ -205,16 +265,38 @@ static void psikyosh_drawbglayertext( int layer, mame_bitmap *bitmap, const rect
 				tileno = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 				colour = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0xff000000) >> 24;
 
-				drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* normal */
+				
+				dgp4.code = tileno;
+				dgp4.color = colour;
+				dgp4.sx = (16*sx+scrollx)&0x1ff;
+				dgp4.sy = ((16*sy+scrolly)&(width-1));
+				drawgfx(&dgp4); /* normal */
 				if(scrollx)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* wrap x */
+					
+					dgp4.code = tileno;
+					dgp4.color = colour;
+					dgp4.sx = ((16*sx+scrollx)&0x1ff)-0x200;
+					dgp4.sy = ((16*sy+scrolly)&(width-1));
+					drawgfx(&dgp4); /* wrap x */
 				if(scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap y */
+					
+					dgp4.code = tileno;
+					dgp4.color = colour;
+					dgp4.sx = (16*sx+scrollx)&0x1ff;
+					dgp4.sy = ((16*sy+scrolly)&(width-1))-width;
+					drawgfx(&dgp4); /* wrap y */
 				if(scrollx && scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap xy */
+					
+					dgp4.code = tileno;
+					dgp4.color = colour;
+					dgp4.sx = ((16*sx+scrollx)&0x1ff)-0x200;
+					dgp4.sy = ((16*sy+scrolly)&(width-1))-width;
+					drawgfx(&dgp4); /* wrap xy */
 
 				offs++;
-	}}}
+	}}
+		} // end of patch paragraph
+}
 
 	/* Use first values from the second set of scroll values */
 	bank    = (psikyosh_bgram[(scrollbank*0x800)/4 + 0x400/4 + 0x20/4 - 0x4000/4] & 0x000000ff) >> 0;
@@ -235,6 +317,25 @@ static void psikyosh_drawbglayertext( int layer, mame_bitmap *bitmap, const rect
 
 	if((bank>=0x0c) && (bank<=0x1f)) { /* shouldn't happen, 20 banks of 0x800 bytes */
 		offs=0;
+		
+		{ 
+		struct drawgfxParams dgp8={
+			bitmap, 	// dest
+			gfx, 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			trans, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for ( sy=0; sy<size; sy++) {
 			for (sx=0; sx<32; sx++) {
 				int tileno, colour;
@@ -242,16 +343,38 @@ static void psikyosh_drawbglayertext( int layer, mame_bitmap *bitmap, const rect
 				tileno = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 				colour = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0xff000000) >> 24;
 
-				drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* normal */
+				
+				dgp8.code = tileno;
+				dgp8.color = colour;
+				dgp8.sx = (16*sx+scrollx)&0x1ff;
+				dgp8.sy = ((16*sy+scrolly)&(width-1));
+				drawgfx(&dgp8); /* normal */
 				if(scrollx)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* wrap x */
+					
+					dgp8.code = tileno;
+					dgp8.color = colour;
+					dgp8.sx = ((16*sx+scrollx)&0x1ff)-0x200;
+					dgp8.sy = ((16*sy+scrolly)&(width-1));
+					drawgfx(&dgp8); /* wrap x */
 				if(scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap y */
+					
+					dgp8.code = tileno;
+					dgp8.color = colour;
+					dgp8.sx = (16*sx+scrollx)&0x1ff;
+					dgp8.sy = ((16*sy+scrolly)&(width-1))-width;
+					drawgfx(&dgp8); /* wrap y */
 				if(scrollx && scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap xy */
+					
+					dgp8.code = tileno;
+					dgp8.color = colour;
+					dgp8.sx = ((16*sx+scrollx)&0x1ff)-0x200;
+					dgp8.sy = ((16*sy+scrolly)&(width-1))-width;
+					drawgfx(&dgp8); /* wrap xy */
 
 				offs++;
-	}}}
+	}}
+		} // end of patch paragraph
+}
 }
 
 /* Row Scroll and/or Column Scroll/Zoom, has per-column Alpha/Bank/Priority. This isn't correct, just testing */
@@ -304,6 +427,25 @@ static void psikyosh_drawbglayerscroll( int layer, mame_bitmap *bitmap, const re
 #endif
 
 		offs=0;
+		
+		{ 
+		struct drawgfxParams dgp12={
+			bitmap, 	// dest
+			gfx, 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			trans, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for ( sy=0; sy<size; sy++)
 		{
 			for (sx=0; sx<32; sx++)
@@ -315,17 +457,39 @@ static void psikyosh_drawbglayerscroll( int layer, mame_bitmap *bitmap, const re
 
 //              drawgfx(zoom_bitmap,gfx,tileno,colour,0,0,(16*sx)&0x1ff,((16*sy)&(width-1)),NULL,TRANSPARENCY_PEN,0);
 
-				drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* normal */
+				
+				dgp12.code = tileno;
+				dgp12.color = colour;
+				dgp12.sx = (16*sx+scrollx)&0x1ff;
+				dgp12.sy = ((16*sy+scrolly)&(width-1));
+				drawgfx(&dgp12); /* normal */
 				if(scrollx)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* wrap x */
+					
+					dgp12.code = tileno;
+					dgp12.color = colour;
+					dgp12.sx = ((16*sx+scrollx)&0x1ff)-0x200;
+					dgp12.sy = ((16*sy+scrolly)&(width-1));
+					drawgfx(&dgp12); /* wrap x */
 				if(scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap y */
+					
+					dgp12.code = tileno;
+					dgp12.color = colour;
+					dgp12.sx = (16*sx+scrollx)&0x1ff;
+					dgp12.sy = ((16*sy+scrolly)&(width-1))-width;
+					drawgfx(&dgp12); /* wrap y */
 				if(scrollx && scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap xy */
+					
+					dgp12.code = tileno;
+					dgp12.color = colour;
+					dgp12.sx = ((16*sx+scrollx)&0x1ff)-0x200;
+					dgp12.sy = ((16*sy+scrolly)&(width-1))-width;
+					drawgfx(&dgp12); /* wrap xy */
 
 				offs++;
 			}
 		}
+		} // end of patch paragraph
+
 		/* Only ever seems to use one linescroll value, ok for now */
 		/* Disabled for now, as they doesn't even support alpha :( */
 //      copyscrollbitmap(bitmap,zoom_bitmap,1,bg_scrollx,512,bg_scrolly,cliprect,TRANSPARENCY_PEN,0);

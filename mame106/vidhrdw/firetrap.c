@@ -241,53 +241,107 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 
 		if (spriteram[offs + 1] & 0x10)	/* double width */
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			if (flip_screen) sy -= 16;
 
-			drawgfx(bitmap,Machine->gfx[3],
-					code & ~1,
-					color,
-					flipx,flipy,
-					sx,flipy ? sy : sy + 16,
-					cliprect,TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,Machine->gfx[3],
-					code | 1,
-					color,
-					flipx,flipy,
-					sx,flipy ? sy + 16 : sy,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = code & ~1;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = flipy ? sy : sy + 16;
+			drawgfx(&dgp0);
+			
+			dgp0.code = code | 1;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = flipy ? sy + 16 : sy;
+			drawgfx(&dgp0);
 
 			/* redraw with wraparound */
-			drawgfx(bitmap,Machine->gfx[3],
-					code & ~1,
-					color,
-					flipx,flipy,
-					sx - 256,flipy ? sy : sy + 16,
-					cliprect,TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,Machine->gfx[3],
-					code | 1,
-					color,
-					flipx,flipy,
-					sx - 256,flipy ? sy + 16 : sy,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = code & ~1;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx - 256;
+			dgp0.sy = flipy ? sy : sy + 16;
+			drawgfx(&dgp0);
+			
+			dgp0.code = code | 1;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx - 256;
+			dgp0.sy = flipy ? sy + 16 : sy;
+			drawgfx(&dgp0);
 		}
-		else
+} // end of patch paragraph
+
+		
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 		{
-			drawgfx(bitmap,Machine->gfx[3],
-					code,
-					color,
-					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp4.code = code;
+			dgp4.color = color;
+			dgp4.flipx = flipx;
+			dgp4.flipy = flipy;
+			dgp4.sx = sx;
+			dgp4.sy = sy;
+			drawgfx(&dgp4);
 
 			/* redraw with wraparound */
-			drawgfx(bitmap,Machine->gfx[3],
-					code,
-					color,
-					flipx,flipy,
-					sx - 256,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp4.code = code;
+			dgp4.color = color;
+			dgp4.flipx = flipx;
+			dgp4.flipy = flipy;
+			dgp4.sx = sx - 256;
+			dgp4.sy = sy;
+			drawgfx(&dgp4);
 		}
+} // end of patch paragraph
+
 	}
 }
 

@@ -99,6 +99,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 {
 	int offs,fx,fy,x,y,color,sprite;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 3;offs <= 0x400-5;offs += 4)
 	{
 		UINT16 data = buffered_spriteram16[offs+2];
@@ -131,11 +150,17 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 
 		y = 256-(y+7);
 
-		drawgfx(bitmap,Machine->gfx[0],
-				sprite,
-				color,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,15);
+		
+		dgp0.code = sprite;
+		dgp0.color = color;
+		dgp0.flipx = fx;
+		dgp0.flipy = fy;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 

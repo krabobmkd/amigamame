@@ -311,6 +311,25 @@ static void equites_draw_scroll(mame_bitmap *bitmap)
 		dispx -= 0x10;
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i=0; i<255; i++)
 	{
 		skipx = i & 0x0f;
@@ -325,13 +344,17 @@ static void equites_draw_scroll(mame_bitmap *bitmap)
 		x = (skipx<<4) - dispx + BMPAD;
 		y = skipy - dispy + BMPAD;
 
-		drawgfx( bitmap,
-			 Machine->gfx[bank],
-			 tile, color,
-			 fx, fy,
-			 x, y,
-			 0, TRANSPARENCY_NONE, 0);
+		
+		dgp0.code = tile;
+		dgp0.color = color;
+		dgp0.flipx = fx;
+		dgp0.flipy = fy;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 
 #undef TILE_BANKBASE
 }
@@ -354,7 +377,26 @@ static void equites_draw_sprites(mame_bitmap *bitmap)
 	{
 		encode = *(sptr + 1);
 		if (encode)
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			bank = (encode>>8 & 0x01) + SPRITE_BANKBASE;
 			gfx = Machine->gfx[bank];
 			tile = encode & 0xff;
@@ -371,13 +413,17 @@ static void equites_draw_sprites(mame_bitmap *bitmap)
 			if (absx >= 248) absx -= 256;
 			if (absy >= 248) absy -= 256;
 
-			drawgfx(bitmap,
-				gfx,
-				tile, color,
-				fx, fy,
-				absx + BMPAD, absy + BMPAD,
-				0, TRANSPARENCY_PEN, 0);
+			
+			dgp1.code = tile;
+			dgp1.color = color;
+			dgp1.flipx = fx;
+			dgp1.flipy = fy;
+			dgp1.sx = absx + BMPAD;
+			dgp1.sy = absy + BMPAD;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 
 #undef SHIFTY
@@ -420,7 +466,26 @@ static void splndrbt_draw_scroll(mame_bitmap *bitmap)
 
 	for (i=0; i<0x400; i++)
 	if (dirtybuf[i])
-	{
+	
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[bank], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		dirtybuf[i] = 0;
 
 		x = (i & 0x1f) << 4;
@@ -434,13 +499,17 @@ static void splndrbt_draw_scroll(mame_bitmap *bitmap)
 		fx = data & 4;
 		fy = data & 2;
 
-		drawgfx(bitmap,
-			Machine->gfx[bank],
-			tile, color,
-			fx, fy,
-			x, y,
-			0, TRANSPARENCY_NONE, 0);
+		
+		dgp2.code = tile;
+		dgp2.color = color;
+		dgp2.flipx = fx;
+		dgp2.flipy = fy;
+		dgp2.sx = x;
+		dgp2.sy = y;
+		drawgfx(&dgp2);
 	}
+} // end of patch paragraph
+
 
 #undef TILE_BANKBASE
 }

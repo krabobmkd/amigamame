@@ -597,7 +597,26 @@ static void bootleg_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect
 	while( source>finish )
 	{
 		UINT8 attributes = source[3]; /* PBxF ?xxX */
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int number = source[0];
 			int x = source[2] - 71 + (attributes & 0x01)*256;
 			int y = 242 - source[1];
@@ -615,12 +634,16 @@ static void bootleg_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect
 //          if(combasc_vreg == 0x23 && (attributes & 0x02)) color += 1*16;
 //          if(combasc_vreg == 0x66 ) color += 2*16;
 
-			drawgfx( bitmap, gfx,
-				number, color,
-				attributes & 0x10,0, /* flip */
-				x,y,
-				cliprect, TRANSPARENCY_PEN, 15 );
+			
+			dgp0.code = number;
+			dgp0.color = color;
+			dgp0.flipx = attributes & 0x10;
+			dgp0.sx = /* flip */				x;
+			dgp0.sy = y;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 		source -= 8;
 	}
 }

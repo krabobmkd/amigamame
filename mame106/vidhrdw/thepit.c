@@ -210,7 +210,26 @@ static void drawtiles(mame_bitmap *bitmap,int priority)
 
 		if ((priority == 0 && dirtybuffer[offs]) ||
 				(priority == 1 && bgcolor != 0 && (colorram[offs] & 0x80) == 0))
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	priority == 0 ? tmpbitmap : bitmap, 	// dest
+	Machine->gfx[bank], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,code,bank,color;
 
 
@@ -242,13 +261,17 @@ static void drawtiles(mame_bitmap *bitmap,int priority)
 					colortable[color * Machine->gfx[bank]->color_granularity] =
 					Machine->pens[bgcolor];
 
-			drawgfx(priority == 0 ? tmpbitmap : bitmap,Machine->gfx[bank],
-					code,
-					color,
-					flip_screen_x,flip_screen_y,
-					8*sx,sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = code;
+			dgp0.color = color;
+			dgp0.flipx = flip_screen_x;
+			dgp0.flipy = flip_screen_y;
+			dgp0.sx = 8*sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 
 
@@ -287,7 +310,26 @@ static void drawsprites(mame_bitmap *bitmap,int priority)
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (((spriteram[offs + 2] & 0x08) >> 3) == priority)
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[graphics_bank | 1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	flip_screen_x & 1 ? &spritevisibleareaflipx : &spritevisiblearea, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,flipx,flipy;
 
 
@@ -318,13 +360,17 @@ static void drawsprites(mame_bitmap *bitmap,int priority)
 			/* Sprites 0-3 are drawn one pixel to the left */
 			if (offs <= 3*4) sy++;
 
-			drawgfx(bitmap,Machine->gfx[graphics_bank | 1],
-					spriteram[offs + 1] & 0x3f,
-					spriteram[offs + 2] & 0x07,
-					flipx,flipy,
-					sx,sy,
-					flip_screen_x & 1 ? &spritevisibleareaflipx : &spritevisiblearea,TRANSPARENCY_PEN,0);
+			
+			dgp1.code = spriteram[offs + 1] & 0x3f;
+			dgp1.color = spriteram[offs + 2] & 0x07;
+			dgp1.flipx = flipx;
+			dgp1.flipy = flipy;
+			dgp1.sx = sx;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 }
 

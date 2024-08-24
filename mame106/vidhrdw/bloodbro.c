@@ -157,6 +157,25 @@ WRITE16_HANDLER( bloodbro_txvideoram_w )
 static void bloodbro_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri_mask 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
 	{
 		int sx,sy,x,y,width,height,attributes,tile_number,color,flipx,flipy,pri_mask;
@@ -181,16 +200,19 @@ static void bloodbro_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		{
 			for (y = 0;y <= height;y++)
 			{
-				pdrawgfx(bitmap,Machine->gfx[3],
-						tile_number++,
-						color,
-						flipx,flipy,
-						flipx ? (sx + 16*(width-x)) : (sx + 16*x),flipy ? (sy + 16*(height-y)) : (sy + 16*y),
-						cliprect,TRANSPARENCY_PEN,15,
-						pri_mask);
+				
+				dgp0.code = tile_number++;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = flipx ? (sx + 16*(width-x)) : (sx + 16*x);
+				dgp0.sy = flipy ? (sy + 16*(height-y)) : (sy + 16*y);
+				drawgfx(&dgp0);
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /* SPRITE INFO (8 bytes)
@@ -206,6 +228,25 @@ static void weststry_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 	int offs;
 
 	/* TODO: the last two entries are not sprites - control registers? */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri_mask 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2 - 8;offs += 4)
 	{
 		int data = spriteram16[offs+2];
@@ -225,14 +266,17 @@ static void weststry_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		/* Remap code 0x800 <-> 0x1000 */
 		code = (code&0x7ff) | ((code&0x800)<<1) | ((code&0x1000)>>1);
 
-		pdrawgfx(bitmap,Machine->gfx[3],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,15,
-				pri_mask);
+		
+		dgp1.code = code;
+		dgp1.color = color;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 

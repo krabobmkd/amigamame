@@ -214,20 +214,42 @@ static void ddribble_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 			static int y_offset[2] = { 0x00, 0x02 };
 			int x,y, ex, ey;
 
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				gfx, 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for( y=0; y < height; y++ ){
 				for( x=0; x < width; x++ ){
 					ex = flipx ? (width-1-x) : x;
 					ey = flipy ? (height-1-y) : y;
 
-					drawgfx(bitmap,gfx,
-						(number)+x_offset[ex]+y_offset[ey],
-						color,
-						flipx, flipy,
-						sx+x*16,sy+y*16,
-						cliprect,
-						TRANSPARENCY_PEN, 0);
+					
+					dgp0.code = (number)+x_offset[ex]+y_offset[ey];
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx+x*16;
+					dgp0.sy = sy+y*16;
+					drawgfx(&dgp0);
 				}
 			}
+			} // end of patch paragraph
+
 		}
 		source += 5;
 	}

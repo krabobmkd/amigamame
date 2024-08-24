@@ -99,7 +99,26 @@ VIDEO_UPDATE( xxmissio )
 				offs = (size-1)-offs;
 
 			if (dirtybuffer[offs] != 0)
-			{
+			
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				dirtybuffer[offs]=0;
 
 				px = x*16;
@@ -110,13 +129,17 @@ VIDEO_UPDATE( xxmissio )
 				chr = chr + ((col & 0xc0) << 2 );
 				col = col & 0x0f;
 
-				drawgfx(tmpbitmap,Machine->gfx[2],
-					chr,
-					col,
-					flipscreen,flipscreen,
-					px,py,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+				
+				dgp0.code = chr;
+				dgp0.color = col;
+				dgp0.flipx = flipscreen;
+				dgp0.flipy = flipscreen;
+				dgp0.sx = px;
+				dgp0.sy = py;
+				drawgfx(&dgp0);
 			}
+} // end of patch paragraph
+
 		}
 	}
 
@@ -136,6 +159,25 @@ VIDEO_UPDATE( xxmissio )
 
 /* draw sprites */
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs=0; offs<spriteram_size; offs +=32)
 	{
 		chr = spriteram[offs];
@@ -163,25 +205,50 @@ VIDEO_UPDATE( xxmissio )
 
 		px &= 0x1ff;
 
-		drawgfx(bitmap,Machine->gfx[1],
-			chr,
-			col,
-			fx,fy,
-			px,py,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = chr;
+		dgp1.color = col;
+		dgp1.flipx = fx;
+		dgp1.flipy = fy;
+		dgp1.sx = px;
+		dgp1.sy = py;
+		drawgfx(&dgp1);
 		if (px>0x1e0)
-			drawgfx(bitmap,Machine->gfx[1],
-				chr,
-				col,
-				fx,fy,
-				px-0x200,py,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp1.code = chr;
+			dgp1.color = col;
+			dgp1.flipx = fx;
+			dgp1.flipy = fy;
+			dgp1.sx = px-0x200;
+			dgp1.sy = py;
+			drawgfx(&dgp1);
 
 	}
+	} // end of patch paragraph
+
 
 
 /* draw FG layer */
 
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (y=4; y<28; y++)
 	{
 		for (x=0; x<32; x++)
@@ -201,13 +268,17 @@ VIDEO_UPDATE( xxmissio )
 				py = 248-8*y;
 			}
 
-			drawgfx(bitmap,Machine->gfx[0],
-				chr,
-				col,
-				flipscreen,flipscreen,
-				px,py,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp3.code = chr;
+			dgp3.color = col;
+			dgp3.flipx = flipscreen;
+			dgp3.flipy = flipscreen;
+			dgp3.sx = px;
+			dgp3.sy = py;
+			drawgfx(&dgp3);
 		}
 	}
+	} // end of patch paragraph
+
 
 }

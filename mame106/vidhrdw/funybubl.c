@@ -45,6 +45,25 @@ static void funybubl_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 	UINT8 *finish = source - 0x1000;
 
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		255, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source>finish )
 	{
 		int xpos, ypos, tile;
@@ -73,10 +92,16 @@ static void funybubl_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 		if (source[1] & 0x20) {	if (xpos < 0xe0) xpos += 0x100; }
 		// bits 0x40 and 0x10 not used?...
 
-		drawgfx(bitmap,Machine->gfx[1],tile,0,0,0,xpos,ypos,cliprect,TRANSPARENCY_PEN,255);
+		
+		dgp0.code = tile;
+		dgp0.sx = xpos;
+		dgp0.sy = ypos;
+		drawgfx(&dgp0);
 
 		source -= 0x20;
 	}
+	} // end of patch paragraph
+
 
 }
 
@@ -91,6 +116,25 @@ VIDEO_UPDATE(funybubl)
 
 
 	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (y = 0; y < 32; y++)
 	{
 		for (x = 0; x< 64; x++)
@@ -98,10 +142,17 @@ VIDEO_UPDATE(funybubl)
 			int data;
 
 			data = funybubl_banked_videoram[offs] | (funybubl_banked_videoram[offs+1] << 8);
-			drawgfx(bitmap,Machine->gfx[0],data&0x7fff,(data&0x8000)?2:1,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp1.code = data&0x7fff;
+			dgp1.color = (data&0x8000)?2:1;
+			dgp1.sx = x*8;
+			dgp1.sy = y*8;
+			drawgfx(&dgp1);
 			offs+=2;
 		}
 	}
+	} // end of patch paragraph
+
 
 	funybubl_drawsprites(bitmap,cliprect);
 

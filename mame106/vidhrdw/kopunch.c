@@ -120,6 +120,25 @@ VIDEO_UPDATE( kopunch )
 	tilemap_draw(bitmap, &Machine->visible_area, bg_tilemap, 0, 0);
 	//tilemap_draw(bitmap, &Machine->visible_area, fg_tilemap, 0, 0);
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 1023;offs >= 0;offs--)
 	{
 		int sx,sy;
@@ -127,11 +146,13 @@ VIDEO_UPDATE( kopunch )
 		sx = offs % 16;
 		sy = offs / 16;
 
-		drawgfx(bitmap,Machine->gfx[1],
-				(kopunch_videoram2[offs] & 0x7f) + 128 * gfxbank,
-				0,
-				0,gfxflip,
-				8*(sx+8)+scroll[0],8*(8+(gfxflip ? 15-sy : sy))+scroll[1],
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = (kopunch_videoram2[offs] & 0x7f) + 128 * gfxbank;
+		dgp0.flipy = gfxflip;
+		dgp0.sx = 8*(sx+8)+scroll[0];
+		dgp0.sy = 8*(8+(gfxflip ? 15-sy : sy))+scroll[1];
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }

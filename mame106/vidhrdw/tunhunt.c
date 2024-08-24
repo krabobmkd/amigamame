@@ -353,23 +353,62 @@ static void draw_shell(
 		int vstop,
 		int vstretch,
 		int hstretch )
+
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	if( hstretch )
 	{
 		int sx,sy;
+		
+		{ 
+		struct drawgfxParams dgp0={
+			bitmap, 	// dest
+			Machine->gfx[1], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for( sx=0; sx<256; sx+=16 )
 		{
 			for( sy=0; sy<256; sy+=16 )
 			{
-				drawgfx( bitmap, Machine->gfx[1],
-					picture_code,
-					0, /* color */
-					0,0, /* flip */
-					sx,sy,
-					&Machine->visible_area,
-					TRANSPARENCY_PEN,0 );
+				
+				dgp0.code = picture_code;
+				dgp0.flipx = /* color */					0;
+				dgp0.sx = /* flip */					sx;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 			}
 		}
+		} // end of patch paragraph
+
 	}
 	else
 	/*
@@ -387,14 +426,15 @@ static void draw_shell(
             vstop       = 0x00
 
     */
-	drawgfx( bitmap, Machine->gfx[1],
-			picture_code,
-			0, /* color */
-			0,0, /* flip */
-			255-hposition-16,vstart-32,
-			&Machine->visible_area,
-			TRANSPARENCY_PEN,0 );
+	
+	dgp1.code = picture_code;
+	dgp1.flipx = /* color */			0;
+	dgp1.sx = /* flip */			255-hposition-16;
+	dgp1.sy = vstart-32;
+	drawgfx(&dgp1);
 }
+} // end of patch paragraph
+
 
 VIDEO_UPDATE( tunhunt )
 {

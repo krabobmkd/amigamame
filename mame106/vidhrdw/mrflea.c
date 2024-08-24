@@ -41,25 +41,46 @@ static void draw_sprites( mame_bitmap *bitmap ){
 	rectangle clip = Machine->visible_area;
 	clip.max_x -= 24;
 	clip.min_x += 16;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish ){
 		int xpos = source[1]-3;
 		int ypos = source[0]-16+3;
 		int tile_number = source[2]+source[3]*0x100;
 
-		drawgfx( bitmap, gfx,
-			tile_number,
-			0, /* color */
-			0,0, /* no flip */
-			xpos,ypos,
-			&clip,TRANSPARENCY_PEN,0 );
-		drawgfx( bitmap, gfx,
-			tile_number,
-			0, /* color */
-			0,0, /* no flip */
-			xpos,256+ypos,
-			&clip,TRANSPARENCY_PEN,0 );
+		
+		dgp0.code = tile_number;
+		dgp0.flipx = /* color */			0;
+		dgp0.sx = /* no flip */			xpos;
+		dgp0.sy = ypos;
+		drawgfx(&dgp0);
+		
+		dgp0.code = tile_number;
+		dgp0.flipx = /* color */			0;
+		dgp0.sx = /* no flip */			xpos;
+		dgp0.sy = 256+ypos;
+		drawgfx(&dgp0);
 		source+=4;
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_background( mame_bitmap *bitmap ){
@@ -69,19 +90,39 @@ static void draw_background( mame_bitmap *bitmap ){
 	int base = 0;
 	if( mrflea_gfx_bank&0x04 ) base |= 0x400;
 	if( mrflea_gfx_bank&0x10 ) base |= 0x200;
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		/* no clip */				TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( sy=0; sy<256; sy+=8 ){
 		for( sx=0; sx<256; sx+=8 ){
 			int tile_number = base+source[0]+source[0x400]*0x100;
 			source++;
-			drawgfx( bitmap, gfx,
-				tile_number,
-				0, /* color */
-				0,0, /* no flip */
-				sx,sy,
-				0, /* no clip */
-				TRANSPARENCY_NONE,0 );
+			
+			dgp2.code = tile_number;
+			dgp2.flipx = /* color */				0;
+			dgp2.sx = /* no flip */				sx;
+			dgp2.sy = sy;
+			drawgfx(&dgp2);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_START( mrflea ){

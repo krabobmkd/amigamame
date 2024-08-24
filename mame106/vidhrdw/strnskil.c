@@ -94,6 +94,25 @@ static void strnskil_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x60; offs < 0x100; offs += 4)
 	{
 		int code = spriteram[offs + 1];
@@ -121,13 +140,17 @@ static void strnskil_draw_sprites( mame_bitmap *bitmap )
 		if (sx > 248)
 			sx = sx - 256;
 
-		drawgfx(bitmap, Machine->gfx[1],
-			code, color,
-			flipx, flipy,
-			px, py,
-			&Machine->visible_area,
-			TRANSPARENCY_COLOR, 0);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = px;
+		dgp0.sy = py;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( strnskil )

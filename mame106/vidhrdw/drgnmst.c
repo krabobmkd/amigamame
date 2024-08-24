@@ -74,6 +74,25 @@ static void drgnmst_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	UINT16 *source = spriteram16;
 	UINT16 *finish = source + 0x800/2;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int xpos, ypos, number, flipx,flipy,wide,high;
@@ -106,13 +125,22 @@ static void drgnmst_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				realy = ypos+incy*y;
 				realnumber = number+x+y*16;
 
-				drawgfx(bitmap,gfx,realnumber,colr,flipx,flipy,realx,realy,cliprect,TRANSPARENCY_PEN,15);
+				
+				dgp0.code = realnumber;
+				dgp0.color = colr;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = realx;
+				dgp0.sy = realy;
+				drawgfx(&dgp0);
 
 			}
 		}
 
 		source+=4;
 	}
+	} // end of patch paragraph
+
 }
 
 

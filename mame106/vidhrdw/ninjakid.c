@@ -216,6 +216,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect ){
 
 	const gfx_element *gfx = Machine->gfx[2];
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish ){
 		int tile_number = source[0];
 		int sx = source[1];
@@ -232,30 +251,28 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect ){
 			flipy = !flipy;
 		}
 
-		drawgfx(
-			bitmap,
-			gfx,
-			tile_number,
-			color,
-			flipx,flipy,
-			sx,sy,
-			cliprect,
-			TRANSPARENCY_PEN,0
-		);
+		
+		dgp0.code = tile_number;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 		if (sx>240)
-			drawgfx(
-				bitmap,
-				gfx,
-				tile_number,
-				color,
-				flipx,flipy,
-				sx-256,sy,
-				cliprect,
-				TRANSPARENCY_PEN,0
-			);
+			
+			dgp0.code = tile_number;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx-256;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 
 		source+=0x20;
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( ninjakid )
@@ -276,7 +293,26 @@ VIDEO_UPDATE( ninjakid )
 			chr +=  (col & 0x20) << 3;
 
 			if ((col & 0x10) == 0)
-			{
+			
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 
 				if (flipscreen==0)
 				{
@@ -289,13 +325,17 @@ VIDEO_UPDATE( ninjakid )
 					py = 248-8*y;
 				}
 
-				drawgfx(bitmap,Machine->gfx[0],
-					chr,
-					col & 0x0f,
-					flipscreen,flipscreen,
-					px,py,
-					cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp2.code = chr;
+				dgp2.color = col & 0x0f;
+				dgp2.flipx = flipscreen;
+				dgp2.flipy = flipscreen;
+				dgp2.sx = px;
+				dgp2.sy = py;
+				drawgfx(&dgp2);
 			}
+} // end of patch paragraph
+
 		}
 	}
 

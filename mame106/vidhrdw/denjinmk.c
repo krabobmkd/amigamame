@@ -305,26 +305,74 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			if(!fy)
 			{
 				for (ax=0; ax<dx; ax++)
+					
+					{ 
+					struct drawgfxParams dgp0={
+						bitmap, 	// dest
+						Machine->gfx[3], 	// gfx
+						0, 	// code
+						0, 	// color
+						0, 	// flipx
+						0, 	// flipy
+						0, 	// sx
+						0, 	// sy
+						cliprect, 	// clip
+						TRANSPARENCY_PEN, 	// transparency
+						15, 	// transparent_color
+						0, 	// scalex
+						0, 	// scaley
+						priority_bitmap, 	// pri_buffer
+						pri_mask 	// priority_mask
+					  };
 					for (ay=0; ay<dy; ay++)
 					{
-					  pdrawgfx(bitmap,Machine->gfx[3],
-					  sprite++,
-                      color,fx,fy,(x+ax*16)+denjinmk_sprite_xoffs,y+ay*16+denjinmk_sprite_yoffs,
-					  cliprect,TRANSPARENCY_PEN,15,
-					  pri_mask);
+					  
+					  dgp0.code = sprite++;
+					  dgp0.color = color;
+					  dgp0.flipx = fx;
+					  dgp0.flipy = fy;
+					  dgp0.sx = (x+ax*16)+denjinmk_sprite_xoffs;
+					  dgp0.sy = y+ay*16+denjinmk_sprite_yoffs;
+					  drawgfx(&dgp0);
 					}
+					} // end of patch paragraph
+
 			}
 			else
 			{
 				for (ax=0; ax<dx; ax++)
+					
+					{ 
+					struct drawgfxParams dgp1={
+						bitmap, 	// dest
+						Machine->gfx[3], 	// gfx
+						0, 	// code
+						0, 	// color
+						0, 	// flipx
+						0, 	// flipy
+						0, 	// sx
+						0, 	// sy
+						cliprect, 	// clip
+						TRANSPARENCY_PEN, 	// transparency
+						15, 	// transparent_color
+						0, 	// scalex
+						0, 	// scaley
+						priority_bitmap, 	// pri_buffer
+						pri_mask 	// priority_mask
+					  };
 					for (ay=0; ay<dy; ay++)
 					{
-					  pdrawgfx(bitmap,Machine->gfx[3],
-					  sprite++,
-					  color,fx,fy,(x+ax*16)+denjinmk_sprite_xoffs,y+(dy-ay-1)*16+denjinmk_sprite_yoffs,
-					  cliprect,TRANSPARENCY_PEN,15,
-					  pri_mask);
+					  
+					  dgp1.code = sprite++;
+					  dgp1.color = color;
+					  dgp1.flipx = fx;
+					  dgp1.flipy = fy;
+					  dgp1.sx = (x+ax*16)+denjinmk_sprite_xoffs;
+					  dgp1.sy = y+(dy-ay-1)*16+denjinmk_sprite_yoffs;
+					  drawgfx(&dgp1);
 					}
+					} // end of patch paragraph
+
 			}
 		}
 		else
@@ -332,27 +380,75 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			if(!fy)
 			{
 				for (ax=0; ax<dx; ax++)
+					
+					{ 
+					struct drawgfxParams dgp2={
+						bitmap, 	// dest
+						Machine->gfx[3], 	// gfx
+						0, 	// code
+						0, 	// color
+						0, 	// flipx
+						0, 	// flipy
+						0, 	// sx
+						0, 	// sy
+						cliprect, 	// clip
+						TRANSPARENCY_PEN, 	// transparency
+						15, 	// transparent_color
+						0, 	// scalex
+						0, 	// scaley
+						priority_bitmap, 	// pri_buffer
+						pri_mask 	// priority_mask
+					  };
 					for (ay=0; ay<dy; ay++)
 					{
-						pdrawgfx(bitmap,Machine->gfx[3],
-					    sprite++,
-					    color,fx,fy,(x+(dx-ax-1)*16)+denjinmk_sprite_xoffs,y+ay*16+denjinmk_sprite_yoffs,
-					    cliprect,TRANSPARENCY_PEN,15,
-						pri_mask);
+						
+						dgp2.code = sprite++;
+						dgp2.color = color;
+						dgp2.flipx = fx;
+						dgp2.flipy = fy;
+						dgp2.sx = (x+(dx-ax-1)*16)+denjinmk_sprite_xoffs;
+						dgp2.sy = y+ay*16+denjinmk_sprite_yoffs;
+						drawgfx(&dgp2);
 					}
+					} // end of patch paragraph
+
 			}
 			else
 			{
 				for (ax=0; ax<dx; ax++)
+					
+					{ 
+					struct drawgfxParams dgp3={
+						bitmap, 	// dest
+						Machine->gfx[3], 	// gfx
+						0, 	// code
+						0, 	// color
+						0, 	// flipx
+						0, 	// flipy
+						0, 	// sx
+						0, 	// sy
+						cliprect, 	// clip
+						TRANSPARENCY_PEN, 	// transparency
+						15, 	// transparent_color
+						0, 	// scalex
+						0, 	// scaley
+						priority_bitmap, 	// pri_buffer
+						pri_mask 	// priority_mask
+					  };
 					for (ay=0; ay<dy; ay++)
 					{
-						pdrawgfx(bitmap,Machine->gfx[3],
-					    sprite++,
-					    color,fx,fy,(x+(dx-ax-1)*16)+denjinmk_sprite_xoffs,y+(dy-ay-1)*16+denjinmk_sprite_yoffs,
-					    cliprect,TRANSPARENCY_PEN,15,
-						pri_mask);
+						
+						dgp3.code = sprite++;
+						dgp3.color = color;
+						dgp3.flipx = fx;
+						dgp3.flipy = fy;
+						dgp3.sx = (x+(dx-ax-1)*16)+denjinmk_sprite_xoffs;
+						dgp3.sy = y+(dy-ay-1)*16+denjinmk_sprite_yoffs;
+						drawgfx(&dgp3);
 						
 					}
+					} // end of patch paragraph
+
 			}
 		}
 	}

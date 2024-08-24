@@ -117,6 +117,25 @@ static void targeth_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	int i;
 	const gfx_element *gfx = Machine->gfx[0];
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 3; i < (0x1000 - 6)/2; i += 4){
 		int sx = targeth_spriteram[i+2] & 0x03ff;
 		int sy = (240 - (targeth_spriteram[i] & 0x00ff)) & 0x00ff;
@@ -127,11 +146,17 @@ static void targeth_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
 
-		drawgfx(bitmap,gfx,number,
-				0x20 + color,xflip,yflip,
-				sx - 0x0f,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = number;
+		dgp0.color = 0x20 + color;
+		dgp0.flipx = xflip;
+		dgp0.flipy = yflip;
+		dgp0.sx = sx - 0x0f;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 /***************************************************************************

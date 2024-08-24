@@ -118,6 +118,25 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* rect)
 {
 	int i;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		rect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 16; i++)
 	{
 		UINT8 code = sprint8_pos_d_ram[i];
@@ -130,13 +149,17 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* rect)
 			x |= 0x100;
 		}
 
-		drawgfx(bitmap, Machine->gfx[2],
-			code ^ 7,
-			i,
-			!(code & 0x10), !(code & 0x08),
-			496 - x, y - 31,
-			rect, TRANSPARENCY_PEN, 0);
+		
+		dgp0.code = code ^ 7;
+		dgp0.color = i;
+		dgp0.flipx = !(code & 0x10);
+		dgp0.flipy = !(code & 0x08);
+		dgp0.sx = 496 - x;
+		dgp0.sy = y - 31;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 

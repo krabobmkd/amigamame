@@ -227,24 +227,74 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 		if (!fx)
 		{
 			for (ax=0; ax<dx; ax++)
+				
+				{ 
+				struct drawgfxParams dgp0={
+					bitmap, 	// dest
+					Machine->gfx[3], 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					cliprect, 	// clip
+					TRANSPARENCY_PEN, 	// transparency
+					15, 	// transparent_color
+					0, 	// scalex
+					0, 	// scaley
+					NULL, 	// pri_buffer
+					0 	// priority_mask
+				  };
 				for (ay=0; ay<dy; ay++)
 				{
-					drawgfx(bitmap,Machine->gfx[3],
-					sprite++,
-					color,fx,fy,x+ax*16,y+ay*16,
-					cliprect,TRANSPARENCY_PEN,15);
+					
+					dgp0.code = sprite++;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+ax*16;
+					dgp0.sy = y+ay*16;
+					drawgfx(&dgp0);
 				}
+				} // end of patch paragraph
+
 		}
 		else
 		{
 			for (ax=0; ax<dx; ax++)
+				
+				{ 
+				struct drawgfxParams dgp1={
+					bitmap, 	// dest
+					Machine->gfx[3], 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					cliprect, 	// clip
+					TRANSPARENCY_PEN, 	// transparency
+					15, 	// transparent_color
+					0, 	// scalex
+					0, 	// scaley
+					NULL, 	// pri_buffer
+					0 	// priority_mask
+				  };
 				for (ay=0; ay<dy; ay++)
 				{
-					drawgfx(bitmap,Machine->gfx[3],
-					sprite++,
-					color,fx,fy,x+(dx-ax-1)*16,y+ay*16,
-					cliprect,TRANSPARENCY_PEN,15);
+					
+					dgp1.code = sprite++;
+					dgp1.color = color;
+					dgp1.flipx = fx;
+					dgp1.flipy = fy;
+					dgp1.sx = x+(dx-ax-1)*16;
+					dgp1.sy = y+ay*16;
+					drawgfx(&dgp1);
 				}
+				} // end of patch paragraph
+
 		}
 	}
 }

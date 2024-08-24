@@ -89,6 +89,25 @@ VIDEO_UPDATE( skychut )
 		}
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy;
@@ -99,13 +118,15 @@ VIDEO_UPDATE( skychut )
 		sx = 31 - offs / 32;
 		sy = offs % 32;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				videoram[offs],
-				colorram[offs],
-				0,0,
-				8*sx,8*sy,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = videoram[offs];
+		dgp0.color = colorram[offs];
+		dgp0.sx = 8*sx;
+		dgp0.sy = 8*sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 

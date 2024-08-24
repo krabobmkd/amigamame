@@ -163,6 +163,25 @@ static void draw_background(mame_bitmap *bitmap, int bank, int colortype)
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		int scroll,sx,sy,col;
@@ -187,13 +206,17 @@ static void draw_background(mame_bitmap *bitmap, int bank, int colortype)
 		if (flipx) sx = 31 - sx;
 
 
-		drawgfx(bitmap,Machine->gfx[bank],
-			videoram[offs],
-			col + 8 * palette_bank,
-			flipx,flipy,
-			8*sx,scroll,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = videoram[offs];
+		dgp0.color = col + 8 * palette_bank;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = 8*sx;
+		dgp0.sy = scroll;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_foreground(mame_bitmap *bitmap, int colortype)
@@ -201,6 +224,25 @@ static void draw_foreground(mame_bitmap *bitmap, int colortype)
 	int offs;
 
 	/* draw the frontmost playfield. They are characters, but draw them as sprites. */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[char_bank[1]], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		int scroll,sx,sy,col;
@@ -226,13 +268,17 @@ static void draw_foreground(mame_bitmap *bitmap, int colortype)
 		if (flipx) sx = 31 - sx;
 
 
-		drawgfx(bitmap,Machine->gfx[char_bank[1]],
-			wiz_videoram2[offs],
-			col + 8 * palette_bank,
-			flipx,flipy,
-			8*sx,scroll,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = wiz_videoram2[offs];
+		dgp1.color = col + 8 * palette_bank;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = 8*sx;
+		dgp1.sy = scroll;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_sprites(mame_bitmap *bitmap, unsigned char* sprite_ram,
@@ -240,6 +286,25 @@ static void draw_sprites(mame_bitmap *bitmap, unsigned char* sprite_ram,
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy;
@@ -253,13 +318,17 @@ static void draw_sprites(mame_bitmap *bitmap, unsigned char* sprite_ram,
 		if ( flipx) sx = 240 - sx;
 		if (!flipy) sy = 240 - sy;
 
-		drawgfx(bitmap,Machine->gfx[bank],
-				sprite_ram[offs + 1],
-				(sprite_ram[offs + 2] & 0x07) + 8 * palette_bank,
-				flipx,flipy,
-				sx,sy,
-				visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp2.code = sprite_ram[offs + 1];
+		dgp2.color = (sprite_ram[offs + 2] & 0x07) + 8 * palette_bank;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }
 
 /***************************************************************************

@@ -74,7 +74,26 @@ static void pcktgal_draw_sprites( mame_bitmap *bitmap )
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		if (spriteram[offs] != 0xf8)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,flipx,flipy;
 
 
@@ -90,13 +109,17 @@ static void pcktgal_draw_sprites( mame_bitmap *bitmap )
 				if (flipy) flipy=0; else flipy=1;
 			}
 
-			drawgfx(bitmap,Machine->gfx[1],
-					spriteram[offs+3] + ((spriteram[offs+1] & 1) << 8),
-					(spriteram[offs+1] & 0x70) >> 4,
-					flipx,flipy,
-					sx,sy,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = spriteram[offs+3] + ((spriteram[offs+1] & 1) << 8);
+			dgp0.color = (spriteram[offs+1] & 0x70) >> 4;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 }
 

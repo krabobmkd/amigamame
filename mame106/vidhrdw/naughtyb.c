@@ -278,7 +278,43 @@ VIDEO_UPDATE( naughtyb )
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	tmpbitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 			dirtybuffer[offs] = 0;
@@ -310,20 +346,26 @@ VIDEO_UPDATE( naughtyb )
 				}
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					naughtyb_videoram2[offs] + 256 * bankreg,
-					(naughtyb_videoram2[offs] >> 5) + 8 * palreg,
-					naughtyb_cocktail,naughtyb_cocktail,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = naughtyb_videoram2[offs] + 256 * bankreg;
+			dgp0.color = (naughtyb_videoram2[offs] >> 5) + 8 * palreg;
+			dgp0.flipx = naughtyb_cocktail;
+			dgp0.flipy = naughtyb_cocktail;
+			dgp0.sx = 8*sx;
+			dgp0.sy = 8*sy;
+			drawgfx(&dgp0);
 
-			drawgfx(tmpbitmap,Machine->gfx[1],
-					videoram[offs] + 256*bankreg,
-					(videoram[offs] >> 5) + 8 * palreg,
-					naughtyb_cocktail,naughtyb_cocktail,
-					8*sx,8*sy,
-					0,TRANSPARENCY_PEN,0);
+			
+			dgp1.code = videoram[offs] + 256*bankreg;
+			dgp1.color = (videoram[offs] >> 5) + 8 * palreg;
+			dgp1.flipx = naughtyb_cocktail;
+			dgp1.flipy = naughtyb_cocktail;
+			dgp1.sx = 8*sx;
+			dgp1.sy = 8*sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 
 	// copy the temporary bitmap to the screen

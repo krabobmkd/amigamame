@@ -99,20 +99,43 @@ static void draw_sprites(mame_bitmap *bitmap,int priority)
 			flipx = attr & 0x0001;
 			flipy = attr & 0x0002;
 
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				Machine->gfx[1], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				&Machine->visible_area, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (row = 0;row < size;row++)
 			{
 				for (col = 0;col < size;col++)
 				{
 					int x = sx + 8*(flipx?(size-1-col):col);
 					int y = sy + 8*(flipy?(size-1-row):row);
-					drawgfx(bitmap,Machine->gfx[1],
-						code + layout[row][col],
-						color,
-						flipx,flipy,
-						x,y,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+					
+					dgp0.code = code + layout[row][col];
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = x;
+					dgp0.sy = y;
+					drawgfx(&dgp0);
 				}
 			}
+			} // end of patch paragraph
+
 		}
 	}
 }
@@ -140,14 +163,35 @@ VIDEO_UPDATE( galspnbl )
 
 		/* What is this? A priority/half transparency marker? */
 		if (!(attr & 0x0008))
-		{
-			drawgfx(bitmap,Machine->gfx[0],
-					code,
-					color,
-					0,0,
-					16*sx + screenscroll,8*sy,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp1.code = code;
+			dgp1.color = color;
+			dgp1.sx = 16*sx + screenscroll;
+			dgp1.sy = 8*sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 
 	draw_sprites(bitmap,1);

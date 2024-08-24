@@ -400,16 +400,39 @@ static int system1_draw_fg(mame_bitmap *bitmap,int priority)
 
 			code %= Machine->gfx[0]->total_elements;
 			if (Machine->gfx[0]->pen_usage[code] & ~1)
-			{
+			
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				drawn = 1;
 
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flip_screen,flip_screen,
-						8*sx + blockgal_kludgeoffset,8*sy,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.flipx = flip_screen;
+				dgp0.flipy = flip_screen;
+				dgp0.sx = 8*sx + blockgal_kludgeoffset;
+				dgp0.sy = 8*sy;
+				drawgfx(&dgp0);
 			}
+} // end of patch paragraph
+
 		}
 	}
 
@@ -439,7 +462,26 @@ static void system1_draw_bg(mame_bitmap *bitmap,int priority)
 		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
 		{
 			if (bg_dirtybuffer[offs / 2])
-			{
+			
+{ 
+struct drawgfxParams dgp1={
+	tmp_bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				int code,color;
 
 
@@ -457,13 +499,17 @@ static void system1_draw_bg(mame_bitmap *bitmap,int priority)
 					sy = 31 - sy;
 				}
 
-				drawgfx(tmp_bitmap,Machine->gfx[0],
-						code,
-						color,
-						flip_screen,flip_screen,
-						8*sx,8*sy,
-						0,TRANSPARENCY_NONE,0);
+				
+				dgp1.code = code;
+				dgp1.color = color;
+				dgp1.flipx = flip_screen;
+				dgp1.flipy = flip_screen;
+				dgp1.sx = 8*sx;
+				dgp1.sy = 8*sy;
+				drawgfx(&dgp1);
 			}
+} // end of patch paragraph
+
 		}
 
 		/* copy the temporary bitmap to the screen */
@@ -479,7 +525,26 @@ static void system1_draw_bg(mame_bitmap *bitmap,int priority)
 		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
 		{
 			if ((system1_backgroundram[offs+1] & 0x08) == priority)
-			{
+			
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				int code,color;
 
 
@@ -501,31 +566,41 @@ static void system1_draw_bg(mame_bitmap *bitmap,int priority)
 				}
 
 				/* draw it 4 times because of possible wrap around */
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flip_screen,flip_screen,
-						sx,sy,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flip_screen,flip_screen,
-						sx-256,sy,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flip_screen,flip_screen,
-						sx,sy-256,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flip_screen,flip_screen,
-						sx-256,sy-256,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp2.code = code;
+				dgp2.color = color;
+				dgp2.flipx = flip_screen;
+				dgp2.flipy = flip_screen;
+				dgp2.sx = sx;
+				dgp2.sy = sy;
+				drawgfx(&dgp2);
+				
+				dgp2.code = code;
+				dgp2.color = color;
+				dgp2.flipx = flip_screen;
+				dgp2.flipy = flip_screen;
+				dgp2.sx = sx-256;
+				dgp2.sy = sy;
+				drawgfx(&dgp2);
+				
+				dgp2.code = code;
+				dgp2.color = color;
+				dgp2.flipx = flip_screen;
+				dgp2.flipy = flip_screen;
+				dgp2.sx = sx;
+				dgp2.sy = sy-256;
+				drawgfx(&dgp2);
+				
+				dgp2.code = code;
+				dgp2.color = color;
+				dgp2.flipx = flip_screen;
+				dgp2.flipy = flip_screen;
+				dgp2.sx = sx-256;
+				dgp2.sy = sy-256;
+				drawgfx(&dgp2);
 			}
+} // end of patch paragraph
+
 		}
 	}
 }
@@ -580,7 +655,26 @@ static void chplft_draw_bg(mame_bitmap *bitmap, int priority)
 		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
 		{
 			if (bg_dirtybuffer[offs / 2])
-			{
+			
+{ 
+struct drawgfxParams dgp6={
+	tmp_bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				int code,color;
 
 
@@ -598,13 +692,17 @@ static void chplft_draw_bg(mame_bitmap *bitmap, int priority)
 					sy = 31 - sy;
 				}
 
-				drawgfx(tmp_bitmap,Machine->gfx[0],
-						code,
-						color,
-						flip_screen,flip_screen,
-						8*sx,8*sy,
-						0,TRANSPARENCY_NONE,0);
+				
+				dgp6.code = code;
+				dgp6.color = color;
+				dgp6.flipx = flip_screen;
+				dgp6.flipy = flip_screen;
+				dgp6.sx = 8*sx;
+				dgp6.sy = 8*sy;
+				drawgfx(&dgp6);
 			}
+} // end of patch paragraph
+
 		}
 
 		/* copy the temporary bitmap to the screen */
@@ -632,7 +730,26 @@ static void chplft_draw_bg(mame_bitmap *bitmap, int priority)
 		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
 		{
 			if ((system1_backgroundram[offs+1] & 0x08) == priority)
-			{
+			
+{ 
+struct drawgfxParams dgp7={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				int code,color;
 
 
@@ -659,13 +776,17 @@ static void chplft_draw_bg(mame_bitmap *bitmap, int priority)
 						sx = (sx + scrollx_row[sy]) & 0xff;
 				}
 
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flip_screen,flip_screen,
-						sx,8*sy,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp7.code = code;
+				dgp7.color = color;
+				dgp7.flipx = flip_screen;
+				dgp7.flipy = flip_screen;
+				dgp7.sx = sx;
+				dgp7.sy = 8*sy;
+				drawgfx(&dgp7);
 			}
+} // end of patch paragraph
+
 		}
 	}
 }
@@ -726,6 +847,42 @@ static void wbml_draw_bg(mame_bitmap *bitmap, int trasp)
 	int xscroll = (wbml_paged_videoram[0x7c0] >> 1) + ((wbml_paged_videoram[0x7c1] & 1) << 7) - 256 + 5;
 	int yscroll = -wbml_paged_videoram[0x7ba];
 
+	
+	{ 
+	struct drawgfxParams dgp8={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp9={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (page=0; page < 4; page++)
 	{
 		const unsigned char *source = wbml_paged_videoram + (wbml_paged_videoram[0x0740 + page*2] & 0x07)*0x800;
@@ -755,24 +912,30 @@ static void wbml_draw_bg(mame_bitmap *bitmap, int trasp)
 				code = ((code >> 4) & 0x800) | (code & 0x7ff);
 
 				if (!trasp)
-					drawgfx(bitmap,Machine->gfx[0],
-							code,
-							((code >> 5) & 0x3f) + 64,
-							flip_screen,flip_screen,
-							x,y,
-							&Machine->visible_area, TRANSPARENCY_NONE, 0);
+					
+					dgp8.code = code;
+					dgp8.color = ((code >> 5) & 0x3f) + 64;
+					dgp8.flipx = flip_screen;
+					dgp8.flipy = flip_screen;
+					dgp8.sx = x;
+					dgp8.sy = y;
+					drawgfx(&dgp8);
 				else if (priority)
-					drawgfx(bitmap,Machine->gfx[0],
-							code,
-							((code >> 5) & 0x3f) + 64,
-							flip_screen,flip_screen,
-							x,y,
-							&Machine->visible_area, TRANSPARENCY_PEN, 0);
+					
+					dgp9.code = code;
+					dgp9.color = ((code >> 5) & 0x3f) + 64;
+					dgp9.flipx = flip_screen;
+					dgp9.flipy = flip_screen;
+					dgp9.sx = x;
+					dgp9.sy = y;
+					drawgfx(&dgp9);
 
 				source+=2;
 			}
 		}
-	} /* next page */
+	}
+	} // end of patch paragraph
+ /* next page */
 }
 
 static void wbml_draw_fg(mame_bitmap *bitmap)
@@ -780,6 +943,25 @@ static void wbml_draw_fg(mame_bitmap *bitmap)
 	int offs;
 
 
+	
+	{ 
+	struct drawgfxParams dgp10={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x700;offs += 2)
 	{
 		int sx,sy,code;
@@ -796,13 +978,17 @@ static void wbml_draw_fg(mame_bitmap *bitmap)
 			sy = 31 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				code,
-				(code >> 5) & 0x3f,
-				flip_screen,flip_screen,
-				8*sx,8*sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp10.code = code;
+		dgp10.color = (code >> 5) & 0x3f;
+		dgp10.flipx = flip_screen;
+		dgp10.flipy = flip_screen;
+		dgp10.sx = 8*sx;
+		dgp10.sy = 8*sy;
+		drawgfx(&dgp10);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -825,6 +1011,42 @@ static void ufosensi_draw_bg(mame_bitmap *bitmap, int trasp)
 
 	int yscroll = -wbml_paged_videoram[0x7ba];
 
+	
+	{ 
+	struct drawgfxParams dgp11={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp12={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (page=0; page < 4; page++)
 	{
 		const unsigned char *source = wbml_paged_videoram + (wbml_paged_videoram[0x0740 + page*2] & 0x07)*0x800;
@@ -855,24 +1077,30 @@ static void ufosensi_draw_bg(mame_bitmap *bitmap, int trasp)
 				code = ((code >> 4) & 0x800) | (code & 0x7ff);
 
 				if (!trasp)
-					drawgfx(bitmap,Machine->gfx[0],
-							code,
-							((code >> 5) & 0x3f) + 64,
-							flip_screen,flip_screen,
-							x,y,
-							&Machine->visible_area, TRANSPARENCY_NONE, 0);
+					
+					dgp11.code = code;
+					dgp11.color = ((code >> 5) & 0x3f) + 64;
+					dgp11.flipx = flip_screen;
+					dgp11.flipy = flip_screen;
+					dgp11.sx = x;
+					dgp11.sy = y;
+					drawgfx(&dgp11);
 				else if (priority)
-					drawgfx(bitmap,Machine->gfx[0],
-							code,
-							((code >> 5) & 0x3f) + 64,
-							flip_screen,flip_screen,
-							x,y,
-							&Machine->visible_area, TRANSPARENCY_PEN, 0);
+					
+					dgp12.code = code;
+					dgp12.color = ((code >> 5) & 0x3f) + 64;
+					dgp12.flipx = flip_screen;
+					dgp12.flipy = flip_screen;
+					dgp12.sx = x;
+					dgp12.sy = y;
+					drawgfx(&dgp12);
 
 				source+=2;
 			}
 		}
-	} /* next page */
+	}
+	} // end of patch paragraph
+ /* next page */
 }
 
 VIDEO_UPDATE( ufosensi )

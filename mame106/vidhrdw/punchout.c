@@ -348,7 +348,26 @@ VIDEO_UPDATE( punchout )
 	for (offs = videoram_size - 2;offs >= 0;offs -= 2)
 	{
 		if (dirtybuffer[offs] || dirtybuffer[offs + 1])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&topvisiblearea, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -358,19 +377,41 @@ VIDEO_UPDATE( punchout )
 			sx = offs/2 % 32;
 			sy = offs/2 / 32;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					videoram[offs] + 256 * (videoram[offs + 1] & 0x03),
-					((videoram[offs + 1] & 0x7c) >> 2) + 64 * top_palette_bank,
-					videoram[offs + 1] & 0x80,0,
-					8*sx,8*sy - 16,
-					&topvisiblearea,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = videoram[offs] + 256 * (videoram[offs + 1] & 0x03);
+			dgp0.color = ((videoram[offs + 1] & 0x7c) >> 2) + 64 * top_palette_bank;
+			dgp0.flipx = videoram[offs + 1] & 0x80;
+			dgp0.sx = 8*sx;
+			dgp0.sy = 8*sy - 16;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 
 	for (offs = punchout_videoram2_size - 2;offs >= 0;offs -= 2)
 	{
 		if (dirtybuffer2[offs] | dirtybuffer2[offs + 1])
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	tmpbitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&backgroundvisiblearea, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -380,19 +421,41 @@ VIDEO_UPDATE( punchout )
 			sx = offs/2 % 64;
 			sy = offs/2 / 64;
 
-			drawgfx(tmpbitmap,Machine->gfx[1],
-					punchout_videoram2[offs] + 256 * (punchout_videoram2[offs + 1] & 0x03),
-					((punchout_videoram2[offs + 1] & 0x7c) >> 2) + 64 * bottom_palette_bank,
-					punchout_videoram2[offs + 1] & 0x80,0,
-					8*sx,8*sy + 8*TOP_MONITOR_ROWS - 16,
-					&backgroundvisiblearea,TRANSPARENCY_NONE,0);
+			
+			dgp1.code = punchout_videoram2[offs] + 256 * (punchout_videoram2[offs + 1] & 0x03);
+			dgp1.color = ((punchout_videoram2[offs + 1] & 0x7c) >> 2) + 64 * bottom_palette_bank;
+			dgp1.flipx = punchout_videoram2[offs + 1] & 0x80;
+			dgp1.sx = 8*sx;
+			dgp1.sy = 8*sy + 8*TOP_MONITOR_ROWS - 16;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 
 	for (offs = punchout_bigsprite1ram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (bs1dirtybuffer[offs] | bs1dirtybuffer[offs + 1] | bs1dirtybuffer[offs + 3])
-		{
+		
+{ 
+struct drawgfxParams dgp2={
+	bs1tmpbitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -403,19 +466,41 @@ VIDEO_UPDATE( punchout )
 			sx = offs/4 % 16;
 			sy = offs/4 / 16;
 
-			drawgfx(bs1tmpbitmap,Machine->gfx[2],
-					punchout_bigsprite1ram[offs] + 256 * (punchout_bigsprite1ram[offs + 1] & 0x1f),
-					(punchout_bigsprite1ram[offs + 3] & 0x1f) + 32 * bottom_palette_bank,
-					punchout_bigsprite1ram[offs + 3] & 0x80,0,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp2.code = punchout_bigsprite1ram[offs] + 256 * (punchout_bigsprite1ram[offs + 1] & 0x1f);
+			dgp2.color = (punchout_bigsprite1ram[offs + 3] & 0x1f) + 32 * bottom_palette_bank;
+			dgp2.flipx = punchout_bigsprite1ram[offs + 3] & 0x80;
+			dgp2.sx = 8*sx;
+			dgp2.sy = 8*sy;
+			drawgfx(&dgp2);
 		}
+} // end of patch paragraph
+
 	}
 
 	for (offs = punchout_bigsprite2ram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (bs2dirtybuffer[offs] | bs2dirtybuffer[offs + 1] | bs2dirtybuffer[offs + 3])
-		{
+		
+{ 
+struct drawgfxParams dgp3={
+	bs2tmpbitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -426,13 +511,16 @@ VIDEO_UPDATE( punchout )
 			sx = offs/4 % 16;
 			sy = offs/4 / 16;
 
-			drawgfx(bs2tmpbitmap,Machine->gfx[3],
-					punchout_bigsprite2ram[offs] + 256 * (punchout_bigsprite2ram[offs + 1] & 0x0f),
-					(punchout_bigsprite2ram[offs + 3] & 0x3f) + 64 * bottom_palette_bank,
-					punchout_bigsprite2ram[offs + 3] & 0x80,0,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp3.code = punchout_bigsprite2ram[offs] + 256 * (punchout_bigsprite2ram[offs + 1] & 0x0f);
+			dgp3.color = (punchout_bigsprite2ram[offs + 3] & 0x3f) + 64 * bottom_palette_bank;
+			dgp3.flipx = punchout_bigsprite2ram[offs + 3] & 0x80;
+			dgp3.sx = 8*sx;
+			dgp3.sy = 8*sy;
+			drawgfx(&dgp3);
 		}
+} // end of patch paragraph
+
 	}
 
 
@@ -527,7 +615,26 @@ VIDEO_UPDATE( armwrest )
 	for (offs = punchout_videoram2_size - 2;offs >= 0;offs -= 2)
 	{
 		if (dirtybuffer2[offs] | dirtybuffer2[offs + 1])
-		{
+		
+{ 
+struct drawgfxParams dgp5={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&backgroundvisiblearea, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -538,32 +645,74 @@ VIDEO_UPDATE( armwrest )
 			sy = offs/2 / 32;
 
 			if (sy >= 32)
-			{
+			
+{ 
+struct drawgfxParams dgp4={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&topvisiblearea, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				/* top screen */
 				sy -= 32;
-				drawgfx(tmpbitmap,Machine->gfx[0],
-						punchout_videoram2[offs] + 256 * (punchout_videoram2[offs + 1] & 0x03) +
-								8 * (punchout_videoram2[offs + 1] & 0x80),
-						((punchout_videoram2[offs + 1] & 0x7c) >> 2) + 64 * top_palette_bank,
-						0,0,
-						8*sx,8*sy - 16,
-						&topvisiblearea,TRANSPARENCY_NONE,0);
+				
+				dgp4.code = punchout_videoram2[offs] + 256 * (punchout_videoram2[offs + 1] & 0x03) +								8 * (punchout_videoram2[offs + 1] & 0x80);
+				dgp4.color = ((punchout_videoram2[offs + 1] & 0x7c) >> 2) + 64 * top_palette_bank;
+				dgp4.sx = 8*sx;
+				dgp4.sy = 8*sy - 16;
+				drawgfx(&dgp4);
 			}
+} // end of patch paragraph
+
 			else
 				/* bottom screen background */
-				drawgfx(tmpbitmap,Machine->gfx[0],
-						punchout_videoram2[offs] + 256 * (punchout_videoram2[offs + 1] & 0x03),
-						128 + ((punchout_videoram2[offs + 1] & 0x7c) >> 2) + 64 * bottom_palette_bank,
-						punchout_videoram2[offs + 1] & 0x80,0,
-						8*sx,8*sy + 8*TOP_MONITOR_ROWS - 16,
-						&backgroundvisiblearea,TRANSPARENCY_NONE,0);
+				
+				dgp5.code = punchout_videoram2[offs] + 256 * (punchout_videoram2[offs + 1] & 0x03);
+				dgp5.color = 128 + ((punchout_videoram2[offs + 1] & 0x7c) >> 2) + 64 * bottom_palette_bank;
+				dgp5.flipx = punchout_videoram2[offs + 1] & 0x80;
+				dgp5.sx = 8*sx;
+				dgp5.sy = 8*sy + 8*TOP_MONITOR_ROWS - 16;
+				drawgfx(&dgp5);
 		}
+} // end of patch paragraph
+
 	}
 
 	for (offs = punchout_bigsprite1ram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (bs1dirtybuffer[offs] | bs1dirtybuffer[offs + 1] | bs1dirtybuffer[offs + 3])
-		{
+		
+{ 
+struct drawgfxParams dgp6={
+	bs1tmpbitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -579,19 +728,41 @@ VIDEO_UPDATE( armwrest )
 				sx += 16;
 			}
 
-			drawgfx(bs1tmpbitmap,Machine->gfx[2],
-					punchout_bigsprite1ram[offs] + 256 * (punchout_bigsprite1ram[offs + 1] & 0x1f),
-					(punchout_bigsprite1ram[offs + 3] & 0x1f) + 32 * bottom_palette_bank,
-					punchout_bigsprite1ram[offs + 3] & 0x80,0,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp6.code = punchout_bigsprite1ram[offs] + 256 * (punchout_bigsprite1ram[offs + 1] & 0x1f);
+			dgp6.color = (punchout_bigsprite1ram[offs + 3] & 0x1f) + 32 * bottom_palette_bank;
+			dgp6.flipx = punchout_bigsprite1ram[offs + 3] & 0x80;
+			dgp6.sx = 8*sx;
+			dgp6.sy = 8*sy;
+			drawgfx(&dgp6);
 		}
+} // end of patch paragraph
+
 	}
 
 	for (offs = punchout_bigsprite2ram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (bs2dirtybuffer[offs] | bs2dirtybuffer[offs + 1] | bs2dirtybuffer[offs + 3])
-		{
+		
+{ 
+struct drawgfxParams dgp7={
+	bs2tmpbitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -602,13 +773,16 @@ VIDEO_UPDATE( armwrest )
 			sx = offs/4 % 16;
 			sy = offs/4 / 16;
 
-			drawgfx(bs2tmpbitmap,Machine->gfx[3],
-					punchout_bigsprite2ram[offs] + 256 * (punchout_bigsprite2ram[offs + 1] & 0x0f),
-					(punchout_bigsprite2ram[offs + 3] & 0x3f) + 64 * bottom_palette_bank,
-					punchout_bigsprite2ram[offs + 3] & 0x80,0,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp7.code = punchout_bigsprite2ram[offs] + 256 * (punchout_bigsprite2ram[offs + 1] & 0x0f);
+			dgp7.color = (punchout_bigsprite2ram[offs + 3] & 0x3f) + 64 * bottom_palette_bank;
+			dgp7.flipx = punchout_bigsprite2ram[offs + 3] & 0x80;
+			dgp7.sx = 8*sx;
+			dgp7.sy = 8*sy;
+			drawgfx(&dgp7);
 		}
+} // end of patch paragraph
+
 	}
 
 
@@ -684,6 +858,25 @@ VIDEO_UPDATE( armwrest )
 
 
 	/* draw the foregound chars */
+	
+	{ 
+	struct drawgfxParams dgp8={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&backgroundvisiblearea, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		7, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 2;offs >= 0;offs -= 2)
 	{
 		int sx,sy;
@@ -695,11 +888,14 @@ VIDEO_UPDATE( armwrest )
 		sx = offs/2 % 32;
 		sy = offs/2 / 32;
 
-		drawgfx(bitmap,Machine->gfx[1],
-				videoram[offs] + 256 * (videoram[offs + 1] & 0x07),
-				((videoram[offs + 1] & 0xf8) >> 3) + 32 * bottom_palette_bank,
-				videoram[offs + 1] & 0x80,0,
-				8*sx,8*sy + 8*TOP_MONITOR_ROWS - 16,
-				&backgroundvisiblearea,TRANSPARENCY_PEN,7);
+		
+		dgp8.code = videoram[offs] + 256 * (videoram[offs + 1] & 0x07);
+		dgp8.color = ((videoram[offs + 1] & 0xf8) >> 3) + 32 * bottom_palette_bank;
+		dgp8.flipx = videoram[offs + 1] & 0x80;
+		dgp8.sx = 8*sx;
+		dgp8.sy = 8*sy + 8*TOP_MONITOR_ROWS - 16;
+		drawgfx(&dgp8);
 	}
+	} // end of patch paragraph
+
 }

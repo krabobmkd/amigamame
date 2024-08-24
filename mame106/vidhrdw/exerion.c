@@ -394,6 +394,25 @@ VIDEO_UPDATE( exerion )
 #endif
 
 	/* draw sprites */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		16, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < spriteram_size; i += 4)
 	{
 		int flags = spriteram[i + 0];
@@ -420,34 +439,93 @@ VIDEO_UPDATE( exerion )
 		}
 
 		if (wide)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	16, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			if (yflip)
 				code |= 0x10, code2 &= ~0x10;
 			else
 				code &= ~0x10, code2 |= 0x10;
 
-			drawgfx(bitmap, gfx, code2, color, xflip, yflip, x, y + gfx->height,
-			        cliprect, TRANSPARENCY_COLOR, 16);
+			
+			dgp0.code = code2;
+			dgp0.color = color;
+			dgp0.flipx = xflip;
+			dgp0.flipy = yflip;
+			dgp0.sx = x;
+			dgp0.sy = y + gfx->height;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
 
-		drawgfx(bitmap, gfx, code, color, xflip, yflip, x, y,
-		        cliprect, TRANSPARENCY_COLOR, 16);
+
+		
+		dgp1.code = code;
+		dgp1.color = color;
+		dgp1.flipx = xflip;
+		dgp1.flipy = yflip;
+		dgp1.sx = x;
+		dgp1.sy = y;
+		drawgfx(&dgp1);
 
 		if (doubled) i += 4;
 	}
+	} // end of patch paragraph
+
 
 	/* draw the visible text layer */
 	for (sy = VISIBLE_Y_MIN/8; sy < VISIBLE_Y_MAX/8; sy++)
+		
+		{ 
+		struct drawgfxParams dgp2={
+			bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
 		{
 			int x = exerion_cocktail_flip ? (63*8 - 8*sx) : 8*sx;
 			int y = exerion_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
-			drawgfx(bitmap, Machine->gfx[0],
-				videoram[offs] + 256 * char_bank,
-				((videoram[offs] & 0xf0) >> 4) + char_palette * 16,
-				exerion_cocktail_flip, exerion_cocktail_flip, x, y,
-				cliprect, TRANSPARENCY_PEN, 0);
+			
+			dgp2.code = videoram[offs] + 256 * char_bank;
+			dgp2.color = ((videoram[offs] & 0xf0) >> 4) + char_palette * 16;
+			dgp2.flipx = exerion_cocktail_flip;
+			dgp2.flipy = exerion_cocktail_flip;
+			dgp2.sx = x;
+			dgp2.sy = y;
+			drawgfx(&dgp2);
 		}
+		} // end of patch paragraph
+
 }

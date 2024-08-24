@@ -153,7 +153,26 @@ VIDEO_UPDATE( spacefb )
 		if (cnt)
 		{
 			if (cnt & 0x20)
-			{
+			
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				/* Draw bullets */
 
 				if (flip_screen)
@@ -162,16 +181,39 @@ VIDEO_UPDATE( spacefb )
 					sy = 252 - sy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[1],
-						code & 0x3f,
-						col,
-						flip_screen,flip_screen,
-						sx,sy,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = code & 0x3f;
+				dgp0.color = col;
+				dgp0.flipx = flip_screen;
+				dgp0.flipy = flip_screen;
+				dgp0.sx = sx;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 
 			}
+} // end of patch paragraph
+
 			else if (cnt & 0x40)
-			{
+			
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				sy -= 5;	/* aligns the spaceship and the bullet */
 
 				if (flip_screen)
@@ -180,40 +222,81 @@ VIDEO_UPDATE( spacefb )
 					sy = 248 - sy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[0],
-						255 - code,
-						col,
-						flip_screen,flip_screen,
-						sx,sy,
-						&Machine->visible_area,TRANSPARENCY_NONE,0);
+				
+				dgp1.code = 255 - code;
+				dgp1.color = col;
+				dgp1.flipx = flip_screen;
+				dgp1.flipy = flip_screen;
+				dgp1.sx = sx;
+				dgp1.sy = sy;
+				drawgfx(&dgp1);
 			}
+} // end of patch paragraph
+
 		}
 	}
 #if 0
 	{
 		int b;
+		
+		{ 
+		struct drawgfxParams dgp2={
+			bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			128+(7-b)*8, 	// clip
+			&Machine->visible_area, 	// transparency
+			TRANSPARENCY_NONE, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (b=0;b<8;b++)
 		{
-			drawgfx(bitmap,Machine->gfx[0],
-				 // 255 - b,
-					255 - ( (colour_control & (1<<(7-b))) ? 6 : 5),
-					1,
-					0,0,
-					32,128+(7-b)*8,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp2.code = // 255 - b;
+			dgp2.color = 255 - ( (colour_control & (1<<(7-b))) ? 6 : 5);
+			drawgfx(&dgp2);
 
 		}
+		} // end of patch paragraph
+
+		
+		{ 
+		struct drawgfxParams dgp3={
+			bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			128+(7-b)*8, 	// clip
+			&Machine->visible_area, 	// transparency
+			TRANSPARENCY_NONE, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (b=0;b<8;b++)
 		{
-			drawgfx(bitmap,Machine->gfx[0],
-				 // 255 - b,
-					255 - ( (spacefb_sound_latch & (1<<(7-b))) ? (7-b)+5 : 0),
-					1,
-					0,0,
-					32+8,128+(7-b)*8,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp3.code = // 255 - b;
+			dgp3.color = 255 - ( (spacefb_sound_latch & (1<<(7-b))) ? (7-b)+5 : 0);
+			dgp3.sy = 32+8;
+			drawgfx(&dgp3);
 
 		}
+		} // end of patch paragraph
+
 	}
 #endif
 }

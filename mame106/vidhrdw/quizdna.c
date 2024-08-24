@@ -148,6 +148,25 @@ static void quizdna_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs<spriteram_size; offs+=8)
 	{
 		int i;
@@ -185,16 +204,20 @@ static void quizdna_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		{
 			y &= 0x1ff;
 
-			drawgfx(bitmap,Machine->gfx[2],
-					code ^ i,
-					col,
-					fx,fy,
-					x,y,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = code ^ i;
+			dgp0.color = col;
+			dgp0.flipx = fx;
+			dgp0.flipy = fy;
+			dgp0.sx = x;
+			dgp0.sy = y;
+			drawgfx(&dgp0);
 
 			y += dy;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( quizdna )

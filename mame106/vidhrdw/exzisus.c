@@ -87,6 +87,25 @@ VIDEO_UPDATE( exzisus )
 
 	/* ---------- 1st TC0010VCU ---------- */
 	sx = 0;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0 ; offs < exzisus_objectram_size0 ; offs += 4)
     {
 		int height;
@@ -144,20 +163,43 @@ VIDEO_UPDATE( exzisus )
 					y = 248 - y;
 				}
 
-				drawgfx(bitmap, Machine->gfx[0],
-						code & 0x3fff,
-						color,
-						flip_screen, flip_screen,
-						x, y,
-						&Machine->visible_area, TRANSPARENCY_PEN, 15);
+				
+				dgp0.code = code & 0x3fff;
+				dgp0.color = color;
+				dgp0.flipx = flip_screen;
+				dgp0.flipy = flip_screen;
+				dgp0.sx = x;
+				dgp0.sy = y;
+				drawgfx(&dgp0);
 				goffs += 2;
 			}
 			gfx_offs += height << 1;
 		}
 	}
+	} // end of patch paragraph
+
 
 	/* ---------- 2nd TC0010VCU ---------- */
 	sx = 0;
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0 ; offs < exzisus_objectram_size1 ; offs += 4)
     {
 		int height;
@@ -214,15 +256,19 @@ VIDEO_UPDATE( exzisus )
 					y = 248 - y;
 				}
 
-				drawgfx(bitmap, Machine->gfx[1],
-						code & 0x3fff,
-						color,
-						flip_screen, flip_screen,
-						x, y,
-						&Machine->visible_area, TRANSPARENCY_PEN, 15);
+				
+				dgp1.code = code & 0x3fff;
+				dgp1.color = color;
+				dgp1.flipx = flip_screen;
+				dgp1.flipy = flip_screen;
+				dgp1.sx = x;
+				dgp1.sy = y;
+				drawgfx(&dgp1);
 				goffs += 2;
 			}
 			gfx_offs += height << 1;
 		}
 	}
+	} // end of patch paragraph
+
 }

@@ -233,6 +233,25 @@ static void unico_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0x00, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri_mask 	// priority_mask
+	  };
 	for ( offs = (spriteram_size-8)/2; offs >= 0 ; offs -= 8/2 )
 	{
 		int x, startx, endx, incx;
@@ -270,15 +289,18 @@ static void unico_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx(	bitmap, Machine->gfx[0],
-						code++,
-						attr & 0x1f,
-						flipx, flipy,
-						x, sy,
-						cliprect, TRANSPARENCY_PEN,0x00,
-						pri_mask	);
+			
+			dgp0.code = code++;
+			dgp0.color = attr & 0x1f;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = x;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void unico_draw_sprites32(mame_bitmap *bitmap,const rectangle *cliprect)
@@ -286,6 +308,25 @@ static void unico_draw_sprites32(mame_bitmap *bitmap,const rectangle *cliprect)
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0x00, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri_mask 	// priority_mask
+	  };
 	for ( offs = (spriteram_size-8)/4; offs >= 0 ; offs -= 8/4 )
 	{
 		int x, startx, endx, incx;
@@ -323,15 +364,18 @@ static void unico_draw_sprites32(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx(	bitmap, Machine->gfx[0],
-						code++,
-						attr & 0x1f,
-						flipx, flipy,
-						x, sy,
-						cliprect, TRANSPARENCY_PEN,0x00,
-						pri_mask	);
+			
+			dgp1.code = code++;
+			dgp1.color = attr & 0x1f;
+			dgp1.flipx = flipx;
+			dgp1.flipy = flipy;
+			dgp1.sx = x;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

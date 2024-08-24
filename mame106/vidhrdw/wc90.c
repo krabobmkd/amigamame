@@ -1,3 +1,22 @@
+
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 #include "driver.h"
 
 
@@ -160,8 +179,14 @@ WRITE8_HANDLER( wc90_txvideoram_w )
 ***************************************************************************/
 
 #define WC90_DRAW_SPRITE( code, sx, sy ) \
-					drawgfx( bitmap, Machine->gfx[3], code, flags >> 4, \
-					bank&1, bank&2, sx, sy, cliprect, TRANSPARENCY_PEN, 0 )
+					
+					dgp0.code = code;
+					dgp0.color = flags >> 4;
+					dgp0.flipx = \					bank&1;
+					dgp0.flipy = bank&2;
+					dgp0.sx = sx;
+					dgp0.sy = sy;
+					drawgfx(&dgp0)
 
 static char pos32x32[] = { 0, 1, 2, 3 };
 static char pos32x32x[] = { 1, 0, 3, 2 };
@@ -402,3 +427,5 @@ VIDEO_UPDATE( wc90 )
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	draw_sprites( bitmap,cliprect, 0 );
 }
+
+} // end of patch paragraph

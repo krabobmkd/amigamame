@@ -285,6 +285,25 @@ static void powerins_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int screen_w	=	Machine->drv->screen_width;
 	int screen_h	=	Machine->drv->screen_height;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for ( ; source < finish; source += 16/2 )
 	{
 		int x,y,inc;
@@ -322,13 +341,14 @@ static void powerins_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		{
 			for (y = 0 ; y < dimy ; y++)
 			{
-				drawgfx(bitmap,Machine->gfx[2],
-						code,
-						color,
-						flipx, flipy,
-						sx + x*16,
-						sy + y*16,
-						cliprect,TRANSPARENCY_PEN,15);
+				
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx + x*16;
+				dgp0.sy = sy + y*16;
+				drawgfx(&dgp0);
 
 				code += inc;
 			}
@@ -336,6 +356,8 @@ static void powerins_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 
 	}
+	} // end of patch paragraph
+
 }
 
 

@@ -578,7 +578,77 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
       flipy = (g_attr & SZ_VERTREVERSE) != 0;
     }
 
-    switch( size ) {
+    switch( size ) 
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[GFX_8X8_4BIT], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&spriteClip, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0x00, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	Machine->gfx[GFX_16X16_4BIT], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&spriteClip, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0x00, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp6={
+	bitmap, 	// dest
+	Machine->gfx[GFX_32X32_4BIT], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&spriteClip, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0x00, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp9={
+	bitmap, 	// dest
+	Machine->gfx[GFX_64X64_4BIT], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&spriteClip, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0x00, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 
     case SZ_8X8 :
       code = ( (int)ygv608.regs.s.sba << 8 ) | (int)sa->sn;
@@ -588,27 +658,33 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	    logerror( "SZ_8X8: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx( bitmap, Machine->gfx[GFX_8X8_4BIT],
-	       code+namcond1_gfxbank*0x10000,
-	       color,
-	       flipx,flipy,
-	       sx,sy,
-	       &spriteClip,TRANSPARENCY_PEN,0x00);
+      
+      dgp0.code = code+namcond1_gfxbank*0x10000;
+      dgp0.color = color;
+      dgp0.flipx = flipx;
+      dgp0.flipy = flipy;
+      dgp0.sx = sx;
+      dgp0.sy = sy;
+      drawgfx(&dgp0);
       // redraw with wrap-around
       if( sx > 512-8 )
-        drawgfx( bitmap, Machine->gfx[GFX_8X8_4BIT],
-	        code+namcond1_gfxbank*0x10000,
-	        color,
-	        flipx,flipy,
-	        sx-512,sy,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+        
+        dgp0.code = code+namcond1_gfxbank*0x10000;
+        dgp0.color = color;
+        dgp0.flipx = flipx;
+        dgp0.flipy = flipy;
+        dgp0.sx = sx-512;
+        dgp0.sy = sy;
+        drawgfx(&dgp0);
       if( sy > 512-8 )
-        drawgfx( bitmap, Machine->gfx[GFX_8X8_4BIT],
-	        code+namcond1_gfxbank*0x10000,
-	        color,
-	        flipx,flipy,
-	        sx,sy-512,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+        
+        dgp0.code = code+namcond1_gfxbank*0x10000;
+        dgp0.color = color;
+        dgp0.flipx = flipx;
+        dgp0.flipy = flipy;
+        dgp0.sx = sx;
+        dgp0.sy = sy-512;
+        drawgfx(&dgp0);
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -621,27 +697,33 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	    logerror( "SZ_8X8: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx( bitmap, Machine->gfx[GFX_16X16_4BIT],
-	       code+namcond1_gfxbank*0x4000,
-	       color,
-	       flipx,flipy,
-	       sx,sy,
-	       &spriteClip,TRANSPARENCY_PEN,0x00);
+      
+      dgp3.code = code+namcond1_gfxbank*0x4000;
+      dgp3.color = color;
+      dgp3.flipx = flipx;
+      dgp3.flipy = flipy;
+      dgp3.sx = sx;
+      dgp3.sy = sy;
+      drawgfx(&dgp3);
       // redraw with wrap-around
       if( sx > 512-16 )
-        drawgfx( bitmap, Machine->gfx[GFX_16X16_4BIT],
-	        code+namcond1_gfxbank*0x4000,
-	        color,
-	        flipx,flipy,
-	        sx-512,sy,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+        
+        dgp3.code = code+namcond1_gfxbank*0x4000;
+        dgp3.color = color;
+        dgp3.flipx = flipx;
+        dgp3.flipy = flipy;
+        dgp3.sx = sx-512;
+        dgp3.sy = sy;
+        drawgfx(&dgp3);
       if( sy > 512-16 )
-        drawgfx( bitmap, Machine->gfx[GFX_16X16_4BIT],
-	        code+namcond1_gfxbank*0x4000,
-	        color,
-	        flipx,flipy,
-	        sx,sy-512,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+        
+        dgp3.code = code+namcond1_gfxbank*0x4000;
+        dgp3.color = color;
+        dgp3.flipx = flipx;
+        dgp3.flipy = flipy;
+        dgp3.sx = sx;
+        dgp3.sy = sy-512;
+        drawgfx(&dgp3);
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -654,27 +736,33 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	  logerror( "SZ_32X32: sprite=%d\n", code );
 	code = 0;
       }
-      drawgfx( bitmap, Machine->gfx[GFX_32X32_4BIT],
-	       code+namcond1_gfxbank*0x1000,
-	       color,
-	       flipx,flipy,
-	       sx,sy,
-	       &spriteClip,TRANSPARENCY_PEN,0x00);
+      
+      dgp6.code = code+namcond1_gfxbank*0x1000;
+      dgp6.color = color;
+      dgp6.flipx = flipx;
+      dgp6.flipy = flipy;
+      dgp6.sx = sx;
+      dgp6.sy = sy;
+      drawgfx(&dgp6);
       // redraw with wrap-around
       if( sx > 512-32 )
-        drawgfx( bitmap, Machine->gfx[GFX_32X32_4BIT],
-	        code+namcond1_gfxbank*0x1000,
-	        color,
-	        flipx,flipy,
-	        sx-512,sy,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+        
+        dgp6.code = code+namcond1_gfxbank*0x1000;
+        dgp6.color = color;
+        dgp6.flipx = flipx;
+        dgp6.flipy = flipy;
+        dgp6.sx = sx-512;
+        dgp6.sy = sy;
+        drawgfx(&dgp6);
       if( sy > 512-32 )
-        drawgfx( bitmap, Machine->gfx[GFX_32X32_4BIT],
-	        code+namcond1_gfxbank*0x1000,
-	        color,
-	        flipx,flipy,
-	        sx,sy-512,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+        
+        dgp6.code = code+namcond1_gfxbank*0x1000;
+        dgp6.color = color;
+        dgp6.flipx = flipx;
+        dgp6.flipy = flipy;
+        dgp6.sx = sx;
+        dgp6.sy = sy-512;
+        drawgfx(&dgp6);
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -687,27 +775,33 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	    logerror( "SZ_64X64: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx( bitmap, Machine->gfx[GFX_64X64_4BIT],
-	       code+namcond1_gfxbank*0x400,
-	       color,
-	       flipx,flipy,
-	       sx,sy,
-	       &spriteClip,TRANSPARENCY_PEN,0x00);
+      
+      dgp9.code = code+namcond1_gfxbank*0x400;
+      dgp9.color = color;
+      dgp9.flipx = flipx;
+      dgp9.flipy = flipy;
+      dgp9.sx = sx;
+      dgp9.sy = sy;
+      drawgfx(&dgp9);
       // redraw with wrap-around
       if( sx > 512-64 )
-        drawgfx( bitmap, Machine->gfx[GFX_64X64_4BIT],
-	        code+namcond1_gfxbank*0x400,
-	        color,
-	        flipx,flipy,
-	        sx-512,sy,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+        
+        dgp9.code = code+namcond1_gfxbank*0x400;
+        dgp9.color = color;
+        dgp9.flipx = flipx;
+        dgp9.flipy = flipy;
+        dgp9.sx = sx-512;
+        dgp9.sy = sy;
+        drawgfx(&dgp9);
       if( sy > 512-64 )
-        drawgfx( bitmap, Machine->gfx[GFX_64X64_4BIT],
-	        code+namcond1_gfxbank*0x400,
-	        color,
-	        flipx,flipy,
-	        sx,sy-512,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+        
+        dgp9.code = code+namcond1_gfxbank*0x400;
+        dgp9.color = color;
+        dgp9.flipx = flipx;
+        dgp9.flipy = flipy;
+        dgp9.sx = sx;
+        dgp9.sy = sy-512;
+        drawgfx(&dgp9);
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -715,6 +809,8 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
     default :
       break;
     }
+} // end of patch paragraph
+
   }
 
 #endif

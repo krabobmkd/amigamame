@@ -141,6 +141,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prior
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < SPRITERAM_SIZE;offs += 4)
 	{
 		int x,y,color,code,sx,sy,flipx,flipy,sizex,sizey,pri;
@@ -170,15 +189,19 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prior
 		{
 			for (x = 0;x < sizex;x++)
 			{
-				drawgfx(bitmap,Machine->gfx[0],
-						code + x + sizex * y,
-						color,
-						flipx,flipy,
-						(sx + (flipx ? (-8*(x+1)+1) : 8*x) - vreg[6]+44) & 0x1ff,(sy + (flipy ? (-8*(y+1)+1) : 8*y) - vreg[7]-9) & 0x1ff,
-						cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = code + x + sizex * y;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = (sx + (flipx ? (-8*(x+1)+1) : 8*x) - vreg[6]+44) & 0x1ff;
+				dgp0.sy = (sy + (flipy ? (-8*(y+1)+1) : 8*y) - vreg[7]-9) & 0x1ff;
+				drawgfx(&dgp0);
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( othldrby )

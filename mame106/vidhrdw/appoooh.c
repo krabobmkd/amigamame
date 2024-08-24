@@ -554,6 +554,25 @@ static void appoooh_draw_sprites(mame_bitmap *dest_bmp,
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		dest_bmp, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x20 - 4;offs >= 0;offs -= 4)
 	{
 		int sy    = 240 - sprite[offs+0];
@@ -570,14 +589,17 @@ static void appoooh_draw_sprites(mame_bitmap *dest_bmp,
 			sy = 239 - sy;
 			flipx = !flipx;
 		}
-		drawgfx( dest_bmp, gfx,
-				code,
-				color,
-				flipx,flip_screen,
-				sx, sy,
-				cliprect,
-				TRANSPARENCY_PEN , 0);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flip_screen;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	 }
+	} // end of patch paragraph
+
 }
 
 static void robowres_draw_sprites(mame_bitmap *dest_bmp,
@@ -587,6 +609,25 @@ static void robowres_draw_sprites(mame_bitmap *dest_bmp,
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		dest_bmp, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x20 - 4;offs >= 0;offs -= 4)
 	{
 		int sy    = 240 - sprite[offs+0];
@@ -603,14 +644,17 @@ static void robowres_draw_sprites(mame_bitmap *dest_bmp,
 			sy = 239 - sy;
 			flipx = !flipx;
 		}
-		drawgfx( dest_bmp, gfx,
-				code,
-				color,
-				flipx,flip_screen,
-				sx, sy,
-				cliprect,
-				TRANSPARENCY_PEN , 0);
+		
+		dgp1.code = code;
+		dgp1.color = color;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flip_screen;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	 }
+	} // end of patch paragraph
+
 }
 
 /***************************************************************************

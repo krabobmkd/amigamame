@@ -33,31 +33,71 @@ VIDEO_UPDATE( taxidrvr )
 	}
 	else
 	{
+		
+		{ 
+		struct drawgfxParams dgp0={
+			bitmap, 	// dest
+			Machine->gfx[3], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 0;offs < 0x400;offs++)
 		{
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx(bitmap,Machine->gfx[3],
-					taxidrvr_vram3[offs],
-					0,
-					0,0,
-					(sx*8-taxidrvr_scroll[0])&0xff,(sy*8-taxidrvr_scroll[1])&0xff,
-					cliprect,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = taxidrvr_vram3[offs];
+			dgp0.sx = (sx*8-taxidrvr_scroll[0])&0xff;
+			dgp0.sy = (sy*8-taxidrvr_scroll[1])&0xff;
+			drawgfx(&dgp0);
 		}
+		} // end of patch paragraph
 
+
+		
+		{ 
+		struct drawgfxParams dgp1={
+			bitmap, 	// dest
+			Machine->gfx[2], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 0;offs < 0x400;offs++)
 		{
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx(bitmap,Machine->gfx[2],
-					taxidrvr_vram2[offs]+256*taxidrvr_vram2[offs+0x400],
-					0,
-					0,0,
-					(sx*8-taxidrvr_scroll[2])&0xff,(sy*8-taxidrvr_scroll[3])&0xff,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp1.code = taxidrvr_vram2[offs]+256*taxidrvr_vram2[offs+0x400];
+			dgp1.sx = (sx*8-taxidrvr_scroll[2])&0xff;
+			dgp1.sy = (sy*8-taxidrvr_scroll[3])&0xff;
+			drawgfx(&dgp1);
 		}
+		} // end of patch paragraph
+
 
 		if (spritectrl[2] & 4)
 		{
@@ -113,18 +153,38 @@ VIDEO_UPDATE( taxidrvr )
 			}
 		}
 
+		
+		{ 
+		struct drawgfxParams dgp2={
+			bitmap, 	// dest
+			Machine->gfx[1], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 0;offs < 0x400;offs++)
 		{
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx(bitmap,Machine->gfx[1],
-					taxidrvr_vram1[offs],
-					0,
-					0,0,
-					sx*8,sy*8,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp2.code = taxidrvr_vram1[offs];
+			dgp2.sx = sx*8;
+			dgp2.sy = sy*8;
+			drawgfx(&dgp2);
 		}
+		} // end of patch paragraph
+
 
 		for (offs = 0;offs < 0x2000;offs++)
 		{
@@ -141,16 +201,36 @@ VIDEO_UPDATE( taxidrvr )
 		}
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x400;offs++)
 	{
 		sx = offs % 32;
 		sy = offs / 32;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				taxidrvr_vram0[offs],
-				0,
-				0,0,
-				sx*8,sy*8,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp3.code = taxidrvr_vram0[offs];
+		dgp3.sx = sx*8;
+		dgp3.sy = sy*8;
+		drawgfx(&dgp3);
 	}
+	} // end of patch paragraph
+
 }

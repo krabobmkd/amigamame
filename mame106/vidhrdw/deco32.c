@@ -227,6 +227,25 @@ static void captaven_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, 
             0xffff: Sprite value
     */
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[gfxbank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		prival 	// priority_mask
+	  };
 	for (offs = 0x400-4;offs >=0;offs -= 4)
 	{
 		int sx,sy,sprite,colour,fx,fy,x_mult,y_mult,w,h,x,y,prival;
@@ -279,15 +298,19 @@ static void captaven_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, 
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
-				pdrawgfx(bitmap,Machine->gfx[gfxbank],
-						sprite + y + h * x,
-						colour,
-						fx,fy,
-						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						&Machine->visible_area,TRANSPARENCY_PEN,0,prival);
+				
+				dgp0.code = sprite + y + h * x;
+				dgp0.color = colour;
+				dgp0.flipx = fx;
+				dgp0.flipy = fy;
+				dgp0.sx = sx + x_mult * (w-x);
+				dgp0.sy = sy + y_mult * (h-y);
+				drawgfx(&dgp0);
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void fghthist_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, int gfxbank, int mask, int colourmask)
@@ -722,6 +745,25 @@ static void dragngun_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata)
 	if (dragngun_sprite_ctrl&0x40000000)
 		return;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		trans, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x800;offs += 8)
 	{
 		int sx,sy,colour,fx,fy,w,h,x,y,bx,by,trans,scalex,scaley;
@@ -821,12 +863,14 @@ static void dragngun_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata)
 						&Machine->visible_area,trans,15,zoomx,zoomy,NULL,0,
 						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16) );
 				else
-					drawgfx(bitmap,Machine->gfx[bank],
-						sprite,
-						colour,
-						fx,fy,
-						xpos>>16,ypos>>16,
-						&Machine->visible_area,trans,15);
+					
+					dgp0.code = sprite;
+					dgp0.color = colour;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = xpos>>16;
+					dgp0.sy = ypos>>16;
+					drawgfx(&dgp0);
 
 				if (fx)
 					xpos-=zoomx<<4;
@@ -839,6 +883,8 @@ static void dragngun_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata)
 				ypos+=zoomy<<4;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /******************************************************************************/

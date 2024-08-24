@@ -429,14 +429,38 @@ static void gaelco2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,
 					ey = yflip ? (ysize - 1 - y) : y;
 
 					/* normal sprite, pen 0 transparent */
-					if (color_effect == 0){
-						drawgfx(bitmap, gfx, number,
-							color, xflip, yflip,
-							((sx + ex*16) & 0x3ff) + spr_x_adjust,
-							((sy + ey*16) & 0x1ff),
-							cliprect, TRANSPARENCY_PEN, 0);
+					if (color_effect == 0)
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+						
+						dgp0.code = number;
+						dgp0.color = color;
+						dgp0.flipx = xflip;
+						dgp0.flipy = yflip;
+						dgp0.sx = ((sx + ex*16) & 0x3ff) + spr_x_adjust;
+						dgp0.sy = ((sy + ey*16) & 0x1ff);
+						drawgfx(&dgp0);
 
-					} else { /* last palette entry is reserved for shadows and highlights */
+					}
+} // end of patch paragraph
+ else { /* last palette entry is reserved for shadows and highlights */
 
 						/* get a pointer to the current sprite's gfx data */
 						UINT8 *gfx_src = gfx->gfxdata + (number % gfx->total_elements)*gfx->char_modulo;

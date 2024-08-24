@@ -312,25 +312,71 @@ static void draw_sprites(mame_bitmap *bitmap, int color_mask, int extra_sprites)
 			}
 
             if (spriteram[offs] & 0x80)
-            {
+            
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
                 /* 16x16 sprite */
 
-			    drawgfx(bitmap,Machine->gfx[0],
-					    code, color,
-					    0, ~spriteram[offs] & 0x40,
-				    	256-spriteram[offs+2],spriteram[offs+1],
-				        &Machine->visible_area,TRANSPARENCY_PEN,0);
+			    
+			    dgp0.code = code;
+			    dgp0.color = color;
+			    dgp0.flipy = ~spriteram[offs] & 0x40;
+			    dgp0.sx = 256-spriteram[offs+2];
+			    dgp0.sy = spriteram[offs+1];
+			    drawgfx(&dgp0);
             }
-            else
+} // end of patch paragraph
+
+            
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
             {
                 /* 32x32 sprite */
 
-			    drawgfx(bitmap,Machine->gfx[1],
-					    code >> 2, color,
-					    0, ~spriteram[offs] & 0x40,
-				    	256-spriteram[offs+2],spriteram[offs+1],
-				        &Machine->visible_area,TRANSPARENCY_PEN,0);
+			    
+			    dgp1.code = code >> 2;
+			    dgp1.color = color;
+			    dgp1.flipy = ~spriteram[offs] & 0x40;
+			    dgp1.sx = 256-spriteram[offs+2];
+			    dgp1.sy = spriteram[offs+1];
+			    drawgfx(&dgp1);
             }
+} // end of patch paragraph
+
         }
 	}
 }

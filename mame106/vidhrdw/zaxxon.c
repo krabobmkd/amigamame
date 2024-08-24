@@ -114,6 +114,25 @@ static void create_background( mame_bitmap *dst_bm, mame_bitmap *src_bm, int col
 	int offs;
 	int sx,sy;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		src_bm, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x4000;offs++)
 	{
 		sy = 8 * (offs / 32);
@@ -122,13 +141,15 @@ static void create_background( mame_bitmap *dst_bm, mame_bitmap *src_bm, int col
 		/* leave screenful of black pixels at end */
 		sy += 256;
 
-		drawgfx(src_bm,Machine->gfx[1],
-				memory_region(REGION_GFX4)[offs] + 256 * (memory_region(REGION_GFX4)[0x4000 + offs] & 3),
-				col + (memory_region(REGION_GFX4)[0x4000 + offs] >> 4),
-				0,0,
-				sx,sy,
-				0,TRANSPARENCY_NONE,0);
+		
+		dgp0.code = memory_region(REGION_GFX4)[offs] + 256 * (memory_region(REGION_GFX4)[0x4000 + offs] & 3);
+		dgp0.color = col + (memory_region(REGION_GFX4)[0x4000 + offs] >> 4);
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 static int zaxxon_create_background(void)
@@ -254,7 +275,26 @@ static void zaxxon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		if (spriteram[offs] != 0xff)
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int code = spriteram[offs + 1] & 0x3f;
 			int color = spriteram[offs + 2] & 0x3f;
 			int flipx = spriteram[offs + 1] & 0x40;
@@ -270,9 +310,17 @@ static void zaxxon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 				sy = 224 - sy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[2], code, color, flipx, flipy,
-				sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+			
+			dgp1.code = code;
+			dgp1.color = color;
+			dgp1.flipx = flipx;
+			dgp1.flipy = flipy;
+			dgp1.sx = sx;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 }
 
@@ -305,6 +353,42 @@ VIDEO_START( razmataz )
 		return 1;
 
 	/* prepare the background */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		backgroundbitmap1, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp3={
+		backgroundbitmap2, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x4000;offs++)
 	{
 		int sx,sy;
@@ -312,20 +396,22 @@ VIDEO_START( razmataz )
 		sy = 8 * (offs / 32);
 		sx = 8 * (offs % 32);
 
-		drawgfx(backgroundbitmap1,Machine->gfx[1],
-				memory_region(REGION_GFX4)[offs] + 256 * (memory_region(REGION_GFX4)[0x4000 + offs] & 3),
-				memory_region(REGION_GFX4)[0x4000 + offs] >> 4,
-				0,0,
-				sx,sy,
-				0,TRANSPARENCY_NONE,0);
+		
+		dgp2.code = memory_region(REGION_GFX4)[offs] + 256 * (memory_region(REGION_GFX4)[0x4000 + offs] & 3);
+		dgp2.color = memory_region(REGION_GFX4)[0x4000 + offs] >> 4;
+		dgp2.sx = sx;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 
-		drawgfx(backgroundbitmap2,Machine->gfx[1],
-				memory_region(REGION_GFX4)[offs] + 256 * (memory_region(REGION_GFX4)[0x4000 + offs] & 3),
-				16 + (memory_region(REGION_GFX4)[0x4000 + offs] >> 4),
-				0,0,
-				sx,sy,
-				0,TRANSPARENCY_NONE,0);
+		
+		dgp3.code = memory_region(REGION_GFX4)[offs] + 256 * (memory_region(REGION_GFX4)[0x4000 + offs] & 3);
+		dgp3.color = 16 + (memory_region(REGION_GFX4)[0x4000 + offs] >> 4);
+		dgp3.sx = sx;
+		dgp3.sy = sy;
+		drawgfx(&dgp3);
 	}
+	} // end of patch paragraph
+
 
 	fg_tilemap = tilemap_create(razmataz_get_fg_tile_info, tilemap_scan_rows,
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
@@ -409,7 +495,26 @@ static void congo_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		offs = sprpri[i];
 
 		if (spriteram[offs + 2] != 0xff)
-		{
+		
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int code = spriteram[offs + 2 + 1] & 0x7f;
 			int color = spriteram[offs + 2 + 2];
 			int flipx = spriteram[offs + 2 + 2] & 0x80;
@@ -425,9 +530,17 @@ static void congo_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 				sy = 224 - sy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[2], code, color, flipx, flipy,
-				sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+			
+			dgp4.code = code;
+			dgp4.color = color;
+			dgp4.flipx = flipx;
+			dgp4.flipy = flipy;
+			dgp4.sx = sx;
+			dgp4.sy = sy;
+			drawgfx(&dgp4);
 		}
+} // end of patch paragraph
+
 	}
 }
 
@@ -447,7 +560,26 @@ static void futspy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		if (spriteram[offs] != 0xff)
-		{
+		
+{ 
+struct drawgfxParams dgp5={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int code = spriteram[offs + 1] & 0x7f;
 			int color = spriteram[offs + 2] & 0x3f;
 			int flipx = spriteram[offs + 1] & 0x80;
@@ -463,9 +595,17 @@ static void futspy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 				sy = 224 - sy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[2], code, color, flipx, flipy,
-				sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+			
+			dgp5.code = code;
+			dgp5.color = color;
+			dgp5.flipx = flipx;
+			dgp5.flipy = flipy;
+			dgp5.sx = sx;
+			dgp5.sy = sy;
+			drawgfx(&dgp5);
 		}
+} // end of patch paragraph
+
 	}
 }
 

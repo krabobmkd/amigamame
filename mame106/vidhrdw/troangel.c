@@ -131,7 +131,26 @@ static void draw_background( mame_bitmap *bitmap )
 	for (offs = videoram_size - 2;offs >= 0;offs -= 2)
 	{
 		if (dirtybuffer[offs] || dirtybuffer[offs+1])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,code,attr,flipx;
 
 
@@ -151,13 +170,17 @@ static void draw_background( mame_bitmap *bitmap )
 				flipx = !flipx;
 			}
 
-			drawgfx(tmpbitmap,gfx,
-				code,
-				attr & 0x1f,
-				flipx,flipscreen,
-				8*sx,8*sy,
-				0,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = code;
+			dgp0.color = attr & 0x1f;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipscreen;
+			dgp0.sx = 8*sx;
+			dgp0.sy = 8*sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 
 	{
@@ -195,6 +218,25 @@ static void draw_sprites( mame_bitmap *bitmap )
 	int offs;
 
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1+bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size-4;offs >= 0;offs -= 4)
 	{
 		unsigned char attributes = spriteram[offs+1];
@@ -219,13 +261,17 @@ static void draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1+bank],
-			tile_number,
-			color,
-			flipx,flipy,
-			sx,sy,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = tile_number;
+		dgp1.color = color;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 

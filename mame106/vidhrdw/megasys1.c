@@ -585,6 +585,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	{
 		color_mask = (megasys1_sprite_flag & 0x100) ? 0x07 : 0x0f;
 
+		
+		{ 
+		struct drawgfxParams dgp0={
+			bitmap, 	// dest
+			Machine->gfx[3], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			15, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			priority_bitmap, 	// pri_buffer
+			(attr & 0x08) ? 0x0c : 0x0a 	// priority_mask
+		  };
 		for (offs = (0x800-8)/2;offs >= 0;offs -= 8/2)
 		{
 			for (sprite = 0; sprite < 4 ; sprite ++)
@@ -615,22 +634,43 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				code  = spritedata[0x0E/2] + objectdata[0x06/2];
 				color = (attr & color_mask);
 
-				pdrawgfx(bitmap,Machine->gfx[3],
-						(code & 0xfff ) + ((megasys1_sprite_bank & 1) << 12),
-						color,
-						flipx, flipy,
-						sx, sy,
-						cliprect,
-						TRANSPARENCY_PEN,15,
-						(attr & 0x08) ? 0x0c : 0x0a);
+				
+				dgp0.code = (code & 0xfff ) + ((megasys1_sprite_bank & 1) << 12);
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 			}	/* sprite */
-		}	/* offs */
+		}
+		} // end of patch paragraph
+	/* offs */
 	}	/* non Z hw */
 	else
 	{
 
 		/* MS1-Z just draws Sprite Data, and in reverse order */
 
+		
+		{ 
+		struct drawgfxParams dgp1={
+			bitmap, 	// dest
+			Machine->gfx[2], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			15, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			priority_bitmap, 	// pri_buffer
+			(attr & 0x08) ? 0x0c : 0x0a 	// priority_mask
+		  };
 		for (sprite = 0x80-1;sprite >= 0;sprite--)
 		{
 			UINT16 *spritedata = &spriteram16[ sprite * 0x10/2];
@@ -655,15 +695,17 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				sx = 240-sx;		sy = 240-sy;
 			}
 
-			pdrawgfx(bitmap,Machine->gfx[2],
-					code,
-					color,
-					flipx, flipy,
-					sx, sy,
-					cliprect,
-					TRANSPARENCY_PEN,15,
-					(attr & 0x08) ? 0x0c : 0x0a);
-		}	/* sprite */
+			
+			dgp1.code = code;
+			dgp1.color = color;
+			dgp1.flipx = flipx;
+			dgp1.flipy = flipy;
+			dgp1.sx = sx;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
+		}
+		} // end of patch paragraph
+	/* sprite */
 	}	/* Z hw */
 
 }

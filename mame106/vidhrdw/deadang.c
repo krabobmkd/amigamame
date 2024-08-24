@@ -88,6 +88,25 @@ static void draw_sprites(mame_bitmap *bitmap)
 {
 	int offs,fx,fy,x,y,color,sprite,pri;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri 	// priority_mask
+	  };
 	for (offs = 0; offs<0x800; offs+=8)
 	{
 		/* Don't draw empty sprite table entries */
@@ -118,11 +137,17 @@ static void draw_sprites(mame_bitmap *bitmap)
 			if (fy) fy=0; else fy=1;
 		}
 
-		pdrawgfx(bitmap,Machine->gfx[1],
-				sprite,
-				color,fx,fy,x,y,
-				&Machine->visible_area,TRANSPARENCY_PEN,15,pri);
+		
+		dgp0.code = sprite;
+		dgp0.color = color;
+		dgp0.flipx = fx;
+		dgp0.flipy = fy;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( deadang )

@@ -118,12 +118,40 @@ static void psikyo4_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect,
 			if (flipy)	{ ystart = high-1;  yend = -1;     yinc = -1; }
 			else		{ ystart = 0;       yend = high;   yinc = +1; }
 
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				gfx, 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (j = ystart; j != yend; j += yinc) {
 				for (i = xstart; i != xend; i += xinc) {
-					drawgfx(bitmap,gfx,tnum+loopnum,colr,flipx,flipy,xpos+16*i,ypos+16*j,cliprect,TRANSPARENCY_PEN,0);
+					
+					dgp0.code = tnum+loopnum;
+					dgp0.color = colr;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = xpos+16*i;
+					dgp0.sy = ypos+16*j;
+					drawgfx(&dgp0);
 					loopnum++;
 				}
 			}
+			} // end of patch paragraph
+
 		}
 		/* end drawing */
 		listcntr++;

@@ -304,13 +304,31 @@ VIDEO_UPDATE( ccastles )
 		y = 216 - spriteaddr[offs+1];
 
 		if (spriteaddr[offs+2] & 0x80)	/* background can have priority over the sprite */
-		{
-			drawgfx(sprite_bm,Machine->gfx[0],
-					spriteaddr[offs],
-					0,
-					flip_screen,flip_screen,
-					0,0,
-					0,TRANSPARENCY_NONE,0);
+		
+{ 
+struct drawgfxParams dgp0={
+	sprite_bm, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp0.code = spriteaddr[offs];
+			dgp0.flipx = flip_screen;
+			dgp0.flipy = flip_screen;
+			drawgfx(&dgp0);
 
 			for (j = 0;j < 16;j++)
 			{
@@ -333,14 +351,38 @@ VIDEO_UPDATE( ccastles )
 
 			copybitmap(bitmap,sprite_bm,0,0,x,y,cliprect,TRANSPARENCY_PEN,Machine->pens[7]);
 		}
-		else
+} // end of patch paragraph
+
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	7, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 		{
-			drawgfx(bitmap,Machine->gfx[0],
-					spriteaddr[offs],
-					0,
-					flip_screen,flip_screen,
-					x,y,
-					cliprect,TRANSPARENCY_PEN,7);
+			
+			dgp1.code = spriteaddr[offs];
+			dgp1.flipx = flip_screen;
+			dgp1.flipy = flip_screen;
+			dgp1.sx = x;
+			dgp1.sy = y;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 }

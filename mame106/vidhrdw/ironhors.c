@@ -200,63 +200,159 @@ static void ironhors_draw_sprites( mame_bitmap *bitmap )
 		}
 
 		switch (sr[offs+4] & 0x0c)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			case 0x00:	/* 16x16 */
-				drawgfx(bitmap,Machine->gfx[1],
-						code/4,
-						color,
-						flipx,flipy,
-						sx,sy,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = code/4;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 				break;
 
 			case 0x04:	/* 16x8 */
-				{
+				
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 					if (flip_screen) sy += 8; // this fixes the train wheels' position
 
-					drawgfx(bitmap,Machine->gfx[2],
-							code & ~1,
-							color,
-							flipx,flipy,
-							flipx?sx+8:sx,sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[2],
-							code | 1,
-							color,
-							flipx,flipy,
-							flipx?sx:sx+8,sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+					
+					dgp1.code = code & ~1;
+					dgp1.color = color;
+					dgp1.flipx = flipx;
+					dgp1.flipy = flipy;
+					dgp1.sx = flipx?sx+8:sx;
+					dgp1.sy = sy;
+					drawgfx(&dgp1);
+					
+					dgp1.code = code | 1;
+					dgp1.color = color;
+					dgp1.flipx = flipx;
+					dgp1.flipy = flipy;
+					dgp1.sx = flipx?sx:sx+8;
+					dgp1.sy = sy;
+					drawgfx(&dgp1);
 				}
+} // end of patch paragraph
+
 				break;
 
 			case 0x08:	/* 8x16 */
-				{
-					drawgfx(bitmap,Machine->gfx[2],
-							code & ~2,
-							color,
-							flipx,flipy,
-							sx,flipy?sy+8:sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[2],
-							code | 2,
-							color,
-							flipx,flipy,
-							sx,flipy?sy:sy+8,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+{ 
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+					
+					dgp3.code = code & ~2;
+					dgp3.color = color;
+					dgp3.flipx = flipx;
+					dgp3.flipy = flipy;
+					dgp3.sx = sx;
+					dgp3.sy = flipy?sy+8:sy;
+					drawgfx(&dgp3);
+					
+					dgp3.code = code | 2;
+					dgp3.color = color;
+					dgp3.flipx = flipx;
+					dgp3.flipy = flipy;
+					dgp3.sx = sx;
+					dgp3.sy = flipy?sy:sy+8;
+					drawgfx(&dgp3);
 				}
+} // end of patch paragraph
+
 				break;
 
 			case 0x0c:	/* 8x8 */
-				{
-					drawgfx(bitmap,Machine->gfx[2],
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+{ 
+struct drawgfxParams dgp5={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+					
+					dgp5.code = code;
+					dgp5.color = color;
+					dgp5.flipx = flipx;
+					dgp5.flipy = flipy;
+					dgp5.sx = sx;
+					dgp5.sy = sy;
+					drawgfx(&dgp5);
 				}
+} // end of patch paragraph
+
 				break;
 		}
+} // end of patch paragraph
+
 	}
 }
 

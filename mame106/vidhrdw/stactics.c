@@ -509,6 +509,25 @@ static const rectangle visible_screen_area = {0*8, 32*8, 0*8, 30*8};
 ***************************************************************************/
 
 VIDEO_UPDATE( stactics )
+
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	Machine->gfx[5], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
     int offs, sx, sy, i;
     int char_number;
@@ -543,15 +562,36 @@ VIDEO_UPDATE( stactics )
         }
 
         if (dirty_videoram_d[offs])
-        {
-            drawgfx(bitmap_D,Machine->gfx[3],
-                    char_number,
-                    color_code,
-                    0,0,
-                    sx*8,sy*8,
-                    &Machine->visible_area,TRANSPARENCY_NONE,0);
+        
+{ 
+struct drawgfxParams dgp0={
+	bitmap_D, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+            
+            dgp0.code = char_number;
+            dgp0.color = color_code;
+            dgp0.sx = sx*8;
+            dgp0.sy = sy*8;
+            drawgfx(&dgp0);
             dirty_videoram_d[offs] = 0;
         }
+} // end of patch paragraph
+
 
         /* Draw aliens in Page E */
 
@@ -572,15 +612,36 @@ VIDEO_UPDATE( stactics )
         }
 
         if (dirty_videoram_e[offs])
-        {
-            drawgfx(bitmap_E,Machine->gfx[2],
-                    char_number,
-                    color_code,
-                    0,0,
-                    sx*8,sy*8,
-                    &Machine->visible_area,TRANSPARENCY_NONE,0);
+        
+{ 
+struct drawgfxParams dgp1={
+	bitmap_E, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+            
+            dgp1.code = char_number;
+            dgp1.color = color_code;
+            dgp1.sx = sx*8;
+            dgp1.sy = sy*8;
+            drawgfx(&dgp1);
             dirty_videoram_e[offs] = 0;
         }
+} // end of patch paragraph
+
 
         /* Draw aliens in Page F */
 
@@ -601,15 +662,36 @@ VIDEO_UPDATE( stactics )
         }
 
         if (dirty_videoram_f[offs])
-        {
-            drawgfx(bitmap_F,Machine->gfx[1],
-                    char_number,
-                    color_code,
-                    0,0,
-                    sx*8,sy*8,
-                    &Machine->visible_area,TRANSPARENCY_NONE,0);
+        
+{ 
+struct drawgfxParams dgp2={
+	bitmap_F, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+            
+            dgp2.code = char_number;
+            dgp2.color = color_code;
+            dgp2.sx = sx*8;
+            dgp2.sy = sy*8;
+            drawgfx(&dgp2);
             dirty_videoram_f[offs] = 0;
         }
+} // end of patch paragraph
+
 
         /* Draw the page B stuff */
 
@@ -630,15 +712,36 @@ VIDEO_UPDATE( stactics )
         }
 
         if (dirty_videoram_b[offs])
-        {
-            drawgfx(bitmap_B,Machine->gfx[0],
-                    char_number,
-                    color_code,
-                    0,0,
-                    sx*8,sy*8,
-                    &Machine->visible_area,TRANSPARENCY_NONE,0);
+        
+{ 
+struct drawgfxParams dgp3={
+	bitmap_B, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+            
+            dgp3.code = char_number;
+            dgp3.color = color_code;
+            dgp3.sx = sx*8;
+            dgp3.sy = sy*8;
+            drawgfx(&dgp3);
             dirty_videoram_b[offs] = 0;
         }
+} // end of patch paragraph
+
 
     }
 
@@ -666,127 +769,191 @@ VIDEO_UPDATE( stactics )
     pixel_y = 248;
 
     /* Draw an S */
-    drawgfx(bitmap,Machine->gfx[5],
-            18,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            &Machine->visible_area,TRANSPARENCY_NONE,0);
+    
+    dgp4.sx = pixel_x;
+    dgp4.sy = pixel_y;
+    drawgfx(&dgp4);
     pixel_x+=6;
     /* Draw a colon */
-    drawgfx(bitmap,Machine->gfx[5],
-            25,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            &Machine->visible_area,TRANSPARENCY_NONE,0);
+    
+    dgp4.sx = pixel_x;
+    dgp4.sy = pixel_y;
+    drawgfx(&dgp4);
     pixel_x+=6;
     /* Draw the digits */
+    
+    { 
+    struct drawgfxParams dgp6={
+    	bitmap, 	// dest
+    	Machine->gfx[5], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for(i=1;i<7;i++)
     {
-        drawgfx(bitmap,Machine->gfx[5],
-                stactics_display_buffer[i]&0x0f,
-                16,
-                0,0,
-                pixel_x,pixel_y,
-                &Machine->visible_area,TRANSPARENCY_NONE,0);
+        
+        dgp6.code = stactics_display_buffer[i]&0x0f;
+        dgp6.sx = pixel_x;
+        dgp6.sy = pixel_y;
+        drawgfx(&dgp6);
         pixel_x+=6;
     }
+    } // end of patch paragraph
+
 
     /***** Draw Credits Indicator *****/
 
     pixel_x = 64+16;
 
     /* Draw a C */
-    drawgfx(bitmap,Machine->gfx[5],
-            21,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            &Machine->visible_area,TRANSPARENCY_NONE,0);
+    
+    dgp4.sx = pixel_x;
+    dgp4.sy = pixel_y;
+    drawgfx(&dgp4);
     pixel_x+=6;
     /* Draw a colon */
-    drawgfx(bitmap,Machine->gfx[5],
-            25,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            &Machine->visible_area,TRANSPARENCY_NONE,0);
+    
+    dgp4.sx = pixel_x;
+    dgp4.sy = pixel_y;
+    drawgfx(&dgp4);
     pixel_x+=6;
     /* Draw the pips */
+    
+    { 
+    struct drawgfxParams dgp9={
+    	bitmap, 	// dest
+    	Machine->gfx[5], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for(i=7;i<9;i++)
     {
-        drawgfx(bitmap,Machine->gfx[5],
-                16 + (~stactics_display_buffer[i]&0x0f),
-                16,
-                0,0,
-                pixel_x,pixel_y,
-                &Machine->visible_area,TRANSPARENCY_NONE,0);
+        
+        dgp9.code = 16 + (~stactics_display_buffer[i]&0x0f);
+        dgp9.sx = pixel_x;
+        dgp9.sy = pixel_y;
+        drawgfx(&dgp9);
         pixel_x+=2;
     }
+    } // end of patch paragraph
+
 
     /***** Draw Rounds Indicator *****/
 
     pixel_x = 128+16;
 
     /* Draw an R */
-    drawgfx(bitmap,Machine->gfx[5],
-            22,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            &Machine->visible_area,TRANSPARENCY_NONE,0);
+    
+    dgp4.sx = pixel_x;
+    dgp4.sy = pixel_y;
+    drawgfx(&dgp4);
     pixel_x+=6;
     /* Draw a colon */
-    drawgfx(bitmap,Machine->gfx[5],
-            25,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            &Machine->visible_area,TRANSPARENCY_NONE,0);
+    
+    dgp4.sx = pixel_x;
+    dgp4.sy = pixel_y;
+    drawgfx(&dgp4);
     pixel_x+=6;
     /* Draw the pips */
+    
+    { 
+    struct drawgfxParams dgp12={
+    	bitmap, 	// dest
+    	Machine->gfx[5], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for(i=9;i<12;i++)
     {
-        drawgfx(bitmap,Machine->gfx[5],
-                16 + (~stactics_display_buffer[i]&0x0f),
-                16,
-                0,0,
-                pixel_x,pixel_y,
-                &Machine->visible_area,TRANSPARENCY_NONE,0);
+        
+        dgp12.code = 16 + (~stactics_display_buffer[i]&0x0f);
+        dgp12.sx = pixel_x;
+        dgp12.sy = pixel_y;
+        drawgfx(&dgp12);
         pixel_x+=2;
     }
+    } // end of patch paragraph
+
 
     /***** Draw Barriers Indicator *****/
 
     pixel_x = 192+16;
     /* Draw a B */
-    drawgfx(bitmap,Machine->gfx[5],
-            23,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            &Machine->visible_area,TRANSPARENCY_NONE,0);
+    
+    dgp4.sx = pixel_x;
+    dgp4.sy = pixel_y;
+    drawgfx(&dgp4);
     pixel_x+=6;
     /* Draw a colon */
-    drawgfx(bitmap,Machine->gfx[5],
-            25,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            &Machine->visible_area,TRANSPARENCY_NONE,0);
+    
+    dgp4.sx = pixel_x;
+    dgp4.sy = pixel_y;
+    drawgfx(&dgp4);
     pixel_x+=6;
     /* Draw the pips */
+    
+    { 
+    struct drawgfxParams dgp15={
+    	bitmap, 	// dest
+    	Machine->gfx[5], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for(i=12;i<16;i++)
     {
-        drawgfx(bitmap,Machine->gfx[5],
-                16 + (~stactics_display_buffer[i]&0x0f),
-                16,
-                0,0,
-                pixel_x,pixel_y,
-                &Machine->visible_area,TRANSPARENCY_NONE,0);
+        
+        dgp15.code = 16 + (~stactics_display_buffer[i]&0x0f);
+        dgp15.sx = pixel_x;
+        dgp15.sy = pixel_y;
+        drawgfx(&dgp15);
         pixel_x+=2;
     }
+    } // end of patch paragraph
+
 
     /* An LED fire beam! */
     /* (There were 120 green LEDS mounted in the cabinet in the game, */
@@ -824,41 +991,87 @@ VIDEO_UPDATE( stactics )
     for(i=0;i<8;i++)
     {
         if ((i%2)==1)
-        {
+        
+{ 
+struct drawgfxParams dgp16={
+	bitmap, 	// dest
+	Machine->gfx[4], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
             /* Draw 7 LEDS on each side */
-            drawgfx(bitmap,Machine->gfx[4],
-                    beamdata[firebeam_state*8+i]&0x7f,
-                    16*2,  /* Make it green */
-                    0,0,
-                    pixel_x,pixel_y,
-                    &Machine->visible_area,TRANSPARENCY_COLOR,0);
-            drawgfx(bitmap,Machine->gfx[4],
-                    beamdata[firebeam_state*8+i]&0x7f,
-                    16*2,  /* Make it green */
-                    1,0,
-                    255-pixel_x,pixel_y,
-                    &Machine->visible_area,TRANSPARENCY_COLOR,0);
+            
+            dgp16.code = beamdata[firebeam_state*8+i]&0x7f;
+            dgp16.color = 16*2;
+            dgp16.flipx = /* Make it green */                    0;
+            dgp16.sx = pixel_x;
+            dgp16.sy = pixel_y;
+            drawgfx(&dgp16);
+            
+            dgp16.code = beamdata[firebeam_state*8+i]&0x7f;
+            dgp16.color = 16*2;
+            dgp16.flipx = /* Make it green */                    1;
+            dgp16.sx = 255-pixel_x;
+            dgp16.sy = pixel_y;
+            drawgfx(&dgp16);
             pixel_x+=14;
             pixel_y-=7;
         }
-        else
+} // end of patch paragraph
+
+        
+{ 
+struct drawgfxParams dgp18={
+	bitmap, 	// dest
+	Machine->gfx[4], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
         {
             /* Draw 8 LEDS on each side */
-            drawgfx(bitmap,Machine->gfx[4],
-                    beamdata[firebeam_state*8+i],
-                    16*2,  /* Make it green */
-                    0,0,
-                    pixel_x,pixel_y,
-                    &Machine->visible_area,TRANSPARENCY_COLOR,0);
-            drawgfx(bitmap,Machine->gfx[4],
-                    beamdata[firebeam_state*8+i],
-                    16*2,  /* Make it green */
-                    1,0,
-                    255-pixel_x,pixel_y,
-                    &Machine->visible_area,TRANSPARENCY_COLOR,0);
+            
+            dgp18.code = beamdata[firebeam_state*8+i];
+            dgp18.color = 16*2;
+            dgp18.flipx = /* Make it green */                    0;
+            dgp18.sx = pixel_x;
+            dgp18.sy = pixel_y;
+            drawgfx(&dgp18);
+            
+            dgp18.code = beamdata[firebeam_state*8+i];
+            dgp18.color = 16*2;
+            dgp18.flipx = /* Make it green */                    1;
+            dgp18.sx = 255-pixel_x;
+            dgp18.sy = pixel_y;
+            drawgfx(&dgp18);
             pixel_x+=16;
             pixel_y-=8;
         }
+} // end of patch paragraph
+
 
     }
 
@@ -868,14 +1081,34 @@ VIDEO_UPDATE( stactics )
     pixel_y = 112;
 
     if (*stactics_motor_on & 0x01)
-    {
-        drawgfx(bitmap,Machine->gfx[5],
-                26,
-                16, /* red */
-                0,0,
-                pixel_x,pixel_y,
-                &Machine->visible_area,TRANSPARENCY_COLOR,0);
+    
+{ 
+struct drawgfxParams dgp20={
+	bitmap, 	// dest
+	Machine->gfx[5], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+        
+        dgp20.flipx = /* red */                0;
+        dgp20.sx = pixel_x;
+        dgp20.sy = pixel_y;
+        drawgfx(&dgp20);
     }
+} // end of patch paragraph
+
 
     /* Update vblank counter */
     stactics_vblank_count++;
@@ -890,3 +1123,5 @@ VIDEO_UPDATE( stactics )
     }
 
 }
+} // end of patch paragraph
+

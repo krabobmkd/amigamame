@@ -20,6 +20,25 @@ static void fitfight_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 	UINT16 *source = fitfight_spriteram;
 	UINT16 *finish = source + 0x800/2;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int xpos, ypos, number,xflip,yflip, end, colr, prio;
@@ -41,10 +60,19 @@ static void fitfight_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 
 		if (end) break;
 		if (prio == layer)
-		  drawgfx(bitmap,gfx,number,colr,xflip,yflip,xpos,ypos,cliprect,TRANSPARENCY_PEN,0);
+		  
+		  dgp0.code = number;
+		  dgp0.color = colr;
+		  dgp0.flipx = xflip;
+		  dgp0.flipy = yflip;
+		  dgp0.sx = xpos;
+		  dgp0.sy = ypos;
+		  drawgfx(&dgp0);
 
 		source+=4;
 	}
+	} // end of patch paragraph
+
 }
 
 static void get_fof_bak_tile_info(int tile_index)

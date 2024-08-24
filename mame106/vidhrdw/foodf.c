@@ -116,6 +116,25 @@ VIDEO_UPDATE( foodf )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0,0);
 
 	/* walk the motion object list. */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < spriteram_size / 4; offs += 2)
 	{
 		int data1 = spriteram16[offs];
@@ -128,11 +147,25 @@ VIDEO_UPDATE( foodf )
 		int hflip = (data1 >> 15) & 1;
 		int vflip = (data1 >> 14) & 1;
 
-		drawgfx(bitmap, Machine->gfx[1], pict, color, hflip, vflip,
-				xpos, ypos, cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp0.code = pict;
+		dgp0.color = color;
+		dgp0.flipx = hflip;
+		dgp0.flipy = vflip;
+		dgp0.sx = xpos;
+		dgp0.sy = ypos;
+		drawgfx(&dgp0);
 
 		/* draw again with wraparound (needed to get the end of level animation right) */
-		drawgfx(bitmap, Machine->gfx[1], pict, color, hflip, vflip,
-				xpos - 256, ypos, cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp0.code = pict;
+		dgp0.color = color;
+		dgp0.flipx = hflip;
+		dgp0.flipy = vflip;
+		dgp0.sx = xpos - 256;
+		dgp0.sy = ypos;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }

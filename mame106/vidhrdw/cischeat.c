@@ -654,6 +654,25 @@ void cischeat_draw_road(mame_bitmap *bitmap, const rectangle *cliprect, int road
 	max_priority = (max_priority & 7) * 0x100;
 
 	/* Let's draw from the top to the bottom of the visible screen */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&rect, 	// clip
+		transparency, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (sy = min_y ; sy <= max_y ; sy ++)
 	{
 		int code	= roadram[ sy * 4 + 0 ];
@@ -672,18 +691,19 @@ void cischeat_draw_road(mame_bitmap *bitmap, const rectangle *cliprect, int road
 
 		for (sx = -(xscroll%TILE_SIZE) ; sx <= max_x ; sx +=TILE_SIZE)
 		{
-			drawgfx(bitmap,gfx,
-					curr_code++,
-					attr,
-					0,0,
-					sx,sy,
-					&rect,
-					transparency,15);
+			
+			dgp0.code = curr_code++;
+			dgp0.color = attr;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 
 			/* wrap around */
 			if (curr_code%(X_SIZE/TILE_SIZE)==0)	curr_code = code;
 		}
 	}
+	} // end of patch paragraph
+
 
 }
 

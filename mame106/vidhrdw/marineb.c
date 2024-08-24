@@ -61,7 +61,26 @@ static void draw_chars(mame_bitmap *_tmpbitmap, mame_bitmap *bitmap,
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	_tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,flipx,flipy;
 
 
@@ -85,13 +104,17 @@ static void draw_chars(mame_bitmap *_tmpbitmap, mame_bitmap *bitmap,
 				flipx = !flipx;
 			}
 
-			drawgfx(_tmpbitmap,Machine->gfx[0],
-					videoram[offs] | ((colorram[offs] & 0xc0) << 2),
-					(colorram[offs] & 0x0f) + 16 * palbank,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = videoram[offs] | ((colorram[offs] & 0xc0) << 2);
+			dgp0.color = (colorram[offs] & 0x0f) + 16 * palbank;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = 8*sx;
+			dgp0.sy = 8*sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 
 
@@ -130,6 +153,25 @@ VIDEO_UPDATE( marineb )
 
 
 	/* draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x0f; offs >= 0; offs--)
 	{
 		int gfx,sx,sy,code,col,flipx,flipy,offs2;
@@ -179,17 +221,40 @@ VIDEO_UPDATE( marineb )
 			sx++;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code,
-				col,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = code;
+		dgp1.color = col;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 
 VIDEO_UPDATE( changes )
+
+{ 
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int offs,sx,sy,code,col,flipx,flipy;
 
@@ -198,6 +263,25 @@ VIDEO_UPDATE( changes )
 
 
 	/* draw the small sprites */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x05; offs >= 0; offs--)
 	{
 		int offs2;
@@ -223,13 +307,17 @@ VIDEO_UPDATE( changes )
 			sx++;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
-				code >> 2,
-				col,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp2.code = code >> 2;
+		dgp2.color = col;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 
 	/* draw the big sprite */
 
@@ -253,22 +341,28 @@ VIDEO_UPDATE( changes )
 
 	code >>= 4;
 
-	drawgfx(bitmap,Machine->gfx[2],
-			code,
-			col,
-			flipx,flipy,
-			sx,sy,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+	
+	dgp3.code = code;
+	dgp3.color = col;
+	dgp3.flipx = flipx;
+	dgp3.flipy = flipy;
+	dgp3.sx = sx;
+	dgp3.sy = sy;
+	drawgfx(&dgp3);
 
 	/* draw again for wrap around */
 
-	drawgfx(bitmap,Machine->gfx[2],
-			code,
-			col,
-			flipx,flipy,
-			sx-256,sy,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+	
+	dgp3.code = code;
+	dgp3.color = col;
+	dgp3.flipx = flipx;
+	dgp3.flipy = flipy;
+	dgp3.sx = sx-256;
+	dgp3.sy = sy;
+	drawgfx(&dgp3);
 }
+} // end of patch paragraph
+
 
 
 VIDEO_UPDATE( springer )
@@ -280,6 +374,25 @@ VIDEO_UPDATE( springer )
 
 
 	/* draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp5={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x0f; offs >= 0; offs--)
 	{
 		int gfx,sx,sy,code,col,flipx,flipy,offs2;
@@ -323,13 +436,17 @@ VIDEO_UPDATE( springer )
 			sx--;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code,
-				col,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp5.code = code;
+		dgp5.color = col;
+		dgp5.flipx = flipx;
+		dgp5.flipy = flipy;
+		dgp5.sx = sx;
+		dgp5.sy = sy;
+		drawgfx(&dgp5);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -342,6 +459,25 @@ VIDEO_UPDATE( hoccer )
 
 
 	/* draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp6={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x07; offs >= 0; offs--)
 	{
 		int sx,sy,code,col,flipx,flipy,offs2;
@@ -369,13 +505,17 @@ VIDEO_UPDATE( hoccer )
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
-				code >> 2,
-				col,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp6.code = code >> 2;
+		dgp6.color = col;
+		dgp6.flipx = flipx;
+		dgp6.flipy = flipy;
+		dgp6.sx = sx;
+		dgp6.sy = sy;
+		drawgfx(&dgp6);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -388,6 +528,25 @@ VIDEO_UPDATE( hopprobo )
 
 
 	/* draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp7={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x0f; offs >= 0; offs--)
 	{
 		int gfx,sx,sy,code,col,flipx,flipy,offs2;
@@ -430,11 +589,15 @@ VIDEO_UPDATE( hopprobo )
 			sx--;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
-				code,
-				col,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp7.code = code;
+		dgp7.color = col;
+		dgp7.flipx = flipx;
+		dgp7.flipy = flipy;
+		dgp7.sx = sx;
+		dgp7.sy = sy;
+		drawgfx(&dgp7);
 	}
+	} // end of patch paragraph
+
 }

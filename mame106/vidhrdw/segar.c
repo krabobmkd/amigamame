@@ -234,7 +234,26 @@ static void segar_common_screenrefresh(mame_bitmap *bitmap, int sprite_transpare
 
 		/* Redraw every character if our palette or scene changed */
 		if ((dirtybuffer[offs]) || sv.refresh)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	sprite_transparency, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 			sx = 8 * (offs % 32);
@@ -256,14 +275,20 @@ static void segar_common_screenrefresh(mame_bitmap *bitmap, int sprite_transpare
 				sv.dirtychar[charcode] = 2;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					charcode,charcode>>4,
-					sv.flip,sv.flip,sx,sy,
-					&Machine->visible_area,sprite_transparency,0);
+			
+			dgp0.code = charcode;
+			dgp0.color = charcode>>4;
+			dgp0.flipx = sv.flip;
+			dgp0.flipy = sv.flip;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 
 			dirtybuffer[offs] = 0;
 
 		}
+} // end of patch paragraph
+
 	}
 
 	for (offs=0;offs<256;offs++)
@@ -459,19 +484,67 @@ VIDEO_UPDATE( spaceod )
 			charcode = back_charmap[(sv.back_scene*0x1000) + offs];
 
 			if (vert_scene)
-			{
-				drawgfx(sv.vertbackbitmap,Machine->gfx[1 + sv.back_charset],
-					  charcode,0,
-					  sv.bflip,sv.bflip,sx,sy,
-					  0,TRANSPARENCY_NONE,0);
+			
+{ 
+struct drawgfxParams dgp1={
+	sv.vertbackbitmap, 	// dest
+	Machine->gfx[1 + sv.back_charset], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+				
+				dgp1.code = charcode;
+				dgp1.flipx = sv.bflip;
+				dgp1.flipy = sv.bflip;
+				dgp1.sx = sx;
+				dgp1.sy = sy;
+				drawgfx(&dgp1);
 			}
-			else
+} // end of patch paragraph
+
+			
+{ 
+struct drawgfxParams dgp2={
+	sv.horizbackbitmap, 	// dest
+	Machine->gfx[1 + sv.back_charset], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 			{
-				drawgfx(sv.horizbackbitmap,Machine->gfx[1 + sv.back_charset],
-					  charcode,0,
-					  sv.bflip,sv.bflip,sx,sy,
-					  0,TRANSPARENCY_NONE,0);
+				
+				dgp2.code = charcode;
+				dgp2.flipx = sv.bflip;
+				dgp2.flipy = sv.bflip;
+				dgp2.sx = sx;
+				dgp2.sy = sy;
+				drawgfx(&dgp2);
 			}
+} // end of patch paragraph
+
 		}
 	}
 
@@ -656,7 +729,26 @@ VIDEO_UPDATE( monsterb )
 
 			/* Redraw every background character if our palette or scene changed */
 			if ((dirtybuffer[offs]) || sv.refresh)
-			{
+			
+{ 
+struct drawgfxParams dgp3={
+	tmpbitmap, 	// dest
+	Machine->gfx[1 + sv.back_charset], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				int sx,sy;
 
 				sx = 8 * (offs % 32);
@@ -670,11 +762,17 @@ VIDEO_UPDATE( monsterb )
 
 				charcode = back_charmap[offs + sv.back_scene];
 
-				drawgfx(tmpbitmap,Machine->gfx[1 + sv.back_charset],
-					charcode,((charcode & 0xF0)>>4),
-					sv.flip,sv.flip,sx,sy,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+				
+				dgp3.code = charcode;
+				dgp3.color = ((charcode & 0xF0)>>4);
+				dgp3.flipx = sv.flip;
+				dgp3.flipy = sv.flip;
+				dgp3.sx = sx;
+				dgp3.sy = sy;
+				drawgfx(&dgp3);
 			}
+} // end of patch paragraph
+
 		}
 		sprite_transparency=TRANSPARENCY_PEN;
 	}
@@ -833,7 +931,26 @@ VIDEO_UPDATE( sindbadm )
 
 			/* Redraw every background character if our palette or scene changed */
 			if ((dirtybuffer[offs]) || sv.refresh)
-			{
+			
+{ 
+struct drawgfxParams dgp4={
+	tmpbitmap, 	// dest
+	Machine->gfx[1 + sv.back_charset], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				int sx,sy;
 
 				sx = 8 * (offs % 32);
@@ -852,11 +969,17 @@ VIDEO_UPDATE( sindbadm )
 
 				charcode = back_charmap[backoffs + back_scene];
 
-				drawgfx(tmpbitmap,Machine->gfx[1 + sv.back_charset],
-					charcode,((charcode & 0xF0)>>4),
-					sv.flip,sv.flip,sx,sy,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+				
+				dgp4.code = charcode;
+				dgp4.color = ((charcode & 0xF0)>>4);
+				dgp4.flipx = sv.flip;
+				dgp4.flipy = sv.flip;
+				dgp4.sx = sx;
+				dgp4.sy = sy;
+				drawgfx(&dgp4);
 			}
+} // end of patch paragraph
+
 		}
 		sprite_transparency=TRANSPARENCY_PEN;
 	}

@@ -1388,41 +1388,123 @@ if (code_pressed(KEYCODE_D))
 					ey = yflip ? (height-1-y) : y;
 
 					if (flipscreen)
+					
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	trans, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	priority_bitmap, 	// pri_buffer
+	pri_mask 	// priority_mask
+  };
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	trans, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+						if (pri_mask != -1)
+							
+							dgp0.code = number + x_offset[ex] + y_offset[ey];
+							dgp0.color = color;
+							dgp0.flipx = !xflip;
+							dgp0.flipy = !yflip;
+							dgp0.sx = 248-(sx+x*8);
+							dgp0.sy = 248-(sy+y*8);
+							drawgfx(&dgp0);
+						else
+							
+							dgp0.code = number + x_offset[ex] + y_offset[ey];
+							dgp0.color = color;
+							dgp0.flipx = !xflip;
+							dgp0.flipy = !yflip;
+							dgp0.sx = 248-(sx+x*8);
+							dgp0.sy = 248-(sy+y*8);
+							drawgfx(&dgp0);
+					}
+} // end of patch paragraph
+
+					
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	trans, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	priority_bitmap, 	// pri_buffer
+	pri_mask 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	trans, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 					{
 						if (pri_mask != -1)
-							pdrawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								!xflip,!yflip,
-								248-(sx+x*8),248-(sy+y*8),
-								cliprect,trans,0,
-								pri_mask);
+							
+							dgp1.code = number + x_offset[ex] + y_offset[ey];
+							dgp1.color = color;
+							dgp1.flipx = xflip;
+							dgp1.flipy = yflip;
+							dgp1.sx = global_x_offset+sx+x*8;
+							dgp1.sy = sy+y*8;
+							drawgfx(&dgp1);
 						else
-							drawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								!xflip,!yflip,
-								248-(sx+x*8),248-(sy+y*8),
-								cliprect,trans,0);
+							
+							dgp1.code = number + x_offset[ex] + y_offset[ey];
+							dgp1.color = color;
+							dgp1.flipx = xflip;
+							dgp1.flipy = yflip;
+							dgp1.sx = global_x_offset+sx+x*8;
+							dgp1.sy = sy+y*8;
+							drawgfx(&dgp1);
 					}
-					else
-					{
-						if (pri_mask != -1)
-							pdrawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								xflip,yflip,
-								global_x_offset+sx+x*8,sy+y*8,
-								cliprect,trans,0,
-								pri_mask);
-						else
-							drawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								xflip,yflip,
-								global_x_offset+sx+x*8,sy+y*8,
-								cliprect,trans,0);
-					}
+} // end of patch paragraph
+
 				}
 			}
 		}
@@ -1776,6 +1858,25 @@ void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect)
 		{
 			int sx,sy;
 
+			
+			{ 
+			struct drawgfxParams dgp2={
+				bitmap, 	// dest
+				K007420_gfx, 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (y = 0;y < h;y++)
 			{
 				sy = oy + 8 * y;
@@ -1792,22 +1893,28 @@ void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect)
 
 					if (c & bankmask) continue; else c += bank;
 
-					drawgfx(bitmap,K007420_gfx,
-						c,
-						color,
-						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+					
+					dgp2.code = c;
+					dgp2.color = color;
+					dgp2.flipx = flipx;
+					dgp2.flipy = flipy;
+					dgp2.sx = sx;
+					dgp2.sy = sy;
+					drawgfx(&dgp2);
 
 					if (K007342_regs[2] & 0x80)
-						drawgfx(bitmap,K007420_gfx,
-							c,
-							color,
-							flipx,flipy,
-							sx,sy-256,
-							cliprect,TRANSPARENCY_PEN,0);
+						
+						dgp2.code = c;
+						dgp2.color = color;
+						dgp2.flipx = flipx;
+						dgp2.flipy = flipy;
+						dgp2.sx = sx;
+						dgp2.sy = sy-256;
+						drawgfx(&dgp2);
 				}
 			}
+			} // end of patch paragraph
+
 		}
 		else
 		{
@@ -2746,6 +2853,42 @@ void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_
 		{
 			int sx,sy;
 
+			
+			{ 
+			struct drawgfxParams dgp2={
+				bitmap, 	// dest
+				K051960_gfx, 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				priority_bitmap, 	// pri_buffer
+				pri 	// priority_mask
+			  };
+			struct drawgfxParams dgp4={
+				bitmap, 	// dest
+				K051960_gfx, 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (y = 0;y < h;y++)
 			{
 				sy = oy + 16 * y;
@@ -2761,21 +2904,27 @@ void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_
 					else c += yoffset[y];
 
 					if (max_priority == -1)
-						pdrawgfx(bitmap,K051960_gfx,
-								c,
-								color,
-								flipx,flipy,
-								sx & 0x1ff,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,pri);
+						
+						dgp2.code = c;
+						dgp2.color = color;
+						dgp2.flipx = flipx;
+						dgp2.flipy = flipy;
+						dgp2.sx = sx & 0x1ff;
+						dgp2.sy = sy;
+						drawgfx(&dgp2);
 					else
-						drawgfx(bitmap,K051960_gfx,
-								c,
-								color,
-								flipx,flipy,
-								sx & 0x1ff,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0);
+						
+						dgp4.code = c;
+						dgp4.color = color;
+						dgp4.flipx = flipx;
+						dgp4.flipy = flipy;
+						dgp4.sx = sx & 0x1ff;
+						dgp4.sy = sy;
+						drawgfx(&dgp4);
 				}
 			}
+			} // end of patch paragraph
+
 		}
 		else
 		{
@@ -3370,14 +3519,37 @@ void K053245_sprites_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprec
 				c = (c & 0x3f) | (code & ~0x3f);
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
-				{
-					pdrawgfx(bitmap,K053245_gfx[chip],
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,pri);
+				
+{ 
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	K053245_gfx[chip], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	priority_bitmap, 	// pri_buffer
+	pri 	// priority_mask
+  };
+{
+					
+					dgp3.code = c;
+					dgp3.color = color;
+					dgp3.flipx = fx;
+					dgp3.flipy = fy;
+					dgp3.sx = sx;
+					dgp3.sy = sy;
+					drawgfx(&dgp3);
 				}
+} // end of patch paragraph
+
 				else
 				{
 					pdrawgfxzoom(bitmap,K053245_gfx[chip],
@@ -3599,14 +3771,37 @@ void K053245_sprites_draw_lethal(int chip, mame_bitmap *bitmap,const rectangle *
 				c = (c & 0x3f) | (code & ~0x3f);
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
-				{
-					pdrawgfx(bitmap,Machine->gfx[0], /* hardcoded to 0 (decoded 6bpp gfx) for le */
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,pri);
+				
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	priority_bitmap, 	// pri_buffer
+	pri 	// priority_mask
+  };
+{
+					
+					dgp4.code = /* hardcoded to 0 (decoded 6bpp gfx) for le */							c;
+					dgp4.color = color;
+					dgp4.flipx = fx;
+					dgp4.flipy = fy;
+					dgp4.sx = sx;
+					dgp4.sy = sy;
+					drawgfx(&dgp4);
 				}
+} // end of patch paragraph
+
 				else
 				{
 					pdrawgfxzoom(bitmap,Machine->gfx[0],  /* hardcoded to 0 (decoded 6bpp gfx) for le */
@@ -4484,14 +4679,37 @@ void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
 				}
 
 				if (nozoom)
-				{
-					pdrawgfx(bitmap,K053247_gfx,
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,primask);
+				
+{ 
+struct drawgfxParams dgp5={
+	bitmap, 	// dest
+	K053247_gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	priority_bitmap, 	// pri_buffer
+	primask 	// priority_mask
+  };
+{
+					
+					dgp5.code = c;
+					dgp5.color = color;
+					dgp5.flipx = fx;
+					dgp5.flipy = fy;
+					dgp5.sx = sx;
+					dgp5.sy = sy;
+					drawgfx(&dgp5);
 				}
+} // end of patch paragraph
+
 				else
 				{
 					pdrawgfxzoom(bitmap,K053247_gfx,
@@ -4506,14 +4724,37 @@ void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
 				if (mirrory && h == 1)  /* Simpsons shadows */
 				{
 					if (nozoom)
-					{
-						pdrawgfx(bitmap,K053247_gfx,
-								c,
-								color,
-								fx,!fy,
-								sx,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,primask);
+					
+{ 
+struct drawgfxParams dgp6={
+	bitmap, 	// dest
+	K053247_gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	priority_bitmap, 	// pri_buffer
+	primask 	// priority_mask
+  };
+{
+						
+						dgp6.code = c;
+						dgp6.color = color;
+						dgp6.flipx = fx;
+						dgp6.flipy = !fy;
+						dgp6.sx = sx;
+						dgp6.sy = sy;
+						drawgfx(&dgp6);
 					}
+} // end of patch paragraph
+
 					else
 					{
 						pdrawgfxzoom(bitmap,K053247_gfx,

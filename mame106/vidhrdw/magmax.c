@@ -306,7 +306,26 @@ VIDEO_UPDATE( magmax )
 
 		sy = spriteram16[offs] & 0xff;
 		if (sy)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	31, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int code = spriteram16[offs + 1] & 0xff;
 			int attr = spriteram16[offs + 2] & 0xff;
 			int color = (attr & 0xf0) >> 4;
@@ -329,13 +348,17 @@ VIDEO_UPDATE( magmax )
 				code += (magmax_vreg & 0x30) * 0x8;
 			}
 
-			drawgfx(bitmap, Machine->gfx[1],
-					code,
-					color,
-					flipx, flipy,
-					sx, sy,
-					&Machine->visible_area, TRANSPARENCY_COLOR, 31);
+			
+			dgp0.code = code;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 	if (!(magmax_vreg & 0x40))		/* background disable */
 	{
@@ -351,7 +374,26 @@ VIDEO_UPDATE( magmax )
 
 		code = videoram16[offs /*+ page*/] & 0xff;
 		if (code)
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx = (offs % 32);
 			int sy = (offs / 32);
 
@@ -361,12 +403,15 @@ VIDEO_UPDATE( magmax )
 				sy = 31 - sy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[0],
-					code,
-					0,
-					flipscreen, flipscreen,
-					8 * sx, 8 * sy,
-					&Machine->visible_area, TRANSPARENCY_PEN, 15);
+			
+			dgp1.code = code;
+			dgp1.flipx = flipscreen;
+			dgp1.flipy = flipscreen;
+			dgp1.sx = 8 * sx;
+			dgp1.sy = 8 * sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 }

@@ -189,6 +189,25 @@ VIDEO_UPDATE( darkmist)
 
 */
 	int i,fx,fy,tile,palette;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for(i=0;i<spriteram_size;i+=32)
 	{
 		fy=spriteram[i+1]&0x40;
@@ -208,15 +227,17 @@ VIDEO_UPDATE( darkmist)
 
 		palette+=32;
 
-		drawgfx(
-               bitmap,Machine->gfx[2],
-               tile,
-               palette,
-               fx,fy,
-               spriteram[i+3],spriteram[i+2],
-               &Machine->visible_area,
-               TRANSPARENCY_PEN,0 );
+		
+		dgp0.code = tile;
+		dgp0.color = palette;
+		dgp0.flipx = fx;
+		dgp0.flipy = fy;
+		dgp0.sx = spriteram[i+3];
+		dgp0.sy = spriteram[i+2];
+		drawgfx(&dgp0);
 		}
+	} // end of patch paragraph
+
 
 	}
 

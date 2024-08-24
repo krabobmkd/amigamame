@@ -99,6 +99,25 @@ static void battlex_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect 
 	UINT8 *source = spriteram;
 	UINT8 *finish = spriteram + 0x200;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int sx = (source[0] & 0x7f) * 2 - (source[0] & 0x80) * 2;
@@ -116,10 +135,19 @@ static void battlex_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect 
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,gfx,tile,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = tile;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 
 		source += 4;
 	}
+	} // end of patch paragraph
+
 
 }
 

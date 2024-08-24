@@ -522,6 +522,25 @@ static void afega_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect, UI
 	int max_x		=	Machine->drv->screen_width;
 	int max_y		=	Machine->drv->screen_height;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for ( offs = 0; offs < spriteram_size/2; offs += 16/2 )
 	{
 		int attr, dim, code, sx, sy, color, flipx, flipy;
@@ -559,12 +578,14 @@ static void afega_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect, UI
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				drawgfx( bitmap,Machine->gfx[0],
-								code++,
-								color,
-								flipx, flipy,
-								sx + x * 16, sy + y * 16,
-								cliprect,TRANSPARENCY_PEN,15 );
+				
+				dgp0.code = code++;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx + x * 16;
+				dgp0.sy = sy + y * 16;
+				drawgfx(&dgp0);
 			}
 		}
 
@@ -579,6 +600,8 @@ if (code_pressed(KEYCODE_X))
 #endif
 #endif
 	}
+	} // end of patch paragraph
+
 }
 
 

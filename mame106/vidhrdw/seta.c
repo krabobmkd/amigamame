@@ -688,6 +688,25 @@ static void seta_draw_sprites_map(mame_bitmap *bitmap,const rectangle *cliprect)
         BM 071204 - first column frontmost breaks superman.
     */
 //  for ( col = numcol - 1 ; col >= 0; col -- )
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for ( col = 0 ; col < numcol; col ++ )
 	{
 		int x	=	spriteram16[(col * 0x20 + 0x08 + 0x400)/2] & 0xff;
@@ -735,15 +754,19 @@ twineagl:   000 027 00 0f   (test mode)
 			color	=	( color >> (16-5) ) % total_color_codes;
 			code	=	(code & 0x3fff) + (bank * 0x4000);
 
-			drawgfx(bitmap,Machine->gfx[0],
-					code,
-					color,
-					flipx, flipy,
-					((sx + 0x10) & 0x1ff) - 0x10,((sy + 8) & 0x0ff) - 8,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = code;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = ((sx + 0x10) & 0x1ff) - 0x10;
+			dgp0.sy = ((sy + 8) & 0x0ff) - 8;
+			drawgfx(&dgp0);
 		}
 	/* next column */
 	}
+	} // end of patch paragraph
+
 
 }
 
@@ -773,6 +796,25 @@ static void seta_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	xoffs = global_offsets->sprite_offs[flip ? 1 : 0];
 	yoffs = -2;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for ( offs = (0x400-2)/2 ; offs >= 0/2; offs -= 2/2 )
 	{
 		int	code	=	src[offs + 0x000/2];
@@ -797,13 +839,17 @@ static void seta_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		y = max_y - y;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				code,
-				color,
-				flipx, flipy,
-				((x + xoffs + 0x10) & 0x1ff) - 0x10,((y - yoffs + 8) & 0x0ff) - 8,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = code;
+		dgp1.color = color;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = ((x + xoffs + 0x10) & 0x1ff) - 0x10;
+		dgp1.sy = ((y - yoffs + 8) & 0x0ff) - 8;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 
 }
 

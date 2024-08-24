@@ -227,6 +227,42 @@ static void mcr68_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect,
 	fillbitmap(priority_bitmap,1,&sprite_clip);
 
 	/* loop over sprite RAM */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&sprite_clip, 	// clip
+		TRANSPARENCY_PENS, 	// transparency
+		0x0101, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x00 	// priority_mask
+	  };
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&sprite_clip, 	// clip
+		TRANSPARENCY_PENS, 	// transparency
+		0xfeff, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x02 	// priority_mask
+	  };
 	for (offs = spriteram_size / 2 - 4;offs >= 0;offs -= 4)
 	{
 		int code, color, flipx, flipy, x, y, flags;
@@ -256,13 +292,27 @@ static void mcr68_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect,
             The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
-				&sprite_clip, TRANSPARENCY_PENS, 0x0101, 0x00);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
-				&sprite_clip, TRANSPARENCY_PENS, 0xfeff, 0x02);
+		
+		dgp1.code = code;
+		dgp1.color = color;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = x;
+		dgp1.sy = y;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -273,6 +323,42 @@ static void zwackery_update_sprites(mame_bitmap *bitmap, const rectangle *clipre
 	fillbitmap(priority_bitmap,1,cliprect);
 
 	/* loop over sprite RAM */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PENS, 	// transparency
+		0x0101, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x00 	// priority_mask
+	  };
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PENS, 	// transparency
+		0xfeff, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x02 	// priority_mask
+	  };
 	for (offs = spriteram_size / 2 - 4;offs >= 0;offs -= 4)
 	{
 		int code, color, flipx, flipy, x, y, flags;
@@ -312,13 +398,27 @@ static void zwackery_update_sprites(mame_bitmap *bitmap, const rectangle *clipre
             The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
-				cliprect, TRANSPARENCY_PENS, 0x0101, 0x00);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = x;
+		dgp2.sy = y;
+		drawgfx(&dgp2);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
-				cliprect, TRANSPARENCY_PENS, 0xfeff, 0x02);
+		
+		dgp3.code = code;
+		dgp3.color = color;
+		dgp3.flipx = flipx;
+		dgp3.flipy = flipy;
+		dgp3.sx = x;
+		dgp3.sy = y;
+		drawgfx(&dgp3);
 	}
+	} // end of patch paragraph
+
 }
 
 

@@ -159,31 +159,77 @@ void nycaptor_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,int pr
 			sy = 240-nycaptor_spriteram[offs+0];
 			priori=(pr&0xe0)>>5;
       if(priori==pri)
-      {
+      
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 #ifdef MAME_DEBUG
       if(nycaptor_mask&(1<<(pri+4)))pal=0xd;
 #endif
 			flipx = ((nycaptor_spriteram[offs+1]&0x40)>>6);
 			flipy = ((nycaptor_spriteram[offs+1]&0x80)>>7);
 
-			drawgfx(bitmap,Machine->gfx[1],
-					code,
-					pal,
-					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+			
+			dgp0.code = code;
+			dgp0.color = pal;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 
 			if(nycaptor_spriteram[offs+3]>240)
-			{
+			
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				sx = (nycaptor_spriteram[offs+3]-256);
-				drawgfx(bitmap,Machine->gfx[1],
-        				code,
-				        pal,
-				        flipx,flipy,
-					      sx,sy,
-					      cliprect,TRANSPARENCY_PEN,15);
+				
+				dgp1.code = code;
+				dgp1.color = pal;
+				dgp1.flipx = flipx;
+				dgp1.flipy = flipy;
+				dgp1.sx = sx;
+				dgp1.sy = sy;
+				drawgfx(&dgp1);
 					}
+} // end of patch paragraph
+
 				}
+} // end of patch paragraph
+
 		}
 	}
 }

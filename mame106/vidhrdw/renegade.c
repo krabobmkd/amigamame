@@ -101,7 +101,26 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		int sy = 240 - source[0];
 
 		if (sy >= 16)
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[sprite_bank], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int attributes = source[1]; /* SFCCBBBB */
 			int sx = source[3];
 			int sprite_number = source[2];
@@ -120,26 +139,53 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			}
 
 			if (attributes & 0x80) /* big sprite */
-			{
+			
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[sprite_bank], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				sprite_number &= ~1;
-				drawgfx(bitmap, Machine->gfx[sprite_bank],
-					sprite_number + 1,
-					color,
-					xflip, flip_screen,
-					sx, sy + (flip_screen ? -16 : 16),
-					cliprect, TRANSPARENCY_PEN, 0);
+				
+				dgp0.code = sprite_number + 1;
+				dgp0.color = color;
+				dgp0.flipx = xflip;
+				dgp0.flipy = flip_screen;
+				dgp0.sx = sx;
+				dgp0.sy = sy + (flip_screen ? -16 : 16);
+				drawgfx(&dgp0);
 			}
+} // end of patch paragraph
+
 			else
 			{
 				sy += (flip_screen ? -16 : 16);
 			}
-			drawgfx(bitmap, Machine->gfx[sprite_bank],
-				sprite_number,
-				color,
-				xflip, flip_screen,
-				sx, sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+			
+			dgp1.code = sprite_number;
+			dgp1.color = color;
+			dgp1.flipx = xflip;
+			dgp1.flipy = flip_screen;
+			dgp1.sx = sx;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 		source += 4;
 	}
 }

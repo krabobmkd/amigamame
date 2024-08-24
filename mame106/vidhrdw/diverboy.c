@@ -33,14 +33,35 @@ static void diverboy_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 		bank = (source[1]&0x0002) >> 1;
 
 		if (!flash || (cpu_getcurrentframe() & 1))
-		{
-			drawgfx(bitmap,Machine->gfx[bank],
-					number,
-					colr,
-					0,0,
-					xpos,ypos,
-					cliprect,(source[1] & 0x0008) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[bank], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	(source[1] & 0x0008) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp0.code = number;
+			dgp0.color = colr;
+			dgp0.sx = xpos;
+			dgp0.sy = ypos;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 
 		source+=8;
 	}

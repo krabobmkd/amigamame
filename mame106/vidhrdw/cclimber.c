@@ -323,6 +323,25 @@ static void drawbigsprite(mame_bitmap *bitmap)
 	color = cclimber_bigspriteram[1] & 0x07;	/* cclimber */
 //  color = cclimber_bigspriteram[1] & 0x03;    /* swimmer */
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		(oy+8*sy) & 0xff, 	// clip
+		0, 	// transparency
+		TRANSPARENCY_PEN, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = cclimber_bsvideoram_size - 1;offs >= 0;offs--)
 	{
 		sx = offs % 16;
@@ -330,23 +349,27 @@ static void drawbigsprite(mame_bitmap *bitmap)
 		if (flipx) sx = 15 - sx;
 		if (flipy) sy = 15 - sy;
 
-		drawgfx(bitmap,Machine->gfx[2],
-//              cclimber_bsvideoram[offs],  /* cclimber */
-				cclimber_bsvideoram[offs] + ((cclimber_bigspriteram[1] & 0x08) << 5),	/* swimmer */
-				color,
-				flipx,flipy,
-				(ox+8*sx) & 0xff,(oy+8*sy) & 0xff,
-				0,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = //              cclimber_bsvideoram[offs];
+		dgp0.color = /* cclimber */				cclimber_bsvideoram[offs] + ((cclimber_bigspriteram[1] & 0x08) << 5);
+		dgp0.flipx = /* swimmer */				color;
+		dgp0.flipy = flipx;
+		dgp0.sx = flipy;
+		dgp0.sy = (ox+8*sx) & 0xff;
+		drawgfx(&dgp0);
 
 		/* wraparound */
-		drawgfx(bitmap,Machine->gfx[2],
-//              cclimber_bsvideoram[offs],  /* cclimber */
-				cclimber_bsvideoram[offs] + ((cclimber_bigspriteram[1] & 0x08) << 5),	/* swimmer */
-				color,
-				flipx,flipy,
-				((ox+8*sx) & 0xff) - 256,(oy+8*sy) & 0xff,
-				0,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = //              cclimber_bsvideoram[offs];
+		dgp0.color = /* cclimber */				cclimber_bsvideoram[offs] + ((cclimber_bigspriteram[1] & 0x08) << 5);
+		dgp0.flipx = /* swimmer */				color;
+		dgp0.flipy = flipx;
+		dgp0.sx = flipy;
+		dgp0.sy = ((ox+8*sx) & 0xff) - 256;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -365,7 +388,26 @@ VIDEO_UPDATE( cclimber )
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp2={
+	tmpbitmap, 	// dest
+	Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,flipx,flipy;
 
 
@@ -389,13 +431,17 @@ VIDEO_UPDATE( cclimber )
 				flipy = !flipy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
-					videoram[offs] + 8 * (colorram[offs] & 0x20),
-					colorram[offs] & 0x0f,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp2.code = videoram[offs] + 8 * (colorram[offs] & 0x20);
+			dgp2.color = colorram[offs] & 0x0f;
+			dgp2.flipx = flipx;
+			dgp2.flipy = flipy;
+			dgp2.sx = 8*sx;
+			dgp2.sy = 8*sy;
+			drawgfx(&dgp2);
 		}
+} // end of patch paragraph
+
 	}
 
 
@@ -432,6 +478,25 @@ VIDEO_UPDATE( cclimber )
 
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
 	/* order, to have the correct priorities. */
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
@@ -452,13 +517,17 @@ VIDEO_UPDATE( cclimber )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3],
-				(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
-				spriteram[offs + 1] & 0x0f,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp3.code = (spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20);
+		dgp3.color = spriteram[offs + 1] & 0x0f;
+		dgp3.flipx = flipx;
+		dgp3.flipy = flipy;
+		dgp3.sx = sx;
+		dgp3.sy = sy;
+		drawgfx(&dgp3);
 	}
+	} // end of patch paragraph
+
 
 
 	if ((cclimber_bigspriteram[0] & 1) == 0)
@@ -481,7 +550,26 @@ VIDEO_UPDATE( swimmer )
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp4={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,flipx,flipy,color;
 
 
@@ -511,13 +599,17 @@ VIDEO_UPDATE( swimmer )
 				flipy = !flipy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					videoram[offs] + ((colorram[offs] & 0x10) << 4),
-					color,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp4.code = videoram[offs] + ((colorram[offs] & 0x10) << 4);
+			dgp4.color = color;
+			dgp4.flipx = flipx;
+			dgp4.flipy = flipy;
+			dgp4.sx = 8*sx;
+			dgp4.sy = 8*sy;
+			drawgfx(&dgp4);
 		}
+} // end of patch paragraph
+
 	}
 
 
@@ -548,6 +640,25 @@ VIDEO_UPDATE( swimmer )
 
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
 	/* order, to have the correct priorities. */
+	
+	{ 
+	struct drawgfxParams dgp5={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
@@ -568,13 +679,17 @@ VIDEO_UPDATE( swimmer )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
-				(spriteram[offs] & 0x3f) | (spriteram[offs + 1] & 0x10) << 2,
-				(spriteram[offs + 1] & 0x0f) + 0x10 * palettebank,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp5.code = (spriteram[offs] & 0x3f) | (spriteram[offs + 1] & 0x10) << 2;
+		dgp5.color = (spriteram[offs + 1] & 0x0f) + 0x10 * palettebank;
+		dgp5.flipx = flipx;
+		dgp5.flipy = flipy;
+		dgp5.sx = sx;
+		dgp5.sy = sy;
+		drawgfx(&dgp5);
 	}
+	} // end of patch paragraph
+
 
 
 	if ((cclimber_bigspriteram[0] & 1) == 0)
@@ -608,7 +723,26 @@ VIDEO_UPDATE( yamato )
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp6={
+	tmpbitmap, 	// dest
+	Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,flipx,flipy;
 
 
@@ -632,13 +766,17 @@ VIDEO_UPDATE( yamato )
 				flipy = !flipy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
-					videoram[offs] + 8 * (colorram[offs] & 0x20),
-					colorram[offs] & 0x0f,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp6.code = videoram[offs] + 8 * (colorram[offs] & 0x20);
+			dgp6.color = colorram[offs] & 0x0f;
+			dgp6.flipx = flipx;
+			dgp6.flipy = flipy;
+			dgp6.sx = 8*sx;
+			dgp6.sy = 8*sy;
+			drawgfx(&dgp6);
 		}
+} // end of patch paragraph
+
 	}
 
 
@@ -675,6 +813,25 @@ VIDEO_UPDATE( yamato )
 
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
 	/* order, to have the correct priorities. */
+	
+	{ 
+	struct drawgfxParams dgp7={
+		bitmap, 	// dest
+		Machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
@@ -695,13 +852,17 @@ VIDEO_UPDATE( yamato )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3],
-				(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
-				spriteram[offs + 1] & 0x0f,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp7.code = (spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20);
+		dgp7.color = spriteram[offs + 1] & 0x0f;
+		dgp7.flipx = flipx;
+		dgp7.flipy = flipy;
+		dgp7.sx = sx;
+		dgp7.sy = sy;
+		drawgfx(&dgp7);
 	}
+	} // end of patch paragraph
+
 
 
 	if ((cclimber_bigspriteram[0] & 1) == 0)
@@ -779,6 +940,25 @@ static void trdrawbigsprite(mame_bitmap *bitmap,const rectangle *cliprect,int pr
 
 
 			for(y=0;y<16;y++)
+				
+				{ 
+				struct drawgfxParams dgp8={
+					bitmap, 	// dest
+					Machine->gfx[3], 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					cliprect, 	// clip
+					TRANSPARENCY_PEN, 	// transparency
+					0, 	// transparent_color
+					0, 	// scalex
+					0, 	// scaley
+					NULL, 	// pri_buffer
+					0 	// priority_mask
+				  };
 				for(x=0;x<16;x++)
 				{
 					int sx=x;
@@ -788,9 +968,25 @@ static void trdrawbigsprite(mame_bitmap *bitmap,const rectangle *cliprect,int pr
 
 					code=cclimber_bsvideoram[y*16+x]+bank*256;
 
-					drawgfx(bitmap, Machine->gfx[3], code, palette, flipx, flipy,(sx*8+xs)&0xff,(sy*8+ys)&0xff, cliprect, TRANSPARENCY_PEN, 0);
-					drawgfx(bitmap, Machine->gfx[3], code, palette, flipx, flipy,((sx*8+xs)&0xff)-256,((sy*8+ys)&0xff)-256, cliprect, TRANSPARENCY_PEN, 0);
+					
+					dgp8.code = code;
+					dgp8.color = palette;
+					dgp8.flipx = flipx;
+					dgp8.flipy = flipy;
+					dgp8.sx = (sx*8+xs)&0xff;
+					dgp8.sy = (sy*8+ys)&0xff;
+					drawgfx(&dgp8);
+					
+					dgp8.code = code;
+					dgp8.color = palette;
+					dgp8.flipx = flipx;
+					dgp8.flipy = flipy;
+					dgp8.sx = ((sx*8+xs)&0xff)-256;
+					dgp8.sy = ((sy*8+ys)&0xff)-256;
+					drawgfx(&dgp8);
 				}
+				} // end of patch paragraph
+
 		}
 }
 
@@ -811,6 +1007,25 @@ VIDEO_UPDATE( toprollr )
 
 	trdrawbigsprite(bitmap, &myclip, PRIORITY_UNDER);
 
+	
+	{ 
+	struct drawgfxParams dgp10={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&myclip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy,palette;
@@ -832,17 +1047,40 @@ VIDEO_UPDATE( toprollr )
 
 		palette=0x08+(spriteram[offs + 1] & 0x0f);
 
-		drawgfx(bitmap,Machine->gfx[2],
-			(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20)+8*(spriteram[offs + 1] & 0x10),
-				palette,
-				flipx,flipy,
-				sx,sy,
-				&myclip,TRANSPARENCY_PEN,0);
+		
+		dgp10.code = (spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20)+8*(spriteram[offs + 1] & 0x10);
+		dgp10.color = palette;
+		dgp10.flipx = flipx;
+		dgp10.flipy = flipy;
+		dgp10.sx = sx;
+		dgp10.sy = sy;
+		drawgfx(&dgp10);
 	}
+	} // end of patch paragraph
+
 
 	trdrawbigsprite(bitmap, &myclip, PRIORITY_OVER);
 
 	for(y=0;y<32;y++)
+		
+		{ 
+		struct drawgfxParams dgp11={
+			bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for(x=0;x<32;x++)
 		{
 			int sx=x*8;
@@ -866,9 +1104,18 @@ VIDEO_UPDATE( toprollr )
 			}
 
 			palette=8+(attr&0xf);
-			drawgfx(bitmap, Machine->gfx[0], code+((attr&0xf0)<<4),palette, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+			
+			dgp11.code = code+((attr&0xf0)<<4);
+			dgp11.color = palette;
+			dgp11.flipx = flipx;
+			dgp11.flipy = flipy;
+			dgp11.sx = sx;
+			dgp11.sy = sy;
+			drawgfx(&dgp11);
 
 		}
+		} // end of patch paragraph
+
 }
 
 

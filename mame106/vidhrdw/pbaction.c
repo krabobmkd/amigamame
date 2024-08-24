@@ -106,6 +106,25 @@ static void pbaction_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
@@ -136,13 +155,17 @@ static void pbaction_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2],	/* normal or double size */
-				spriteram[offs],
-				spriteram[offs + 1] & 0x0f,
-				flipx,flipy,
-				sx + (flip_screen ? scroll : -scroll), sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = /* normal or double size */				spriteram[offs];
+		dgp0.color = spriteram[offs + 1] & 0x0f;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx + (flip_screen ? scroll : -scroll);
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( pbaction )

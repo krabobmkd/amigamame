@@ -215,7 +215,26 @@ static void exedexes_draw_sprites(mame_bitmap *bitmap, int priority)
 	for (offs = spriteram_size - 32;offs >= 0;offs -= 32)
 	{
 		if ((buffered_spriteram[offs + 1] & 0x40) == priority)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int code,color,flipx,flipy,sx,sy;
 
 			code = buffered_spriteram[offs];
@@ -225,13 +244,17 @@ static void exedexes_draw_sprites(mame_bitmap *bitmap, int priority)
 			sx = buffered_spriteram[offs + 3] - ((buffered_spriteram[offs + 1] & 0x80) << 1);
 			sy = buffered_spriteram[offs + 2];
 
-			drawgfx(bitmap,Machine->gfx[3],
-					code,
-					color,
-					flipx,flipy,
-					sx,sy,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = code;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 }
 

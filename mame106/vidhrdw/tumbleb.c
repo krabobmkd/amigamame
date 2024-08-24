@@ -30,6 +30,25 @@ static void tumblepb_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x400;offs += 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
@@ -76,22 +95,45 @@ static void tumblepb_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = sprite - multi * inc;
+			dgp0.color = colour;
+			dgp0.flipx = fx;
+			dgp0.flipy = fy;
+			dgp0.sx = x;
+			dgp0.sy = y + mult * multi;
+			drawgfx(&dgp0);
 
 			multi--;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void jumpkids_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		// x-1 for bcstory .. realign other layers?					cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
@@ -138,22 +180,45 @@ static void jumpkids_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x-1,y + mult * multi, // x-1 for bcstory .. realign other layers?
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp1.code = sprite - multi * inc;
+			dgp1.color = colour;
+			dgp1.flipx = fx;
+			dgp1.flipy = fy;
+			dgp1.sx = x-1;
+			dgp1.sy = y + mult * multi;
+			drawgfx(&dgp1);
 
 			multi--;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void fncywld_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x400;offs += 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
@@ -200,16 +265,20 @@ static void fncywld_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,15);
+			
+			dgp2.code = sprite - multi * inc;
+			dgp2.color = colour;
+			dgp2.flipx = fx;
+			dgp2.flipy = fy;
+			dgp2.sx = x;
+			dgp2.sy = y + mult * multi;
+			drawgfx(&dgp2);
 
 			multi--;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /******************************************************************************/

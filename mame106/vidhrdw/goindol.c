@@ -118,26 +118,49 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int gfx
 		}
 
 		if ((sprite_ram[offs+1] >> 3) && (sx < 248))
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[gfxbank], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			tile	 = ((sprite_ram[offs+3])+((sprite_ram[offs+2] & 7) << 8));
 			tile	+= tile;
 			palette	 = sprite_ram[offs+2] >> 3;
 
-			drawgfx(bitmap,Machine->gfx[gfxbank],
-						tile,
-						palette,
-						flip_screen,flip_screen,
-						sx,sy,
-						cliprect,
-						TRANSPARENCY_PEN, 0);
-			drawgfx(bitmap,Machine->gfx[gfxbank],
-						tile+1,
-						palette,
-						flip_screen,flip_screen,
-						sx,sy + (flip_screen ? -8 : 8),
-						cliprect,
-						TRANSPARENCY_PEN, 0);
+			
+			dgp0.code = tile;
+			dgp0.color = palette;
+			dgp0.flipx = flip_screen;
+			dgp0.flipy = flip_screen;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
+			
+			dgp0.code = tile+1;
+			dgp0.color = palette;
+			dgp0.flipx = flip_screen;
+			dgp0.flipy = flip_screen;
+			dgp0.sx = sx;
+			dgp0.sy = sy + (flip_screen ? -8 : 8);
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 }
 

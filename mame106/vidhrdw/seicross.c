@@ -108,41 +108,91 @@ static void seicross_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int x = spriteram[offs + 3];
-		drawgfx(bitmap,Machine->gfx[1],
-				(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
-				spriteram[offs + 1] & 0x0f,
-				spriteram[offs] & 0x40,spriteram[offs] & 0x80,
-				x,240-spriteram[offs + 2],
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = (spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128;
+		dgp0.color = spriteram[offs + 1] & 0x0f;
+		dgp0.flipx = spriteram[offs] & 0x40;
+		dgp0.flipy = spriteram[offs] & 0x80;
+		dgp0.sx = x;
+		dgp0.sy = 240-spriteram[offs + 2];
+		drawgfx(&dgp0);
 		if(x>0xf0)
-			drawgfx(bitmap,Machine->gfx[1],
-					(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
-					spriteram[offs + 1] & 0x0f,
-					spriteram[offs] & 0x40,spriteram[offs] & 0x80,
-					x-256,240-spriteram[offs + 2],
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = (spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128;
+			dgp0.color = spriteram[offs + 1] & 0x0f;
+			dgp0.flipx = spriteram[offs] & 0x40;
+			dgp0.flipy = spriteram[offs] & 0x80;
+			dgp0.sx = x-256;
+			dgp0.sy = 240-spriteram[offs + 2];
+			drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
 
+
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_2_size - 4;offs >= 0;offs -= 4)
 	{
 		int x = spriteram_2[offs + 3];
-		drawgfx(bitmap,Machine->gfx[1],
-				(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
-				spriteram_2[offs + 1] & 0x0f,
-				spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
-				x,240-spriteram_2[offs + 2],
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp2.code = (spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2);
+		dgp2.color = spriteram_2[offs + 1] & 0x0f;
+		dgp2.flipx = spriteram_2[offs] & 0x40;
+		dgp2.flipy = spriteram_2[offs] & 0x80;
+		dgp2.sx = x;
+		dgp2.sy = 240-spriteram_2[offs + 2];
+		drawgfx(&dgp2);
 		if(x>0xf0)
-			drawgfx(bitmap,Machine->gfx[1],
-					(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
-					spriteram_2[offs + 1] & 0x0f,
-					spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
-					x-256,240-spriteram_2[offs + 2],
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp2.code = (spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2);
+			dgp2.color = spriteram_2[offs + 1] & 0x0f;
+			dgp2.flipx = spriteram_2[offs] & 0x40;
+			dgp2.flipy = spriteram_2[offs] & 0x80;
+			dgp2.sx = x-256;
+			dgp2.sy = 240-spriteram_2[offs + 2];
+			drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( seicross )

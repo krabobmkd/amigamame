@@ -119,6 +119,25 @@ static void suna16_draw_sprites(mame_bitmap *bitmap)
 	int max_x	=	Machine->drv->screen_width	- 8;
 	int max_y	=	Machine->drv->screen_height - 8;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for ( offs = 0xfc00/2; offs < 0x10000/2 ; offs += 4/2 )
 	{
 		int srcpg, srcx,srcy, dimx,dimy;
@@ -186,12 +205,14 @@ static void suna16_draw_sprites(mame_bitmap *bitmap)
 					tile_flipy = !tile_flipy;
 				}
 
-				drawgfx(	bitmap, Machine->gfx[0],
-							(tile & 0x3fff) + bank*0x4000,
-							attr + (color_bank ? 0x10 : 0),
-							tile_flipx, tile_flipy,
-							sx, sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,15	);
+				
+				dgp0.code = (tile & 0x3fff) + bank*0x4000;
+				dgp0.color = attr + (color_bank ? 0x10 : 0);
+				dgp0.flipx = tile_flipx;
+				dgp0.flipy = tile_flipy;
+				dgp0.sx = sx;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 
 				tile_x += tile_xinc;
 			}
@@ -200,6 +221,8 @@ static void suna16_draw_sprites(mame_bitmap *bitmap)
 		}
 
 	}
+	} // end of patch paragraph
+
 
 }
 

@@ -303,7 +303,26 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prior
 		int big,sx,sy,flipx,flipy;
 
 		if (((spriteram[offs+1] & 0x30) >> 4) == priority)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[big ? 5 : 4], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			if (senjyo)	/* Senjyo */
 				big = (spriteram[offs] & 0x80);
 			else	/* Star Force */
@@ -334,13 +353,17 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prior
 			}
 
 
-			drawgfx(bitmap,Machine->gfx[big ? 5 : 4],
-					spriteram[offs],
-					spriteram[offs + 1] & 0x07,
-					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = spriteram[offs];
+			dgp0.color = spriteram[offs + 1] & 0x07;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 }
 

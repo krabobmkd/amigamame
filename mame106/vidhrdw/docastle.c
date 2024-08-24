@@ -226,6 +226,42 @@ static void docastle_draw_sprites( mame_bitmap *bitmap )
 
 	fillbitmap(priority_bitmap,1,NULL);
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		256, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x00 	// priority_mask
+	  };
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		256, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x02 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy,code,color;
@@ -292,23 +328,27 @@ static void docastle_draw_sprites( mame_bitmap *bitmap )
 		}
 
 		/* first draw the sprite, visible */
-		pdrawgfx(bitmap,Machine->gfx[1],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_COLOR,256,
-				0x00);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx(bitmap,Machine->gfx[1],
-				code,
-				color + 32,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_COLOR,256,
-				0x02);
+		
+		dgp1.code = code;
+		dgp1.color = color + 32;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( docastle )

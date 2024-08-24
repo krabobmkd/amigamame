@@ -65,6 +65,25 @@ static void fantland_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			*ram		=	spriteram,			// current sprite pointer in spriteram
 			*ram2		=	indx_ram;			// current sprite pointer in indx_ram
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for ( ; ram < indx_ram; ram += 8,ram2++)
 	{
 		int attr,code,color, x,y,xoffs,yoffs,flipx,flipy, idx;
@@ -120,8 +139,17 @@ static void fantland_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		if (x >= 0x180)		x -= 0x200;
 
-		drawgfx(bitmap,Machine->gfx[0], code,color, flipx,flipy, x,y, &Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( fantland )

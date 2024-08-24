@@ -450,6 +450,25 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 			{
 				color |= 0x80;
 
+				
+				{ 
+				struct drawgfxParams dgp0={
+					bitmap_sp, 	// dest
+					gfx, 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					cliprect, 	// clip
+					TRANSPARENCY_PEN, 	// transparency
+					0, 	// transparent_color
+					0, 	// scalex
+					0, 	// scaley
+					priority_bitmap, 	// pri_buffer
+					priority_mask 	// priority_mask
+				  };
 				for (row = 0; row < sizey; row++)
 				{
 					for (col = 0; col < sizex; col++)
@@ -457,21 +476,43 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
 						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
 
-						pdrawgfx(bitmap_sp, gfx,
-							number + layout[row][col],
-							color,
-							flipx, flipy,
-							sx, sy,
-							cliprect, TRANSPARENCY_PEN, 0,
-							priority_mask);
+						
+						dgp0.code = number + layout[row][col];
+						dgp0.color = color;
+						dgp0.flipx = flipx;
+						dgp0.flipy = flipy;
+						dgp0.sx = sx;
+						dgp0.sy = sy;
+						drawgfx(&dgp0);
 					}
 				}
+				} // end of patch paragraph
+
 			}
 			else
 			{
 				if (blend_support)
 					bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
 
+				
+				{ 
+				struct drawgfxParams dgp1={
+					bitmap, 	// dest
+					gfx, 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					cliprect, 	// clip
+					TRANSPARENCY_PEN, 	// transparency
+					0, 	// transparent_color
+					0, 	// scalex
+					0, 	// scaley
+					priority_bitmap, 	// pri_buffer
+					priority_mask 	// priority_mask
+				  };
 				for (row = 0; row < sizey; row++)
 				{
 					for (col = 0; col < sizex; col++)
@@ -479,15 +520,18 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
 						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
 
-						pdrawgfx(bitmap, gfx,
-							number + layout[row][col],
-							color,
-							flipx, flipy,
-							sx, sy,
-							cliprect, TRANSPARENCY_PEN, 0,
-							priority_mask);
+						
+						dgp1.code = number + layout[row][col];
+						dgp1.color = color;
+						dgp1.flipx = flipx;
+						dgp1.flipy = flipy;
+						dgp1.sx = sx;
+						dgp1.sy = sy;
+						drawgfx(&dgp1);
 					}
 				}
+				} // end of patch paragraph
+
 			}
 		}
 skip_sprite:
@@ -518,6 +562,25 @@ static void drgnbowl_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 {
 	int i, code, color, x, y, flipx, flipy, priority_mask;
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		priority_mask 	// priority_mask
+	  };
 	for( i = 0; i < 0x800/2; i += 4 )
 	{
 		code = (spriteram16[i + 0] & 0xff) | ((spriteram16[i + 3] & 0x1f) << 8);
@@ -537,22 +600,28 @@ static void drgnbowl_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		else
 			priority_mask = 0;
 
-		pdrawgfx(bitmap,Machine->gfx[3],
-				code,
-				color,flipx,flipy,x,y,
-				cliprect,
-				TRANSPARENCY_PEN,15,
-				priority_mask);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = x;
+		dgp2.sy = y;
+		drawgfx(&dgp2);
 
 		/* wrap x*/
-		pdrawgfx(bitmap,Machine->gfx[3],
-				code,
-				color,flipx,flipy,x-512,y,
-				cliprect,
-				TRANSPARENCY_PEN,15,
-				priority_mask);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = x-512;
+		dgp2.sy = y;
+		drawgfx(&dgp2);
 
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( gaiden )

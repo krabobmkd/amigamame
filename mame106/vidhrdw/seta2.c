@@ -255,6 +255,25 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				/* I don't think the following is entirely correct (when using 16x16
                    tiles x should probably loop from 0 to 0x20) but it seems to work
                    fine in all the games we have for now. */
+				
+				{ 
+				struct drawgfxParams dgp0={
+					bitmap, 	// dest
+					Machine->gfx[gfx], 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					cliprect, 	// clip
+					TRANSPARENCY_PEN, 	// transparency
+					0, 	// transparent_color
+					0, 	// scalex
+					0, 	// scaley
+					NULL, 	// pri_buffer
+					0 	// priority_mask
+				  };
 				for (y = 0; y < (0x40 >> tilesize); y++)
 				{
 					int py = ((scrolly - (y+1) * (8 << tilesize) + 0x10) & 0x1ff) - 0x10 - yoffset;
@@ -286,17 +305,21 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 						{
 							for (tx = 0; tx <= tilesize; tx++)
 							{
-								drawgfx(bitmap, Machine->gfx[gfx],
-										code ^ tx ^ (ty<<1),
-										color,
-										flipx, flipy,
-										px + (flipx ? tilesize-tx : tx) * 8, py + (flipy ? tilesize-ty : ty) * 8,
-										cliprect,TRANSPARENCY_PEN,0 );
+								
+								dgp0.code = code ^ tx ^ (ty<<1);
+								dgp0.color = color;
+								dgp0.flipx = flipx;
+								dgp0.flipy = flipy;
+								dgp0.sx = px + (flipx ? tilesize-tx : tx) * 8;
+								dgp0.sy = py + (flipy ? tilesize-ty : ty) * 8;
+								drawgfx(&dgp0);
 							}
 						}
 
 					}
 				}
+				} // end of patch paragraph
+
 			}
 			else
 // "normal" sprite
@@ -325,18 +348,41 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 				code &= ~((sizex+1) * (sizey+1) - 1);	// see myangel, myangel2 and grdians
 
+				
+				{ 
+				struct drawgfxParams dgp1={
+					bitmap, 	// dest
+					Machine->gfx[gfx], 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					cliprect, 	// clip
+					TRANSPARENCY_PEN, 	// transparency
+					0, 	// transparent_color
+					0, 	// scalex
+					0, 	// scaley
+					NULL, 	// pri_buffer
+					0 	// priority_mask
+				  };
 				for (y = 0; y <= sizey; y++)
 				{
 					for (x = 0; x <= sizex; x++)
 					{
-						drawgfx(bitmap, Machine->gfx[gfx],
-								code++,
-								color,
-								flipx, flipy,
-								sx + (flipx ? sizex-x : x) * 8, sy + (flipy ? sizey-y : y) * 8,
-								cliprect,TRANSPARENCY_PEN,0 );
+						
+						dgp1.code = code++;
+						dgp1.color = color;
+						dgp1.flipx = flipx;
+						dgp1.flipy = flipy;
+						dgp1.sx = sx + (flipx ? sizex-x : x) * 8;
+						dgp1.sy = sy + (flipy ? sizey-y : y) * 8;
+						drawgfx(&dgp1);
 					}
 				}
+				} // end of patch paragraph
+
 			}
 		}
 

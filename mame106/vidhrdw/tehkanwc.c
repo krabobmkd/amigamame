@@ -153,22 +153,39 @@ static void gridiron_drawled(mame_bitmap *bitmap,UINT8 led,int player)
 	}
 
 	if (i < 10)
-	{
+	
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		if (player == 0)
-			drawgfx(bitmap,Machine->gfx[0],
-					0xc0 + i,
-					0x0a,
-					0,0,
-					0,232,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = 0xc0 + i;
+			dgp0.color = 0x0a;
+			drawgfx(&dgp0);
 		else
-			drawgfx(bitmap,Machine->gfx[0],
-					0xc0 + i,
-					0x03,
-					1,1,
-					0,16,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = 0xc0 + i;
+			dgp0.color = 0x03;
+			drawgfx(&dgp0);
 	}
+} // end of patch paragraph
+
 else logerror("unknown LED %02x for player %d\n",led,player);
 }
 
@@ -176,6 +193,25 @@ static void tehkanwc_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		int attr = spriteram[offs + 1];
@@ -198,10 +234,17 @@ static void tehkanwc_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
-			code, color, flipx, flipy, sx, sy,
-			&Machine->visible_area, TRANSPARENCY_PEN, 0);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( tehkanwc )

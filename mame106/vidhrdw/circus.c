@@ -111,6 +111,25 @@ static void draw_robot_box (mame_bitmap *bitmap, int x, int y)
 }
 
 static void circus_draw_fg( mame_bitmap *bitmap )
+
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	/* The sync generator hardware is used to   */
 	/* draw the border and diving boards        */
@@ -125,13 +144,14 @@ static void circus_draw_fg( mame_bitmap *bitmap )
 	draw_line (bitmap,0,193,17,193,0);
 	draw_line (bitmap,231,193,248,193,0);
 
-	drawgfx(bitmap,Machine->gfx[1],
-			clown_z,
-			0,
-			0,0,
-			clown_y,clown_x,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+	
+	dgp0.code = clown_z;
+	dgp0.sx = clown_y;
+	dgp0.sy = clown_x;
+	drawgfx(&dgp0);
 }
+} // end of patch paragraph
+
 
 VIDEO_UPDATE( circus )
 {
@@ -173,14 +193,34 @@ static void robotbwl_draw_bowling_alley( mame_bitmap *bitmap )
 }
 
 static void robotbwl_draw_ball( mame_bitmap *bitmap )
+
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	/* Y is horizontal position */			&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
-	drawgfx(bitmap,Machine->gfx[1],
-			clown_z,
-			0,
-			0,0,
-			clown_y+8,clown_x+8, /* Y is horizontal position */
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+	
+	dgp1.code = clown_z;
+	dgp1.sx = clown_y+8;
+	dgp1.sy = clown_x+8;
+	drawgfx(&dgp1);
 }
+} // end of patch paragraph
+
 
 VIDEO_UPDATE( robotbwl )
 {
@@ -191,14 +231,34 @@ VIDEO_UPDATE( robotbwl )
 }
 
 static void crash_draw_car( mame_bitmap *bitmap )
+
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	/* Y is horizontal position */		&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
-	drawgfx(bitmap,Machine->gfx[1],
-		clown_z,
-		0,
-		0,0,
-		clown_y,clown_x, /* Y is horizontal position */
-		&Machine->visible_area,TRANSPARENCY_PEN,0);
+	
+	dgp2.code = clown_z;
+	dgp2.sx = clown_y;
+	dgp2.sy = clown_x;
+	drawgfx(&dgp2);
 }
+} // end of patch paragraph
+
 
 VIDEO_UPDATE( crash )
 {

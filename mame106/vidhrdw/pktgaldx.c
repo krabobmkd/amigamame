@@ -10,6 +10,25 @@ static void pktgaldx_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int offs;
 	int flipscreen=!flip_screen;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x400;offs += 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
@@ -58,16 +77,20 @@ static void pktgaldx_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[2],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = sprite - multi * inc;
+			dgp0.color = colour;
+			dgp0.flipx = fx;
+			dgp0.flipy = fy;
+			dgp0.sx = x;
+			dgp0.sy = y + mult * multi;
+			drawgfx(&dgp0);
 
 			multi--;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static int pktgaldx_bank_callback(const int bank)
@@ -115,6 +138,25 @@ VIDEO_UPDATE(pktgaldb)
 	fillbitmap(bitmap, get_black_pen(), cliprect);
 
 	/* the bootleg seems to treat the tilemaps as sprites */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offset = 0;offset<0x1600/2;offset+=8)
 	{
 		tileno =  pcktgaldb_sprites[offset+3] | (pcktgaldb_sprites[offset+2]<<16);
@@ -126,9 +168,35 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,Machine->gfx[0],tileno^0x1000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = tileno^0x1000;
+		dgp1.color = colour;
+		dgp1.sx = x;
+		dgp1.sy = y;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
 
+
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offset = 0x1600/2;offset<0x2000/2;offset+=8)
 	{
 		tileno =  pcktgaldb_sprites[offset+3] | (pcktgaldb_sprites[offset+2]<<16);
@@ -140,9 +208,35 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,Machine->gfx[0],tileno^0x4000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp2.code = tileno^0x4000;
+		dgp2.color = colour;
+		dgp2.sx = x;
+		dgp2.sy = y;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
 
+
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offset = 0x2000/2;offset<0x4000/2;offset+=8)
 	{
 		tileno =  pcktgaldb_sprites[offset+3] | (pcktgaldb_sprites[offset+2]<<16);
@@ -154,7 +248,14 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,Machine->gfx[0],tileno^0x3000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp3.code = tileno^0x3000;
+		dgp3.color = colour;
+		dgp3.sx = x;
+		dgp3.sy = y;
+		drawgfx(&dgp3);
 	}
+	} // end of patch paragraph
+
 
 }

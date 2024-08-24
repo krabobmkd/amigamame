@@ -430,6 +430,25 @@ static void rallyx_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect,
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x02 	// priority_mask
+	  };
 	for (offs = 0x20-2;offs >= spriteram_base;offs -= 2)
 	{
 		int sx = spriteram[offs + 1] + ((spriteram_2[offs + 1] & 0x80) << 1) - displacement;
@@ -438,19 +457,42 @@ static void rallyx_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect,
 		int flipy = spriteram[offs] & 2;
 		if (flip_screen) sx -= 2*displacement;
 
-		pdrawgfx(bitmap,Machine->gfx[1],
-				(spriteram[offs] & 0xfc) >> 2,
-				spriteram_2[offs + 1] & 0x3f,
-				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,0,0x02);
+		
+		dgp0.code = (spriteram[offs] & 0xfc) >> 2;
+		dgp0.color = spriteram_2[offs + 1] & 0x3f;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 static void locomotn_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int displacement )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x02 	// priority_mask
+	  };
 	for (offs = 0x20-2;offs >= spriteram_base;offs -= 2)
 	{
 		int sx = spriteram[offs + 1] + ((spriteram_2[offs + 1] & 0x80) << 1);
@@ -460,19 +502,42 @@ static void locomotn_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		/* handle reduced visible area in some games */
 		if (flip_screen && Machine->drv->default_visible_area.max_x == 32*8-1) sx += 32;
 
-		pdrawgfx(bitmap,Machine->gfx[1],
-				((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1),
-				spriteram_2[offs + 1] & 0x3f,
-				flip,flip,
-				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,0,0x02);
+		
+		dgp1.code = ((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1);
+		dgp1.color = spriteram_2[offs + 1] & 0x3f;
+		dgp1.flipx = flip;
+		dgp1.flipy = flip;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 static void rallyx_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		transparency, 	// transparency
+		3, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_base; offs < 0x20;offs++)
 	{
 		int x,y;
@@ -481,19 +546,39 @@ static void rallyx_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect,
 		y = 253 - rallyx_radary[offs];
 		if (flip_screen) x -= 3;
 
-		drawgfx(bitmap,Machine->gfx[2],
-				((rallyx_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
-				0,
-				0,0,
-				x,y,
-				cliprect,transparency,3);
+		
+		dgp0.code = ((rallyx_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 static void jungler_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		transparency, 	// transparency
+		3, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_base; offs < 0x20;offs++)
 	{
 		int x,y;
@@ -501,19 +586,39 @@ static void jungler_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect
 		x = rallyx_radarx[offs] + ((~rallyx_radarattr[offs & 0x0f] & 0x08) << 5);
 		y = 253 - rallyx_radary[offs];
 
-		drawgfx(bitmap,Machine->gfx[2],
-				(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
-				0,
-				0,0,
-				x,y,
-				cliprect,transparency,3);
+		
+		dgp1.code = (rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07;
+		dgp1.sx = x;
+		dgp1.sy = y;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 static void locomotn_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		transparency, 	// transparency
+		3, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_base; offs < 0x20;offs++)
 	{
 		int x,y;
@@ -532,13 +637,14 @@ static void locomotn_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprec
 		/* handle reduced visible area in some games */
 		if (flip_screen && Machine->drv->default_visible_area.max_x == 32*8-1) x += 32;
 
-		drawgfx(bitmap,Machine->gfx[2],
-				(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
-				0,
-				0,0,
-				x,y,
-				cliprect,transparency,3);
+		
+		dgp2.code = (rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07;
+		dgp2.sx = x;
+		dgp2.sy = y;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }
 
 

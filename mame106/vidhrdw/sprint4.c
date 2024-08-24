@@ -136,6 +136,25 @@ VIDEO_UPDATE( sprint4 )
 
 	tilemap_draw(bitmap, cliprect, playfield, 0, 0);
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 4; i++)
 	{
 		int bank = 0;
@@ -150,14 +169,15 @@ VIDEO_UPDATE( sprint4 )
 			bank = 32;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
-			(code >> 3) | bank,
-			(attr & 0x80) ? 4 : i,
-			0, 0,
-			horz - 15,
-			vert - 15,
-			cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp0.code = (code >> 3) | bank;
+		dgp0.color = (attr & 0x80) ? 4 : i;
+		dgp0.sx = horz - 15;
+		dgp0.sy = vert - 15;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -182,15 +202,35 @@ VIDEO_UPDATE( ultratnk )
 		}
 
 		if (!(attr & 0x80))
-		{
-			drawgfx(bitmap, Machine->gfx[1],
-				(code >> 3) | bank,
-				i,
-				0, 0,
-				horz - 15,
-				vert - 15,
-				cliprect, TRANSPARENCY_PEN, 0);
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp1.code = (code >> 3) | bank;
+			dgp1.color = i;
+			dgp1.sx = horz - 15;
+			dgp1.sy = vert - 15;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 }
 
@@ -203,6 +243,25 @@ VIDEO_EOF( sprint4 )
 
 	/* check for sprite-playfield collisions */
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		helper, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&rect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		1, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 4; i++)
 	{
 		rectangle rect;
@@ -237,13 +296,11 @@ VIDEO_EOF( sprint4 )
 			bank = 32;
 		}
 
-		drawgfx(helper, Machine->gfx[1],
-			(code >> 3) | bank,
-			4,
-			0, 0,
-			horz - 15,
-			vert - 15,
-			&rect, TRANSPARENCY_PEN, 1);
+		
+		dgp2.code = (code >> 3) | bank;
+		dgp2.sx = horz - 15;
+		dgp2.sy = vert - 15;
+		drawgfx(&dgp2);
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 		{
@@ -256,6 +313,8 @@ VIDEO_EOF( sprint4 )
 			}
 		}
 	}
+	} // end of patch paragraph
+
 
 	/* update sound status */
 
@@ -274,6 +333,25 @@ VIDEO_EOF( ultratnk )
 
 	/* check for sprite-playfield collisions */
 
+	
+	{ 
+	struct drawgfxParams dgp3={
+		helper, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&rect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		1, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 4; i++)
 	{
 		rectangle rect;
@@ -308,13 +386,11 @@ VIDEO_EOF( ultratnk )
 			bank = 32;
 		}
 
-		drawgfx(helper, Machine->gfx[1],
-			(code >> 3) | bank,
-			4,
-			0, 0,
-			horz - 15,
-			vert - 15,
-			&rect, TRANSPARENCY_PEN, 1);
+		
+		dgp3.code = (code >> 3) | bank;
+		dgp3.sx = horz - 15;
+		dgp3.sy = vert - 15;
+		drawgfx(&dgp3);
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 		{
@@ -327,6 +403,8 @@ VIDEO_EOF( ultratnk )
 			}
 		}
 	}
+	} // end of patch paragraph
+
 
 	/* update sound status */
 

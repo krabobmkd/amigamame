@@ -146,14 +146,37 @@ static void mario_draw_sprites( mame_bitmap *bitmap )
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		if (spriteram[offs])
-		{
-			drawgfx(bitmap,Machine->gfx[1],
-					spriteram[offs + 2],
-					(spriteram[offs + 1] & 0x0f) + 16 * palette_bank,
-					spriteram[offs + 1] & 0x80,spriteram[offs + 1] & 0x40,
-					spriteram[offs + 3] - 8,240 - spriteram[offs] + 8,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp0.code = spriteram[offs + 2];
+			dgp0.color = (spriteram[offs + 1] & 0x0f) + 16 * palette_bank;
+			dgp0.flipx = spriteram[offs + 1] & 0x80;
+			dgp0.flipy = spriteram[offs + 1] & 0x40;
+			dgp0.sx = spriteram[offs + 3] - 8;
+			dgp0.sy = 240 - spriteram[offs] + 8;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 }
 

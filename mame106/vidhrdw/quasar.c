@@ -185,31 +185,72 @@ VIDEO_UPDATE( quasar )
 		}
 
 		if(dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			dirtybuffer[offs] = 0;
 
             /* Main Screen */
 
- 			drawgfx(tmpbitmap,Machine->gfx[0],
-				    character,
-					colorram[offs],
-				    0,0,
-				    sx,sy,
-				    0,TRANSPARENCY_NONE,0);
+ 			
+ 			dgp0.code = character;
+ 			dgp0.color = colorram[offs];
+ 			dgp0.sx = sx;
+ 			dgp0.sy = sy;
+ 			drawgfx(&dgp0);
 
 
             /* background for Collision Detection (it can only hit certain items) */
 
             if((colorram[offs] & 7) == 0)
-            {
- 			    drawgfx(collision_background,Machine->gfx[0],
-				        character,
-					    64,
-				        0,0,
-				        sx,sy,
-				        0,TRANSPARENCY_NONE,0);
+            
+{ 
+struct drawgfxParams dgp1={
+	collision_background, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+ 			    
+ 			    dgp1.code = character;
+ 			    dgp1.sx = sx;
+ 			    dgp1.sy = sy;
+ 			    drawgfx(&dgp1);
             }
+} // end of patch paragraph
+
 		}
+} // end of patch paragraph
+
 	}
 
     /* Update screen */

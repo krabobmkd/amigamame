@@ -787,6 +787,25 @@ if ((temp & 0xff00) == 0xc800)
 	if (!mo->swapxy)
 	{
 		/* loop over the height */
+		
+		{ 
+		struct drawgfxParams dgp0={
+			bitmap, 	// dest
+			gfx, 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN_RAW, 	// transparency
+			mo->transpen, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (y = 0, sy = ypos; y < height; y++, sy += yadv)
 		{
 			/* clip the Y coordinate */
@@ -806,7 +825,14 @@ if ((temp & 0xff00) == 0xc800)
 					continue;
 
 				/* draw the sprite */
-				drawgfx(bitmap, gfx, code, color, hflip, vflip, sx, sy, cliprect, TRANSPARENCY_PEN_RAW, mo->transpen);
+				
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.flipx = hflip;
+				dgp0.flipy = vflip;
+				dgp0.sx = sx;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 				rendered = 1;
 
 				/* mark the grid dirty */
@@ -817,12 +843,33 @@ if ((temp & 0xff00) == 0xc800)
 				dirtybase[mo->dirtywidth + 1] = 1;
 			}
 		}
+		} // end of patch paragraph
+
 	}
 
 	/* alternative order is swapped */
 	else
 	{
 		/* loop over the width */
+		
+		{ 
+		struct drawgfxParams dgp1={
+			bitmap, 	// dest
+			gfx, 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN_RAW, 	// transparency
+			mo->transpen, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (x = 0, sx = xpos; x < width; x++, sx += xadv)
 		{
 			/* clip the X coordinate */
@@ -843,7 +890,14 @@ if ((temp & 0xff00) == 0xc800)
 					continue;
 
 				/* draw the sprite */
-				drawgfx(bitmap, gfx, code, color, hflip, vflip, sx, sy, cliprect, TRANSPARENCY_PEN_RAW, mo->transpen);
+				
+				dgp1.code = code;
+				dgp1.color = color;
+				dgp1.flipx = hflip;
+				dgp1.flipy = vflip;
+				dgp1.sx = sx;
+				dgp1.sy = sy;
+				drawgfx(&dgp1);
 				rendered = 1;
 
 				/* mark the grid dirty */
@@ -854,6 +908,8 @@ if ((temp & 0xff00) == 0xc800)
 				dirtybase[mo->dirtywidth + 1] = 1;
 			}
 		}
+		} // end of patch paragraph
+
 	}
 
 	return rendered;

@@ -201,6 +201,25 @@ static void draw_text( mame_bitmap *bitmap, const rectangle *cliprect )
 	const UINT8 *source = videoram;
 	int bank = (grchamp_videoreg0&0x20)?256:0;
 	int offs;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		(col==31)?TRANSPARENCY_NONE:TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( offs=0; offs<0x400; offs++ )
 	{
 		int col = offs%32;
@@ -209,16 +228,15 @@ static void draw_text( mame_bitmap *bitmap, const rectangle *cliprect )
 		int attributes = colorram[col*2+1];
 		int tile_number = source[offs];
 
-		drawgfx(bitmap,
-			gfx,
-			bank + tile_number,
-			attributes,
-			0,0, /* no flip */
-			8*col,
-			(8*row-scroll)&0xff,
-			cliprect,
-			(col==31)?TRANSPARENCY_NONE:TRANSPARENCY_PEN,0);
+		
+		dgp0.code = bank + tile_number;
+		dgp0.color = attributes;
+		dgp0.sx = /* no flip */			8*col;
+		dgp0.sy = (8*row-scroll)&0xff;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect)
@@ -252,17 +270,35 @@ static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 static void draw_player_car( mame_bitmap *bitmap, const rectangle *cliprect )
+
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
-	drawgfx( bitmap,
-		Machine->gfx[2],
-		grchamp_tile_number&0xf,
-		1, /* color = red */
-		0,0, /* flip */
-		256-grchamp_player_xpos,
-		240-grchamp_player_ypos,
-		cliprect,
-		TRANSPARENCY_PEN, 0 );
+	
+	dgp1.code = grchamp_tile_number&0xf;
+	dgp1.flipx = /* color = red */		0;
+	dgp1.sx = /* flip */		256-grchamp_player_xpos;
+	dgp1.sy = 240-grchamp_player_ypos;
+	drawgfx(&dgp1);
 }
+} // end of patch paragraph
+
 
 static int collision_check( mame_bitmap *bitmap, int which )
 {
@@ -276,17 +312,34 @@ static int collision_check( mame_bitmap *bitmap, int which )
 	int result = 0;
 
 	if( which==0 )
-	{
+	
+{ 
+struct drawgfxParams dgp2={
+	work_bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		/* draw the current player sprite into a work bitmap */
-		drawgfx( work_bitmap,
-			Machine->gfx[2],
-			grchamp_tile_number&0xf,
-			1, /* color */
-			0,0,
-			0,0,
-			0,
-			TRANSPARENCY_NONE, 0 );
+		
+		dgp2.code = grchamp_tile_number&0xf;
+		dgp2.flipx = /* color */			0;
+		drawgfx(&dgp2);
 	}
+} // end of patch paragraph
+
 
 	for( y = 0; y <32; y++ )
 	{
@@ -326,18 +379,36 @@ static void draw_rain( mame_bitmap *bitmap, const rectangle *cliprect ){
 
 		palette_set_highlight_factor32(1.7);
 
+		
+		{ 
+		struct drawgfxParams dgp3={
+			bitmap, 	// dest
+			gfx, 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN_TABLE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for( sy=0; sy<256; sy+=16 ){
 			for( sx=0; sx<256; sx+=16 ){
-				drawgfx( bitmap,
-					gfx,
-					tile_number,
-					1,
-					0,0,
-					(sx+scrollx)&0xff,(sy+scrolly)&0xff,
-					cliprect,
-					TRANSPARENCY_PEN_TABLE, 0 );
+				
+				dgp3.code = tile_number;
+				dgp3.sx = (sx+scrollx)&0xff;
+				dgp3.sy = (sy+scrolly)&0xff;
+				drawgfx(&dgp3);
 			}
 		}
+		} // end of patch paragraph
+
 	}
 }
 
@@ -360,6 +431,25 @@ static void draw_fog( mame_bitmap *bitmap, const rectangle *cliprect, int fog ){
 }
 
 static void draw_headlights( mame_bitmap *bitmap, const rectangle *cliprect, int fog )
+
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN_TABLE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int x0 = 256-grchamp_player_xpos-64;
 	int y0 = 240-grchamp_player_ypos-64;
@@ -378,27 +468,21 @@ static void draw_headlights( mame_bitmap *bitmap, const rectangle *cliprect, int
 	// i.e if(fog) palette_set_shadow_dRGB32(1,10,10,0,0);, but that appears
 	// not to be supported.
 
-	drawgfx( bitmap,
-			gfx,
-			code+0,
-			1,
-			0,0,
-			x0,
-			y0,
-			cliprect,
-			TRANSPARENCY_PEN_TABLE, 0 );
+	
+	dgp4.code = code+0;
+	dgp4.sx = x0;
+	dgp4.sy = y0;
+	drawgfx(&dgp4);
 
-	drawgfx( bitmap,
-			gfx,
-			code+1,
-			1,
-			0,0,
-			x0,
-			y0+64,
-			cliprect,
-			TRANSPARENCY_PEN_TABLE, 0 );
+	
+	dgp4.code = code+1;
+	dgp4.sx = x0;
+	dgp4.sy = y0+64;
+	drawgfx(&dgp4);
 
 }
+} // end of patch paragraph
+
 
 static void draw_radar( mame_bitmap *bitmap, const rectangle *cliprect ){
 	const UINT8 *source = grchamp_radar;
@@ -444,21 +528,42 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect){
 	const UINT8 *finish = source+0x40;
 
 
+	
+	{ 
+	struct drawgfxParams dgp6={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish ){
 		int sx = source[3];
 		int sy = 240-source[0];
 		int color = source[2];
 		int code = source[1];
-		drawgfx( bitmap, gfx,
-			bank + (code&0x3f),
-			color,
-			code&0x40,
-			code&0x80,
-			sx,sy,
-			cliprect,
-			TRANSPARENCY_PEN, 0 );
+		
+		dgp6.code = bank + (code&0x3f);
+		dgp6.color = color;
+		dgp6.flipx = code&0x40;
+		dgp6.flipy = code&0x80;
+		dgp6.sx = sx;
+		dgp6.sy = sy;
+		drawgfx(&dgp6);
 		source += 4;
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( grchamp ){

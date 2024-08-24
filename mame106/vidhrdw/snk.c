@@ -96,7 +96,26 @@ static void tnk3_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly,
 		attributes  = videoram[offs+1];
 
 		if(tile_number != dirtybuffer[offs] || attributes != dirtybuffer[offs+1])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			dirtybuffer[offs]   = tile_number;
 			dirtybuffer[offs+1] = attributes;
 
@@ -116,8 +135,15 @@ static void tnk3_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly,
 			sx = x * 512 / x_size;
 			sy = y * 512 / y_size;
 
-			drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = tile_number;
+			dgp0.color = color;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,clip,TRANSPARENCY_NONE,0);
 }
@@ -130,6 +156,25 @@ void tnk3_draw_text( mame_bitmap *bitmap, int bank, UINT8 *source )
 	int tile_number, color, sx, sy;
 	int x, y;
 
+	for(x=0; x<32; x++) 
+	for(x=0; x<32; x++) { 
+	for(x=0; x<32; x++) struct drawgfxParams dgp1={
+	for(x=0; x<32; x++) 	bitmap, 	// dest
+	for(x=0; x<32; x++) 	gfx, 	// gfx
+	for(x=0; x<32; x++) 	0, 	// code
+	for(x=0; x<32; x++) 	0, 	// color
+	for(x=0; x<32; x++) 	0, 	// flipx
+	for(x=0; x<32; x++) 	0, 	// flipy
+	for(x=0; x<32; x++) 	0, 	// sx
+	for(x=0; x<32; x++) 	0, 	// sy
+	for(x=0; x<32; x++) 	clip, 	// clip
+	for(x=0; x<32; x++) 	TRANSPARENCY_PEN, 	// transparency
+	for(x=0; x<32; x++) 	15, 	// transparent_color
+	for(x=0; x<32; x++) 	0, 	// scalex
+	for(x=0; x<32; x++) 	0, 	// scaley
+	for(x=0; x<32; x++) 	NULL, 	// pri_buffer
+	for(x=0; x<32; x++) 	0 	// priority_mask
+	for(x=0; x<32; x++)   };
 	for(x=0; x<32; x++) for(y=0; y<32; y++)
 	{
 		tile_number = source[(x<<5)+y];
@@ -145,8 +190,15 @@ void tnk3_draw_text( mame_bitmap *bitmap, int bank, UINT8 *source )
 		sx = (x+2) << 3;
 		sy = (y+1) << 3;
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_PEN,15);
+		
+		dgp1.code = tile_number;
+		dgp1.color = color;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	for(x=0; x<32; x++) } // end of patch paragraph
+
 }
 
 void tnk3_draw_status_main( mame_bitmap *bitmap, int bank, UINT8 *source, int start )
@@ -157,6 +209,25 @@ void tnk3_draw_status_main( mame_bitmap *bitmap, int bank, UINT8 *source, int st
 	int tile_number, color, sx, sy;
 	int x, y;
 
+	for(x = start; x < start+2; x++) 
+	for(x = start; x < start+2; x++) { 
+	for(x = start; x < start+2; x++) struct drawgfxParams dgp2={
+	for(x = start; x < start+2; x++) 	bitmap, 	// dest
+	for(x = start; x < start+2; x++) 	gfx, 	// gfx
+	for(x = start; x < start+2; x++) 	0, 	// code
+	for(x = start; x < start+2; x++) 	0, 	// color
+	for(x = start; x < start+2; x++) 	0, 	// flipx
+	for(x = start; x < start+2; x++) 	0, 	// flipy
+	for(x = start; x < start+2; x++) 	0, 	// sx
+	for(x = start; x < start+2; x++) 	0, 	// sy
+	for(x = start; x < start+2; x++) 	clip, 	// clip
+	for(x = start; x < start+2; x++) 	TRANSPARENCY_NONE, 	// transparency
+	for(x = start; x < start+2; x++) 	0, 	// transparent_color
+	for(x = start; x < start+2; x++) 	0, 	// scalex
+	for(x = start; x < start+2; x++) 	0, 	// scaley
+	for(x = start; x < start+2; x++) 	NULL, 	// pri_buffer
+	for(x = start; x < start+2; x++) 	0 	// priority_mask
+	for(x = start; x < start+2; x++)   };
 	for(x = start; x < start+2; x++) for(y = 0; y < 32; y++)
 	{
 		tile_number = source[(x<<5)+y];
@@ -170,8 +241,15 @@ void tnk3_draw_status_main( mame_bitmap *bitmap, int bank, UINT8 *source, int st
 		sx = ((x+34)&0x3f) << 3;
 		sy = (y+1) << 3;
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_NONE,0);
+		
+		dgp2.code = tile_number;
+		dgp2.color = color;
+		dgp2.sx = sx;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 	}
+	for(x = start; x < start+2; x++) } // end of patch paragraph
+
 }
 
 void tnk3_draw_status( mame_bitmap *bitmap, int bank, UINT8 *source )
@@ -189,6 +267,25 @@ void tnk3_draw_sprites( mame_bitmap *bitmap, int xscroll, int yscroll )
 	int tile_number, attributes, color, sx, sy;
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		clip, 	// clip
+		TRANSPARENCY_PEN_TABLE, 	// transparency
+		7, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for(offs = 0; offs < 50*4; offs+=4)
 	{
 		if(*(UINT32*)(spriteram+offs) == 0 || *(UINT32*)(spriteram+offs) == -1) continue;
@@ -208,8 +305,15 @@ void tnk3_draw_sprites( mame_bitmap *bitmap, int xscroll, int yscroll )
 		if (sx > 512-16) sx -= 512;
 		if (sy > 512-16) sy -= 512;
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_PEN_TABLE,7);
+		
+		dgp3.code = tile_number;
+		dgp3.color = color;
+		dgp3.sx = sx;
+		dgp3.sy = sy;
+		drawgfx(&dgp3);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( tnk3 )
@@ -280,15 +384,41 @@ static void sgladiat_draw_background( mame_bitmap *bitmap, int scrollx, int scro
 		tile_number = videoram[offs];
 
 		if(tile_number != dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp4={
+	tmpbitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			dirtybuffer[offs] = tile_number;
 
 			color = 0;
 			sx = x << 3;
 			sy = y << 3;
 
-			drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
+			
+			dgp4.code = tile_number;
+			dgp4.color = color;
+			dgp4.sx = sx;
+			dgp4.sy = sy;
+			drawgfx(&dgp4);
 		}
+} // end of patch paragraph
+
 	}
 	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,clip,TRANSPARENCY_NONE,0);
 }
@@ -327,6 +457,25 @@ static void ikari_draw_sprites( mame_bitmap *bitmap, int start, int xscroll, int
 
 	finish = (start+25)*4;
 
+	
+	{ 
+	struct drawgfxParams dgp5={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		clip, 	// clip
+		TRANSPARENCY_PEN_TABLE, 	// transparency
+		7, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for(which = start*4; which < finish; which+=4)
 	{
 		if(*(UINT32*)(source+which) == 0 || *(UINT32*)(source+which) == -1) continue;
@@ -352,8 +501,15 @@ static void ikari_draw_sprites( mame_bitmap *bitmap, int start, int xscroll, int
 		if (sx > 512-16) sx -= 512;
 		if (sy > 512-16) sy -= 512;
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_PEN_TABLE,7);
+		
+		dgp5.code = tile_number;
+		dgp5.color = color;
+		dgp5.sx = sx;
+		dgp5.sy = sy;
+		drawgfx(&dgp5);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( ikari )
@@ -403,7 +559,26 @@ static void tdfever_draw_bg( mame_bitmap *bitmap, int xscroll, int yscroll )
 		attributes  = source[offs+1];
 
 		if(tile_number != dirtybuffer[offs] || attributes != dirtybuffer[offs+1])
-		{
+		
+{ 
+struct drawgfxParams dgp6={
+	tmpbitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			dirtybuffer[offs]   = tile_number;
 			dirtybuffer[offs+1] = attributes;
 			tile_number |= (attributes & 0xf) << 8;
@@ -416,8 +591,15 @@ static void tdfever_draw_bg( mame_bitmap *bitmap, int xscroll, int yscroll )
 			if(tile_number >= gfx->total_elements)
 				plot_box(tmpbitmap, sx, sy, gfx->width, gfx->height, get_black_pen());
 			else
-				drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
+				
+				dgp6.code = tile_number;
+				dgp6.color = color;
+				dgp6.sx = sx;
+				dgp6.sy = sy;
+				drawgfx(&dgp6);
 		}
+} // end of patch paragraph
+
 	}
 	copyscrollbitmap(bitmap,tmpbitmap,1,&xscroll,1,&yscroll,clip,TRANSPARENCY_NONE,0);
 }
@@ -469,6 +651,25 @@ static void tdfever_draw_sp( mame_bitmap *bitmap, int xscroll, int yscroll, int 
 		sp_size = 32;
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp7={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		clip, 	// clip
+		pen_mode, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for(which = 0; which < finish; which+=4)
 	{
 		if(*(UINT32*)(source+which) == 0 || *(UINT32*)(source+which) == -1) continue;
@@ -497,8 +698,15 @@ static void tdfever_draw_sp( mame_bitmap *bitmap, int xscroll, int yscroll, int 
 					palette_set_shadow_mode(((attributes & 0x6f) == 0x60) ? 1 : 0);
 		}
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,pen_mode,15);
+		
+		dgp7.code = tile_number;
+		dgp7.color = color;
+		dgp7.sx = sx;
+		dgp7.sy = sy;
+		drawgfx(&dgp7);
 	}
+	} // end of patch paragraph
+
 }
 
 static void tdfever_draw_tx( mame_bitmap *bitmap, int attributes, int dx, int dy, int base )
@@ -512,6 +720,25 @@ static void tdfever_draw_tx( mame_bitmap *bitmap, int attributes, int dx, int dy
 	int tile_number, sx, sy;
 	int x, y;
 
+	for(x = 0; x < 64; x++) 
+	for(x = 0; x < 64; x++) { 
+	for(x = 0; x < 64; x++) struct drawgfxParams dgp8={
+	for(x = 0; x < 64; x++) 	bitmap, 	// dest
+	for(x = 0; x < 64; x++) 	gfx, 	// gfx
+	for(x = 0; x < 64; x++) 	0, 	// code
+	for(x = 0; x < 64; x++) 	0, 	// color
+	for(x = 0; x < 64; x++) 	0, 	// flipx
+	for(x = 0; x < 64; x++) 	0, 	// flipy
+	for(x = 0; x < 64; x++) 	0, 	// sx
+	for(x = 0; x < 64; x++) 	0, 	// sy
+	for(x = 0; x < 64; x++) 	clip, 	// clip
+	for(x = 0; x < 64; x++) 	TRANSPARENCY_PEN, 	// transparency
+	for(x = 0; x < 64; x++) 	15, 	// transparent_color
+	for(x = 0; x < 64; x++) 	0, 	// scalex
+	for(x = 0; x < 64; x++) 	0, 	// scaley
+	for(x = 0; x < 64; x++) 	NULL, 	// pri_buffer
+	for(x = 0; x < 64; x++) 	0 	// priority_mask
+	for(x = 0; x < 64; x++)   };
 	for(x = 0; x < 64; x++) for(y = 0; y < 32; y++)
 	{
 		tile_number = source[(x<<5)+y];
@@ -521,8 +748,15 @@ static void tdfever_draw_tx( mame_bitmap *bitmap, int attributes, int dx, int dy
 		sx = dx + x*8;
 		sy = dy + y*8;
 
-		drawgfx(bitmap,gfx,tile_high|tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_PEN,15);
+		
+		dgp8.code = tile_high|tile_number;
+		dgp8.color = color;
+		dgp8.sx = sx;
+		dgp8.sy = sy;
+		drawgfx(&dgp8);
 	}
+	for(x = 0; x < 64; x++) } // end of patch paragraph
+
 }
 
 /**************************************************************/

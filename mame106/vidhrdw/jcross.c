@@ -120,6 +120,25 @@ static void draw_status( mame_bitmap *bitmap, const rectangle *cliprect )
 	const UINT8 *base =  jcr_textram + 0x400;
 	const gfx_element *gfx = Machine->gfx[0];
 	int row;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0xf, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( row=0; row<4; row++ )
 	{
 		int sy,sx = (row&1)*8;
@@ -132,14 +151,16 @@ static void draw_status( mame_bitmap *bitmap, const rectangle *cliprect )
 		for( sy=0; sy<256; sy+=8 )
 		{
 			int tile_number = *source++;
-			drawgfx( bitmap, gfx,
-			    tile_number, tile_number>>5,
-			    0,0,
-			    sx,sy,
-			    cliprect,
-			    TRANSPARENCY_NONE, 0xf );
+			
+			dgp0.code = tile_number;
+			dgp0.color = tile_number>>5;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
@@ -149,6 +170,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int sc
 	source = spriteram;
 	finish = spriteram + 0x64;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		7, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int attributes = source[3];
@@ -162,15 +202,19 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int sc
 		sy=(sy-scrolly)&0x1ff;
 		sx=(sx-scrollx)&0x1ff;
 
-		drawgfx( bitmap,gfx,
-			tile_number,
-			color,
-			flipx, flipy,
-			(256-sx)&0x1ff,sy-16,
-			cliprect,TRANSPARENCY_PEN,7);
+		
+		dgp1.code = tile_number;
+		dgp1.color = color;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = (256-sx)&0x1ff;
+		dgp1.sy = sy-16;
+		drawgfx(&dgp1);
 
 		source+=4;
 	}
+	} // end of patch paragraph
+
 }
 
 

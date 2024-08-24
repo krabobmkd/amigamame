@@ -58,6 +58,25 @@ static void sshangha_drawsprites(mame_bitmap *bitmap, UINT16 *spritesrc, UINT16 
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x800;offs += 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
@@ -110,16 +129,20 @@ static void sshangha_drawsprites(mame_bitmap *bitmap, UINT16 *spritesrc, UINT16 
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[2],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = sprite - multi * inc;
+			dgp0.color = colour;
+			dgp0.flipx = fx;
+			dgp0.flipy = fy;
+			dgp0.sx = x;
+			dgp0.sy = y + mult * multi;
+			drawgfx(&dgp0);
 
 			multi--;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /******************************************************************************/

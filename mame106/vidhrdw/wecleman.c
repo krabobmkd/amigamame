@@ -789,6 +789,25 @@ void hotchase_draw_road(mame_bitmap *bitmap, const rectangle *cliprect)
 	int sx, sy;
 
 	/* Let's draw from the top to the bottom of the visible screen */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (sy = Machine->visible_area.min_y;sy <= Machine->visible_area.max_y;sy++)
 	{
 		int code    = wecleman_roadram[sy*4/2+2/2] + (wecleman_roadram[sy*4/2+0/2] << 16);
@@ -802,14 +821,16 @@ void hotchase_draw_road(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		for (sx=0; sx<2*XSIZE; sx+=64)
 		{
-			drawgfx(bitmap,Machine->gfx[0],
-					code++,
-					color,
-					0,0,
-					((sx-scrollx)&0x3ff)-(384-32),sy,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = code++;
+			dgp0.color = color;
+			dgp0.sx = ((sx-scrollx)&0x3ff)-(384-32);
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
 	}
+	} // end of patch paragraph
+
 
 #undef XSIZE
 #undef YSIZE

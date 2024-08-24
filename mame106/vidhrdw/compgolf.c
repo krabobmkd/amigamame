@@ -97,6 +97,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,fx,fy,x,y,color,sprite;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x60;offs += 4)
 	{
 		sprite = spriteram[offs+1] + (((spriteram[offs] & 0xc0) >> 6)*0x100);
@@ -106,20 +125,51 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		fx = spriteram[offs]&4;
 		fy = 0; /* ? */
 
-		drawgfx(bitmap,Machine->gfx[0],
-				sprite,
-				color,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = sprite;
+		dgp0.color = color;
+		dgp0.flipx = fx;
+		dgp0.flipy = fy;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 
 		/* Double Height */
 		if(spriteram[offs] & 0x10)
-		{
-			drawgfx(bitmap,Machine->gfx[0],
-				sprite+1,
-				color,fx,fy,x,y+16,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp1.code = sprite+1;
+			dgp1.color = color;
+			dgp1.flipx = fx;
+			dgp1.flipy = fy;
+			dgp1.sx = x;
+			dgp1.sy = y+16;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( compgolf )

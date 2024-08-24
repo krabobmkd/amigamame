@@ -359,6 +359,25 @@ static void drawchars(mame_bitmap *bitmap, int transparency, int color, int prio
     /* since last time and update it accordingly. If the background is on, */
     /* draw characters as sprites */
 
+    
+    { 
+    struct drawgfxParams dgp0={
+    	bitmap, 	// dest
+    	Machine->gfx[0], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	transparency, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for (offs = videoram_size - 1;offs >= 0;offs--)
     {
         int sx,sy,code;
@@ -381,13 +400,17 @@ static void drawchars(mame_bitmap *bitmap, int transparency, int color, int prio
             sy = 31 - sy;
         }
 
-        drawgfx(bitmap,Machine->gfx[0],
-                code,
-                color,
-                flip_screen,flip_screen,
-                8*sx,8*sy,
-                &Machine->visible_area,transparency,0);
+        
+        dgp0.code = code;
+        dgp0.color = color;
+        dgp0.flipx = flip_screen;
+        dgp0.flipy = flip_screen;
+        dgp0.sx = 8*sx;
+        dgp0.sy = 8*sy;
+        drawgfx(&dgp0);
     }
+    } // end of patch paragraph
+
 }
 
 static void drawsprites(mame_bitmap *bitmap, int color,
@@ -397,6 +420,25 @@ static void drawsprites(mame_bitmap *bitmap, int color,
     int i,offs;
 
     /* Draw the sprites */
+    
+    { 
+    struct drawgfxParams dgp1={
+    	bitmap, 	// dest
+    	Machine->gfx[1], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_PEN, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for (i = 0, offs = 0;i < 8; i++, offs += 4*interleave)
     {
         int sx,sy,flipx,flipy;
@@ -420,23 +462,29 @@ static void drawsprites(mame_bitmap *bitmap, int color,
 
         sy -= sprite_y_adjust;
 
-        drawgfx(bitmap,Machine->gfx[1],
-                sprite_ram[offs + interleave],
-                color,
-                flipx,flipy,
-                sx,sy,
-                &Machine->visible_area,TRANSPARENCY_PEN,0);
+        
+        dgp1.code = sprite_ram[offs + interleave];
+        dgp1.color = color;
+        dgp1.flipx = flipx;
+        dgp1.flipy = flipy;
+        dgp1.sx = sx;
+        dgp1.sy = sy;
+        drawgfx(&dgp1);
 
         sy += (flip_screen ? -256 : 256);
 
         // Wrap around
-        drawgfx(bitmap,Machine->gfx[1],
-                sprite_ram[offs + interleave],
-                color,
-                flipx,flipy,
-                sx,sy,
-                &Machine->visible_area,TRANSPARENCY_PEN,0);
+        
+        dgp1.code = sprite_ram[offs + interleave];
+        dgp1.color = color;
+        dgp1.flipx = flipx;
+        dgp1.flipy = flipy;
+        dgp1.sx = sx;
+        dgp1.sy = sy;
+        drawgfx(&dgp1);
     }
+    } // end of patch paragraph
+
 }
 
 
@@ -447,6 +495,25 @@ static void drawbackground(mame_bitmap *bitmap, unsigned char* tilemap)
     int scroll = -(bnj_scroll2 | ((bnj_scroll1 & 0x03) << 8));
 
     // One extra iteration for wrap around
+    
+    { 
+    struct drawgfxParams dgp3={
+    	bitmap, 	// dest
+    	Machine->gfx[2], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	0, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for (i = 0; i < 5; i++, scroll += 256)
     {
         int tileoffset = tilemap[i & 3] * 0x100;
@@ -468,14 +535,18 @@ static void drawbackground(mame_bitmap *bitmap, unsigned char* tilemap)
                 sy = 240 - sy;
             }
 
-            drawgfx(bitmap, Machine->gfx[2],
-                    memory_region(REGION_GFX3)[tileoffset + offs],
-                    btime_palette,
-                    flip_screen,flip_screen,
-                    sx,sy,
-                    0,TRANSPARENCY_NONE,0);
+            
+            dgp3.code = memory_region(REGION_GFX3)[tileoffset + offs];
+            dgp3.color = btime_palette;
+            dgp3.flipx = flip_screen;
+            dgp3.flipy = flip_screen;
+            dgp3.sx = sx;
+            dgp3.sy = sy;
+            drawgfx(&dgp3);
         }
     }
+    } // end of patch paragraph
+
 }
 
 
@@ -634,6 +705,25 @@ VIDEO_UPDATE( bnj )
     {
         int scroll, offs;
 
+        
+        { 
+        struct drawgfxParams dgp4={
+        	background_bitmap, 	// dest
+        	Machine->gfx[2], 	// gfx
+        	0, 	// code
+        	0, 	// color
+        	0, 	// flipx
+        	0, 	// flipy
+        	0, 	// sx
+        	0, 	// sy
+        	0, 	// clip
+        	TRANSPARENCY_NONE, 	// transparency
+        	0, 	// transparent_color
+        	0, 	// scalex
+        	0, 	// scaley
+        	NULL, 	// pri_buffer
+        	0 	// priority_mask
+          };
         for (offs = bnj_backgroundram_size-1; offs >=0; offs--)
         {
             int sx,sy;
@@ -652,13 +742,16 @@ VIDEO_UPDATE( bnj )
                 sy = 240 - sy;
             }
 
-            drawgfx(background_bitmap, Machine->gfx[2],
-                    (bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32,
-                    0,
-                    flip_screen, flip_screen,
-                    sx, sy,
-                    0, TRANSPARENCY_NONE, 0);
+            
+            dgp4.code = (bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32;
+            dgp4.flipx = flip_screen;
+            dgp4.flipy = flip_screen;
+            dgp4.sx = sx;
+            dgp4.sy = sy;
+            drawgfx(&dgp4);
         }
+        } // end of patch paragraph
+
 
         /* copy the background bitmap to the screen */
         scroll = (bnj_scroll1 & 0x02) * 128 + 511 - bnj_scroll2;
@@ -696,6 +789,25 @@ VIDEO_UPDATE( cookrace )
      *  For each character in the background RAM, check if it has been
      *  modified since last time and update it accordingly.
      */
+    
+    { 
+    struct drawgfxParams dgp5={
+    	bitmap, 	// dest
+    	Machine->gfx[2], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	0, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for (offs = bnj_backgroundram_size-1; offs >=0; offs--)
     {
         int sx,sy;
@@ -709,13 +821,16 @@ VIDEO_UPDATE( cookrace )
             sy = 31 - sy;
         }
 
-        drawgfx(bitmap, Machine->gfx[2],
-                bnj_backgroundram[offs],
-                0,
-                flip_screen, flip_screen,
-                8*sx,8*sy,
-                0, TRANSPARENCY_NONE, 0);
+        
+        dgp5.code = bnj_backgroundram[offs];
+        dgp5.flipx = flip_screen;
+        dgp5.flipy = flip_screen;
+        dgp5.sx = 8*sx;
+        dgp5.sy = 8*sy;
+        drawgfx(&dgp5);
     }
+    } // end of patch paragraph
+
 
     drawchars(bitmap, TRANSPARENCY_PEN, 0, -1);
 

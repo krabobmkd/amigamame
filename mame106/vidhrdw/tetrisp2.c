@@ -434,6 +434,25 @@ static void tetrisp2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 
 	flipscreen = (tetrisp2_systemregs[0x00] & 0x02);
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[gfxnum], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		primask 	// priority_mask
+	  };
 	for (; source <= finish; source += 0x10/2 )
 	{
 		rectangle clip;
@@ -518,17 +537,20 @@ static void tetrisp2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				pdrawgfx(bitmap, Machine->gfx[gfxnum],
-						code++,
-						color,
-						flipx, flipy,
-						sx + x * 8, sy + y * 8,
-						&clip,
-						TRANSPARENCY_PEN, 0, primask);
+				
+				dgp0.code = code++;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx + x * 8;
+				dgp0.sy = sy + y * 8;
+				drawgfx(&dgp0);
 			}
 			code	+=	(0x100/8) - xnum;
 		}
-	}	/* end sprite loop */
+	}
+	} // end of patch paragraph
+	/* end sprite loop */
 }
 
 

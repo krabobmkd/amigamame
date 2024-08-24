@@ -85,7 +85,26 @@ void ninjakd2_draw_foreground(mame_bitmap *bitmap)
 		int sx,sy,tile,palette,flipx,flipy,lo,hi;
 
 		if (ninjakd2_foreground_videoram[offs*2] | ninjakd2_foreground_videoram[offs*2+1])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			sx = (offs % 32) << 3;
 			sy = (offs >> 5) << 3;
 
@@ -96,13 +115,17 @@ void ninjakd2_draw_foreground(mame_bitmap *bitmap)
 			flipy = hi & 0x20;
 			palette = hi & 0x0f;
 
-			drawgfx(bitmap,Machine->gfx[2],
-						tile,
-						palette,
-						flipx,flipy,
-						sx,sy,
-						&Machine->visible_area,TRANSPARENCY_PEN, 15);
+			
+			dgp0.code = tile;
+			dgp0.color = palette;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 
 	}
 }
@@ -120,7 +143,26 @@ void ninjakd2_draw_background(mame_bitmap *bitmap)
 		int sx,sy,tile,palette,flipx,flipy,lo,hi;
 
 		if (bg_dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			sx = (offs % 32) << 4;
 			sy = (offs >> 5) << 4;
 
@@ -132,13 +174,17 @@ void ninjakd2_draw_background(mame_bitmap *bitmap)
 			flipx = hi & 0x10;
 			flipy = hi & 0x20;
 			palette = hi & 0x0f;
-			drawgfx(bitmap,Machine->gfx[0],
-					  tile,
-					  palette,
-					  flipx,flipy,
-					  sx,sy,
-					  0,TRANSPARENCY_NONE,0);
+			
+			dgp1.code = tile;
+			dgp1.color = palette;
+			dgp1.flipx = flipx;
+			dgp1.flipy = flipy;
+			dgp1.sx = sx;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 
 	}
 }
@@ -154,7 +200,26 @@ void ninjakd2_draw_sprites(mame_bitmap *bitmap)
 		int sx,sy,tile,palette,flipx,flipy;
 
 		if (spriteram[offs+2] & 2)
-		{
+		
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			sx = spriteram[offs+1];
 			sy = spriteram[offs];
 			if (spriteram[offs+2] & 1) sx-=256;
@@ -162,14 +227,17 @@ void ninjakd2_draw_sprites(mame_bitmap *bitmap)
 			flipx = spriteram[offs+2] & 0x10;
 			flipy = spriteram[offs+2] & 0x20;
 			palette = spriteram[offs+4] & 0x0f;
-			drawgfx(bitmap,Machine->gfx[1],
-						tile,
-						palette,
-						flipx,flipy,
-						sx,sy,
-						&Machine->visible_area,
-						TRANSPARENCY_PEN, 15);
+			
+			dgp2.code = tile;
+			dgp2.color = palette;
+			dgp2.flipx = flipx;
+			dgp2.flipy = flipy;
+			dgp2.sx = sx;
+			dgp2.sy = sy;
+			drawgfx(&dgp2);
 		}
+} // end of patch paragraph
+
 	}
 }
 

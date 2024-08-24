@@ -229,6 +229,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 
 	for (i=0; i<4; i++)
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (j=0x7c; j>=0; j-=4)
 	{
 		int offs = pribase[i] + j;
@@ -253,13 +272,17 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 
 		if (sx >= 256-8) sx -= 256;
 
-		drawgfx(bitmap,gfx,
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				&clip,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( kncljoe )

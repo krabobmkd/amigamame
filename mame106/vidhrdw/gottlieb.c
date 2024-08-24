@@ -188,7 +188,26 @@ static void gottlieb_draw_sprites( mame_bitmap *bitmap )
     int offs;
 
 	for (offs = 0; offs < spriteram_size - 8; offs += 4)     /* it seems there's something strange with sprites #62 and #63 */
-	{
+	
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		/* coordinates hand tuned to make the position correct in Q*Bert Qubes start */
 		/* of level animation. */
 		int sx = (spriteram[offs + 1]) - 4;
@@ -199,13 +218,16 @@ static void gottlieb_draw_sprites( mame_bitmap *bitmap )
 		if (flip_screen_y) sy = 244 - sy;
 
 		if (spriteram[offs] || spriteram[offs + 1])	/* needed to avoid garbage on screen */
-			drawgfx(bitmap, Machine->gfx[1],
-				code, 0,
-				flip_screen_x, flip_screen_y,
-				sx,sy,
-				&Machine->visible_area,
-				TRANSPARENCY_PEN, 0);
+			
+			dgp0.code = code;
+			dgp0.flipx = flip_screen_x;
+			dgp0.flipy = flip_screen_y;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 	}
+} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( gottlieb )

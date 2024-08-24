@@ -120,7 +120,26 @@ static void draw_bg(mame_bitmap *bitmap)
 		int code = videoram[0x400+offs];
 
 		if (dirtybuffer[0x400+offs] || dirtychar[code])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap1, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	NULL, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx = offs % 32;
 			int sy = offs / 32;
 
@@ -129,13 +148,16 @@ static void draw_bg(mame_bitmap *bitmap)
 			if (flip_screen_x) sx = 31 - sx;
 			if (flip_screen_y) sy = 31 - sy;
 
-			drawgfx(tmpbitmap1,Machine->gfx[0],
-					code,
-					2,
-					flip_screen_x,flip_screen_y,
-					8*sx,8*sy,
-					NULL,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = code;
+			dgp0.flipx = flip_screen_x;
+			dgp0.flipy = flip_screen_y;
+			dgp0.sx = 8*sx;
+			dgp0.sy = 8*sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 
 	/* first copy to a temp bitmap doing column scroll */
@@ -157,6 +179,25 @@ static void draw_fg(mame_bitmap *bitmap)
 	int offs;
 
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		transp, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x400;offs++)
 	{
 		int sx = offs % 32;
@@ -169,13 +210,16 @@ static void draw_fg(mame_bitmap *bitmap)
 		if (flip_screen_x) sx = 31 - sx;
 		if (flip_screen_y) sy = 31 - sy;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				code,
-				0,
-				flip_screen_x,flip_screen_y,
-				8*sx,8*sy,
-				&Machine->visible_area,transp,0);
+		
+		dgp1.code = code;
+		dgp1.flipx = flip_screen_x;
+		dgp1.flipy = flip_screen_y;
+		dgp1.sx = 8*sx;
+		dgp1.sy = 8*sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 

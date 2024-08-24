@@ -222,6 +222,25 @@ void suna8_draw_normal_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int max_x	=	Machine->drv->screen_width	- 8;
 	int max_y	=	Machine->drv->screen_height - 8;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0x1d00; i < 0x2000; i += 4)
 	{
 		int srcpg, srcx,srcy, dimx,dimy, tx, ty;
@@ -333,16 +352,20 @@ void suna8_draw_normal_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				{	sx = max_x - sx;	tile_flipx = !tile_flipx;
 					sy = max_y - sy;	tile_flipy = !tile_flipy;	}
 
-				drawgfx(	bitmap,Machine->gfx[0],
-							tile + (attr & 0x3)*0x100 + gfxbank,
-							((attr >> 2) & 0xf) | colorbank,	// hardhea2 player2
-							tile_flipx, tile_flipy,
-							sx, sy,
-							cliprect,TRANSPARENCY_PEN,15);
+				
+				dgp0.code = tile + (attr & 0x3)*0x100 + gfxbank;
+				dgp0.color = ((attr >> 2) & 0xf) | colorbank;
+				dgp0.flipx = // hardhea2 player2							tile_flipx;
+				dgp0.flipy = tile_flipy;
+				dgp0.sx = sx;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 			}
 		}
 
 	}
+	} // end of patch paragraph
+
 }
 
 void suna8_draw_text_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
@@ -355,6 +378,25 @@ void suna8_draw_text_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	/* Earlier games only */
 	if (!(suna8_text_dim > 0))	return;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0x1900; i < 0x19ff; i += 4)
 	{
 		int srcpg, srcx,srcy, dimx,dimy, tx, ty;
@@ -398,16 +440,20 @@ void suna8_draw_text_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				{	sx = max_x - sx;	flipx = !flipx;
 					sy = max_y - sy;	flipy = !flipy;	}
 
-				drawgfx(	bitmap,Machine->gfx[0],
-							tile + (attr & 0x3)*0x100 + bank,
-							(attr >> 2) & 0xf,
-							flipx, flipy,
-							sx, sy,
-							cliprect,TRANSPARENCY_PEN,15);
+				
+				dgp1.code = tile + (attr & 0x3)*0x100 + bank;
+				dgp1.color = (attr >> 2) & 0xf;
+				dgp1.flipx = flipx;
+				dgp1.flipy = flipy;
+				dgp1.sx = sx;
+				dgp1.sy = sy;
+				drawgfx(&dgp1);
 			}
 		}
 
 	}
+	} // end of patch paragraph
+
 }
 
 /***************************************************************************

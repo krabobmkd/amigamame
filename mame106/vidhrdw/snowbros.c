@@ -46,6 +46,25 @@ VIDEO_UPDATE( snowbros )
 
 	fillbitmap(bitmap,0xf0,&Machine->visible_area);
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{
 		int dx = spriteram16[offs+4] & 0xff;
@@ -85,13 +104,17 @@ VIDEO_UPDATE( snowbros )
 			sy = y;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				tile,
-				(tilecolour & 0xf0) >> 4,
-				flipx, flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = tile;
+		dgp0.color = (tilecolour & 0xf0) >> 4;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( honeydol )
@@ -102,6 +125,42 @@ VIDEO_UPDATE( honeydol )
 
 	fillbitmap(bitmap,0xf0,&Machine->visible_area);
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x0000/2;offs < 0x2000/2;offs += 8)
 	{
 		int dx = (spriteram16[offs+4]>>8) & 0xff;
@@ -131,12 +190,14 @@ VIDEO_UPDATE( honeydol )
 			sy = y;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
-				tile,
-				tilecolour,
-				flipx, flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = tile;
+		dgp1.color = tilecolour;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 
 		/* second list interleaved with first ??? */
 		dx = spriteram16[offs+4] & 0xff;
@@ -166,14 +227,18 @@ VIDEO_UPDATE( honeydol )
 			sy = y;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-				tile,
-				(tilecolour & 0xf0) >> 4,
-				flipx, flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp2.code = tile;
+		dgp2.color = (tilecolour & 0xf0) >> 4;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -207,14 +272,37 @@ VIDEO_UPDATE( wintbob )
 		}
 
 		if ((xpos > -16) && (ypos > 0) && (xpos < 256) && (ypos < 240) && (disbl !=2))
-		{
-			drawgfx(bitmap,Machine->gfx[0],
-					tilen,
-					colr,
-					flipx, flipy,
-					xpos,ypos,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+{ 
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp3.code = tilen;
+			dgp3.color = colr;
+			dgp3.flipx = flipx;
+			dgp3.flipy = flipy;
+			dgp3.sx = xpos;
+			dgp3.sy = ypos;
+			drawgfx(&dgp3);
 		}
+} // end of patch paragraph
+
 	}
 }
 
@@ -250,6 +338,25 @@ VIDEO_UPDATE( snowbro3 )
 
 	fillbitmap(bitmap,get_black_pen(),&Machine->visible_area);
 
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{
 		gfx_element *gfx = Machine->gfx[0];
@@ -296,12 +403,16 @@ VIDEO_UPDATE( snowbro3 )
 			tilecolour = 0x10;
 		}
 
-	drawgfx(bitmap,gfx,
-				tile,
-				(tilecolour & 0xf0) >> 4,
-				flipx, flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+	
+	dgp4.code = tile;
+	dgp4.color = (tilecolour & 0xf0) >> 4;
+	dgp4.flipx = flipx;
+	dgp4.flipy = flipy;
+	dgp4.sx = sx;
+	dgp4.sy = sy;
+	drawgfx(&dgp4);
 	}
+	} // end of patch paragraph
+
 }
 

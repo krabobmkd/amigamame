@@ -396,24 +396,64 @@ static void ladybug_draw_sprites( mame_bitmap *bitmap )
 			i -= 4;
 
 			if (spriteram[offs + i] & 0x80)
-			{
+			
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				if (spriteram[offs + i] & 0x40)	/* 16x16 */
-					drawgfx(bitmap,Machine->gfx[1],
-							(spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10),
-							spriteram[offs + i + 2] & 0x0f,
-							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
-							spriteram[offs + i + 3],
-							offs / 4 - 8 + (spriteram[offs + i] & 0x0f),
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+					
+					dgp0.code = (spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10);
+					dgp0.color = spriteram[offs + i + 2] & 0x0f;
+					dgp0.flipx = spriteram[offs + i] & 0x20;
+					dgp0.flipy = spriteram[offs + i] & 0x10;
+					dgp0.sx = spriteram[offs + i + 3];
+					dgp0.sy = offs / 4 - 8 + (spriteram[offs + i] & 0x0f);
+					drawgfx(&dgp0);
 				else	/* 8x8 */
-					drawgfx(bitmap,Machine->gfx[2],
-							spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10),
-							spriteram[offs + i + 2] & 0x0f,
-							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
-							spriteram[offs + i + 3],
-							offs / 4 + (spriteram[offs + i] & 0x0f),
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+					
+					dgp1.code = spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10);
+					dgp1.color = spriteram[offs + i + 2] & 0x0f;
+					dgp1.flipx = spriteram[offs + i] & 0x20;
+					dgp1.flipy = spriteram[offs + i] & 0x10;
+					dgp1.sx = spriteram[offs + i + 3];
+					dgp1.sy = offs / 4 + (spriteram[offs + i] & 0x0f);
+					drawgfx(&dgp1);
 			}
+} // end of patch paragraph
+
 		}
 	}
 }

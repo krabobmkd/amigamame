@@ -168,20 +168,36 @@ static void draw_ship(mame_bitmap* bitmap, const rectangle* cliprect)
 
 
 static void draw_torpedo(mame_bitmap* bitmap, const rectangle* cliprect)
+
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int count = 0;
 
 	int x;
 	int y;
 
-	drawgfx(bitmap, Machine->gfx[3],
-		wolfpack_torpedo_pic,
-		0,
-		0, 0,
-		2 * (244 - wolfpack_torpedo_h),
-		224 - wolfpack_torpedo_v,
-		cliprect,
-		TRANSPARENCY_PEN, 0);
+	
+	dgp0.code = wolfpack_torpedo_pic;
+	dgp0.sx = 2 * (244 - wolfpack_torpedo_h);
+	dgp0.sy = 224 - wolfpack_torpedo_v;
+	drawgfx(&dgp0);
 
 	for (y = 16; y < 224 - wolfpack_torpedo_v; y++)
 	{
@@ -205,9 +221,30 @@ static void draw_torpedo(mame_bitmap* bitmap, const rectangle* cliprect)
 		}
 	}
 }
+} // end of patch paragraph
+
 
 
 static void draw_pt(mame_bitmap* bitmap, const rectangle* cliprect)
+
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&rect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	rectangle rect = *cliprect;
 
@@ -220,24 +257,20 @@ static void draw_pt(mame_bitmap* bitmap, const rectangle* cliprect)
 		rect.max_x = 255;
 	}
 
-	drawgfx(bitmap, Machine->gfx[2],
-		wolfpack_pt_pic,
-		0,
-		0, 0,
-		2 * wolfpack_pt_horz,
-		wolfpack_pt_pos_select ? 0x70 : 0xA0,
-		&rect,
-		TRANSPARENCY_PEN, 0);
+	
+	dgp1.code = wolfpack_pt_pic;
+	dgp1.sx = 2 * wolfpack_pt_horz;
+	dgp1.sy = wolfpack_pt_pos_select ? 0x70 : 0xA0;
+	drawgfx(&dgp1);
 
-	drawgfx(bitmap, Machine->gfx[2],
-		wolfpack_pt_pic,
-		0,
-		0, 0,
-		2 * wolfpack_pt_horz - 512,
-		wolfpack_pt_pos_select ? 0x70 : 0xA0,
-		&rect,
-		TRANSPARENCY_PEN, 0);
+	
+	dgp1.code = wolfpack_pt_pic;
+	dgp1.sx = 2 * wolfpack_pt_horz - 512;
+	dgp1.sy = wolfpack_pt_pos_select ? 0x70 : 0xA0;
+	drawgfx(&dgp1);
 }
+} // end of patch paragraph
+
 
 
 static void draw_water(mame_bitmap* bitmap, const rectangle* cliprect)
@@ -271,22 +304,41 @@ VIDEO_UPDATE( wolfpack )
 
 	fillbitmap(bitmap, wolfpack_video_invert, cliprect);
 
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 8; i++)
 	{
 		for (j = 0; j < 32; j++)
 		{
 			int code = wolfpack_alpha_num_ram[32 * i + j];
 
-			drawgfx(bitmap, Machine->gfx[0],
-				code,
-				wolfpack_video_invert,
-				0, 0,
-				16 * j,
-				192 + 8 * i,
-				cliprect,
-				TRANSPARENCY_NONE, 0);
+			
+			dgp3.code = code;
+			dgp3.color = wolfpack_video_invert;
+			dgp3.sx = 16 * j;
+			dgp3.sy = 192 + 8 * i;
+			drawgfx(&dgp3);
 		}
 	}
+	} // end of patch paragraph
+
 
 	draw_pt(bitmap, cliprect);
 	draw_ship(bitmap, cliprect);

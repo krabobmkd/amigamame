@@ -529,14 +529,37 @@ static void drawbgmap(mame_bitmap *bitmap,const rectangle *cliprect, int priorit
 					flipy=st0016_spriteram[i+3]&0x40;
 
 				 	if(priority)
-				 	{
-				 		drawgfx(bitmap,Machine->gfx[0],
-										code,
-										color,
-										flipx,flipy,
-										x*8+spr_dx,y*8+spr_dy,
-										&Machine->visible_area,TRANSPARENCY_PEN,0);
+				 	
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+				 		
+				 		dgp0.code = code;
+				 		dgp0.color = color;
+				 		dgp0.flipx = flipx;
+				 		dgp0.flipy = flipy;
+				 		dgp0.sx = x*8+spr_dx;
+				 		dgp0.sy = y*8+spr_dy;
+				 		drawgfx(&dgp0);
 					}
+} // end of patch paragraph
+
 					else
 					{
 							UINT16 *destline;

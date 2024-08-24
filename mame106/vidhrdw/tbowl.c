@@ -167,47 +167,76 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 			/* bg: 1; fg:2; text: 4 */
 
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				Machine->gfx[3], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (y = 0;y < sizey;y++)
 			{
 				for (x = 0;x < sizex;x++)
 				{
 					int sx = xpos + 8*(flipx?(sizex-1-x):x);
 					int sy = ypos + 8*(flipy?(sizey-1-y):y);
-					drawgfx(bitmap,Machine->gfx[3],
-							code + layout[y][x],
-							color,
-							flipx,flipy,
-							sx,sy,
-							cliprect,TRANSPARENCY_PEN,0 );
+					
+					dgp0.code = code + layout[y][x];
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx;
+					dgp0.sy = sy;
+					drawgfx(&dgp0);
 
 					/* wraparound */
-					drawgfx(bitmap,Machine->gfx[3],
-							code + layout[y][x],
-							color,
-							flipx,flipy,
-							sx,sy-0x200,
-							cliprect,TRANSPARENCY_PEN,0 );
+					
+					dgp0.code = code + layout[y][x];
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx;
+					dgp0.sy = sy-0x200;
+					drawgfx(&dgp0);
 
 					/* wraparound */
-					drawgfx(bitmap,Machine->gfx[3],
-							code + layout[y][x],
-							color,
-							flipx,flipy,
-							sx-0x400,sy,
-							cliprect,TRANSPARENCY_PEN,0 );
+					
+					dgp0.code = code + layout[y][x];
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx-0x400;
+					dgp0.sy = sy;
+					drawgfx(&dgp0);
 
 					/* wraparound */
-					drawgfx(bitmap,Machine->gfx[3],
-							code + layout[y][x],
-							color,
-							flipx,flipy,
-							sx-0x400,sy-0x200,
-							cliprect,TRANSPARENCY_PEN,0 );
+					
+					dgp0.code = code + layout[y][x];
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx-0x400;
+					dgp0.sy = sy-0x200;
+					drawgfx(&dgp0);
 
 
 
 				}
 			}
+			} // end of patch paragraph
+
 		}
 	}
 

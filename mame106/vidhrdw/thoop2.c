@@ -166,6 +166,25 @@ static void gaelco_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 	static int x_offset[2] = {0x0,0x2};
 	static int y_offset[2] = {0x0,0x1};
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (j = 0; j < sprite_count[pri]; j++){
 		int i = sprite_table[pri][j];
 		int sx = thoop2_spriteram[i+2] & 0x01ff;
@@ -194,13 +213,19 @@ static void gaelco_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 				ex = xflip ? (spr_size-1-x) : x;
 				ey = yflip ? (spr_size-1-y) : y;
 
-				drawgfx(bitmap,gfx,number + x_offset[ex] + y_offset[ey],
-						color,xflip,yflip,
-						sx-0x0f+x*8,sy+y*8,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = number + x_offset[ex] + y_offset[ey];
+				dgp0.color = color;
+				dgp0.flipx = xflip;
+				dgp0.flipy = yflip;
+				dgp0.sx = sx-0x0f+x*8;
+				dgp0.sy = sy+y*8;
+				drawgfx(&dgp0);
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /***************************************************************************

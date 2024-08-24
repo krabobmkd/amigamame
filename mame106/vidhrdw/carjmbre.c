@@ -123,7 +123,26 @@ VIDEO_UPDATE( carjmbre )
 		//unused sprites are marked with ypos <= 0x02 (or >= 0xfd if screen flipped)
 		if (spriteram[troffs] > 0x02 && spriteram[troffs] < 0xfd)
 		{
-			{
+			
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				sx = spriteram[troffs+3]-7;
 				sy = 241-spriteram[troffs];
 				flipx = (spriteram[troffs+2]&0x40)>>6;
@@ -137,13 +156,17 @@ VIDEO_UPDATE( carjmbre )
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[1],
-						spriteram[troffs+1],
-						spriteram[troffs+2]&0x07,
-						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = spriteram[troffs+1];
+				dgp0.color = spriteram[troffs+2]&0x07;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 			}
+} // end of patch paragraph
+
 		}
 	}
 }

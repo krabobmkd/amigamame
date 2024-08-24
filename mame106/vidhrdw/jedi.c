@@ -300,15 +300,39 @@ VIDEO_UPDATE( jedi )
     /* update foreground bitmap as a raw bitmap*/
     for (offs = videoram_size - 1; offs >= 0; offs--)
 		if (fgdirty[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	fgbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE_RAW, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx = offs % 64;
 			int sy = offs / 64;
 
 			fgdirty[offs] = 0;
 
-			drawgfx(fgbitmap, Machine->gfx[0], videoram[offs] + jedi_alpha_bank,
-					0, 0, 0, 8*sx, 8*sy, &Machine->visible_area, TRANSPARENCY_NONE_RAW, 0);
+			
+			dgp0.code = videoram[offs] + jedi_alpha_bank;
+			dgp0.sx = 8*sx;
+			dgp0.sy = 8*sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 
 	/* reset the expanded dirty array */
 	for (offs = 0; offs < 32; offs++)
@@ -317,7 +341,26 @@ VIDEO_UPDATE( jedi )
     /* update background bitmap as a raw bitmap */
 	for (offs = jedi_backgroundram_size / 2 - 1; offs >= 0; offs--)
 		if (bgdirty[offs] || bgdirty[offs + 0x400])
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bgbitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE_RAW, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx = offs % 32;
 			int sy = offs / 32;
 			int code = (jedi_backgroundram[offs] & 0xFF);
@@ -335,9 +378,15 @@ VIDEO_UPDATE( jedi )
 				bgexdirty[sy][1] = sx;
 			bgexdirty[sy][0] = sx;
 
-			drawgfx(bgbitmap, Machine->gfx[1], code,
-					0, bank & 0x04, 0, 8*sx, 8*sy, 0, TRANSPARENCY_NONE_RAW, 0);
+			
+			dgp1.code = code;
+			dgp1.flipx = bank & 0x04;
+			dgp1.sx = 8*sx;
+			dgp1.sy = 8*sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 
 	/* update smoothed version of background */
 	for (offs = 0; offs < 32; offs++)
@@ -345,6 +394,25 @@ VIDEO_UPDATE( jedi )
 			update_smoothing(offs, bgexdirty[offs][0], bgexdirty[offs][1]);
 
 	/* draw the motion objects */
+    
+    { 
+    struct drawgfxParams dgp2={
+    	mobitmap, 	// dest
+    	Machine->gfx[2], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_PEN_RAW, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for (offs = 0; offs < 0x30; offs++)
 	{
 		/* coordinates adjustments made to match screenshot */
@@ -366,14 +434,26 @@ VIDEO_UPDATE( jedi )
 			code |= 1;
 
 		/* draw motion object */
-		drawgfx(mobitmap, Machine->gfx[2], code,
-				0, flipx, flipy, x, y, &Machine->visible_area, TRANSPARENCY_PEN_RAW, 0);
+		
+		dgp2.code = code;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = x;
+		dgp2.sy = y;
+		drawgfx(&dgp2);
 
 		/* handle double-height */
 		if (tall)
-			drawgfx(mobitmap, Machine->gfx[2], code - 1,
-					0, flipx, flipy, x, y - 16, &Machine->visible_area, TRANSPARENCY_PEN_RAW, 0);
+			
+			dgp2.code = code - 1;
+			dgp2.flipx = flipx;
+			dgp2.flipy = flipy;
+			dgp2.sx = x;
+			dgp2.sy = y - 16;
+			drawgfx(&dgp2);
     }
+    } // end of patch paragraph
+
 
 	/* compose the three layers */
 	{

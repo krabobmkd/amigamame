@@ -395,6 +395,42 @@ INLINE int get_sprite_xy(UINT8 num, UINT8* sx, UINT8* sy)
 
 static int check_sprite_sprite_bitpattern(int sx1, int sy1, int num1,
                                           int sx2, int sy2, int num2)
+
+{ 
+struct drawgfxParams dgp0={
+	sprite_sprite_collbitmap1, 	// dest
+	Machine->gfx[(taitosj_spritebank[offs1 + 3] & 0x40) ? 3 : 1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	sprite_sprite_collbitmap2, 	// dest
+	Machine->gfx[(taitosj_spritebank[offs2 + 3] & 0x40) ? 3 : 1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int x,y,minx,miny,maxx = 16,maxy = 16;
 	int offs1 = num1 * 4;
@@ -428,19 +464,21 @@ static int check_sprite_sprite_bitpattern(int sx1, int sy1, int num1,
 	}
 
 	/* draw the sprites into seperate bitmaps and check overlapping region */
-	drawgfx(sprite_sprite_collbitmap1,Machine->gfx[(taitosj_spritebank[offs1 + 3] & 0x40) ? 3 : 1],
-			taitosj_spritebank[offs1 + 3] & 0x3f,
-			0,
-			taitosj_spritebank[offs1 + 2] & 1, taitosj_spritebank[offs1 + 2] & 2,
-			sx1,sy1,
-			0,TRANSPARENCY_NONE,0);
+	
+	dgp0.code = taitosj_spritebank[offs1 + 3] & 0x3f;
+	dgp0.flipx = taitosj_spritebank[offs1 + 2] & 1;
+	dgp0.flipy = taitosj_spritebank[offs1 + 2] & 2;
+	dgp0.sx = sx1;
+	dgp0.sy = sy1;
+	drawgfx(&dgp0);
 
-	drawgfx(sprite_sprite_collbitmap2,Machine->gfx[(taitosj_spritebank[offs2 + 3] & 0x40) ? 3 : 1],
-			taitosj_spritebank[offs2 + 3] & 0x3f,
-			0,
-			taitosj_spritebank[offs2 + 2] & 1, taitosj_spritebank[offs2 + 2] & 2,
-			sx2,sy2,
-			0,TRANSPARENCY_NONE,0);
+	
+	dgp1.code = taitosj_spritebank[offs2 + 3] & 0x3f;
+	dgp1.flipx = taitosj_spritebank[offs2 + 2] & 1;
+	dgp1.flipy = taitosj_spritebank[offs2 + 2] & 2;
+	dgp1.sx = sx2;
+	dgp1.sy = sy2;
+	drawgfx(&dgp1);
 
 	for (y = miny;y < maxy;y++)
 	{
@@ -456,6 +494,8 @@ static int check_sprite_sprite_bitpattern(int sx1, int sy1, int num1,
 
 	return 0;
 }
+} // end of patch paragraph
+
 
 
 static void check_sprite_sprite_collision(void)
@@ -560,6 +600,25 @@ static void calculate_sprites_areas(void)
 }
 
 static int check_sprite_plane_bitpattern(int num)
+
+{ 
+struct drawgfxParams dgp2={
+	sprite_plane_collbitmap1, 	// dest
+	Machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int x,y,flipx,flipy,minx,miny,maxx,maxy;
 	int offs = num * 4;
@@ -584,12 +643,11 @@ static int check_sprite_plane_bitpattern(int num)
 		flipy = !flipy;
 
 	/* draw sprite into a bitmap and check if playfields collide */
-	drawgfx(sprite_plane_collbitmap1, Machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1],
-			taitosj_spritebank[offs + 3] & 0x3f,
-			0,
-			flipx, flipy,
-			0,0,
-			0,TRANSPARENCY_NONE,0);
+	
+	dgp2.code = taitosj_spritebank[offs + 3] & 0x3f;
+	dgp2.flipx = flipx;
+	dgp2.flipy = flipy;
+	drawgfx(&dgp2);
 
 	for (y = miny;y < maxy;y++)
 	{
@@ -623,6 +681,8 @@ static int check_sprite_plane_bitpattern(int num)
 done:
 	return result;
 }
+} // end of patch paragraph
+
 
 static void check_sprite_plane_collision(void)
 {
@@ -679,7 +739,26 @@ static void drawsprites(mame_bitmap *bitmap)
 
 
 			if (get_sprite_xy(offs / 4, &sx, &sy))
-			{
+			
+{ 
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	Machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	flipscreen[0] ? &spritevisibleareaflip : &spritevisiblearea, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				flipx = taitosj_spritebank[offs + 2] & 1;
 				flipy = taitosj_spritebank[offs + 2] & 2;
 				if (flipscreen[0])
@@ -693,21 +772,27 @@ static void drawsprites(mame_bitmap *bitmap)
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1],
-						taitosj_spritebank[offs + 3] & 0x3f,
-						2 * ((taitosj_colorbank[1] >> 4) & 0x03) + ((taitosj_spritebank[offs + 2] >> 2) & 1),
-						flipx,flipy,
-						sx,sy,
-						flipscreen[0] ? &spritevisibleareaflip : &spritevisiblearea,TRANSPARENCY_PEN,0);
+				
+				dgp3.code = taitosj_spritebank[offs + 3] & 0x3f;
+				dgp3.color = 2 * ((taitosj_colorbank[1] >> 4) & 0x03) + ((taitosj_spritebank[offs + 2] >> 2) & 1);
+				dgp3.flipx = flipx;
+				dgp3.flipy = flipy;
+				dgp3.sx = sx;
+				dgp3.sy = sy;
+				drawgfx(&dgp3);
 
 				/* draw with wrap around. The horizontal games (eg. sfposeid) need this */
-				drawgfx(bitmap,Machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1],
-						taitosj_spritebank[offs + 3] & 0x3f,
-						2 * ((taitosj_colorbank[1] >> 4) & 0x03) + ((taitosj_spritebank[offs + 2] >> 2) & 1),
-						flipx,flipy,
-						sx - 0x100,sy,
-						flipscreen[0] ? &spritevisibleareaflip : &spritevisiblearea,TRANSPARENCY_PEN,0);
+				
+				dgp3.code = taitosj_spritebank[offs + 3] & 0x3f;
+				dgp3.color = 2 * ((taitosj_colorbank[1] >> 4) & 0x03) + ((taitosj_spritebank[offs + 2] >> 2) & 1);
+				dgp3.flipx = flipx;
+				dgp3.flipy = flipy;
+				dgp3.sx = sx - 0x100;
+				dgp3.sy = sy;
+				drawgfx(&dgp3);
 			}
+} // end of patch paragraph
+
 		}
 	}
 }
@@ -862,7 +947,26 @@ VIDEO_UPDATE( taitosj )
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp5={
+	taitosj_tmpbitmap[0], 	// dest
+	Machine->gfx[taitosj_colorbank[0] & 0x08 ? 2 : 0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -873,16 +977,39 @@ VIDEO_UPDATE( taitosj )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(taitosj_tmpbitmap[0],Machine->gfx[taitosj_colorbank[0] & 0x08 ? 2 : 0],
-					videoram[offs],
-					(taitosj_colorbank[0] & 0x07) + 8,	/* use transparent pen 0 */
-					flipscreen[0],flipscreen[1],
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp5.code = videoram[offs];
+			dgp5.color = (taitosj_colorbank[0] & 0x07) + 8;
+			dgp5.flipx = /* use transparent pen 0 */					flipscreen[0];
+			dgp5.flipy = flipscreen[1];
+			dgp5.sx = 8*sx;
+			dgp5.sy = 8*sy;
+			drawgfx(&dgp5);
 		}
+} // end of patch paragraph
+
 
 		if (dirtybuffer2[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp6={
+	taitosj_tmpbitmap[1], 	// dest
+	Machine->gfx[taitosj_colorbank[0] & 0x80 ? 2 : 0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -893,16 +1020,39 @@ VIDEO_UPDATE( taitosj )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(taitosj_tmpbitmap[1],Machine->gfx[taitosj_colorbank[0] & 0x80 ? 2 : 0],
-					taitosj_videoram2[offs],
-					((taitosj_colorbank[0] >> 4) & 0x07) + 8,	/* use transparent pen 0 */
-					flipscreen[0],flipscreen[1],
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp6.code = taitosj_videoram2[offs];
+			dgp6.color = ((taitosj_colorbank[0] >> 4) & 0x07) + 8;
+			dgp6.flipx = /* use transparent pen 0 */					flipscreen[0];
+			dgp6.flipy = flipscreen[1];
+			dgp6.sx = 8*sx;
+			dgp6.sy = 8*sy;
+			drawgfx(&dgp6);
 		}
+} // end of patch paragraph
+
 
 		if (dirtybuffer3[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp7={
+	taitosj_tmpbitmap[2], 	// dest
+	Machine->gfx[taitosj_colorbank[1] & 0x08 ? 2 : 0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -913,13 +1063,17 @@ VIDEO_UPDATE( taitosj )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(taitosj_tmpbitmap[2],Machine->gfx[taitosj_colorbank[1] & 0x08 ? 2 : 0],
-					taitosj_videoram3[offs],
-					(taitosj_colorbank[1] & 0x07) + 8,	/* use transparent pen 0 */
-					flipscreen[0],flipscreen[1],
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp7.code = taitosj_videoram3[offs];
+			dgp7.color = (taitosj_colorbank[1] & 0x07) + 8;
+			dgp7.flipx = /* use transparent pen 0 */					flipscreen[0];
+			dgp7.flipy = flipscreen[1];
+			dgp7.sx = 8*sx;
+			dgp7.sy = 8*sy;
+			drawgfx(&dgp7);
 		}
+} // end of patch paragraph
+
 	}
 
 

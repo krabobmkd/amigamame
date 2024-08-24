@@ -12,6 +12,25 @@ static void draw_layer(mame_bitmap *bitmap,unsigned char *scrollram)
 	scrollx = scrollram[3];
 	scrolly = -scrollram[0];
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x080;offs += 4)
 	{
 		int base,y,sx,sy,code,color;
@@ -33,27 +52,52 @@ static void draw_layer(mame_bitmap *bitmap,unsigned char *scrollram)
 			code = videoram[base + 2*y] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
-			drawgfx(bitmap,Machine->gfx[0],
-					code,
-					color,
-					flip_screen,flip_screen,
-					sx,sy,
-					&Machine->visible_area,TRANSPARENCY_PEN,15);
+			
+			dgp0.code = code;
+			dgp0.color = color;
+			dgp0.flipx = flip_screen;
+			dgp0.flipy = flip_screen;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 			if (sx > 248)	/* wraparound */
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flip_screen,flip_screen,
-						sx-256,sy,
-						&Machine->visible_area,TRANSPARENCY_PEN,15);
+				
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.flipx = flip_screen;
+				dgp0.flipy = flip_screen;
+				dgp0.sx = sx-256;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_sprites(mame_bitmap *bitmap)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size-4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,attr,code,color,flipx,flipy;
@@ -74,20 +118,26 @@ static void draw_sprites(mame_bitmap *bitmap)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,15);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 		/* wraparound */
-		drawgfx(bitmap,Machine->gfx[1],
-				code,
-				color,
-				flipx,flipy,
-				sx-256,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,15);
+		
+		dgp2.code = code;
+		dgp2.color = color;
+		dgp2.flipx = flipx;
+		dgp2.flipy = flipy;
+		dgp2.sx = sx-256;
+		dgp2.sy = sy;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( lsasquad )

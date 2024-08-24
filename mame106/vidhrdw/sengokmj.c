@@ -66,6 +66,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x800-8;offs >= 0;offs -= 8)
 	{
 		if ((spriteram[offs+1]&0x80)!=0x80) continue;
@@ -90,17 +109,27 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {
 				if (!fx)
-					drawgfx(bitmap,Machine->gfx[0],
-						sprite++,
-						color,fx,fy,x+ax*16,y+ay*16,
-						cliprect,TRANSPARENCY_PEN,15);
+					
+					dgp0.code = sprite++;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+ax*16;
+					dgp0.sy = y+ay*16;
+					drawgfx(&dgp0);
 				else
-					drawgfx(bitmap,Machine->gfx[0],
-						sprite++,
-						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,
-						cliprect,TRANSPARENCY_PEN,15);
+					
+					dgp0.code = sprite++;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+(dx-1-ax)*16;
+					dgp0.sy = y+ay*16;
+					drawgfx(&dgp0);
 			}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_START( sengokmj )

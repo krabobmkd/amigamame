@@ -298,6 +298,25 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		int x = spriteram[offs+3];
@@ -309,13 +328,17 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			y = 240 - y;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
-				spriteram[offs+1],
-				spriteram[offs+2] & 0x07,
-				flip_screen, flip_screen,
-				((x + 8) & 0xff) - 8, y,
-				cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp0.code = spriteram[offs+1];
+		dgp0.color = spriteram[offs+2] & 0x07;
+		dgp0.flipx = flip_screen;
+		dgp0.flipy = flip_screen;
+		dgp0.sx = ((x + 8) & 0xff) - 8;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 

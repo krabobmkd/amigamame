@@ -299,16 +299,39 @@ static void m107_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int
 			s_ptr = 0;
 			if (!fy) s_ptr+=y_multi-1;
 
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				Machine->gfx[1], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (i=0; i<y_multi; i++)
 			{
-				drawgfx(bitmap,Machine->gfx[1],
-						sprite + s_ptr,
-						colour,
-						fx,fy,
-						x,y-i*16,
-						cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = sprite + s_ptr;
+				dgp0.color = colour;
+				dgp0.flipx = fx;
+				dgp0.flipy = fy;
+				dgp0.sx = x;
+				dgp0.sy = y-i*16;
+				drawgfx(&dgp0);
 				if (fy) s_ptr++; else s_ptr--;
 			}
+			} // end of patch paragraph
+
 		}
 		else
 		{
@@ -328,15 +351,38 @@ static void m107_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int
 					if (fx) xdisp = -xdisp;
 					if (fy) ydisp = -ydisp - (16*y_multi-1);
 					if (!ffy) sprite+=y_multi-1;
+					
+					{ 
+					struct drawgfxParams dgp1={
+						bitmap, 	// dest
+						Machine->gfx[1], 	// gfx
+						0, 	// code
+						0, 	// color
+						0, 	// flipx
+						0, 	// flipy
+						0, 	// sx
+						0, 	// sy
+						cliprect, 	// clip
+						TRANSPARENCY_PEN, 	// transparency
+						0, 	// transparent_color
+						0, 	// scalex
+						0, 	// scaley
+						NULL, 	// pri_buffer
+						0 	// priority_mask
+					  };
 					for (i=0; i<y_multi; i++)
 					{
-						drawgfx(bitmap,Machine->gfx[1],
-								sprite+(ffy?i:-i),
-								colour,
-								ffx,ffy,
-								(x+xdisp)&0x1ff,(y-ydisp-16*i)&0x1ff,
-								cliprect,TRANSPARENCY_PEN,0);
+						
+						dgp1.code = sprite+(ffy?i:-i);
+						dgp1.color = colour;
+						dgp1.flipx = ffx;
+						dgp1.flipy = ffy;
+						dgp1.sx = (x+xdisp)&0x1ff;
+						dgp1.sy = (y-ydisp-16*i)&0x1ff;
+						drawgfx(&dgp1);
 					}
+					} // end of patch paragraph
+
 
 					if (rom[rom_offs+1]&0x80) break;	/* end of block */
 

@@ -201,7 +201,26 @@ static void lwings_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (is_sprite_on(offs))
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int code,color,sx,sy,flipx,flipy;
 
 
@@ -221,12 +240,17 @@ static void lwings_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[2],
-					code,color,
-					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+			
+			dgp0.code = code;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 }
 
@@ -238,7 +262,26 @@ static void trojan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (is_sprite_on(offs))
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int code,color,sx,sy,flipx,flipy;
 
 
@@ -270,12 +313,17 @@ static void trojan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[2],
-					code,color,
-					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+			
+			dgp1.code = code;
+			dgp1.color = color;
+			dgp1.flipx = flipx;
+			dgp1.flipy = flipy;
+			dgp1.sx = sx;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 }
 

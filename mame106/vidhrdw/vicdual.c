@@ -151,7 +151,26 @@ VIDEO_UPDATE( vicdual )
 		charcode = videoram[offs];
 
 		if (dirtybuffer[offs] || dirtycharacter[charcode])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -168,14 +187,16 @@ VIDEO_UPDATE( vicdual )
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					charcode,
-					(charcode >> 5) + 8 * palette_bank,
-					0,0,
-					8*sx,8*sy,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = charcode;
+			dgp0.color = (charcode >> 5) + 8 * palette_bank;
+			dgp0.sx = 8*sx;
+			dgp0.sy = 8*sy;
+			drawgfx(&dgp0);
 
 		}
+} // end of patch paragraph
+
 	}
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE,0);
 

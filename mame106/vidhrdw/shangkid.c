@@ -250,18 +250,36 @@ static void dynamski_draw_background( mame_bitmap *bitmap, const rectangle *clip
             -xx-.----   bank
         */
 		if( pri==0 || (attr>>7)==pri )
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	sx, 	// clip
+	sy, 	// transparency
+	cliprect, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			tile += ((attr>>5)&0x3)*256;
-			drawgfx(
-				bitmap,
-				Machine->gfx[0],
-				tile,
-				attr & 0x0f,
-				0,0,//xflip,yflip,
-				sx,sy,
-				cliprect,
-				transparency,3 );
+			
+			dgp0.code = tile;
+			dgp0.color = attr & 0x0f;
+			dgp0.sx = //xflip;
+			dgp0.sy = yflip;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 }
 
@@ -273,6 +291,25 @@ static void dynamski_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 	int bank;
 	int attr;
 	int color;
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		sy, 	// clip
+		cliprect, 	// transparency
+		TRANSPARENCY_PEN, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( i=0x7e; i>=0x00; i-=2 )
 	{
 		bank = videoram[0x1b80+i];
@@ -284,16 +321,17 @@ static void dynamski_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		sx = videoram[0x1381+i]-64+8+16;
 		if( attr&1 ) sx += 0x100;
 
-		drawgfx(
-				bitmap,
-				Machine->gfx[1],
-				bank*0x40 + (tile&0x3f),
-				color,
-				tile&0x80,tile&0x40, /* flipx,flipy */
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_PEN,3 );
+		
+		dgp1.code = bank*0x40 + (tile&0x3f);
+		dgp1.color = color;
+		dgp1.flipx = tile&0x80;
+		dgp1.flipy = tile&0x40;
+		dgp1.sx = /* flipx;
+		dgp1.sy = flipy */				sx;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( dynamski )

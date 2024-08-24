@@ -148,6 +148,25 @@ static void drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int offs;
 
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		/* placement relative to zoom layer verified on the real thing */				cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
 	{
 		int sx,sy,flipx,flipy,code,color;
@@ -161,13 +180,17 @@ static void drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		flipx = spriteram16[offs + 2] & 0x1000;
 		flipy = spriteram16[offs + 2] & 0x0800;
 
-		drawgfx(bitmap,Machine->gfx[1],
-				code,
-				40 + color,
-				flipx,flipy,
-				sx+3,sy+1,	/* placement relative to zoom layer verified on the real thing */
-				cliprect,TRANSPARENCY_PEN,15);
+		
+		dgp0.code = code;
+		dgp0.color = 40 + color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx+3;
+		dgp0.sy = sy+1;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( tail2nos )

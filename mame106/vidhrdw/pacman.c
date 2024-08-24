@@ -229,6 +229,25 @@ VIDEO_UPDATE( pacman )
 
 		/* Draw the sprites. Note that it is important to draw them exactly in this */
 		/* order, to have the correct priorities. */
+		
+		{ 
+		struct drawgfxParams dgp0={
+			bitmap, 	// dest
+			Machine->gfx[1], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&spriteclip, 	// clip
+			TRANSPARENCY_COLOR, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = spriteram_size - 2;offs > 2*2;offs -= 2)
 		{
 			int sx,sy;
@@ -236,23 +255,48 @@ VIDEO_UPDATE( pacman )
 			sx = 272 - spriteram_2[offs + 1];
 			sy = spriteram_2[offs] - 31;
 
-			drawgfx(bitmap,Machine->gfx[1],
-					( spriteram[offs] >> 2 ) | (spritebank << 6),
-					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
-					spriteram[offs] & 1,spriteram[offs] & 2,
-					sx,sy,
-					&spriteclip,TRANSPARENCY_COLOR,0);
+			
+			dgp0.code = ( spriteram[offs] >> 2 ) | (spritebank << 6);
+			dgp0.color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
+			dgp0.flipx = spriteram[offs] & 1;
+			dgp0.flipy = spriteram[offs] & 2;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx(bitmap,Machine->gfx[1],
-					( spriteram[offs] >> 2 ) | (spritebank << 6),
-					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
-					spriteram[offs] & 1,spriteram[offs] & 2,
-					sx - 256,sy,
-					&spriteclip,TRANSPARENCY_COLOR,0);
+			
+			dgp0.code = ( spriteram[offs] >> 2 ) | (spritebank << 6);
+			dgp0.color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
+			dgp0.flipx = spriteram[offs] & 1;
+			dgp0.flipy = spriteram[offs] & 2;
+			dgp0.sx = sx - 256;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
+		} // end of patch paragraph
+
 		/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 		/* one pixel to the left to get a more correct placement */
+		
+		{ 
+		struct drawgfxParams dgp2={
+			bitmap, 	// dest
+			Machine->gfx[1], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&spriteclip, 	// clip
+			TRANSPARENCY_COLOR, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 2*2;offs >= 0;offs -= 2)
 		{
 			int sx,sy;
@@ -260,21 +304,27 @@ VIDEO_UPDATE( pacman )
 			sx = 272 - spriteram_2[offs + 1];
 			sy = spriteram_2[offs] - 31;
 
-			drawgfx(bitmap,Machine->gfx[1],
-					( spriteram[offs] >> 2 ) | (spritebank << 6),
-					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
-					spriteram[offs] & 1,spriteram[offs] & 2,
-					sx,sy + xoffsethack,
-					&spriteclip,TRANSPARENCY_COLOR,0);
+			
+			dgp2.code = ( spriteram[offs] >> 2 ) | (spritebank << 6);
+			dgp2.color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
+			dgp2.flipx = spriteram[offs] & 1;
+			dgp2.flipy = spriteram[offs] & 2;
+			dgp2.sx = sx;
+			dgp2.sy = sy + xoffsethack;
+			drawgfx(&dgp2);
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx(bitmap,Machine->gfx[1],
-					( spriteram[offs] >> 2 ) | (spritebank << 6),
-					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
-					spriteram[offs] & 2,spriteram[offs] & 1,
-					sx - 256,sy + xoffsethack,
-					&spriteclip,TRANSPARENCY_COLOR,0);
+			
+			dgp2.code = ( spriteram[offs] >> 2 ) | (spritebank << 6);
+			dgp2.color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
+			dgp2.flipx = spriteram[offs] & 2;
+			dgp2.flipy = spriteram[offs] & 1;
+			dgp2.sx = sx - 256;
+			dgp2.sy = sy + xoffsethack;
+			drawgfx(&dgp2);
 		}
+		} // end of patch paragraph
+
 	}
 
 	if (bgpriority != 0)
@@ -398,6 +448,25 @@ VIDEO_UPDATE( s2650games )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 2;offs > 2*2;offs -= 2)
 	{
 		int sx,sy;
@@ -407,15 +476,38 @@ VIDEO_UPDATE( s2650games )
 		sy = spriteram_2[offs] - 15;
 
 		/* TODO: ?? */
-		drawgfx(bitmap,Machine->gfx[1],
-				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3) << 6),
-				spriteram[offs + 1] & 0x1f,
-				spriteram[offs] & 1,spriteram[offs] & 2,
-				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,0);
+		
+		dgp4.code = (spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3) << 6);
+		dgp4.color = spriteram[offs + 1] & 0x1f;
+		dgp4.flipx = spriteram[offs] & 1;
+		dgp4.flipy = spriteram[offs] & 2;
+		dgp4.sx = sx;
+		dgp4.sy = sy;
+		drawgfx(&dgp4);
 	}
+	} // end of patch paragraph
+
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
+	
+	{ 
+	struct drawgfxParams dgp5={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 2*2;offs >= 0;offs -= 2)
 	{
 		int sx,sy;
@@ -425,13 +517,17 @@ VIDEO_UPDATE( s2650games )
 		sy = spriteram_2[offs] - 15;
 
 		/* TODO: ?? */
-		drawgfx(bitmap,Machine->gfx[1],
-				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3)<<6),
-				spriteram[offs + 1] & 0x1f,
-				spriteram[offs] & 1,spriteram[offs] & 2,
-				sx,sy + xoffsethack,
-				cliprect,TRANSPARENCY_COLOR,0);
+		
+		dgp5.code = (spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3)<<6);
+		dgp5.color = spriteram[offs + 1] & 0x1f;
+		dgp5.flipx = spriteram[offs] & 1;
+		dgp5.flipy = spriteram[offs] & 2;
+		dgp5.sx = sx;
+		dgp5.sy = sy + xoffsethack;
+		drawgfx(&dgp5);
 	}
+	} // end of patch paragraph
+
 }
 
 WRITE8_HANDLER( s2650games_videoram_w )

@@ -268,6 +268,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 	/* the last entry is not a sprite, we skip it otherwise spang shows a bubble */
 	/* moving diagonally across the screen */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x1000-0x40;offs >= 0;offs -= 0x20)
 	{
 		int code = pang_objram[offs];
@@ -281,13 +300,17 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		drawgfx(bitmap,Machine->gfx[1],
-				 code,
-				 color,
-				 flipscreen,flipscreen,
-				 sx,sy,
-				 cliprect,TRANSPARENCY_PEN,15);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipscreen;
+		dgp0.flipy = flipscreen;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( pang )

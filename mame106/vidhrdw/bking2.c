@@ -272,34 +272,91 @@ VIDEO_START( bking2 )
 
 
 VIDEO_UPDATE( bking2 )
+
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the balls */
 
-	drawgfx(bitmap, Machine->gfx[2],
-		ball1_pic,
-		palette_bank,
-		0, 0,
-		xld1, yld1,
-		cliprect, TRANSPARENCY_PEN, 0);
+	
+	dgp0.code = ball1_pic;
+	dgp0.color = palette_bank;
+	dgp0.sx = xld1;
+	dgp0.sy = yld1;
+	drawgfx(&dgp0);
 
-	drawgfx(bitmap, Machine->gfx[3],
-		ball2_pic,
-		palette_bank,
-		0, 0,
-		xld2, yld2,
-		cliprect, TRANSPARENCY_PEN, 0);
+	
+	dgp1.code = ball2_pic;
+	dgp1.color = palette_bank;
+	dgp1.sx = xld2;
+	dgp1.sy = yld2;
+	drawgfx(&dgp1);
 
 	/* draw the crow */
 
-	drawgfx(bitmap, Machine->gfx[1],
-		crow_pic,
-		palette_bank,
-		crow_flip, crow_flip,
-		crow_flip ? xld3 - 16 : 256 - xld3, crow_flip ? yld3 - 16 : 256 - yld3,
-		cliprect, TRANSPARENCY_PEN, 0);
+	
+	dgp2.code = crow_pic;
+	dgp2.color = palette_bank;
+	dgp2.flipx = crow_flip;
+	dgp2.flipy = crow_flip;
+	dgp2.sx = crow_flip ? xld3 - 16 : 256 - xld3;
+	dgp2.sy = crow_flip ? yld3 - 16 : 256 - yld3;
+	drawgfx(&dgp2);
 }
+} // end of patch paragraph
+
 
 
 VIDEO_EOF( bking2 )
@@ -312,34 +369,70 @@ VIDEO_EOF( bking2 )
 	UINT32 latch = 0;
 
 	if (pc3259_mask == 6)	/* player 1 */
-	{
+	
+{ 
+struct drawgfxParams dgp3={
+	helper1, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&rect, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		xld = xld1;
 		yld = yld1;
 
-		drawgfx(helper1, Machine->gfx[2],
-			ball1_pic,
-			0,
-			0, 0,
-			0, 0,
-			&rect, TRANSPARENCY_NONE, 0);
+		
+		dgp3.code = ball1_pic;
+		drawgfx(&dgp3);
 
 		latch = 0x0C00;
 	}
+} // end of patch paragraph
+
 
 	if (pc3259_mask == 3)	/* player 2 */
-	{
+	
+{ 
+struct drawgfxParams dgp4={
+	helper1, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&rect, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		xld = xld2;
 		yld = yld2;
 
-		drawgfx(helper1, Machine->gfx[3],
-			ball2_pic,
-			0,
-			0, 0,
-			0, 0,
-			&rect, TRANSPARENCY_NONE, 0);
+		
+		dgp4.code = ball2_pic;
+		drawgfx(&dgp4);
 
 		latch = 0x0400;
 	}
+} // end of patch paragraph
+
 
 	tilemap_set_scrollx(bg_tilemap, 0, flip_screen ? -xld : xld);
 	tilemap_set_scrolly(bg_tilemap, 0, flip_screen ? -yld : yld);

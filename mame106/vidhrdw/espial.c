@@ -214,41 +214,118 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		if (espial_spriteram_1[offs] & 1)	/* double height */
 		{
 			if (flipscreen)
-			{
-				drawgfx(bitmap,Machine->gfx[1],
-						code,color,
-						flipx,flipy,
-						sx,sy + 16,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[1],
-						code + 1,
-						color,
-						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+			
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+				
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx;
+				dgp0.sy = sy + 16;
+				drawgfx(&dgp0);
+				
+				dgp0.code = code + 1;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 			}
-			else
+} // end of patch paragraph
+
+			
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 			{
-				drawgfx(bitmap,Machine->gfx[1],
-						code,color,
-						flipx,flipy,
-						sx,sy - 16,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[1],
-						code + 1,color,
-						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp2.code = code;
+				dgp2.color = color;
+				dgp2.flipx = flipx;
+				dgp2.flipy = flipy;
+				dgp2.sx = sx;
+				dgp2.sy = sy - 16;
+				drawgfx(&dgp2);
+				
+				dgp2.code = code + 1;
+				dgp2.color = color;
+				dgp2.flipx = flipx;
+				dgp2.flipy = flipy;
+				dgp2.sx = sx;
+				dgp2.sy = sy;
+				drawgfx(&dgp2);
 			}
+} // end of patch paragraph
+
 		}
-		else
+		
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 		{
-			drawgfx(bitmap,Machine->gfx[1],
-					code,color,
-					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp4.code = code;
+			dgp4.color = color;
+			dgp4.flipx = flipx;
+			dgp4.flipy = flipy;
+			dgp4.sx = sx;
+			dgp4.sy = sy;
+			drawgfx(&dgp4);
 		}
+} // end of patch paragraph
+
 	}
 }
 

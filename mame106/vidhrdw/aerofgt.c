@@ -1093,6 +1093,25 @@ static void pspikesb_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int i;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[sprite_gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 4;i < aerofgt_spriteram3_size/2;i += 4)
 	{
 		int xpos,ypos,color,flipx,flipy,code;
@@ -1106,22 +1125,28 @@ static void pspikesb_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		flipx = aerofgt_spriteram3[i + 1] & 0x0800;
 		color = aerofgt_spriteram3[i + 1] & 0x000f;
 
-		drawgfx(bitmap,Machine->gfx[sprite_gfx],
-				code,
-				color,
-				flipx,flipy,
-				xpos,ypos,
-				cliprect,TRANSPARENCY_PEN,15);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = xpos;
+		dgp0.sy = ypos;
+		drawgfx(&dgp0);
 
 		/* wrap around y */
-		drawgfx(bitmap,Machine->gfx[sprite_gfx],
-				code,
-				color,
-				flipx,flipy,
-				xpos,ypos + 512,
-				cliprect,TRANSPARENCY_PEN,15);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = xpos;
+		dgp0.sy = ypos + 512;
+		drawgfx(&dgp0);
 
 	}
+	} // end of patch paragraph
+
 }
 
 static void aerfboot_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)

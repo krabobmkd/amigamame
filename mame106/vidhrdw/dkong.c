@@ -262,42 +262,92 @@ static void draw_sprites(mame_bitmap *bitmap, unsigned int mask_bank, unsigned i
 			y = 240 - spriteram[offs] + 7;
 
 			if (flip_screen)
-			{
+			
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				x = 240 - x;
 				y = 240 - y;
 
-				drawgfx(bitmap,Machine->gfx[1],
-						(spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits),
-						(spriteram[offs + 2] & 0x0f) + 16 * palette_bank,
-						!(spriteram[offs + 2] & 0x80),!(spriteram[offs + 1] & 0x80),
-						x,y,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = (spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits);
+				dgp0.color = (spriteram[offs + 2] & 0x0f) + 16 * palette_bank;
+				dgp0.flipx = !(spriteram[offs + 2] & 0x80);
+				dgp0.flipy = !(spriteram[offs + 1] & 0x80);
+				dgp0.sx = x;
+				dgp0.sy = y;
+				drawgfx(&dgp0);
 
 				/* draw with wrap around - this fixes the 'beheading' bug */
-				drawgfx(bitmap,Machine->gfx[1],
-						(spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits),
-						(spriteram[offs + 2] & 0x0f) + 16 * palette_bank,
-						(spriteram[offs + 2] & 0x80),(spriteram[offs + 1] & 0x80),
-						x-256,y,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = (spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits);
+				dgp0.color = (spriteram[offs + 2] & 0x0f) + 16 * palette_bank;
+				dgp0.flipx = (spriteram[offs + 2] & 0x80);
+				dgp0.flipy = (spriteram[offs + 1] & 0x80);
+				dgp0.sx = x-256;
+				dgp0.sy = y;
+				drawgfx(&dgp0);
 			}
-			else
+} // end of patch paragraph
+
+			
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 			{
-				drawgfx(bitmap,Machine->gfx[1],
-						(spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits),
-						(spriteram[offs + 2] & 0x0f) + 16 * palette_bank,
-						(spriteram[offs + 2] & 0x80),(spriteram[offs + 1] & 0x80),
-						x,y,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp2.code = (spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits);
+				dgp2.color = (spriteram[offs + 2] & 0x0f) + 16 * palette_bank;
+				dgp2.flipx = (spriteram[offs + 2] & 0x80);
+				dgp2.flipy = (spriteram[offs + 1] & 0x80);
+				dgp2.sx = x;
+				dgp2.sy = y;
+				drawgfx(&dgp2);
 
 				/* draw with wrap around - this fixes the 'beheading' bug */
-				drawgfx(bitmap,Machine->gfx[1],
-						(spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits),
-						(spriteram[offs + 2] & 0x0f) + 16 * palette_bank,
-						(spriteram[offs + 2] & 0x80),(spriteram[offs + 1] & 0x80),
-						x+256,y,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp2.code = (spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits);
+				dgp2.color = (spriteram[offs + 2] & 0x0f) + 16 * palette_bank;
+				dgp2.flipx = (spriteram[offs + 2] & 0x80);
+				dgp2.flipy = (spriteram[offs + 1] & 0x80);
+				dgp2.sx = x+256;
+				dgp2.sy = y;
+				drawgfx(&dgp2);
 			}
+} // end of patch paragraph
+
 		}
 	}
 }
@@ -358,14 +408,37 @@ VIDEO_UPDATE( pestplce )
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		if (spriteram[offs])
-		{
-			drawgfx(bitmap,Machine->gfx[1],
-					spriteram[offs + 2],
-					(spriteram[offs + 1] & 0x0f) + 16 * palette_bank,
-					spriteram[offs + 1] & 0x80,spriteram[offs + 1] & 0x40,
-					spriteram[offs + 3] - 8,240 - spriteram[offs] + 8,
-					cliprect,TRANSPARENCY_PEN,0);
+		
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp4.code = spriteram[offs + 2];
+			dgp4.color = (spriteram[offs + 1] & 0x0f) + 16 * palette_bank;
+			dgp4.flipx = spriteram[offs + 1] & 0x80;
+			dgp4.flipy = spriteram[offs + 1] & 0x40;
+			dgp4.sx = spriteram[offs + 3] - 8;
+			dgp4.sy = 240 - spriteram[offs] + 8;
+			drawgfx(&dgp4);
 		}
+} // end of patch paragraph
+
 	}
 }
 

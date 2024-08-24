@@ -488,24 +488,47 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri
 			}
 
 			yy = h;
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				Machine->gfx[2], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				15, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			do
 			{
 				x = sx;
 				xx = w;
 				do
 				{
-					drawgfx(bitmap,Machine->gfx[2],
-							code,
-							color,
-							flip_screen, flip_screen,
-							((x + 16) & 0x1ff) - 16,sy & 0x1ff,
-							cliprect,TRANSPARENCY_PEN,15);
+					
+					dgp0.code = code;
+					dgp0.color = color;
+					dgp0.flipx = flip_screen;
+					dgp0.flipy = flip_screen;
+					dgp0.sx = ((x + 16) & 0x1ff) - 16;
+					dgp0.sy = sy & 0x1ff;
+					drawgfx(&dgp0);
 					code++;
 					x += delta;
 				} while (--xx >= 0);
 
 				sy += delta;
 			} while (--yy >= 0);
+			} // end of patch paragraph
+
 		}
 	}
 }
@@ -547,18 +570,39 @@ static void manybloc_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 			}
 
 			yy = h;
+			
+			{ 
+			struct drawgfxParams dgp1={
+				bitmap, 	// dest
+				Machine->gfx[2], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				15, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			do
 			{
 				x = sx;
 				xx = w;
 				do
 				{
-					drawgfx(bitmap,Machine->gfx[2],
-							code,
-							color,
-							flipx, flipy,
-							((x + 16) & 0x1ff) - 16,sy & 0x1ff,
-							cliprect,TRANSPARENCY_PEN,15);
+					
+					dgp1.code = code;
+					dgp1.color = color;
+					dgp1.flipx = flipx;
+					dgp1.flipy = flipy;
+					dgp1.sx = ((x + 16) & 0x1ff) - 16;
+					dgp1.sy = sy & 0x1ff;
+					drawgfx(&dgp1);
 
 					code++;
 					x += delta;
@@ -566,6 +610,8 @@ static void manybloc_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 
 				sy += delta;
 			} while (--yy >= 0);
+			} // end of patch paragraph
+
 		}
 	}
 }
@@ -606,6 +652,25 @@ static void tharrier_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 
 			yy = h;
 			sy+=flipy?(delta*h):0;
+			
+			{ 
+			struct drawgfxParams dgp2={
+				bitmap, 	// dest
+				Machine->gfx[2], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				15, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			do
 			{
 				x = sx+(flipx?(delta*w):0);
@@ -614,12 +679,14 @@ static void tharrier_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 				xx = w;
 				do
 				{
-					drawgfx(bitmap,Machine->gfx[2],
-							code,
-							color,
-							flipx, flipy,
-							((x + 16) & 0x1ff) - 16,sy & 0x1ff,
-							cliprect,TRANSPARENCY_PEN,15);
+					
+					dgp2.code = code;
+					dgp2.color = color;
+					dgp2.flipx = flipx;
+					dgp2.flipy = flipy;
+					dgp2.sx = ((x + 16) & 0x1ff) - 16;
+					dgp2.sy = sy & 0x1ff;
+					drawgfx(&dgp2);
 
 					code++;
 					x +=delta * ( flipx?-1:1 );
@@ -629,6 +696,8 @@ static void tharrier_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 				sy += delta * ( flipy?-1:1);
 
 			} while (--yy >= 0);
+			} // end of patch paragraph
+
 		}
 	}
 }
@@ -852,31 +921,52 @@ VIDEO_UPDATE( bioship )
 		redraw_bitmap=0;
 
 		/* Draw background from tile rom */
+		
+		{ 
+		struct drawgfxParams dgp3={
+			background_bitmap, 	// dest
+			Machine->gfx[3], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			0, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 0;offs <0x1000;offs++) {
 				UINT16 data = tilerom[offs+bank];
 				int numtile = data&0xfff;
 				int color = (data&0xf000)>>12;
 
-				drawgfx(background_bitmap,Machine->gfx[3],
-						numtile,
-						color,
-						0,0,   /* no flip */
-						16*sx,16*sy,
-						0,TRANSPARENCY_NONE,0);
+				
+				dgp3.code = numtile;
+				dgp3.color = color;
+				dgp3.sx = /* no flip */						16*sx;
+				dgp3.sy = 16*sy;
+				drawgfx(&dgp3);
 
 				data = tilerom[offs+0x1000+bank];
 				numtile = data&0xfff;
 				color = (data&0xf000)>>12;
-				drawgfx(background_bitmap,Machine->gfx[3],
-						numtile,
-						color,
-						0,0,   /* no flip */
-						16*sx,(16*sy)+256,
-						0,TRANSPARENCY_NONE,0);
+				
+				dgp3.code = numtile;
+				dgp3.color = color;
+				dgp3.sx = /* no flip */						16*sx;
+				dgp3.sy = (16*sy)+256;
+				drawgfx(&dgp3);
 
 				sy++;
 				if (sy==16) {sy=0; sx++;}
 		}
+		} // end of patch paragraph
+
 	}
 
 	copyscrollbitmap(bitmap,background_bitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);

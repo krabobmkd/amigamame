@@ -323,11 +323,37 @@ static void update_background(void)
 
 			/* see if the bitmap is dirty */
 			if (dirtybuffer[offs] || chardirty[code])
-			{
+			
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	NULL, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				int color = code >> 6;
-				drawgfx(tmpbitmap, Machine->gfx[0], code, color, 0, 0, x * 8, y * 8, NULL, TRANSPARENCY_NONE, 0);
+				
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.sx = x * 8;
+				dgp0.sy = y * 8;
+				drawgfx(&dgp0);
 				dirtybuffer[offs] = 0;
 			}
+} // end of patch paragraph
+
 		}
 
 	/* reset the char dirty array */
@@ -422,38 +448,103 @@ VIDEO_EOF( exidy )
 
 	/* draw sprite 1 */
 	if (sprite_1_enabled())
-	{
+	
+{ 
+struct drawgfxParams dgp1={
+	motion_object_1_vid, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		org_1_x = 236 - sprite1_xpos - 4;
 		org_1_y = 244 - sprite1_ypos - 4;
-		drawgfx(motion_object_1_vid, Machine->gfx[1],
-			(spriteno & 0x0f) + 16 * enable_set, 0,
-			0, 0, 0, 0, &clip, TRANSPARENCY_NONE, 0);
+		
+		dgp1.code = (spriteno & 0x0f) + 16 * enable_set;
+		drawgfx(&dgp1);
 	}
+} // end of patch paragraph
+
 	else
 		fillbitmap(motion_object_1_vid, pen0, &clip);
 
 	/* draw sprite 2 */
 	if (sprite_2_enabled())
-	{
+	
+{ 
+struct drawgfxParams dgp2={
+	motion_object_2_vid, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		org_2_x = 236 - sprite2_xpos - 4;
 		org_2_y = 244 - sprite2_ypos - 4;
-		drawgfx(motion_object_2_vid, Machine->gfx[1],
-			((spriteno >> 4) & 0x0f) + 32, 0,
-			0, 0, 0, 0, &clip, TRANSPARENCY_NONE, 0);
+		
+		dgp2.code = ((spriteno >> 4) & 0x0f) + 32;
+		drawgfx(&dgp2);
 	}
+} // end of patch paragraph
+
 	else
 		fillbitmap(motion_object_2_vid, pen0, &clip);
 
     /* draw sprite 2 clipped to sprite 1's location */
 	fillbitmap(motion_object_2_clip, pen0, &clip);
 	if (sprite_1_enabled() && sprite_2_enabled())
-	{
+	
+{ 
+struct drawgfxParams dgp3={
+	motion_object_2_clip, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&clip, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
-		drawgfx(motion_object_2_clip, Machine->gfx[1],
-			((spriteno >> 4) & 0x0f) + 32, 0,
-			0, 0, sx, sy, &clip, TRANSPARENCY_NONE, 0);
+		
+		dgp3.code = ((spriteno >> 4) & 0x0f) + 32;
+		dgp3.sx = sx;
+		dgp3.sy = sy;
+		drawgfx(&dgp3);
 	}
+} // end of patch paragraph
+
 
     /* scan for collisions */
     for (sy = 0; sy < 16; sy++)
@@ -503,18 +594,60 @@ VIDEO_UPDATE( exidy )
 
 	/* draw sprite 2 first */
 	if (sprite_2_enabled())
-	{
+	
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		sx = 236 - sprite2_xpos - 4;
 		sy = 244 - sprite2_ypos - 4;
 
-		drawgfx(bitmap, Machine->gfx[1],
-			((spriteno >> 4) & 0x0f) + 32, 1,
-			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp4.code = ((spriteno >> 4) & 0x0f) + 32;
+		dgp4.sx = sx;
+		dgp4.sy = sy;
+		drawgfx(&dgp4);
 	}
+} // end of patch paragraph
+
 
 	/* draw sprite 1 next */
 	if (sprite_1_enabled())
-	{
+	
+{ 
+struct drawgfxParams dgp5={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		UINT8 enable_set = ((sprite_enable & 0x20) != 0);
 
 		sx = 236 - sprite1_xpos - 4;
@@ -522,10 +655,14 @@ VIDEO_UPDATE( exidy )
 
 		if (sy < 0) sy = 0;
 
-		drawgfx(bitmap, Machine->gfx[1],
-			(spriteno & 0x0f) + 16 * enable_set, 0,
-			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp5.code = (spriteno & 0x0f) + 16 * enable_set;
+		dgp5.sx = sx;
+		dgp5.sy = sy;
+		drawgfx(&dgp5);
 	}
+} // end of patch paragraph
+
 
 	/* indicate that we already updated the background */
 	update_complete = 1;

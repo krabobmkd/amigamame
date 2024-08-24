@@ -149,6 +149,25 @@ static void get_fg_tile_info(int tile_index)
  ********************************************/
 
 static void draw_object(mame_bitmap *bitmap, const rectangle *cliprect)
+
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int sx, sy, color;
 
@@ -164,11 +183,29 @@ static void draw_object(mame_bitmap *bitmap, const rectangle *cliprect)
 	else
 		sx = 91 - (part_h_shift & 0x7f);
 
-	drawgfx(bitmap, Machine->gfx[3], 0, color, 0, 0, sx + 64, sy, cliprect, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap, Machine->gfx[3], 1, color, 0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap, Machine->gfx[3], 0, color, 0, 1, sx + 64, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap, Machine->gfx[3], 1, color, 0, 1, sx, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
+	
+	dgp0.color = color;
+	dgp0.sx = sx + 64;
+	dgp0.sy = sy;
+	drawgfx(&dgp0);
+	
+	dgp0.color = color;
+	dgp0.sx = sx;
+	dgp0.sy = sy;
+	drawgfx(&dgp0);
+	
+	dgp0.color = color;
+	dgp0.sx = sx + 64;
+	dgp0.sy = sy - 64;
+	drawgfx(&dgp0);
+	
+	dgp0.color = color;
+	dgp0.sx = sx;
+	dgp0.sy = sy - 64;
+	drawgfx(&dgp0);
 }
+} // end of patch paragraph
+
 
 static void draw_center(mame_bitmap *bitmap, const rectangle *cliprect)
 {
@@ -410,6 +447,25 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 	int i,offs;
 
 	/* Draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0, offs = 0;i < 8; i++, offs += 4*interleave)
 	{
 		int sx,sy,flipx,flipy;
@@ -434,23 +490,29 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 
 		sy -= sprite_y_adjust;
 
-		drawgfx(bitmap,Machine->gfx[1],
-				sprite_ram[offs + interleave],
-				color,
-				flipx,flipy,
-				sx,sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp4.code = sprite_ram[offs + interleave];
+		dgp4.color = color;
+		dgp4.flipx = flipx;
+		dgp4.flipy = flipy;
+		dgp4.sx = sx;
+		dgp4.sy = sy;
+		drawgfx(&dgp4);
 
 		sy += (flip_screen ? -256 : 256);
 
 		// Wrap around
-		drawgfx(bitmap,Machine->gfx[1],
-				sprite_ram[offs + interleave],
-				color,
-				flipx,flipy,
-				sx,sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp4.code = sprite_ram[offs + interleave];
+		dgp4.color = color;
+		dgp4.flipx = flipx;
+		dgp4.flipy = flipy;
+		dgp4.sx = sx;
+		dgp4.sy = sy;
+		drawgfx(&dgp4);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -462,6 +524,25 @@ static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
 
 	/* Draw the missiles (16 of them) seemingly with alternating colors
      * from the E302 latch (color_missiles) */
+	
+	{ 
+	struct drawgfxParams dgp6={
+		bitmap, 	// dest
+		Machine->gfx[4], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0, offs = 0; i < 8; i++, offs += 4*interleave)
 	{
 		int sx,sy;
@@ -474,9 +555,11 @@ static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
 			sy = 240 - sy + missile_y_adjust_flip_screen;
 		}
 		sy -= missile_y_adjust;
-		drawgfx(bitmap,Machine->gfx[4],
-				0,32 + ((color_missiles >> 4) & 7), 0,0, sx,sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp6.color = 32 + ((color_missiles >> 4) & 7);
+		dgp6.sx = sx;
+		dgp6.sy = sy;
+		drawgfx(&dgp6);
 
 		sy = 255 - missile_ram[offs + 1*interleave];
 		sx = 255 - missile_ram[offs + 3*interleave];
@@ -486,10 +569,14 @@ static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
 			sy = 240 - sy + missile_y_adjust_flip_screen;
 		}
 		sy -= missile_y_adjust;
-		drawgfx(bitmap,Machine->gfx[4],
-				0,32 + (color_missiles & 7), 0,0, sx,sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp6.color = 32 + (color_missiles & 7);
+		dgp6.sx = sx;
+		dgp6.sy = sy;
+		drawgfx(&dgp6);
 	}
+	} // end of patch paragraph
+
 }
 
 

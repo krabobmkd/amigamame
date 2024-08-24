@@ -185,23 +185,67 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 //      if(sprite_type == 1) sy=sy+2;
 
 		if( flip_screen )
-		{
-			drawgfx( bitmap,gfx,
-				sprite_number&0x7f,
-				color,
-				1,(sprite_number&0x80)?0:1,
-				256-32-sx,256-32-sy,
-				cliprect,TRANSPARENCY_PEN,0 );
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp0.code = sprite_number&0x7f;
+			dgp0.color = color;
+			dgp0.flipy = (sprite_number&0x80)?0:1;
+			dgp0.sx = 256-32-sx;
+			dgp0.sy = 256-32-sy;
+			drawgfx(&dgp0);
 		}
-		else
+} // end of patch paragraph
+
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 		{
-			drawgfx( bitmap,gfx,
-				sprite_number&0x7f,
-				color,
-				0,sprite_number&0x80,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0 );
+			
+			dgp1.code = sprite_number&0x7f;
+			dgp1.color = color;
+			dgp1.flipy = sprite_number&0x80;
+			dgp1.sx = sx;
+			dgp1.sy = sy;
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 
 		source -= 4;
 	}

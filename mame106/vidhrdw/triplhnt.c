@@ -59,6 +59,25 @@ static void triplhnt_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect
 	int hit_line = 999;
 	int hit_code = 999;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		helper, 	// dest
+		Machine->gfx[triplhnt_sprite_zoom], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 16; i++)
 	{
 		rectangle rect;
@@ -95,9 +114,12 @@ static void triplhnt_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect
 
 		/* render sprite to auxiliary bitmap */
 
-		drawgfx(helper, Machine->gfx[triplhnt_sprite_zoom],
-			2 * code + triplhnt_sprite_bank, 0, code & 8, 0,
-			rect.min_x, rect.min_y, cliprect, TRANSPARENCY_NONE, 0);
+		
+		dgp0.code = 2 * code + triplhnt_sprite_bank;
+		dgp0.flipx = code & 8;
+		dgp0.sx = rect.min_x;
+		dgp0.sy = rect.min_y;
+		drawgfx(&dgp0);
 
 		if (rect.min_x < cliprect->min_x)
 			rect.min_x = cliprect->min_x;
@@ -135,6 +157,8 @@ static void triplhnt_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect
 			}
 		}
 	}
+	} // end of patch paragraph
+
 
 	if (hit_line != 999 && hit_code != 999)
 	{

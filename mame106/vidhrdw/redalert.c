@@ -184,7 +184,26 @@ VIDEO_UPDATE( redalert )
 		charcode = videoram[offs];
 
 		if (dirtybuffer[offs] || redalert_dirtycharacter[charcode] || redalert_dirtycharacter2[charcode])
-		{
+		
+{ 
+struct drawgfxParams dgp2={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	stat_transparent, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,color;
 
 
@@ -224,69 +243,168 @@ VIDEO_UPDATE( redalert )
 
 			/* First layer of color */
 			if (charcode >= 0xC0)
-			{
+			
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	tmpbitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				stat_transparent = TRANSPARENCY_COLOR;
 
 				color = color_lookup[charcode];
 
-				drawgfx(tmpbitmap,Machine->gfx[2],
-						charcode-0x80,
-						color,
-						0,0,
-						8*sx,8*sy,
-						&Machine->visible_area,TRANSPARENCY_NONE,0);
+				
+				dgp0.code = charcode-0x80;
+				dgp0.color = color;
+				dgp0.sx = 8*sx;
+				dgp0.sy = 8*sy;
+				drawgfx(&dgp0);
 
 				if( redalert_dirtycharacter2[charcode] != 0 )
-					drawgfx(tmpbitmap,Machine->gfx[3],
-							charcode-0x80,
-							color,
-							0,0,
-							8*sx,8*sy,
-							&Machine->visible_area,TRANSPARENCY_COLOR,0);
+					
+					dgp1.code = charcode-0x80;
+					dgp1.color = color;
+					dgp1.sx = 8*sx;
+					dgp1.sy = 8*sy;
+					drawgfx(&dgp1);
 
 			}
+} // end of patch paragraph
+
 
 			/* Second layer - background */
 			color = redalert_backcolor[offs];
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					offs,
-					color,
-					0,0,
-					8*sx,8*sy,
-					&Machine->visible_area,stat_transparent,0);
+			
+			dgp2.code = offs;
+			dgp2.color = color;
+			dgp2.sx = 8*sx;
+			dgp2.sy = 8*sy;
+			drawgfx(&dgp2);
 
 			/* Third layer - alphanumerics & sprites */
 			if (charcode < 0x80)
-			{
+			
+{ 
+struct drawgfxParams dgp3={
+	tmpbitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				color = color_lookup[charcode];
-				drawgfx(tmpbitmap,Machine->gfx[1],
-						charcode,
-						color,
-						0,0,
-						8*sx,8*sy,
-						&Machine->visible_area,TRANSPARENCY_COLOR,0);
+				
+				dgp3.code = charcode;
+				dgp3.color = color;
+				dgp3.sx = 8*sx;
+				dgp3.sy = 8*sy;
+				drawgfx(&dgp3);
 			}
+} // end of patch paragraph
+
 			else if (charcode < 0xC0)
-			{
+			
+{ 
+struct drawgfxParams dgp4={
+	tmpbitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp5={
+	tmpbitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				color = color_lookup[charcode];
-				drawgfx(tmpbitmap,Machine->gfx[2],
-						charcode-0x80,
-						color,
-						0,0,
-						8*sx,8*sy,
-						&Machine->visible_area,TRANSPARENCY_COLOR,0);
+				
+				dgp4.code = charcode-0x80;
+				dgp4.color = color;
+				dgp4.sx = 8*sx;
+				dgp4.sy = 8*sy;
+				drawgfx(&dgp4);
 
 				if( redalert_dirtycharacter2[charcode] != 0 )
-					drawgfx(tmpbitmap,Machine->gfx[3],
-							charcode-0x80,
-							color,
-							0,0,
-							8*sx,8*sy,
-							&Machine->visible_area,TRANSPARENCY_COLOR,0);
+					
+					dgp5.code = charcode-0x80;
+					dgp5.color = color;
+					dgp5.sx = 8*sx;
+					dgp5.sy = 8*sy;
+					drawgfx(&dgp5);
 
 			}
+} // end of patch paragraph
+
 
 		}
+} // end of patch paragraph
+
 	}
 
 	for (i = 0;i < 256;i++)

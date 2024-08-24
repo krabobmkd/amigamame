@@ -225,6 +225,25 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x80;offs += 2)
 	{
 		static int tile_offset[2][2] =
@@ -259,15 +278,19 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 				int t = tile_offset[ey][ex] + tile_number;
 
-				drawgfx(bitmap,Machine->gfx[2],
-						t,
-						color,
-						xflip, yflip,
-						sx+x*16, sy+y*16,
-						cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = t;
+				dgp0.color = color;
+				dgp0.flipx = xflip;
+				dgp0.flipy = yflip;
+				dgp0.sx = sx+x*16;
+				dgp0.sy = sy+y*16;
+				drawgfx(&dgp0);
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

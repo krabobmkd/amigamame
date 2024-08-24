@@ -208,7 +208,26 @@ VIDEO_UPDATE( jumping )
 	{
 		int tile = spriteram16[offs];
 		if (tile < Machine->gfx[1]->total_elements)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	15, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy,color,data1;
 
 			sy = ((spriteram16[offs+1] - 0xfff1) ^ 0xffff) & 0x1ff;
@@ -219,13 +238,17 @@ VIDEO_UPDATE( jumping )
 			data1 = spriteram16[offs+3];
 			color = (spriteram16[offs+4] & 0x0f) | sprite_colbank;
 
-			drawgfx(bitmap,Machine->gfx[0],
-					tile,
-					color,
-					data1 & 0x40, data1 & 0x80,
-					sx,sy+1,
-					cliprect,TRANSPARENCY_PEN,15);
+			
+			dgp0.code = tile;
+			dgp0.color = color;
+			dgp0.flipx = data1 & 0x40;
+			dgp0.flipy = data1 & 0x80;
+			dgp0.sx = sx;
+			dgp0.sy = sy+1;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,0);

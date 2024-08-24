@@ -365,6 +365,25 @@ static void draw_text(mame_bitmap* bitmap, const rectangle* cliprect)
 
 	int i;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 2; i++)
 	{
 		int x = 0;
@@ -381,10 +400,15 @@ static void draw_text(mame_bitmap* bitmap, const rectangle* cliprect)
 
 		for (y = 0; y < 256; y += Machine->gfx[0]->width)
 		{
-			drawgfx(bitmap, Machine->gfx[0], *p++, 0, 0, 0,
-				x, y, cliprect, TRANSPARENCY_NONE, 0);
+			
+			dgp0.code = *p++;
+			dgp0.sx = x;
+			dgp0.sy = y;
+			drawgfx(&dgp0);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -396,6 +420,25 @@ VIDEO_UPDATE( firetrk )
 
 	calc_car_positions();
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[car[i].layout], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&playfield_window, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 1; i >= 0; i--)
 	{
 		if (GAME_IS_SUPERBUG && i == 1)
@@ -403,17 +446,17 @@ VIDEO_UPDATE( firetrk )
 			continue;
 		}
 
-		drawgfx(bitmap,
-			Machine->gfx[car[i].layout],
-			car[i].number,
-			car[i].color,
-			car[i].flipx,
-			car[i].flipy,
-			car[i].x,
-			car[i].y,
-			&playfield_window,
-			TRANSPARENCY_PEN, 0);
+		
+		dgp1.code = car[i].number;
+		dgp1.color = car[i].color;
+		dgp1.flipx = car[i].flipx;
+		dgp1.flipy = car[i].flipy;
+		dgp1.sx = car[i].x;
+		dgp1.sy = car[i].y;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 
 	draw_text(bitmap, cliprect);
 }
@@ -427,6 +470,25 @@ VIDEO_EOF( firetrk )
 
 	calc_car_positions();
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		helper2, 	// dest
+		Machine->gfx[car[i].layout], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&playfield_window, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 1; i >= 0; i--)
 	{
 		int width = Machine->gfx[car[i].layout]->width;
@@ -440,16 +502,13 @@ VIDEO_EOF( firetrk )
 			continue;
 		}
 
-		drawgfx(helper2,
-			Machine->gfx[car[i].layout],
-			car[i].number,
-			0,
-			car[i].flipx,
-			car[i].flipy,
-			car[i].x,
-			car[i].y,
-			&playfield_window,
-			TRANSPARENCY_NONE, 0);
+		
+		dgp2.code = car[i].number;
+		dgp2.flipx = car[i].flipx;
+		dgp2.flipy = car[i].flipy;
+		dgp2.sx = car[i].x;
+		dgp2.sy = car[i].y;
+		drawgfx(&dgp2);
 
 		for (y = car[i].y; y < car[i].y + height; y++)
 		{
@@ -481,6 +540,8 @@ VIDEO_EOF( firetrk )
 			}
 		}
 	}
+	} // end of patch paragraph
+
 
 	if (blink)
 	{

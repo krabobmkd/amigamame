@@ -30,6 +30,25 @@ VIDEO_UPDATE( copsnrob )
 
     /* redrawing the entire display is faster in this case */
 
+    
+    { 
+    struct drawgfxParams dgp0={
+    	bitmap, 	// dest
+    	Machine->gfx[0], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for (offs = videoram_size;offs >= 0;offs--)
     {
 		int sx,sy;
@@ -37,50 +56,136 @@ VIDEO_UPDATE( copsnrob )
 		sx = 31 - (offs % 32);
 		sy = offs / 32;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				videoram[offs] & 0x3f,0,
-				0,0,
-				8*sx,8*sy,
-				&Machine->visible_area,TRANSPARENCY_NONE,0);
+		
+		dgp0.code = videoram[offs] & 0x3f;
+		dgp0.sx = 8*sx;
+		dgp0.sy = 8*sy;
+		drawgfx(&dgp0);
     }
+    } // end of patch paragraph
+
 
 
     /* Draw the cars. Positioning was based on a screen shot */
     if (copsnrob_cary[0])
-    {
-        drawgfx(bitmap,Machine->gfx[1],
-                copsnrob_carimage[0],0,
-                1,0,
-                0xe4,256-copsnrob_cary[0],
-                &Machine->visible_area,TRANSPARENCY_PEN,0);
+    
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+        
+        dgp1.code = copsnrob_carimage[0];
+        dgp1.sx = 0xe4;
+        dgp1.sy = 256-copsnrob_cary[0];
+        drawgfx(&dgp1);
     }
+} // end of patch paragraph
+
 
     if (copsnrob_cary[1])
-    {
-        drawgfx(bitmap,Machine->gfx[1],
-                copsnrob_carimage[1],0,
-                1,0,
-                0xc4,256-copsnrob_cary[1],
-                &Machine->visible_area,TRANSPARENCY_PEN,0);
+    
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+        
+        dgp2.code = copsnrob_carimage[1];
+        dgp2.sx = 0xc4;
+        dgp2.sy = 256-copsnrob_cary[1];
+        drawgfx(&dgp2);
     }
+} // end of patch paragraph
+
 
     if (copsnrob_cary[2])
-    {
-        drawgfx(bitmap,Machine->gfx[1],
-                copsnrob_carimage[2],0,
-                0,0,
-                0x24,256-copsnrob_cary[2],
-                &Machine->visible_area,TRANSPARENCY_PEN,0);
+    
+{ 
+struct drawgfxParams dgp3={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+        
+        dgp3.code = copsnrob_carimage[2];
+        dgp3.sx = 0x24;
+        dgp3.sy = 256-copsnrob_cary[2];
+        drawgfx(&dgp3);
     }
+} // end of patch paragraph
+
 
     if (copsnrob_cary[3])
-    {
-        drawgfx(bitmap,Machine->gfx[1],
-                copsnrob_carimage[3],0,
-                0,0,
-                0x04,256-copsnrob_cary[3],
-                &Machine->visible_area,TRANSPARENCY_PEN,0);
+    
+{ 
+struct drawgfxParams dgp4={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+        
+        dgp4.code = copsnrob_carimage[3];
+        dgp4.sx = 0x04;
+        dgp4.sy = 256-copsnrob_cary[3];
+        drawgfx(&dgp4);
     }
+} // end of patch paragraph
+
 
 
     /* Draw the beer truck. Positioning was based on a screen shot.
@@ -103,28 +208,68 @@ VIDEO_UPDATE( copsnrob )
 			/* The hardware only uses the low 5 bits of the truck image line
             sync register. */
 			if ((copsnrob_trucky[0] & 0x1f) == ((y+31) & 0x1f))
-			{
+			
+{ 
+struct drawgfxParams dgp5={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				/* We've hit a truck's back end, so draw the truck.  The front
                    end may be off the top of the screen, but we don't care. */
-				drawgfx(bitmap,Machine->gfx[2],
-						0,0,
-						0,0,
-						0x80,256-(y+31),
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp5.sx = 0x80;
+				dgp5.sy = 256-(y+31);
+				drawgfx(&dgp5);
 				/* Skip past this truck's front end so we don't draw this
                 truck twice. */
 				y += 31;
 			}
+} // end of patch paragraph
+
 			else if ((copsnrob_trucky[0] & 0x1f) == (y & 0x1f))
-			{
+			
+{ 
+struct drawgfxParams dgp6={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				/* We missed a truck's back end (it was off the bottom of the
                    screen) but have hit its front end, so draw the truck. */
-				drawgfx(bitmap,Machine->gfx[2],
-						0,0,
-						0,0,
-						0x80,256-y,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp6.sx = 0x80;
+				dgp6.sy = 256-y;
+				drawgfx(&dgp6);
 			}
+} // end of patch paragraph
+
 		}
     }
 

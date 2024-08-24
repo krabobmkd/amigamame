@@ -127,6 +127,25 @@ static void gotya_draw_status_row( mame_bitmap *bitmap, int sx, int col )
 		sx = 35 - sx;
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (row = 29; row >= 0; row--)
 	{
 		int sy;
@@ -140,20 +159,42 @@ static void gotya_draw_status_row( mame_bitmap *bitmap, int sx, int col )
 			sy = 31 - row;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
-			gotya_videoram2[row * 32 + col],
-			gotya_videoram2[row * 32 + col + 0x10] & 0x0f,
-			flip_screen_x, flip_screen_y,
-			8 * sx, 8 * sy,
-			&Machine->visible_area,
-			TRANSPARENCY_NONE, 0);
+		
+		dgp0.code = gotya_videoram2[row * 32 + col];
+		dgp0.color = gotya_videoram2[row * 32 + col + 0x10] & 0x0f;
+		dgp0.flipx = flip_screen_x;
+		dgp0.flipy = flip_screen_y;
+		dgp0.sx = 8 * sx;
+		dgp0.sy = 8 * sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 static void gotya_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 2; offs < 0x0e; offs += 2)
 	{
 		int code = spriteram[offs + 0x01] >> 2;
@@ -166,13 +207,17 @@ static void gotya_draw_sprites( mame_bitmap *bitmap )
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
-			code, color,
-			flip_screen_x, flip_screen_y,
-			sx, sy,
-			&Machine->visible_area,
-			TRANSPARENCY_PEN, 0);
+		
+		dgp1.code = code;
+		dgp1.color = color;
+		dgp1.flipx = flip_screen_x;
+		dgp1.flipy = flip_screen_y;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 static void gotya_draw_status( mame_bitmap *bitmap )

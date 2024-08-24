@@ -122,6 +122,25 @@ VIDEO_UPDATE( momoko )
 
 	if (momoko_bg_mask == 0)
 	{
+		
+		{ 
+		struct drawgfxParams dgp0={
+			bitmap, 	// dest
+			Machine->gfx[1], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (y=0; y<29; y++)
 		{
 			for (x=0; x<32; x++)
@@ -142,14 +161,18 @@ VIDEO_UPDATE( momoko )
 					py = 248-(8*y+dy+9);
 				}
 
-				drawgfx(bitmap,Machine->gfx[1],
-					chr,
-					col,
-					flip,flip,
-					px,py,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+				
+				dgp0.code = chr;
+				dgp0.color = col;
+				dgp0.flipx = flip;
+				dgp0.flipy = flip;
+				dgp0.sx = px;
+				dgp0.sy = py;
+				drawgfx(&dgp0);
 			}
 		}
+		} // end of patch paragraph
+
 	}
 	else
 	fillbitmap(bitmap, Machine->pens[256], 0);
@@ -157,6 +180,25 @@ VIDEO_UPDATE( momoko )
 
 /* draw sprites (momoko) */
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs=0; offs<9*4; offs +=4)
 	{
 		chr = spriteram[offs+1] | ((spriteram[offs+2]&0x60)<<3);
@@ -177,13 +219,17 @@ VIDEO_UPDATE( momoko )
 			py = y+1;
 		}
 
-		drawgfx(bitmap,Machine->gfx[3],
-			chr,
-			col,
-			!fx,fy,
-			px,py,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = chr;
+		dgp1.color = col;
+		dgp1.flipx = !fx;
+		dgp1.flipy = fy;
+		dgp1.sx = px;
+		dgp1.sy = py;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 
 
 /* draw BG layer */
@@ -222,6 +268,25 @@ VIDEO_UPDATE( momoko )
 
 /* draw sprites (others) */
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs=9*4; offs<spriteram_size; offs +=4)
 	{
 		chr = spriteram[offs+1] | ((spriteram[offs+2]&0x60)<<3);
@@ -241,17 +306,40 @@ VIDEO_UPDATE( momoko )
 			px = 248-x;
 			py = y+1;
 		}
-		drawgfx(bitmap,Machine->gfx[3],
-			chr,
-			col,
-			!fx,fy,
-			px,py,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp2.code = chr;
+		dgp2.color = col;
+		dgp2.flipx = !fx;
+		dgp2.flipy = fy;
+		dgp2.sx = px;
+		dgp2.sy = py;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 
 
 /* draw text layer */
 
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (y=16; y<240; y++)
 	{
 		for (x=0; x<32; x++)
@@ -276,14 +364,17 @@ VIDEO_UPDATE( momoko )
 				px = 248-x*8;
 				py = 255-y;
 			}
-			drawgfx(bitmap,Machine->gfx[0],
-				videoram[(sy>>3)*32+x]*8+dy,
-				col,
-				flip,0,
-				px,py,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp3.code = videoram[(sy>>3)*32+x]*8+dy;
+			dgp3.color = col;
+			dgp3.flipx = flip;
+			dgp3.sx = px;
+			dgp3.sy = py;
+			drawgfx(&dgp3);
 		}
 	}
+	} // end of patch paragraph
+
 
 
 /* draw FG layer */
@@ -295,6 +386,25 @@ VIDEO_UPDATE( momoko )
 		rx = momoko_fg_scrollx >> 3 ;
 		ry = momoko_fg_scrolly >> 3 ;
 
+		
+		{ 
+		struct drawgfxParams dgp4={
+			bitmap, 	// dest
+			Machine->gfx[2], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (y=0; y<29; y++)
 		{
 			for (x=0; x<32; x++)
@@ -311,13 +421,16 @@ VIDEO_UPDATE( momoko )
 					px = 248-(8*x+dx-8);
 					py = 248-(8*y+dy+9);
 				}
-				drawgfx(bitmap,Machine->gfx[2],
-					chr,
-					0, /* color */
-					flip,flip, /* flip */
-					px,py,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp4.code = chr;
+				dgp4.flipx = /* color */					flip;
+				dgp4.flipy = flip;
+				dgp4.sx = /* flip */					px;
+				dgp4.sy = py;
+				drawgfx(&dgp4);
 			}
 		}
+		} // end of patch paragraph
+
 	}
 }

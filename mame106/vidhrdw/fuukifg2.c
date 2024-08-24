@@ -156,6 +156,25 @@ static void fuuki16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	int max_y		=	Machine->visible_area.max_y+1;
 
 	/* Draw them backwards, for pdrawgfx */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri_mask 	// priority_mask
+	  };
 	for ( offs = (spriteram_size-8)/2; offs >=0; offs -= 8/2 )
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
@@ -205,13 +224,14 @@ static void fuuki16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			for (x = xstart; x != xend; x += xinc)
 			{
 				if (xzoom == (16*8) && yzoom == (16*8))
-					pdrawgfx(		bitmap,Machine->gfx[0],
-									code++,
-									attr & 0x3f,
-									flipx, flipy,
-									sx + x * 16, sy + y * 16,
-									cliprect,TRANSPARENCY_PEN,15,
-									pri_mask	);
+					
+					dgp0.code = code++;
+					dgp0.color = attr & 0x3f;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx + x * 16;
+					dgp0.sy = sy + y * 16;
+					drawgfx(&dgp0);
 				else
 					pdrawgfxzoom(	bitmap,Machine->gfx[0],
 									code++,
@@ -235,6 +255,8 @@ if (code_pressed(KEYCODE_X))
 #endif
 #endif
 	}
+	} // end of patch paragraph
+
 }
 
 

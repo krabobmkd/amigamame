@@ -169,6 +169,25 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri 	// priority_mask
+	  };
 	for (offs = 0x400-4;offs >=0 ;offs -= 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult,pri=0;
@@ -222,22 +241,45 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,Machine->gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0,pri);
+			
+			dgp0.code = sprite - multi * inc;
+			dgp0.color = colour;
+			dgp0.flipx = fx;
+			dgp0.flipy = fy;
+			dgp0.sx = x;
+			dgp0.sy = y + mult * multi;
+			drawgfx(&dgp0);
 
 			multi--;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri 	// priority_mask
+	  };
 	for (offs = 0x400-4;offs >=0 ;offs -= 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult,pri=0;
@@ -290,16 +332,20 @@ static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,Machine->gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0,pri);
+			
+			dgp1.code = sprite - multi * inc;
+			dgp1.color = colour;
+			dgp1.flipx = fx;
+			dgp1.flipy = fy;
+			dgp1.sx = x;
+			dgp1.sy = y + mult * multi;
+			drawgfx(&dgp1);
 
 			multi--;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void mutantf_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
@@ -337,6 +383,25 @@ static void mutantf_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 		inc=-4;
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[gfxbank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		trans, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while (offs!=end)
 	{
 		int x,y,sprite,colour,fx,fy,w,h,sx,sy,x_mult,y_mult;
@@ -395,17 +460,21 @@ static void mutantf_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
-				pdrawgfx(bitmap,Machine->gfx[gfxbank],
-						sprite + y + h * x,
-						colour,
-						fx,fy,
-						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						&Machine->visible_area,trans,0,0);
+				
+				dgp2.code = sprite + y + h * x;
+				dgp2.color = colour;
+				dgp2.flipx = fx;
+				dgp2.flipy = fy;
+				dgp2.sx = sx + x_mult * (w-x);
+				dgp2.sy = sy + y_mult * (h-y);
+				drawgfx(&dgp2);
 			}
 		}
 
 		offs+=inc;
 	}
+	} // end of patch paragraph
+
 }
 
 /******************************************************************************/

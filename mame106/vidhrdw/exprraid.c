@@ -110,6 +110,25 @@ static void exprraid_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		int attr = spriteram[offs + 1];
@@ -128,23 +147,52 @@ static void exprraid_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
-			code, color,
-			flipx, flipy,
-			sx, sy,
-			0, TRANSPARENCY_PEN, 0);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 
 		/* double height */
 
 		if (attr & 0x10)
-		{
-			drawgfx(bitmap,Machine->gfx[1],
-				code + 1, color,
-				flipx, flipy,
-				sx, sy + (flip_screen ? -16 : 16),
-				0, TRANSPARENCY_PEN, 0);
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+			
+			dgp1.code = code + 1;
+			dgp1.color = color;
+			dgp1.flipx = flipx;
+			dgp1.flipy = flipy;
+			dgp1.sx = sx;
+			dgp1.sy = sy + (flip_screen ? -16 : 16);
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( exprraid )

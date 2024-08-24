@@ -171,7 +171,26 @@ static void shaolins_draw_sprites( mame_bitmap *bitmap )
 	for (offs = spriteram_size-32; offs >= 0; offs-=32 ) /* max 24 sprites */
 	{
 		if (spriteram[offs] && spriteram[offs + 6]) /* stop rogue sprites on high score screen */
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_COLOR, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int code = spriteram[offs + 8];
 			int color = (spriteram[offs + 9] & 0x0f) + 16 * palettebank;
 			int flipx = !(spriteram[offs + 9] & 0x40);
@@ -187,14 +206,18 @@ static void shaolins_draw_sprites( mame_bitmap *bitmap )
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[1],
-				code, color,
-				flipx, flipy,
-				sx, sy,
-				&Machine->visible_area,
-				TRANSPARENCY_COLOR, 0);
+			
+			dgp0.code = code;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 				/* transparency_color, otherwise sprites in test mode are not visible */
 		}
+} // end of patch paragraph
+
 	}
 }
 

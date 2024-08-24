@@ -662,7 +662,26 @@ VIDEO_UPDATE( tubep )
 	for (offs = 0;offs < 0x800; offs+=2)
 	{
 		if (dirtybuff[offs/2])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	*/					8*sx, 	// clip
+	8*sy, 	// transparency
+	&Machine->visible_area, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 			dirtybuff[offs/2] = 0;
@@ -672,13 +691,15 @@ VIDEO_UPDATE( tubep )
 			sy = (offs/2) / 32;
 			//if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					tubep_textram[offs],
-					((tubep_textram[offs+1]) & 0x0f) | color_A4,
-					0,0, /*flipscreen[0],flipscreen[1],*/
-					8*sx,8*sy,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = tubep_textram[offs];
+			dgp0.color = ((tubep_textram[offs+1]) & 0x0f) | color_A4;
+			dgp0.sx = /*flipscreen[0];
+			dgp0.sy = flipscreen[1];
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 
 	/* draw background ram */
@@ -783,7 +804,26 @@ VIDEO_UPDATE( rjammer )
 	for (offs = 0;offs < 0x800; offs+=2)
 	{
 		if (dirtybuff[offs/2])
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	*/					8*sx, 	// clip
+	8*sy, 	// transparency
+	&Machine->visible_area, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 			dirtybuff[offs/2] = 0;
@@ -793,13 +833,15 @@ VIDEO_UPDATE( rjammer )
 			sy = (offs/2) / 32;
 			//if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					tubep_textram[offs],
-					(tubep_textram[offs+1]) & 0x0f,
-					0,0, /*flipscreen[0],flipscreen[1],*/
-					8*sx,8*sy,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp1.code = tubep_textram[offs];
+			dgp1.color = (tubep_textram[offs+1]) & 0x0f;
+			dgp1.sx = /*flipscreen[0];
+			dgp1.sy = flipscreen[1];
+			drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 
 

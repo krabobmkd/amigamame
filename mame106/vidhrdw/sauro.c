@@ -117,6 +117,25 @@ static void sauro_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs,code,sx,sy,color,flipx;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 3;offs < spriteram_size - 1;offs += 4)
 	{
 		sy = spriteram[offs];
@@ -150,13 +169,17 @@ static void sauro_draw_sprites( mame_bitmap *bitmap )
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[2],
-				code,
-				color,
-				flipx,flip_screen,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flip_screen;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( sauro )
@@ -189,6 +212,25 @@ static void trckydoc_draw_sprites( mame_bitmap *bitmap )
 	int offs,code,sy,color,flipx,sx;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 3;offs < spriteram_size - 1;offs += 4)
 	{
 		sy = spriteram[offs];
@@ -229,13 +271,17 @@ static void trckydoc_draw_sprites( mame_bitmap *bitmap )
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
-				code,
-				color,
-				flipx,flip_screen,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = code;
+		dgp1.color = color;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flip_screen;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( trckydoc )

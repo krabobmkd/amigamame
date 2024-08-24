@@ -104,7 +104,26 @@ void darius_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prima
 		code = spriteram16[offs+2] &0x1fff;
 
 		if (code)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			data = spriteram16[offs];
 			sy = (256-data) & 0x1ff;
 
@@ -133,13 +152,17 @@ void darius_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prima
 			sprite_ptr->x = curx;
 			sprite_ptr->y = cury;
 
-			drawgfx(bitmap,Machine->gfx[0],
-					sprite_ptr->code,
-					sprite_ptr->color,
-					sprite_ptr->flipx,sprite_ptr->flipy,
-					sprite_ptr->x,sprite_ptr->y,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = sprite_ptr->code;
+			dgp0.color = sprite_ptr->color;
+			dgp0.flipx = sprite_ptr->flipx;
+			dgp0.flipy = sprite_ptr->flipy;
+			dgp0.sx = sprite_ptr->x;
+			dgp0.sy = sprite_ptr->y;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 }
 

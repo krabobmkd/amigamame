@@ -396,6 +396,25 @@ VIDEO_UPDATE( centiped )
 		spriteclip.max_x -= 8;
 
 	/* draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&spriteclip, 	// clip
+		TRANSPARENCY_PENS, 	// transparency
+		penmask[color & 0x3f], 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < 0x10; offs++)
 	{
 		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6);
@@ -405,9 +424,17 @@ VIDEO_UPDATE( centiped )
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
-				&spriteclip, TRANSPARENCY_PENS, penmask[color & 0x3f]);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -428,6 +455,25 @@ VIDEO_UPDATE( warlords )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < 0x10; offs++)
 	{
 		int code = spriteram[offs] & 0x3f;
@@ -449,9 +495,17 @@ VIDEO_UPDATE( warlords )
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
-				cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp1.code = code;
+		dgp1.color = color;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = x;
+		dgp1.sy = y;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -471,6 +525,25 @@ VIDEO_UPDATE( bullsdrt )
 		spriteclip.max_x -= 8;
 
 	/* draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&spriteclip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < 0x10; offs++)
 	{
 		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6) | (bullsdrt_sprites_bank * 0x20);
@@ -479,7 +552,14 @@ VIDEO_UPDATE( bullsdrt )
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx(bitmap, Machine->gfx[1], code, color & 0x3f, 1, flipy, x, y,
-				&spriteclip, TRANSPARENCY_PEN, 0);
+		
+		dgp2.code = code;
+		dgp2.color = color & 0x3f;
+		dgp2.flipy = flipy;
+		dgp2.sx = x;
+		dgp2.sy = y;
+		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }

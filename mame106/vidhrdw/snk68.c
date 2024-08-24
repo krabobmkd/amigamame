@@ -186,7 +186,26 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int j,i
 		for (i=0; i<0x80; i+=4) {
 			color=spriteram16[(offs+i+(0x1000*j)+0x1000)>>1]&0x7f;
 
-			if (color) {
+			if (color) 
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				tile=spriteram16[(offs+2+i+(0x1000*j)+0x1000)>>1];
 				fy=tile&0x8000;
 				fx=tile&0x4000;
@@ -197,13 +216,17 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int j,i
 					if (fy) fy=0; else fy=1;
 				}
 
-				drawgfx(bitmap,Machine->gfx[1],
-					tile,
-					color,
-					fx,fy,
-					mx,my,
-					cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = tile;
+				dgp0.color = color;
+				dgp0.flipx = fx;
+				dgp0.flipy = fy;
+				dgp0.sx = mx;
+				dgp0.sy = my;
+				drawgfx(&dgp0);
 			}
+} // end of patch paragraph
+
 
 			if (flip_screen) {
 				my-=16;
@@ -261,7 +284,26 @@ static void draw_sprites2(mame_bitmap *bitmap, const rectangle *cliprect, int j,
 
 		for (i=0; i<0x80; i+=4) {
 			color=spriteram16[(offs+i+z)>>1]&0x7f;
-			if (color) {
+			if (color) 
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				tile=spriteram16[(offs+2+i+z)>>1];
 				if (sprite_flip) {
 					fx=0;
@@ -279,13 +321,17 @@ static void draw_sprites2(mame_bitmap *bitmap, const rectangle *cliprect, int j,
 				tile&=0x7fff;
 				if (tile>0x5fff) break;
 
-				drawgfx(bitmap,Machine->gfx[1],
-					tile,
-					color,
-					fx,fy,
-					mx,my,
-					cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp1.code = tile;
+				dgp1.color = color;
+				dgp1.flipx = fx;
+				dgp1.flipy = fy;
+				dgp1.sx = mx;
+				dgp1.sy = my;
+				drawgfx(&dgp1);
 			}
+} // end of patch paragraph
+
 			if (flip_screen) {
 				my-=16;
 				if (my < -0x100) my+=0x200;

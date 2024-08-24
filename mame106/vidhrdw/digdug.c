@@ -264,6 +264,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&spritevisiblearea, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0x1f, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x80;offs += 2)
 	{
 		static int gfx_offs[2][2] =
@@ -296,22 +315,28 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		{
 			for (x = 0;x <= size;x++)
 			{
-				drawgfx(bitmap,Machine->gfx[1],
-					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
-					color,
-					flipx,flipy,
-					((sx + 16*x) & 0xff), sy + 16*y,
-					&spritevisiblearea,TRANSPARENCY_COLOR,0x1f);
+				
+				dgp0.code = sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)];
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = ((sx + 16*x) & 0xff);
+				dgp0.sy = sy + 16*y;
+				drawgfx(&dgp0);
 				/* wraparound */
-				drawgfx(bitmap,Machine->gfx[1],
-					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
-					color,
-					flipx,flipy,
-					((sx + 16*x) & 0xff) + 0x100, sy + 16*y,
-					&spritevisiblearea,TRANSPARENCY_COLOR,0x1f);
+				
+				dgp0.code = sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)];
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = ((sx + 16*x) & 0xff) + 0x100;
+				dgp0.sy = sy + 16*y;
+				drawgfx(&dgp0);
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

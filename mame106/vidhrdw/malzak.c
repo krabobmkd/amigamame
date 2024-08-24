@@ -172,17 +172,88 @@ VIDEO_UPDATE( malzak )
 			if((blank == 0) || (saa5050_state.saa5050_flags & SAA5050_HOLDGR))
 			{
 				if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
-				{
-					drawgfx (bitmap, Machine->gfx[4], code, colour, 0, 0,
-						sx * 6, sy * 10, &Machine->visible_area, TRANSPARENCY_NONE, 0);
-					drawgfx (bitmap, Machine->gfx[5], code, colour, 0, 0,
-						sx * 6, (sy + 1) * 10, &Machine->visible_area, TRANSPARENCY_NONE, 0);
+				
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[4], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[5], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
+					
+					dgp0.code = code;
+					dgp0.color = colour;
+					dgp0.sx = sx * 6;
+					dgp0.sy = sy * 10;
+					drawgfx(&dgp0);
+					
+					dgp1.code = code;
+					dgp1.color = colour;
+					dgp1.sx = sx * 6;
+					dgp1.sy = (sy + 1) * 10;
+					drawgfx(&dgp1);
 				}
-				else
+} // end of patch paragraph
+
+				
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[3], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+else
 				{
-					drawgfx (bitmap, Machine->gfx[3], code, colour, 0, 0,
-						sx * 6, sy * 10, &Machine->visible_area, TRANSPARENCY_NONE, 0);
+					
+					dgp2.code = code;
+					dgp2.color = colour;
+					dgp2.sx = sx * 6;
+					dgp2.sy = sy * 10;
+					drawgfx(&dgp2);
 				}
+} // end of patch paragraph
+
 			}
 		}
 		if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
@@ -198,6 +269,25 @@ VIDEO_UPDATE( malzak )
 
 	// playfield - not sure exactly how this works...
 	for(x = 0;x < 16;x++)
+		
+		{ 
+		struct drawgfxParams dgp3={
+			bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_COLOR, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for(y = 0; y < 16;y++)
 		{
 			sx = ((x*16-48) - malzak_x);
@@ -208,9 +298,14 @@ VIDEO_UPDATE( malzak )
 			if(sx < -15)
 				sx+=256;
 
-			drawgfx(bitmap,Machine->gfx[0],field[x*16 + y].code,7,0,0,
-			sx, sy, &Machine->visible_area, TRANSPARENCY_COLOR, 0);
+			
+			dgp3.code = field[x*16 + y].code;
+			dgp3.sx = sx;
+			dgp3.sy = sy;
+			drawgfx(&dgp3);
 		}
+		} // end of patch paragraph
+
 
 	// S2636 - Sprites / Collision detection (x2)
 

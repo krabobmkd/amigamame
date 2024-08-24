@@ -115,6 +115,42 @@ VIDEO_START( crbaloon )
 }
 
 static void crbaloon_draw_sprites( mame_bitmap *bitmap )
+
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int x,y;
 
@@ -131,12 +167,11 @@ static void crbaloon_draw_sprites( mame_bitmap *bitmap )
 		by += 32;
 	}
 
-	drawgfx(bitmap,Machine->gfx[1],
-			spritectrl[0] & 0x0f,
-			15,
-			0,0,
-			bx,by,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+	
+	dgp0.code = spritectrl[0] & 0x0f;
+	dgp0.sx = bx;
+	dgp0.sy = by;
+	drawgfx(&dgp0);
 
     crbaloon_collision = 0;
 
@@ -163,13 +198,15 @@ static void crbaloon_draw_sprites( mame_bitmap *bitmap )
 
 	/* actually draw the balloon */
 
-	drawgfx(bitmap,Machine->gfx[1],
-			spritectrl[0] & 0x0f,
-			(spritectrl[0] & 0xf0) >> 4,
-			0,0,
-			bx,by,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+	
+	dgp1.code = spritectrl[0] & 0x0f;
+	dgp1.color = (spritectrl[0] & 0xf0) >> 4;
+	dgp1.sx = bx;
+	dgp1.sy = by;
+	drawgfx(&dgp1);
 }
+} // end of patch paragraph
+
 
 VIDEO_UPDATE( crbaloon )
 {

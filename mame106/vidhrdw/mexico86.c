@@ -36,6 +36,25 @@ VIDEO_UPDATE( mexico86 )
 
 	sx = 0;
 /* the score display seems to be outside of the main objectram. */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < mexico86_objectram_size+0x200;offs += 4)
 	{
 		int height;
@@ -88,15 +107,19 @@ if (offs >= mexico86_objectram_size+0x1c0) continue;
 				x = (sx + xc * 8) & 0xff;
 				y = (sy + yc * 8) & 0xff;
 
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flipx,flipy,
-						x,y,
-						&Machine->visible_area,TRANSPARENCY_PEN,15);
+				
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = x;
+				dgp0.sy = y;
+				drawgfx(&dgp0);
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 //AT
 #if 0 // old code
@@ -116,6 +139,25 @@ VIDEO_UPDATE( kikikai )
 
 	sx = 0;
 /* the score display seems to be outside of the main objectram. */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < mexico86_objectram_size+0x200;offs += 4)
 	{
 		int height;
@@ -167,15 +209,19 @@ if (offs >= mexico86_objectram_size+0x1c0) continue;
 				x = (sx + xc * 8) & 0xff;
 				y = (sy + yc * 8) & 0xff;
 
-				drawgfx(bitmap,Machine->gfx[0],
-						code,
-						color,
-						flipx,flipy,
-						x,y,
-						&Machine->visible_area,TRANSPARENCY_PEN,15);
+				
+				dgp1.code = code;
+				dgp1.color = color;
+				dgp1.flipx = flipx;
+				dgp1.flipy = flipy;
+				dgp1.sx = x;
+				dgp1.sy = y;
+				drawgfx(&dgp1);
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 #endif
 
@@ -190,6 +236,25 @@ VIDEO_UPDATE( kikikai )
 
 	fillbitmap(bitmap, get_black_pen(), &Machine->visible_area);
 	sx = 0;
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs=0; offs<mexico86_objectram_size; offs+=4)
 	{
 		if (*(UINT32*)(mexico86_objectram + offs) == 0) continue;
@@ -224,23 +289,25 @@ VIDEO_UPDATE( kikikai )
 			color = (mexico86_videoram[goffs + 1] & 0xe0) >> 5;
 			goffs += 0x40;
 
-			drawgfx(bitmap,Machine->gfx[0],
-					code,
-					color,
-					0,0,
-					sx&0xff,y,
-					&Machine->visible_area,TRANSPARENCY_PEN,15);
+			
+			dgp2.code = code;
+			dgp2.color = color;
+			dgp2.sx = sx&0xff;
+			dgp2.sy = y;
+			drawgfx(&dgp2);
 
 			code = mexico86_videoram[goffs] + ((mexico86_videoram[goffs + 1] & 0x1f) << 8);
 			color = (mexico86_videoram[goffs + 1] & 0xe0) >> 5;
 
-			drawgfx(bitmap,Machine->gfx[0],
-					code,
-					color,
-					0,0,
-					(sx+8)&0xff,y,
-					&Machine->visible_area,TRANSPARENCY_PEN,15);
+			
+			dgp2.code = code;
+			dgp2.color = color;
+			dgp2.sx = (sx+8)&0xff;
+			dgp2.sy = y;
+			drawgfx(&dgp2);
 		}
 	}
+	} // end of patch paragraph
+
 }
 //ZT

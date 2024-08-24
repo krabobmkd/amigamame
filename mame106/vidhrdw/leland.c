@@ -508,6 +508,25 @@ VIDEO_UPDATE( leland )
 	update_for_scanline(cliprect->max_y);
 
 	/* draw what's visible to the main bitmap */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_NONE_RAW, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (y = cliprect->min_y / 8; y < cliprect->max_y / 8 + 2; y++)
 	{
 		int ysum = ycoarse + y;
@@ -524,12 +543,16 @@ VIDEO_UPDATE( leland )
 			int color = (code >> 5) & 7;
 
 			/* draw to the bitmap */
-			drawgfx(bitmap, gfx,
-					code, 8 * color, 0, 0,
-					8 * x - xfine, 8 * y - yfine,
-					cliprect, TRANSPARENCY_NONE_RAW, 0);
+			
+			dgp0.code = code;
+			dgp0.color = 8 * color;
+			dgp0.sx = 8 * x - xfine;
+			dgp0.sy = 8 * y - yfine;
+			drawgfx(&dgp0);
 		}
 	}
+	} // end of patch paragraph
+
 
 	/* Merge the two bitmaps together */
 	copybitmap(bitmap, fgbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_BLEND, 6);
@@ -556,6 +579,25 @@ VIDEO_UPDATE( ataxx )
 	update_for_scanline(cliprect->max_y);
 
 	/* draw what's visible to the main bitmap */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_NONE_RAW, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (y = cliprect->min_y / 8; y < cliprect->max_y / 8 + 2; y++)
 	{
 		int ysum = ycoarse + y;
@@ -566,12 +608,15 @@ VIDEO_UPDATE( ataxx )
 			int code = ataxx_qram[offs] | ((ataxx_qram[offs + 0x4000] & 0x7f) << 8);
 
 			/* draw to the bitmap */
-			drawgfx(bitmap, gfx,
-					code, 0, 0, 0,
-					8 * x - xfine, 8 * y - yfine,
-					cliprect, TRANSPARENCY_NONE_RAW, 0);
+			
+			dgp1.code = code;
+			dgp1.sx = 8 * x - xfine;
+			dgp1.sy = 8 * y - yfine;
+			drawgfx(&dgp1);
 		}
 	}
+	} // end of patch paragraph
+
 
 	/* Merge the two bitmaps together */
 	copybitmap(bitmap, fgbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_BLEND, 6);

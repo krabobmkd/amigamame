@@ -487,24 +487,70 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 			for (i=0; i<y_multi; i++)
 			{
-				if (flip_screen) {
+				if (flip_screen) 
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	priority_bitmap, 	// pri_buffer
+	pri 	// priority_mask
+  };
+{
 					int ffx=fx,ffy=fy;
 					if (ffx) ffx=0; else ffx=1;
 					if (ffy) ffy=0; else ffy=1;
-					pdrawgfx(bitmap,Machine->gfx[1],
-							sprite + s_ptr,
-							colour,
-							ffx,ffy,
-							496-x,496-(y-i*16),
-							cliprect,TRANSPARENCY_PEN,0,pri);
-				} else {
-					pdrawgfx(bitmap,Machine->gfx[1],
-							sprite + s_ptr,
-							colour,
-							fx,fy,
-							x,y-i*16,
-							cliprect,TRANSPARENCY_PEN,0,pri);
+					
+					dgp0.code = sprite + s_ptr;
+					dgp0.color = colour;
+					dgp0.flipx = ffx;
+					dgp0.flipy = ffy;
+					dgp0.sx = 496-x;
+					dgp0.sy = 496-(y-i*16);
+					drawgfx(&dgp0);
 				}
+} // end of patch paragraph
+ 
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	priority_bitmap, 	// pri_buffer
+	pri 	// priority_mask
+  };
+else {
+					
+					dgp1.code = sprite + s_ptr;
+					dgp1.color = colour;
+					dgp1.flipx = fx;
+					dgp1.flipy = fy;
+					dgp1.sx = x;
+					dgp1.sy = y-i*16;
+					drawgfx(&dgp1);
+				}
+} // end of patch paragraph
+
 				if (fy) s_ptr++; else s_ptr--;
 			}
 			if (fx) x-=16; else x+=16;

@@ -335,16 +335,40 @@ static void draw_sprites(mame_bitmap *bitmap, int colormask, int prioritymask, i
 			}
 			else incr = 1;
 
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				Machine->gfx[1], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				&Machine->visible_area, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			do
 			{
-				drawgfx(bitmap,Machine->gfx[1],
-						code + i * incr,col,
-						flipx,flipy,
-						sx,sy + 16 * i,
-						&Machine->visible_area,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = code + i * incr;
+				dgp0.color = col;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx;
+				dgp0.sy = sy + 16 * i;
+				drawgfx(&dgp0);
 
 				i--;
 			} while (i >= 0);
+			} // end of patch paragraph
+
 		}
 	}
 }

@@ -96,6 +96,25 @@ static void draw_status( mame_bitmap *bitmap )
 	const gfx_element *gfx = Machine->gfx[0];
 	int row;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( row=0; row<4; row++ )
 	{
 		int sy,sx = (row&1)*8;
@@ -107,15 +126,16 @@ static void draw_status( mame_bitmap *bitmap )
 		}
 		for( sy=0; sy<256; sy+=8 )
 		{
-			drawgfx( bitmap, gfx,
-				*source++,
-				0, /* color */
-				0,0, /* no flip */
-				sx,sy,
-				&clip,
-				TRANSPARENCY_NONE, 0 );
+			
+			dgp0.code = *source++;
+			dgp0.flipx = /* color */				0;
+			dgp0.sx = /* no flip */				sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_background( mame_bitmap *bitmap )
@@ -137,18 +157,39 @@ static void draw_background( mame_bitmap *bitmap )
 			int tile_number = videoram[offs];
 			int row,col;
 			dirtybuffer[offs] = 0;
+			
+			{ 
+			struct drawgfxParams dgp1={
+				tmpbitmap, 	// dest
+				gfx, 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				0, 	// clip
+				TRANSPARENCY_NONE, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for( row=0; row<4; row++ )
 			{
 				for( col=0; col<4; col++ )
 				{
-					drawgfx( tmpbitmap,gfx,
-						tile_data[col+tile_number*4+row*0x400],
-						mnchmobl_palette_bank,
-						0,0, /* flip */
-						sx+col*8, sy+row*8,
-						0, TRANSPARENCY_NONE, 0 );
+					
+					dgp1.code = tile_data[col+tile_number*4+row*0x400];
+					dgp1.color = mnchmobl_palette_bank;
+					dgp1.sx = /* flip */						sx+col*8;
+					dgp1.sy = sy+row*8;
+					drawgfx(&dgp1);
 				}
 			}
+			} // end of patch paragraph
+
 		}
 	}
 
@@ -180,16 +221,37 @@ static void draw_sprites( mame_bitmap *bitmap )
 		int sy = (i/0x40)*0x20;						/* Y YY------ */
 		sy += (attributes>>2)&0x1f;
 		if( tile_number != 0xff && (attributes&0x80) )
-		{
+		
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	clip, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	7, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			sx = (sx>>1) | (tile_number&0x80);
 			sx = 2*((-32-scroll - sx)&0xff)+xadjust;
-			drawgfx( bitmap, gfx,
-				0x7f - (tile_number&0x7f),
-				color_base-(attributes&0x03),
-				0,0, /* no flip */
-				sx,sy,
-				clip, TRANSPARENCY_PEN, 7 );
+			
+			dgp2.code = 0x7f - (tile_number&0x7f);
+			dgp2.color = color_base-(attributes&0x03);
+			dgp2.sx = /* no flip */				sx;
+			dgp2.sy = sy;
+			drawgfx(&dgp2);
 		}
+} // end of patch paragraph
+
 	}
 }
 

@@ -87,7 +87,26 @@ VIDEO_UPDATE( wiping )
 	for (offs = videoram_size - 1; offs > 0; offs--)
 	{
 		if (dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int mx,my,sx,sy;
 
 			dirtybuffer[offs] = 0;
@@ -117,18 +136,41 @@ VIDEO_UPDATE( wiping )
 				sy = 27 - sy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					videoram[offs],
-					colorram[offs] & 0x3f,
-					flipscreen,flipscreen,
-					sx*8,sy*8,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = videoram[offs];
+			dgp0.color = colorram[offs] & 0x3f;
+			dgp0.flipx = flipscreen;
+			dgp0.flipy = flipscreen;
+			dgp0.sx = sx*8;
+			dgp0.sy = sy*8;
+			drawgfx(&dgp0);
         	}
+} // end of patch paragraph
+
 	}
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE,0);
 
 	/* Note, we're counting up on purpose ! */
 	/* This way the vacuum cleaner is always on top */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0x1f, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x0; offs < 128; offs += 2) {
 		int sx,sy,flipx,flipy,otherbank;
 
@@ -147,19 +189,42 @@ VIDEO_UPDATE( wiping )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
-			(spriteram[offs] & 0x3f) + 64 * otherbank,
-			spriteram[offs+1] & 0x3f,
-			flipx,flipy,
-			sx,sy,
-			&Machine->visible_area,TRANSPARENCY_COLOR,0x1f);
+		
+		dgp1.code = (spriteram[offs] & 0x3f) + 64 * otherbank;
+		dgp1.color = spriteram[offs+1] & 0x3f;
+		dgp1.flipx = flipx;
+		dgp1.flipy = flipy;
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 
 	/* redraw high priority chars */
 	for (offs = videoram_size - 1; offs > 0; offs--)
 	{
 		if (colorram[offs] & 0x80)
-		{
+		
+{ 
+struct drawgfxParams dgp2={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int mx,my,sx,sy;
 
 	        mx = offs % 32;
@@ -187,13 +252,17 @@ VIDEO_UPDATE( wiping )
 				sy = 27 - sy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[0],
-					videoram[offs],
-					colorram[offs] & 0x3f,
-					flipscreen,flipscreen,
-					sx*8,sy*8,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp2.code = videoram[offs];
+			dgp2.color = colorram[offs] & 0x3f;
+			dgp2.flipx = flipscreen;
+			dgp2.flipy = flipscreen;
+			dgp2.sx = sx*8;
+			dgp2.sy = sy*8;
+			drawgfx(&dgp2);
         	}
+} // end of patch paragraph
+
 	}
 
 

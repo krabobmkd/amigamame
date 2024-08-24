@@ -326,6 +326,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prior
 	int height = Machine->gfx[0]->height;
 	int colordiv = Machine->gfx[0]->color_granularity / 16;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 4;offs < spriteram_size/2;offs += 4)
 	{
 		int sx,sy,code,color,flipx,pri;
@@ -346,13 +365,16 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prior
 		if (pri != priority)
 			continue;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				code,
-				color,
-				flipx,0,
-				sx + xoffset,sy + yoffset,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.sx = sx + xoffset;
+		dgp0.sy = sy + yoffset;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_bitmap(mame_bitmap *bitmap)

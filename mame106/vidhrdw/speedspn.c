@@ -65,6 +65,25 @@ static void speedspn_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 	UINT8 *source = speedspn_vidram+ 0x1000;
 	UINT8 *finish = source + 0x1000;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int xpos = source[0];
@@ -79,15 +98,17 @@ static void speedspn_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 		tileno += ((attr & 0xe0) >> 5) * 0x100;
 		color = attr & 0x0f;
 
-		drawgfx(bitmap,gfx,
-				tileno,
-				color,
-				0,0,
-				xpos,ypos,
-				cliprect,TRANSPARENCY_PEN,15);
+		
+		dgp0.code = tileno;
+		dgp0.color = color;
+		dgp0.sx = xpos;
+		dgp0.sy = ypos;
+		drawgfx(&dgp0);
 
 		source +=4;
 	}
+	} // end of patch paragraph
+
 }
 
 

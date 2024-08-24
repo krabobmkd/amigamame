@@ -244,6 +244,25 @@ static void draw_sprites1(mame_bitmap *bitmap, const rectangle *cliprect, int pr
 {
 	int offs,x,y,sprite,sprite2,colour,extra,fx,fy;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x800;offs += 8)
 	{
 		y=buffered_spriteram[offs+1]+(buffered_spriteram[offs]<<8);
@@ -288,18 +307,28 @@ static void draw_sprites1(mame_bitmap *bitmap, const rectangle *cliprect, int pr
 		else
 			sprite2=sprite+1;
 
-		drawgfx(bitmap,Machine->gfx[1],
-				sprite,
-				colour,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = sprite;
+		dgp0.color = colour;
+		dgp0.flipx = fx;
+		dgp0.flipy = fy;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 
     	/* 1 more sprite drawn underneath */
     	if (extra)
-    		drawgfx(bitmap,Machine->gfx[1],
-				sprite2,
-				colour,fx,fy,x,y+16,
-				cliprect,TRANSPARENCY_PEN,0);
+    		
+    		dgp0.code = sprite2;
+    		dgp0.color = colour;
+    		dgp0.flipx = fx;
+    		dgp0.flipy = fy;
+    		dgp0.sx = x;
+    		dgp0.sy = y+16;
+    		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 /* 'Dec0' sprites, used by Cobra Command, Oscar */
@@ -308,6 +337,25 @@ static void draw_sprites2(mame_bitmap *bitmap, const rectangle *cliprect, int pr
 	int offs,x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 
 	/* Sprites */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x800;offs += 8)
 	{
 		y =buffered_spriteram[offs+1]+(buffered_spriteram[offs]<<8);
@@ -355,15 +403,19 @@ static void draw_sprites2(mame_bitmap *bitmap, const rectangle *cliprect, int pr
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[1],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+			
+			dgp2.code = sprite - multi * inc;
+			dgp2.color = colour;
+			dgp2.flipx = fx;
+			dgp2.flipy = fy;
+			dgp2.sx = x;
+			dgp2.sy = y + mult * multi;
+			drawgfx(&dgp2);
 			multi--;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void srdarwin_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri)
@@ -371,6 +423,25 @@ static void srdarwin_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect,
 	int offs;
 
 	/* Sprites */
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x200;offs += 4)
 	{
 		int multi,fx,sx,sy,sy2,code,color;
@@ -398,20 +469,26 @@ static void srdarwin_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect,
 		}
 		else sy2=sy+16;
 
-    	drawgfx(bitmap,Machine->gfx[1],
-        		code,
-				color,
-				fx,flip_screen,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+    	
+    	dgp3.code = code;
+    	dgp3.color = color;
+    	dgp3.flipx = fx;
+    	dgp3.flipy = flip_screen;
+    	dgp3.sx = sx;
+    	dgp3.sy = sy;
+    	drawgfx(&dgp3);
         if (multi)
-    		drawgfx(bitmap,Machine->gfx[1],
-				code+1,
-				color,
-				fx,flip_screen,
-				sx,sy2,
-				cliprect,TRANSPARENCY_PEN,0);
+    		
+    		dgp3.code = code+1;
+    		dgp3.color = color;
+    		dgp3.flipx = fx;
+    		dgp3.flipy = flip_screen;
+    		dgp3.sx = sx;
+    		dgp3.sy = sy2;
+    		drawgfx(&dgp3);
 	}
+	} // end of patch paragraph
+
 }
 
 /* Draw character tiles, each game has different colour masks */
@@ -420,6 +497,25 @@ static void draw_characters(mame_bitmap *bitmap, const rectangle *cliprect, int 
 {
 	int mx,my,tile,color,offs;
 
+	
+	{ 
+	struct drawgfxParams dgp5={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x800 - 2;offs >= 0;offs -= 2) {
 		tile=videoram[offs+1]+((videoram[offs]&0xf)<<8);
 
@@ -429,10 +525,15 @@ static void draw_characters(mame_bitmap *bitmap, const rectangle *cliprect, int 
 		mx = (offs/2) % 32;
 		my = (offs/2) / 32;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				tile,color,0,0,8*mx,8*my,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp5.code = tile;
+		dgp5.color = color;
+		dgp5.sx = 8*mx;
+		dgp5.sy = 8*my;
+		drawgfx(&dgp5);
 	}
+	} // end of patch paragraph
+
 }
 #endif
 

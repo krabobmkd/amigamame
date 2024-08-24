@@ -1,3 +1,22 @@
+
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[bank], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 /***************************************************************************
 
   vidhrdw.c
@@ -109,7 +128,14 @@ static void jackal_draw_background( mame_bitmap *bitmap, const rectangle *clipre
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 }
 
-#define DRAW_SPRITE(bank, code, sx, sy) drawgfx(bitmap, Machine->gfx[bank], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+#define DRAW_SPRITE(bank, code, sx, sy) 
+#define DRAW_SPRITE(bank, code, sx, sy) dgp0.code = code;
+#define DRAW_SPRITE(bank, code, sx, sy) dgp0.color = color;
+#define DRAW_SPRITE(bank, code, sx, sy) dgp0.flipx = flipx;
+#define DRAW_SPRITE(bank, code, sx, sy) dgp0.flipy = flipy;
+#define DRAW_SPRITE(bank, code, sx, sy) dgp0.sx = sx;
+#define DRAW_SPRITE(bank, code, sx, sy) dgp0.sy = sy;
+#define DRAW_SPRITE(bank, code, sx, sy) drawgfx(&dgp0);
 
 static void jackal_draw_sprites_region( mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *sram, int length, int bank )
 {
@@ -218,3 +244,5 @@ VIDEO_UPDATE( jackal )
 	jackal_draw_background(bitmap, cliprect);
 	jackal_draw_sprites(bitmap, cliprect);
 }
+
+} // end of patch paragraph

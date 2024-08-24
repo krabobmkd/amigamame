@@ -160,6 +160,25 @@ tilemap_mark_all_tiles_dirty(bgmap);
 	//draw_background(bitmap, cliprect);
 
 	/* draw sprites */
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < spriteram_size; i += 4)
 	{
 		int flags = spriteram[i + 0];
@@ -186,50 +205,148 @@ tilemap_mark_all_tiles_dirty(bgmap);
 		}
 
 		if (wide)
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			if (yflip)
 				code |= 0x10, code2 &= ~0x10;
 			else
 				code &= ~0x10, code2 |= 0x10;
 
-			drawgfx(bitmap, gfx, code2, color, xflip, yflip, x, y + gfx->height,
-			        cliprect, TRANSPARENCY_PEN, 0);
+			
+			dgp0.code = code2;
+			dgp0.color = color;
+			dgp0.flipx = xflip;
+			dgp0.flipy = yflip;
+			dgp0.sx = x;
+			dgp0.sy = y + gfx->height;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 
 		if(flags&0x10)
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	gfx, 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 
 
 
-			drawgfx(bitmap, gfx, code2+16, color, xflip, yflip, x, y + gfx->height,
-			        cliprect, TRANSPARENCY_PEN, 0);
-			drawgfx(bitmap, gfx, code2+16*2, color, xflip, yflip, x, y + 2*gfx->height,
-			        cliprect, TRANSPARENCY_PEN, 0);
-			drawgfx(bitmap, gfx, code2+16*3, color, xflip, yflip, x, y + 3*gfx->height,
-			        cliprect, TRANSPARENCY_PEN, 0);
+			
+			dgp1.code = code2+16;
+			dgp1.color = color;
+			dgp1.flipx = xflip;
+			dgp1.flipy = yflip;
+			dgp1.sx = x;
+			dgp1.sy = y + gfx->height;
+			drawgfx(&dgp1);
+			
+			dgp1.code = code2+16*2;
+			dgp1.color = color;
+			dgp1.flipx = xflip;
+			dgp1.flipy = yflip;
+			dgp1.sx = x;
+			dgp1.sy = y + 2*gfx->height;
+			drawgfx(&dgp1);
+			
+			dgp1.code = code2+16*3;
+			dgp1.color = color;
+			dgp1.flipx = xflip;
+			dgp1.flipy = yflip;
+			dgp1.sx = x;
+			dgp1.sy = y + 3*gfx->height;
+			drawgfx(&dgp1);
 
 		}
+} // end of patch paragraph
 
 
 
-		drawgfx(bitmap, gfx, code, color, xflip, yflip, x, y,
-		        cliprect, TRANSPARENCY_PEN, 0);
+
+		
+		dgp4.code = code;
+		dgp4.color = color;
+		dgp4.flipx = xflip;
+		dgp4.flipy = yflip;
+		dgp4.sx = x;
+		dgp4.sy = y;
+		drawgfx(&dgp4);
 
 		if (doubled) i += 4;
 	}
+	} // end of patch paragraph
+
 
 	/* draw the visible text layer */
 	for (sy = VISIBLE_Y_MIN/8; sy < VISIBLE_Y_MAX/8; sy++)
+		
+		{ 
+		struct drawgfxParams dgp5={
+			bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
 		{
 			int x = fcombat_cocktail_flip ? (63*8 - 8*sx) : 8*sx;
 			int y = fcombat_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
-			drawgfx(bitmap, Machine->gfx[0],
-				videoram[offs] + 256 * char_bank,
-				((videoram[offs] & 0xf0) >> 4) + char_palette * 16,
-				fcombat_cocktail_flip, fcombat_cocktail_flip, x, y,
-				cliprect, TRANSPARENCY_PEN, 0);
+			
+			dgp5.code = videoram[offs] + 256 * char_bank;
+			dgp5.color = ((videoram[offs] & 0xf0) >> 4) + char_palette * 16;
+			dgp5.flipx = fcombat_cocktail_flip;
+			dgp5.flipy = fcombat_cocktail_flip;
+			dgp5.sx = x;
+			dgp5.sy = y;
+			drawgfx(&dgp5);
 		}
+		} // end of patch paragraph
+
 }

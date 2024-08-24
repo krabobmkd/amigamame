@@ -114,7 +114,26 @@ VIDEO_UPDATE( finalizr )
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		{
+		
+{ 
+struct drawgfxParams dgp0={
+	tmpbitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			int sx,sy;
 
 
@@ -123,13 +142,17 @@ VIDEO_UPDATE( finalizr )
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					videoram[offs] + ((colorram[offs] & 0xc0) << 2) + (charbank<<10),
-					(colorram[offs] & 0x0f),
-					colorram[offs] & 0x10,colorram[offs] & 0x20,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = videoram[offs] + ((colorram[offs] & 0xc0) << 2) + (charbank<<10);
+			dgp0.color = (colorram[offs] & 0x0f);
+			dgp0.flipx = colorram[offs] & 0x10;
+			dgp0.flipy = colorram[offs] & 0x20;
+			dgp0.sx = 8*sx;
+			dgp0.sy = 8*sy;
+			drawgfx(&dgp0);
 		}
+} // end of patch paragraph
+
 	}
 
 
@@ -168,88 +191,146 @@ VIDEO_UPDATE( finalizr )
 //          (sr[offs+4] & 0x02) is used, meaning unknown
 
 			switch (sr[offs+4] & 0x1c)
-			{
+			
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp6={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				case 0x10:	/* 32x32? */
 				case 0x14:	/* ? */
 				case 0x18:	/* ? */
 				case 0x1c:	/* ? */
-					drawgfx(bitmap,Machine->gfx[1],
-							code,
-							color,
-							flipx,flipy,
-							flipx?sx+16:sx,flipy?sy+16:sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[1],
-							code + 1,
-							color,
-							flipx,flipy,
-							flipx?sx:sx+16,flipy?sy+16:sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[1],
-							code + 2,
-							color,
-							flipx,flipy,
-							flipx?sx+16:sx,flipy?sy:sy+16,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[1],
-							code + 3,
-							color,
-							flipx,flipy,
-							flipx?sx:sx+16,flipy?sy:sy+16,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+					
+					dgp1.code = code;
+					dgp1.color = color;
+					dgp1.flipx = flipx;
+					dgp1.flipy = flipy;
+					dgp1.sx = flipx?sx+16:sx;
+					dgp1.sy = flipy?sy+16:sy;
+					drawgfx(&dgp1);
+					
+					dgp1.code = code + 1;
+					dgp1.color = color;
+					dgp1.flipx = flipx;
+					dgp1.flipy = flipy;
+					dgp1.sx = flipx?sx:sx+16;
+					dgp1.sy = flipy?sy+16:sy;
+					drawgfx(&dgp1);
+					
+					dgp1.code = code + 2;
+					dgp1.color = color;
+					dgp1.flipx = flipx;
+					dgp1.flipy = flipy;
+					dgp1.sx = flipx?sx+16:sx;
+					dgp1.sy = flipy?sy:sy+16;
+					drawgfx(&dgp1);
+					
+					dgp1.code = code + 3;
+					dgp1.color = color;
+					dgp1.flipx = flipx;
+					dgp1.flipy = flipy;
+					dgp1.sx = flipx?sx:sx+16;
+					dgp1.sy = flipy?sy:sy+16;
+					drawgfx(&dgp1);
 					break;
 
 				case 0x00:	/* 16x16 */
-					drawgfx(bitmap,Machine->gfx[1],
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+					
+					dgp1.code = code;
+					dgp1.color = color;
+					dgp1.flipx = flipx;
+					dgp1.flipy = flipy;
+					dgp1.sx = sx;
+					dgp1.sy = sy;
+					drawgfx(&dgp1);
 					break;
 
 				case 0x04:	/* 16x8 */
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,Machine->gfx[2],
-							code & ~1,
-							color,
-							flipx,flipy,
-							flipx?sx+8:sx,sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[2],
-							code | 1,
-							color,
-							flipx,flipy,
-							flipx?sx:sx+8,sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+					
+					dgp6.code = code & ~1;
+					dgp6.color = color;
+					dgp6.flipx = flipx;
+					dgp6.flipy = flipy;
+					dgp6.sx = flipx?sx+8:sx;
+					dgp6.sy = sy;
+					drawgfx(&dgp6);
+					
+					dgp6.code = code | 1;
+					dgp6.color = color;
+					dgp6.flipx = flipx;
+					dgp6.flipy = flipy;
+					dgp6.sx = flipx?sx:sx+8;
+					dgp6.sy = sy;
+					drawgfx(&dgp6);
 					break;
 
 				case 0x08:	/* 8x16 */
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,Machine->gfx[2],
-							code & ~2,
-							color,
-							flipx,flipy,
-							sx,flipy?sy+8:sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[2],
-							code | 2,
-							color,
-							flipx,flipy,
-							sx,flipy?sy:sy+8,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+					
+					dgp6.code = code & ~2;
+					dgp6.color = color;
+					dgp6.flipx = flipx;
+					dgp6.flipy = flipy;
+					dgp6.sx = sx;
+					dgp6.sy = flipy?sy+8:sy;
+					drawgfx(&dgp6);
+					
+					dgp6.code = code | 2;
+					dgp6.color = color;
+					dgp6.flipx = flipx;
+					dgp6.flipy = flipy;
+					dgp6.sx = sx;
+					dgp6.sy = flipy?sy:sy+8;
+					drawgfx(&dgp6);
 					break;
 
 				case 0x0c:	/* 8x8 */
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,Machine->gfx[2],
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							&Machine->visible_area,TRANSPARENCY_PEN,0);
+					
+					dgp6.code = code;
+					dgp6.color = color;
+					dgp6.flipx = flipx;
+					dgp6.flipy = flipy;
+					dgp6.sx = sx;
+					dgp6.sy = sy;
+					drawgfx(&dgp6);
 					break;
 			}
+} // end of patch paragraph
+
 		}
 	}
 
@@ -260,16 +341,39 @@ VIDEO_UPDATE( finalizr )
 
 		sx = offs % 32;
 		if (sx < 6)
-		{
+		
+{ 
+struct drawgfxParams dgp11={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_NONE, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 			if (sx >= 3) sx += 30;
 			sy = offs / 32;
 
-			drawgfx(bitmap,Machine->gfx[0],
-					finalizr_videoram2[offs] + ((finalizr_colorram2[offs] & 0xc0) << 2),
-					(finalizr_colorram2[offs] & 0x0f),
-					finalizr_colorram2[offs] & 0x10,finalizr_colorram2[offs] & 0x20,
-					8*sx,8*sy,
-					&Machine->visible_area,TRANSPARENCY_NONE,0);
+			
+			dgp11.code = finalizr_videoram2[offs] + ((finalizr_colorram2[offs] & 0xc0) << 2);
+			dgp11.color = (finalizr_colorram2[offs] & 0x0f);
+			dgp11.flipx = finalizr_colorram2[offs] & 0x10;
+			dgp11.flipy = finalizr_colorram2[offs] & 0x20;
+			dgp11.sx = 8*sx;
+			dgp11.sy = 8*sy;
+			drawgfx(&dgp11);
 		}
+} // end of patch paragraph
+
 	}
 }

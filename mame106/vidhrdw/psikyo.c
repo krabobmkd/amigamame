@@ -327,6 +327,25 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 	offs -= 2/2;
 
 	//  fprintf(stderr, "\n");
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		trans_pen, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri[(attr & 0xc0) >> 6] 	// priority_mask
+	  };
 	for ( ; offs >= 0/2 ; offs -= 2/2 )
 	{
 		UINT32 *source;
@@ -391,13 +410,14 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 				int addr	=	(code*2) & (TILES_LEN-1);
 
 				if (zoomx == 32 && zoomy == 32)
-					pdrawgfx(bitmap,Machine->gfx[0],
-							TILES[addr+1] * 256 + TILES[addr],
-							attr >> 8,
-							flipx, flipy,
-							x + dx * 16, y + dy * 16,
-							cliprect,TRANSPARENCY_PEN,trans_pen,
-							pri[(attr & 0xc0) >> 6]);
+					
+					dgp0.code = TILES[addr+1] * 256 + TILES[addr];
+					dgp0.color = attr >> 8;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = x + dx * 16;
+					dgp0.sy = y + dy * 16;
+					drawgfx(&dgp0);
 				else
 					pdrawgfxzoom(bitmap,Machine->gfx[0],
 								TILES[addr+1] * 256 + TILES[addr],
@@ -412,6 +432,8 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

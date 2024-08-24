@@ -201,6 +201,25 @@ static void liberate_drawsprites(mame_bitmap *bitmap)
 	int offs;
 
 	/* Sprites */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x800;offs += 4)
 	{
 		int multi,fx,fy,sx,sy,sy2,code,color;
@@ -231,26 +250,51 @@ static void liberate_drawsprites(mame_bitmap *bitmap)
 		}
 		else sy2=sy+16;
 
-    	drawgfx(bitmap,Machine->gfx[1],
-        		code,
-				color,
-				fx,fy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+    	
+    	dgp0.code = code;
+    	dgp0.color = color;
+    	dgp0.flipx = fx;
+    	dgp0.flipy = fy;
+    	dgp0.sx = sx;
+    	dgp0.sy = sy;
+    	drawgfx(&dgp0);
         if (multi)
-    		drawgfx(bitmap,Machine->gfx[1],
-				code+1,
-				color,
-				fx,fy,
-				sx,sy2,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+    		
+    		dgp0.code = code+1;
+    		dgp0.color = color;
+    		dgp0.flipx = fx;
+    		dgp0.flipy = fy;
+    		dgp0.sx = sx;
+    		dgp0.sy = sy2;
+    		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 static void prosport_drawsprites(mame_bitmap *bitmap)
 {
 	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x000;offs < 0x800;offs += 4)
 	{
 	//  if ((spriteram[offs+0]&1)!=1) continue;
@@ -286,26 +330,51 @@ static void prosport_drawsprites(mame_bitmap *bitmap)
 			sy2=sy+16;
 		}
 
-    	drawgfx(bitmap,Machine->gfx[1],
-        		code,
-				color,
-				fx,fy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+    	
+    	dgp2.code = code;
+    	dgp2.color = color;
+    	dgp2.flipx = fx;
+    	dgp2.flipy = fy;
+    	dgp2.sx = sx;
+    	dgp2.sy = sy;
+    	drawgfx(&dgp2);
         if (multi)
-    		drawgfx(bitmap,Machine->gfx[1],
-				code2,
-				color,
-				fx,fy,
-				sx,sy2,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+    		
+    		dgp2.code = code2;
+    		dgp2.color = color;
+    		dgp2.flipx = fx;
+    		dgp2.flipy = fy;
+    		dgp2.sx = sx;
+    		dgp2.sy = sy2;
+    		drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 }
 
 static void boomrang_drawsprites(mame_bitmap *bitmap, int pri)
 {
 	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
 
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x000;offs < 0x800;offs += 4)
 	{
 		if ((spriteram[offs+0]&1)!=1) continue;
@@ -342,20 +411,26 @@ static void boomrang_drawsprites(mame_bitmap *bitmap, int pri)
 			sy2=sy+16;
 		}
 
-    	drawgfx(bitmap,Machine->gfx[1],
-        		code,
-				color,
-				fx,fy,
-				sx,sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+    	
+    	dgp4.code = code;
+    	dgp4.color = color;
+    	dgp4.flipx = fx;
+    	dgp4.flipy = fy;
+    	dgp4.sx = sx;
+    	dgp4.sy = sy;
+    	drawgfx(&dgp4);
         if (multi)
-    		drawgfx(bitmap,Machine->gfx[1],
-				code2,
-				color,
-				fx,fy,
-				sx,sy2,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+    		
+    		dgp4.code = code2;
+    		dgp4.color = color;
+    		dgp4.flipx = fx;
+    		dgp4.flipy = fy;
+    		dgp4.sx = sx;
+    		dgp4.sy = sy2;
+    		drawgfx(&dgp4);
 	}
+	} // end of patch paragraph
+
 }
 
 /***************************************************************************/
@@ -381,6 +456,25 @@ VIDEO_UPDATE( prosport )
 
 	prosport_drawsprites(bitmap);
 
+	
+	{ 
+	struct drawgfxParams dgp6={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x400;offs++) {
 		tile=videoram[offs+0x400]+((videoram[offs]&0x3)<<8);
 
@@ -392,10 +486,14 @@ VIDEO_UPDATE( prosport )
 		my = (offs) % 32;
 		mx = (offs) / 32;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				tile,1,0,0,248-8*mx,8*my,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp6.code = tile;
+		dgp6.sx = 248-8*mx;
+		dgp6.sy = 8*my;
+		drawgfx(&dgp6);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( boomrang )

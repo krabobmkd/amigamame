@@ -376,18 +376,41 @@ void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xof
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				Machine->gfx[1], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_COLOR, 	// transparency
+				trans_color, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (y = 0;y <= sizey;y++)
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx(bitmap,Machine->gfx[1],
-						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
-						color,
-						flipx,flipy,
-						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_COLOR,trans_color);
+					
+					dgp0.code = sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)];
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx + 16*x;
+					dgp0.sy = sy + 16*y;
+					drawgfx(&dgp0);
 				}
 			}
+			} // end of patch paragraph
+
 		}
 	}
 }
@@ -450,18 +473,41 @@ static void phozon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 			sy -= 8 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
+			
+			{ 
+			struct drawgfxParams dgp1={
+				bitmap, 	// dest
+				Machine->gfx[1], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_COLOR, 	// transparency
+				31, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (y = 0;y <= sizey;y++)
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx(bitmap,Machine->gfx[1],
-						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
-						color,
-						flipx,flipy,
-						sx + 8*x,sy + 8*y,
-						cliprect,TRANSPARENCY_COLOR,31);
+					
+					dgp1.code = sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)];
+					dgp1.color = color;
+					dgp1.flipx = flipx;
+					dgp1.flipy = flipy;
+					dgp1.sx = sx + 8*x;
+					dgp1.sy = sy + 8*y;
+					drawgfx(&dgp1);
 				}
 			}
+			} // end of patch paragraph
+
 		}
 	}
 }

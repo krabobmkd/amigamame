@@ -69,6 +69,25 @@ VIDEO_UPDATE( rollrace )
 	fillbitmap(bitmap,Machine->pens[ra_bkgpen],&Machine->visible_area);
 
 	/* draw road */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[RA_BGCHAR_BASE], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 		{
 			if(!(ra_bkgflip))
@@ -86,17 +105,19 @@ VIDEO_UPDATE( rollrace )
 			if(ra_flipy)
 				sy = 31-sy ;
 
-			drawgfx(bitmap,
-				Machine->gfx[RA_BGCHAR_BASE],
-				memory_region(REGION_USER1)[offs + ( ra_bkgpage * 1024 )] \
-				+ ((( memory_region(REGION_USER1)[offs + 0x4000 + ( ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
-				ra_bkgcol,
-				ra_flipx,(ra_bkgflip^ra_flipy),
-				sx*8,sy*8,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp0.code = memory_region(REGION_USER1)[offs + ( ra_bkgpage * 1024 )] \				+ ((( memory_region(REGION_USER1)[offs + 0x4000 + ( ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 );
+			dgp0.color = ra_bkgcol;
+			dgp0.flipx = ra_flipx;
+			dgp0.flipy = (ra_bkgflip^ra_flipy);
+			dgp0.sx = sx*8;
+			dgp0.sy = sy*8;
+			drawgfx(&dgp0);
 
 
 		}
+	} // end of patch paragraph
+
 
 
 
@@ -111,7 +132,26 @@ VIDEO_UPDATE( rollrace )
 		sx=spriteram[offs+3] - 16;
 
 		if(sx && sy)
-		{
+		
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[ RA_SP_BASE + bank ], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 
 		if(ra_flipx)
 			sx = 224 - sx;
@@ -126,19 +166,42 @@ VIDEO_UPDATE( rollrace )
 		if(bank)
 			bank += ra_spritebank;
 
-		drawgfx(bitmap, Machine->gfx[ RA_SP_BASE + bank ],
-			spriteram[offs+1] & 0x3f ,
-			spriteram[offs+2] & 0x1f,
-			ra_flipx,!(s_flipy^ra_flipy),
-			sx,sy,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = spriteram[offs+1] & 0x3f;
+		dgp1.color = spriteram[offs+2] & 0x1f;
+		dgp1.flipx = ra_flipx;
+		dgp1.flipy = !(s_flipy^ra_flipy);
+		dgp1.sx = sx;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 		}
+} // end of patch paragraph
+
 	}
 
 
 
 
 	/* draw foreground characters */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[RA_FGCHAR_BASE + ra_chrbank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 
@@ -155,14 +218,18 @@ VIDEO_UPDATE( rollrace )
 
 		if (ra_flipx) sx = 31 - sx;
 
-		drawgfx(bitmap,Machine->gfx[RA_FGCHAR_BASE + ra_chrbank]  ,
-			videoram[ offs ]  ,
-			col,
-			ra_flipx,ra_flipy,
-			8*sx,scroll,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp2.code = videoram[ offs ];
+		dgp2.color = col;
+		dgp2.flipx = ra_flipx;
+		dgp2.flipy = ra_flipy;
+		dgp2.sx = 8*sx;
+		dgp2.sy = scroll;
+		drawgfx(&dgp2);
 
 	}
+	} // end of patch paragraph
+
 
 
 

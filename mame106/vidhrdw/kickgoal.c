@@ -99,6 +99,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	const gfx_element *gfx = Machine->gfx[1];
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
 	{
 		int xpos = spriteram16[offs+3];
@@ -113,13 +132,16 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		ypos = 0x200-ypos;
 
-		drawgfx(bitmap,gfx,
-				tileno,
-				0x30 + color,
-				flipx,0,
-				xpos-16+4,ypos-32,
-				cliprect,TRANSPARENCY_PEN,15);
+		
+		dgp0.code = tileno;
+		dgp0.color = 0x30 + color;
+		dgp0.flipx = flipx;
+		dgp0.sx = xpos-16+4;
+		dgp0.sy = ypos-32;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -225,6 +247,25 @@ static void actionhw_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	const gfx_element *gfx = Machine->gfx[1];
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
 	{
 		int xpos = spriteram16[offs+3];
@@ -237,13 +278,16 @@ static void actionhw_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		ypos = 0x110-ypos;
 
-		drawgfx(bitmap,gfx,
-				tileno+0x4000,
-				0x30 + color,
-				flipx,0,
-				xpos-16+4,ypos-32,
-				cliprect,TRANSPARENCY_PEN,15);
+		
+		dgp1.code = tileno+0x4000;
+		dgp1.color = 0x30 + color;
+		dgp1.flipx = flipx;
+		dgp1.sx = xpos-16+4;
+		dgp1.sy = ypos-32;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 

@@ -929,48 +929,49 @@ void drawgfx(struct drawgfxParams *p DGREG(a0))
 //	assert(p->gfx, "drawgfx() gfx == 0");
 //	assert(p->gfx->colortable || is_raw[p->transparency], "drawgfx() gfx->colortable == 0");
 
-	p->code %= p->gfx->total_elements;
-	if (!is_raw[p->transparency])
-		p->color %= p->gfx->total_colors;
+    //re
+//	p->code %= p->gfx->total_elements;
+//	if (!is_raw[p->transparency])
+//		p->color %= p->gfx->total_colors;
 
-	if (!(Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
-		(p->transparency == TRANSPARENCY_ALPHAONE ||
-		p->transparency == TRANSPARENCY_ALPHA ||
-		p->transparency == TRANSPARENCY_ALPHARANGE))
-	{
-		if (p->transparency == TRANSPARENCY_ALPHAONE && (cpu_getcurrentframe() & 1))
-		{
-			p->transparency = TRANSPARENCY_PENS;
-			p->transparent_color = (1 << (p->transparent_color & 0xff))|(1 << (p->transparent_color >> 8));
-		}
-		else
-		{
-			p->transparency = TRANSPARENCY_PEN;
-			p->transparent_color &= 0xff;
-		}
-	}
+//	if (!(Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
+//		(p->transparency == TRANSPARENCY_ALPHAONE ||
+//		p->transparency == TRANSPARENCY_ALPHA ||
+//		p->transparency == TRANSPARENCY_ALPHARANGE))
+//	{
+//		if (p->transparency == TRANSPARENCY_ALPHAONE && (cpu_getcurrentframe() & 1))
+//		{
+//			p->transparency = TRANSPARENCY_PENS;
+//			p->transparent_color = (1 << (p->transparent_color & 0xff))|(1 << (p->transparent_color >> 8));
+//		}
+//		else
+//		{
+//			p->transparency = TRANSPARENCY_PEN;
+//			p->transparent_color &= 0xff;
+//		}
+//	}
 
-	if (p->gfx->pen_usage && (p->transparency == TRANSPARENCY_PEN ||
-                                p->transparency == TRANSPARENCY_PENS))
-	{
-		int transmask = 0;
+//	if (p->gfx->pen_usage && (p->transparency == TRANSPARENCY_PEN ||
+//                                p->transparency == TRANSPARENCY_PENS))
+//	{
+//		int transmask = 0;
 
-		if (p->transparency == TRANSPARENCY_PEN)
-		{
-			transmask = 1 << (p->transparent_color & 0xff);
-		}
-		else	/* transparency == TRANSPARENCY_PENS */
-		{
-			transmask = p->transparent_color;
-		}
+//		if (p->transparency == TRANSPARENCY_PEN)
+//		{
+//			transmask = 1 << (p->transparent_color & 0xff);
+//		}
+//		else	/* transparency == TRANSPARENCY_PENS */
+//		{
+//			transmask = p->transparent_color;
+//		}
 
-		if ((p->gfx->pen_usage[p->code] & ~transmask) == 0)
-			/* character is totally transparent, no need to draw */
-			return;
-		else if ((p->gfx->pen_usage[p->code] & transmask) == 0)
-			/* character is totally opaque, can disable transparency */
-			p->transparency = TRANSPARENCY_NONE;
-	}
+//		if ((p->gfx->pen_usage[p->code] & ~transmask) == 0)
+//			/* character is totally transparent, no need to draw */
+//			return;
+//		else if ((p->gfx->pen_usage[p->code] & transmask) == 0)
+//			/* character is totally opaque, can disable transparency */
+//			p->transparency = TRANSPARENCY_NONE;
+//	}
 
 //	if (dest->depth == 8)
 //		drawgfx_core8(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
@@ -5144,8 +5145,13 @@ DECLARE(drawgfx_core,(
 {
     mame_bitmap *dest = p->dest;
     const gfx_element *gfx = p->gfx;
+    int flipx = p->flipx;
+    int flipy = p->flipy;
     int sx = p->sx;
     int sy = p->sy;
+    UINT32 pri_mask = p->priority_mask;
+    int transparent_color = p->transparent_color;
+
     const rectangle *clip = p->clip;
 
 	int ox;

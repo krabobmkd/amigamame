@@ -501,6 +501,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int offs;
 
 	offs = 0;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while (offs < spriteram_size)
 	{
 		int code,color,sx,sy,flipx,flipy,w,h,x,y;
@@ -536,23 +555,46 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx(bitmap,Machine->gfx[0],
-						c,
-						color,
-						flipx,flipy,
-						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp0.code = c;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx + 16*x;
+				dgp0.sy = sy + 16*y;
+				drawgfx(&dgp0);
 			}
 		}
 
 		offs += w*8;
 	}
+	} // end of patch paragraph
+
 }
 
 static void majtitle_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 8)
 	{
 		int code,color,sx,sy,flipx,flipy,w,h,x,y;
@@ -588,15 +630,19 @@ static void majtitle_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx(bitmap,Machine->gfx[2],
-						c,
-						color,
-						flipx,flipy,
-						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_PEN,0);
+				
+				dgp1.code = c;
+				dgp1.color = color;
+				dgp1.flipx = flipx;
+				dgp1.flipy = flipy;
+				dgp1.sx = sx + 16*x;
+				dgp1.sy = sy + 16*y;
+				drawgfx(&dgp1);
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( m72 )

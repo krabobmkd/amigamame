@@ -103,6 +103,25 @@ static void mustache_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 	const gfx_element *gfx = Machine->gfx[1];
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		int sy = 240-spriteram[offs];
@@ -129,13 +148,17 @@ static void mustache_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap,gfx,
-				code,
-				color,
-				flip_screen,flip_screen,
-				sx,sy,
-				&clip,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = flip_screen;
+		dgp0.flipy = flip_screen;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( mustache )

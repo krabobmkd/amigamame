@@ -228,6 +228,25 @@ static void splash_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int i;
 	const gfx_element *gfx = Machine->gfx[1];
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 0x400; i += 4){
 		int sx = splash_spriteram[i+2] & 0xff;
 		int sy = (240 - (splash_spriteram[i+1] & 0xff)) & 0xff;
@@ -237,11 +256,17 @@ static void splash_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		if (attr2 & 0x80) sx += 256;
 
-		drawgfx(bitmap,gfx,number,
-			0x10 + (attr2 & 0x0f),attr & 0x40,attr & 0x80,
-			sx-8,sy,
-			cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = number;
+		dgp0.color = 0x10 + (attr2 & 0x0f);
+		dgp0.flipx = attr & 0x40;
+		dgp0.flipy = attr & 0x80;
+		dgp0.sx = sx-8;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 static void funystrp_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
@@ -249,6 +274,25 @@ static void funystrp_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int i;
 	const gfx_element *gfx = Machine->gfx[1];
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 0x400; i += 4){
 		int sx = splash_spriteram[i+2] & 0x1ff;
 		int sy = (240 - (splash_spriteram[i+1] & 0xff)) & 0xff;
@@ -256,11 +300,17 @@ static void funystrp_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		int attr2 = splash_spriteram[i+0x400] >> splash_sprite_attr2_shift;
 		int number = (splash_spriteram[i] & 0xff) + (attr & 0xf)*256;
 
-		drawgfx(bitmap,gfx,number,
-			(attr2 & 0x7f),attr & 0x40,attr & 0x80,
-			sx-8,sy,
-			cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp1.code = number;
+		dgp1.color = (attr2 & 0x7f);
+		dgp1.flipx = attr & 0x40;
+		dgp1.flipy = attr & 0x80;
+		dgp1.sx = sx-8;
+		dgp1.sy = sy;
+		drawgfx(&dgp1);
 	}
+	} // end of patch paragraph
+
 }
 
 /***************************************************************************

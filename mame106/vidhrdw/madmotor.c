@@ -207,6 +207,25 @@ static void madmotor_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 	int offs;
 
 	offs = 0;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while (offs < spriteram_size/2)
 	{
 		int sx,sy,code,color,w,h,flipx,flipy,incy,flash,mult,x,y;
@@ -256,12 +275,14 @@ static void madmotor_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 			{
 				if ((color & pri_mask) == pri_val &&
 							(!flash || (cpu_getcurrentframe() & 1)))
-					drawgfx(bitmap,Machine->gfx[3],
-							code - y * incy + h * x,
-							color,
-							flipx,flipy,
-							sx + mult * x,sy + mult * y,
-							cliprect,TRANSPARENCY_PEN,0);
+					
+					dgp0.code = code - y * incy + h * x;
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = sx + mult * x;
+					dgp0.sy = sy + mult * y;
+					drawgfx(&dgp0);
 			}
 
 			offs += 4;
@@ -270,6 +291,8 @@ static void madmotor_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 				 break;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

@@ -288,6 +288,25 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = spriteram[0x07f7];
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		&mygfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		(color != 0x7f) ? TRANSPARENCY_PEN : TRANSPARENCY_PEN_TABLE, 	// transparency
+		0xf, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri_mask 	// priority_mask
+	  };
 	while (source >= finish)
 	{
 		static const int sprite_size[4] = { 16, 8, 32, 4 };
@@ -328,16 +347,19 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		mygfx.height = sizey;
 		mygfx.gfxdata = gfx->gfxdata + tx + ty * gfx->line_modulo;
 
-		pdrawgfx( bitmap, &mygfx,
-				sprite,
-				color,
-				flipx,flipy,
-				sx & 0x1ff,
-				((sy + 16) & 0xff) - 16,
-				cliprect,(color != 0x7f) ? TRANSPARENCY_PEN : TRANSPARENCY_PEN_TABLE,0xf, pri_mask);
+		
+		dgp0.code = sprite;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx & 0x1ff;
+		dgp0.sy = ((sy + 16) & 0xff) - 16;
+		drawgfx(&dgp0);
 
 		source -= 0x10;
 	}
+	} // end of patch paragraph
+
 }
 
 

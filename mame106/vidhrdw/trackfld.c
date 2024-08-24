@@ -187,6 +187,25 @@ static void trackfld_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 2; offs >= 0; offs -= 2)
 	{
 		int attr = spriteram_2[offs];
@@ -207,21 +226,27 @@ static void trackfld_draw_sprites( mame_bitmap *bitmap )
 		/* proving that this is a hardware related "feature" */
 		sy += 1;
 
-		drawgfx(bitmap, Machine->gfx[1],
-			code + sprite_bank1 + sprite_bank2, color,
-			flipx, flipy,
-			sx, sy,
-			&Machine->visible_area,
-			TRANSPARENCY_COLOR, 0);
+		
+		dgp0.code = code + sprite_bank1 + sprite_bank2;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 
 		/* redraw with wraparound */
-		drawgfx(bitmap,Machine->gfx[1],
-			code + sprite_bank1 + sprite_bank2, color,
-			flipx, flipy,
-			sx - 256, sy,
-			&Machine->visible_area,
-			TRANSPARENCY_COLOR, 0);
+		
+		dgp0.code = code + sprite_bank1 + sprite_bank2;
+		dgp0.color = color;
+		dgp0.flipx = flipx;
+		dgp0.flipy = flipy;
+		dgp0.sx = sx - 256;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( trackfld )

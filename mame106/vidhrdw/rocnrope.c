@@ -122,15 +122,38 @@ static void rocnrope_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 2;offs >= 0;offs -= 2)
 	{
-		drawgfx(bitmap,Machine->gfx[1],
-				spriteram[offs + 1],
-				spriteram_2[offs] & 0x0f,
-				spriteram_2[offs] & 0x40,~spriteram_2[offs] & 0x80,
-				240-spriteram[offs],spriteram_2[offs + 1],
-				&Machine->visible_area,TRANSPARENCY_COLOR,0);
+		
+		dgp0.code = spriteram[offs + 1];
+		dgp0.color = spriteram_2[offs] & 0x0f;
+		dgp0.flipx = spriteram_2[offs] & 0x40;
+		dgp0.flipy = ~spriteram_2[offs] & 0x80;
+		dgp0.sx = 240-spriteram[offs];
+		dgp0.sy = spriteram_2[offs + 1];
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( rocnrope )

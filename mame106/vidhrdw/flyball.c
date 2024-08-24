@@ -57,6 +57,25 @@ VIDEO_START( flyball )
 
 
 VIDEO_UPDATE( flyball )
+
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	&Machine->visible_area, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	1, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int pitcherx = flyball_pitcher_horz;
 	int pitchery = flyball_pitcher_vert - 31;
@@ -75,8 +94,11 @@ VIDEO_UPDATE( flyball )
 
 	/* draw pitcher */
 
-	drawgfx(bitmap, Machine->gfx[1], flyball_pitcher_pic ^ 0xf,
-		0, 1, 0, pitcherx, pitchery, &Machine->visible_area, TRANSPARENCY_PEN, 1);
+	
+	dgp0.code = flyball_pitcher_pic ^ 0xf;
+	dgp0.sx = pitcherx;
+	dgp0.sy = pitchery;
+	drawgfx(&dgp0);
 
 	/* draw ball */
 
@@ -94,3 +116,5 @@ VIDEO_UPDATE( flyball )
 		}
 	}
 }
+} // end of patch paragraph
+

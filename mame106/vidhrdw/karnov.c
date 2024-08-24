@@ -88,6 +88,25 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 
 	/* 1st area is stored along X-axis... */
 	mx=-1; my=0;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap_f, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x400; offs ++) {
 		mx++;
 		if (mx==32) {mx=0; my++;}
@@ -98,17 +117,48 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 		color = tile >> 12;
 		tile = tile&0x7ff;
 		if (flipscreen)
-			drawgfx(bitmap_f,Machine->gfx[1],tile,
-				color, fx, fy, 496-16*mx,496-16*my,
-		 		0,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = tile;
+			dgp0.color = color;
+			dgp0.flipx = fx;
+			dgp0.flipy = fy;
+			dgp0.sx = 496-16*mx;
+			dgp0.sy = 496-16*my;
+			drawgfx(&dgp0);
 		else
-			drawgfx(bitmap_f,Machine->gfx[1],tile,
-				color, fx, fy, 16*mx,16*my,
-		 		0,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = tile;
+			dgp0.color = color;
+			dgp0.flipx = fx;
+			dgp0.flipy = fy;
+			dgp0.sx = 16*mx;
+			dgp0.sy = 16*my;
+			drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 
 	/* 2nd area is stored along Y-axis... */
 	mx=0; my=-1;
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap_f, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x400 ;offs < 0x800; offs ++) {
 		my++;
 		if (my==32) {my=0; mx++;}
@@ -120,14 +170,26 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 		tile=tile&0x7ff;
 
 		if (flipscreen)
-			drawgfx(bitmap_f,Machine->gfx[1],tile,
-				color, fx, fy, 496-16*mx,496-16*my,
-		 		0,TRANSPARENCY_NONE,0);
+			
+			dgp2.code = tile;
+			dgp2.color = color;
+			dgp2.flipx = fx;
+			dgp2.flipy = fy;
+			dgp2.sx = 496-16*mx;
+			dgp2.sy = 496-16*my;
+			drawgfx(&dgp2);
 		else
-			drawgfx(bitmap_f,Machine->gfx[1],tile,
-				color, fx, fy, 16*mx,16*my,
-		 		0,TRANSPARENCY_NONE,0);
+			
+			dgp2.code = tile;
+			dgp2.color = color;
+			dgp2.flipx = fx;
+			dgp2.flipy = fy;
+			dgp2.sx = 16*mx;
+			dgp2.sy = 16*my;
+			drawgfx(&dgp2);
 	}
+	} // end of patch paragraph
+
 
 	if (!flipscreen) {
 		scrolly=-scrolly;
@@ -143,6 +205,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs <0x800;offs += 4) {
 		int x,y,sprite,sprite2,colour,fx,fy,extra;
 
@@ -182,18 +263,28 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		}
 		else sprite2=sprite+1;
 
-		drawgfx(bitmap,Machine->gfx[2],
-				sprite,
-				colour,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp4.code = sprite;
+		dgp4.color = colour;
+		dgp4.flipx = fx;
+		dgp4.flipy = fy;
+		dgp4.sx = x;
+		dgp4.sy = y;
+		drawgfx(&dgp4);
 
     	/* 1 more sprite drawn underneath */
     	if (extra)
-    		drawgfx(bitmap,Machine->gfx[2],
-				sprite2,
-				colour,fx,fy,x,y+16,
-				cliprect,TRANSPARENCY_PEN,0);
+    		
+    		dgp4.code = sprite2;
+    		dgp4.color = colour;
+    		dgp4.flipx = fx;
+    		dgp4.flipy = fy;
+    		dgp4.sx = x;
+    		dgp4.sy = y+16;
+    		drawgfx(&dgp4);
 	}
+	} // end of patch paragraph
+
 }
 
 /******************************************************************************/

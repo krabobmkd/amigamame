@@ -205,6 +205,25 @@ static void draw_alpha_line(mame_bitmap *bitmap, const rectangle *cliprect,
 	int x;
 
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (x = 0; x < 32; x++)
 	{
 		UINT8 code, col;
@@ -212,12 +231,15 @@ static void draw_alpha_line(mame_bitmap *bitmap, const rectangle *cliprect,
 		code = carpolo_alpharam[alpha_line * 32 + x] >> 2;
 		col  = carpolo_alpharam[alpha_line * 32 + x] & 0x03;
 
-		drawgfx(bitmap,Machine->gfx[2],
-				code,col,
-				0,0,
-				x*8,video_line*8,
-				cliprect,TRANSPARENCY_PEN,0);
+		
+		dgp0.code = code;
+		dgp0.color = col;
+		dgp0.sx = x*8;
+		dgp0.sy = video_line*8;
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -236,6 +258,25 @@ static void remap_sprite_code(int bank, int code, int *remapped_code, int *flipy
 
 static void draw_sprite(mame_bitmap *bitmap, const rectangle *cliprect,
 						UINT8 x, UINT8 y, int bank, int code, int col)
+
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	int remapped_code, flipy;
 
@@ -245,19 +286,25 @@ static void draw_sprite(mame_bitmap *bitmap, const rectangle *cliprect,
 	x = 240 - x;
 	y = 240 - y;
 
-	drawgfx(bitmap,Machine->gfx[0],
-			remapped_code, col,
-			0, flipy,
-			x, y,
-			cliprect,TRANSPARENCY_PEN,0);
+	
+	dgp1.code = remapped_code;
+	dgp1.color = col;
+	dgp1.flipy = flipy;
+	dgp1.sx = x;
+	dgp1.sy = y;
+	drawgfx(&dgp1);
 
 	/* draw with wrap around */
-	drawgfx(bitmap,Machine->gfx[0],
-			remapped_code, col,
-			0, flipy,
-			(INT16)x - 256, y,
-			cliprect,TRANSPARENCY_PEN,0);
+	
+	dgp1.code = remapped_code;
+	dgp1.color = col;
+	dgp1.flipy = flipy;
+	dgp1.sx = (INT16)x - 256;
+	dgp1.sy = y;
+	drawgfx(&dgp1);
 }
+} // end of patch paragraph
+
 
 
 VIDEO_UPDATE( carpolo )
@@ -397,7 +444,43 @@ static int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 
 	// check if the two sprites are within collision range
 	if ((abs(x1 - x2) < SPRITE_WIDTH) && (abs(y1 - y2) < SPRITE_HEIGHT))
-	{
+	
+{ 
+struct drawgfxParams dgp3={
+	sprite_sprite_collision_bitmap1, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+struct drawgfxParams dgp4={
+	sprite_sprite_collision_bitmap2, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		int x,y;
 
 
@@ -406,17 +489,19 @@ static int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 		fillbitmap(sprite_sprite_collision_bitmap1, Machine->pens[0], 0);
 		fillbitmap(sprite_sprite_collision_bitmap2, Machine->pens[0], 0);
 
-		drawgfx(sprite_sprite_collision_bitmap1,Machine->gfx[0],
-				code1,1,
-				0,flipy1,
-				x1,y1,
-				0,TRANSPARENCY_PEN,0);
+		
+		dgp3.code = code1;
+		dgp3.flipy = flipy1;
+		dgp3.sx = x1;
+		dgp3.sy = y1;
+		drawgfx(&dgp3);
 
-		drawgfx(sprite_sprite_collision_bitmap2,Machine->gfx[0],
-				code2,1,
-				0,flipy2,
-				x2,y2,
-				0,TRANSPARENCY_PEN,0);
+		
+		dgp4.code = code2;
+		dgp4.flipy = flipy2;
+		dgp4.sx = x2;
+		dgp4.sy = y2;
+		drawgfx(&dgp4);
 
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
@@ -436,6 +521,8 @@ static int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 			}
 		}
 	}
+} // end of patch paragraph
+
 
 	return collided;
 }
@@ -455,7 +542,26 @@ static int check_sprite_left_goal_collision(int x1, int y1, int code1, int flipy
 	// check if the sprites is within the range of the goal
 	if (((y1 + 16) > GOAL_Y) && (y1 < (GOAL_Y + GOAL_HEIGHT)) &&
 	    ((x1 + 16) > LEFT_GOAL_X) && (x1 < (LEFT_GOAL_X + GOAL_WIDTH)))
-	{
+	
+{ 
+struct drawgfxParams dgp5={
+	sprite_goal_collision_bitmap1, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		int x,y;
 		int x2,y2;
 
@@ -468,11 +574,12 @@ static int check_sprite_left_goal_collision(int x1, int y1, int code1, int flipy
 		fillbitmap(sprite_goal_collision_bitmap1, Machine->pens[0], 0);
 		fillbitmap(sprite_goal_collision_bitmap2, Machine->pens[0], 0);
 
-		drawgfx(sprite_goal_collision_bitmap1,Machine->gfx[0],
-				code1,1,
-				0,flipy1,
-				x1,y1,
-				0,TRANSPARENCY_PEN,0);
+		
+		dgp5.code = code1;
+		dgp5.flipy = flipy1;
+		dgp5.sx = x1;
+		dgp5.sy = y1;
+		drawgfx(&dgp5);
 
 		drawgfxzoom(sprite_goal_collision_bitmap2,Machine->gfx[1],
 					0,0,
@@ -504,6 +611,8 @@ static int check_sprite_left_goal_collision(int x1, int y1, int code1, int flipy
 			}
 		}
 	}
+} // end of patch paragraph
+
 
 	return collided;
 }
@@ -521,7 +630,26 @@ static int check_sprite_right_goal_collision(int x1, int y1, int code1, int flip
 	// check if the sprites is within the range of the goal
 	if (((y1 + 16) > GOAL_Y) && (y1 < (GOAL_Y + GOAL_HEIGHT)) &&
 	    ((x1 + 16) > RIGHT_GOAL_X) && (x1 < (RIGHT_GOAL_X + GOAL_WIDTH)))
-	{
+	
+{ 
+struct drawgfxParams dgp6={
+	sprite_goal_collision_bitmap1, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 		int x,y;
 		int x2,y2;
 
@@ -534,11 +662,12 @@ static int check_sprite_right_goal_collision(int x1, int y1, int code1, int flip
 		fillbitmap(sprite_goal_collision_bitmap1, Machine->pens[0], 0);
 		fillbitmap(sprite_goal_collision_bitmap2, Machine->pens[0], 0);
 
-		drawgfx(sprite_goal_collision_bitmap1,Machine->gfx[0],
-				code1,1,
-				0,flipy1,
-				x1,y1,
-				0,TRANSPARENCY_PEN,0);
+		
+		dgp6.code = code1;
+		dgp6.flipy = flipy1;
+		dgp6.sx = x1;
+		dgp6.sy = y1;
+		drawgfx(&dgp6);
 
 		drawgfxzoom(sprite_goal_collision_bitmap2,Machine->gfx[1],
 					0,1,
@@ -570,6 +699,8 @@ static int check_sprite_right_goal_collision(int x1, int y1, int code1, int flip
 			}
 		}
 	}
+} // end of patch paragraph
+
 
 	return collided;
 }
@@ -578,6 +709,25 @@ static int check_sprite_right_goal_collision(int x1, int y1, int code1, int flip
 /* returns 1 for collision with vertical border,
    2 for collision with horizontal border */
 static int check_sprite_border_collision(UINT8 x1, UINT8 y1, int code1, int flipy1)
+
+{ 
+struct drawgfxParams dgp7={
+	sprite_border_collision_bitmap, 	// dest
+	Machine->gfx[0], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	0, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	UINT8 x,y;
 	int collided = 0;
@@ -589,11 +739,10 @@ static int check_sprite_border_collision(UINT8 x1, UINT8 y1, int code1, int flip
 
 	fillbitmap(sprite_border_collision_bitmap, Machine->pens[0], 0);
 
-	drawgfx(sprite_border_collision_bitmap,Machine->gfx[0],
-			code1,1,
-			0,flipy1,
-			0,0,
-			0,TRANSPARENCY_PEN,0);
+	
+	dgp7.code = code1;
+	dgp7.flipy = flipy1;
+	drawgfx(&dgp7);
 
 	for (x = 0; x < SPRITE_WIDTH; x++)
 	{
@@ -620,6 +769,8 @@ static int check_sprite_border_collision(UINT8 x1, UINT8 y1, int code1, int flip
 
 	return collided;
 }
+} // end of patch paragraph
+
 
 
 VIDEO_EOF( carpolo )

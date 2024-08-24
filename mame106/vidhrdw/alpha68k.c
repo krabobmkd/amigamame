@@ -616,7 +616,26 @@ static void kyros_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, i
 			{
 				color = color_prom[(data>>1&0x1000)|(data&0xffc)|(data>>14&3)];
 				if (color!=0xff)
-				{
+				
+{ 
+struct drawgfxParams dgp0={
+	bitmap, 	// dest
+	Machine->gfx[bank], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 					fy = data & 0x1000;
 					fx = 0;
 
@@ -628,9 +647,17 @@ static void kyros_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, i
 
 					tile = (data>>3 & 0x400) | (data & 0x3ff);
 					alpha68k_video_banking(&bank, data);
-					drawgfx(bitmap, Machine->gfx[bank], tile, color, fx, fy, mx, my,
-							cliprect, TRANSPARENCY_PEN, 0);
+					
+					dgp0.code = tile;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = mx;
+					dgp0.sy = my;
+					drawgfx(&dgp0);
 				}
+} // end of patch paragraph
+
 			}
 //ZT
 			if(flipscreen)
@@ -672,7 +699,26 @@ static void sstingry_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		{
 			data = spriteram16[offs+d+i];
 			if (data!=0x40)
-			{
+			
+{ 
+struct drawgfxParams dgp1={
+	bitmap, 	// dest
+	Machine->gfx[bank], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0, 	// scalex
+	0, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
+{
 				fy = data & 0x1000;
 				fx = 0;
 
@@ -685,9 +731,17 @@ static void sstingry_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 				color = (data>>7 & 0x18) | (data>>13 & 7);
 				tile = data & 0x3ff;
 				bank = data>>10 & 3;
-				drawgfx(bitmap, Machine->gfx[bank], tile, color, fx, fy, mx, my,
-						cliprect, TRANSPARENCY_PEN, 0);
+				
+				dgp1.code = tile;
+				dgp1.color = color;
+				dgp1.flipx = fx;
+				dgp1.flipy = fy;
+				dgp1.sx = mx;
+				dgp1.sy = my;
+				drawgfx(&dgp1);
 			}
+} // end of patch paragraph
+
 //ZT
 			if(flipscreen)
 				my=(my-8)&0xff;

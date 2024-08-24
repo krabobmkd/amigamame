@@ -195,18 +195,38 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	int i;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 14; i++)
 	{
 		int code = (starshp1_obj_ram[i] & 0xf) ^ 0xf;
 
-		drawgfx(bitmap, Machine->gfx[1],
-			code % 8,
-			code / 8,
-			0, 0,
-			get_sprite_hpos(i),
-			get_sprite_vpos(i),
-			cliprect, TRANSPARENCY_PEN, 0);
+		
+		dgp0.code = code % 8;
+		dgp0.color = code / 8;
+		dgp0.sx = get_sprite_hpos(i);
+		dgp0.sy = get_sprite_vpos(i);
+		drawgfx(&dgp0);
 	}
+	} // end of patch paragraph
+
 }
 
 

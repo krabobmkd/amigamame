@@ -150,6 +150,25 @@ static int draw_sprites(mame_bitmap *bitmap, int priority)
 				color |= 0x0080;
 
 
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				Machine->gfx[2], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				&Machine->visible_area, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (row = 0; row < size; row++)
 			{
 				for (col = 0; col < size; col++)
@@ -157,14 +176,18 @@ static int draw_sprites(mame_bitmap *bitmap, int priority)
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
 
-					drawgfx(bitmap, Machine->gfx[2],
-						code + layout[row][col],
-						color,
-						flipx, flipy,
-						x, y,
-						&Machine->visible_area, TRANSPARENCY_PEN, 0);
+					
+					dgp0.code = code + layout[row][col];
+					dgp0.color = color;
+					dgp0.flipx = flipx;
+					dgp0.flipy = flipy;
+					dgp0.sx = x;
+					dgp0.sy = y;
+					drawgfx(&dgp0);
 				}
 			}
+			} // end of patch paragraph
+
 
 			count++;
 		}
@@ -193,6 +216,25 @@ VIDEO_UPDATE( spbactn )
 	fillbitmap(tile_bitmap_fg,      0, cliprect);
 
 	/* draw table bg gfx */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		tile_bitmap_bg, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
 	{
 		int attr, code, colour;
@@ -202,12 +244,12 @@ VIDEO_UPDATE( spbactn )
 
 		colour = ((attr & 0x00f0) >> 4) | 0x80;
 
-		drawgfx(tile_bitmap_bg, Machine->gfx[1],
-					code,
-					colour,
-					0, 0,
-					16 * sx, 8 * sy,
-					&Machine->visible_area, TRANSPARENCY_NONE, 0);
+		
+		dgp1.code = code;
+		dgp1.color = colour;
+		dgp1.sx = 16 * sx;
+		dgp1.sy = 8 * sy;
+		drawgfx(&dgp1);
 
 		sx++;
 		if (sx > 63)
@@ -216,10 +258,31 @@ VIDEO_UPDATE( spbactn )
 			sx = 0;
 		}
 	}
+	} // end of patch paragraph
+
 
 	if (draw_sprites(tile_bitmap_bg, 0))
 	{
 		/* kludge: draw table bg gfx again if priority 0 sprites are enabled */
+		
+		{ 
+		struct drawgfxParams dgp2={
+			tile_bitmap_bg, 	// dest
+			Machine->gfx[1], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
 		{
 			int attr, code, colour;
@@ -229,12 +292,12 @@ VIDEO_UPDATE( spbactn )
 
 			colour = ((attr & 0x00f0) >> 4) | 0x80;
 
-			drawgfx(tile_bitmap_bg, Machine->gfx[1],
-					code,
-					colour,
-					0, 0,
-					16 * sx, 8 * sy,
-					&Machine->visible_area, TRANSPARENCY_PEN, 0);
+			
+			dgp2.code = code;
+			dgp2.color = colour;
+			dgp2.sx = 16 * sx;
+			dgp2.sy = 8 * sy;
+			drawgfx(&dgp2);
 
 			sx++;
 			if (sx > 63)
@@ -243,11 +306,32 @@ VIDEO_UPDATE( spbactn )
 				sx = 0;
 			}
 		}
+		} // end of patch paragraph
+
 	}
 
 	draw_sprites(tile_bitmap_bg, 1);
 
 	/* draw table fg gfx */
+	
+	{ 
+	struct drawgfxParams dgp3={
+		tile_bitmap_fg, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
 	{
 		int attr, code, colour;
@@ -263,12 +347,12 @@ VIDEO_UPDATE( spbactn )
 		else
 			colour |= 0x0080;
 
-		drawgfx(tile_bitmap_fg, Machine->gfx[0],
-					code,
-					colour,
-					0, 0,
-					16 * sx, 8 * sy,
-					&Machine->visible_area,TRANSPARENCY_PEN, 0);
+		
+		dgp3.code = code;
+		dgp3.color = colour;
+		dgp3.sx = 16 * sx;
+		dgp3.sy = 8 * sy;
+		drawgfx(&dgp3);
 
 		sx++;
 		if (sx > 63)
@@ -277,6 +361,8 @@ VIDEO_UPDATE( spbactn )
 			sx = 0;
 		}
 	}
+	} // end of patch paragraph
+
 	draw_sprites(tile_bitmap_fg, 2);
 	draw_sprites(tile_bitmap_fg, 3);
 
