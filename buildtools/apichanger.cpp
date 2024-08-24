@@ -1122,33 +1122,36 @@ int main(int argc, char **argv)
    ofstream gitofs("gitcommands.sh");
 
 //re
-    for (const auto & entry : fs::directory_iterator(sdir))
-    {
-        string sname =  entry.path().filename().string();
-        if(sname == "battlane.c" ||
-sname == "bogeyman.c" ||
-sname == "ddragon.c" ||
-sname == "ddragon3.c" ||
-sname == "dogfgt.c" ||
-//sname == "generic.c" ||
-sname == "matmania.c"
-        ) continue;
-//        "battlane.c","bogeyman.c","ddragon.c","ddragon3.c","dogfgt.c","generic.c","matmania.c",
-        if(sname.rfind(".c") != sname.length()-2) continue;
-        string ofilepath = sourcebase+"drivers2/" + sname;
-        string nfilepath = sourcebase+"drivers/" + sname;
-        bool didchange = changeapi(ofilepath,nfilepath);
-        if(didchange) {
-            gitofs << "git add drivers/"<<sname<<"\n";
-        }
+//    for (const auto & entry : fs::directory_iterator(sdir))
+//    {
+//        string sname =  entry.path().filename().string();
+//        if(sname == "battlane.c" ||
+//sname == "bogeyman.c" ||
+//sname == "ddragon.c" ||
+//sname == "ddragon3.c" ||
+//sname == "dogfgt.c" ||
+////sname == "generic.c" ||
+//sname == "matmania.c"
+//        ) continue;
+////        "battlane.c","bogeyman.c","ddragon.c","ddragon3.c","dogfgt.c","generic.c","matmania.c",
+//        if(sname.rfind(".c") != sname.length()-2) continue;
+//        string ofilepath = sourcebase+"drivers2/" + sname;
+//        string nfilepath = sourcebase+"drivers/" + sname;
+//        bool didchange = changeapi(ofilepath,nfilepath);
+//        if(didchange) {
+//            gitofs << "git add drivers/"<<sname<<"\n";
+//        }
 
-    }
+//    }
 
 //    string ofilepath = sourcebase+"vidhrdw2/" + "40love.c";
 //    string nfilepath = sourcebase+"vidhrdw/" + "40love.c";
 
 //    string ofilepath = sourcebase+"vidhrdw/" + "test.c";
 //    string nfilepath = sourcebase+"vidhrdw/" + "testn.c";
+
+       string ofilepath = sourcebase+"drivers2/" + "calori.c";
+       string nfilepath = sourcebase+"drivers/" + "calori.c";
 
 //    changeapi(ofilepath,nfilepath);
 

@@ -159,71 +159,15 @@ VIDEO_UPDATE( calorie )
 		}
 
 		if( calorie_sprites[x+1] & 0x10 )
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			 /* 32x32 sprites */
-			
-			dgp0.code = tileno | 0x40;
-			dgp0.color = color;
-			dgp0.flipx = flipx;
-			dgp0.flipy = flipy;
-			dgp0.sx = xpos;
-			dgp0.sy = ypos - 31;
-			drawgfx(&dgp0);
+			drawgfx(bitmap,Machine->gfx[3],tileno | 0x40,color,flipx,flipy,xpos,ypos - 31,cliprect,TRANSPARENCY_PEN,0);
 		}
-} // end of patch paragraph
-
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+		else
 		{
 			/* 16x16 sprites */
-			
-			dgp1.code = tileno;
-			dgp1.color = color;
-			dgp1.flipx = flipx;
-			dgp1.flipy = flipy;
-			dgp1.sx = xpos;
-			dgp1.sy = ypos - 15;
-			drawgfx(&dgp1);
+			drawgfx(bitmap,Machine->gfx[2],tileno,color,flipx,flipy,xpos,ypos - 15,cliprect,TRANSPARENCY_PEN,0);
 		}
-} // end of patch paragraph
-
 	}
 }
 
