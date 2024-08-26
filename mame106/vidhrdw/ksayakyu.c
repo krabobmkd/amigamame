@@ -77,7 +77,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 { 
 struct drawgfxParams dgp0={
 	bitmap, 	// dest
-	gfx, 	// gfx
+	NULL, // gfx, 	// gfx
 	0, 	// code
 	0, 	// color
 	0, 	// flipx
@@ -110,7 +110,7 @@ struct drawgfxParams dgp0={
 			flipy^=1;
 		}
 
-			
+			dgp0.gfx = gfx;
 			dgp0.code = tile&0x7f;
 			dgp0.color = (attributes) & 7;
 			dgp0.flipx = flipx;

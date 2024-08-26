@@ -84,29 +84,29 @@ VIDEO_UPDATE( wiping )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1; offs > 0; offs--)
 	{
 		if (dirtybuffer[offs])
-		
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int mx,my,sx,sy;
 
 			dirtybuffer[offs] = 0;
@@ -145,9 +145,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy*8;
 			drawgfx(&dgp0);
         	}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE,0);
 
 	/* Note, we're counting up on purpose ! */
@@ -202,29 +202,29 @@ struct drawgfxParams dgp0={
 
 
 	/* redraw high priority chars */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1; offs > 0; offs--)
 	{
 		if (colorram[offs] & 0x80)
-		
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int mx,my,sx,sy;
 
 	        mx = offs % 32;
@@ -261,9 +261,9 @@ struct drawgfxParams dgp2={
 			dgp2.sy = sy*8;
 			drawgfx(&dgp2);
         	}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 
 #if 0

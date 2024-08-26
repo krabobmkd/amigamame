@@ -299,27 +299,27 @@ VIDEO_UPDATE( jedi )
 
     /* update foreground bitmap as a raw bitmap*/
     for (offs = videoram_size - 1; offs >= 0; offs--)
-		if (fgdirty[offs])
 		
-{ 
-struct drawgfxParams dgp0={
-	fgbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE_RAW, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{ 
+		struct drawgfxParams dgp0={
+			fgbitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_NONE_RAW, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
+		if (fgdirty[offs])
+		{
 			int sx = offs % 64;
 			int sy = offs / 64;
 
@@ -331,7 +331,7 @@ struct drawgfxParams dgp0={
 			dgp0.sy = 8*sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
+		} // end of patch paragraph
 
 
 	/* reset the expanded dirty array */
@@ -340,27 +340,27 @@ struct drawgfxParams dgp0={
 
     /* update background bitmap as a raw bitmap */
 	for (offs = jedi_backgroundram_size / 2 - 1; offs >= 0; offs--)
-		if (bgdirty[offs] || bgdirty[offs + 0x400])
 		
-{ 
-struct drawgfxParams dgp1={
-	bgbitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE_RAW, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{ 
+		struct drawgfxParams dgp1={
+			bgbitmap, 	// dest
+			Machine->gfx[1], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			0, 	// clip
+			TRANSPARENCY_NONE_RAW, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
+		if (bgdirty[offs] || bgdirty[offs + 0x400])
+		{
 			int sx = offs % 32;
 			int sy = offs / 32;
 			int code = (jedi_backgroundram[offs] & 0xFF);
@@ -385,7 +385,7 @@ struct drawgfxParams dgp1={
 			dgp1.sy = 8*sy;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
+		} // end of patch paragraph
 
 
 	/* update smoothed version of background */
@@ -444,13 +444,14 @@ struct drawgfxParams dgp1={
 
 		/* handle double-height */
 		if (tall)
-			
+        {
 			dgp2.code = code - 1;
 			dgp2.flipx = flipx;
 			dgp2.flipy = flipy;
 			dgp2.sx = x;
 			dgp2.sy = y - 16;
 			drawgfx(&dgp2);
+        }
     }
     } // end of patch paragraph
 

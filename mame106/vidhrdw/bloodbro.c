@@ -174,7 +174,7 @@ static void bloodbro_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		pri_mask 	// priority_mask
+		0// pri_mask 	// priority_mask
 	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
 	{
@@ -196,16 +196,17 @@ static void bloodbro_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		flipy = attributes & 0x4000;	/* ?? */
 		color = attributes & 0xf;
 
+        dgp0.color = color;
+        dgp0.flipx = flipx;
+        dgp0.flipy = flipy;
+        dgp0.priority_mask = pri_mask | (1<<31);
+
 		for (x = 0;x <= width;x++)
 		{
+            dgp0.sx = flipx ? (sx + 16*(width-x)) : (sx + 16*x);
 			for (y = 0;y <= height;y++)
-			{
-				
+			{				
 				dgp0.code = tile_number++;
-				dgp0.color = color;
-				dgp0.flipx = flipx;
-				dgp0.flipy = flipy;
-				dgp0.sx = flipx ? (sx + 16*(width-x)) : (sx + 16*x);
 				dgp0.sy = flipy ? (sy + 16*(height-y)) : (sy + 16*y);
 				drawgfx(&dgp0);
 			}
@@ -245,7 +246,7 @@ static void weststry_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		pri_mask 	// priority_mask
+		0//pri_mask 	// priority_mask
 	  };
 	for (offs = 0;offs < spriteram_size/2 - 8;offs += 4)
 	{
@@ -259,6 +260,7 @@ static void weststry_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		int color = (data&0xf000)>>12;
 		int pri_mask = (data & 0x0080) ? 0x02 : 0;
 
+        dgp1.priority_mask = pri_mask | (1<<31);
 		if (sx >= 256) sx -= 512;
 
 		if (data0 & 0x8000) continue;	/* disabled */

@@ -89,6 +89,25 @@ static void tnk3_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly,
 	int offs, x, y;
 
 	/* to be moved to memmap */
+	for(x=0; x<x_size; x++) 
+	for(x=0; x<x_size; x++) { 
+	for(x=0; x<x_size; x++) struct drawgfxParams dgp0={
+	for(x=0; x<x_size; x++) 	tmpbitmap, 	// dest
+	for(x=0; x<x_size; x++) 	gfx, 	// gfx
+	for(x=0; x<x_size; x++) 	0, 	// code
+	for(x=0; x<x_size; x++) 	0, 	// color
+	for(x=0; x<x_size; x++) 	0, 	// flipx
+	for(x=0; x<x_size; x++) 	0, 	// flipy
+	for(x=0; x<x_size; x++) 	0, 	// sx
+	for(x=0; x<x_size; x++) 	0, 	// sy
+	for(x=0; x<x_size; x++) 	0, 	// clip
+	for(x=0; x<x_size; x++) 	TRANSPARENCY_NONE, 	// transparency
+	for(x=0; x<x_size; x++) 	0, 	// transparent_color
+	for(x=0; x<x_size; x++) 	0, 	// scalex
+	for(x=0; x<x_size; x++) 	0, 	// scaley
+	for(x=0; x<x_size; x++) 	NULL, 	// pri_buffer
+	for(x=0; x<x_size; x++) 	0 	// priority_mask
+	for(x=0; x<x_size; x++)   };
 	for(x=0; x<x_size; x++) for(y=0; y<y_size; y++)
 	{
 		offs = (x*y_size + y) << 1;
@@ -96,26 +115,7 @@ static void tnk3_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly,
 		attributes  = videoram[offs+1];
 
 		if(tile_number != dirtybuffer[offs] || attributes != dirtybuffer[offs+1])
-		
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			dirtybuffer[offs]   = tile_number;
 			dirtybuffer[offs+1] = attributes;
 
@@ -142,9 +142,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	for(x=0; x<x_size; x++) } // end of patch paragraph
+
 	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,clip,TRANSPARENCY_NONE,0);
 }
 
@@ -378,32 +378,32 @@ static void sgladiat_draw_background( mame_bitmap *bitmap, int scrollx, int scro
 	int tile_number, color, sx, sy;
 	int offs, x, y;
 
+	for(x = 0; x < 64; x++) 
+	for(x = 0; x < 64; x++) { 
+	for(x = 0; x < 64; x++) struct drawgfxParams dgp4={
+	for(x = 0; x < 64; x++) 	tmpbitmap, 	// dest
+	for(x = 0; x < 64; x++) 	gfx, 	// gfx
+	for(x = 0; x < 64; x++) 	0, 	// code
+	for(x = 0; x < 64; x++) 	0, 	// color
+	for(x = 0; x < 64; x++) 	0, 	// flipx
+	for(x = 0; x < 64; x++) 	0, 	// flipy
+	for(x = 0; x < 64; x++) 	0, 	// sx
+	for(x = 0; x < 64; x++) 	0, 	// sy
+	for(x = 0; x < 64; x++) 	0, 	// clip
+	for(x = 0; x < 64; x++) 	TRANSPARENCY_NONE, 	// transparency
+	for(x = 0; x < 64; x++) 	0, 	// transparent_color
+	for(x = 0; x < 64; x++) 	0, 	// scalex
+	for(x = 0; x < 64; x++) 	0, 	// scaley
+	for(x = 0; x < 64; x++) 	NULL, 	// pri_buffer
+	for(x = 0; x < 64; x++) 	0 	// priority_mask
+	for(x = 0; x < 64; x++)   };
 	for(x = 0; x < 64; x++) for(y = 0; y < 32; y++)
 	{
 		offs = (x<<5)+y;
 		tile_number = videoram[offs];
 
 		if(tile_number != dirtybuffer[offs])
-		
-{ 
-struct drawgfxParams dgp4={
-	tmpbitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			dirtybuffer[offs] = tile_number;
 
 			color = 0;
@@ -417,9 +417,9 @@ struct drawgfxParams dgp4={
 			dgp4.sy = sy;
 			drawgfx(&dgp4);
 		}
-} // end of patch paragraph
-
 	}
+	for(x = 0; x < 64; x++) } // end of patch paragraph
+
 	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,clip,TRANSPARENCY_NONE,0);
 }
 
@@ -552,6 +552,25 @@ static void tdfever_draw_bg( mame_bitmap *bitmap, int xscroll, int yscroll )
 	int tile_number, attributes, color, sx, sy;
 	int offs, x, y;
 
+	for(x = 0; x < 32; x++) 
+	for(x = 0; x < 32; x++) { 
+	for(x = 0; x < 32; x++) struct drawgfxParams dgp6={
+	for(x = 0; x < 32; x++) 	tmpbitmap, 	// dest
+	for(x = 0; x < 32; x++) 	gfx, 	// gfx
+	for(x = 0; x < 32; x++) 	0, 	// code
+	for(x = 0; x < 32; x++) 	0, 	// color
+	for(x = 0; x < 32; x++) 	0, 	// flipx
+	for(x = 0; x < 32; x++) 	0, 	// flipy
+	for(x = 0; x < 32; x++) 	0, 	// sx
+	for(x = 0; x < 32; x++) 	0, 	// sy
+	for(x = 0; x < 32; x++) 	0, 	// clip
+	for(x = 0; x < 32; x++) 	TRANSPARENCY_NONE, 	// transparency
+	for(x = 0; x < 32; x++) 	0, 	// transparent_color
+	for(x = 0; x < 32; x++) 	0, 	// scalex
+	for(x = 0; x < 32; x++) 	0, 	// scaley
+	for(x = 0; x < 32; x++) 	NULL, 	// pri_buffer
+	for(x = 0; x < 32; x++) 	0 	// priority_mask
+	for(x = 0; x < 32; x++)   };
 	for(x = 0; x < 32; x++) for(y = 0; y < 32; y++)
 	{
 		offs = (x<<6)+(y<<1);
@@ -559,26 +578,7 @@ static void tdfever_draw_bg( mame_bitmap *bitmap, int xscroll, int yscroll )
 		attributes  = source[offs+1];
 
 		if(tile_number != dirtybuffer[offs] || attributes != dirtybuffer[offs+1])
-		
-{ 
-struct drawgfxParams dgp6={
-	tmpbitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			dirtybuffer[offs]   = tile_number;
 			dirtybuffer[offs+1] = attributes;
 			tile_number |= (attributes & 0xf) << 8;
@@ -598,9 +598,9 @@ struct drawgfxParams dgp6={
 				dgp6.sy = sy;
 				drawgfx(&dgp6);
 		}
-} // end of patch paragraph
-
 	}
+	for(x = 0; x < 32; x++) } // end of patch paragraph
+
 	copyscrollbitmap(bitmap,tmpbitmap,1,&xscroll,1,&yscroll,clip,TRANSPARENCY_NONE,0);
 }
 

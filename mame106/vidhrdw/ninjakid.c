@@ -260,7 +260,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect ){
 		dgp0.sy = sy;
 		drawgfx(&dgp0);
 		if (sx>240)
-			
+        {
 			dgp0.code = tile_number;
 			dgp0.color = color;
 			dgp0.flipx = flipx;
@@ -268,7 +268,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect ){
 			dgp0.sx = sx-256;
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
-
+        }
 		source+=0x20;
 	}
 	} // end of patch paragraph
@@ -283,6 +283,25 @@ VIDEO_UPDATE( ninjakid )
 	tilemap_draw( bitmap,cliprect,fg_tilemap,0,0 );
 	draw_sprites( bitmap,cliprect );
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (y=4; y<28; y++)
 	{
 		for (x=0; x<32; x++)
@@ -293,26 +312,7 @@ VIDEO_UPDATE( ninjakid )
 			chr +=  (col & 0x20) << 3;
 
 			if ((col & 0x10) == 0)
-			
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 
 				if (flipscreen==0)
 				{
@@ -334,10 +334,10 @@ struct drawgfxParams dgp2={
 				dgp2.sy = py;
 				drawgfx(&dgp2);
 			}
-} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 
 
 }

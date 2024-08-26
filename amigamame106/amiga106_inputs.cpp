@@ -144,7 +144,7 @@ static USHORT askedPadsRawKey = 0;
 static USHORT useAnyMouse = 0;
 void ConfigureLowLevelLib()
 {
-printf(" ***** ConfigureLowLevelLib\n");
+//printf(" ***** ConfigureLowLevelLib\n");
     if(!LowLevelBase) return;
 
     /*
@@ -176,11 +176,10 @@ printf(" ***** ConfigureLowLevelLib\n");
     for(int iLLPort=0;iLLPort<4;iLLPort++) // actually 2
     {
         int iPlayer = configControls._llPort_Player[iLLPort] ;
-        printf("iPlayer:%d\n",iPlayer);
         if( iPlayer == 0) continue;
 
         int lowlevelState = configControls._llPort_Type[iLLPort];
-                printf("type:%d\n",lowlevelState);
+
         if(lowlevelState<0 || lowlevelState>3) continue; // shouldnt
 
 //        if(lowlevelState == SJA_TYPE_AUTOSENSE)
@@ -888,7 +887,7 @@ void RawKeyMap::init()
 */
 const os_code_info *osd_get_code_list(void)
 {
-    printf(" * * * ** osd_get_key_list  * * * *  *\n");
+//    printf(" * * * ** osd_get_key_list  * * * *  *\n");
 
     ConfigureLowLevelLib();
 

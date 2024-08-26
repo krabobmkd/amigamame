@@ -17,6 +17,25 @@ static void sslam_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
 
 	source += 3; // strange
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int xpos, ypos, number, flipx, colr, eightbyeight;
@@ -43,26 +62,7 @@ static void sslam_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		if (!eightbyeight)
 		{
 			if (flipx)
-			
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				
 				dgp0.code = number;
 				dgp0.color = colr;
@@ -88,123 +88,60 @@ struct drawgfxParams dgp0={
 				dgp0.sy = ypos+8;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
-			
-{ 
-struct drawgfxParams dgp4={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+			else
 			{
 				
-				dgp4.code = number;
-				dgp4.color = colr;
-				dgp4.sx = xpos;
-				dgp4.sy = ypos;
-				drawgfx(&dgp4);
+				dgp0.code = number;
+				dgp0.color = colr;
+				dgp0.sx = xpos;
+				dgp0.sy = ypos;
+				drawgfx(&dgp0);
 				
-				dgp4.code = number+1;
-				dgp4.color = colr;
-				dgp4.sx = xpos;
-				dgp4.sy = ypos+8;
-				drawgfx(&dgp4);
+				dgp0.code = number+1;
+				dgp0.color = colr;
+				dgp0.sx = xpos;
+				dgp0.sy = ypos+8;
+				drawgfx(&dgp0);
 				
-				dgp4.code = number+2;
-				dgp4.color = colr;
-				dgp4.sx = xpos+8;
-				dgp4.sy = ypos;
-				drawgfx(&dgp4);
+				dgp0.code = number+2;
+				dgp0.color = colr;
+				dgp0.sx = xpos+8;
+				dgp0.sy = ypos;
+				drawgfx(&dgp0);
 				
-				dgp4.code = number+3;
-				dgp4.color = colr;
-				dgp4.sx = xpos+8;
-				dgp4.sy = ypos+8;
-				drawgfx(&dgp4);
+				dgp0.code = number+3;
+				dgp0.color = colr;
+				dgp0.sx = xpos+8;
+				dgp0.sy = ypos+8;
+				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
 		}
 		else
 		{
 			if (flipx)
-			
-{ 
-struct drawgfxParams dgp8={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
-				
-				dgp8.code = number ^ 2;
-				dgp8.color = colr;
-				dgp8.sx = xpos;
-				dgp8.sy = ypos;
-				drawgfx(&dgp8);
-			}
-} // end of patch paragraph
-
-			
-{ 
-struct drawgfxParams dgp9={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
 			{
 				
-				dgp9.code = number;
-				dgp9.color = colr;
-				dgp9.sx = xpos;
-				dgp9.sy = ypos;
-				drawgfx(&dgp9);
+				dgp0.code = number ^ 2;
+				dgp0.color = colr;
+				dgp0.sx = xpos;
+				dgp0.sy = ypos;
+				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
+			else
+			{
+				
+				dgp0.code = number;
+				dgp0.color = colr;
+				dgp0.sx = xpos;
+				dgp0.sy = ypos;
+				drawgfx(&dgp0);
+			}
 		}
 
 		source += 4;
 	}
+	} // end of patch paragraph
+
 
 }
 

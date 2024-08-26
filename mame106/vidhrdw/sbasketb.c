@@ -146,32 +146,32 @@ static void sbasketb_draw_sprites( mame_bitmap *bitmap )
 	int offs = (*sbasketb_spriteram_select & 0x01) * 0x100;
 	int i;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 64; i++, offs += 4)
 	{
 		int sx = spriteram[offs + 2];
 		int sy = spriteram[offs + 3];
 
 		if (sx || sy)
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int code  =  spriteram[offs + 0] | ((spriteram[offs + 1] & 0x20) << 3);
 			int color = (spriteram[offs + 1] & 0x0f) + 16 * *sbasketb_palettebank;
 			int flipx =  spriteram[offs + 1] & 0x40;
@@ -194,9 +194,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( sbasketb )

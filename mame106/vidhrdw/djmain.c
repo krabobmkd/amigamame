@@ -35,6 +35,44 @@ static void djmain_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	
+	{ 
+	struct drawgfxParams dgpz0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (pri_code = NUM_SPRITES - 1; pri_code >= 0; pri_code--)
 	{
 		static int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
@@ -94,40 +132,18 @@ static void djmain_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					int zw = ox + (((x + 1) * xscale + (1 << 11)) >> 12) - sx;
 					int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
 
-					drawgfxzoom(bitmap,
-					            Machine->gfx[0],
-					            c,
-					            color,
-					            flipx,
-					            flipy,
-					            sx,
-					            sy,
-					            cliprect,
-					            TRANSPARENCY_PEN,
-					            0,
-					            (zw << 16) / 16,
-					            (zh << 16) / 16);
+					
+					dgpz0.code = c;
+					dgpz0.color = color;
+					dgpz0.flipx = flipx;
+					dgpz0.flipy = flipy;
+					dgpz0.sx = sx;
+					dgpz0.sy = sy;
+					dgpz0.scalex = (zw << 16) / 16;
+					dgpz0.scaley = (zh << 16) / 16;
+					drawgfxzoom(&dgpz0);
 				}
-				
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+				else
 				{
 					int sx = ox + (x << 4);
 					int sy = oy + (y << 4);
@@ -141,10 +157,12 @@ else
 					dgp0.sy = sy;
 					drawgfx(&dgp0);
 				}
-} // end of patch paragraph
-
 			}
 	}
+	} // end of patch paragraph
+
+	} // end of patch paragraph
+
 }
 
 

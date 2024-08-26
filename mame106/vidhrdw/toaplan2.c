@@ -1329,6 +1329,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int co
 
 	priority_to_display <<= 8;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < (TOAPLAN2_SPRITERAM_SIZE/2); offs += 4)
 	{
 		int attrib, sprite, color, priority, flipx, flipy, sx, sy;
@@ -1398,25 +1417,6 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int co
 			flipy = (flipy ^ (sprite_flip[controller] & TOAPLAN2_SPRITE_FLIPY));
 
 			/***** Draw the complete sprites using the dimension info *****/
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				gfx, 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (dim_y = 0; dim_y < sprite_sizey; dim_y += 8)
 			{
 				if (flipy) sy = sy_base - dim_y;
@@ -1438,10 +1438,10 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int co
 					sprite++ ;
 				}
 			}
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

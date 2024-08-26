@@ -668,7 +668,7 @@ struct drawgfxParams dgp9={
       drawgfx(&dgp0);
       // redraw with wrap-around
       if( sx > 512-8 )
-        
+      {
         dgp0.code = code+namcond1_gfxbank*0x10000;
         dgp0.color = color;
         dgp0.flipx = flipx;
@@ -676,8 +676,9 @@ struct drawgfxParams dgp9={
         dgp0.sx = sx-512;
         dgp0.sy = sy;
         drawgfx(&dgp0);
+      }
       if( sy > 512-8 )
-        
+      {
         dgp0.code = code+namcond1_gfxbank*0x10000;
         dgp0.color = color;
         dgp0.flipx = flipx;
@@ -685,6 +686,7 @@ struct drawgfxParams dgp9={
         dgp0.sx = sx;
         dgp0.sy = sy-512;
         drawgfx(&dgp0);
+      }
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -707,7 +709,7 @@ struct drawgfxParams dgp9={
       drawgfx(&dgp3);
       // redraw with wrap-around
       if( sx > 512-16 )
-        
+      {
         dgp3.code = code+namcond1_gfxbank*0x4000;
         dgp3.color = color;
         dgp3.flipx = flipx;
@@ -715,8 +717,9 @@ struct drawgfxParams dgp9={
         dgp3.sx = sx-512;
         dgp3.sy = sy;
         drawgfx(&dgp3);
+      }
       if( sy > 512-16 )
-        
+      {
         dgp3.code = code+namcond1_gfxbank*0x4000;
         dgp3.color = color;
         dgp3.flipx = flipx;
@@ -724,6 +727,7 @@ struct drawgfxParams dgp9={
         dgp3.sx = sx;
         dgp3.sy = sy-512;
         drawgfx(&dgp3);
+      }
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -746,7 +750,7 @@ struct drawgfxParams dgp9={
       drawgfx(&dgp6);
       // redraw with wrap-around
       if( sx > 512-32 )
-        
+      {
         dgp6.code = code+namcond1_gfxbank*0x1000;
         dgp6.color = color;
         dgp6.flipx = flipx;
@@ -754,8 +758,9 @@ struct drawgfxParams dgp9={
         dgp6.sx = sx-512;
         dgp6.sy = sy;
         drawgfx(&dgp6);
+      }
       if( sy > 512-32 )
-        
+      {
         dgp6.code = code+namcond1_gfxbank*0x1000;
         dgp6.color = color;
         dgp6.flipx = flipx;
@@ -763,6 +768,7 @@ struct drawgfxParams dgp9={
         dgp6.sx = sx;
         dgp6.sy = sy-512;
         drawgfx(&dgp6);
+      }
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -785,7 +791,7 @@ struct drawgfxParams dgp9={
       drawgfx(&dgp9);
       // redraw with wrap-around
       if( sx > 512-64 )
-        
+      {
         dgp9.code = code+namcond1_gfxbank*0x400;
         dgp9.color = color;
         dgp9.flipx = flipx;
@@ -793,8 +799,9 @@ struct drawgfxParams dgp9={
         dgp9.sx = sx-512;
         dgp9.sy = sy;
         drawgfx(&dgp9);
+      }
       if( sy > 512-64 )
-        
+      {
         dgp9.code = code+namcond1_gfxbank*0x400;
         dgp9.color = color;
         dgp9.flipx = flipx;
@@ -802,6 +809,7 @@ struct drawgfxParams dgp9={
         dgp9.sx = sx;
         dgp9.sy = sy-512;
         drawgfx(&dgp9);
+      }
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;

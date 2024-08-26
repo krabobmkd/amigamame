@@ -60,44 +60,44 @@ int SpriteCollision(int first,int second)
 	int Checksum=0;
 	int x,y;
 
-    if((s2636ram[first * 0x10 + 10] < 0xf0) && (s2636ram[second * 0x10 + 10] < 0xf0))
     
-{ 
-struct drawgfxParams dgp0={
-	spritebitmap, 	// dest
-	Machine->gfx[expand], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-struct drawgfxParams dgp1={
-	spritebitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+    { 
+    struct drawgfxParams dgp0={
+    	spritebitmap, 	// dest
+    	Machine->gfx[expand], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	0, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
+    struct drawgfxParams dgp1={
+    	spritebitmap, 	// dest
+    	Machine->gfx[1], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	0, 	// clip
+    	TRANSPARENCY_PEN, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
+    if((s2636ram[first * 0x10 + 10] < 0xf0) && (s2636ram[second * 0x10 + 10] < 0xf0))
+    {
     	int fx     = (s2636ram[first * 0x10 + 10] * 4)-22;
         int fy     = (s2636ram[first * 0x10 + 12] * 3)+3;
 		int expand = (first==1) ? 2 : 1;
@@ -162,7 +162,7 @@ struct drawgfxParams dgp1={
 	    dgp0.sy = fy;
 	    drawgfx(&dgp0);
     }
-} // end of patch paragraph
+    } // end of patch paragraph
 
 
 	return Checksum;
@@ -212,29 +212,29 @@ static void tinvader_draw_sprites( mame_bitmap *bitmap )
 	// for collision detection checking
 	copybitmap(tmpbitmap,bitmap,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE,0);
 
+    
+    { 
+    struct drawgfxParams dgp3={
+    	bitmap, 	// dest
+    	Machine->gfx[expand], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	0, 	// clip
+    	TRANSPARENCY_PEN, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for(offs=0;offs<0x50;offs+=0x10)
     {
     	if((s2636ram[offs+10]<0xF0) && (offs!=0x30))
-		
-{ 
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	Machine->gfx[expand], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
             int spriteno = (offs / 8);
 			int expand   = ((s2636ram[0xc0] & (spriteno*2))!=0) ? 2 : 1;
             int bx       = (s2636ram[offs+10] * 4) - 22;
@@ -285,9 +285,9 @@ struct drawgfxParams dgp3={
 			dgp3.sy = by;
 			drawgfx(&dgp3);
         }
-} // end of patch paragraph
-
     }
+    } // end of patch paragraph
+
 
     /* Sprite->Sprite collision detection */
     CollisionSprite = 0;

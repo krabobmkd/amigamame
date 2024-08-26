@@ -205,6 +205,23 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 					NULL, 	// pri_buffer
 					0 	// priority_mask
 				  };
+                struct drawgfxParams dgpz0={
+                    rawbitmap, 	// dest
+                    Machine->gfx[0], 	// gfx
+                    0, 	// code
+                    0, 	// color
+                    0, 	// flipx
+                    0, 	// flipy
+                    0, 	// sx
+                    0, 	// sy
+                    &myclip, 	// clip
+                    shangha3_do_shadows ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+                    15, 	// transparent_color
+                    0x00010000, 	// scalex
+                    0x00010000, 	// scaley
+                    NULL, 	// pri_buffer
+                    0 	// priority_mask
+                  };
 				for (y = 0;y < h;y++)
 				{
 					for (x = 0;x < w;x++)
@@ -250,36 +267,65 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 			else	/* sprite */
 			{
 				int w;
-
-if (zoomx <= 1 && zoomy <= 1)
-	drawgfxzoom(rawbitmap,Machine->gfx[0],
-			code,
-			color,
-			flipx,flipy,
-			sx,sy,
-			&myclip,shangha3_do_shadows ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,15,
-			0x1000000,0x1000000);
-else
-{
+                if (zoomx <= 1 && zoomy <= 1)
+                {
+                    dgpz0.code = code;
+                    dgpz0.color = color;
+                    dgpz0.flipx = flipx;
+                    dgpz0.flipy = flipy;
+                    dgpz0.sx = sx;
+                    dgpz0.sy = sy;
+                    dgpz0.scalex = 0x1000000;
+                    dgpz0.scaley = 0x1000000;
+                    drawgfxzoom(&dgpz0);
+                }
+                else
+                        {
 				w = (sizex+15)/16;
 
+				
+				{ 
+				struct drawgfxParams dgpz1={
+					rawbitmap, 	// dest
+					Machine->gfx[0], 	// gfx
+					0, 	// code
+					0, 	// color
+					0, 	// flipx
+					0, 	// flipy
+					0, 	// sx
+					0, 	// sy
+					&myclip, 	// clip
+					shangha3_do_shadows ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+					15, 	// transparent_color
+					0x00010000, 	// scalex
+					0x00010000, 	// scaley
+					NULL, 	// pri_buffer
+					0 	// priority_mask
+				  };
 				for (x = 0;x < w;x++)
 				{
-					drawgfxzoom(rawbitmap,Machine->gfx[0],
-							code,
-							color,
-							flipx,flipy,
-							sx + 16*x,sy,
-							&myclip,shangha3_do_shadows ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,15,
-							(0x200-zoomx)*0x100,(0x200-zoomy)*0x100);
+					
+					dgpz1.code = code;
+					dgpz1.color = color;
+					dgpz1.flipx = flipx;
+					dgpz1.flipy = flipy;
+					dgpz1.sx = sx + 16*x;
+					dgpz1.sy = sy;
+					dgpz1.scalex = (0x200-zoomx)*0x100;
+					dgpz1.scaley = (0x200-zoomy)*0x100;
+					drawgfxzoom(&dgpz1);
 
 					if ((code & 0x000f) == 0x0f)
 						code = (code + 0x100) & 0xfff0;
 					else
 						code++;
 				}
-}
+				} // end of patch paragraph
+
+                }
 			}
+
+
 		}
 	}
 

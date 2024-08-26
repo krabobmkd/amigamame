@@ -182,31 +182,31 @@ void gsword_draw_sprites(mame_bitmap *bitmap)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		NULL, // Machine->gfx[1+spritebank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0x8f, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < gsword_spritexy_size - 1; offs+=2)
 	{
 		int sx,sy,flipx,flipy,spritebank,tile;
 
 		if (gsword_spritexy_ram[offs]!=0xf1)
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1+spritebank], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_COLOR, 	// transparency
-	0x8f, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			spritebank = 0;
 			tile = gsword_spritetile_ram[offs];
 			sy = 241-gsword_spritexy_ram[offs];
@@ -229,7 +229,7 @@ struct drawgfxParams dgp0={
 				flipx = !flipx;
 				flipy = !flipy;
 			}
-			
+			dgp0.gfx = Machine->gfx[1+spritebank];
 			dgp0.code = tile;
 			dgp0.color = gsword_spritetile_ram[offs+1] & 0x3f;
 			dgp0.flipx = flipx;
@@ -238,9 +238,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( gsword )

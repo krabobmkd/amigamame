@@ -396,7 +396,7 @@ VIDEO_UPDATE( exerion )
 	/* draw sprites */
 	
 	{ 
-	struct drawgfxParams dgp1={
+	struct drawgfxParams dgp0={
 		bitmap, 	// dest
 		gfx, 	// gfx
 		0, 	// code
@@ -439,26 +439,7 @@ VIDEO_UPDATE( exerion )
 		}
 
 		if (wide)
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_COLOR, 	// transparency
-	16, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			if (yflip)
 				code |= 0x10, code2 &= ~0x10;
 			else
@@ -473,17 +454,15 @@ struct drawgfxParams dgp0={
 			dgp0.sy = y + gfx->height;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 
 		
-		dgp1.code = code;
-		dgp1.color = color;
-		dgp1.flipx = xflip;
-		dgp1.flipy = yflip;
-		dgp1.sx = x;
-		dgp1.sy = y;
-		drawgfx(&dgp1);
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = xflip;
+		dgp0.flipy = yflip;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 
 		if (doubled) i += 4;
 	}

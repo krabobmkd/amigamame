@@ -173,6 +173,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	const unsigned char *source = spriteram+32*4-4;
 	const unsigned char *finish = spriteram; /* ? */
 
+	
+	{ 
+	struct drawgfxParams dgp8={
+		bitmap, 	// dest
+		NULL,// gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source>=finish )
 	{
 		int sx 				= source[0];
@@ -291,28 +310,9 @@ struct drawgfxParams dgp0={
 } // end of patch paragraph
 
 		}
-		
-{ 
-struct drawgfxParams dgp8={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+		else
 		{
-			
+			dgp8.gfx = gfx;
 			dgp8.code = sprite_number;
 			dgp8.color = color;
 			dgp8.flipx = flipx;
@@ -321,10 +321,10 @@ else
 			dgp8.sy = sy;
 			drawgfx(&dgp8);
 		}
-} // end of patch paragraph
-
 		source -= 4;
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( msisaac )

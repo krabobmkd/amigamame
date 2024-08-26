@@ -347,6 +347,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	const gfx_element *gfx = Machine->gfx[0];
 	int x, y, color, flipx, dy, pri, pri_mask, i;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri_mask 	// priority_mask
+	  };
 	while( source>=finish )
 	{
 		/* draw sprite */
@@ -363,25 +382,6 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 			pri		 =	((source[1] & 0x3c00)>>10);	// Priority (1 = Low)
 			pri_mask =	~((1 << (pri+1)) - 1);		// Above the first "pri" levels
 
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				gfx, 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				priority_bitmap, 	// pri_buffer
-				pri_mask 	// priority_mask
-			  };
 			for(i=0;i<=dy;i++)
 			{
 				
@@ -419,12 +419,12 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 				dgp0.sy = y-512+i*16;
 				drawgfx(&dgp0);
 			}
-			} // end of patch paragraph
-
 		}
 
 		source -= 0x4;
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( mwarr )

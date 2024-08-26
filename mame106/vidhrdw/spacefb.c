@@ -137,6 +137,42 @@ VIDEO_UPDATE( spacefb )
        according to the schematics */
 	col_bit2 = (video_control & 0x40) ? 0x04 : 0x00;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < 128; offs++, spriteno++)
 	{
 		int sx,sy,code,cnt,col;
@@ -153,26 +189,7 @@ VIDEO_UPDATE( spacefb )
 		if (cnt)
 		{
 			if (cnt & 0x20)
-			
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				/* Draw bullets */
 
 				if (flip_screen)
@@ -191,29 +208,8 @@ struct drawgfxParams dgp0={
 				drawgfx(&dgp0);
 
 			}
-} // end of patch paragraph
-
 			else if (cnt & 0x40)
-			
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				sy -= 5;	/* aligns the spaceship and the bullet */
 
 				if (flip_screen)
@@ -231,10 +227,10 @@ struct drawgfxParams dgp1={
 				dgp1.sy = sy;
 				drawgfx(&dgp1);
 			}
-} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 #if 0
 	{
 		int b;

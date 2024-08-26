@@ -213,7 +213,7 @@ static void draw_text( mame_bitmap *bitmap, const rectangle *cliprect )
 		0, 	// sx
 		0, 	// sy
 		cliprect, 	// clip
-		(col==31)?TRANSPARENCY_NONE:TRANSPARENCY_PEN, 	// transparency
+		TRANSPARENCY_NONE,// (col==31)?TRANSPARENCY_NONE:TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex
 		0, 	// scaley
@@ -230,6 +230,7 @@ static void draw_text( mame_bitmap *bitmap, const rectangle *cliprect )
 
 		
 		dgp0.code = bank + tile_number;
+        dgp0.transparency = (col==31)?TRANSPARENCY_NONE:TRANSPARENCY_PEN;
 		dgp0.color = attributes;
 		dgp0.sx = /* no flip */			8*col;
 		dgp0.sy = (8*row-scroll)&0xff;
@@ -311,34 +312,34 @@ static int collision_check( mame_bitmap *bitmap, int which )
 	int pixel;
 	int result = 0;
 
-	if( which==0 )
 	
-{ 
-struct drawgfxParams dgp2={
-	work_bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{ 
+	struct drawgfxParams dgp2={
+		work_bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	if( which==0 )
+	{
 		/* draw the current player sprite into a work bitmap */
 		
 		dgp2.code = grchamp_tile_number&0xf;
 		dgp2.flipx = /* color */			0;
 		drawgfx(&dgp2);
 	}
-} // end of patch paragraph
+	} // end of patch paragraph
 
 
 	for( y = 0; y <32; y++ )
@@ -435,7 +436,7 @@ static void draw_headlights( mame_bitmap *bitmap, const rectangle *cliprect, int
 { 
 struct drawgfxParams dgp4={
 	bitmap, 	// dest
-	gfx, 	// gfx
+	NULL, // hand done gfx, 	// gfx
 	0, 	// code
 	0, 	// color
 	0, 	// flipx
@@ -468,7 +469,8 @@ struct drawgfxParams dgp4={
 	// i.e if(fog) palette_set_shadow_dRGB32(1,10,10,0,0);, but that appears
 	// not to be supported.
 
-	
+	dgp4.gfx = gfx;
+
 	dgp4.code = code+0;
 	dgp4.sx = x0;
 	dgp4.sy = y0;

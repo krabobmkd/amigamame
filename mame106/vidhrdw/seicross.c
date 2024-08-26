@@ -139,7 +139,7 @@ static void seicross_draw_sprites( mame_bitmap *bitmap )
 		dgp0.sy = 240-spriteram[offs + 2];
 		drawgfx(&dgp0);
 		if(x>0xf0)
-			
+        {
 			dgp0.code = (spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128;
 			dgp0.color = spriteram[offs + 1] & 0x0f;
 			dgp0.flipx = spriteram[offs] & 0x40;
@@ -147,6 +147,7 @@ static void seicross_draw_sprites( mame_bitmap *bitmap )
 			dgp0.sx = x-256;
 			dgp0.sy = 240-spriteram[offs + 2];
 			drawgfx(&dgp0);
+        }
 	}
 	} // end of patch paragraph
 
@@ -182,7 +183,7 @@ static void seicross_draw_sprites( mame_bitmap *bitmap )
 		dgp2.sy = 240-spriteram_2[offs + 2];
 		drawgfx(&dgp2);
 		if(x>0xf0)
-			
+		{
 			dgp2.code = (spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2);
 			dgp2.color = spriteram_2[offs + 1] & 0x0f;
 			dgp2.flipx = spriteram_2[offs] & 0x40;
@@ -190,6 +191,7 @@ static void seicross_draw_sprites( mame_bitmap *bitmap )
 			dgp2.sx = x-256;
 			dgp2.sy = 240-spriteram_2[offs + 2];
 			drawgfx(&dgp2);
+        }
 	}
 	} // end of patch paragraph
 

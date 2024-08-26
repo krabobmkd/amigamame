@@ -344,6 +344,25 @@ void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xof
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		trans_color, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x80;offs += 2)
 	{
 		/* is it on? */
@@ -376,25 +395,6 @@ void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xof
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_COLOR, 	// transparency
-				trans_color, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (y = 0;y <= sizey;y++)
 			{
 				for (x = 0;x <= sizex;x++)
@@ -409,10 +409,10 @@ void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xof
 					drawgfx(&dgp0);
 				}
 			}
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -441,6 +441,25 @@ static void phozon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		31, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x80;offs += 2)
 	{
 		/* is it on? */
@@ -473,25 +492,6 @@ static void phozon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 			sy -= 8 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
-			
-			{ 
-			struct drawgfxParams dgp1={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_COLOR, 	// transparency
-				31, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (y = 0;y <= sizey;y++)
 			{
 				for (x = 0;x <= sizex;x++)
@@ -506,10 +506,10 @@ static void phozon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 					drawgfx(&dgp1);
 				}
 			}
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

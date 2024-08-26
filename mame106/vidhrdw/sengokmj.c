@@ -109,7 +109,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {
 				if (!fx)
-					
+				{
 					dgp0.code = sprite++;
 					dgp0.color = color;
 					dgp0.flipx = fx;
@@ -117,8 +117,9 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 					dgp0.sx = x+ax*16;
 					dgp0.sy = y+ay*16;
 					drawgfx(&dgp0);
+                }
 				else
-					
+				{
 					dgp0.code = sprite++;
 					dgp0.color = color;
 					dgp0.flipx = fx;
@@ -126,6 +127,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 					dgp0.sx = x+(dx-1-ax)*16;
 					dgp0.sy = y+ay*16;
 					drawgfx(&dgp0);
+                }
 			}
 	}
 	} // end of patch paragraph

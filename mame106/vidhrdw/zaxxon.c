@@ -272,29 +272,29 @@ static void zaxxon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		if (spriteram[offs] != 0xff)
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int code = spriteram[offs + 1] & 0x3f;
 			int color = spriteram[offs + 2] & 0x3f;
 			int flipx = spriteram[offs + 1] & 0x40;
@@ -319,9 +319,9 @@ struct drawgfxParams dgp1={
 			dgp1.sy = sy;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( zaxxon )
@@ -490,31 +490,31 @@ static void congo_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	for (offs = 0x1e * 0x20; offs >= 0x00; offs -= 0x20)
 		sprpri[spriteram[offs + 1]] = offs;
 
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0x1e; i >= 0; i--)
 	{
 		offs = sprpri[i];
 
 		if (spriteram[offs + 2] != 0xff)
-		
-{ 
-struct drawgfxParams dgp4={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int code = spriteram[offs + 2 + 1] & 0x7f;
 			int color = spriteram[offs + 2 + 2];
 			int flipx = spriteram[offs + 2 + 2] & 0x80;
@@ -539,9 +539,9 @@ struct drawgfxParams dgp4={
 			dgp4.sy = sy;
 			drawgfx(&dgp4);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( congo )
@@ -557,29 +557,29 @@ static void futspy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp5={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		if (spriteram[offs] != 0xff)
-		
-{ 
-struct drawgfxParams dgp5={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int code = spriteram[offs + 1] & 0x7f;
 			int color = spriteram[offs + 2] & 0x3f;
 			int flipx = spriteram[offs + 1] & 0x80;
@@ -604,9 +604,9 @@ struct drawgfxParams dgp5={
 			dgp5.sy = sy;
 			drawgfx(&dgp5);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( futspy )

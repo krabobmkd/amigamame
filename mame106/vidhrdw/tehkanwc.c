@@ -152,41 +152,43 @@ static void gridiron_drawled(mame_bitmap *bitmap,UINT8 led,int player)
 		if (led == ledvalues[i] ) break;
 	}
 
-	if (i < 10)
 	
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	if (i < 10)
+	{
 		if (player == 0)
-			
+		{
 			dgp0.code = 0xc0 + i;
 			dgp0.color = 0x0a;
 			drawgfx(&dgp0);
+        }
 		else
-			
+		{
 			dgp0.code = 0xc0 + i;
 			dgp0.color = 0x03;
 			drawgfx(&dgp0);
-	}
-} // end of patch paragraph
+        }
+	} else logerror("unknown LED %02x for player %d\n",led,player);
+	} // end of patch paragraph
 
-else logerror("unknown LED %02x for player %d\n",led,player);
+
 }
 
 static void tehkanwc_draw_sprites( mame_bitmap *bitmap )

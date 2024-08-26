@@ -466,25 +466,6 @@ static MACHINE_RESET( cps )
 		rom[0xe5332/2] = 0x6014;
 	}
 
-#if 0
-	if (strcmp(gamename, "sf2accp2" )==0)
-	{
-		/* Patch out a odd branch which would be incorrectly interpreted
-           by the cpu core as a 32-bit branch. This branch would make the
-           game crash (address error, since it would branch to an odd address)
-           if location 180ca6 (outside ROM space) isn't 0. Protection check? */
-		UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
-		rom[0x11756/2] = 0x4e71;
-	}
-	else if (strcmp(gamename, "ghouls" )==0)
-	{
-		/* Patch out self-test... it takes forever */
-		UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
-		rom[0x61964/2] = 0x4ef9;
-		rom[0x61966/2] = 0x0000;
-		rom[0x61968/2] = 0x0400;
-	}
-#endif
 }
 
 
@@ -922,26 +903,6 @@ void cps1_get_video_base(void )
 {
 	int enablemask;
 
-#if 0
-if (code_pressed(KEYCODE_Z))
-{
-	if (code_pressed(KEYCODE_Q)) cps1_layer_enabled[3]=0;
-	if (code_pressed(KEYCODE_W)) cps1_layer_enabled[2]=0;
-	if (code_pressed(KEYCODE_E)) cps1_layer_enabled[1]=0;
-	if (code_pressed(KEYCODE_R)) cps1_layer_enabled[0]=0;
-	if (code_pressed(KEYCODE_T))
-	{
-		ui_popup("%d %d %d %d layer %02x",
-			(layercontrol>>0x06)&03,
-			(layercontrol>>0x08)&03,
-			(layercontrol>>0x0a)&03,
-			(layercontrol>>0x0c)&03,
-			layercontrol&0xc03f
-			);
-	}
-
-}
-#endif
 
 	enablemask = 0;
 	if (cps1_game_config->layer_enable_mask[0] == cps1_game_config->layer_enable_mask[1])
@@ -1334,48 +1295,23 @@ void cps1_find_last_sprite(void)    /* Find the offset of last sprite */
 
 void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
-#define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)					
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	\				cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	0x02 	// priority_mask
-  };
-\
-{																	\
-	if (flip_screen)												\
-		
-		dgp0.code = \				CODE;
-		dgp0.color = \				COLOR;
-		dgp0.flipx = \				!(FLIPX);
-		dgp0.flipy = !(FLIPY);
-		dgp0.sx = \				511-16-(SX);
-		dgp0.sy = 255-16-(SY);
-		drawgfx(&dgp0);					\
-	else															\
-		
-		dgp0.code = \				CODE;
-		dgp0.color = \				COLOR;
-		dgp0.flipx = \				FLIPX;
-		dgp0.flipy = FLIPY;
-		dgp0.sx = \				SX;
-		dgp0.sy = SY;
-		drawgfx(&dgp0);					\
-}
-} // end of patch paragraph
-
+//#define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)
+//{
+//	if (flip_screen)
+//		pdr awgfx(bitmap,Machine->gfx[2],
+//				CODE,
+//				COLOR,
+//				!(FLIPX),!(FLIPY),
+//				511-16-(SX),255-16-(SY),
+//				cliprect,TRANSPARENCY_PEN,15,0x02);
+//	else
+//		pd rawgfx(bitmap,Machine->gfx[2],
+//				CODE,
+//				COLOR,
+//				FLIPX,FLIPY,
+//				SX,SY,
+//				cliprect,TRANSPARENCY_PEN,15,0x02);
+//}
 
 
 	int i, baseadd;
@@ -1392,13 +1328,38 @@ struct drawgfxParams dgp0={
 		baseadd = 4;
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x02 	// priority_mask
+	  };
 	for (i=cps1_last_sprite_offset; i>=0; i-=4)
 	{
 		int x=*(base+0);
 		int y=*(base+1);
 		int code  =*(base+2);
 		int colour=*(base+3);
-		int col=colour&0x1f;
+
+        int col=(colour&0x1f) + palette_basecolor[0];
+
+        int flipx = ((colour &0x20)!=0);
+        int flipy = ((colour &0x40)!=0);
+        int fflipx = flipx^flip_screen;
+        int fflipy = flipy^flip_screen;
 
 //      x-=0x20;
 //      y+=0x20;
@@ -1427,94 +1388,49 @@ struct drawgfxParams dgp0={
 				nx++;
 				ny++;
 
-				if (colour & 0x40)
-				{
-					/* Y flip */
-					if (colour &0x20)
-					{
-						for (nys=0; nys<ny; nys++)
-						{
-							for (nxs=0; nxs<nx; nxs++)
-							{
-								sx = (x+nxs*16) & 0x1ff;
-								sy = (y+nys*16) & 0x1ff;
+                for (nys=0; nys<ny; nys++)
+                {
+                    int ycodeoffset = code + (((flipy)?(ny-1-nys):nys)<<4);
 
-								DRAWSPRITE(
-										code+(nx-1)-nxs+0x10*(ny-1-nys),
-										(col&0x1f) + palette_basecolor[0],
-										1,1,
-										sx,sy);
-							}
-						}
-					}
-					else
-					{
-						for (nys=0; nys<ny; nys++)
-						{
-							for (nxs=0; nxs<nx; nxs++)
-							{
-								sx = (x+nxs*16) & 0x1ff;
-								sy = (y+nys*16) & 0x1ff;
+                    sy = (y+nys*16) & 0x1ff;
+                    if(flip_screen) {  sy= 255-16-sy;  }
 
-								DRAWSPRITE(
-										code+nxs+0x10*(ny-1-nys),
-										(col&0x1f) + palette_basecolor[0],
-										0,1,
-										sx,sy);
-							}
-						}
-					}
-				}
-				else
-				{
-					if (colour &0x20)
-					{
-						for (nys=0; nys<ny; nys++)
-						{
-							for (nxs=0; nxs<nx; nxs++)
-							{
-								sx = (x+nxs*16) & 0x1ff;
-								sy = (y+nys*16) & 0x1ff;
+                    for (nxs=0; nxs<nx; nxs++)
+                    {
+                        int fcode = ycodeoffset + (flipx)?((nx-1)-nxs): nxs ;
 
-								DRAWSPRITE(
-										code+(nx-1)-nxs+0x10*nys,
-										(col&0x1f) + palette_basecolor[0],
-										1,0,
-										sx,sy);
-							}
-						}
-					}
-					else
-					{
-						for (nys=0; nys<ny; nys++)
-						{
-							for (nxs=0; nxs<nx; nxs++)
-							{
-								sx = (x+nxs*16) & 0x1ff;
-								sy = (y+nys*16) & 0x1ff;
+                        sx = (x+(nxs<<4)) & 0x1ff;
+                        if(flip_screen) { sx= 511-16-sx; }
 
-								DRAWSPRITE(
-										code+nxs+0x10*nys,
-										(col&0x1f) + palette_basecolor[0],
-										0,0,
-										sx,sy);
-							}
-						}
-					}
-				}
+                        
+                        dgp0.code = fcode;
+                        dgp0.color = col;
+                        dgp0.flipx = fflipx;
+                        dgp0.flipy = fflipy;
+                        dgp0.sx = sx;
+                        dgp0.sy = sy;
+                        drawgfx(&dgp0);
+                    }
+                }// end loop y
+
 			}
 			else
 			{
 				/* Simple case... 1 sprite */
-						DRAWSPRITE(
-						code,
-						(col&0x1f) + palette_basecolor[0],
-						colour&0x20,colour&0x40,
-						x & 0x1ff,y & 0x1ff);
+                
+                dgp0.code = code;
+                dgp0.color = col;
+                dgp0.flipx = flipx;
+                dgp0.flipy = flipy;
+                dgp0.sx = x & 0x1ff;
+                dgp0.sy = y & 0x1ff;
+                drawgfx(&dgp0);
 			}
 		}
 		base += baseadd;
 	}
+	} // end of patch paragraph
+
 #undef DRAWSPRITE
 }
 
@@ -1599,52 +1515,29 @@ void cps2_find_last_sprite(void)    /* Find the offset of last sprite */
 	cps2_last_sprite_offset=cps2_obj_size/2-4;
 #undef DRAWSPRITE
 }
+//#define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)
+
+
+
+//	if (flip_screen)
+
+//		pd rawgfx(bitmap,Machine->gfx[2],
+//				CODE,
+//				COLOR,
+//				!(FLIPX),!(FLIPY),
+//				511-16-(SX),255-16-(SY),
+//				cliprect,TRANSPARENCY_PEN,15,primasks[priority]);
+//	else
+//		pd rawgfx(bitmap,Machine->gfx[2],
+//				CODE,
+//				COLOR,
+//				FLIPX,FLIPY,
+//				SX,SY,
+//				cliprect,TRANSPARENCY_PEN,15,primasks[priority]);
+
 
 void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *primasks)
 {
-#define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)									
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	\				cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	primasks[priority] 	// priority_mask
-  };
-\
-{																					\
-	if (flip_screen)																\
-		
-		dgp2.code = \				CODE;
-		dgp2.color = \				COLOR;
-		dgp2.flipx = \				!(FLIPX);
-		dgp2.flipy = !(FLIPY);
-		dgp2.sx = \				511-16-(SX);
-		dgp2.sy = 255-16-(SY);
-		drawgfx(&dgp2);					\
-	else																			\
-		
-		dgp2.code = \				CODE;
-		dgp2.color = \				COLOR;
-		dgp2.flipx = \				FLIPX;
-		dgp2.flipy = FLIPY;
-		dgp2.sx = \				SX;
-		dgp2.sy = SY;
-		drawgfx(&dgp2);					\
-}
-} // end of patch paragraph
-
-
 	int i;
 	UINT16 *base=cps2_buffered_obj;
 	int xoffs = 64-cps2_port(CPS2_OBJ_XOFFS);
@@ -1657,6 +1550,25 @@ struct drawgfxParams dgp2={
 	}
 #endif
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0 //hand primasks[priority] 	// priority_mask
+	  };
 	for (i=cps2_last_sprite_offset; i>=0; i-=4)
 	{
 		int x=base[i+0];
@@ -1664,7 +1576,14 @@ struct drawgfxParams dgp2={
 		int priority=(x>>13)&0x07;
 		int code  = base[i+2]+((y & 0x6000) <<3);
 		int colour= base[i+3];
-		int col=colour&0x1f;
+		int col=(colour&0x1f) + palette_basecolor[0];
+
+        int flipx = ((colour &0x20)!=0);
+        int flipy = ((colour &0x40)!=0);
+        int fflipx = flipx^flip_screen;
+        int fflipy = flipy^flip_screen;
+
+        dgp2.priority_mask =  primasks[priority] ;
 
 		if(colour & 0x80)
 		{
@@ -1681,92 +1600,50 @@ struct drawgfxParams dgp2={
 			nx++;
 			ny++;
 
-			if (colour & 0x40)
-			{
-				/* Y flip */
-				if (colour &0x20)
-				{
-					for (nys=0; nys<ny; nys++)
-					{
-						for (nxs=0; nxs<nx; nxs++)
-						{
-							sx = (x+nxs*16+xoffs) & 0x3ff;
-							sy = (y+nys*16+yoffs) & 0x3ff;
-							DRAWSPRITE(
-									code+(nx-1)-nxs+0x10*(ny-1-nys),
-									(col&0x1f) + palette_basecolor[0],
-									1,1,
-									sx,sy);
-						}
-					}
-				}
-				else
-				{
-					for (nys=0; nys<ny; nys++)
-					{
-						for (nxs=0; nxs<nx; nxs++)
-						{
-							sx = (x+nxs*16+xoffs) & 0x3ff;
-							sy = (y+nys*16+yoffs) & 0x3ff;
+            for (nys=0; nys<ny; nys++)
+            {
+                int ycodeoffset = (((flipy)?(ny-1-nys):nys)<<4);
+                 sy = (y+(nys<<4)+yoffs) & 0x3ff;
+                 if(flip_screen) {  sy= 255-16-sy;  }
 
-							DRAWSPRITE(
-									code+nxs+0x10*(ny-1-nys),
-									(col&0x1f) + palette_basecolor[0],
-									0,1,
-									sx,sy);
-						}
-					}
-				}
-			}
-			else
-			{
-				if (colour &0x20)
-				{
-					for (nys=0; nys<ny; nys++)
-					{
-						for (nxs=0; nxs<nx; nxs++)
-						{
-							sx = (x+nxs*16+xoffs) & 0x3ff;
-							sy = (y+nys*16+yoffs) & 0x3ff;
+                for (nxs=0; nxs<nx; nxs++)
+                {
+                    int fcode = (flipx)?
+                                   (code+ (nx-1)-nxs):
+                                   ((code & ~0xf) + ((code + nxs) & 0xf) ) ; // could be simplified
+                    fcode += ycodeoffset;
+                    sx = (x+(nxs<<4)+xoffs) & 0x3ff;
 
-							DRAWSPRITE(
-									code+(nx-1)-nxs+0x10*nys,
-									(col&0x1f) + palette_basecolor[0],
-									1,0,
-									sx,sy);
-						}
-					}
-				}
-				else
-				{
-					for (nys=0; nys<ny; nys++)
-					{
-						for (nxs=0; nxs<nx; nxs++)
-						{
-							sx = (x+nxs*16+xoffs) & 0x3ff;
-							sy = (y+nys*16+yoffs) & 0x3ff;
+                    if(flip_screen) {
+                        sx= 511-16-sx;
+                    }
 
-							DRAWSPRITE(
-//                                      code+nxs+0x10*nys,
-									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10*nys,	//  pgear fix
-									(col&0x1f) + palette_basecolor[0],
-									0,0,
-									sx,sy);
-						}
-					}
-				}
-			}
+                    
+                    dgp2.code = fcode;
+                    dgp2.color = col;
+                    dgp2.flipx = fflipx;
+                    dgp2.flipy = fflipy;
+                    dgp2.sx = sx;
+                    dgp2.sy = sy;
+                    drawgfx(&dgp2);
+                }
+            }// end loop y
 		}
 		else
 		{
 			/* Simple case... 1 sprite */
-			DRAWSPRITE(
-					code,
-					(col&0x1f) + palette_basecolor[0],
-					colour&0x20,colour&0x40,
-					(x+xoffs) & 0x3ff,(y+yoffs) & 0x3ff);
+            
+            dgp2.code = code;
+            dgp2.color = col;
+            dgp2.flipx = flipx;
+            dgp2.flipy = flipy;
+            dgp2.sx = (x+xoffs) & 0x3ff;
+            dgp2.sy = (y+yoffs) & 0x3ff;
+            drawgfx(&dgp2);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -1956,216 +1833,7 @@ VIDEO_UPDATE( cps1 )
 		l2pri = (pri_ctrl >> 4*l2) & 0x0f;
 		l3pri = (pri_ctrl >> 4*l3) & 0x0f;
 
-#if 0
-if (	(cps2_port(CPS2_OBJ_BASE) != 0x7080 && cps2_port(CPS2_OBJ_BASE) != 0x7000) ||
-		cps2_port(CPS2_OBJ_UK1) != 0x807d ||
-		(cps2_port(CPS2_OBJ_UK2) != 0x0000 && cps2_port(CPS2_OBJ_UK2) != 0x1101 && cps2_port(CPS2_OBJ_UK2) != 0x0001) ||
-	ui_popup("base %04x uk1 %04x uk2 %04x",
-			cps2_port(CPS2_OBJ_BASE),
-			cps2_port(CPS2_OBJ_UK1),
-			cps2_port(CPS2_OBJ_UK2));
 
-if (0 && code_pressed(KEYCODE_Z))
-	ui_popup("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
-#endif
-
-		/* take out the CPS1 sprites layer */
-		if (l0 == 0) { l0 = l1; l1 = 0; l0pri = l1pri; }
-		if (l1 == 0) { l1 = l2; l2 = 0; l1pri = l2pri; }
-		if (l2 == 0) { l2 = l3; l3 = 0; l2pri = l3pri; }
-
-		{
-			int mask0 = 0xaa;
-			int mask1 = 0xcc;
-			if(l0pri>l1pri) mask0 &= ~0x88;
-			if(l0pri>l2pri) mask0 &= ~0xa0;
-			if(l1pri>l2pri) mask1 &= ~0xc0;
-
-			primasks[0] = 0xff;
-			for (i = 1;i < 8;i++)
-			{
-				if (i <= l0pri && i <= l1pri && i <= l2pri)
-				{
-					primasks[i] = 0xfe;
-					continue;
-				}
-				primasks[i] = 0;
-				if (i <= l0pri) primasks[i] |= mask0;
-				if (i <= l1pri) primasks[i] |= mask1;
-				if (i <= l2pri) primasks[i] |= 0xf0;
-			}
-		}
-
-		cps1_render_layer(bitmap,cliprect,l0,1);
-		cps1_render_layer(bitmap,cliprect,l1,2);
-		cps1_render_layer(bitmap,cliprect,l2,4);
-		cps2_render_sprites(bitmap,cliprect,primasks)(	(cps2_port(CPS2_OBJ_BASE) != 0x7080 && cps2_port(CPS2_OBJ_BASE) != 0x7000) ||
-		cps2_port(CPS2_OBJ_UK1) != 0x807d ||
-		(cps2_port(CPS2_OBJ_UK2) != 0x0000 && cps2_port(CPS2_OBJ_UK2) != 0x1101 && cps2_port(CPS2_OBJ_UK2) != 0x0001) ||
-	ui_popup("base %04x uk1 %04x uk2 %04x",
-			cps2_port(CPS2_OBJ_BASE),
-			cps2_port(CPS2_OBJ_UK1),
-			cps2_port(CPS2_OBJ_UK2));
-
-if (0 && code_pressed(KEYCODE_Z))
-	ui_popup("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
-#endif
-
-		/* take out the CPS1 sprites layer */
-		if (l0 == 0) { l0 = l1; l1 = 0; l0pri = l1pri; }
-		if (l1 == 0) { l1 = l2; l2 = 0; l1pri = l2pri; }
-		if (l2 == 0) { l2 = l3; l3 = 0; l2pri = l3pri; }
-
-		{
-			int mask0 = 0xaa;
-			int mask1 = 0xcc;
-			if(l0pri>l1pri) mask0 &= ~0x88;
-			if(l0pri>l2pri) mask0 &= ~0xa0;
-			if(l1pri>l2pri) mask1 &= ~0xc0;
-
-			primasks[0] = 0xff;
-			for (i = 1;i < 8;i++)
-			{
-				if (i <= l0pri && i <= l1pri && i <= l2pri)
-				{
-					primasks[i] = 0xfe;
-					continue;
-				}
-				primasks[i] = 0;
-				if (i <= l0pri) primasks[i] |= mask0;
-				if (i <= l1pri) primasks[i] |= mask1;
-				if (i <= l2pri) primasks[i] |= 0xf0;
-			}
-		}
-
-		cps1_render_layer(bitmap,cliprect,l0,1);
-		cps1_render_layer(bitmap,cliprect,l1,2);
-		cps1_render_layer(bitmap,cliprect,l2,4);
-		cps2_render_sprites(bitmap,cliprect,primasks);
-	}
-
-#if CPS1_DUMP_VIDEO
-	if (code_pressed(KEYCODE_F))
-	{
-		cps1_dump_video();
-	}
-#endif
-}
-
-VIDEO_EOF( cps1 )
-{
-	/* Get video memory base registers */
-	cps1_get_video_base();
-
-	if (cps_version == 1)
-	{
-		/* CPS1 sprites have to be delayed one frame */
-		memcpy(cps1_buffered_obj, cps1_obj, cps1_obj_size);
-	}
-}
-
-void cps2_set_sprite_priorities(void)
-{
-	pri_ctrl = cps2_port(CPS2_OBJ_PRI);
-}
-
-void cps2_objram_latch(void)
-{
-	cps2_set_sprite_priorities();
-	memcpy(cps2_buffered_obj, cps2_objbase(), cps2_obj_size);
-}
-
-{
-    int layercontrol,l0,l1,l2,l3;
-	int videocontrol=cps1_port(0x22);
-
-
-	flip_screen_set(videocontrol & 0x8000);
-
-	layercontrol = cps1_output[cps1_game_config->layer_control/2];
-
-	/* Get video memory base registers */
-	cps1_get_video_base();
-
-	/* Find the offset of the last sprite in the sprite table */
-    cps1_find_last_sprite();
-    if (cps_version == 2)
-    {
-        cps2_find_last_sprite();
-    }
-	/* Build palette */
-	cps1_build_palette();
-
-	cps1_update_transmasks();
-
-	tilemap_set_scrollx(cps1_bg_tilemap[0],0,cps1_scroll1x);
-	tilemap_set_scrolly(cps1_bg_tilemap[0],0,cps1_scroll1y);
-	if (videocontrol & 0x01)	/* linescroll enable */
-	{
-		int scrly=-cps1_scroll2y;
-		int i;
-		int otheroffs;
-
-		tilemap_set_scroll_rows(cps1_bg_tilemap[1],1024);
-
-		otheroffs = cps1_port(CPS1_ROWSCROLL_OFFS);
-
-		for (i = 0;i < 256;i++)
-			tilemap_set_scrollx(cps1_bg_tilemap[1],(i - scrly) & 0x3ff,cps1_scroll2x + cps1_other[(i + otheroffs) & 0x3ff]);
-	}
-	else
-	{
-		tilemap_set_scroll_rows(cps1_bg_tilemap[1],1);
-		tilemap_set_scrollx(cps1_bg_tilemap[1],0,cps1_scroll2x);
-	}
-	tilemap_set_scrolly(cps1_bg_tilemap[1],0,cps1_scroll2y);
-	tilemap_set_scrollx(cps1_bg_tilemap[2],0,cps1_scroll3x);
-	tilemap_set_scrolly(cps1_bg_tilemap[2],0,cps1_scroll3y);
-
-
-	/* Blank screen */
-	fillbitmap(bitmap,Machine->pens[4095],cliprect);
-
-	cps1_render_stars(bitmap,cliprect);
-
-	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
-	l0 = (layercontrol >> 0x06) & 03;
-	l1 = (layercontrol >> 0x08) & 03;
-	l2 = (layercontrol >> 0x0a) & 03;
-	l3 = (layercontrol >> 0x0c) & 03;
-	fillbitmap(priority_bitmap,0,cliprect);
-
-	if (cps_version == 1)
-	{
-		cps1_render_layer(bitmap,cliprect,l0,0);
-		if (l1 == 0) cps1_render_high_layer(bitmap,cliprect,l0); /* prepare mask for sprites */
-		cps1_render_layer(bitmap,cliprect,l1,0);
-		if (l2 == 0) cps1_render_high_layer(bitmap,cliprect,l1); /* prepare mask for sprites */
-		cps1_render_layer(bitmap,cliprect,l2,0);
-		if (l3 == 0) cps1_render_high_layer(bitmap,cliprect,l2); /* prepare mask for sprites */
-		cps1_render_layer(bitmap,cliprect,l3,0);
-	}
-	else
-	{
-		int l0pri,l1pri,l2pri,l3pri;
-		int primasks[8],i;
-		l0pri = (pri_ctrl >> 4*l0) & 0x0f;
-		l1pri = (pri_ctrl >> 4*l1) & 0x0f;
-		l2pri = (pri_ctrl >> 4*l2) & 0x0f;
-		l3pri = (pri_ctrl >> 4*l3) & 0x0f;
-
-#if 0
-if (	(cps2_port(CPS2_OBJ_BASE) != 0x7080 && cps2_port(CPS2_OBJ_BASE) != 0x7000) ||
-		cps2_port(CPS2_OBJ_UK1) != 0x807d ||
-		(cps2_port(CPS2_OBJ_UK2) != 0x0000 && cps2_port(CPS2_OBJ_UK2) != 0x1101 && cps2_port(CPS2_OBJ_UK2) != 0x0001) ||
-	ui_popup("base %04x uk1 %04x uk2 %04x",
-			cps2_port(CPS2_OBJ_BASE),
-			cps2_port(CPS2_OBJ_UK1),
-			cps2_port(CPS2_OBJ_UK2));
-
-if (0 && code_pressed(KEYCODE_Z))
-	ui_popup("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
-#endif
 
 		/* take out the CPS1 sprites layer */
 		if (l0 == 0) { l0 = l1; l1 = 0; l0pri = l1pri; }

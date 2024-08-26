@@ -7,7 +7,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <memory>
-
+#include <algorithm>
 
 //#if (__cplusplus > 201402L)
 #include <filesystem>
@@ -168,6 +168,7 @@ enum class ParType : int {
     eWhile,
     eDo,
     eIf,
+    eElse,
     eSwitch,
     eFoundCall
 };
@@ -193,7 +194,8 @@ struct CFileModifier {
 
 
 struct fstr {
-    std::vector<char> _b;
+    string _filename;
+    vector<char> _b;
 
     string substr(size_t i, size_t l) const {
         string s;
@@ -253,6 +255,27 @@ struct fstr {
     size_t rfind_first_of(const std::string &str,size_t i=0) const {
         return rfind_first_of(str.c_str(),i);
     }
+    size_t find_first_not_of(const char *ps,size_t i=0) const {
+        size_t si = i;
+        while(si<_b.size())
+        {
+            char c = _b[si];
+            size_t j=0;
+             bool ispartoflist = false;
+            while(ps[j] != 0){
+                if(c==ps[j]){ ispartoflist = true;
+                    break; }
+                j++;
+            }
+            if(!ispartoflist) return si;
+            si++;
+        }
+        return string::npos;
+    }
+    size_t find_first_not_of(const std::string &str,size_t i=0) const {
+        return find_first_not_of(str.c_str(),i);
+    }
+
     size_t find(const char *ps,size_t i=0, size_t imax=string::npos) const {
         size_t si = i;
         while(si<_b.size() && si<imax)
@@ -352,6 +375,9 @@ struct fstr {
         }
         if(s=="if") {
             return ParType::eIf;
+        }
+        if(s=="else") {
+            return ParType::eElse;
         }
         if(s=="switch") {
             return ParType::eSwitch;
@@ -470,12 +496,12 @@ enum class BaseType : int {
 
 struct CFileParse {
     CFileParse() : _type(BaseType::eMain)
-    ,_start(0),_end(0),_parType(ParType::eNone)
+    ,_start(0),_end(0),_end_par(0),_parType(ParType::eNone)
     , _pParent(nullptr),_pmodsel(nullptr)
     {}
     CFileParse(BaseType type, size_t istart, size_t iend,CFileParse *parent)
      : _type(type)
-    ,_start(istart),_end(iend),_parType(ParType::eNone)
+    ,_start(istart),_end(iend),_end_par(0),_parType(ParType::eNone)
     , _pParent(parent),_pmodsel(nullptr)
     {}
     size_t parseStruct(const fstr &sfile,size_t ic,int recurse,const vector<CFileModifier> &m);
@@ -483,11 +509,14 @@ struct CFileParse {
     void modify(const fstr &sfile);
     void apply(ostream &ofs,const fstr &sfile,size_t imin);
 
+    // other tool
+    void findsyntax(const fstr &sfile);
 
     BaseType _type;
     //std::string _content;
     size_t _start;
     size_t _end;
+    size_t _end_par;
     //  if _type == BaseType::ePar, we want to tag "for","while"
     // if type ==brace , we want to tag "do"
     ParType _parType;
@@ -510,9 +539,21 @@ struct CFileParse {
     // applied modifier if any
     const CFileModifier *_pmodsel;
 
+    // exists or not
+     CFileParse *getPrevBrother();
 
 };
-
+// exists or not
+ CFileParse *CFileParse::getPrevBrother()
+{
+    if(!_pParent) return NULL;
+    for(size_t i=0; i<_pParent->_parts.size() ;i++ )
+    {
+        CFileParse &p = _pParent->_parts[i];
+        if(this == &p && i>0) return &_pParent->_parts[i-1];
+    }
+    return NULL;
+}
 /*
 pPrevParent->_prepatch,  pPrevParent->_postpatch,
                 pPrevParent->_indent,
@@ -624,9 +665,13 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
                 b._parType = sfile.rfindTagBeforePar(par_prepend,b._start,b._pmodsel,icn,m);
                 icn = b.parseStruct(sfile,icn+1,recurse+1,m);
                 size_t endpar = icn;
+                b._end_par = icn;
                 // got to have englobing bounds for loop
                if( b._parType == ParType::eWhile ||
-                    b._parType == ParType::eFor
+                    b._parType == ParType::eFor ||
+                     b._parType == ParType::eIf ||
+                     b._parType == ParType::eElse
+
                     )
                {
                     // keep indent before word
@@ -639,16 +684,7 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
                    // size_t nextbrace = sfile.find("{",b._end);
                     //if(nextbrace != string::npos)
 
-                     size_t inextbrace = b._end;
-                     char c = sfile[inextbrace];
-                     while(c == ' ' ||
-                           c == '\t' ||
-                           c == '\r' ||
-                          c == '\n'
-                           )
-                     {  inextbrace++;
-                         c =  sfile[inextbrace];
-                     }
+                     size_t inextbrace = sfile.find_first_not_of(" \t\r\n",b._end);
 
                     if(sfile[inextbrace] == '{') {
                         b._type = BaseType::eBrace;
@@ -656,7 +692,8 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
                         // this will move b._end accordingly matching comments and recursion:
                         icn = b.parseStruct(sfile,inextbrace+1,recurse+1,m);
                     }
-
+                    // if() {...} else if(...) {...} else {...} should be treated the same if block.
+                    // no, it is treated as different brothers and we use getPrevBrother() to escape at modify.
 
                }
 
@@ -774,6 +811,47 @@ size_t CFileParse::parseStruct(const fstr &sfile,size_t ic,int recurse,const vec
     return ic;
 }
 
+// other tool
+void CFileParse::findsyntax(const fstr &sfile)
+{
+    for(CFileParse &p : _parts)
+    {
+        p._pParent = this;
+        p.findsyntax(sfile);
+    }
+    if(_type == BaseType::ePar &&
+        _parType == ParType::eIf)
+    {
+       size_t inextbrace = sfile.find_first_not_of(" \t\r\n",_end);
+       if(inextbrace != string::npos && sfile[inextbrace] != '{')
+       {
+           size_t is_dgp = sfile.find("dgp",inextbrace);
+            if( is_dgp == inextbrace)
+            {
+                size_t iline,icol;
+                sfile.getPosition(iline,icol,is_dgp);
+                cout << sfile._filename <<" : \tif l: "<<iline << endl;
+            }
+       }
+    } // end
+
+    if(_type == BaseType::ePar &&
+        _parType == ParType::eElse)
+    {
+        size_t inextbrace = sfile.find_first_not_of(" \t\r\n",_end);
+        if(inextbrace != string::npos && sfile[inextbrace] != '{')
+        {
+            size_t is_dgp = sfile.find("dgp",inextbrace);
+             if( is_dgp == inextbrace)
+             {
+                 size_t iline,icol;
+                 sfile.getPosition(iline,icol,is_dgp);
+                 cout << sfile._filename <<" : \telse l: "<<iline << endl;
+             }
+        }
+    } // end
+}
+
 void CFileParse::modify(const fstr &sfile)
 {
     for(CFileParse &p : _parts)
@@ -789,14 +867,31 @@ void CFileParse::modify(const fstr &sfile)
         CFileParse *pPrevParent = pParent;
         while(pParent)
         {
+            if( pParent->_parType == ParType::eElse )
+            {
+                // next should be "previous brother"
+               CFileParse *pprev = pParent->getPrevBrother();
+                while(pprev && pprev->_parType != ParType::eIf) // should always be a if
+                {
+                    pprev = pprev->getPrevBrother();
+                }
+                if(pprev)
+                {
+                  //  pPrevParent = pParent;
+                    pParent = pprev;
+                }
+//                pPrevParent = pParent;
+//                pParent = pParent->_pParent;
+                continue;
+            } else
             if( pParent->_parType == ParType::eIf ||
                 pParent->_parType == ParType::eSwitch
                 )
                 {
-                    pPrevParent = pParent;
+                   // pPrevParent = pParent;
                     pParent = pParent->_pParent;
                     continue;
-                }
+                } else
             if(pParent->_parType == ParType::eWhile ||
                 pParent->_parType == ParType::eDo ||
                 pParent->_parType == ParType::eFor
@@ -897,7 +992,10 @@ void CFileParse::apply(ostream &ofs,const fstr &sfile,size_t imin)
 
 
     size_t i=_start;
-    if(imin>i) i=imin;
+    if(imin>i)
+    {
+        i=imin;
+    }
     if(_parts.size()==0)
     {
         for( ; i<_end ; i++)
@@ -937,6 +1035,7 @@ bool  changeapi(std::string ofilepath,std::string nfilepath)
 {
 cout << "check: " <<ofilepath << endl;
     fstr bfile;
+    bfile._filename = ofilepath;
     { //
         ifstream ifs(ofilepath);
         if(!ifs.good()) return 1;
@@ -991,6 +1090,8 @@ cout << "check: " <<ofilepath << endl;
 
             UINT32 priority_mask);
     */
+
+
     {
         CFileModifier pdrawgfxModifier;
         pdrawgfxModifier._func = "pdrawgfx";
@@ -1023,7 +1124,7 @@ cout << "check: " <<ofilepath << endl;
     }
     {
         CFileModifier mdrawgfxModifier;
-        mdrawgfxModifier._func = "pdrawgfx";
+        mdrawgfxModifier._func = "mdrawgfx";
         mdrawgfxModifier._structtype = "struct drawgfxParams";
         mdrawgfxModifier._structbasename = "dgp";
         mdrawgfxModifier._replacement = "drawgfx";
@@ -1081,6 +1182,99 @@ cout << "check: " <<ofilepath << endl;
 
         modifiers.push_back(drawgfxModifier);
     }
+
+    //void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+    //		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+    //		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley)
+    //{
+    //	profiler_mark(PROFILER_DRAWGFX);
+    //	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
+    //			clip,transparency,transparent_color,scalex,scaley,NULL,0);
+    //	profiler_mark(PROFILER_END);
+    //}
+
+    //void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+    //		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+    //		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
+    //		UINT32 priority_mask)
+    //{
+    //	profiler_mark(PROFILER_DRAWGFX);
+    //	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
+    //			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask | (1<<31));
+    //	profiler_mark(PROFILER_END);
+    //}
+
+    //void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+    //		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+    //		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
+    //		UINT32 priority_mask)
+    //{
+    //	profiler_mark(PROFILER_DRAWGFX);
+    //	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
+    //			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask);
+    //	profiler_mark(PROFILER_END);
+    //}
+    {
+        CFileModifier drawgfxzoomModifier;
+        drawgfxzoomModifier._func = "drawgfxzoom";
+        drawgfxzoomModifier._structtype = "struct drawgfxParams";
+        drawgfxzoomModifier._structbasename = "dgpz";
+        drawgfxzoomModifier._replacement = "drawgfxzoom";
+        drawgfxzoomModifier._nbfuncfound = 0;
+        drawgfxzoomModifier._params = {
+            // index in call,name in struct, forcefactorize, isextra, defaultval.
+            {0,"dest",1,0,"NULL"},
+            {1,"gfx",1,0,"NULL"},
+            {2,"code",0,0,"0"},
+            {3,"color",0,0,"0"},
+            {4,"flipx",0,0,"0"},
+            {5,"flipy",0,0,"0"},
+            {6,"sx",0,0,"0"},
+            {7,"sy",0,0,"0"},
+            {8,"clip",1,0,"NULL"},
+            {9,"transparency",1,0,"TRANSPARENCY_NONE"},
+            {10,"transparent_color",1,0,"0"},
+            // extra params used or not
+            {11,"scalex",0,0,"0x00010000"},
+            {12,"scaley",0,0,"0x00010000"},
+
+            {-1,"pri_buffer",1,1,"NULL"},
+            {-1,"priority_mask",1,1,"0"},
+        };
+
+        modifiers.push_back(drawgfxzoomModifier);
+    }
+    {
+        CFileModifier pdrawgfxzoomModifier;
+        pdrawgfxzoomModifier._func = "pdrawgfxzoom";
+        pdrawgfxzoomModifier._structtype = "struct drawgfxParams";
+        pdrawgfxzoomModifier._structbasename = "dgpz";
+        pdrawgfxzoomModifier._replacement = "drawgfxzoom";
+        pdrawgfxzoomModifier._nbfuncfound = 0;
+        pdrawgfxzoomModifier._params = {
+            // index in call,name in struct, forcefactorize, isextra, defaultval.
+            {0,"dest",1,0,"NULL"},
+            {1,"gfx",1,0,"NULL"},
+            {2,"code",0,0,"0"},
+            {3,"color",0,0,"0"},
+            {4,"flipx",0,0,"0"},
+            {5,"flipy",0,0,"0"},
+            {6,"sx",0,0,"0"},
+            {7,"sy",0,0,"0"},
+            {8,"clip",1,0,"NULL"},
+            {9,"transparency",1,0,"TRANSPARENCY_NONE"},
+            {10,"transparent_color",1,0,"0"},
+            // extra params used or not
+            {11,"scalex",0,0,"0x00010000"}, // for scale draw else not used
+            {12,"scaley",0,0,"0x00010000"},
+
+            {-1,"pri_buffer",1,1,"priority_bitmap"}, // priority_bitmap,priority_mask | (1<<31)
+            {13,"priority_mask",1,1,"| (1<<31)"},
+        };
+
+        modifiers.push_back(pdrawgfxzoomModifier);
+    }
+
     CFileParse fp;
     fp._type = BaseType::eMain;
     fp._start = 0;
@@ -1113,47 +1307,106 @@ cout << "check: " <<ofilepath << endl;
     return didchange;
 }
 
+
+bool findapi(std::string ofilepath)
+{
+//cout << "check: " <<ofilepath << endl;
+    fstr bfile;
+    bfile._filename = ofilepath;
+    { //
+        ifstream ifs(ofilepath);
+        if(!ifs.good()) return 1;
+        ifs.seekg(0,ios::end);
+        size_t sz = (size_t)ifs.tellg();
+        ifs.seekg(0,ios::beg);
+        ifs.clear();
+
+        bfile._b.reserve(sz+1);
+        bfile._b.resize(sz+1);
+        ifs.read(bfile._b.data(),sz);
+        bfile._b[sz] = 0;
+    }
+
+    vector<CFileModifier> modifiers;
+
+    CFileParse fp;
+    fp._type = BaseType::eMain;
+    fp._start = 0;
+    fp._end = bfile._b.size()-1;
+    fp.parseStruct(bfile,0,0,modifiers);
+
+    fp.findsyntax(bfile);
+
+    return false;
+//    return didchange;
+}
+
+
+
+bool compareFunction (std::string a, std::string b) {return a<b;}
 int main(int argc, char **argv)
 {
 
-//#if (__cplusplus > 201402L)
-    string sdir =sourcebase+"drivers2";
-   // stringstream ssgit;
-   ofstream gitofs("gitcommands.sh");
+//    string sdir =sourcebase+"vidhrdw";
+//   // stringstream ssgit;
+//   ofstream gitofs("gitcommands.sh");
 
+//    vector<string> entries;
+//   for (const auto & entry : fs::directory_iterator(sdir))
+//   {
+//      entries.push_back(entry.path().filename().string());
+//   }
+//    std::sort(entries.begin(),entries.end(),compareFunction);//sort the vector
+
+//    // search for a syntax
+//       for (const string & sname :entries)
+//       {
+//           if(sname.rfind(".c") != sname.length()-2) continue;
+//           string ofilepath = sourcebase+"vidhrdw/" + sname;
+//           findapi(ofilepath);
+//       }
+//    string sdir =sourcebase+"vidhrdw3";
 //re
 //    for (const auto & entry : fs::directory_iterator(sdir))
 //    {
 //        string sname =  entry.path().filename().string();
-//        if(sname == "battlane.c" ||
-//sname == "bogeyman.c" ||
-//sname == "ddragon.c" ||
-//sname == "ddragon3.c" ||
-//sname == "dogfgt.c" ||
-////sname == "generic.c" ||
-//sname == "matmania.c"
-//        ) continue;
+////        if(sname == "battlane.c" ||
+////sname == "bogeyman.c" ||
+////sname == "ddragon.c" ||
+////sname == "ddragon3.c" ||
+////sname == "dogfgt.c" ||
+
+////   sname == "stvvdp2.c" ||
+
+////   sname == "buggychl.c" ||
+//////sname == "generic.c" ||
+////sname == "matmania.c"
+////        ) continue;
 ////        "battlane.c","bogeyman.c","ddragon.c","ddragon3.c","dogfgt.c","generic.c","matmania.c",
 //        if(sname.rfind(".c") != sname.length()-2) continue;
-//        string ofilepath = sourcebase+"drivers2/" + sname;
-//        string nfilepath = sourcebase+"drivers/" + sname;
+////        string ofilepath = sourcebase+"drivers3/" + sname;
+////        string nfilepath = sourcebase+"drivers/" + sname;
+//        string ofilepath = sourcebase+"vidhrdw3/" + sname;
+//        string nfilepath = sourcebase+"vidhrdw/" + sname;
+
 //        bool didchange = changeapi(ofilepath,nfilepath);
 //        if(didchange) {
-//            gitofs << "git add drivers/"<<sname<<"\n";
+//            gitofs << "git add vidhrdw/"<<sname<<"\n";
 //        }
 
 //    }
 
-//    string ofilepath = sourcebase+"vidhrdw2/" + "40love.c";
-//    string nfilepath = sourcebase+"vidhrdw/" + "40love.c";
+    string ofilepath = sourcebase+"vidhrdw3/" + "wc90.c";
+    string nfilepath = sourcebase+"vidhrdw/" + "wc90.c";
 
-//    string ofilepath = sourcebase+"vidhrdw/" + "test.c";
-//    string nfilepath = sourcebase+"vidhrdw/" + "testn.c";
+//    string ofilepath = sourcebase+"vidhrdw2/" + "stvvdp2.c";
+//    string nfilepath = sourcebase+"vidhrdw/" + "stvvdp2.c";
+//    string ofilepath = sourcebase+"vidhrdw2/" + "test.c";
+//    string nfilepath = sourcebase+"vidhrdw/" + "test.c";
+//       string ofilepath = sourcebase+"drivers2/" + "calorie.c";
+//       string nfilepath = sourcebase+"drivers/" + "calorie.c";
 
-       string ofilepath = sourcebase+"drivers2/" + "calori.c";
-       string nfilepath = sourcebase+"drivers/" + "calori.c";
-
-//    changeapi(ofilepath,nfilepath);
+    changeapi(ofilepath,nfilepath);
 
 //#else
 //    DIR *dir;

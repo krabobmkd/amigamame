@@ -1281,6 +1281,7 @@ WRITE8_HANDLER( K007121_ctrl_1_w )
  *
  */
 
+
 void K007121_sprites_draw(int chip,mame_bitmap *bitmap,const rectangle *cliprect,
 		const unsigned char *source,int base_color,int global_x_offset,int bank_base,
 		UINT32 pri_mask)
@@ -1289,24 +1290,6 @@ void K007121_sprites_draw(int chip,mame_bitmap *bitmap,const rectangle *cliprect
 	int flipscreen = K007121_flipscreen[chip];
 	int i,num,inc,offs[5],trans;
 	int is_flakatck = K007121_ctrlram[chip][0x06] & 0x04;	/* WRONG!!!! */
-
-#if 0
-ui_popup("%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x  %02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x",
-	K007121_ctrlram[0][0x00],K007121_ctrlram[0][0x01],K007121_ctrlram[0][0x02],K007121_ctrlram[0][0x03],K007121_ctrlram[0][0x04],K007121_ctrlram[0][0x05],K007121_ctrlram[0][0x06],K007121_ctrlram[0][0x07],
-	K007121_ctrlram[1][0x00],K007121_ctrlram[1][0x01],K007121_ctrlram[1][0x02],K007121_ctrlram[1][0x03],K007121_ctrlram[1][0x04],K007121_ctrlram[1][0x05],K007121_ctrlram[1][0x06],K007121_ctrlram[1][0x07]);
-
-if (code_pressed(KEYCODE_D))
-{
-	FILE *fp;
-	fp=fopen(chip?"SPRITE1.DMP":"SPRITE0.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(source, 0x800, 1, fp);
-		ui_popup("saved");
-		fclose(fp);
-	}
-}
-#endif
 
 	if (is_flakatck)
 	{
@@ -1342,6 +1325,25 @@ if (code_pressed(KEYCODE_D))
 		}
 	}
 
+    {
+    struct drawgfxParams dgp0={
+        bitmap, 	// dest
+        gfx, 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        cliprect, 	// clip
+        trans, 	// transparency
+        0, 	// transparent_color
+        0, 	// scalex
+        0, 	// scaley
+        (pri_mask != -1)?priority_bitmap:NULL, 	// pri_buffer
+       (pri_mask != -1)?(pri_mask| (1<<31)):0	// priority_mask
+      };
+
 	for (i = 0;i < num;i++)
 	{
 		int number = source[offs[0]];				/* sprite number */
@@ -1357,6 +1359,7 @@ if (code_pressed(KEYCODE_D))
 		static int y_offset[4] = {0x0,0x2,0x8,0xa};
 		int x,y, ex, ey;
 
+        dgp0.color = color;
 		if (attr & 0x01) sx -= 256;
 		if (sy >= 240) sy -= 256;
 
@@ -1387,130 +1390,30 @@ if (code_pressed(KEYCODE_D))
 					ex = xflip ? (width-1-x) : x;
 					ey = yflip ? (height-1-y) : y;
 
+                    dgp0.code = number + x_offset[ex] + y_offset[ey];
+
 					if (flipscreen)
-					
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	trans, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri_mask 	// priority_mask
-  };
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	trans, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
-						if (pri_mask != -1)
-							
-							dgp0.code = number + x_offset[ex] + y_offset[ey];
-							dgp0.color = color;
-							dgp0.flipx = !xflip;
-							dgp0.flipy = !yflip;
-							dgp0.sx = 248-(sx+x*8);
-							dgp0.sy = 248-(sy+y*8);
-							drawgfx(&dgp0);
-						else
-							
-							dgp0.code = number + x_offset[ex] + y_offset[ey];
-							dgp0.color = color;
-							dgp0.flipx = !xflip;
-							dgp0.flipy = !yflip;
-							dgp0.sx = 248-(sx+x*8);
-							dgp0.sy = 248-(sy+y*8);
-							drawgfx(&dgp0);
-					}
-} // end of patch paragraph
-
-					
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	trans, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri_mask 	// priority_mask
-  };
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	trans, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
 					{
-						if (pri_mask != -1)
-							
-							dgp1.code = number + x_offset[ex] + y_offset[ey];
-							dgp1.color = color;
-							dgp1.flipx = xflip;
-							dgp1.flipy = yflip;
-							dgp1.sx = global_x_offset+sx+x*8;
-							dgp1.sy = sy+y*8;
-							drawgfx(&dgp1);
-						else
-							
-							dgp1.code = number + x_offset[ex] + y_offset[ey];
-							dgp1.color = color;
-							dgp1.flipx = xflip;
-							dgp1.flipy = yflip;
-							dgp1.sx = global_x_offset+sx+x*8;
-							dgp1.sy = sy+y*8;
-							drawgfx(&dgp1);
+                        dgp0.flipx = !xflip;
+                        dgp0.flipy = !yflip;
+                        dgp0.sx = 248-(sx+x*8);
+                        dgp0.sy = 248-(sy+y*8);
 					}
-} // end of patch paragraph
-
+                    else
+					{
+                        dgp0.flipx = xflip;
+                        dgp0.flipy = yflip;
+                        dgp0.sx = global_x_offset+sx+x*8;
+                        dgp0.sy = sy+y*8;
+					}
+                    drawgfx(&dgp0);
 				}
 			}
-		}
 
+        }
 		source += inc;
 	}
+    } // end patch
 }
 
 
@@ -1805,6 +1708,7 @@ WRITE8_HANDLER( K007420_w )
  *   7  | xxxxxxxx | unused
  */
 
+
 void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 #define K007420_SPRITERAM_SIZE 0x200
@@ -1812,6 +1716,25 @@ void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect)
 	int codemask = K007420_banklimit;
 	int bankmask = ~K007420_banklimit;
 
+
+	{
+	struct drawgfxParams dgpz0={
+		bitmap, 	// dest
+		K007420_gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = K007420_SPRITERAM_SIZE - 8; offs >= 0; offs -= 8)
 	{
 		int ox,oy,code,color,flipx,flipy,zoom,w,h,x,y,bank;
@@ -1858,25 +1781,6 @@ void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect)
 		{
 			int sx,sy;
 
-			
-			{ 
-			struct drawgfxParams dgp2={
-				bitmap, 	// dest
-				K007420_gfx, 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (y = 0;y < h;y++)
 			{
 				sy = oy + 8 * y;
@@ -1893,28 +1797,22 @@ void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect)
 
 					if (c & bankmask) continue; else c += bank;
 
-					
-					dgp2.code = c;
-					dgp2.color = color;
-					dgp2.flipx = flipx;
-					dgp2.flipy = flipy;
-					dgp2.sx = sx;
-					dgp2.sy = sy;
-					drawgfx(&dgp2);
+
+					dgpz0.code = c;
+					dgpz0.color = color;
+					dgpz0.flipx = flipx;
+					dgpz0.flipy = flipy;
+					dgpz0.sx = sx;
+					dgpz0.sy = sy;
+					drawgfx(&dgpz0);
 
 					if (K007342_regs[2] & 0x80)
-						
-						dgp2.code = c;
-						dgp2.color = color;
-						dgp2.flipx = flipx;
-						dgp2.flipy = flipy;
-						dgp2.sx = sx;
-						dgp2.sy = sy-256;
-						drawgfx(&dgp2);
+					{
+						dgpz0.sy = sy-256;
+						drawgfx(&dgpz0);
+                    }
 				}
 			}
-			} // end of patch paragraph
-
 		}
 		else
 		{
@@ -1937,41 +1835,39 @@ void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect)
 
 					if (c & bankmask) continue; else c += bank;
 
-					drawgfxzoom(bitmap,K007420_gfx,
-						c,
-						color,
-						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0,
-						(zw << 16) / 8,(zh << 16) / 8);
+
+					dgpz0.code = c;
+					dgpz0.color = color;
+					dgpz0.flipx = flipx;
+					dgpz0.flipy = flipy;
+					dgpz0.sx = sx;
+					dgpz0.sy = sy;
+					dgpz0.scalex = (zw << 16) >>3;
+					dgpz0.scaley = (zh << 16) >>3;
+					drawgfxzoom(&dgpz0);
 
 					if (K007342_regs[2] & 0x80)
-						drawgfxzoom(bitmap,K007420_gfx,
-							c,
-							color,
-							flipx,flipy,
-							sx,sy-256,
-							cliprect,TRANSPARENCY_PEN,0,
-							(zw << 16) / 8,(zh << 16) / 8);
+					{
+//						dgpz0.code = c;
+//						dgpz0.color = color;
+//						dgpz0.flipx = flipx;
+//						dgpz0.flipy = flipy;
+//						dgpz0.sx = sx;
+						dgpz0.sy = sy-256;
+//						dgpz0.scalex = (zw << 16) >>3;
+//						dgpz0.scaley = (zh << 16) >>3;
+						drawgfxzoom(&dgpz0);
+                    }
 				}
 			}
 		}
 	}
-#if 0
-	{
-		static int current_sprite = 0;
+	} // end of patch paragraph
 
-		if (code_pressed_memory(KEYCODE_Z)) current_sprite = (current_sprite+1) & ((K007420_SPRITERAM_SIZE/8)-1);
-		if (code_pressed_memory(KEYCODE_X)) current_sprite = (current_sprite-1) & ((K007420_SPRITERAM_SIZE/8)-1);
-
-		ui_popup("%02x:%02x %02x %02x %02x %02x %02x %02x %02x", current_sprite,
-			K007420_ram[(current_sprite*8)+0], K007420_ram[(current_sprite*8)+1],
-			K007420_ram[(current_sprite*8)+2], K007420_ram[(current_sprite*8)+3],
-			K007420_ram[(current_sprite*8)+4], K007420_ram[(current_sprite*8)+5],
-			K007420_ram[(current_sprite*8)+6], K007420_ram[(current_sprite*8)+7]);
-	}
-#endif
 }
+
+
+
 
 void K007420_set_banklimit(int limit)
 {
@@ -2769,6 +2665,7 @@ WRITE16_HANDLER( K051937_word_w )
  * Note that Aliens also uses the shadow bit to select the second sprite bank.
  */
 
+
 void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_priority,int max_priority)
 {
 #define NUM_SPRITES 128
@@ -2789,6 +2686,26 @@ void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_
 				sortedlist[K051960_ram[offs] & 0x7f] = offs;
 		}
 	}
+
+
+	{
+	struct drawgfxParams dgpz0={
+		bitmap, 	// dest
+		K051960_gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN_TABLE, //shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL,//priority_bitmap, 	// pri_buffer
+		0// pri 	// priority_mask
+	  };
 
 	for (pri_code = 0;pri_code < NUM_SPRITES;pri_code++)
 	{
@@ -2821,6 +2738,16 @@ void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_
 		if (max_priority != -1)
 			if (pri < min_priority || pri > max_priority) continue;
 
+        if(max_priority == -1){
+            dgpz0.pri_buffer =  priority_bitmap;
+            dgpz0.priority_mask = pri | (1<<31);
+        } else {
+            dgpz0.pri_buffer = NULL;
+            dgpz0.priority_mask = 0;
+        }
+        dgpz0.color = color;
+        dgpz0.transparency = shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN;
+
 		size = (K051960_ram[offs+1] & 0xe0) >> 5;
 		w = width[size];
 		h = height[size];
@@ -2848,50 +2775,17 @@ void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_
 			flipx = !flipx;
 			flipy = !flipy;
 		}
+        dgpz0.flipx = flipx;
+        dgpz0.flipy = flipy;
 
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{
 			int sx,sy;
 
-			
-			{ 
-			struct drawgfxParams dgp2={
-				bitmap, 	// dest
-				K051960_gfx, 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				priority_bitmap, 	// pri_buffer
-				pri 	// priority_mask
-			  };
-			struct drawgfxParams dgp4={
-				bitmap, 	// dest
-				K051960_gfx, 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (y = 0;y < h;y++)
 			{
 				sy = oy + 16 * y;
+                dgpz0.sy = sy;
 
 				for (x = 0;x < w;x++)
 				{
@@ -2903,27 +2797,12 @@ void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_
 					if (flipy) c += yoffset[(h-1-y)];
 					else c += yoffset[y];
 
-					if (max_priority == -1)
-						
-						dgp2.code = c;
-						dgp2.color = color;
-						dgp2.flipx = flipx;
-						dgp2.flipy = flipy;
-						dgp2.sx = sx & 0x1ff;
-						dgp2.sy = sy;
-						drawgfx(&dgp2);
-					else
-						
-						dgp4.code = c;
-						dgp4.color = color;
-						dgp4.flipx = flipx;
-						dgp4.flipy = flipy;
-						dgp4.sx = sx & 0x1ff;
-						dgp4.sy = sy;
-						drawgfx(&dgp4);
+                    dgpz0.code = c;
+                    dgpz0.sx = sx & 0x1ff;
+
+    				drawgfx(&dgpz0);
 				}
 			}
-			} // end of patch paragraph
 
 		}
 		else
@@ -2934,6 +2813,7 @@ void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_
 			{
 				sy = oy + ((zoomy * y + (1<<11)) >> 12);
 				zh = (oy + ((zoomy * (y+1) + (1<<11)) >> 12)) - sy;
+                dgpz0.sy = sy;
 
 				for (x = 0;x < w;x++)
 				{
@@ -2946,41 +2826,22 @@ void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_
 					if (flipy) c += yoffset[(h-1-y)];
 					else c += yoffset[y];
 
-					if (max_priority == -1)
-						pdrawgfxzoom(bitmap,K051960_gfx,
-								c,
-								color,
-								flipx,flipy,
-								sx & 0x1ff,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-								(zw << 16) / 16,(zh << 16) / 16,pri);
-					else
-						drawgfxzoom(bitmap,K051960_gfx,
-								c,
-								color,
-								flipx,flipy,
-								sx & 0x1ff,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-								(zw << 16) / 16,(zh << 16) / 16);
+                    dgpz0.code = c;
+                    dgpz0.sx = sx & 0x1ff;
+
+                    dgpz0.scalex = (zw << 16) >>4;
+                    dgpz0.scaley = (zh << 16) >>4;
+                    drawgfxzoom(&dgpz0);
+
 				}
 			}
 		}
 	}
-#if 0
-if (code_pressed(KEYCODE_D))
-{
-	FILE *fp;
-	fp=fopen("SPRITE.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(K051960_ram, 0x400, 1, fp);
-		ui_popup("saved");
-		fclose(fp);
-	}
-}
-#endif
+    } // end patch
 #undef NUM_SPRITES
 }
+
+
 
 int K051960_is_IRQ_enabled(void)
 {
@@ -3330,6 +3191,7 @@ void K053244_bankselect(int chip, int bank)
  * The rest of the sprite remains normal.
  */
 
+
 void K053245_sprites_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 128
@@ -3359,6 +3221,25 @@ void K053245_sprites_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprec
 		}
 	}
 
+
+	{
+	struct drawgfxParams dgpz1={
+		bitmap, 	// dest
+		K053245_gfx[chip], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN_TABLE,// shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		priority_bitmap,//priority_bitmap, 	// pri_buffer
+		0,//pri 	// priority_mask
+	  };
 	for (pri_code = NUM_SPRITES-1;pri_code >= 0;pri_code--)
 	{
 		int ox,oy,color,code,size,w,h,x,y,flipx,flipy,mirrorx,mirrory,shadow,zoomx,zoomy,pri;
@@ -3401,6 +3282,9 @@ void K053245_sprites_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprec
 
 		(*K053245_callback[chip])(&code,&color,&pri);
 
+        dgpz1.color = color;
+        dgpz1.priority_mask = pri | (1<<31);
+
 		size = (K053245_buffer[chip][offs] & 0x0f00) >> 8;
 
 		w = 1 << (size & 0x03);
@@ -3438,6 +3322,8 @@ void K053245_sprites_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprec
 		mirrory = K053245_buffer[chip][offs+6] & 0x0200;
 		shadow = K053245_buffer[chip][offs+6] & 0x0080;
 
+       dgpz1.transparency =  shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN ;
+
 		if (flipscreenX)
 		{
 			ox = 512 - ox;
@@ -3465,6 +3351,7 @@ void K053245_sprites_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprec
 			sy = oy + ((zoomy * y + (1<<11)) >> 12);
 			zh = (oy + ((zoomy * (y+1) + (1<<11)) >> 12)) - sy;
 
+            dgpz1.sy = sy;
 			for (x = 0;x < w;x++)
 			{
 				int c,fx,fy;
@@ -3517,68 +3404,30 @@ void K053245_sprites_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprec
 				/* in a 64 entries window, wrapping around at the edges. The animation */
 				/* at the end of the saloon level in Sunset Riders breaks otherwise. */
 				c = (c & 0x3f) | (code & ~0x3f);
+                dgpz1.code = c;
+                dgpz1.flipx = fx;
+                dgpz1.flipy = fy;
+                dgpz1.sx = sx;
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
-				
-{ 
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	K053245_gfx[chip], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri 	// priority_mask
-  };
-{
-					
-					dgp3.code = c;
-					dgp3.color = color;
-					dgp3.flipx = fx;
-					dgp3.flipy = fy;
-					dgp3.sx = sx;
-					dgp3.sy = sy;
-					drawgfx(&dgp3);
+                {
+					drawgfx( &dgpz1 );
 				}
-} // end of patch paragraph
-
 				else
 				{
-					pdrawgfxzoom(bitmap,K053245_gfx[chip],
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-							(zw << 16) / 16,(zh << 16) / 16,pri);
-
+					dgpz1.scalex = (zw << 16)>>4;
+					dgpz1.scaley = (zh << 16)>>4;
+					drawgfxzoom( &dgpz1 );
 				}
 			}
 		}
 	}
-#if 0
-if (code_pressed(KEYCODE_D))
-{
-	FILE *fp;
-	fp=fopen("SPRITE.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(K053245_buffer, 0x800, 1, fp);
-		ui_popup("saved");
-		fclose(fp);
-	}
-}
-#endif
+	} // end of patch paragraph
+
+
 #undef NUM_SPRITES
 }
+
 
 /* Lethal Enforcers has 2 of these chips hooked up in parallel to give 6bpp gfx.. lets cheat a
   bit and make emulating it a little less messy by using a custom function instead */
@@ -3611,6 +3460,25 @@ void K053245_sprites_draw_lethal(int chip, mame_bitmap *bitmap,const rectangle *
 		}
 	}
 
+
+	{
+	struct drawgfxParams dgpz2={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN_TABLE,//hand //shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0, //hand pri 	// priority_mask
+	  };
 	for (pri_code = NUM_SPRITES-1;pri_code >= 0;pri_code--)
 	{
 		int ox,oy,color,code,size,w,h,x,y,flipx,flipy,mirrorx,mirrory,shadow,zoomx,zoomy,pri;
@@ -3652,6 +3520,8 @@ void K053245_sprites_draw_lethal(int chip, mame_bitmap *bitmap,const rectangle *
 		pri = 0;
 
 		(*K053245_callback[chip])(&code,&color,&pri);
+        dgpz2.priority_mask = pri | (1<<31);
+        dgpz2.color = color;
 
 		size = (K053245_buffer[chip][offs] & 0x0f00) >> 8;
 
@@ -3689,6 +3559,8 @@ void K053245_sprites_draw_lethal(int chip, mame_bitmap *bitmap,const rectangle *
 		if (mirrorx) flipx = 0; // documented and confirmed
 		mirrory = K053245_buffer[chip][offs+6] & 0x0200;
 		shadow = K053245_buffer[chip][offs+6] & 0x0080;
+
+        dgpz2.transparency = shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN;
 
 		if (flipscreenX)
 		{
@@ -3770,67 +3642,31 @@ void K053245_sprites_draw_lethal(int chip, mame_bitmap *bitmap,const rectangle *
 				/* at the end of the saloon level in Sunset Riders breaks otherwise. */
 				c = (c & 0x3f) | (code & ~0x3f);
 
-				if (zoomx == 0x10000 && zoomy == 0x10000)
-				
-{ 
-struct drawgfxParams dgp4={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri 	// priority_mask
-  };
-{
-					
-					dgp4.code = /* hardcoded to 0 (decoded 6bpp gfx) for le */							c;
-					dgp4.color = color;
-					dgp4.flipx = fx;
-					dgp4.flipy = fy;
-					dgp4.sx = sx;
-					dgp4.sy = sy;
-					drawgfx(&dgp4);
-				}
-} // end of patch paragraph
+                dgpz2.code = /* hardcoded to 0 (decoded 6bpp gfx) for le */c;
 
+                dgpz2.flipx = fx;
+                dgpz2.flipy = fy;
+                dgpz2.sx = sx;
+                dgpz2.sy = sy;
+
+				if (zoomx == 0x10000 && zoomy == 0x10000)
+                {
+					drawgfx(&dgpz2);
+				}
 				else
 				{
-					pdrawgfxzoom(bitmap,Machine->gfx[0],  /* hardcoded to 0 (decoded 6bpp gfx) for le */
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-							(zw << 16) / 16,(zh << 16) / 16,pri);
+					dgpz2.scalex = (zw << 16) >>4;
+					dgpz2.scaley = (zh << 16) >>4;
+					drawgfxzoom(&dgpz2);
 
 				}
 			}
 		}
 	}
-#if 0
-if (code_pressed(KEYCODE_D))
-{
-	FILE *fp;
-	fp=fopen("SPRITE.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(K053245_buffer, 0x800, 1, fp);
-		ui_popup("saved");
-		fclose(fp);
-	}
-}
-#endif
+    }// end patch
 #undef NUM_SPRITES
 }
+
 
 
 /***************************************************************************/
@@ -4369,6 +4205,7 @@ int K053246_is_IRQ_enabled(void)
  * The rest of the sprite remains normal.
  */
 
+
 void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 256
@@ -4388,7 +4225,7 @@ void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
 
 	int sortedlist[NUM_SPRITES];
 	int offs,zcode;
-	int ox,oy,color,code,size,w,h,x,y,xa,ya,flipx,flipy,mirrorx,mirrory,shadow,zoomx,zoomy,primask;
+	int ox,oy,color,code,size,w,h,x,y,xa,ya,flipx,flipy,mirrorx,mirrory,shadow,zoomx,zoomy;
 	int shdmask,nozoom,count,temp;
 
 	int flipscreenx = K053246_regs[5] & 0x01;
@@ -4489,15 +4326,35 @@ void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
 		}
 	}
 
+
+	{
+	struct drawgfxParams dgpz3={
+		bitmap, 	// dest
+		K053247_gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		0,// shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0,//primask 	// priority_mask
+	  };
 	for (; count>=0; count--)
 	{
 		offs = sortedlist[count];
 
 		code = K053247_ram[offs+1];
 		shadow = color = K053247_ram[offs+6];
-		primask = 0;
 
-		(*K053247_callback)(&code,&color,&primask);
+        int pri=0;
+		(*K053247_callback)(&code,&color,&pri);
+        dgpz3.priority_mask = pri | (1<<31);
 
 		temp = K053247_ram[offs];
 
@@ -4587,6 +4444,7 @@ void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
 			else
 				shadow = 0;
 		}
+        dgpz3.transparency =  shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN;
 
 		color &= 0xffff; // strip attribute flags
 
@@ -4678,92 +4536,48 @@ void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
 					fy = flipy;
 				}
 
+                dgpz3.code = c;
+                dgpz3.color = color;
+                dgpz3.flipx = fx;
+                dgpz3.flipy = fy;
+                dgpz3.sx = sx;
+                dgpz3.sy = sy;
 				if (nozoom)
-				
-{ 
-struct drawgfxParams dgp5={
-	bitmap, 	// dest
-	K053247_gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	primask 	// priority_mask
-  };
-{
-					
-					dgp5.code = c;
-					dgp5.color = color;
-					dgp5.flipx = fx;
-					dgp5.flipy = fy;
-					dgp5.sx = sx;
-					dgp5.sy = sy;
-					drawgfx(&dgp5);
+                {
+					drawgfx(&dgpz3);
 				}
-} // end of patch paragraph
-
 				else
 				{
-					pdrawgfxzoom(bitmap,K053247_gfx,
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-							(zw << 16) >> 4,(zh << 16) >> 4,primask);
+					dgpz3.scalex = (zw << 16) >> 4;
+					dgpz3.scaley = (zh << 16) >> 4;
+					drawgfxzoom(&dgpz3);
 				}
 
 				if (mirrory && h == 1)  /* Simpsons shadows */
 				{
+                    dgpz3.flipy = !fy;
 					if (nozoom)
-					
-{ 
-struct drawgfxParams dgp6={
-	bitmap, 	// dest
-	K053247_gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	primask 	// priority_mask
-  };
-{
-						
-						dgp6.code = c;
-						dgp6.color = color;
-						dgp6.flipx = fx;
-						dgp6.flipy = !fy;
-						dgp6.sx = sx;
-						dgp6.sy = sy;
-						drawgfx(&dgp6);
+					{
+//						dgpz3.code = c;
+//						dgpz3.color = color;
+//						dgpz3.flipx = fx;
+//						dgpz3.flipy = !fy;
+//						dgpz3.sx = sx;
+//						dgpz3.sy = sy;
+						drawgfx(&dgpz3);
 					}
-} // end of patch paragraph
-
 					else
 					{
-						pdrawgfxzoom(bitmap,K053247_gfx,
-								c,
-								color,
-								fx,!fy,
-								sx,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-								(zw << 16) >> 4,(zh << 16) >> 4,primask);
+
+//						dgpz3.code = c;
+//						dgpz3.color = color;
+//						dgpz3.flipx = fx;
+//						dgpz3.flipy = !fy;
+//						dgpz3.sx = sx;
+//						dgpz3.sy = sy;
+						dgpz3.scalex = (zw << 16) >> 4;
+						dgpz3.scaley = (zh << 16) >> 4;
+						drawgfxzoom(&dgpz3);
 					}
 				}
 			} // end of X loop
@@ -4772,11 +4586,11 @@ struct drawgfxParams dgp6={
 		// reset drawmode_table
 		if (shadow == -1) for (temp=1; temp<solidpens; temp++) gfx_drawmode_table[temp] = DRAWMODE_SOURCE;
 
-	} // end of sprite-list loop
+	}
+	} // end of patch paragraph
+ // end of sprite-list loop
 #undef NUM_SPRITES
 }
-
-
 
 /***************************************************************************/
 /*                                                                         */

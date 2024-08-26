@@ -536,6 +536,76 @@ struct drawgfxParams dgp4={
 
     int palette_offset = palette_select * 64;
 
+    
+    { 
+    struct drawgfxParams dgp0={
+    	bitmap_D, 	// dest
+    	Machine->gfx[3], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
+    struct drawgfxParams dgp1={
+    	bitmap_E, 	// dest
+    	Machine->gfx[2], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
+    struct drawgfxParams dgp2={
+    	bitmap_F, 	// dest
+    	Machine->gfx[1], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
+    struct drawgfxParams dgp3={
+    	bitmap_B, 	// dest
+    	Machine->gfx[0], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_NONE, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for(offs=0x400-1; offs>=0; offs--)
     {
         sx = offs%32;
@@ -562,26 +632,7 @@ struct drawgfxParams dgp4={
         }
 
         if (dirty_videoram_d[offs])
-        
-{ 
-struct drawgfxParams dgp0={
-	bitmap_D, 	// dest
-	Machine->gfx[3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+        {
             
             dgp0.code = char_number;
             dgp0.color = color_code;
@@ -590,8 +641,6 @@ struct drawgfxParams dgp0={
             drawgfx(&dgp0);
             dirty_videoram_d[offs] = 0;
         }
-} // end of patch paragraph
-
 
         /* Draw aliens in Page E */
 
@@ -612,26 +661,7 @@ struct drawgfxParams dgp0={
         }
 
         if (dirty_videoram_e[offs])
-        
-{ 
-struct drawgfxParams dgp1={
-	bitmap_E, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+        {
             
             dgp1.code = char_number;
             dgp1.color = color_code;
@@ -640,8 +670,6 @@ struct drawgfxParams dgp1={
             drawgfx(&dgp1);
             dirty_videoram_e[offs] = 0;
         }
-} // end of patch paragraph
-
 
         /* Draw aliens in Page F */
 
@@ -662,26 +690,7 @@ struct drawgfxParams dgp1={
         }
 
         if (dirty_videoram_f[offs])
-        
-{ 
-struct drawgfxParams dgp2={
-	bitmap_F, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+        {
             
             dgp2.code = char_number;
             dgp2.color = color_code;
@@ -690,8 +699,6 @@ struct drawgfxParams dgp2={
             drawgfx(&dgp2);
             dirty_videoram_f[offs] = 0;
         }
-} // end of patch paragraph
-
 
         /* Draw the page B stuff */
 
@@ -712,26 +719,7 @@ struct drawgfxParams dgp2={
         }
 
         if (dirty_videoram_b[offs])
-        
-{ 
-struct drawgfxParams dgp3={
-	bitmap_B, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+        {
             
             dgp3.code = char_number;
             dgp3.color = color_code;
@@ -740,10 +728,10 @@ struct drawgfxParams dgp3={
             drawgfx(&dgp3);
             dirty_videoram_b[offs] = 0;
         }
-} // end of patch paragraph
-
 
     }
+    } // end of patch paragraph
+
 
     /* Now, composite the four layers together */
 
@@ -988,29 +976,29 @@ struct drawgfxParams dgp3={
     pixel_x = 15;
     pixel_y = 166;
 
+    
+    { 
+    struct drawgfxParams dgp16={
+    	bitmap, 	// dest
+    	Machine->gfx[4], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_COLOR, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
     for(i=0;i<8;i++)
     {
         if ((i%2)==1)
-        
-{ 
-struct drawgfxParams dgp16={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_COLOR, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+        {
             /* Draw 7 LEDS on each side */
             
             dgp16.code = beamdata[firebeam_state*8+i]&0x7f;
@@ -1029,85 +1017,64 @@ struct drawgfxParams dgp16={
             pixel_x+=14;
             pixel_y-=7;
         }
-} // end of patch paragraph
-
-        
-{ 
-struct drawgfxParams dgp18={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_COLOR, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+        else
         {
             /* Draw 8 LEDS on each side */
             
-            dgp18.code = beamdata[firebeam_state*8+i];
-            dgp18.color = 16*2;
-            dgp18.flipx = /* Make it green */                    0;
-            dgp18.sx = pixel_x;
-            dgp18.sy = pixel_y;
-            drawgfx(&dgp18);
+            dgp16.code = beamdata[firebeam_state*8+i];
+            dgp16.color = 16*2;
+            dgp16.flipx = /* Make it green */                    0;
+            dgp16.sx = pixel_x;
+            dgp16.sy = pixel_y;
+            drawgfx(&dgp16);
             
-            dgp18.code = beamdata[firebeam_state*8+i];
-            dgp18.color = 16*2;
-            dgp18.flipx = /* Make it green */                    1;
-            dgp18.sx = 255-pixel_x;
-            dgp18.sy = pixel_y;
-            drawgfx(&dgp18);
+            dgp16.code = beamdata[firebeam_state*8+i];
+            dgp16.color = 16*2;
+            dgp16.flipx = /* Make it green */                    1;
+            dgp16.sx = 255-pixel_x;
+            dgp16.sy = pixel_y;
+            drawgfx(&dgp16);
             pixel_x+=16;
             pixel_y-=8;
         }
-} // end of patch paragraph
-
 
     }
+    } // end of patch paragraph
+
 
     /* Red Sight LED */
 
     pixel_x = 134;
     pixel_y = 112;
 
-    if (*stactics_motor_on & 0x01)
     
-{ 
-struct drawgfxParams dgp20={
-	bitmap, 	// dest
-	Machine->gfx[5], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_COLOR, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+    { 
+    struct drawgfxParams dgp20={
+    	bitmap, 	// dest
+    	Machine->gfx[5], 	// gfx
+    	0, 	// code
+    	0, 	// color
+    	0, 	// flipx
+    	0, 	// flipy
+    	0, 	// sx
+    	0, 	// sy
+    	&Machine->visible_area, 	// clip
+    	TRANSPARENCY_COLOR, 	// transparency
+    	0, 	// transparent_color
+    	0, 	// scalex
+    	0, 	// scaley
+    	NULL, 	// pri_buffer
+    	0 	// priority_mask
+      };
+    if (*stactics_motor_on & 0x01)
+    {
         
         dgp20.flipx = /* red */                0;
         dgp20.sx = pixel_x;
         dgp20.sy = pixel_y;
         drawgfx(&dgp20);
     }
-} // end of patch paragraph
+    } // end of patch paragraph
 
 
     /* Update vblank counter */

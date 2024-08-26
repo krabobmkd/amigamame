@@ -556,6 +556,42 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int offs;
 
 	/* Draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap_sp, 	// dest
+		Machine->gfx[(big) ? 4 : 3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[(big) ? 4 : 3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 11 ;offs < spriteram_size; offs += 16)
 	{
 		int sx, sy, tile, color, flipx, flipy, big;
@@ -578,26 +614,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			color = spriteram[offs + 4] & 0x0f;
 
 			if(sprite_overdraw_enabled && (color & 8))
-			
-{ 
-struct drawgfxParams dgp0={
-	bitmap_sp, 	// dest
-	Machine->gfx[(big) ? 4 : 3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				/* "static" sprites */
 				
 				dgp0.code = tile;
@@ -608,28 +625,7 @@ struct drawgfxParams dgp0={
 				dgp0.sy = sy;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
-			
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[(big) ? 4 : 3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+			else
 			{
 				
 				dgp1.code = tile;
@@ -661,10 +657,10 @@ else
 					}
 				}
 			}
-} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 
 	if(sprite_overdraw_enabled)
 		copybitmap(bitmap, bitmap_sp, 0, 0, 0, 0, &Machine->visible_area, TRANSPARENCY_PEN, 15);

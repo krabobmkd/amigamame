@@ -165,6 +165,25 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
 	UINT16 *end = &buffered_spriteram16[spriteram_size/2];
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[gfx], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for ( ; s1 < end; s1+=4 )
 	{
 		int gfx;
@@ -255,25 +274,6 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				/* I don't think the following is entirely correct (when using 16x16
                    tiles x should probably loop from 0 to 0x20) but it seems to work
                    fine in all the games we have for now. */
-				
-				{ 
-				struct drawgfxParams dgp0={
-					bitmap, 	// dest
-					Machine->gfx[gfx], 	// gfx
-					0, 	// code
-					0, 	// color
-					0, 	// flipx
-					0, 	// flipy
-					0, 	// sx
-					0, 	// sy
-					cliprect, 	// clip
-					TRANSPARENCY_PEN, 	// transparency
-					0, 	// transparent_color
-					0, 	// scalex
-					0, 	// scaley
-					NULL, 	// pri_buffer
-					0 	// priority_mask
-				  };
 				for (y = 0; y < (0x40 >> tilesize); y++)
 				{
 					int py = ((scrolly - (y+1) * (8 << tilesize) + 0x10) & 0x1ff) - 0x10 - yoffset;
@@ -318,8 +318,6 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 					}
 				}
-				} // end of patch paragraph
-
 			}
 			else
 // "normal" sprite
@@ -387,7 +385,9 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		}
 
 		if (s1[0] & 0x8000) break;	/* end of list marker */
-	}	/* sprite list */
+	}
+	} // end of patch paragraph
+	/* sprite list */
 }
 
 

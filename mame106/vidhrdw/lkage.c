@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "tilemap.h"
 
 static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
 static unsigned char bg_tile_bank, fg_tile_bank;
@@ -125,7 +126,7 @@ draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		priority_mask 	// priority_mask
+		0 // hand priority_mask 	// priority_mask
 	  };
 	while( source<finish )
 	{
@@ -173,7 +174,7 @@ draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 
 		for (y = 0;y < height;y++)
 		{
-			
+			dgp0.priority_mask = priority_mask;
 			dgp0.code = sprite_number ^ y;
 			dgp0.color = color;
 			dgp0.flipx = flipx;

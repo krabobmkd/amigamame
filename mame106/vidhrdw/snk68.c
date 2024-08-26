@@ -165,6 +165,25 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int j,i
 {
 	int offs,mx,my,color,tile,fx,fy,i;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = pos; offs < pos+0x800; offs += 0x80 )
 	{
 		mx=(spriteram16[(offs+4+(4*j))>>1]&0xff)<<4;
@@ -186,26 +205,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int j,i
 		for (i=0; i<0x80; i+=4) {
 			color=spriteram16[(offs+i+(0x1000*j)+0x1000)>>1]&0x7f;
 
-			if (color) 
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			if (color) {
 				tile=spriteram16[(offs+2+i+(0x1000*j)+0x1000)>>1];
 				fy=tile&0x8000;
 				fx=tile&0x4000;
@@ -225,8 +225,6 @@ struct drawgfxParams dgp0={
 				dgp0.sy = my;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
 
 			if (flip_screen) {
 				my-=16;
@@ -238,6 +236,8 @@ struct drawgfxParams dgp0={
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -261,6 +261,25 @@ static void draw_sprites2(mame_bitmap *bitmap, const rectangle *cliprect, int j,
 {
 	int offs,mx,my,color,tile,fx,fy,i;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = pos; offs < pos+0x800 ; offs += 0x80 )
 	{
 		mx=spriteram16[(offs+j)>>1];
@@ -284,26 +303,7 @@ static void draw_sprites2(mame_bitmap *bitmap, const rectangle *cliprect, int j,
 
 		for (i=0; i<0x80; i+=4) {
 			color=spriteram16[(offs+i+z)>>1]&0x7f;
-			if (color) 
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			if (color) {
 				tile=spriteram16[(offs+2+i+z)>>1];
 				if (sprite_flip) {
 					fx=0;
@@ -330,8 +330,6 @@ struct drawgfxParams dgp1={
 				dgp1.sy = my;
 				drawgfx(&dgp1);
 			}
-} // end of patch paragraph
-
 			if (flip_screen) {
 				my-=16;
 				if (my < -0x100) my+=0x200;
@@ -342,6 +340,8 @@ struct drawgfxParams dgp1={
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

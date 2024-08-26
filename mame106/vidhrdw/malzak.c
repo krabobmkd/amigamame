@@ -72,6 +72,59 @@ VIDEO_UPDATE( malzak )
 	fillbitmap(bitmap,0,0);
 
 	// SAA 5050 - Teletext character generator
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[4], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[5], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (sy = 24; sy >= 0; sy--)
 	{
 		/* Set start of line state */
@@ -172,43 +225,7 @@ VIDEO_UPDATE( malzak )
 			if((blank == 0) || (saa5050_state.saa5050_flags & SAA5050_HOLDGR))
 			{
 				if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
-				
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[5], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+				{
 					
 					dgp0.code = code;
 					dgp0.color = colour;
@@ -222,28 +239,7 @@ struct drawgfxParams dgp1={
 					dgp1.sy = (sy + 1) * 10;
 					drawgfx(&dgp1);
 				}
-} // end of patch paragraph
-
-				
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	Machine->gfx[3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+				else
 				{
 					
 					dgp2.code = code;
@@ -252,8 +248,6 @@ else
 					dgp2.sy = sy * 10;
 					drawgfx(&dgp2);
 				}
-} // end of patch paragraph
-
 			}
 		}
 		if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
@@ -262,6 +256,8 @@ else
 			saa5050_state.saa5050_flags &= ~SAA5050_DBLHI;
 		}
 	}
+	} // end of patch paragraph
+
 
 	frame_count++;
 	if(frame_count > 50)

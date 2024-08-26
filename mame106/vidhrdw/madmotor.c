@@ -275,7 +275,7 @@ static void madmotor_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 			{
 				if ((color & pri_mask) == pri_val &&
 							(!flash || (cpu_getcurrentframe() & 1)))
-					
+                {
 					dgp0.code = code - y * incy + h * x;
 					dgp0.color = color;
 					dgp0.flipx = flipx;
@@ -283,6 +283,7 @@ static void madmotor_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 					dgp0.sx = sx + mult * x;
 					dgp0.sy = sy + mult * y;
 					drawgfx(&dgp0);
+                }
 			}
 
 			offs += 4;

@@ -115,31 +115,31 @@ static void draw_bg(mame_bitmap *bitmap)
 	int offs;
 	int scroll[256];
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap1, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		NULL, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x400;offs++)
 	{
 		int code = videoram[0x400+offs];
 
 		if (dirtybuffer[0x400+offs] || dirtychar[code])
-		
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap1, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	NULL, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx = offs % 32;
 			int sy = offs / 32;
 
@@ -156,9 +156,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = 8*sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	/* first copy to a temp bitmap doing column scroll */
 	for (offs = 0;offs < 256;offs++)
@@ -191,7 +191,7 @@ static void draw_fg(mame_bitmap *bitmap)
 		0, 	// sx
 		0, 	// sy
 		&Machine->visible_area, 	// clip
-		transp, 	// transparency
+		TRANSPARENCY_NONE, //hand done 0transp, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex
 		0, 	// scaley
@@ -212,6 +212,7 @@ static void draw_fg(mame_bitmap *bitmap)
 
 		
 		dgp1.code = code;
+        dgp1.transparency = transp;
 		dgp1.flipx = flip_screen_x;
 		dgp1.flipy = flip_screen_y;
 		dgp1.sx = 8*sx;

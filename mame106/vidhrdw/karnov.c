@@ -117,7 +117,7 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 		color = tile >> 12;
 		tile = tile&0x7ff;
 		if (flipscreen)
-			
+		{
 			dgp0.code = tile;
 			dgp0.color = color;
 			dgp0.flipx = fx;
@@ -125,8 +125,9 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 			dgp0.sx = 496-16*mx;
 			dgp0.sy = 496-16*my;
 			drawgfx(&dgp0);
+        }
 		else
-			
+		{
 			dgp0.code = tile;
 			dgp0.color = color;
 			dgp0.flipx = fx;
@@ -134,6 +135,7 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 			dgp0.sx = 16*mx;
 			dgp0.sy = 16*my;
 			drawgfx(&dgp0);
+        }
 	}
 	} // end of patch paragraph
 
@@ -170,7 +172,7 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 		tile=tile&0x7ff;
 
 		if (flipscreen)
-			
+		{
 			dgp2.code = tile;
 			dgp2.color = color;
 			dgp2.flipx = fx;
@@ -178,8 +180,9 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 			dgp2.sx = 496-16*mx;
 			dgp2.sy = 496-16*my;
 			drawgfx(&dgp2);
+        }
 		else
-			
+		{
 			dgp2.code = tile;
 			dgp2.color = color;
 			dgp2.flipx = fx;
@@ -187,6 +190,7 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 			dgp2.sx = 16*mx;
 			dgp2.sy = 16*my;
 			drawgfx(&dgp2);
+        }
 	}
 	} // end of patch paragraph
 
@@ -274,7 +278,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
     	/* 1 more sprite drawn underneath */
     	if (extra)
-    		
+    	{
     		dgp4.code = sprite2;
     		dgp4.color = colour;
     		dgp4.flipx = fx;
@@ -282,6 +286,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
     		dgp4.sx = x;
     		dgp4.sy = y+16;
     		drawgfx(&dgp4);
+        }
 	}
 	} // end of patch paragraph
 

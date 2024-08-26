@@ -148,6 +148,25 @@ static void draw_background( mame_bitmap *bitmap )
 	const gfx_element *gfx = Machine->gfx[1];
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		tmpbitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( offs=0; offs<0x100; offs++ )
 	{
 		if( dirtybuffer[offs] )
@@ -157,25 +176,6 @@ static void draw_background( mame_bitmap *bitmap )
 			int tile_number = videoram[offs];
 			int row,col;
 			dirtybuffer[offs] = 0;
-			
-			{ 
-			struct drawgfxParams dgp1={
-				tmpbitmap, 	// dest
-				gfx, 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				0, 	// clip
-				TRANSPARENCY_NONE, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for( row=0; row<4; row++ )
 			{
 				for( col=0; col<4; col++ )
@@ -188,10 +188,10 @@ static void draw_background( mame_bitmap *bitmap )
 					drawgfx(&dgp1);
 				}
 			}
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 
 	{
 		int scrollx = -(mnchmobl_vreg[6]*2+(mnchmobl_vreg[7]>>7))-64-128-16;
@@ -213,6 +213,25 @@ static void draw_sprites( mame_bitmap *bitmap )
 	const gfx_element *gfx = Machine->gfx[2+bank];
 	int color_base = mnchmobl_palette_bank*4+3;
 	int i;
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		clip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		7, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( i=0; i<0x200; i++ )
 	{
 		int tile_number = mnchmobl_sprite_tile[i];	/*   ETTTTTTT */
@@ -221,26 +240,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 		int sy = (i/0x40)*0x20;						/* Y YY------ */
 		sy += (attributes>>2)&0x1f;
 		if( tile_number != 0xff && (attributes&0x80) )
-		
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	clip, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	7, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			sx = (sx>>1) | (tile_number&0x80);
 			sx = 2*((-32-scroll - sx)&0xff)+xadjust;
 			
@@ -250,9 +250,9 @@ struct drawgfxParams dgp2={
 			dgp2.sy = sy;
 			drawgfx(&dgp2);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( mnchmobl )

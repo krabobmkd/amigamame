@@ -198,29 +198,29 @@ static void lwings_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	int offs;
 
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (is_sprite_on(offs))
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int code,color,sx,sy,flipx,flipy;
 
 
@@ -249,9 +249,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 static void trojan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
@@ -259,29 +259,29 @@ static void trojan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	int offs;
 
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (is_sprite_on(offs))
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int code,color,sx,sy,flipx,flipy;
 
 
@@ -322,9 +322,9 @@ struct drawgfxParams dgp1={
 			dgp1.sy = sy;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( lwings )

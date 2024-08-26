@@ -765,6 +765,25 @@ void f1gpstar_draw_road(mame_bitmap *bitmap, const rectangle *cliprect, int road
 	max_priority = (max_priority & 7) * 0x1000;
 
 	/* Let's draw from the top to the bottom of the visible screen */
+	
+	{ 
+	struct drawgfxParams dgpz0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&rect, 	// clip
+		transparency, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (sy = min_y ; sy <= max_y ; sy ++)
 	{
 		int xscale, xdim;
@@ -799,20 +818,22 @@ void f1gpstar_draw_road(mame_bitmap *bitmap, const rectangle *cliprect, int road
 		/* Draw the line */
 		for (sx = xstart ; sx <= max_x ; sx += xdim)
 		{
-			drawgfxzoom(bitmap,gfx,
-						code++,
-						attr >> 8,
-						0,0,
-						sx / 0x10000, sy,
-						&rect,
-						transparency,15,
-						xscale, 1 << 16);
+			
+			dgpz0.code = code++;
+			dgpz0.color = attr >> 8;
+			dgpz0.sx = sx / 0x10000;
+			dgpz0.sy = sy;
+			dgpz0.scalex = xscale;
+			dgpz0.scaley = 1 << 16;
+			drawgfxzoom(&dgpz0);
 
 			/* stop when the end of the line of gfx is reached */
 			if ((code % (X_SIZE/TILE_SIZE)) == 0)	break;
 		}
 
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -877,6 +898,25 @@ static void cischeat_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprec
 	if (priority1 < priority2)	{	min_priority = priority1;	max_priority = priority2; }
 	else						{	min_priority = priority2;	max_priority = priority1; }
 
+	
+	{ 
+	struct drawgfxParams dgpz1={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (; source < finish; source += 0x10/2 )
 	{
 		size	=	source[ 0 ];
@@ -956,14 +996,16 @@ if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continu
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				drawgfxzoom(bitmap,Machine->gfx[3],
-							code++,
-							color,
-							flipx,flipy,
-							(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-							cliprect,
-							shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,15,
-							xscale, yscale );
+				
+				dgpz1.code = code++;
+				dgpz1.color = color;
+				dgpz1.flipx = flipx;
+				dgpz1.flipy = flipy;
+				dgpz1.sx = (sx + x * xdim) / 0x10000;
+				dgpz1.sy = (sy + y * ydim) / 0x10000;
+				dgpz1.scalex = xscale;
+				dgpz1.scaley = yscale;
+				drawgfxzoom(&dgpz1);
 			}
 		}
 #ifdef MAME_DEBUG
@@ -975,7 +1017,9 @@ if (code_pressed(KEYCODE_X))
 }
 #endif
 #endif
-	}	/* end sprite loop */
+	}
+	} // end of patch paragraph
+	/* end sprite loop */
 }
 
 
@@ -1031,6 +1075,25 @@ static void bigrun_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprect,
 	if (priority1 < priority2)	{	min_priority = priority1;	max_priority = priority2; }
 	else						{	min_priority = priority2;	max_priority = priority1; }
 
+	
+	{ 
+	struct drawgfxParams dgpz2={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (; source < finish; source += 0x10/2 )
 	{
 		size	=	source[ 0 ];
@@ -1110,14 +1173,16 @@ if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continu
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				drawgfxzoom(bitmap,Machine->gfx[3],
-							code++,
-							color,
-							flipx,flipy,
-							(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-							cliprect,
-							shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,15,
-							xscale, yscale );
+				
+				dgpz2.code = code++;
+				dgpz2.color = color;
+				dgpz2.flipx = flipx;
+				dgpz2.flipy = flipy;
+				dgpz2.sx = (sx + x * xdim) / 0x10000;
+				dgpz2.sy = (sy + y * ydim) / 0x10000;
+				dgpz2.scalex = xscale;
+				dgpz2.scaley = yscale;
+				drawgfxzoom(&dgpz2);
 			}
 		}
 #ifdef MAME_DEBUG
@@ -1129,7 +1194,9 @@ if (code_pressed(KEYCODE_X))
 }
 #endif
 #endif
-	}	/* end sprite loop */
+	}
+	} // end of patch paragraph
+	/* end sprite loop */
 }
 
 

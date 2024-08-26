@@ -6,7 +6,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-
+#include "drawgfx.h"
 
 WRITE16_HANDLER( snowbros_flipscreen_w )
 {
@@ -111,6 +111,7 @@ VIDEO_UPDATE( snowbros )
 		dgp0.flipy = flipy;
 		dgp0.sx = sx;
 		dgp0.sy = sy;
+
 		drawgfx(&dgp0);
 	}
 	} // end of patch paragraph
@@ -248,6 +249,25 @@ VIDEO_UPDATE( wintbob )
 
 	fillbitmap(bitmap,get_black_pen(),&Machine->visible_area);
 
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{
 		int xpos  = spriteram16[offs] & 0xff;
@@ -272,26 +292,7 @@ VIDEO_UPDATE( wintbob )
 		}
 
 		if ((xpos > -16) && (ypos > 0) && (xpos < 256) && (ypos < 240) && (disbl !=2))
-		
-{ 
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
 			dgp3.code = tilen;
 			dgp3.color = colr;
@@ -301,9 +302,9 @@ struct drawgfxParams dgp3={
 			dgp3.sy = ypos;
 			drawgfx(&dgp3);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -342,7 +343,7 @@ VIDEO_UPDATE( snowbro3 )
 	{ 
 	struct drawgfxParams dgp4={
 		bitmap, 	// dest
-		gfx, 	// gfx
+		NULL, // hand done gfx, 	// gfx
 		0, 	// code
 		0, 	// color
 		0, 	// flipx
@@ -403,14 +404,14 @@ VIDEO_UPDATE( snowbro3 )
 			tilecolour = 0x10;
 		}
 
-	
-	dgp4.code = tile;
-	dgp4.color = (tilecolour & 0xf0) >> 4;
-	dgp4.flipx = flipx;
-	dgp4.flipy = flipy;
-	dgp4.sx = sx;
-	dgp4.sy = sy;
-	drawgfx(&dgp4);
+        dgp4.gfx = gfx;
+        dgp4.code = tile;
+        dgp4.color = (tilecolour & 0xf0) >> 4;
+        dgp4.flipx = flipx;
+        dgp4.flipy = flipy;
+        dgp4.sx = sx;
+        dgp4.sy = sy;
+        drawgfx(&dgp4);
 	}
 	} // end of patch paragraph
 

@@ -134,6 +134,25 @@ VIDEO_UPDATE( cheekyms )
 
 	/* Draw the sprites first, because they're supposed to appear below
        the characters */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < sizeof(sprites)/sizeof(sprites[0]); offs += 4)
 	{
 		int v1, sx, sy, col, code;
@@ -148,26 +167,7 @@ VIDEO_UPDATE( cheekyms )
 		code = (~v1 << 1) & 0x1f;
 
 		if (v1 & 0x80)
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			if (!flip_screen)
 			{
 				code++;
@@ -180,49 +180,47 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+		else
 		{
 			
-			dgp1.code = code + 0x20;
-			dgp1.color = col;
-			dgp1.sx = sx;
-			dgp1.sy = sy;
-			drawgfx(&dgp1);
+			dgp0.code = code + 0x20;
+			dgp0.color = col;
+			dgp0.sx = sx;
+			dgp0.sy = sy;
+			drawgfx(&dgp0);
 
 			
-			dgp1.code = code + 0x21;
-			dgp1.color = col;
-			dgp1.sx = sx + 8*(v1 & 2);
-			dgp1.sy = sy + 8*(~v1 & 2);
-			drawgfx(&dgp1);
+			dgp0.code = code + 0x21;
+			dgp0.color = col;
+			dgp0.sx = sx + 8*(v1 & 2);
+			dgp0.sy = sy + 8*(~v1 & 2);
+			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp3={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy,man_area;
@@ -241,26 +239,7 @@ else
 
 		if (dirtybuffer[offs] ||
 			(redraw_man && man_area))
-		
-{ 
-struct drawgfxParams dgp3={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			dirtybuffer[offs] = 0;
 
 			if (flip_screen)
@@ -278,9 +257,9 @@ struct drawgfxParams dgp3={
 			dgp3.sy = 8*sy - (man_area ? man_scroll : 0);
 			drawgfx(&dgp3);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	redraw_man = 0;
 

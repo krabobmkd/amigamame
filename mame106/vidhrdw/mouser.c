@@ -82,32 +82,32 @@ VIDEO_UPDATE( mouser )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		int scrolled_y_position;
 		int color_offs;
 
 		if (dirtybuffer[offs])
-		
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			dirtybuffer[offs] = 0;
 
 			sx = offs % 32;
@@ -141,9 +141,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = scrolled_y_position;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	copyscrollbitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE,0);
 
@@ -190,7 +190,7 @@ struct drawgfxParams dgp0={
 		}
 
 		if ((spriteram[offs+1]&0x10)>>4)
-			
+        {
 			dgp1.code = spriteram[offs]&0x3f;
 			dgp1.color = spriteram[offs+1]%16;
 			dgp1.flipx = flipx;
@@ -198,6 +198,7 @@ struct drawgfxParams dgp0={
 			dgp1.sx = sx;
 			dgp1.sy = sy;
 			drawgfx(&dgp1);
+        }
 	}
 	} // end of patch paragraph
 
@@ -243,7 +244,7 @@ struct drawgfxParams dgp0={
 		}
 
 		if ((spriteram[offs+1]&0x10)>>4)
-			
+		{
 			dgp2.code = spriteram[offs]&0x3f;
 			dgp2.color = spriteram[offs+1]%16;
 			dgp2.flipx = flipx;
@@ -251,6 +252,7 @@ struct drawgfxParams dgp0={
 			dgp2.sx = sx;
 			dgp2.sy = sy;
 			drawgfx(&dgp2);
+        }
 	}
 	} // end of patch paragraph
 

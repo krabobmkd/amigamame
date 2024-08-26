@@ -456,6 +456,25 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs=0;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0  // hand	// priority_mask
+	  };
 	while (offs<m92_sprite_list) {
 		int x,y,sprite,colour,fx,fy,x_multi,y_multi,i,j,s_ptr,pri;
 
@@ -463,6 +482,7 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		x=(buffered_spriteram[offs+6] | (buffered_spriteram[offs+7]<<8))&0x1ff;
 
 		if ((buffered_spriteram[offs+4]&0x80)==0x80) pri=0; else pri=2;
+        dgp0.priority_mask = pri;
 
 		x = x - 16;
 		y = 512 - 16 - y;
@@ -487,26 +507,7 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 			for (i=0; i<y_multi; i++)
 			{
-				if (flip_screen) 
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri 	// priority_mask
-  };
-{
+				if (flip_screen) {
 					int ffx=fx,ffy=fy;
 					if (ffx) ffx=0; else ffx=1;
 					if (ffy) ffy=0; else ffy=1;
@@ -518,45 +519,24 @@ struct drawgfxParams dgp0={
 					dgp0.sx = 496-x;
 					dgp0.sy = 496-(y-i*16);
 					drawgfx(&dgp0);
-				}
-} // end of patch paragraph
- 
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri 	// priority_mask
-  };
-else {
+				} else {
 					
-					dgp1.code = sprite + s_ptr;
-					dgp1.color = colour;
-					dgp1.flipx = fx;
-					dgp1.flipy = fy;
-					dgp1.sx = x;
-					dgp1.sy = y-i*16;
-					drawgfx(&dgp1);
+					dgp0.code = sprite + s_ptr;
+					dgp0.color = colour;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x;
+					dgp0.sy = y-i*16;
+					drawgfx(&dgp0);
 				}
-} // end of patch paragraph
-
 				if (fy) s_ptr++; else s_ptr--;
 			}
 			if (fx) x-=16; else x+=16;
 			offs+=8;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /*****************************************************************************/

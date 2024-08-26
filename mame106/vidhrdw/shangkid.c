@@ -133,24 +133,45 @@ static void draw_sprite( const UINT8 *source, mame_bitmap *bitmap, const rectang
 	xpos += (16-width)*(xsize+1)/2;
 	ypos += (16-height)*(ysize+1)/2;
 
+	
+	{ 
+	struct drawgfxParams dgpz0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		transparent_pen, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( r=0; r<=ysize; r++ )
 	{
 		for( c=0; c<=xsize; c++ )
 		{
 			sx = xpos+(c^xflip)*width;
 			sy = ypos+(r^yflip)*height;
-			drawgfxzoom(
-				bitmap,
-				gfx,
-				tile+c*8+r,
-				color,
-				xflip,yflip,
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_PEN,transparent_pen,
-				(width<<16)/16, (height<<16)/16 );
+			
+			dgpz0.code = tile+c*8+r;
+			dgpz0.color = color;
+			dgpz0.flipx = xflip;
+			dgpz0.flipy = yflip;
+			dgpz0.sx = sx;
+			dgpz0.sy = sy;
+			dgpz0.scalex = (width<<16)/16;
+			dgpz0.scaley = (height<<16)/16;
+			drawgfxzoom(&dgpz0);
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
@@ -221,6 +242,25 @@ static void dynamski_draw_background( mame_bitmap *bitmap, const rectangle *clip
 
 	int transparency = pri?TRANSPARENCY_PEN:TRANSPARENCY_NONE;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		sx, 	// clip
+		sy, 	// transparency
+		cliprect, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( i=0; i<0x400; i++ )
 	{
 		sx = (i%32)*8;
@@ -250,26 +290,7 @@ static void dynamski_draw_background( mame_bitmap *bitmap, const rectangle *clip
             -xx-.----   bank
         */
 		if( pri==0 || (attr>>7)==pri )
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	sx, 	// clip
-	sy, 	// transparency
-	cliprect, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			tile += ((attr>>5)&0x3)*256;
 			
 			dgp0.code = tile;
@@ -278,9 +299,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = yflip;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 static void dynamski_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )

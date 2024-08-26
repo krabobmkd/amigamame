@@ -79,6 +79,25 @@ VIDEO_UPDATE( atarifb )
 
 	/* for every character in the Player 1 Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&right_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = atarifb_alphap1_vram_size - 1;offs >= 0;offs--)
 	{
 		int charcode;
@@ -94,26 +113,7 @@ VIDEO_UPDATE( atarifb )
 		disable = (atarifb_alphap1_vram[offs] & 0x80) >> 7;
 
 		if (!disable)
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&right_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
 			dgp0.code = charcode;
 			dgp0.flipx = flipbit;
@@ -122,12 +122,31 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	/* for every character in the Player 2 Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&left_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = atarifb_alphap2_vram_size - 1;offs >= 0;offs--)
 	{
 		int charcode;
@@ -143,26 +162,7 @@ struct drawgfxParams dgp0={
 		disable = (atarifb_alphap2_vram[offs] & 0x80) >> 7;
 
 		if (!disable)
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&left_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
 			dgp1.code = charcode;
 			dgp1.flipx = flipbit;
@@ -171,35 +171,35 @@ struct drawgfxParams dgp1={
 			dgp1.sy = sy;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		tmpbitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		
-{ 
-struct drawgfxParams dgp2={
-	tmpbitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int charcode;
 			int flipx,flipy;
 			int sx,sy;
@@ -233,9 +233,9 @@ struct drawgfxParams dgp2={
 			dgp2.sy = sy;
 			drawgfx(&dgp2);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	/* copy the character mapped graphics */
 	copybitmap(bitmap,tmpbitmap,0,0,8*3,0,&bigfield_area,TRANSPARENCY_NONE,0);
@@ -243,7 +243,41 @@ struct drawgfxParams dgp2={
 	/* Draw our motion objects */
 	
 	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[sprite_bank+1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&bigfield_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[sprite_bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&bigfield_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp5={
 		bitmap, 	// dest
 		Machine->gfx[sprite_bank], 	// gfx
 		0, 	// code
@@ -280,26 +314,7 @@ struct drawgfxParams dgp2={
 		/* black, dk grey, grey and white. I think the 3 sets determine the */
 		/* color of each bit in the sprite, but I haven't implemented it that way. */
 		if (atarifb_game == 4)
-		
-{ 
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	Machine->gfx[sprite_bank+1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&bigfield_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			shade = ((spriteram[obj*2+1 + 0x20]) & 0x07);
 
 			
@@ -313,8 +328,6 @@ struct drawgfxParams dgp3={
 
 			shade = ((spriteram[obj*2+1 + 0x20]) & 0x08) >> 3;
 		}
-} // end of patch paragraph
-
 
 		
 		dgp4.code = charcode;
@@ -331,26 +344,7 @@ struct drawgfxParams dgp3={
 			/* The down markers are multiplexed by altering the y location during */
 			/* mid-screen. We'll fake it by essentially doing the same thing here. */
 			if ((charcode == 0x11) && (sy == 0x07))
-			
-{ 
-struct drawgfxParams dgp5={
-	bitmap, 	// dest
-	Machine->gfx[sprite_bank], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&bigfield_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				sy = 0xf1; /* When multiplexed, it's 0x10...why? */
 				
 				dgp5.code = charcode;
@@ -360,8 +354,6 @@ struct drawgfxParams dgp5={
 				dgp5.sy = sy;
 				drawgfx(&dgp5);
 			}
-} // end of patch paragraph
-
 		}
 	}
 	} // end of patch paragraph

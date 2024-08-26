@@ -331,6 +331,25 @@ static void aerofgt_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,in
 	priority <<= 12;
 
 	offs = 0;
+	
+	{ 
+	struct drawgfxParams dgpz0={
+		bitmap, 	// dest
+		Machine->gfx[sprite_gfx + (map_start >= 0x2000 ? 1 : 0)], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while (offs < 0x0400 && (aerofgt_spriteram3[offs] & 0x8000) == 0)
 	{
 		int attr_start;
@@ -379,13 +398,16 @@ static void aerofgt_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,in
 					else
 						code = aerofgt_spriteram2[map_start & 0x1fff] & 0x1fff;
 
-					drawgfxzoom(bitmap,Machine->gfx[sprite_gfx + (map_start >= 0x2000 ? 1 : 0)],
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							cliprect,TRANSPARENCY_PEN,15,
-							zoomx << 11, zoomy << 11);
+					
+					dgpz0.code = code;
+					dgpz0.color = color;
+					dgpz0.flipx = flipx;
+					dgpz0.flipy = flipy;
+					dgpz0.sx = sx;
+					dgpz0.sy = sy;
+					dgpz0.scalex = zoomx << 11;
+					dgpz0.scaley = zoomy << 11;
+					drawgfxzoom(&dgpz0);
 					map_start++;
 				}
 			}
@@ -393,6 +415,8 @@ static void aerofgt_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,in
 
 		offs++;
 	}
+	} // end of patch paragraph
+
 }
 
 static void turbofrc_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int chip_disabled_pri)
@@ -402,6 +426,25 @@ static void turbofrc_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 	base = chip * 0x0200;
 	first = 4 * aerofgt_spriteram3[0x1fe + base];
 
+	
+	{ 
+	struct drawgfxParams dgpz0={
+		bitmap, 	// dest
+		Machine->gfx[sprite_gfx + chip], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		(pri || chip == chip_disabled_pri) ? 0 : 2 	// priority_mask
+	  };
 	for (attr_start = base + 0x0200-8;attr_start >= first + base;attr_start -= 4)
 	{
 		int map_start;
@@ -449,14 +492,16 @@ static void turbofrc_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 				else
 					code = aerofgt_spriteram2[map_start % (aerofgt_spriteram2_size/2)];
 
-				pdrawgfxzoom(bitmap,Machine->gfx[sprite_gfx + chip],
-							 code,
-							 color,
-							 flipx,flipy,
-							 sx,sy,
-							 cliprect,TRANSPARENCY_PEN,15,
-							 zoomx << 11, zoomy << 11,
-							 (pri || chip == chip_disabled_pri) ? 0 : 2);
+				
+				dgpz0.code = code;
+				dgpz0.color = color;
+				dgpz0.flipx = flipx;
+				dgpz0.flipy = flipy;
+				dgpz0.sx = sx;
+				dgpz0.sy = sy;
+				dgpz0.scalex = zoomx << 11;
+				dgpz0.scaley = zoomy << 11;
+				drawgfxzoom(&dgpz0);
 
 				map_start++;
 			}
@@ -467,6 +512,8 @@ static void turbofrc_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 			if (xsize == 6) map_start += 1;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void pspikesb_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
@@ -502,6 +549,25 @@ static void aerfboot_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 //  base = chip * 0x0200;
 //  first = 4 * aerofgt_spriteram3[0x1fe + base];
 
+	
+	{ 
+	struct drawgfxParams dgpz1={
+		bitmap, 	// dest
+		Machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri ? 0 : 0x2 	// priority_mask
+	  };
 	for (attr_start = aerofgt_spriteram3_size/2 - 4;attr_start >= 0;attr_start -= 4)
 	{
 		int code;
@@ -545,14 +611,16 @@ static void aerfboot_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				if (flipx) sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
 				else sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
-				pdrawgfxzoom(bitmap,Machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
-						code,
-						color,
-						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,15,
-						zoomx << 11,zoomy << 11,
-						pri ? 0 : 0x2);
+				
+				dgpz1.code = code;
+				dgpz1.color = color;
+				dgpz1.flipx = flipx;
+				dgpz1.flipy = flipy;
+				dgpz1.sx = sx;
+				dgpz1.sy = sy;
+				dgpz1.scalex = zoomx << 11;
+				dgpz1.scaley = zoomy << 11;
+				drawgfxzoom(&dgpz1);
 				code++;
 			}
 
@@ -562,6 +630,8 @@ static void aerfboot_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 //          if (xsize == 6) code += 1;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void wbbc97_draw_bitmap(mame_bitmap *bitmap)
@@ -951,6 +1021,25 @@ static void aerofgt_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,in
 	priority <<= 12;
 
 	offs = 0;
+	
+	{ 
+	struct drawgfxParams dgpz1={
+		bitmap, 	// dest
+		Machine->gfx[sprite_gfx + (map_start >= 0x2000 ? 1 : 0)], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while (offs < 0x0400 && (aerofgt_spriteram3[offs] & 0x8000) == 0)
 	{
 		int attr_start;
@@ -999,13 +1088,16 @@ static void aerofgt_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,in
 					else
 						code = aerofgt_spriteram2[map_start & 0x1fff] & 0x1fff;
 
-					drawgfxzoom(bitmap,Machine->gfx[sprite_gfx + (map_start >= 0x2000 ? 1 : 0)],
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							cliprect,TRANSPARENCY_PEN,15,
-							zoomx << 11, zoomy << 11);
+					
+					dgpz1.code = code;
+					dgpz1.color = color;
+					dgpz1.flipx = flipx;
+					dgpz1.flipy = flipy;
+					dgpz1.sx = sx;
+					dgpz1.sy = sy;
+					dgpz1.scalex = zoomx << 11;
+					dgpz1.scaley = zoomy << 11;
+					drawgfxzoom(&dgpz1);
 					map_start++;
 				}
 			}
@@ -1013,6 +1105,8 @@ static void aerofgt_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,in
 
 		offs++;
 	}
+	} // end of patch paragraph
+
 }
 
 static void turbofrc_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int chip_disabled_pri)
@@ -1022,6 +1116,25 @@ static void turbofrc_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 	base = chip * 0x0200;
 	first = 4 * aerofgt_spriteram3[0x1fe + base];
 
+	
+	{ 
+	struct drawgfxParams dgpz2={
+		bitmap, 	// dest
+		Machine->gfx[sprite_gfx + chip], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		(pri || chip == chip_disabled_pri) ? 0 : 2 	// priority_mask
+	  };
 	for (attr_start = base + 0x0200-8;attr_start >= first + base;attr_start -= 4)
 	{
 		int map_start;
@@ -1069,14 +1182,16 @@ static void turbofrc_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 				else
 					code = aerofgt_spriteram2[map_start % (aerofgt_spriteram2_size/2)];
 
-				pdrawgfxzoom(bitmap,Machine->gfx[sprite_gfx + chip],
-							 code,
-							 color,
-							 flipx,flipy,
-							 sx,sy,
-							 cliprect,TRANSPARENCY_PEN,15,
-							 zoomx << 11, zoomy << 11,
-							 (pri || chip == chip_disabled_pri) ? 0 : 2);
+				
+				dgpz2.code = code;
+				dgpz2.color = color;
+				dgpz2.flipx = flipx;
+				dgpz2.flipy = flipy;
+				dgpz2.sx = sx;
+				dgpz2.sy = sy;
+				dgpz2.scalex = zoomx << 11;
+				dgpz2.scaley = zoomy << 11;
+				drawgfxzoom(&dgpz2);
 
 				map_start++;
 			}
@@ -1087,6 +1202,8 @@ static void turbofrc_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 			if (xsize == 6) map_start += 1;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void pspikesb_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
@@ -1157,6 +1274,25 @@ static void aerfboot_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 //  base = chip * 0x0200;
 //  first = 4 * aerofgt_spriteram3[0x1fe + base];
 
+	
+	{ 
+	struct drawgfxParams dgpz3={
+		bitmap, 	// dest
+		Machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri ? 0 : 0x2 	// priority_mask
+	  };
 	for (attr_start = aerofgt_spriteram3_size/2 - 4;attr_start >= 0;attr_start -= 4)
 	{
 		int code;
@@ -1200,14 +1336,16 @@ static void aerfboot_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				if (flipx) sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
 				else sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
-				pdrawgfxzoom(bitmap,Machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
-						code,
-						color,
-						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,15,
-						zoomx << 11,zoomy << 11,
-						pri ? 0 : 0x2);
+				
+				dgpz3.code = code;
+				dgpz3.color = color;
+				dgpz3.flipx = flipx;
+				dgpz3.flipy = flipy;
+				dgpz3.sx = sx;
+				dgpz3.sy = sy;
+				dgpz3.scalex = zoomx << 11;
+				dgpz3.scaley = zoomy << 11;
+				drawgfxzoom(&dgpz3);
 				code++;
 			}
 
@@ -1217,6 +1355,8 @@ static void aerfboot_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 //          if (xsize == 6) code += 1;
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void wbbc97_draw_bitmap(mame_bitmap *bitmap)

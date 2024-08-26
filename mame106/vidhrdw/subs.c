@@ -52,6 +52,42 @@ VIDEO_UPDATE( subs )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp1={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (updateall || dirtybuffer[offs])
@@ -85,128 +121,65 @@ VIDEO_UPDATE( subs )
 
 			/* Draw the left screen */
 			if ((left_enable || left_sonar_window) && (!right_sonar_window))
-			
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				
 				dgp0.code = charcode;
 				dgp0.sx = sx;
 				dgp0.sy = sy;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
-			
-{ 
-struct drawgfxParams dgp1={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+			else
 			{
 				
 				dgp1.sx = sx;
 				dgp1.sy = sy;
 				drawgfx(&dgp1);
 			}
-} // end of patch paragraph
-
 
 			/* Draw the right screen */
 			if ((right_enable || right_sonar_window) && (!left_sonar_window))
-			
-{ 
-struct drawgfxParams dgp2={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
-				
-				dgp2.code = charcode;
-				dgp2.sx = sx+256;
-				dgp2.sy = sy;
-				drawgfx(&dgp2);
-			}
-} // end of patch paragraph
-
-			
-{ 
-struct drawgfxParams dgp3={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
 			{
 				
-				dgp3.sx = sx+256;
-				dgp3.sy = sy;
-				drawgfx(&dgp3);
+				dgp0.code = charcode;
+				dgp0.sx = sx+256;
+				dgp0.sy = sy;
+				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
+			else
+			{
+				
+				dgp1.sx = sx+256;
+				dgp1.sy = sy;
+				drawgfx(&dgp1);
+			}
 		}
 	}
+	} // end of patch paragraph
+
 
 	/* copy the character mapped graphics */
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE,0);
 
 	/* draw the motion objects */
+	
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < 4; offs++)
 	{
 		int sx,sy;
@@ -227,66 +200,26 @@ else
 
 		/* Left screen - special check for drawing right screen's sub */
 		if ((offs!=0) || (sub_enable))
-		
-{ 
-struct drawgfxParams dgp4={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
 			dgp4.code = charcode + 32 * prom_set;
 			dgp4.sx = sx;
 			dgp4.sy = sy;
 			drawgfx(&dgp4);
 		}
-} // end of patch paragraph
-
 
 		/* Right screen - special check for drawing left screen's sub */
 		if ((offs!=1) || (sub_enable))
-		
-{ 
-struct drawgfxParams dgp5={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
-			dgp5.code = charcode + 32 * prom_set;
-			dgp5.sx = sx + 256;
-			dgp5.sy = sy;
-			drawgfx(&dgp5);
+			dgp4.code = charcode + 32 * prom_set;
+			dgp4.sx = sx + 256;
+			dgp4.sy = sy;
+			drawgfx(&dgp4);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	/* Update sound */
 	discrete_sound_w(SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data

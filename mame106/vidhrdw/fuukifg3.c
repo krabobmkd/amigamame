@@ -178,6 +178,25 @@ static void fuuki32_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		priority_bitmap, 	// pri_buffer
 		pri_mask 	// priority_mask
 	  };
+	
+	{ 
+	struct drawgfxParams dgpz0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		// nearest greater integer value to avoid holes									pri_mask 	// priority_mask
+	  };
 	for ( offs = (spriteram_size-8)/4; offs >=0; offs -= 8/4 )
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
@@ -251,14 +270,16 @@ static void fuuki32_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					dgp0.sy = sy + y * 16;
 					drawgfx(&dgp0);
 				else
-					pdrawgfxzoom(	bitmap,Machine->gfx[0],
-									code++,
-									attr & 0x3f,
-									flipx, flipy,
-									sx + (x * xzoom) / 8, sy + (y * yzoom) / 8,
-									cliprect,TRANSPARENCY_PEN,15,
-									(0x10000/0x10/8) * (xzoom + 8),(0x10000/0x10/8) * (yzoom + 8),	// nearest greater integer value to avoid holes
-									pri_mask	);
+					
+					dgpz0.code = code++;
+					dgpz0.color = attr & 0x3f;
+					dgpz0.flipx = flipx;
+					dgpz0.flipy = flipy;
+					dgpz0.sx = sx + (x * xzoom) / 8;
+					dgpz0.sy = sy + (y * yzoom) / 8;
+					dgpz0.scalex = (0x10000/0x10/8) * (xzoom + 8);
+					dgpz0.scaley = (0x10000/0x10/8) * (yzoom + 8);
+					drawgfxzoom(&dgpz0);
 			}
 		}
 
@@ -273,6 +294,8 @@ if (code_pressed(KEYCODE_X))
 #endif
 #endif
 	}
+	} // end of patch paragraph
+
 	} // end of patch paragraph
 
 }

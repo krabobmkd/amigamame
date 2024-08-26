@@ -379,6 +379,25 @@ static int system1_draw_fg(mame_bitmap *bitmap,int priority)
 
 	priority <<= 3;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < system1_videoram_size;offs += 2)
 	{
 		if ((system1_videoram[offs+1] & 0x08) == priority)
@@ -400,26 +419,7 @@ static int system1_draw_fg(mame_bitmap *bitmap,int priority)
 
 			code %= Machine->gfx[0]->total_elements;
 			if (Machine->gfx[0]->pen_usage[code] & ~1)
-			
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				drawn = 1;
 
 				
@@ -431,10 +431,10 @@ struct drawgfxParams dgp0={
 				dgp0.sy = 8*sy;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 
 	return drawn;
 }
@@ -459,29 +459,29 @@ static void system1_draw_bg(mame_bitmap *bitmap,int priority)
          * been modified since last time and update it accordingly.
          */
 
+		
+		{ 
+		struct drawgfxParams dgp1={
+			tmp_bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			0, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
 		{
 			if (bg_dirtybuffer[offs / 2])
-			
-{ 
-struct drawgfxParams dgp1={
-	tmp_bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				int code,color;
 
 
@@ -508,9 +508,9 @@ struct drawgfxParams dgp1={
 				dgp1.sy = 8*sy;
 				drawgfx(&dgp1);
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 
 		/* copy the temporary bitmap to the screen */
 		if (flip_screen)
@@ -522,29 +522,29 @@ struct drawgfxParams dgp1={
 	{
 		priority <<= 3;
 
+		
+		{ 
+		struct drawgfxParams dgp2={
+			bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
 		{
 			if ((system1_backgroundram[offs+1] & 0x08) == priority)
-			
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				int code,color;
 
 
@@ -599,9 +599,9 @@ struct drawgfxParams dgp2={
 				dgp2.sy = sy-256;
 				drawgfx(&dgp2);
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 	}
 }
 
@@ -652,29 +652,29 @@ static void chplft_draw_bg(mame_bitmap *bitmap, int priority)
          * been modified since last time and update it accordingly.
          */
 
+		
+		{ 
+		struct drawgfxParams dgp6={
+			tmp_bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			0, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
 		{
 			if (bg_dirtybuffer[offs / 2])
-			
-{ 
-struct drawgfxParams dgp6={
-	tmp_bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				int code,color;
 
 
@@ -701,9 +701,9 @@ struct drawgfxParams dgp6={
 				dgp6.sy = 8*sy;
 				drawgfx(&dgp6);
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 
 		/* copy the temporary bitmap to the screen */
 		if (choplifter_scroll_x_on)
@@ -727,29 +727,29 @@ struct drawgfxParams dgp6={
 	{
 		priority <<= 3;
 
+		
+		{ 
+		struct drawgfxParams dgp7={
+			bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
 		{
 			if ((system1_backgroundram[offs+1] & 0x08) == priority)
-			
-{ 
-struct drawgfxParams dgp7={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				int code,color;
 
 
@@ -785,9 +785,9 @@ struct drawgfxParams dgp7={
 				dgp7.sy = 8*sy;
 				drawgfx(&dgp7);
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 	}
 }
 
@@ -912,7 +912,7 @@ static void wbml_draw_bg(mame_bitmap *bitmap, int trasp)
 				code = ((code >> 4) & 0x800) | (code & 0x7ff);
 
 				if (!trasp)
-					
+                {
 					dgp8.code = code;
 					dgp8.color = ((code >> 5) & 0x3f) + 64;
 					dgp8.flipx = flip_screen;
@@ -920,8 +920,9 @@ static void wbml_draw_bg(mame_bitmap *bitmap, int trasp)
 					dgp8.sx = x;
 					dgp8.sy = y;
 					drawgfx(&dgp8);
+                }
 				else if (priority)
-					
+				{
 					dgp9.code = code;
 					dgp9.color = ((code >> 5) & 0x3f) + 64;
 					dgp9.flipx = flip_screen;
@@ -929,7 +930,7 @@ static void wbml_draw_bg(mame_bitmap *bitmap, int trasp)
 					dgp9.sx = x;
 					dgp9.sy = y;
 					drawgfx(&dgp9);
-
+                }
 				source+=2;
 			}
 		}
@@ -1077,7 +1078,7 @@ static void ufosensi_draw_bg(mame_bitmap *bitmap, int trasp)
 				code = ((code >> 4) & 0x800) | (code & 0x7ff);
 
 				if (!trasp)
-					
+				{
 					dgp11.code = code;
 					dgp11.color = ((code >> 5) & 0x3f) + 64;
 					dgp11.flipx = flip_screen;
@@ -1085,8 +1086,9 @@ static void ufosensi_draw_bg(mame_bitmap *bitmap, int trasp)
 					dgp11.sx = x;
 					dgp11.sy = y;
 					drawgfx(&dgp11);
+                }
 				else if (priority)
-					
+				{
 					dgp12.code = code;
 					dgp12.color = ((code >> 5) & 0x3f) + 64;
 					dgp12.flipx = flip_screen;
@@ -1094,6 +1096,7 @@ static void ufosensi_draw_bg(mame_bitmap *bitmap, int trasp)
 					dgp12.sx = x;
 					dgp12.sy = y;
 					drawgfx(&dgp12);
+                }
 
 				source+=2;
 			}

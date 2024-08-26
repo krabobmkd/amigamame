@@ -310,6 +310,25 @@ static void update_background(void)
 
 	/* update the background and any dirty characters in it */
 	for (y = offs = 0; y < 32; y++)
+		
+		{ 
+		struct drawgfxParams dgp0={
+			tmpbitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			NULL, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (x = 0; x < 32; x++, offs++)
 		{
 			int code = videoram[offs];
@@ -323,26 +342,7 @@ static void update_background(void)
 
 			/* see if the bitmap is dirty */
 			if (dirtybuffer[offs] || chardirty[code])
-			
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	NULL, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				int color = code >> 6;
 				
 				dgp0.code = code;
@@ -352,9 +352,9 @@ struct drawgfxParams dgp0={
 				drawgfx(&dgp0);
 				dirtybuffer[offs] = 0;
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 
 	/* reset the char dirty array */
 	for (y = 0; y < 256; y++)
@@ -447,94 +447,94 @@ VIDEO_EOF( exidy )
 	update_complete = 0;
 
 	/* draw sprite 1 */
-	if (sprite_1_enabled())
 	
-{ 
-struct drawgfxParams dgp1={
-	motion_object_1_vid, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&clip, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{ 
+	struct drawgfxParams dgp1={
+		motion_object_1_vid, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	if (sprite_1_enabled())
+	{
 		org_1_x = 236 - sprite1_xpos - 4;
 		org_1_y = 244 - sprite1_ypos - 4;
 		
 		dgp1.code = (spriteno & 0x0f) + 16 * enable_set;
 		drawgfx(&dgp1);
 	}
-} // end of patch paragraph
+	} // end of patch paragraph
 
 	else
 		fillbitmap(motion_object_1_vid, pen0, &clip);
 
 	/* draw sprite 2 */
-	if (sprite_2_enabled())
 	
-{ 
-struct drawgfxParams dgp2={
-	motion_object_2_vid, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&clip, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{ 
+	struct drawgfxParams dgp2={
+		motion_object_2_vid, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	if (sprite_2_enabled())
+	{
 		org_2_x = 236 - sprite2_xpos - 4;
 		org_2_y = 244 - sprite2_ypos - 4;
 		
 		dgp2.code = ((spriteno >> 4) & 0x0f) + 32;
 		drawgfx(&dgp2);
 	}
-} // end of patch paragraph
+	} // end of patch paragraph
 
 	else
 		fillbitmap(motion_object_2_vid, pen0, &clip);
 
     /* draw sprite 2 clipped to sprite 1's location */
 	fillbitmap(motion_object_2_clip, pen0, &clip);
-	if (sprite_1_enabled() && sprite_2_enabled())
 	
-{ 
-struct drawgfxParams dgp3={
-	motion_object_2_clip, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&clip, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{ 
+	struct drawgfxParams dgp3={
+		motion_object_2_clip, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	if (sprite_1_enabled() && sprite_2_enabled())
+	{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
 		
@@ -543,7 +543,7 @@ struct drawgfxParams dgp3={
 		dgp3.sy = sy;
 		drawgfx(&dgp3);
 	}
-} // end of patch paragraph
+	} // end of patch paragraph
 
 
     /* scan for collisions */
@@ -593,27 +593,27 @@ VIDEO_UPDATE( exidy )
 	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 
 	/* draw sprite 2 first */
-	if (sprite_2_enabled())
 	
-{ 
-struct drawgfxParams dgp4={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{ 
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	if (sprite_2_enabled())
+	{
 		sx = 236 - sprite2_xpos - 4;
 		sy = 244 - sprite2_ypos - 4;
 
@@ -623,31 +623,31 @@ struct drawgfxParams dgp4={
 		dgp4.sy = sy;
 		drawgfx(&dgp4);
 	}
-} // end of patch paragraph
+	} // end of patch paragraph
 
 
 	/* draw sprite 1 next */
-	if (sprite_1_enabled())
 	
-{ 
-struct drawgfxParams dgp5={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{ 
+	struct drawgfxParams dgp5={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	if (sprite_1_enabled())
+	{
 		UINT8 enable_set = ((sprite_enable & 0x20) != 0);
 
 		sx = 236 - sprite1_xpos - 4;
@@ -661,7 +661,7 @@ struct drawgfxParams dgp5={
 		dgp5.sy = sy;
 		drawgfx(&dgp5);
 	}
-} // end of patch paragraph
+	} // end of patch paragraph
 
 
 	/* indicate that we already updated the background */

@@ -93,6 +93,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int ba
 
 	bFlicker = !bFlicker;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		priority_mask 	// priority_mask
+	  };
 	for( count=0; count<128; count++ ){
 		int attributes = source[1];
 		/*
@@ -105,26 +124,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int ba
             -------x    enable
         */
 		if ( attributes & 0x01 ){ /* visible */
-			if( bFlicker || (attributes&0x02)==0 )
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	priority_mask 	// priority_mask
-  };
-{
+			if( bFlicker || (attributes&0x02)==0 ){
 				int priority_mask = (attributes&0x08)?0x2:0;
 				int sx = (240 - source[2])&0xff;
 				int sy = (240 - source[0])&0xff;
@@ -138,26 +138,7 @@ struct drawgfxParams dgp1={
 					flipy = !flipy;
 				}
 
-				if( attributes & 0x10 )
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	priority_mask 	// priority_mask
-  };
-{ /* double height */
+				if( attributes & 0x10 ){ /* double height */
 					number = number&(~1);
 					sy -= 16;
 
@@ -180,8 +161,6 @@ struct drawgfxParams dgp0={
 					number++;
 					sy += 16;
 				}
-} // end of patch paragraph
-
 
 				vx = sx;
 				vy = sy;
@@ -191,19 +170,19 @@ struct drawgfxParams dgp0={
 				}
 
 				
-				dgp1.code = number;
-				dgp1.color = 0 /*color*/;
-				dgp1.flipx = flipx;
-				dgp1.flipy = flipy;
-				dgp1.sx = vx;
-				dgp1.sy = vy;
-				drawgfx(&dgp1);
+				dgp0.code = number;
+				dgp0.color = 0 /*color*/;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = vx;
+				dgp0.sy = vy;
+				drawgfx(&dgp0);
 				}
-} // end of patch paragraph
-
 		}
 		source -= 4;
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( shootout )

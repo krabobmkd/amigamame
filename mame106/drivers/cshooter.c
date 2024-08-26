@@ -151,29 +151,29 @@ VIDEO_UPDATE(cshooter)
 	//sprites
 	{
 		int i;
+		
+		{ 
+		struct drawgfxParams dgp0={
+			bitmap, 	// dest
+			Machine->gfx[0], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			cliprect, 	// clip
+			TRANSPARENCY_PEN, 	// transparency
+			3, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for(i=0;i<spriteram_size;i+=4)
 		{
 			if(spriteram[i+3]!=0)
-			
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	3, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				int tile=0x30+((spriteram[i]>>2)&0x1f);
 
 				
@@ -204,9 +204,9 @@ struct drawgfxParams dgp0={
 				dgp0.sy = spriteram[i+2]+8;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 	}
 
 	tilemap_mark_all_tiles_dirty(cshooter_txtilemap);

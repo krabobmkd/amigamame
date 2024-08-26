@@ -160,7 +160,7 @@ static void commando_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		}
 
 		if (bank < 3)
-			
+        {
 			dgp0.code = code;
 			dgp0.color = color;
 			dgp0.flipx = flipx;
@@ -168,6 +168,7 @@ static void commando_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 			dgp0.sx = sx;
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
+        }
 	}
 	} // end of patch paragraph
 

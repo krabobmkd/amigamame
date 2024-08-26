@@ -1,22 +1,3 @@
-
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
 #include "driver.h"
 
 
@@ -178,15 +159,6 @@ WRITE8_HANDLER( wc90_txvideoram_w )
 
 ***************************************************************************/
 
-#define WC90_DRAW_SPRITE( code, sx, sy ) \
-					
-					dgp0.code = code;
-					dgp0.color = flags >> 4;
-					dgp0.flipx = \					bank&1;
-					dgp0.flipy = bank&2;
-					dgp0.sx = sx;
-					dgp0.sy = sy;
-					drawgfx(&dgp0)
 
 static char pos32x32[] = { 0, 1, 2, 3 };
 static char pos32x32x[] = { 1, 0, 3, 2 };
@@ -236,134 +208,311 @@ static char* p64x64[4] = {
 	pos64x64xy
 };
 
-static void drawsprite_16x16( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-							  int sx, int sy, int bank, int flags ) {
-	WC90_DRAW_SPRITE( code, sx, sy );
+static void drawsprite_16x16(struct drawgfxParams *pdgp,int code,int sx,int sy,int bank)
+{
+    pdgp->code = code;
+    pdgp->sx = sx;
+    pdgp->sy = sy;
+    drawgfx(pdgp);
 }
 
-static void drawsprite_16x32( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-							  int sx, int sy, int bank, int flags ) {
-	if ( bank & 2 ) {
-		WC90_DRAW_SPRITE( code+1, sx, sy+16 );
-		WC90_DRAW_SPRITE( code, sx, sy );
-	} else {
-		WC90_DRAW_SPRITE( code, sx, sy );
-		WC90_DRAW_SPRITE( code+1, sx, sy+16 );
+static void drawsprite_16x32( struct drawgfxParams *pdgp,int code,int sx,int sy,int bank) {
+	
+	if ( pdgp->flipy ) {
+        
+        pdgp->code = code+1;
+        pdgp->sx = sx;
+        pdgp->sy = sy+16;
+        drawgfx(pdgp);
+        
+        pdgp->code = code;
+        pdgp->sx = sx;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
 	}
-}
+    else {
+        
+        pdgp->code = code;
+        pdgp->sx = sx;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
 
-static void drawsprite_16x64( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-							  int sx, int sy, int bank, int flags ) {
-	if ( bank & 2 ) {
-		WC90_DRAW_SPRITE( code+3, sx, sy+48 );
-		WC90_DRAW_SPRITE( code+2, sx, sy+32 );
-		WC90_DRAW_SPRITE( code+1, sx, sy+16 );
-		WC90_DRAW_SPRITE( code, sx, sy );
-	} else {
-		WC90_DRAW_SPRITE( code, sx, sy );
-		WC90_DRAW_SPRITE( code+1, sx, sy+16 );
-		WC90_DRAW_SPRITE( code+2, sx, sy+32 );
-		WC90_DRAW_SPRITE( code+3, sx, sy+48 );
+        pdgp->code = code+1;
+        pdgp->sx = sx;
+        pdgp->sy = sy+16;
+        drawgfx(pdgp);
 	}
+
+
 }
 
-static void drawsprite_32x16( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-							  int sx, int sy, int bank, int flags ) {
-	if ( bank & 1 ) {
-		WC90_DRAW_SPRITE( code+1, sx+16, sy );
-		WC90_DRAW_SPRITE( code, sx, sy );
+static void drawsprite_16x64(struct drawgfxParams *pdgp,int code,int sx,int sy,int bank ) {
+	
+	if (pdgp->flipy ) {
+
+        pdgp->code = code+3;
+        pdgp->sx = sx;
+        pdgp->sy = sy+48;
+        drawgfx(pdgp);
+
+        pdgp->code = code+2;
+        pdgp->sx = sx;
+        pdgp->sy = sy+32;
+        drawgfx(pdgp);
+
+        pdgp->code = code+1;
+        pdgp->sx = sx;
+        pdgp->sy = sy+16;
+        drawgfx(pdgp);
+
+        pdgp->code = code;
+        pdgp->sx = sx;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
 	} else {
-		WC90_DRAW_SPRITE( code, sx, sy );
-		WC90_DRAW_SPRITE( code+1, sx+16, sy );
+
+        pdgp->code = code;
+        pdgp->sx = sx;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+
+        pdgp->code = code+1;
+        pdgp->sx = sx;
+        pdgp->sy = sy+16;
+        drawgfx(pdgp);
+
+        pdgp->code = code+2;
+        pdgp->sx = sx;
+        pdgp->sy = sy+32;
+        drawgfx(pdgp);
+
+        pdgp->code = code+3;
+        pdgp->sx = sx;
+        pdgp->sy = sy+48;
+        drawgfx(pdgp);
 	}
+
+
 }
 
-static void drawsprite_32x32( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-							  int sx, int sy, int bank, int flags ) {
+static void drawsprite_32x16( struct drawgfxParams *pdgp,int code,int sx,int sy,int bank ) {
+
+	if ( pdgp->flipx ) {
+
+        pdgp->code = code+1;
+        pdgp->sx = sx+16;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+
+        pdgp->code = code;
+        pdgp->sx = sx;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+	} else {
+
+        pdgp->code = code;
+        pdgp->sx = sx;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+
+        pdgp->code = code+1;
+        pdgp->sx = sx+16;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+	}
+
+}
+
+static void drawsprite_32x32( struct drawgfxParams *pdgp,int code,int sx,int sy,int bank )
+{ 
 
 	char *p = p32x32[ bank&3 ];
 
-	WC90_DRAW_SPRITE( code+p[0], sx, sy );
-	WC90_DRAW_SPRITE( code+p[1], sx+16, sy );
-	WC90_DRAW_SPRITE( code+p[2], sx, sy+16 );
-	WC90_DRAW_SPRITE( code+p[3], sx+16, sy+16 );
+    pdgp->code = code+p[0];
+    pdgp->sx = sx;
+    pdgp->sy = sy;
+    drawgfx(pdgp);
+    
+    pdgp->code = code+p[1];
+    pdgp->sx = sx+16;
+    pdgp->sy = sy;
+    drawgfx(pdgp);
+
+    pdgp->code = code+p[2];
+    pdgp->sx = sx;
+    pdgp->sy = sy+16;
+    drawgfx(pdgp);
+
+    pdgp->code = code+p[3];
+    pdgp->sx = sx+16;
+    pdgp->sy = sy+16;
+    drawgfx(pdgp);
 }
 
-static void drawsprite_32x64( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-							  int sx, int sy, int bank, int flags ) {
-
+static void drawsprite_32x64( struct drawgfxParams *pdgp,int code,int sx,int sy ,int bank)
+{
 	char *p = p32x64[ bank&3 ];
 
-	WC90_DRAW_SPRITE( code+p[0], sx, sy );
-	WC90_DRAW_SPRITE( code+p[1], sx+16, sy );
-	WC90_DRAW_SPRITE( code+p[2], sx, sy+16 );
-	WC90_DRAW_SPRITE( code+p[3], sx+16, sy+16 );
-	WC90_DRAW_SPRITE( code+p[4], sx, sy+32 );
-	WC90_DRAW_SPRITE( code+p[5], sx+16, sy+32 );
-	WC90_DRAW_SPRITE( code+p[6], sx, sy+48 );
-	WC90_DRAW_SPRITE( code+p[7], sx+16, sy+48 );
+    pdgp->code = code+p[0];
+    pdgp->sx = sx;
+    pdgp->sy = sy;
+    drawgfx(pdgp);
+
+    pdgp->code = code+p[1];
+    pdgp->sx = sx+16;
+    pdgp->sy = sy;
+    drawgfx(pdgp);
+
+    pdgp->code = code+p[2];
+    pdgp->sx = sx;
+    pdgp->sy = sy+16;
+    drawgfx(pdgp);
+
+    pdgp->code = code+p[3];
+    pdgp->sx = sx+16;
+    pdgp->sy = sy+16;
+    drawgfx(pdgp);
+
+    pdgp->code = code+p[4];
+    pdgp->sx = sx;
+    pdgp->sy = sy+32;
+    drawgfx(pdgp);
+
+    pdgp->code = code+p[5];
+    pdgp->sx = sx+16;
+    pdgp->sy = sy+32;
+    drawgfx(pdgp);
+
+    pdgp->code = code+p[6];
+    pdgp->sx = sx;
+    pdgp->sy = sy+48;
+    drawgfx(pdgp);
+
+    pdgp->code = code+p[7];
+    pdgp->sx = sx+16;
+    pdgp->sy = sy+48;
+    drawgfx(pdgp);
 }
 
-static void drawsprite_64x16( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-							  int sx, int sy, int bank, int flags ) {
-	if ( bank & 1 ) {
-		WC90_DRAW_SPRITE( code+3, sx+48, sy );
-		WC90_DRAW_SPRITE( code+2, sx+32, sy );
-		WC90_DRAW_SPRITE( code+1, sx+16, sy );
-		WC90_DRAW_SPRITE( code, sx, sy );
+
+
+static void drawsprite_64x16( struct drawgfxParams *pdgp,int code,int sx,int sy,int bank ) {
+	
+	if ( pdgp->flipx ) {
+
+        pdgp->code = code+3;
+        pdgp->sx = sx+48;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+
+        pdgp->code = code+2;
+        pdgp->sx = sx+32;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+
+        pdgp->code = code+1;
+        pdgp->sx = sx+16;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+
+        pdgp->code = code;
+        pdgp->sx = sx;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
 	} else {
-		WC90_DRAW_SPRITE( code, sx, sy );
-		WC90_DRAW_SPRITE( code+1, sx+16, sy );
-		WC90_DRAW_SPRITE( code+2, sx+32, sy );
-		WC90_DRAW_SPRITE( code+3, sx+48, sy );
+        
+        pdgp->code = code;
+        pdgp->sx = sx;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+        
+        pdgp->code = code+1;
+        pdgp->sx = sx+16;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+        
+        pdgp->code = code+2;
+        pdgp->sx = sx+32;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
+        
+        pdgp->code = code+3;
+        pdgp->sx = sx+48;
+        pdgp->sy = sy;
+        drawgfx(pdgp);
 	}
 }
 
-static void drawsprite_64x32( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-							  int sx, int sy, int bank, int flags ) {
+static void drawsprite_64x32( struct drawgfxParams *pdgp,int code,int sx,int sy,int bank ) {
 
 	char *p = p64x32[ bank&3 ];
 
-	WC90_DRAW_SPRITE( code+p[0], sx, sy );
-	WC90_DRAW_SPRITE( code+p[1], sx+16, sy );
-	WC90_DRAW_SPRITE( code+p[2], sx, sy+16 );
-	WC90_DRAW_SPRITE( code+p[3], sx+16, sy+16 );
-	WC90_DRAW_SPRITE( code+p[4], sx+32, sy );
-	WC90_DRAW_SPRITE( code+p[5], sx+48, sy );
-	WC90_DRAW_SPRITE( code+p[6], sx+32, sy+16 );
-	WC90_DRAW_SPRITE( code+p[7], sx+48, sy+16 );
+    static const int dxy[]={
+        0,0,
+        16,0,
+        0,16,
+        16,16,
+        32,0,
+        48,0,
+        32,16,
+        48,16
+    };
+    const int *pdxy = dxy;
+
+    for(UINT16 i=0;i<8;i++)
+    {
+        int dx = *pdxy++;
+        int dy = *pdxy++;
+        
+        pdgp->code = code+p[i];
+        pdgp->sx = sx+dx;
+        pdgp->sy = sy+dy;
+        drawgfx(pdgp);
+    }
+
 }
 
-static void drawsprite_64x64( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-							  int sx, int sy, int bank, int flags ) {
+static void drawsprite_64x64(struct drawgfxParams *pdgp,int code,int sx,int sy,int bank ) {
 
 	char *p = p64x64[ bank&3 ];
 
-	WC90_DRAW_SPRITE( code+p[0], sx, sy );
-	WC90_DRAW_SPRITE( code+p[1], sx+16, sy );
-	WC90_DRAW_SPRITE( code+p[2], sx, sy+16 );
-	WC90_DRAW_SPRITE( code+p[3], sx+16, sy+16 );
-	WC90_DRAW_SPRITE( code+p[4], sx+32, sy );
-	WC90_DRAW_SPRITE( code+p[5], sx+48, sy );
-	WC90_DRAW_SPRITE( code+p[6], sx+32, sy+16 );
-	WC90_DRAW_SPRITE( code+p[7], sx+48, sy+16 );
+    static const int dxy[]={
+        0,0,
+        16,0,
+        0,16,
+        16,16,
+        32,0,
+        48,0,
+        32,16,
+        48,16,
+        0,32,
+        16,32,
+        0,48,
+        16,48,
+        32,32,
+        48,32,
+        32,48,
+        48,48
+    };
+    const int *pdxy = dxy;
 
-	WC90_DRAW_SPRITE( code+p[8], sx, sy+32 );
-	WC90_DRAW_SPRITE( code+p[9], sx+16, sy+32 );
-	WC90_DRAW_SPRITE( code+p[10], sx, sy+48 );
-	WC90_DRAW_SPRITE( code+p[11], sx+16, sy+48 );
-	WC90_DRAW_SPRITE( code+p[12], sx+32, sy+32 );
-	WC90_DRAW_SPRITE( code+p[13], sx+48, sy+32 );
-	WC90_DRAW_SPRITE( code+p[14], sx+32, sy+48 );
-	WC90_DRAW_SPRITE( code+p[15], sx+48, sy+48 );
+    for(UINT16 i=0;i<16;i++)
+    {
+        int dx = *pdxy++;
+        int dy = *pdxy++;
+
+        pdgp->code = code+p[i];
+        pdgp->sx = sx+dx;
+        pdgp->sy = sy+dy;
+        drawgfx(pdgp);
+    }
 }
 
-static void drawsprite_invalid( mame_bitmap *bitmap, const rectangle *cliprect, int code,
-											int sx, int sy, int bank, int flags ) {
+static void drawsprite_invalid(struct drawgfxParams *pdgp,int code,int sx,int sy,int bank ) {
 	logerror("8 pixel sprite size not supported\n" );
 }
-
-typedef void (*drawsprites_procdef)( mame_bitmap *, const rectangle *, int, int, int, int, int );
+//  mame_bitmap *, const rectangle *, int, int, int, int, int )
+typedef void (*drawsprites_procdef)(struct drawgfxParams *pdgp,int code,int sx,int sy,int bank);
 
 static drawsprites_procdef drawsprites_proc[16] = {
 	drawsprite_invalid,		/* 0000 = 08x08 */
@@ -388,6 +537,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pr
 {
 	int offs, sx,sy, flags, which;
 
+    struct drawgfxParams dgp={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+        0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+
+
 	/* draw all visible sprites of specified priority */
 	for (offs = 0;offs < spriteram_size;offs += 16){
 		int bank = spriteram[offs+0];
@@ -401,13 +569,16 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pr
 				sy = spriteram[offs + 6] + ( (spriteram[offs + 7] & 1 ) << 8 );
 
 				flags = spriteram[offs+4];
-				( *( drawsprites_proc[ flags & 0x0f ] ) )( bitmap,cliprect, which, sx, sy, bank, flags );
+
+                dgp.color = flags >> 4;
+                dgp.flipx = bank&1; 	// flipx
+                dgp.flipy = bank&2; 	// flipy
+
+				( *( drawsprites_proc[ flags & 0x0f ] ) )( &dgp,which,sx,sy,bank );
 			}
 		}
 	}
 }
-
-#undef WC90_DRAW_SPRITE
 
 
 VIDEO_UPDATE( wc90 )
@@ -427,5 +598,3 @@ VIDEO_UPDATE( wc90 )
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	draw_sprites( bitmap,cliprect, 0 );
 }
-
-} // end of patch paragraph

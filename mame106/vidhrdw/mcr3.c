@@ -218,6 +218,42 @@ void mcr3_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 	fillbitmap(priority_bitmap, 1, cliprect);
 
 	/* loop over sprite RAM */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PENS, 	// transparency
+		0x0101, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x00 	// priority_mask
+	  };
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PENS, 	// transparency
+		0xfeff, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0x02 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int code, color, flipx, flipy, sx, sy, flags;
@@ -254,43 +290,7 @@ void mcr3_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 		/* sprites use color 0 for background pen and 8 for the 'under tile' pen.
             The color 8 is used to cover over other sprites. */
 		if (!mcr_cocktail_flip)
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PENS, 	// transparency
-	0x0101, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	0x00 	// priority_mask
-  };
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PENS, 	// transparency
-	0xfeff, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	0x02 	// priority_mask
-  };
-{
+		{
 			/* first draw the sprite, visible */
 			
 			dgp0.code = code;
@@ -311,69 +311,31 @@ struct drawgfxParams dgp1={
 			dgp1.sy = sy;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
-		
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PENS, 	// transparency
-	0x0101, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	0x00 	// priority_mask
-  };
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PENS, 	// transparency
-	0xfeff, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	0x02 	// priority_mask
-  };
-else
+		else
 		{
 			/* first draw the sprite, visible */
 			
-			dgp2.code = code;
-			dgp2.color = color;
-			dgp2.flipx = !flipx;
-			dgp2.flipy = !flipy;
-			dgp2.sx = 480 - sx;
-			dgp2.sy = 452 - sy;
-			drawgfx(&dgp2);
+			dgp0.code = code;
+			dgp0.color = color;
+			dgp0.flipx = !flipx;
+			dgp0.flipy = !flipy;
+			dgp0.sx = 480 - sx;
+			dgp0.sy = 452 - sy;
+			drawgfx(&dgp0);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
 			
-			dgp3.code = code;
-			dgp3.color = color;
-			dgp3.flipx = !flipx;
-			dgp3.flipy = !flipy;
-			dgp3.sx = 480 - sx;
-			dgp3.sy = 452 - sy;
-			drawgfx(&dgp3);
+			dgp1.code = code;
+			dgp1.color = color;
+			dgp1.flipx = !flipx;
+			dgp1.flipy = !flipy;
+			dgp1.sx = 480 - sx;
+			dgp1.sy = 452 - sy;
+			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 

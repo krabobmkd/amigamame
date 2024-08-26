@@ -92,7 +92,7 @@ static void m90_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		(colour & 0x08) ? 0x00 : 0x02 	// priority_mask
+		0 // (colour & 0x08) ? 0x00 : 0x02 	// priority_mask
 	  };
 	for (offs = 0x1f2;offs >= 0;offs -= 6)
 	{
@@ -100,6 +100,8 @@ static void m90_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		sprite = (m90_spriteram[offs+2] | (m90_spriteram[offs+3]<<8));
 		colour = (m90_spriteram[offs+1] >> 1) & 0x0f;
+
+        dgp0.priority_mask =  (colour & 0x08) ? 0x00 : 0x02 ;
 
 		y = m90_spriteram[offs+0] | ((m90_spriteram[offs+1] & 0x01) << 8);
 		x = m90_spriteram[offs+4] | ((m90_spriteram[offs+5] & 0x01) << 8);
@@ -114,7 +116,7 @@ static void m90_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		y -= 16 * y_multi;
 
 		for (i = 0;i < y_multi;i++)
-			
+        {
 			dgp0.code = sprite + (fy ? y_multi-1 - i : i);
 			dgp0.color = colour;
 			dgp0.flipx = fx;
@@ -122,6 +124,7 @@ static void m90_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			dgp0.sx = x;
 			dgp0.sy = y+i*16;
 			drawgfx(&dgp0);
+        }
 	}
 	} // end of patch paragraph
 

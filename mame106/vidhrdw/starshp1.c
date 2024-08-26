@@ -231,6 +231,25 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
 
 
 static void draw_spaceship(mame_bitmap* bitmap, const rectangle* cliprect)
+
+{ 
+struct drawgfxParams dgpz0={
+	bitmap, 	// dest
+	Machine->gfx[2], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0x00010000, 	// scalex
+	0x00010000, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	double scaler = -5 * log(1 - starshp1_ship_size / 256.0); /* ? */
 
@@ -249,14 +268,18 @@ static void draw_spaceship(mame_bitmap* bitmap, const rectangle* cliprect)
 		y -= (yzoom * starshp1_ship_voffset) >> 16;
 	}
 
-	drawgfxzoom(bitmap, Machine->gfx[2],
-		starshp1_ship_picture & 0x03,
-		starshp1_ship_explode,
-		starshp1_ship_picture & 0x80, 0,
-		x, y,
-		cliprect, TRANSPARENCY_PEN, 0,
-		xzoom, yzoom);
+	
+	dgpz0.code = starshp1_ship_picture & 0x03;
+	dgpz0.color = starshp1_ship_explode;
+	dgpz0.flipx = starshp1_ship_picture & 0x80;
+	dgpz0.sx = x;
+	dgpz0.sy = y;
+	dgpz0.scalex = xzoom;
+	dgpz0.scaley = yzoom;
+	drawgfxzoom(&dgpz0);
 }
+} // end of patch paragraph
+
 
 
 static void draw_phasor(mame_bitmap* bitmap)

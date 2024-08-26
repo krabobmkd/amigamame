@@ -176,6 +176,25 @@ static void wwfwfest_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 	UINT16 *source = buffered_spriteram16;
 	UINT16 *finish = source + 0x2000/2;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( source<finish )
 	{
 		int xpos, ypos, colourbank, flipx, flipy, chain, enable, number, count;
@@ -205,26 +224,7 @@ static void wwfwfest_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 
 			for (count=0;count<chain;count++) {
 				if (flip_screen) {
-					if (!flipy) 
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+					if (!flipy) {
 						
 						dgp0.code = number+count;
 						dgp0.color = colourbank;
@@ -233,106 +233,43 @@ struct drawgfxParams dgp0={
 						dgp0.sx = xpos;
 						dgp0.sy = ypos+(16*(chain-1))-(16*count);
 						drawgfx(&dgp0);
-					}
-} // end of patch paragraph
- 
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else {
+					} else {
 						
-						dgp1.code = number+count;
-						dgp1.color = colourbank;
-						dgp1.flipx = flipx;
-						dgp1.flipy = flipy;
-						dgp1.sx = xpos;
-						dgp1.sy = ypos+16*count;
-						drawgfx(&dgp1);
+						dgp0.code = number+count;
+						dgp0.color = colourbank;
+						dgp0.flipx = flipx;
+						dgp0.flipy = flipy;
+						dgp0.sx = xpos;
+						dgp0.sy = ypos+16*count;
+						drawgfx(&dgp0);
 					}
-} // end of patch paragraph
-
 				} else {
-						if (flipy) 
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+						if (flipy) {
 						
-						dgp2.code = number+count;
-						dgp2.color = colourbank;
-						dgp2.flipx = flipx;
-						dgp2.flipy = flipy;
-						dgp2.sx = xpos;
-						dgp2.sy = ypos-(16*(chain-1))+(16*count);
-						drawgfx(&dgp2);
-					}
-} // end of patch paragraph
- 
-{ 
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else {
+						dgp0.code = number+count;
+						dgp0.color = colourbank;
+						dgp0.flipx = flipx;
+						dgp0.flipy = flipy;
+						dgp0.sx = xpos;
+						dgp0.sy = ypos-(16*(chain-1))+(16*count);
+						drawgfx(&dgp0);
+					} else {
 						
-						dgp3.code = number+count;
-						dgp3.color = colourbank;
-						dgp3.flipx = flipx;
-						dgp3.flipy = flipy;
-						dgp3.sx = xpos;
-						dgp3.sy = ypos-16*count;
-						drawgfx(&dgp3);
+						dgp0.code = number+count;
+						dgp0.color = colourbank;
+						dgp0.flipx = flipx;
+						dgp0.flipy = flipy;
+						dgp0.sx = xpos;
+						dgp0.sy = ypos-16*count;
+						drawgfx(&dgp0);
 					}
-} // end of patch paragraph
-
 				}
 			}
 		}
 	source+=8;
 	}
+	} // end of patch paragraph
+
 }
 
 /*******************************************************************************

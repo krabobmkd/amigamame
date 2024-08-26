@@ -162,7 +162,7 @@ static void bagman_draw_sprites( mame_bitmap *bitmap )
 		}
 
 		if (spriteram[offs + 2] && spriteram[offs + 3])
-			
+		{
 			dgp0.code = (spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20);
 			dgp0.color = spriteram[offs + 1] & 0x1f;
 			dgp0.flipx = flipx;
@@ -170,6 +170,7 @@ static void bagman_draw_sprites( mame_bitmap *bitmap )
 			dgp0.sx = sx;
 			dgp0.sy = sy+1;
 			drawgfx(&dgp0);
+        }
 	}
 	} // end of patch paragraph
 

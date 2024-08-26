@@ -398,6 +398,25 @@ static void gaelco2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,
 	}
 #endif
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (j = start_offset; j < end_offset; j += 8){
 		int data = buffered_spriteram16[(j/2) + 0];
 		int data2 = buffered_spriteram16[(j/2) + 1];
@@ -429,26 +448,7 @@ static void gaelco2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,
 					ey = yflip ? (ysize - 1 - y) : y;
 
 					/* normal sprite, pen 0 transparent */
-					if (color_effect == 0)
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+					if (color_effect == 0){
 						
 						dgp0.code = number;
 						dgp0.color = color;
@@ -458,9 +458,7 @@ struct drawgfxParams dgp0={
 						dgp0.sy = ((sy + ey*16) & 0x1ff);
 						drawgfx(&dgp0);
 
-					}
-} // end of patch paragraph
- else { /* last palette entry is reserved for shadows and highlights */
+					} else { /* last palette entry is reserved for shadows and highlights */
 
 						/* get a pointer to the current sprite's gfx data */
 						UINT8 *gfx_src = gfx->gfxdata + (number % gfx->total_elements)*gfx->char_modulo;
@@ -498,6 +496,8 @@ struct drawgfxParams dgp0={
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /***************************************************************************

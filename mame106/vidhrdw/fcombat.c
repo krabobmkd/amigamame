@@ -162,7 +162,7 @@ tilemap_mark_all_tiles_dirty(bgmap);
 	/* draw sprites */
 	
 	{ 
-	struct drawgfxParams dgp4={
+	struct drawgfxParams dgp0={
 		bitmap, 	// dest
 		gfx, 	// gfx
 		0, 	// code
@@ -205,26 +205,7 @@ tilemap_mark_all_tiles_dirty(bgmap);
 		}
 
 		if (wide)
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			if (yflip)
 				code |= 0x10, code2 &= ~0x10;
 			else
@@ -239,72 +220,49 @@ struct drawgfxParams dgp0={
 			dgp0.sy = y + gfx->height;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 
 		if(flags&0x10)
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 
 
 
 			
-			dgp1.code = code2+16;
-			dgp1.color = color;
-			dgp1.flipx = xflip;
-			dgp1.flipy = yflip;
-			dgp1.sx = x;
-			dgp1.sy = y + gfx->height;
-			drawgfx(&dgp1);
+			dgp0.code = code2+16;
+			dgp0.color = color;
+			dgp0.flipx = xflip;
+			dgp0.flipy = yflip;
+			dgp0.sx = x;
+			dgp0.sy = y + gfx->height;
+			drawgfx(&dgp0);
 			
-			dgp1.code = code2+16*2;
-			dgp1.color = color;
-			dgp1.flipx = xflip;
-			dgp1.flipy = yflip;
-			dgp1.sx = x;
-			dgp1.sy = y + 2*gfx->height;
-			drawgfx(&dgp1);
+			dgp0.code = code2+16*2;
+			dgp0.color = color;
+			dgp0.flipx = xflip;
+			dgp0.flipy = yflip;
+			dgp0.sx = x;
+			dgp0.sy = y + 2*gfx->height;
+			drawgfx(&dgp0);
 			
-			dgp1.code = code2+16*3;
-			dgp1.color = color;
-			dgp1.flipx = xflip;
-			dgp1.flipy = yflip;
-			dgp1.sx = x;
-			dgp1.sy = y + 3*gfx->height;
-			drawgfx(&dgp1);
+			dgp0.code = code2+16*3;
+			dgp0.color = color;
+			dgp0.flipx = xflip;
+			dgp0.flipy = yflip;
+			dgp0.sx = x;
+			dgp0.sy = y + 3*gfx->height;
+			drawgfx(&dgp0);
 
 		}
-} // end of patch paragraph
-
 
 
 
 		
-		dgp4.code = code;
-		dgp4.color = color;
-		dgp4.flipx = xflip;
-		dgp4.flipy = yflip;
-		dgp4.sx = x;
-		dgp4.sy = y;
-		drawgfx(&dgp4);
+		dgp0.code = code;
+		dgp0.color = color;
+		dgp0.flipx = xflip;
+		dgp0.flipy = yflip;
+		dgp0.sx = x;
+		dgp0.sy = y;
+		drawgfx(&dgp0);
 
 		if (doubled) i += 4;
 	}

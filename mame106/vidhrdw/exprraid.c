@@ -159,37 +159,16 @@ static void exprraid_draw_sprites( mame_bitmap *bitmap )
 		/* double height */
 
 		if (attr & 0x10)
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
-			dgp1.code = code + 1;
-			dgp1.color = color;
-			dgp1.flipx = flipx;
-			dgp1.flipy = flipy;
-			dgp1.sx = sx;
-			dgp1.sy = sy + (flip_screen ? -16 : 16);
-			drawgfx(&dgp1);
+			dgp0.code = code + 1;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = sy + (flip_screen ? -16 : 16);
+			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
 	} // end of patch paragraph
 

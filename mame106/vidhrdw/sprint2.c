@@ -189,6 +189,23 @@ VIDEO_EOF( sprint2 )
 		NULL, 	// pri_buffer
 		0 	// priority_mask
 	  };
+	struct drawgfxParams dgp2={
+		helper, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&rect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 2; i++)
 	{
 		rectangle rect;
@@ -224,34 +241,13 @@ VIDEO_EOF( sprint2 )
 		for (j = 0; j < 4; j++)
 		{
 			if (j != i)
-			
-{ 
-struct drawgfxParams dgp2={
-	helper, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&rect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				
 				dgp2.code = get_sprite_code(j);
 				dgp2.sx = get_sprite_x(j);
 				dgp2.sy = get_sprite_y(j);
 				drawgfx(&dgp2);
 			}
-} // end of patch paragraph
-
 		}
 
 		

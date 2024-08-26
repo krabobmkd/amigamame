@@ -132,6 +132,25 @@ VIDEO_START( wolfpack )
 
 
 static void draw_ship(mame_bitmap* bitmap, const rectangle* cliprect)
+
+{ 
+struct drawgfxParams dgpz0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0x00010000, 	// scalex
+	0x00010000, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	static const UINT32 scaler[] =
 	{
@@ -155,16 +174,16 @@ static void draw_ship(mame_bitmap* bitmap, const rectangle* cliprect)
 
 	int chop = (scaler[wolfpack_ship_size] * wolfpack_ship_h_precess) >> 16;
 
-	drawgfxzoom(bitmap, Machine->gfx[1],
-		wolfpack_ship_pic,
-		0,
-		wolfpack_ship_reflect, 0,
-		2 * (wolfpack_ship_h - chop),
-		128,
-		cliprect,
-		TRANSPARENCY_PEN, 0,
-		2 * scaler[wolfpack_ship_size], scaler[wolfpack_ship_size]);
+	
+	dgpz0.code = wolfpack_ship_pic;
+	dgpz0.flipx = wolfpack_ship_reflect;
+	dgpz0.sx = 2 * (wolfpack_ship_h - chop);
+	dgpz0.scalex = 2 * scaler[wolfpack_ship_size];
+	dgpz0.scaley = scaler[wolfpack_ship_size];
+	drawgfxzoom(&dgpz0);
 }
+} // end of patch paragraph
+
 
 
 static void draw_torpedo(mame_bitmap* bitmap, const rectangle* cliprect)

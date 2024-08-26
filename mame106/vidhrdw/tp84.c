@@ -241,6 +241,25 @@ static void tp84_draw_sprites(mame_bitmap *bitmap)
 	int line;
 	int coloffset = ((col0&0x07) << 4);
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (line = 0;line < 256;line++)
 	{
 		if (line >= Machine->visible_area.min_y && line <= Machine->visible_area.max_y)
@@ -258,26 +277,7 @@ static void tp84_draw_sprites(mame_bitmap *bitmap)
 				sy = 240 - sr[offs + 3];
 
 				if (sy > line-16 && sy <= line)
-				
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&clip, 	// clip
-	TRANSPARENCY_COLOR, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+				{
 					code = sr[offs + 1];
 					color = (sr[offs + 2] & 0x0f) + coloffset;
 					flipx = ~sr[offs + 2] & 0x40;
@@ -292,11 +292,11 @@ struct drawgfxParams dgp0={
 					dgp0.sy = sy;
 					drawgfx(&dgp0);
 				}
-} // end of patch paragraph
-
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( tp84 )

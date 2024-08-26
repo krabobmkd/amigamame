@@ -315,7 +315,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *clip,int pri)
 			drawgfx(&dgp0);
 
 			if (cgx)
-				
+            {
 				dgp0.code = code2;
 				dgp0.color = colour;
 				dgp0.flipx = fx;
@@ -323,6 +323,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *clip,int pri)
 				dgp0.sx = mx+16;
 				dgp0.sy = my;
 				drawgfx(&dgp0);
+            }
 			my+=16;
 			/* if (cgx) */ /* Different from console? */
 			code+=2;
@@ -353,6 +354,59 @@ static void screenrefresh(mame_bitmap *bitmap,const rectangle *clip)
 
 	mx=-1;
 	my=0;
+	
+	{ 
+	struct drawgfxParams dgp2={
+		tile_bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp3={
+		front_bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp4={
+		front_bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_PENS, 	// transparency
+		0x1, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x0000;offs < 0x2000;offs += 2)
 	{
 		mx++;
@@ -360,60 +414,7 @@ static void screenrefresh(mame_bitmap *bitmap,const rectangle *clip)
 		code=HuC6270_vram[offs+1] + ((HuC6270_vram[offs] & 0x0f) << 8);
 
 		/* If this tile was changed OR tilemap was changed, redraw */
-		if (tile_dirty[code] || vram_dirty[offs/2]) 
-{ 
-struct drawgfxParams dgp2={
-	tile_bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-struct drawgfxParams dgp3={
-	front_bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-struct drawgfxParams dgp4={
-	front_bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_PENS, 	// transparency
-	0x1, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		if (tile_dirty[code] || vram_dirty[offs/2]) {
 			vram_dirty[offs/2]=0;
 	        
 	        dgp2.code = code;
@@ -433,9 +434,9 @@ struct drawgfxParams dgp4={
 	        dgp4.sy = 8*my;
 	        drawgfx(&dgp4);
 			}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	/* Nothing dirty after a screen refresh */
 	for (code = 0x0000;code < 0x1000;code++)

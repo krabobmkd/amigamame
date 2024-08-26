@@ -385,29 +385,29 @@ VIDEO_UPDATE( cclimber )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp2={
+		tmpbitmap, 	// dest
+		Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		
-{ 
-struct drawgfxParams dgp2={
-	tmpbitmap, 	// dest
-	Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy,flipx,flipy;
 
 
@@ -440,9 +440,9 @@ struct drawgfxParams dgp2={
 			dgp2.sy = 8*sy;
 			drawgfx(&dgp2);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 
 	/* copy the temporary bitmap to the screen */
@@ -547,29 +547,29 @@ VIDEO_UPDATE( swimmer )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp4={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		
-{ 
-struct drawgfxParams dgp4={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy,flipx,flipy,color;
 
 
@@ -608,9 +608,9 @@ struct drawgfxParams dgp4={
 			dgp4.sy = 8*sy;
 			drawgfx(&dgp4);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 
 	/* copy the temporary bitmap to the screen */
@@ -720,29 +720,29 @@ VIDEO_UPDATE( yamato )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp6={
+		tmpbitmap, 	// dest
+		Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		
-{ 
-struct drawgfxParams dgp6={
-	tmpbitmap, 	// dest
-	Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy,flipx,flipy;
 
 
@@ -775,9 +775,9 @@ struct drawgfxParams dgp6={
 			dgp6.sy = 8*sy;
 			drawgfx(&dgp6);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 
 	/* copy the temporary bitmap to the screen */

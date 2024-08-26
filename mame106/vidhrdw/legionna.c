@@ -200,6 +200,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x400-4;offs >= 0;offs -= 4)
 	{
 		UINT16 data = spriteram16[offs];
@@ -227,25 +246,6 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 		if (!fx)
 		{
 			for (ax=0; ax<dx; ax++)
-				
-				{ 
-				struct drawgfxParams dgp0={
-					bitmap, 	// dest
-					Machine->gfx[3], 	// gfx
-					0, 	// code
-					0, 	// color
-					0, 	// flipx
-					0, 	// flipy
-					0, 	// sx
-					0, 	// sy
-					cliprect, 	// clip
-					TRANSPARENCY_PEN, 	// transparency
-					15, 	// transparent_color
-					0, 	// scalex
-					0, 	// scaley
-					NULL, 	// pri_buffer
-					0 	// priority_mask
-				  };
 				for (ay=0; ay<dy; ay++)
 				{
 					
@@ -257,46 +257,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 					dgp0.sy = y+ay*16;
 					drawgfx(&dgp0);
 				}
-				} // end of patch paragraph
-
 		}
 		else
 		{
 			for (ax=0; ax<dx; ax++)
-				
-				{ 
-				struct drawgfxParams dgp1={
-					bitmap, 	// dest
-					Machine->gfx[3], 	// gfx
-					0, 	// code
-					0, 	// color
-					0, 	// flipx
-					0, 	// flipy
-					0, 	// sx
-					0, 	// sy
-					cliprect, 	// clip
-					TRANSPARENCY_PEN, 	// transparency
-					15, 	// transparent_color
-					0, 	// scalex
-					0, 	// scaley
-					NULL, 	// pri_buffer
-					0 	// priority_mask
-				  };
 				for (ay=0; ay<dy; ay++)
 				{
 					
-					dgp1.code = sprite++;
-					dgp1.color = color;
-					dgp1.flipx = fx;
-					dgp1.flipy = fy;
-					dgp1.sx = x+(dx-ax-1)*16;
-					dgp1.sy = y+ay*16;
-					drawgfx(&dgp1);
+					dgp0.code = sprite++;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+(dx-ax-1)*16;
+					dgp0.sy = y+ay*16;
+					drawgfx(&dgp0);
 				}
-				} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

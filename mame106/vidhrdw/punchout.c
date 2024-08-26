@@ -345,29 +345,29 @@ VIDEO_UPDATE( punchout )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&topvisiblearea, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 2;offs >= 0;offs -= 2)
 	{
 		if (dirtybuffer[offs] || dirtybuffer[offs + 1])
-		
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&topvisiblearea, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy;
 
 
@@ -385,33 +385,33 @@ struct drawgfxParams dgp0={
 			dgp0.sy = 8*sy - 16;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
 
+
+	
+	{ 
+	struct drawgfxParams dgp1={
+		tmpbitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&backgroundvisiblearea, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = punchout_videoram2_size - 2;offs >= 0;offs -= 2)
 	{
 		if (dirtybuffer2[offs] | dirtybuffer2[offs + 1])
-		
-{ 
-struct drawgfxParams dgp1={
-	tmpbitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&backgroundvisiblearea, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy;
 
 
@@ -429,33 +429,33 @@ struct drawgfxParams dgp1={
 			dgp1.sy = 8*sy + 8*TOP_MONITOR_ROWS - 16;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
 
+
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bs1tmpbitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = punchout_bigsprite1ram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (bs1dirtybuffer[offs] | bs1dirtybuffer[offs + 1] | bs1dirtybuffer[offs + 3])
-		
-{ 
-struct drawgfxParams dgp2={
-	bs1tmpbitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy;
 
 
@@ -474,33 +474,33 @@ struct drawgfxParams dgp2={
 			dgp2.sy = 8*sy;
 			drawgfx(&dgp2);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
 
+
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bs2tmpbitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = punchout_bigsprite2ram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (bs2dirtybuffer[offs] | bs2dirtybuffer[offs + 1] | bs2dirtybuffer[offs + 3])
-		
-{ 
-struct drawgfxParams dgp3={
-	bs2tmpbitmap, 	// dest
-	Machine->gfx[3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy;
 
 
@@ -519,9 +519,9 @@ struct drawgfxParams dgp3={
 			dgp3.sy = 8*sy;
 			drawgfx(&dgp3);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 
 	/* copy the character mapped graphics */
@@ -612,29 +612,46 @@ VIDEO_UPDATE( armwrest )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp4={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&topvisiblearea, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp5={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&backgroundvisiblearea, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = punchout_videoram2_size - 2;offs >= 0;offs -= 2)
 	{
 		if (dirtybuffer2[offs] | dirtybuffer2[offs + 1])
-		
-{ 
-struct drawgfxParams dgp5={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&backgroundvisiblearea, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy;
 
 
@@ -645,26 +662,7 @@ struct drawgfxParams dgp5={
 			sy = offs/2 / 32;
 
 			if (sy >= 32)
-			
-{ 
-struct drawgfxParams dgp4={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&topvisiblearea, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				/* top screen */
 				sy -= 32;
 				
@@ -674,8 +672,6 @@ struct drawgfxParams dgp4={
 				dgp4.sy = 8*sy - 16;
 				drawgfx(&dgp4);
 			}
-} // end of patch paragraph
-
 			else
 				/* bottom screen background */
 				
@@ -686,33 +682,33 @@ struct drawgfxParams dgp4={
 				dgp5.sy = 8*sy + 8*TOP_MONITOR_ROWS - 16;
 				drawgfx(&dgp5);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
 
+
+	
+	{ 
+	struct drawgfxParams dgp6={
+		bs1tmpbitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = punchout_bigsprite1ram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (bs1dirtybuffer[offs] | bs1dirtybuffer[offs + 1] | bs1dirtybuffer[offs + 3])
-		
-{ 
-struct drawgfxParams dgp6={
-	bs1tmpbitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy;
 
 
@@ -736,33 +732,33 @@ struct drawgfxParams dgp6={
 			dgp6.sy = 8*sy;
 			drawgfx(&dgp6);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
 
+
+	
+	{ 
+	struct drawgfxParams dgp7={
+		bs2tmpbitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = punchout_bigsprite2ram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (bs2dirtybuffer[offs] | bs2dirtybuffer[offs + 1] | bs2dirtybuffer[offs + 3])
-		
-{ 
-struct drawgfxParams dgp7={
-	bs2tmpbitmap, 	// dest
-	Machine->gfx[3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy;
 
 
@@ -781,9 +777,9 @@ struct drawgfxParams dgp7={
 			dgp7.sy = 8*sy;
 			drawgfx(&dgp7);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 
 	/* copy the character mapped graphics */

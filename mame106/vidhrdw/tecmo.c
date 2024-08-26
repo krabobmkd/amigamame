@@ -191,6 +191,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		{42,43,46,47,58,59,62,63}
 	};
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0//priority_mask 	// priority_mask
+	  };
 	for (offs = spriteram_size-8;offs >= 0;offs -= 8)
 	{
 		int flags = spriteram[offs+3];
@@ -232,26 +251,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				case 0x2: priority_mask = 0xf0|0xcc; break;	/* obscured by foreground */
 				case 0x3: priority_mask = 0xf0|0xcc|0xaa; break; /* obscured by bg and fg */
 			}
-
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				priority_bitmap, 	// pri_buffer
-				priority_mask 	// priority_mask
-			  };
+            dgp0.priority_mask = priority_mask | (1<<31);
 			for (y = 0;y < size;y++)
 			{
 				for (x = 0;x < size;x++)
@@ -268,10 +268,10 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					drawgfx(&dgp0);
 				}
 			}
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 

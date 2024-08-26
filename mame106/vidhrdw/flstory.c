@@ -149,32 +149,32 @@ void flstory_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pr
 {
 	int i;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i = 0; i < 0x20; i++)
 	{
 		int pr = spriteram[spriteram_size-1 -i];
 		int offs = (pr & 0x1f) * 4;
 
 		if ((pr & 0x80) == pri)
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int code,sx,sy,flipx,flipy;
 
 			code = spriteram[offs+2] + ((spriteram[offs+1] & 0x30) << 4);
@@ -202,7 +202,7 @@ struct drawgfxParams dgp0={
 			drawgfx(&dgp0);
 			/* wrap around */
 			if (sx > 240)
-				
+            {
 				dgp0.code = code;
 				dgp0.color = spriteram[offs+1] & 0x0f;
 				dgp0.flipx = flipx;
@@ -210,10 +210,11 @@ struct drawgfxParams dgp0={
 				dgp0.sx = sx-256;
 				dgp0.sy = sy;
 				drawgfx(&dgp0);
+            }
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( flstory )
@@ -283,7 +284,7 @@ struct drawgfxParams dgp2={
 			drawgfx(&dgp2);
 			/* wrap around */
 			if (sx > 240)
-				
+			{
 				dgp2.code = code;
 				dgp2.color = spriteram[offs+1] & 0x0f;
 				dgp2.flipx = flipx;
@@ -291,6 +292,7 @@ struct drawgfxParams dgp2={
 				dgp2.sx = sx-256;
 				dgp2.sy = sy;
 				drawgfx(&dgp2);
+            }
 		}
 } // end of patch paragraph
 

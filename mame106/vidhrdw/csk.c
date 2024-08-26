@@ -238,29 +238,29 @@ VIDEO_UPDATE( cska )
 
 	if (abilityflag)
 	{
+		
+		{ 
+		struct drawgfxParams dgp0={
+			tmpbitmap2, 	// dest
+			Machine->gfx[1+(offs % 4)], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			0, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = (CPK_VIDEO_SIZE)-1; offs >= 0; offs--)
 		{
 			if (dirtybuffer1[offs] || dirtybuffer[offs])
-			
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap2, 	// dest
-	Machine->gfx[1+(offs % 4)], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				int sx,sy;
 
 
@@ -275,38 +275,38 @@ struct drawgfxParams dgp0={
 				dgp0.sy = 32*sy;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 		copybitmap(bitmap,tmpbitmap2,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE,0);
 	}
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = CPK_VIDEO_SIZE-1; offs >= 0; offs--)
 	{
 		int tile = cpk_videoram[offs] + ((cpk_colorram[offs] & 0x1f) << 8);
 		int color = (tile != 0x1fff) ? (((cpk_colorram[offs] & 0xe0) >> 4) + 1) : 0;
 
 		if (dirtybuffer[offs])
-		
-{ 
-struct drawgfxParams dgp1={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy;
 
 
@@ -322,9 +322,9 @@ struct drawgfxParams dgp1={
 			dgp1.sy = 8*sy;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->visible_area, (abilityflag) ? TRANSPARENCY_COLOR : TRANSPARENCY_NONE, 0);
 }

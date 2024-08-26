@@ -137,27 +137,27 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 
-			if(ladyfrog_spriteram[offs+3]>240)
 			
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{ 
+			struct drawgfxParams dgp1={
+				bitmap, 	// dest
+				Machine->gfx[1], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				15, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
+			if(ladyfrog_spriteram[offs+3]>240)
+			{
 				sx = (ladyfrog_spriteram[offs+3]-256);
 				
 				dgp1.code = code;
@@ -168,7 +168,7 @@ struct drawgfxParams dgp1={
 				dgp1.sy = sy;
 				drawgfx(&dgp1);
 					}
-} // end of patch paragraph
+			} // end of patch paragraph
 
 				}
 } // end of patch paragraph

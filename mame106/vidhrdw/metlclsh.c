@@ -188,6 +188,25 @@ static void metlclsh_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	gfx_element *gfx = Machine->gfx[0];
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size; offs += 4)
 	{
 		int attr,code,color,sx,sy,flipx,flipy,wrapy,sizey;
@@ -216,26 +235,7 @@ static void metlclsh_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		for ( wrapy = 0; wrapy <= 256; wrapy += 256 )
 		{
 			if (sizey)
-			
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				
 				dgp0.code = code & ~1;
 				dgp0.color = color;
@@ -254,42 +254,21 @@ struct drawgfxParams dgp0={
 				dgp0.sy = sy + (flipy ? -16 : 0) + wrapy;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
-			
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+			else
 			{
 				
-				dgp2.code = code;
-				dgp2.color = color;
-				dgp2.flipx = flipx;
-				dgp2.flipy = flipy;
-				dgp2.sx = sx;
-				dgp2.sy = sy + wrapy;
-				drawgfx(&dgp2);
+				dgp0.code = code;
+				dgp0.color = color;
+				dgp0.flipx = flipx;
+				dgp0.flipy = flipy;
+				dgp0.sx = sx;
+				dgp0.sy = sy + wrapy;
+				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /***************************************************************************

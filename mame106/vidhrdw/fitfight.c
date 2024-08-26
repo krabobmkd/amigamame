@@ -60,7 +60,7 @@ static void fitfight_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 
 		if (end) break;
 		if (prio == layer)
-		  
+		{
 		  dgp0.code = number;
 		  dgp0.color = colr;
 		  dgp0.flipx = xflip;
@@ -68,7 +68,7 @@ static void fitfight_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 		  dgp0.sx = xpos;
 		  dgp0.sy = ypos;
 		  drawgfx(&dgp0);
-
+        }
 		source+=4;
 	}
 	} // end of patch paragraph

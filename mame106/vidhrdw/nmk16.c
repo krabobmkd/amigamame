@@ -463,6 +463,25 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{
 		if ((spriteram_old2[offs] & 0x0001) || (spriteram_old2[offs] && is_blkheart))
@@ -488,25 +507,6 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri
 			}
 
 			yy = h;
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				Machine->gfx[2], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				15, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			do
 			{
 				x = sx;
@@ -527,10 +527,10 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri
 
 				sy += delta;
 			} while (--yy >= 0);
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /* sprites have flipping and are not delayed 2 frames */
@@ -538,6 +538,25 @@ static void manybloc_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{
 		if ((spriteram16[offs] & 0x0001) || (spriteram16[offs] && is_blkheart))
@@ -570,25 +589,6 @@ static void manybloc_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 			}
 
 			yy = h;
-			
-			{ 
-			struct drawgfxParams dgp1={
-				bitmap, 	// dest
-				Machine->gfx[2], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				15, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			do
 			{
 				x = sx;
@@ -610,16 +610,35 @@ static void manybloc_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 
 				sy += delta;
 			} while (--yy >= 0);
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 static void tharrier_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{
 		if ((spriteram16[offs] & 0x0001) || (spriteram16[offs] && is_blkheart))
@@ -652,25 +671,6 @@ static void tharrier_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 
 			yy = h;
 			sy+=flipy?(delta*h):0;
-			
-			{ 
-			struct drawgfxParams dgp2={
-				bitmap, 	// dest
-				Machine->gfx[2], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				15, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			do
 			{
 				x = sx+(flipx?(delta*w):0);
@@ -696,10 +696,10 @@ static void tharrier_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 				sy += delta * ( flipy?-1:1);
 
 			} while (--yy >= 0);
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( macross )

@@ -178,6 +178,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int line;
 
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (line = 0;line < 256;line++)
 	{
 		if (line >= cliprect->min_y && line <= cliprect->max_y)
@@ -196,26 +215,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				sy = 241 - sr2[offs + 1];
 
 				if (sy > line-16 && sy <= line)
-				
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&clip, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+				{
 					code = sr[offs + 1];
 					color = sr2[offs] & 0x3f;
 					flipx = ~sr2[offs] & 0x40;
@@ -230,11 +230,11 @@ struct drawgfxParams dgp0={
 					dgp0.sy = sy;
 					drawgfx(&dgp0);
 				}
-} // end of patch paragraph
-
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( timeplt )

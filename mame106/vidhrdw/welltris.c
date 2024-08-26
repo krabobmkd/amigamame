@@ -44,6 +44,44 @@ static void welltris_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int offs;
 
 	/* draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	
+	{ 
+	struct drawgfxParams dgpz0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0; offs < 0x200 - 4; offs += 4) {
 		int data0 = welltris_spriteram[offs + 0];
 		int data1 = welltris_spriteram[offs + 1];
@@ -74,180 +112,128 @@ static void welltris_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		/* normal case */
 		if (!xflip && !yflip) {
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				15, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						
+					{
 						dgp0.code = code;
 						dgp0.color = color;
 						dgp0.sx = x + xt * 16;
 						dgp0.sy = y + yt * 16;
 						drawgfx(&dgp0);
+                    }
 					else
-						drawgfxzoom(bitmap, Machine->gfx[1], code, color, 0, 0,
-								x + xt * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-								0x1000 * xzoom, 0x1000 * yzoom);
+					{
+						dgpz0.code = code;
+						dgpz0.color = color;
+						dgpz0.sx = x + xt * xzoom;
+						dgpz0.sy = y + yt * yzoom;
+						dgpz0.scalex = 0x1000 * xzoom;
+						dgpz0.scaley = 0x1000 * yzoom;
+						drawgfxzoom(&dgpz0);
+                    }
 				}
 				if (xtiles == 3) code += 1;
 				if (xtiles == 5) code += 3;
 				if (xtiles == 6) code += 2;
 				if (xtiles == 7) code += 1;
 			}
-			} // end of patch paragraph
-
 		}
 
 		/* xflipped case */
 		else if (xflip && !yflip) {
-			
-			{ 
-			struct drawgfxParams dgp1={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				15, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						
-						dgp1.code = code;
-						dgp1.color = color;
-						dgp1.sx = x + (xtiles - 1 - xt) * 16;
-						dgp1.sy = y + yt * 16;
-						drawgfx(&dgp1);
+					{
+						dgp0.code = code;
+						dgp0.color = color;
+						dgp0.sx = x + (xtiles - 1 - xt) * 16;
+						dgp0.sy = y + yt * 16;
+						drawgfx(&dgp0);
+                    }
 					else
-						drawgfxzoom(bitmap, Machine->gfx[1], code, color, 1, 0,
-								x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-								0x1000 * xzoom, 0x1000 * yzoom);
+					{
+						dgpz0.code = code;
+						dgpz0.color = color;
+						dgpz0.sx = x + (xtiles - 1 - xt) * xzoom;
+						dgpz0.sy = y + yt * yzoom;
+						dgpz0.scalex = 0x1000 * xzoom;
+						dgpz0.scaley = 0x1000 * yzoom;
+						drawgfxzoom(&dgpz0);
+                    }
 				}
 				if (xtiles == 3) code += 1;
 				if (xtiles == 5) code += 3;
 				if (xtiles == 6) code += 2;
 				if (xtiles == 7) code += 1;
 			}
-			} // end of patch paragraph
-
 		}
 
 		/* yflipped case */
 		else if (!xflip && yflip) {
-			
-			{ 
-			struct drawgfxParams dgp2={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				15, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						
-						dgp2.code = code;
-						dgp2.color = color;
-						dgp2.sx = x + xt * 16;
-						dgp2.sy = y + (ytiles - 1 - yt) * 16;
-						drawgfx(&dgp2);
+					{
+						dgp0.code = code;
+						dgp0.color = color;
+						dgp0.sx = x + xt * 16;
+						dgp0.sy = y + (ytiles - 1 - yt) * 16;
+						drawgfx(&dgp0);
+                    }
 					else
-						drawgfxzoom(bitmap, Machine->gfx[1], code, color, 0, 1,
-								x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-								0x1000 * xzoom, 0x1000 * yzoom);
+					{
+						dgpz0.code = code;
+						dgpz0.color = color;
+						dgpz0.sx = x + xt * xzoom;
+						dgpz0.sy = y + (ytiles - 1 - yt) * yzoom;
+						dgpz0.scalex = 0x1000 * xzoom;
+						dgpz0.scaley = 0x1000 * yzoom;
+						drawgfxzoom(&dgpz0);
+                    }
 				}
 				if (xtiles == 3) code += 1;
 				if (xtiles == 5) code += 3;
 				if (xtiles == 6) code += 2;
 				if (xtiles == 7) code += 1;
 			}
-			} // end of patch paragraph
-
 		}
 
 		/* x & yflipped case */
 		else {
-			
-			{ 
-			struct drawgfxParams dgp3={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				15, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						
-						dgp3.code = code;
-						dgp3.color = color;
-						dgp3.sx = x + (xtiles - 1 - xt) * 16;
-						dgp3.sy = y + (ytiles - 1 - yt) * 16;
-						drawgfx(&dgp3);
+					{
+						dgp0.code = code;
+						dgp0.color = color;
+						dgp0.sx = x + (xtiles - 1 - xt) * 16;
+						dgp0.sy = y + (ytiles - 1 - yt) * 16;
+						drawgfx(&dgp0);
+                    }
 					else
-						drawgfxzoom(bitmap, Machine->gfx[1], code, color, 1, 1,
-								x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-								0x1000 * xzoom, 0x1000 * yzoom);
+					{
+						dgpz0.code = code;
+						dgpz0.color = color;
+						dgpz0.sx = x + (xtiles - 1 - xt) * xzoom;
+						dgpz0.sy = y + (ytiles - 1 - yt) * yzoom;
+						dgpz0.scalex = 0x1000 * xzoom;
+						dgpz0.scaley = 0x1000 * yzoom;
+						drawgfxzoom(&dgpz0);
+                    }
 				}
 				if (xtiles == 3) code += 1;
 				if (xtiles == 5) code += 3;
 				if (xtiles == 6) code += 2;
 				if (xtiles == 7) code += 1;
 			}
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
+	} // end of patch paragraph
+
 }
 
 static void setbank(tilemap *tmap, int num, int bank)

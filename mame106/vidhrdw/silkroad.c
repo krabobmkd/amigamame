@@ -26,6 +26,25 @@ static void silkroad_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 
 	finish = maxspr-2;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while( finish>=source )
 	{
 
@@ -50,25 +69,6 @@ static void silkroad_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 		if (priority == pri){
 
 		if (!flipx) {
-		
-		{ 
-		struct drawgfxParams dgp0={
-			bitmap, 	// dest
-			gfx, 	// gfx
-			0, 	// code
-			0, 	// color
-			0, 	// flipx
-			0, 	// flipy
-			0, 	// sx
-			0, 	// sy
-			cliprect, 	// clip
-			TRANSPARENCY_PEN, 	// transparency
-			0, 	// transparent_color
-			0, 	// scalex
-			0, 	// scaley
-			NULL, 	// pri_buffer
-			0 	// priority_mask
-		  };
 		for (wcount=0;wcount<width;wcount++) {
 		
 		dgp0.code = tileno+wcount;
@@ -77,45 +77,24 @@ static void silkroad_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 		dgp0.sy = ypos;
 		drawgfx(&dgp0);
 		}
-		} // end of patch paragraph
-
 
 		} else {
 
-		
-		{ 
-		struct drawgfxParams dgp1={
-			bitmap, 	// dest
-			gfx, 	// gfx
-			0, 	// code
-			0, 	// color
-			0, 	// flipx
-			0, 	// flipy
-			0, 	// sx
-			0, 	// sy
-			cliprect, 	// clip
-			TRANSPARENCY_PEN, 	// transparency
-			0, 	// transparent_color
-			0, 	// scalex
-			0, 	// scaley
-			NULL, 	// pri_buffer
-			0 	// priority_mask
-		  };
 		for (wcount=width;wcount>0;wcount--) {
 		
-		dgp1.code = tileno+(width-wcount);
-		dgp1.color = color;
-		dgp1.sx = xpos+wcount*16-16+8;
-		dgp1.sy = ypos;
-		drawgfx(&dgp1);
+		dgp0.code = tileno+(width-wcount);
+		dgp0.color = color;
+		dgp0.sx = xpos+wcount*16-16+8;
+		dgp0.sy = ypos;
+		drawgfx(&dgp0);
 		}
-		} // end of patch paragraph
-
 
 	}
 		}
 	finish-=2;
 	}
+	} // end of patch paragraph
+
 }
 
 

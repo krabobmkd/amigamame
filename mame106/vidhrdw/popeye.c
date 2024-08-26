@@ -407,7 +407,7 @@ static void popeye_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 
 		if (spriteram[offs] != 0)
-			
+		{
 			dgp0.code = code ^ 0x1ff;
 			dgp0.color = color;
 			dgp0.flipx = flipx;
@@ -415,6 +415,7 @@ static void popeye_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			dgp0.sx = sx;
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
+        }
 	}
 	} // end of patch paragraph
 

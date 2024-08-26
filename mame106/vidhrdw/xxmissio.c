@@ -89,6 +89,25 @@ VIDEO_UPDATE( xxmissio )
 
 /* draw BG layer */
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (y=0; y<32; y++)
 	{
 		for (x=0; x<32; x++)
@@ -99,26 +118,7 @@ VIDEO_UPDATE( xxmissio )
 				offs = (size-1)-offs;
 
 			if (dirtybuffer[offs] != 0)
-			
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				dirtybuffer[offs]=0;
 
 				px = x*16;
@@ -138,10 +138,10 @@ struct drawgfxParams dgp0={
 				dgp0.sy = py;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 
 	if (flipscreen == 0)
 	{
@@ -214,7 +214,7 @@ struct drawgfxParams dgp0={
 		dgp1.sy = py;
 		drawgfx(&dgp1);
 		if (px>0x1e0)
-			
+        {
 			dgp1.code = chr;
 			dgp1.color = col;
 			dgp1.flipx = fx;
@@ -222,6 +222,7 @@ struct drawgfxParams dgp0={
 			dgp1.sx = px-0x200;
 			dgp1.sy = py;
 			drawgfx(&dgp1);
+        }
 
 	}
 	} // end of patch paragraph

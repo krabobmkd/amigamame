@@ -132,6 +132,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	UINT16 *finish = shadfrce_spvideoram_old;
 	UINT16 *source = finish + 0x2000/2 - 8;
 	int hcount;
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		0, // pri_mask 	// priority_mask
+	  };
 	while( source>=finish )
 	{
 		int ypos = 0x100 - (((source[0] & 0x0003) << 8) | (source[1] & 0x00ff));
@@ -144,29 +163,13 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		int pal = ((source[4] & 0x003e));
 		int pri_mask = (source[4] & 0x0040) ? 0x02 : 0x00;
 
+
+
 		if (pal & 0x20) pal ^= 0x60;	/* skip hole */
 
 		height++;
 		if (enable)	{
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				gfx, 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				priority_bitmap, 	// pri_buffer
-				pri_mask 	// priority_mask
-			  };
+            dgp0.priority_mask = pri_mask;
 			for (hcount=0;hcount<height;hcount++) {
 				
 				dgp0.code = tile+hcount;
@@ -201,11 +204,11 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 				dgp0.sy = ypos-hcount*16-16+0x200;
 				drawgfx(&dgp0);
 			}
-			} // end of patch paragraph
-
 		}
 		source-=8;
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( shadfrce )

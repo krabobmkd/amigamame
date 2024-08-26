@@ -16,6 +16,25 @@ static void diverboy_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 	UINT16 *source = diverboy_spriteram;
 	UINT16 *finish = source + (diverboy_spriteram_size/2);
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		(source[1] & 0x0008) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while (source < finish)
 	{
 		INT16 xpos,ypos,number,colr,bank,flash;
@@ -33,26 +52,7 @@ static void diverboy_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 		bank = (source[1]&0x0002) >> 1;
 
 		if (!flash || (cpu_getcurrentframe() & 1))
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[bank], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	(source[1] & 0x0008) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
 			dgp0.code = number;
 			dgp0.color = colr;
@@ -60,11 +60,11 @@ struct drawgfxParams dgp0={
 			dgp0.sy = ypos;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 
 		source+=8;
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE(diverboy)

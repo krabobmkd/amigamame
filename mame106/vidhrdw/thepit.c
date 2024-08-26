@@ -201,6 +201,25 @@ static void drawtiles(mame_bitmap *bitmap,int priority)
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		priority == 0 ? tmpbitmap : bitmap, 	// dest
+		Machine->gfx[bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		int bgcolor;
@@ -210,26 +229,7 @@ static void drawtiles(mame_bitmap *bitmap,int priority)
 
 		if ((priority == 0 && dirtybuffer[offs]) ||
 				(priority == 1 && bgcolor != 0 && (colorram[offs] & 0x80) == 0))
-		
-{ 
-struct drawgfxParams dgp0={
-	priority == 0 ? tmpbitmap : bitmap, 	// dest
-	Machine->gfx[bank], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy,code,bank,color;
 
 
@@ -270,9 +270,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 
 	/* copy the temporary bitmap to the screen */
@@ -307,29 +307,29 @@ static void drawsprites(mame_bitmap *bitmap,int priority)
 
 
 	/* draw low priority sprites */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[graphics_bank | 1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		flip_screen_x & 1 ? &spritevisibleareaflipx : &spritevisiblearea, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		if (((spriteram[offs + 2] & 0x08) >> 3) == priority)
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[graphics_bank | 1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	flip_screen_x & 1 ? &spritevisibleareaflipx : &spritevisiblearea, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy,flipx,flipy;
 
 
@@ -369,9 +369,9 @@ struct drawgfxParams dgp1={
 			dgp1.sy = sy;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 

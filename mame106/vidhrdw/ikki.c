@@ -216,6 +216,25 @@ VIDEO_UPDATE( ikki )
 
 	/* mask sprites */
 
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs=0; offs<(videoram_size/2); offs++)
 	{
 		int sx,sy;
@@ -226,26 +245,7 @@ VIDEO_UPDATE( ikki )
 		d = VIDEOATTR[ sx ];
 
 		if ( (d == 0) || (d == 0x0d) )
-		
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			py = sy*8;
 			px = sx*8;
 
@@ -268,8 +268,8 @@ struct drawgfxParams dgp2={
 			dgp2.sy = py;
 			drawgfx(&dgp2);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 }

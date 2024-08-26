@@ -513,6 +513,25 @@ static void drawbgmap(mame_bitmap *bitmap,const rectangle *cliprect, int priorit
 {
 	int j;
 	//for(j=0x40-8;j>=0;j-=8)
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for(j=0;j<0x40;j+=8)
 	{
 		if(st0016_vregs[j+1] && ((priority && (st0016_vregs[j+3]==0xff))||((!priority)&&(st0016_vregs[j+3]!=0xff))))
@@ -529,26 +548,7 @@ static void drawbgmap(mame_bitmap *bitmap,const rectangle *cliprect, int priorit
 					flipy=st0016_spriteram[i+3]&0x40;
 
 				 	if(priority)
-				 	
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+				 	{
 				 		
 				 		dgp0.code = code;
 				 		dgp0.color = color;
@@ -558,8 +558,6 @@ struct drawgfxParams dgp0={
 				 		dgp0.sy = y*8+spr_dy;
 				 		drawgfx(&dgp0);
 					}
-} // end of patch paragraph
-
 					else
 					{
 							UINT16 *destline;
@@ -626,6 +624,8 @@ struct drawgfxParams dgp0={
 	 			}
 	 	}
 	}
+	} // end of patch paragraph
+
 }
 
 

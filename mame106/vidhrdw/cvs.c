@@ -465,48 +465,48 @@ VIDEO_UPDATE( cvs )
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap, 	// dest
+		Machine->gfx[character_bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp1={
+		collision_background, 	// dest
+		Machine->gfx[character_bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
         character = videoram[offs];
 
 		if(dirtybuffer[offs] || dirty_character[character])
-		
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	Machine->gfx[character_bank], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-struct drawgfxParams dgp1={
-	collision_background, 	// dest
-	Machine->gfx[character_bank], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
             int character_bank;
             int forecolor;
 
@@ -558,16 +558,17 @@ struct drawgfxParams dgp1={
             }
 
             if(forecolor)
- 			    
+            {
  			    dgp1.code = character;
  			    dgp1.color = forecolor;
  			    dgp1.sx = sx;
  			    dgp1.sy = sy;
  			    drawgfx(&dgp1);
+            }
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
     /* Tidy up dirty character map */
 

@@ -80,6 +80,25 @@ static void draw_sprites(mame_bitmap *bitmap,int priority)
 		{42,43,46,47,58,59,62,63}
 	};
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = (spriteram_size-16)/2;offs >= 0;offs -= 8)
 	{
 		int sx,sy,code,color,size,attr,flipx,flipy;
@@ -99,25 +118,6 @@ static void draw_sprites(mame_bitmap *bitmap,int priority)
 			flipx = attr & 0x0001;
 			flipy = attr & 0x0002;
 
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				&Machine->visible_area, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (row = 0;row < size;row++)
 			{
 				for (col = 0;col < size;col++)
@@ -134,10 +134,10 @@ static void draw_sprites(mame_bitmap *bitmap,int priority)
 					drawgfx(&dgp0);
 				}
 			}
-			} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -151,6 +151,25 @@ VIDEO_UPDATE( galspnbl )
 
 	draw_sprites(bitmap,0);
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x1000/2;offs++)
 	{
 		int sx,sy,code,attr,color;
@@ -163,26 +182,7 @@ VIDEO_UPDATE( galspnbl )
 
 		/* What is this? A priority/half transparency marker? */
 		if (!(attr & 0x0008))
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
 			dgp1.code = code;
 			dgp1.color = color;
@@ -190,9 +190,9 @@ struct drawgfxParams dgp1={
 			dgp1.sy = 8*sy;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	draw_sprites(bitmap,1);
 }

@@ -176,27 +176,29 @@ static void psikyosh_drawbglayer( int layer, mame_bitmap *bitmap, const rectangl
 				dgp0.sy = ((16*sy+scrolly)&(width-1));
 				drawgfx(&dgp0); /* normal */
 				if(scrollx)
-					
+				{
 					dgp0.code = tileno;
 					dgp0.color = colour;
 					dgp0.sx = ((16*sx+scrollx)&0x1ff)-0x200;
 					dgp0.sy = ((16*sy+scrolly)&(width-1));
 					drawgfx(&dgp0); /* wrap x */
+                }
 				if(scrolly)
-					
+				{
 					dgp0.code = tileno;
 					dgp0.color = colour;
 					dgp0.sx = (16*sx+scrollx)&0x1ff;
 					dgp0.sy = ((16*sy+scrolly)&(width-1))-width;
 					drawgfx(&dgp0); /* wrap y */
+                }
 				if(scrollx && scrolly)
-					
+				{
 					dgp0.code = tileno;
 					dgp0.color = colour;
 					dgp0.sx = ((16*sx+scrollx)&0x1ff)-0x200;
 					dgp0.sy = ((16*sy+scrolly)&(width-1))-width;
 					drawgfx(&dgp0); /* wrap xy */
-
+                }
 				offs++;
 			}
 		}
@@ -272,27 +274,29 @@ static void psikyosh_drawbglayertext( int layer, mame_bitmap *bitmap, const rect
 				dgp4.sy = ((16*sy+scrolly)&(width-1));
 				drawgfx(&dgp4); /* normal */
 				if(scrollx)
-					
+				{
 					dgp4.code = tileno;
 					dgp4.color = colour;
 					dgp4.sx = ((16*sx+scrollx)&0x1ff)-0x200;
 					dgp4.sy = ((16*sy+scrolly)&(width-1));
 					drawgfx(&dgp4); /* wrap x */
+                }
 				if(scrolly)
-					
+				{
 					dgp4.code = tileno;
 					dgp4.color = colour;
 					dgp4.sx = (16*sx+scrollx)&0x1ff;
 					dgp4.sy = ((16*sy+scrolly)&(width-1))-width;
 					drawgfx(&dgp4); /* wrap y */
+                }
 				if(scrollx && scrolly)
-					
+				{
 					dgp4.code = tileno;
 					dgp4.color = colour;
 					dgp4.sx = ((16*sx+scrollx)&0x1ff)-0x200;
 					dgp4.sy = ((16*sy+scrolly)&(width-1))-width;
 					drawgfx(&dgp4); /* wrap xy */
-
+                }
 				offs++;
 	}}
 		} // end of patch paragraph
@@ -350,27 +354,29 @@ static void psikyosh_drawbglayertext( int layer, mame_bitmap *bitmap, const rect
 				dgp8.sy = ((16*sy+scrolly)&(width-1));
 				drawgfx(&dgp8); /* normal */
 				if(scrollx)
-					
+				{
 					dgp8.code = tileno;
 					dgp8.color = colour;
 					dgp8.sx = ((16*sx+scrollx)&0x1ff)-0x200;
 					dgp8.sy = ((16*sy+scrolly)&(width-1));
 					drawgfx(&dgp8); /* wrap x */
+                }
 				if(scrolly)
-					
+                {
 					dgp8.code = tileno;
 					dgp8.color = colour;
 					dgp8.sx = (16*sx+scrollx)&0x1ff;
 					dgp8.sy = ((16*sy+scrolly)&(width-1))-width;
 					drawgfx(&dgp8); /* wrap y */
+                }
 				if(scrollx && scrolly)
-					
+				{
 					dgp8.code = tileno;
 					dgp8.color = colour;
 					dgp8.sx = ((16*sx+scrollx)&0x1ff)-0x200;
 					dgp8.sy = ((16*sy+scrolly)&(width-1))-width;
 					drawgfx(&dgp8); /* wrap xy */
-
+                }
 				offs++;
 	}}
 		} // end of patch paragraph
@@ -464,27 +470,29 @@ static void psikyosh_drawbglayerscroll( int layer, mame_bitmap *bitmap, const re
 				dgp12.sy = ((16*sy+scrolly)&(width-1));
 				drawgfx(&dgp12); /* normal */
 				if(scrollx)
-					
+				{
 					dgp12.code = tileno;
 					dgp12.color = colour;
 					dgp12.sx = ((16*sx+scrollx)&0x1ff)-0x200;
 					dgp12.sy = ((16*sy+scrolly)&(width-1));
 					drawgfx(&dgp12); /* wrap x */
+                }
 				if(scrolly)
-					
+				{
 					dgp12.code = tileno;
 					dgp12.color = colour;
 					dgp12.sx = (16*sx+scrollx)&0x1ff;
 					dgp12.sy = ((16*sy+scrolly)&(width-1))-width;
 					drawgfx(&dgp12); /* wrap y */
+                }
 				if(scrollx && scrolly)
-					
+				{
 					dgp12.code = tileno;
 					dgp12.color = colour;
 					dgp12.sx = ((16*sx+scrollx)&0x1ff)-0x200;
 					dgp12.sy = ((16*sy+scrolly)&(width-1))-width;
 					drawgfx(&dgp12); /* wrap xy */
-
+                }
 				offs++;
 			}
 		}

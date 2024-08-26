@@ -169,7 +169,7 @@ static void exctsccr_draw_sprites( mame_bitmap *bitmap ) {
 	{ 
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
-		Machine->gfx[bank], 	// gfx
+		NULL, //Machine->gfx[bank], 	// gfx
 		0, 	// code
 		0, 	// color
 		0, 	// flipx
@@ -197,7 +197,7 @@ static void exctsccr_draw_sprites( mame_bitmap *bitmap ) {
 		bank = 2;
 		bank += ( ( OBJ1[offs+1] >> 4 ) & 1 );
 
-		
+		dgp0.gfx = Machine->gfx[bank];
 		dgp0.code = code;
 		dgp0.color = color;
 		dgp0.flipx = flipx;
@@ -212,6 +212,76 @@ static void exctsccr_draw_sprites( mame_bitmap *bitmap ) {
 	OBJ1 = spriteram_2;
 	OBJ2 = spriteram;
 
+	
+	{ 
+	struct drawgfxParams dgp1={
+		bitmap, 	// dest
+		Machine->gfx[4], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[4], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		16, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp4={
+		bitmap, 	// dest
+		NULL, //Machine->gfx[bank], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for ( offs = 0x0e; offs >= 0; offs -= 2 ) {
 		int sx,sy,code,bank,flipx,flipy,color;
 
@@ -231,26 +301,7 @@ static void exctsccr_draw_sprites( mame_bitmap *bitmap ) {
 			bank++;
 
 		if ( color > 0x10 && color < 0x17 )
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
 			dgp1.code = code;
 			dgp1.color = 0x0e;
@@ -262,46 +313,8 @@ struct drawgfxParams dgp1={
 
 			color += 6;
 		}
-} // end of patch paragraph
-
 		if ( color==0x1d && gfx_bank==1 )
-		
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	Machine->gfx[3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_COLOR, 	// transparency
-	16, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
 			dgp2.code = code;
 			dgp2.color = color;
@@ -319,30 +332,9 @@ struct drawgfxParams dgp3={
 			dgp3.sy = sy;
 			drawgfx(&dgp3);
 
-		}
-} // end of patch paragraph
- 
-{ 
-struct drawgfxParams dgp4={
-	bitmap, 	// dest
-	Machine->gfx[bank], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+		} else
 		{
-		
+		dgp4.gfx = Machine->gfx[bank];
 		dgp4.code = code;
 		dgp4.color = color;
 		dgp4.flipx = flipx;
@@ -351,9 +343,9 @@ else
 		dgp4.sy = sy;
 		drawgfx(&dgp4);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( exctsccr )

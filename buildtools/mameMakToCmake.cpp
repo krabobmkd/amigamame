@@ -778,6 +778,7 @@ int createCmake(map<string,TMachine> machinetargets,
         // konami is huge, need ninja turtles and simpsons.
         if(upname == "MINIKONAMI" ) onShouldBeDefault = true;
 
+        if(upname == "NEOGEO" ) onShouldBeDefault = true;
         // toki & cabal
         if(upname == "TAD" ) onShouldBeDefault = true;
 

@@ -308,6 +308,25 @@ struct drawgfxParams dgp1={
 
 
 VIDEO_UPDATE( carpolo )
+
+{ 
+struct drawgfxParams dgpz0={
+	bitmap, 	// dest
+	Machine->gfx[1], 	// gfx
+	0, 	// code
+	0, 	// color
+	0, 	// flipx
+	0, 	// flipy
+	0, 	// sx
+	0, 	// sy
+	cliprect, 	// clip
+	TRANSPARENCY_PEN, 	// transparency
+	0, 	// transparent_color
+	0x00010000, 	// scalex
+	0x00010000, 	// scaley
+	NULL, 	// pri_buffer
+	0 	// priority_mask
+  };
 {
 	/* draw the playfield elements, in the correct priority order */
 
@@ -350,20 +369,20 @@ VIDEO_UPDATE( carpolo )
 
 	/* left goal - position determined by bit 6 of the
        horizontal and vertical timing PROMs */
-	drawgfxzoom(bitmap,Machine->gfx[1],
-				0,0,
-				0,0,
-				LEFT_GOAL_X,GOAL_Y,
-				cliprect,TRANSPARENCY_PEN,0,
-				0x20000,0x20000);
+	
+	dgpz0.sx = LEFT_GOAL_X;
+	dgpz0.sy = GOAL_Y;
+	dgpz0.scalex = 0x20000;
+	dgpz0.scaley = 0x20000;
+	drawgfxzoom(&dgpz0);
 
 	/* right goal */
-	drawgfxzoom(bitmap,Machine->gfx[1],
-				0,1,
-				1,0,
-				RIGHT_GOAL_X,GOAL_Y,
-				cliprect,TRANSPARENCY_PEN,0,
-				0x20000,0x20000);
+	
+	dgpz0.sx = RIGHT_GOAL_X;
+	dgpz0.sy = GOAL_Y;
+	dgpz0.scalex = 0x20000;
+	dgpz0.scaley = 0x20000;
+	drawgfxzoom(&dgpz0);
 
 	/* special char - bit 0 of 0x0f enables it,
                       bit 1 marked as WIDE, but never appears to be set */
@@ -395,6 +414,8 @@ VIDEO_UPDATE( carpolo )
 	draw_alpha_line(bitmap, cliprect, 6, (0*4+3)*2  );
 	draw_alpha_line(bitmap, cliprect, 7, (0*4+3)*2+1);
 }
+} // end of patch paragraph
+
 
 
 /*************************************
@@ -443,44 +464,44 @@ static int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 
 
 	// check if the two sprites are within collision range
-	if ((abs(x1 - x2) < SPRITE_WIDTH) && (abs(y1 - y2) < SPRITE_HEIGHT))
 	
-{ 
-struct drawgfxParams dgp3={
-	sprite_sprite_collision_bitmap1, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-struct drawgfxParams dgp4={
-	sprite_sprite_collision_bitmap2, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{ 
+	struct drawgfxParams dgp3={
+		sprite_sprite_collision_bitmap1, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	struct drawgfxParams dgp4={
+		sprite_sprite_collision_bitmap2, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	if ((abs(x1 - x2) < SPRITE_WIDTH) && (abs(y1 - y2) < SPRITE_HEIGHT))
+	{
 		int x,y;
 
 
@@ -521,7 +542,7 @@ struct drawgfxParams dgp4={
 			}
 		}
 	}
-} // end of patch paragraph
+	} // end of patch paragraph
 
 
 	return collided;
@@ -540,28 +561,47 @@ static int check_sprite_left_goal_collision(int x1, int y1, int code1, int flipy
 
 
 	// check if the sprites is within the range of the goal
+	
+	{ 
+	struct drawgfxParams dgp5={
+		sprite_goal_collision_bitmap1, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	
+	{ 
+	struct drawgfxParams dgpz2={
+		sprite_goal_collision_bitmap2, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	if (((y1 + 16) > GOAL_Y) && (y1 < (GOAL_Y + GOAL_HEIGHT)) &&
 	    ((x1 + 16) > LEFT_GOAL_X) && (x1 < (LEFT_GOAL_X + GOAL_WIDTH)))
-	
-{ 
-struct drawgfxParams dgp5={
-	sprite_goal_collision_bitmap1, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{
 		int x,y;
 		int x2,y2;
 
@@ -581,12 +621,12 @@ struct drawgfxParams dgp5={
 		dgp5.sy = y1;
 		drawgfx(&dgp5);
 
-		drawgfxzoom(sprite_goal_collision_bitmap2,Machine->gfx[1],
-					0,0,
-					0,0,
-					x2,y2,
-					0,TRANSPARENCY_PEN,0,
-					0x20000,0x20000);
+		
+		dgpz2.sx = x2;
+		dgpz2.sy = y2;
+		dgpz2.scalex = 0x20000;
+		dgpz2.scaley = 0x20000;
+		drawgfxzoom(&dgpz2);
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 		{
@@ -611,7 +651,9 @@ struct drawgfxParams dgp5={
 			}
 		}
 	}
-} // end of patch paragraph
+	} // end of patch paragraph
+
+	} // end of patch paragraph
 
 
 	return collided;
@@ -628,28 +670,47 @@ static int check_sprite_right_goal_collision(int x1, int y1, int code1, int flip
 
 
 	// check if the sprites is within the range of the goal
+	
+	{ 
+	struct drawgfxParams dgp6={
+		sprite_goal_collision_bitmap1, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+	
+	{ 
+	struct drawgfxParams dgpz3={
+		sprite_goal_collision_bitmap2, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	if (((y1 + 16) > GOAL_Y) && (y1 < (GOAL_Y + GOAL_HEIGHT)) &&
 	    ((x1 + 16) > RIGHT_GOAL_X) && (x1 < (RIGHT_GOAL_X + GOAL_WIDTH)))
-	
-{ 
-struct drawgfxParams dgp6={
-	sprite_goal_collision_bitmap1, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+	{
 		int x,y;
 		int x2,y2;
 
@@ -669,12 +730,12 @@ struct drawgfxParams dgp6={
 		dgp6.sy = y1;
 		drawgfx(&dgp6);
 
-		drawgfxzoom(sprite_goal_collision_bitmap2,Machine->gfx[1],
-					0,1,
-					1,0,
-					x2,y2,
-					0,TRANSPARENCY_PEN,0,
-					0x20000,0x20000);
+		
+		dgpz3.sx = x2;
+		dgpz3.sy = y2;
+		dgpz3.scalex = 0x20000;
+		dgpz3.scaley = 0x20000;
+		drawgfxzoom(&dgpz3);
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 		{
@@ -699,7 +760,9 @@ struct drawgfxParams dgp6={
 			}
 		}
 	}
-} // end of patch paragraph
+	} // end of patch paragraph
+
+	} // end of patch paragraph
 
 
 	return collided;

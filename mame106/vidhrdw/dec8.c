@@ -318,7 +318,7 @@ static void draw_sprites1(mame_bitmap *bitmap, const rectangle *cliprect, int pr
 
     	/* 1 more sprite drawn underneath */
     	if (extra)
-    		
+        {
     		dgp0.code = sprite2;
     		dgp0.color = colour;
     		dgp0.flipx = fx;
@@ -326,6 +326,7 @@ static void draw_sprites1(mame_bitmap *bitmap, const rectangle *cliprect, int pr
     		dgp0.sx = x;
     		dgp0.sy = y+16;
     		drawgfx(&dgp0);
+        }
 	}
 	} // end of patch paragraph
 
@@ -478,7 +479,7 @@ static void srdarwin_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect,
     	dgp3.sy = sy;
     	drawgfx(&dgp3);
         if (multi)
-    		
+    	{
     		dgp3.code = code+1;
     		dgp3.color = color;
     		dgp3.flipx = fx;
@@ -486,6 +487,7 @@ static void srdarwin_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect,
     		dgp3.sx = sx;
     		dgp3.sy = sy2;
     		drawgfx(&dgp3);
+        }
 	}
 	} // end of patch paragraph
 

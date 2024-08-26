@@ -144,37 +144,16 @@ static void draw_layer(mame_bitmap *bitmap,int gfx,const unsigned char *scroll,
 		drawgfx(&dgp0);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[gfx], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	transparency, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
-			dgp1.code = code;
-			dgp1.color = color;
-			dgp1.flipx = flipx;
-			dgp1.flipy = flipy;
-			dgp1.sx = sx;
-			dgp1.sy = ((sy + 0x20) & 0xff) - 0x20;
-			drawgfx(&dgp1);
+			dgp0.code = code;
+			dgp0.color = color;
+			dgp0.flipx = flipx;
+			dgp0.flipy = flipy;
+			dgp0.sx = sx;
+			dgp0.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
 	} // end of patch paragraph
 
@@ -238,37 +217,16 @@ static void bluehawk_draw_layer(mame_bitmap *bitmap,int gfx,const unsigned char 
 		drawgfx(&dgp2);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		
-{ 
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	Machine->gfx[gfx], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	transparency, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
-			dgp3.code = code;
-			dgp3.color = color;
-			dgp3.flipx = flipx;
-			dgp3.flipy = flipy;
-			dgp3.sx = sx;
-			dgp3.sy = ((sy + 0x20) & 0xff) - 0x20;
-			drawgfx(&dgp3);
+			dgp2.code = code;
+			dgp2.color = color;
+			dgp2.flipx = flipx;
+			dgp2.flipy = flipy;
+			dgp2.sx = sx;
+			dgp2.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp2);
 		}
-} // end of patch paragraph
-
 	}
 	} // end of patch paragraph
 
@@ -332,37 +290,16 @@ static void bluehawk_draw_layer2(mame_bitmap *bitmap,int gfx,const unsigned char
 		drawgfx(&dgp4);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		
-{ 
-struct drawgfxParams dgp5={
-	bitmap, 	// dest
-	Machine->gfx[gfx], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	transparency, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
-			dgp5.code = code;
-			dgp5.color = color;
-			dgp5.flipx = flipx;
-			dgp5.flipy = flipy;
-			dgp5.sx = sx;
-			dgp5.sy = ((sy + 0x20) & 0xff) - 0x20;
-			drawgfx(&dgp5);
+			dgp4.code = code;
+			dgp4.color = color;
+			dgp4.flipx = flipx;
+			dgp4.flipy = flipy;
+			dgp4.sx = sx;
+			dgp4.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp4);
 		}
-} // end of patch paragraph
-
 	}
 	} // end of patch paragraph
 
@@ -490,37 +427,16 @@ static void popbingo_draw_layer(mame_bitmap *bitmap,int gfx,UINT16 *scroll,
 		drawgfx(&dgp7);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		
-{ 
-struct drawgfxParams dgp8={
-	bitmap, 	// dest
-	Machine->gfx[gfx], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	transparency, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
-			dgp8.code = code;
-			dgp8.color = color;
-			dgp8.flipx = flipx;
-			dgp8.flipy = flipy;
-			dgp8.sx = sx;
-			dgp8.sy = ((sy + 0x20) & 0xff) - 0x20;
-			drawgfx(&dgp8);
+			dgp7.code = code;
+			dgp7.color = color;
+			dgp7.flipx = flipx;
+			dgp7.flipy = flipy;
+			dgp7.sx = sx;
+			dgp7.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp7);
 		}
-} // end of patch paragraph
-
 	}
 	} // end of patch paragraph
 
@@ -587,37 +503,16 @@ static void flytiger_draw_layer2(mame_bitmap *bitmap,int gfx,const unsigned char
 		drawgfx(&dgp9);
 		/* wraparound */
 		if (scrolly & 0x1f)
-		
-{ 
-struct drawgfxParams dgp10={
-	bitmap, 	// dest
-	Machine->gfx[gfx], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	transparency, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			
-			dgp10.code = code;
-			dgp10.color = color;
-			dgp10.flipx = flipx;
-			dgp10.flipy = flipy;
-			dgp10.sx = sx;
-			dgp10.sy = ((sy + 0x20) & 0xff) - 0x20;
-			drawgfx(&dgp10);
+			dgp9.code = code;
+			dgp9.color = color;
+			dgp9.flipx = flipx;
+			dgp9.flipy = flipy;
+			dgp9.sx = sx;
+			dgp9.sy = ((sy + 0x20) & 0xff) - 0x20;
+			drawgfx(&dgp9);
 		}
-} // end of patch paragraph
-
 	}
 	} // end of patch paragraph
 

@@ -110,6 +110,25 @@ static void cabal_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs,data0,data1,data2;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0xf, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for( offs = spriteram_size/2 - 4; offs >= 0; offs -= 4 )
 	{
 		data0 = spriteram16[offs];
@@ -117,26 +136,7 @@ static void cabal_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		data2 = spriteram16[offs+2];
 
 		if( data0 & 0x100 )
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0xf, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int tile_number = data1 & 0xfff;
 			int color   = ( data2 & 0x7800 ) >> 11;
 			int sy = ( data0 & 0xff );
@@ -163,9 +163,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 

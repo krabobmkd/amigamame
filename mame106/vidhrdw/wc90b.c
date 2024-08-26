@@ -122,30 +122,30 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pr
   int offs;
 
   /* draw all visible sprites of specified priority */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[ 17 ], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		/* sy */						cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for ( offs = spriteram_size - 8;offs >= 0;offs -= 8 ){
 
 		if ( ( ~( spriteram[offs+3] >> 6 ) & 3 ) == priority ) {
 
-			if ( spriteram[offs+1] > 16 ) 
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[ 17 ], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	/* sy */						cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{ /* visible */
+			if ( spriteram[offs+1] > 16 ) { /* visible */
 				int code = ( spriteram[offs+3] & 0x3f ) << 4;
 				int bank = spriteram[offs+0];
 				int flags = spriteram[offs+4];
@@ -163,10 +163,10 @@ struct drawgfxParams dgp0={
 				dgp0.sy = /* sx */						240 - spriteram[offs + 1];
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( wc90b )

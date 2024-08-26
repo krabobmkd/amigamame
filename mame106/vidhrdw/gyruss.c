@@ -125,6 +125,25 @@ static void draw_sprites(mame_bitmap *bitmap)
 	int line;
 
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1 + (sr[offs + 1] & 1)], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&clip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (line = 0;line < 256;line++)
 	{
 		if (line >= Machine->visible_area.min_y && line <= Machine->visible_area.max_y)
@@ -141,26 +160,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 				sx = sr[offs];
 				sy = 241 - sr[offs + 3];
 				if (sy > line-16 && sy <= line)
-				
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1 + (sr[offs + 1] & 1)], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&clip, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+				{
 					
 					dgp0.code = sr[offs + 1]/2 + 4*(sr[offs + 2] & 0x20);
 					dgp0.color = sr[offs + 2] & 0x0f;
@@ -170,11 +170,11 @@ struct drawgfxParams dgp0={
 					dgp0.sy = sy;
 					drawgfx(&dgp0);
 				}
-} // end of patch paragraph
-
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 
@@ -185,29 +185,29 @@ VIDEO_UPDATE( gyruss )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
-		
-{ 
-struct drawgfxParams dgp1={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy,flipx,flipy;
 
 
@@ -234,9 +234,9 @@ struct drawgfxParams dgp1={
 			dgp1.sy = 8*sy;
 			drawgfx(&dgp1);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 
 	/* copy the character mapped graphics */
@@ -284,7 +284,7 @@ struct drawgfxParams dgp1={
 		}
 
 		if ((colorram[offs] & 0x10) != 0)
-			
+		{
 			dgp2.code = videoram[offs] + 8 * (colorram[offs] & 0x20);
 			dgp2.color = colorram[offs] & 0x0f;
 			dgp2.flipx = flipx;
@@ -292,6 +292,7 @@ struct drawgfxParams dgp1={
 			dgp2.sx = 8*sx;
 			dgp2.sy = 8*sy;
 			drawgfx(&dgp2);
+        }
 	}
 	} // end of patch paragraph
 

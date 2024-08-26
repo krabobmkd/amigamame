@@ -1,22 +1,3 @@
-
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	\					cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 
@@ -176,14 +157,6 @@ WRITE8_HANDLER( spdodgeb_videoram_w )
 
 ***************************************************************************/
 
-#define DRAW_SPRITE( order, sx, sy ) 
-#define DRAW_SPRITE( order, sx, sy ) dgp0.code = \					(which+order);
-#define DRAW_SPRITE( order, sx, sy ) dgp0.color = color+ 8 * sprite_palbank;
-#define DRAW_SPRITE( order, sx, sy ) dgp0.flipx = flipx;
-#define DRAW_SPRITE( order, sx, sy ) dgp0.flipy = flipy;
-#define DRAW_SPRITE( order, sx, sy ) dgp0.sx = sx;
-#define DRAW_SPRITE( order, sx, sy ) dgp0.sy = sy;
-#define DRAW_SPRITE( order, sx, sy ) drawgfx(&dgp0);
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
@@ -196,6 +169,25 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 /*  240-SY   Z|F|CLR|WCH WHICH    SX
     xxxxxxxx x|x|xxx|xxx xxxxxxxx xxxxxxxx
 */
+
+    {
+    struct drawgfxParams dgp0={
+        bitmap, 	// dest
+        gfx, 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        cliprect, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        0, 	// transparent_color
+        0, 	// scalex
+        0, 	// scaley
+        NULL, 	// pri_buffer
+        0 	// priority_mask
+      };
 	for (i = 0;i < spriteram_size;i += 4)
 	{
 		int attr = src[i+1];
@@ -221,21 +213,45 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		if (sx < -8) sx += 256; else if (sx > 248) sx -= 256;
 
 		switch (size)
-		{
+        {
 			case 0: /* normal */
-			if (sy < -8) sy += 256; else if (sy > 248) sy -= 256;
-			DRAW_SPRITE(0,sx,sy);
+                if (sy < -8) sy += 256; else if (sy > 248) sy -= 256;
+
+
+                dgp0.code = which;
+                dgp0.color = color+ 8 * sprite_palbank;
+                dgp0.flipx = flipx;
+                dgp0.flipy = flipy;
+                dgp0.sx = sx;
+                dgp0.sy = sy;
+                drawgfx(&dgp0);
+
 			break;
 
 			case 1: /* double y */
-			if (flip_screen) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
-			cy = sy + dy;
-			which &= ~1;
-			DRAW_SPRITE(0,sx,cy);
-			DRAW_SPRITE(1,sx,sy);
+                if (flip_screen) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
+                cy = sy + dy;
+                which &= ~1;
+
+                dgp0.code = which;
+                dgp0.color = color+ 8 * sprite_palbank;
+                dgp0.flipx = flipx;
+                dgp0.flipy = flipy;
+                dgp0.sx = sx;
+                dgp0.sy = cy;
+                drawgfx(&dgp0);
+
+                dgp0.code = which+1;
+                //dgp0.color = color+ 8 * sprite_palbank;
+                //dgp0.flipx = flipx;
+                //dgp0.flipy = flipy;
+                //dgp0.sx = sx;
+                dgp0.sy = sy;
+                drawgfx(&dgp0);
 			break;
 		}
 	}
+    } // end of patch paragraph
 }
 
 #undef DRAW_SPRITE
@@ -260,5 +276,3 @@ VIDEO_UPDATE( spdodgeb )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(bitmap,cliprect);
 }
-
-} // end of patch paragraph

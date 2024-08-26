@@ -188,38 +188,9 @@ struct drawgfxParams {
     mame_bitmap *pri_buffer; // optional
     UINT32 priority_mask;
 };
-//// zoom
-// mame_bitmap *dest_bmp,
-// const gfx_element *gfx,
-// unsigned int code,
-// unsigned int color,
-// int flipx,
-// int flipy,
-// int sx,
-// int sy,
-//const rectangle *clip
-//int transparency
-//int transparent_color,
-
-//		int scalex, int scaley,
-
-//		mame_bitmap *pri_buffer,UINT32 pri_mask
 
 
-
-//void drawgfx(mame_bitmap *dest,const gfx_element *gfx,
-//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-//		const rectangle *clip,int transparency,int transparent_color);
-//void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
-//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-//		const rectangle *clip,int transparency,int transparent_color,
-//		UINT32 priority_mask);
-//void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
-//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-//		const rectangle *clip,int transparency,int transparent_color,
-//		UINT32 priority_mask);
-
-void drawgfx(struct drawgfxParams *p DGREG(a0)); // is
+void drawgfx(struct drawgfxParams *p DGREG(a0));
 //void pdrawgfx(struct drawgfxParams *p DGREG(a0));
 //void mdrawgfx(struct drawgfxParams *p DGREG(a0));
 
@@ -319,7 +290,8 @@ void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 priority);
 
 void fillbitmap(mame_bitmap *dest,pen_t pen,const rectangle *clip);
-//void drawgfxzoom(struct drawgfxParams *p DGREG(a0));
+
+void drawgfxzoom(struct drawgfxParams *p DGREG(a0));
 //void pdrawgfxzoom(struct drawgfxParams *p DGREG(a0));
 //void mdrawgfxzoom( struct drawgfxParams *p DGREG(a0));
 

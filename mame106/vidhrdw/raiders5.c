@@ -214,7 +214,7 @@ VIDEO_UPDATE( raiders5 )
 		drawgfx(&dgp1);
 
 		if (px>0xf0)
-			
+        {
 			dgp1.code = chr;
 			dgp1.color = col;
 			dgp1.flipx = fx;
@@ -222,6 +222,7 @@ VIDEO_UPDATE( raiders5 )
 			dgp1.sx = px-0x100;
 			dgp1.sy = py;
 			drawgfx(&dgp1);
+        }
 	}
 	} // end of patch paragraph
 

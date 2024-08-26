@@ -227,6 +227,25 @@ static void segar_common_screenrefresh(mame_bitmap *bitmap, int sprite_transpare
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		sprite_transparency, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if ((sv.char_refresh) || (sv.dirtychar[videoram[offs]]))
@@ -234,26 +253,7 @@ static void segar_common_screenrefresh(mame_bitmap *bitmap, int sprite_transpare
 
 		/* Redraw every character if our palette or scene changed */
 		if ((dirtybuffer[offs]) || sv.refresh)
-		
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	sprite_transparency, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy;
 
 			sx = 8 * (offs % 32);
@@ -287,9 +287,9 @@ struct drawgfxParams dgp0={
 			dirtybuffer[offs] = 0;
 
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	for (offs=0;offs<256;offs++)
 		if (sv.dirtychar[offs]==2)
@@ -451,6 +451,42 @@ VIDEO_UPDATE( spaceod )
 	{
 		sv.brefresh=0;
 
+		
+		{ 
+		struct drawgfxParams dgp1={
+			sv.vertbackbitmap, 	// dest
+			Machine->gfx[1 + sv.back_charset], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			0, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
+		struct drawgfxParams dgp2={
+			sv.horizbackbitmap, 	// dest
+			Machine->gfx[1 + sv.back_charset], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			0, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = 0x1000 - 1; offs >= 0; offs--)
 		{
 			int sx,sy;
@@ -484,26 +520,7 @@ VIDEO_UPDATE( spaceod )
 			charcode = back_charmap[(sv.back_scene*0x1000) + offs];
 
 			if (vert_scene)
-			
-{ 
-struct drawgfxParams dgp1={
-	sv.vertbackbitmap, 	// dest
-	Machine->gfx[1 + sv.back_charset], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				
 				dgp1.code = charcode;
 				dgp1.flipx = sv.bflip;
@@ -512,28 +529,7 @@ struct drawgfxParams dgp1={
 				dgp1.sy = sy;
 				drawgfx(&dgp1);
 			}
-} // end of patch paragraph
-
-			
-{ 
-struct drawgfxParams dgp2={
-	sv.horizbackbitmap, 	// dest
-	Machine->gfx[1 + sv.back_charset], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+			else
 			{
 				
 				dgp2.code = charcode;
@@ -543,9 +539,9 @@ else
 				dgp2.sy = sy;
 				drawgfx(&dgp2);
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 	}
 
 	/* Copy the scrolling background */
@@ -722,6 +718,25 @@ VIDEO_UPDATE( monsterb )
 	{
 		/* for every character in the Video RAM, check if it has been modified */
 		/* since last time and update it accordingly. */
+		
+		{ 
+		struct drawgfxParams dgp3={
+			tmpbitmap, 	// dest
+			Machine->gfx[1 + sv.back_charset], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = videoram_size - 1;offs >= 0;offs--)
 		{
 			if ((sv.char_refresh) || (sv.dirtychar[videoram[offs]]))
@@ -729,26 +744,7 @@ VIDEO_UPDATE( monsterb )
 
 			/* Redraw every background character if our palette or scene changed */
 			if ((dirtybuffer[offs]) || sv.refresh)
-			
-{ 
-struct drawgfxParams dgp3={
-	tmpbitmap, 	// dest
-	Machine->gfx[1 + sv.back_charset], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				int sx,sy;
 
 				sx = 8 * (offs % 32);
@@ -771,9 +767,9 @@ struct drawgfxParams dgp3={
 				dgp3.sy = sy;
 				drawgfx(&dgp3);
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 		sprite_transparency=TRANSPARENCY_PEN;
 	}
 
@@ -924,6 +920,25 @@ VIDEO_UPDATE( sindbadm )
 	{
 		/* for every character in the Video RAM, check if it has been modified */
 		/* since last time and update it accordingly. */
+		
+		{ 
+		struct drawgfxParams dgp4={
+			tmpbitmap, 	// dest
+			Machine->gfx[1 + sv.back_charset], 	// gfx
+			0, 	// code
+			0, 	// color
+			0, 	// flipx
+			0, 	// flipy
+			0, 	// sx
+			0, 	// sy
+			&Machine->visible_area, 	// clip
+			TRANSPARENCY_NONE, 	// transparency
+			0, 	// transparent_color
+			0, 	// scalex
+			0, 	// scaley
+			NULL, 	// pri_buffer
+			0 	// priority_mask
+		  };
 		for (offs = videoram_size - 1;offs >= 0;offs--)
 		{
 			if ((sv.char_refresh) || (sv.dirtychar[videoram[offs]]))
@@ -931,26 +946,7 @@ VIDEO_UPDATE( sindbadm )
 
 			/* Redraw every background character if our palette or scene changed */
 			if ((dirtybuffer[offs]) || sv.refresh)
-			
-{ 
-struct drawgfxParams dgp4={
-	tmpbitmap, 	// dest
-	Machine->gfx[1 + sv.back_charset], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				int sx,sy;
 
 				sx = 8 * (offs % 32);
@@ -978,9 +974,9 @@ struct drawgfxParams dgp4={
 				dgp4.sy = sy;
 				drawgfx(&dgp4);
 			}
-} // end of patch paragraph
-
 		}
+		} // end of patch paragraph
+
 		sprite_transparency=TRANSPARENCY_PEN;
 	}
 

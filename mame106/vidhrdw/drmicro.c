@@ -177,37 +177,16 @@ VIDEO_UPDATE( drmicro )
 			drawgfx(&dgp0);
 
 			if (x>240)
-			
-{ 
-struct drawgfxParams dgp1={
-	bitmap, 	// dest
-	Machine->gfx[3-g], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{
 				
-				dgp1.code = chr;
-				dgp1.color = col;
-				dgp1.flipx = fx;
-				dgp1.flipy = fy;
-				dgp1.sx = x-256;
-				dgp1.sy = y;
-				drawgfx(&dgp1);
+				dgp0.code = chr;
+				dgp0.color = col;
+				dgp0.flipx = fx;
+				dgp0.flipy = fy;
+				dgp0.sx = x-256;
+				dgp0.sy = y;
+				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
-
 		}
 	}
 	} // end of patch paragraph

@@ -75,30 +75,30 @@ static void tigeroad_draw_sprites( mame_bitmap *bitmap, int priority )
 	// TODO: The Track Map should probably be drawn on top of the background tilemap...
 	//       Also convert the below into a for loop!
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	while (source >= finish)
 	{
 		int tile_number = source[0];
 
-		if (tile_number != 0xfff) 
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		if (tile_number != 0xfff) {
 			int attr = source[1];
 			int sy = source[2] & 0x1ff;
 			int sx = source[3] & 0x1ff;
@@ -127,11 +127,11 @@ struct drawgfxParams dgp0={
 			dgp0.sy = 240 - sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 
 		source -= 4;
 	}
+	} // end of patch paragraph
+
 }
 
 static void get_bg_tile_info(int tile_index)

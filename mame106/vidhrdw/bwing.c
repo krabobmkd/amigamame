@@ -254,6 +254,25 @@ static void bwing_drawsprites(mame_bitmap *bmp, const rectangle *clip, UINT8 *ra
 		NULL, 	// pri_buffer
 		0 	// priority_mask
 	  };
+	
+	{ 
+	struct drawgfxParams dgpz0={
+		bmp, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		clip, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0x00010000, 	// scalex
+		0x00010000, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (i=0; i<0x200; i+=4)
 	{
 		attrib = ram[i];   if (!(attrib & 1) || (color = attrib>>3 & 1) != pri) continue;
@@ -268,7 +287,7 @@ static void bwing_drawsprites(mame_bitmap *bmp, const rectangle *clip, UINT8 *ra
 
 		// single/double
 		if (!(attrib & 0x10))
-			
+		{
 			dgp0.code = code;
 			dgp0.color = color;
 			dgp0.flipx = fx;
@@ -276,9 +295,22 @@ static void bwing_drawsprites(mame_bitmap *bmp, const rectangle *clip, UINT8 *ra
 			dgp0.sx = x;
 			dgp0.sy = y;
 			drawgfx(&dgp0);
+        }
 		else
-			drawgfxzoom(bmp, gfx, code, color, fx, fy, x, y, clip, TRANSPARENCY_PEN, 0, 1<<16, 2<<16);
+		{
+			dgpz0.code = code;
+			dgpz0.color = color;
+			dgpz0.flipx = fx;
+			dgpz0.flipy = fy;
+			dgpz0.sx = x;
+			dgpz0.sy = y;
+			dgpz0.scalex = 1<<16;
+			dgpz0.scaley = 2<<16;
+			drawgfxzoom(&dgpz0);
+        }
 	}
+	} // end of patch paragraph
+
 	} // end of patch paragraph
 
 }

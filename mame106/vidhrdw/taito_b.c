@@ -381,6 +381,44 @@ static void taitob_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
   int offs,code,color,flipx,flipy;
   unsigned int data, zoomx, zoomy, zx, zy, zoomxlatch=0, zoomylatch=0;
 
+  
+  { 
+  struct drawgfxParams dgp0={
+  	bitmap, 	// dest
+  	Machine->gfx[1], 	// gfx
+  	0, 	// code
+  	0, 	// color
+  	0, 	// flipx
+  	0, 	// flipy
+  	0, 	// sx
+  	0, 	// sy
+  	cliprect, 	// clip
+  	TRANSPARENCY_PEN_RAW, 	// transparency
+  	0, 	// transparent_color
+  	0, 	// scalex
+  	0, 	// scaley
+  	NULL, 	// pri_buffer
+  	0 	// priority_mask
+    };
+  
+  { 
+  struct drawgfxParams dgpz0={
+  	bitmap, 	// dest
+  	Machine->gfx[1], 	// gfx
+  	0, 	// code
+  	0, 	// color
+  	0, 	// flipx
+  	0, 	// flipy
+  	0, 	// sx
+  	0, 	// sy
+  	cliprect, 	// clip
+  	TRANSPARENCY_PEN_RAW, 	// transparency
+  	0, 	// transparent_color
+  	0x00010000, 	// scalex
+  	0x00010000, 	// scaley
+  	NULL, 	// pri_buffer
+  	0 	// priority_mask
+    };
   for (offs = (0x1980-16)/2; offs >=0; offs -= 8)
   {
     code = taitob_spriteram[offs];
@@ -447,34 +485,18 @@ static void taitob_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
 
     if ( zoomx || zoomy )
     {
-      drawgfxzoom (bitmap,Machine->gfx[1],
-        code,
-        color,
-        flipx,flipy,
-        x,y,
-        cliprect,
-        TRANSPARENCY_PEN_RAW,0,(zx << 16) / 16,(zy << 16) / 16);
+      
+      dgpz0.code = code;
+      dgpz0.color = color;
+      dgpz0.flipx = flipx;
+      dgpz0.flipy = flipy;
+      dgpz0.sx = x;
+      dgpz0.sy = y;
+      dgpz0.scalex = (zx << 16) / 16;
+      dgpz0.scaley = (zy << 16) / 16;
+      drawgfxzoom(&dgpz0);
     }
-    
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN_RAW, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+    else
     {
       
       dgp0.code = code;
@@ -485,9 +507,11 @@ else
       dgp0.sy = y;
       drawgfx(&dgp0);
     }
-} // end of patch paragraph
-
   }
+  } // end of patch paragraph
+
+  } // end of patch paragraph
+
 }
 
 

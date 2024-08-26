@@ -175,49 +175,70 @@ VIDEO_UPDATE( matmania )
 	int offs;
 
 
-    struct drawgfxParams dgp={
-        tmpbitmap, Machine->gfx[1],
-        0,//code,
-        0,//color,
-        0,0,//flipx, flipy,
-        0,0,// //sx, sy,
-        NULL, // cliprect,
-        TRANSPARENCY_NONE, 0,
-        // - - optionals
-        0,0,NULL,0
-    };
-
 	/* Update the tiles in the left tile ram bank */
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
 		{
 			int sx,sy;
 
+
 			dirtybuffer[offs] = 0;
 
 			sx = 15 - offs / 32;
 			sy = offs % 32;
 
-			dgp.code = videoram[offs] + ((colorram[offs] & 0x08) << 5);
-            dgp.color = (colorram[offs] & 0x30) >> 4;
-            dgp.flipy = (sy >= 16);
-            dgp.sx = sx<<4;
-            dgp.sy = sy<<4;
-			drawgfx(&dgp);
-
-//			drawgfx(tmpbitmap,Machine->gfx[1],
-//					videoram[offs] + ((colorram[offs] & 0x08) << 5),
-//					(colorram[offs] & 0x30) >> 4,
-//					0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
-//					16*sx,16*sy,
-//					0,TRANSPARENCY_NONE,0);
+			
+			dgp0.code = videoram[offs] + ((colorram[offs] & 0x08) << 5);
+			dgp0.color = (colorram[offs] & 0x30) >> 4;
+			dgp0.flipy = sy >= 16;
+			dgp0.sx = /* flip horizontally tiles on the right half of the bitmap */					16*sx;
+			dgp0.sy = 16*sy;
+			drawgfx(&dgp0);
 		}
 	}
+	} // end of patch paragraph
 
-    dgp.dest = tmpbitmap2;
 
 	/* Update the tiles in the right tile ram bank */
+	
+	{ 
+	struct drawgfxParams dgp1={
+		tmpbitmap2, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = matmania_videoram3_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer2[offs])
@@ -230,21 +251,17 @@ VIDEO_UPDATE( matmania )
 			sx = 15 - offs / 32;
 			sy = offs % 32;
 
-			dgp.code = matmania_videoram3[offs] + ((matmania_colorram3[offs] & 0x08) << 5);
-            dgp.color = (matmania_colorram3[offs] & 0x30) >> 4;
-            dgp.flipy = (sy >= 16);
-            dgp.sx = sx<<4;
-            dgp.sy = sy<<4;
-			drawgfx(&dgp);
-
-//			drawgfx(tmpbitmap2,Machine->gfx[1],
-//					matmania_videoram3[offs] + ((matmania_colorram3[offs] & 0x08) << 5),
-//					(matmania_colorram3[offs] & 0x30) >> 4,
-//					0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
-//					16*sx,16*sy,
-//					0,TRANSPARENCY_NONE,0);
+			
+			dgp1.code = matmania_videoram3[offs] + ((matmania_colorram3[offs] & 0x08) << 5);
+			dgp1.color = (matmania_colorram3[offs] & 0x30) >> 4;
+			dgp1.flipy = sy >= 16;
+			dgp1.sx = /* flip horizontally tiles on the right half of the bitmap */					16*sx;
+			dgp1.sy = 16*sy;
+			drawgfx(&dgp1);
 		}
 	}
+	} // end of patch paragraph
+
 
 
 	/* copy the temporary bitmap to the screen */
@@ -261,61 +278,80 @@ VIDEO_UPDATE( matmania )
 
 
 	/* Draw the sprites */
-    dgp.dest = bitmap;
-    dgp.gfx = Machine->gfx[2];
-    dgp.clip = &Machine->visible_area;
-    dgp.transparency = TRANSPARENCY_PEN;
-    dgp.transparent_color = 0;
-
+	
+	{ 
+	struct drawgfxParams dgp2={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{
-			dgp.code = spriteram[offs+1] + ((spriteram[offs] & 0xf0) << 4);
-            dgp.color = (spriteram[offs] & 0x08) >> 3;
-            dgp.flipx = spriteram[offs] & 0x04;
-            dgp.flipy = spriteram[offs] & 0x02;
-            dgp.sx = 239 - spriteram[offs+3];
-            dgp.sy = (240 - spriteram[offs+2]) & 0xff;
-			drawgfx(&dgp);
-
-//			drawgfx(bitmap,Machine->gfx[2],
-//					spriteram[offs+1] + ((spriteram[offs] & 0xf0) << 4),
-//					(spriteram[offs] & 0x08) >> 3,
-//					spriteram[offs] & 0x04,spriteram[offs] & 0x02,
-//					239 - spriteram[offs+3],(240 - spriteram[offs+2]) & 0xff,
-//					&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp2.code = spriteram[offs+1] + ((spriteram[offs] & 0xf0) << 4);
+			dgp2.color = (spriteram[offs] & 0x08) >> 3;
+			dgp2.flipx = spriteram[offs] & 0x04;
+			dgp2.flipy = spriteram[offs] & 0x02;
+			dgp2.sx = 239 - spriteram[offs+3];
+			dgp2.sy = (240 - spriteram[offs+2]) & 0xff;
+			drawgfx(&dgp2);
 		}
 	}
+	} // end of patch paragraph
+
 
 
 	/* draw the frontmost playfield. They are characters, but draw them as sprites */
-    //dgp.dest = bitmap;
-    dgp.gfx = Machine->gfx[0];
-   // dgp.clip = &Machine->visible_area;
-    //dgp.transparency = TRANSPARENCY_PEN;
-    //dgp.transparent_color = 0;
-    dgp.flipx = dgp.flipy = 0;
-
+	
+	{ 
+	struct drawgfxParams dgp3={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = matmania_videoram2_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy;
+
+
 		sx = 31 - offs / 32;
 		sy = offs % 32;
 
-        dgp.code = matmania_videoram2[offs] + 256 * (matmania_colorram2[offs] & 0x07);
-        dgp.color = (matmania_colorram2[offs] & 0x30) >> 4;
-        dgp.sx =sx<<3;
-        dgp.sy =sy<<3;
-        drawgfx(&dgp);
-
-		/*drawgfx(bitmap,Machine->gfx[0],
-				matmania_videoram2[offs] + 256 * (matmania_colorram2[offs] & 0x07),
-				(matmania_colorram2[offs] & 0x30) >> 4,
-				0,0,
-				8*sx,8*sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);*/
+		
+		dgp3.code = matmania_videoram2[offs] + 256 * (matmania_colorram2[offs] & 0x07);
+		dgp3.color = (matmania_colorram2[offs] & 0x30) >> 4;
+		dgp3.sx = 8*sx;
+		dgp3.sy = 8*sy;
+		drawgfx(&dgp3);
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( maniach )
@@ -324,6 +360,25 @@ VIDEO_UPDATE( maniach )
 
 
 	/* Update the tiles in the left tile ram bank */
+	
+	{ 
+	struct drawgfxParams dgp4={
+		tmpbitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
@@ -336,16 +391,38 @@ VIDEO_UPDATE( maniach )
 			sx = 15 - offs / 32;
 			sy = offs % 32;
 
-			drawgfx(tmpbitmap,Machine->gfx[1],
-					videoram[offs] + ((colorram[offs] & 0x03) << 8),
-					(colorram[offs] & 0x30) >> 4,
-					0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
-					16*sx,16*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp4.code = videoram[offs] + ((colorram[offs] & 0x03) << 8);
+			dgp4.color = (colorram[offs] & 0x30) >> 4;
+			dgp4.flipy = sy >= 16;
+			dgp4.sx = /* flip horizontally tiles on the right half of the bitmap */					16*sx;
+			dgp4.sy = 16*sy;
+			drawgfx(&dgp4);
 		}
 	}
+	} // end of patch paragraph
+
 
 	/* Update the tiles in the right tile ram bank */
+	
+	{ 
+	struct drawgfxParams dgp5={
+		tmpbitmap2, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = matmania_videoram3_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer2[offs])
@@ -358,14 +435,17 @@ VIDEO_UPDATE( maniach )
 			sx = 15 - offs / 32;
 			sy = offs % 32;
 
-			drawgfx(tmpbitmap2,Machine->gfx[1],
-					matmania_videoram3[offs] + ((matmania_colorram3[offs] & 0x03) << 8),
-					(matmania_colorram3[offs] & 0x30) >> 4,
-					0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
-					16*sx,16*sy,
-					0,TRANSPARENCY_NONE,0);
+			
+			dgp5.code = matmania_videoram3[offs] + ((matmania_colorram3[offs] & 0x03) << 8);
+			dgp5.color = (matmania_colorram3[offs] & 0x30) >> 4;
+			dgp5.flipy = sy >= 16;
+			dgp5.sx = /* flip horizontally tiles on the right half of the bitmap */					16*sx;
+			dgp5.sy = 16*sy;
+			drawgfx(&dgp5);
 		}
 	}
+	} // end of patch paragraph
+
 
 
 	/* copy the temporary bitmap to the screen */
@@ -382,21 +462,63 @@ VIDEO_UPDATE( maniach )
 
 
 	/* Draw the sprites */
+	
+	{ 
+	struct drawgfxParams dgp6={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{
-			drawgfx(bitmap,Machine->gfx[2],
-					spriteram[offs+1] + ((spriteram[offs] & 0xf0) << 4),
-					(spriteram[offs] & 0x08) >> 3,
-					spriteram[offs] & 0x04,spriteram[offs] & 0x02,
-					239 - spriteram[offs+3],(240 - spriteram[offs+2]) & 0xff,
-					&Machine->visible_area,TRANSPARENCY_PEN,0);
+			
+			dgp6.code = spriteram[offs+1] + ((spriteram[offs] & 0xf0) << 4);
+			dgp6.color = (spriteram[offs] & 0x08) >> 3;
+			dgp6.flipx = spriteram[offs] & 0x04;
+			dgp6.flipy = spriteram[offs] & 0x02;
+			dgp6.sx = 239 - spriteram[offs+3];
+			dgp6.sy = (240 - spriteram[offs+2]) & 0xff;
+			drawgfx(&dgp6);
 		}
 	}
+	} // end of patch paragraph
+
 
 
 	/* draw the frontmost playfield. They are characters, but draw them as sprites */
+	
+	{ 
+	struct drawgfxParams dgp7={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = matmania_videoram2_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy;
@@ -405,11 +527,13 @@ VIDEO_UPDATE( maniach )
 		sx = 31 - offs / 32;
 		sy = offs % 32;
 
-		drawgfx(bitmap,Machine->gfx[0],
-				matmania_videoram2[offs] + 256 * (matmania_colorram2[offs] & 0x07),
-				(matmania_colorram2[offs] & 0x30) >> 4,
-				0,0,
-				8*sx,8*sy,
-				&Machine->visible_area,TRANSPARENCY_PEN,0);
+		
+		dgp7.code = matmania_videoram2[offs] + 256 * (matmania_colorram2[offs] & 0x07);
+		dgp7.color = (matmania_colorram2[offs] & 0x30) >> 4;
+		dgp7.sx = 8*sx;
+		dgp7.sy = 8*sy;
+		drawgfx(&dgp7);
 	}
+	} // end of patch paragraph
+
 }

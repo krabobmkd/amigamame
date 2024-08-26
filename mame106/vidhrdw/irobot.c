@@ -384,27 +384,27 @@ VIDEO_UPDATE( irobot )
 	/* redraw the non-zero characters in the alpha layer */
 	for (y = offs = 0; y < 32; y++)
 		for (x = 0; x < 32; x++, offs++)
-			if (videoram[offs] != 0)
 			
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[0], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_COLOR, 	// transparency
-	transp, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				Machine->gfx[0], 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				&Machine->visible_area, 	// clip
+				TRANSPARENCY_COLOR, 	// transparency
+				transp, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
+			if (videoram[offs] != 0)
+			{
 				int code = videoram[offs] & 0x3f;
 				int color = ((videoram[offs] & 0xC0) >> 6) | (irobot_alphamap >> 3);
 				int transp=color + 64;
@@ -416,6 +416,6 @@ struct drawgfxParams dgp0={
 				dgp0.sy = 8*y;
 				drawgfx(&dgp0);
 			}
-} // end of patch paragraph
+			} // end of patch paragraph
 
 }

@@ -128,29 +128,29 @@ static void draw_background( mame_bitmap *bitmap )
 	int offs;
 	const gfx_element *gfx = Machine->gfx[0];
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		tmpbitmap, 	// dest
+		gfx, 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		0, 	// clip
+		TRANSPARENCY_NONE, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = videoram_size - 2;offs >= 0;offs -= 2)
 	{
 		if (dirtybuffer[offs] || dirtybuffer[offs+1])
-		
-{ 
-struct drawgfxParams dgp0={
-	tmpbitmap, 	// dest
-	gfx, 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	0, 	// clip
-	TRANSPARENCY_NONE, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+		{
 			int sx,sy,code,attr,flipx;
 
 
@@ -179,9 +179,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = 8*sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 
 	{
 		int xscroll[256];
@@ -222,7 +222,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 	{ 
 	struct drawgfxParams dgp1={
 		bitmap, 	// dest
-		Machine->gfx[1+bank], 	// gfx
+		NULL,//Machine->gfx[1+bank], 	// gfx
 		0, 	// code
 		0, 	// color
 		0, 	// flipx
@@ -252,6 +252,8 @@ static void draw_sprites( mame_bitmap *bitmap )
 		int bank = 0;
 		if( code&0x80 ) bank += 1;
 		if( attributes&0x20 ) bank += 2;
+
+        dgp1.gfx = Machine->gfx[1+bank];
 
 		if (flipscreen)
 		{

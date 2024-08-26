@@ -259,7 +259,7 @@ static void liberate_drawsprites(mame_bitmap *bitmap)
     	dgp0.sy = sy;
     	drawgfx(&dgp0);
         if (multi)
-    		
+        {
     		dgp0.code = code+1;
     		dgp0.color = color;
     		dgp0.flipx = fx;
@@ -267,6 +267,7 @@ static void liberate_drawsprites(mame_bitmap *bitmap)
     		dgp0.sx = sx;
     		dgp0.sy = sy2;
     		drawgfx(&dgp0);
+        }
 	}
 	} // end of patch paragraph
 
@@ -339,7 +340,7 @@ static void prosport_drawsprites(mame_bitmap *bitmap)
     	dgp2.sy = sy;
     	drawgfx(&dgp2);
         if (multi)
-    		
+    	{
     		dgp2.code = code2;
     		dgp2.color = color;
     		dgp2.flipx = fx;
@@ -347,6 +348,7 @@ static void prosport_drawsprites(mame_bitmap *bitmap)
     		dgp2.sx = sx;
     		dgp2.sy = sy2;
     		drawgfx(&dgp2);
+        }
 	}
 	} // end of patch paragraph
 
@@ -420,7 +422,7 @@ static void boomrang_drawsprites(mame_bitmap *bitmap, int pri)
     	dgp4.sy = sy;
     	drawgfx(&dgp4);
         if (multi)
-    		
+    	{
     		dgp4.code = code2;
     		dgp4.color = color;
     		dgp4.flipx = fx;
@@ -428,6 +430,7 @@ static void boomrang_drawsprites(mame_bitmap *bitmap, int pri)
     		dgp4.sx = sx;
     		dgp4.sy = sy2;
     		drawgfx(&dgp4);
+        }
 	}
 	} // end of patch paragraph
 

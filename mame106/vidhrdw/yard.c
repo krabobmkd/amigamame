@@ -1,22 +1,3 @@
-
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_COLOR, 	// transparency
-	256, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
 /***************************************************************************
 
   vidhrdw.c
@@ -240,19 +221,30 @@ VIDEO_START( yard )
 	return 0;
 }
 
-#define DRAW_SPRITE(code, sy) 
-#define DRAW_SPRITE(code, sy) dgp0.code = code;
-#define DRAW_SPRITE(code, sy) dgp0.color = color;
-#define DRAW_SPRITE(code, sy) dgp0.flipx = flipx;
-#define DRAW_SPRITE(code, sy) dgp0.flipy = flipy;
-#define DRAW_SPRITE(code, sy) dgp0.sx = sx;
-#define DRAW_SPRITE(code, sy) dgp0.sy = sy;
-#define DRAW_SPRITE(code, sy) drawgfx(&dgp0);
 
 static void yard_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_COLOR, 	// transparency
+		256, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 1];
@@ -289,9 +281,27 @@ static void yard_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 			sy2 = sy1 + 0x10;
 		}
 
-		DRAW_SPRITE(code1 + 256 * bank, sy1)
-		DRAW_SPRITE(code2 + 256 * bank, sy2)
+
+        dgp0.code = code1 + (bank<<8);
+        dgp0.color = color;
+        dgp0.flipx = flipx;
+        dgp0.flipy = flipy;
+        dgp0.sx = sx;
+        dgp0.sy = sy1;
+        drawgfx(&dgp0);
+        
+        dgp0.code = code2 + (bank<<8);
+//        dgp0.color = color;
+//        dgp0.flipx = flipx;
+//        dgp0.flipy = flipy;
+//        dgp0.sx = sx;
+        dgp0.sy = sy2;
+        drawgfx(&dgp0);
+
+
 	}
+	} // end of patch paragraph
+
 }
 
 static void yard_draw_panel( mame_bitmap *bitmap, const rectangle *cliprect )
@@ -314,5 +324,3 @@ VIDEO_UPDATE( yard )
 	yard_draw_sprites(bitmap, cliprect);
 	yard_draw_panel(bitmap, cliprect);
 }
-
-} // end of patch paragraph

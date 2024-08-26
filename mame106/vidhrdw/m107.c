@@ -269,6 +269,25 @@ static void m107_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int
 {
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[1], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = 0x1000-8;offs >= 0;offs -= 8) {
 		int x,y,sprite,colour,fx,fy,y_multi,i,s_ptr;
 
@@ -299,25 +318,6 @@ static void m107_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int
 			s_ptr = 0;
 			if (!fy) s_ptr+=y_multi-1;
 
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (i=0; i<y_multi; i++)
 			{
 				
@@ -330,8 +330,6 @@ static void m107_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int
 				drawgfx(&dgp0);
 				if (fy) s_ptr++; else s_ptr--;
 			}
-			} // end of patch paragraph
-
 		}
 		else
 		{
@@ -391,6 +389,8 @@ static void m107_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int
 			}
 		}
 	}
+	} // end of patch paragraph
+
 }
 
 /*****************************************************************************/

@@ -121,6 +121,25 @@ static int draw_sprites(mame_bitmap *bitmap, int priority)
 
 	int offs;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[2], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
 	for (offs = (0x1000 - 16) / 2; offs >= 0; offs -= 8)
 	{
 		int sx, sy, code, color, size, attr, flipx, flipy;
@@ -150,25 +169,6 @@ static int draw_sprites(mame_bitmap *bitmap, int priority)
 				color |= 0x0080;
 
 
-			
-			{ 
-			struct drawgfxParams dgp0={
-				bitmap, 	// dest
-				Machine->gfx[2], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				&Machine->visible_area, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
 			for (row = 0; row < size; row++)
 			{
 				for (col = 0; col < size; col++)
@@ -186,12 +186,12 @@ static int draw_sprites(mame_bitmap *bitmap, int priority)
 					drawgfx(&dgp0);
 				}
 			}
-			} // end of patch paragraph
-
 
 			count++;
 		}
 	}
+	} // end of patch paragraph
+
 
 	return count;
 }

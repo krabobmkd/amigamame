@@ -161,6 +161,25 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay,inc,pri_mask = 0;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[4], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		15, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri_mask 	// priority_mask
+	  };
 	for (offs = 0;offs < 0x400;offs += 4)
 	{
 		if ((spriteram16[offs+0]&0x8000)!=0x8000) continue;
@@ -199,26 +218,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {
 				if (!fx && !fy)
-				
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri_mask 	// priority_mask
-  };
-{
+				{
 					
 					dgp0.code = sprite + inc;
 					dgp0.color = color;
@@ -248,168 +248,105 @@ struct drawgfxParams dgp0={
 					dgp0.sy = y+ay*16 - 512;
 					drawgfx(&dgp0);
 				}
-} // end of patch paragraph
-
 				else if (fx && !fy)
-				
-{ 
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri_mask 	// priority_mask
-  };
-{
-					
-					dgp3.code = sprite + inc;
-					dgp3.color = color;
-					dgp3.flipx = fx;
-					dgp3.flipy = fy;
-					dgp3.sx = x+(dx-1-ax)*16;
-					dgp3.sy = y+ay*16;
-					drawgfx(&dgp3);
-
-					// wrap around y
-					
-					dgp3.code = sprite + inc;
-					dgp3.color = color;
-					dgp3.flipx = fx;
-					dgp3.flipy = fy;
-					dgp3.sx = x+(dx-1-ax)*16;
-					dgp3.sy = y+ay*16 + 512;
-					drawgfx(&dgp3);
-
-					// wrap around y
-					
-					dgp3.code = sprite + inc;
-					dgp3.color = color;
-					dgp3.flipx = fx;
-					dgp3.flipy = fy;
-					dgp3.sx = x+(dx-1-ax)*16;
-					dgp3.sy = y+ay*16 - 512;
-					drawgfx(&dgp3);
-				}
-} // end of patch paragraph
-
-				else if (!fx && fy)
-				
-{ 
-struct drawgfxParams dgp6={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri_mask 	// priority_mask
-  };
-{
-					
-					dgp6.code = sprite + inc;
-					dgp6.color = color;
-					dgp6.flipx = fx;
-					dgp6.flipy = fy;
-					dgp6.sx = x+ax*16;
-					dgp6.sy = y+(dy-1-ay)*16;
-					drawgfx(&dgp6);
-
-					// wrap around y
-					
-					dgp6.code = sprite + inc;
-					dgp6.color = color;
-					dgp6.flipx = fx;
-					dgp6.flipy = fy;
-					dgp6.sx = x+ax*16;
-					dgp6.sy = y+(dy-1-ay)*16 + 512;
-					drawgfx(&dgp6);
-
-					// wrap around y
-					
-					dgp6.code = sprite + inc;
-					dgp6.color = color;
-					dgp6.flipx = fx;
-					dgp6.flipy = fy;
-					dgp6.sx = x+ax*16;
-					dgp6.sy = y+(dy-1-ay)*16 - 512;
-					drawgfx(&dgp6);
-				}
-} // end of patch paragraph
-
-				
-{ 
-struct drawgfxParams dgp9={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	15, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri_mask 	// priority_mask
-  };
-else
 				{
 					
-					dgp9.code = sprite + inc;
-					dgp9.color = color;
-					dgp9.flipx = fx;
-					dgp9.flipy = fy;
-					dgp9.sx = x+(dx-1-ax)*16;
-					dgp9.sy = y+(dy-1-ay)*16;
-					drawgfx(&dgp9);
+					dgp0.code = sprite + inc;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+(dx-1-ax)*16;
+					dgp0.sy = y+ay*16;
+					drawgfx(&dgp0);
 
 					// wrap around y
 					
-					dgp9.code = sprite + inc;
-					dgp9.color = color;
-					dgp9.flipx = fx;
-					dgp9.flipy = fy;
-					dgp9.sx = x+(dx-1-ax)*16;
-					dgp9.sy = y+(dy-1-ay)*16 + 512;
-					drawgfx(&dgp9);
+					dgp0.code = sprite + inc;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+(dx-1-ax)*16;
+					dgp0.sy = y+ay*16 + 512;
+					drawgfx(&dgp0);
 
 					// wrap around y
 					
-					dgp9.code = sprite + inc;
-					dgp9.color = color;
-					dgp9.flipx = fx;
-					dgp9.flipy = fy;
-					dgp9.sx = x+(dx-1-ax)*16;
-					dgp9.sy = y+(dy-1-ay)*16 - 512;
-					drawgfx(&dgp9);
+					dgp0.code = sprite + inc;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+(dx-1-ax)*16;
+					dgp0.sy = y+ay*16 - 512;
+					drawgfx(&dgp0);
 				}
-} // end of patch paragraph
+				else if (!fx && fy)
+				{
+					
+					dgp0.code = sprite + inc;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+ax*16;
+					dgp0.sy = y+(dy-1-ay)*16;
+					drawgfx(&dgp0);
 
+					// wrap around y
+					
+					dgp0.code = sprite + inc;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+ax*16;
+					dgp0.sy = y+(dy-1-ay)*16 + 512;
+					drawgfx(&dgp0);
+
+					// wrap around y
+					
+					dgp0.code = sprite + inc;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+ax*16;
+					dgp0.sy = y+(dy-1-ay)*16 - 512;
+					drawgfx(&dgp0);
+				}
+				else
+				{
+					
+					dgp0.code = sprite + inc;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+(dx-1-ax)*16;
+					dgp0.sy = y+(dy-1-ay)*16;
+					drawgfx(&dgp0);
+
+					// wrap around y
+					
+					dgp0.code = sprite + inc;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+(dx-1-ax)*16;
+					dgp0.sy = y+(dy-1-ay)*16 + 512;
+					drawgfx(&dgp0);
+
+					// wrap around y
+					
+					dgp0.code = sprite + inc;
+					dgp0.color = color;
+					dgp0.flipx = fx;
+					dgp0.flipy = fy;
+					dgp0.sx = x+(dx-1-ax)*16;
+					dgp0.sy = y+(dy-1-ay)*16 - 512;
+					drawgfx(&dgp0);
+				}
 
 				inc++;
 			}
 	}
+	} // end of patch paragraph
+
 }
 
 VIDEO_UPDATE( dcon )

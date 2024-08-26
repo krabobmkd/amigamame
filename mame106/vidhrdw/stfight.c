@@ -251,6 +251,25 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,sx,sy;
 
+	
+	{ 
+	struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[4], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0x0f, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		priority_bitmap, 	// pri_buffer
+		pri ? 0x02 : 0 	// priority_mask
+	  };
 	for (offs = 0;offs < 4096;offs += 32)
 	{
 		int code;
@@ -264,26 +283,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		// non-active sprites have zero y coordinate value
 		if( sy > 0 )
-		
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[4], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	cliprect, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0x0f, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	priority_bitmap, 	// pri_buffer
-	pri ? 0x02 : 0 	// priority_mask
-  };
-{
+		{
 			// sprites which wrap onto/off the screen have
 			// a sign extension bit in the sprite attribute
 			if( sx >= 0xf0 )
@@ -310,9 +310,9 @@ struct drawgfxParams dgp0={
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
 		}
-} // end of patch paragraph
-
 	}
+	} // end of patch paragraph
+
 }
 
 
