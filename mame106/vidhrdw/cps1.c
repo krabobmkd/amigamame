@@ -180,6 +180,8 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #include "cpu/m68000/m68kmame.h"
 #include "cps1.h"
 
+#include <stdio.h>
+
 #define VERBOSE 0
 
 #define CPS1_DUMP_VIDEO 0
@@ -1295,6 +1297,7 @@ void cps1_find_last_sprite(void)    /* Find the offset of last sprite */
 
 void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
+
 //#define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)
 //{
 //	if (flip_screen)
@@ -1345,24 +1348,21 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		0x02 	// priority_mask
+		0x02 | (1<<31) 	// priority_mask -> (|1<<31) for priority draw
 	  };
 	for (i=cps1_last_sprite_offset; i>=0; i-=4)
 	{
-		int x=*(base+0);
-		int y=*(base+1);
-		int code  =*(base+2);
-		int colour=*(base+3);
+		UINT16 x=*(base+0);
+		UINT16 y=*(base+1);
+		UINT16 code  =*(base+2);
+		UINT16 colour=*(base+3);
 
-        int col=(colour&0x1f) + palette_basecolor[0];
+        int col=  palette_basecolor[0] + (colour&0x1f) ;
 
         int flipx = ((colour &0x20)!=0);
         int flipy = ((colour &0x40)!=0);
         int fflipx = flipx^flip_screen;
         int fflipy = flipy^flip_screen;
-
-//      x-=0x20;
-//      y+=0x20;
 
 		if (cps1_game_config->kludge == 7)
 		{
@@ -1388,25 +1388,27 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				nx++;
 				ny++;
 
+                dgp0.color = col;
+                dgp0.flipx = fflipx;
+                dgp0.flipy = fflipy;
+
                 for (nys=0; nys<ny; nys++)
                 {
-                    int ycodeoffset = code + (((flipy)?(ny-1-nys):nys)<<4);
+                    int ycodeoffset =code;
+                    if(flipy) ycodeoffset += (ny-1-nys)<<4;
+                    else  ycodeoffset +=(nys<<4);
 
                     sy = (y+nys*16) & 0x1ff;
                     if(flip_screen) {  sy= 255-16-sy;  }
 
                     for (nxs=0; nxs<nx; nxs++)
                     {
-                        int fcode = ycodeoffset + (flipx)?((nx-1)-nxs): nxs ;
+                        int fcode = ycodeoffset + ((flipx)?((nx-1)-nxs): nxs) ;
 
                         sx = (x+(nxs<<4)) & 0x1ff;
                         if(flip_screen) { sx= 511-16-sx; }
-
                         
                         dgp0.code = fcode;
-                        dgp0.color = col;
-                        dgp0.flipx = fflipx;
-                        dgp0.flipy = fflipy;
                         dgp0.sx = sx;
                         dgp0.sy = sy;
                         drawgfx(&dgp0);
@@ -1583,7 +1585,12 @@ void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
         int fflipx = flipx^flip_screen;
         int fflipy = flipy^flip_screen;
 
-        dgp2.priority_mask =  primasks[priority] ;
+        dgp2.color = col;
+        dgp2.flipx = fflipx;
+        dgp2.flipy = fflipy;
+
+        dgp2.priority_mask =  primasks[priority] |(1<<31) ; // |(1<<31) because pdraw
+
 
 		if(colour & 0x80)
 		{
@@ -1602,27 +1609,25 @@ void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 
             for (nys=0; nys<ny; nys++)
             {
-                int ycodeoffset = (((flipy)?(ny-1-nys):nys)<<4);
+                int ycodeoffset =code;
+                if(flipy) ycodeoffset += (ny-1-nys)<<4;
+                else  ycodeoffset +=(nys<<4);
+
                  sy = (y+(nys<<4)+yoffs) & 0x3ff;
                  if(flip_screen) {  sy= 255-16-sy;  }
 
                 for (nxs=0; nxs<nx; nxs++)
                 {
                     int fcode = (flipx)?
-                                   (code+ (nx-1)-nxs):
-                                   ((code & ~0xf) + ((code + nxs) & 0xf) ) ; // could be simplified
-                    fcode += ycodeoffset;
+                                   (ycodeoffset + (nx-1)-nxs):
+                                   (ycodeoffset + (nxs & 0xf) ) ; // could be simplified
                     sx = (x+(nxs<<4)+xoffs) & 0x3ff;
 
                     if(flip_screen) {
                         sx= 511-16-sx;
                     }
-
                     
                     dgp2.code = fcode;
-                    dgp2.color = col;
-                    dgp2.flipx = fflipx;
-                    dgp2.flipy = fflipy;
                     dgp2.sx = sx;
                     dgp2.sy = sy;
                     drawgfx(&dgp2);
@@ -1631,12 +1636,8 @@ void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 		}
 		else
 		{
-			/* Simple case... 1 sprite */
-            
+			/* Simple case... 1 sprite */            
             dgp2.code = code;
-            dgp2.color = col;
-            dgp2.flipx = flipx;
-            dgp2.flipy = flipy;
             dgp2.sx = (x+xoffs) & 0x3ff;
             dgp2.sy = (y+yoffs) & 0x3ff;
             drawgfx(&dgp2);

@@ -121,7 +121,7 @@ void Drawable_CGX::drawCGX_DirectCPU16(_mame_display *display)
     directDrawScreen ddscreen;
 
  //   int depth,pixfmt,pixbytes;
-
+// int dbg=0;
     ULONG bmwidth,bmheight;
 
     directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
@@ -173,12 +173,15 @@ void Drawable_CGX::drawCGX_DirectCPU16(_mame_display *display)
             case PIXFMT_LUT8:
             if(_drawable.flags() & DISPFLAG_INTUITIONPALETTE)
             {
+                //dbg =1;
                 //8Bit using fullscreen with dynamic palette change, should just copy pixels.
                 directDraw_UBYTE_UBYTE(&p);
             } else {
+               //  dbg =2;
                 if(_pRemap->_clut8.size()>0)
                 {   // 8bit using remap and static palette (like on workbench 8bit)
                     directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
+                 //    dbg =3;
                 }
             }
             break;
@@ -194,6 +197,7 @@ void Drawable_CGX::drawCGX_DirectCPU16(_mame_display *display)
     }
 
     UnLockBitMap(hdl);
+//    printf("case:%d\n", dbg );
 //     if(debugval ==2) printf("unknown pixfmt\n");
 //    else if(debugval ==3) printf("Truecolor todo\n");
 //      else if(debugval !=0) printf("TROUBLE:%d\n",debugval);
@@ -321,11 +325,15 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
         _PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
 
         _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
-       // printf("Intuition_Screen_CGX corrected depth:%d\n",_screenDepthAsked);
+
+//         printf("got CGX %d %d %d %d\n",_fullscreenWidth,_fullscreenHeight,
+//               _PixelFmt, _PixelBytes);
+//        printf("Intuition_Screen_CGX corrected depth:%d\n",_screenDepthAsked);
     }
     if(_PixelFmt == PIXFMT_LUT8)
     {
         _useIntuitionPalette = true;
+        _flags |= DISPFLAG_INTUITIONPALETTE;
     }
 
     // if source is direct RGB32  find function pointer to draw that mode _PixelFmt

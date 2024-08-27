@@ -94,11 +94,10 @@ static void bombjack_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
-	
-	{ 
+
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
-		Machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2], 	// gfx
+		NULL, 	// gfx
 		0, 	// code
 		0, 	// color
 		0, 	// flipx
@@ -154,8 +153,7 @@ static void bombjack_draw_sprites( mame_bitmap *bitmap )
 			flipx = !flipx;
 			flipy = !flipy;
 		}
-
-		
+		dgp0.gfx = Machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2];
 		dgp0.code = spriteram[offs] & 0x7f;
 		dgp0.color = spriteram[offs+1] & 0x0f;
 		dgp0.flipx = flipx;
@@ -164,7 +162,6 @@ static void bombjack_draw_sprites( mame_bitmap *bitmap )
 		dgp0.sy = sy;
 		drawgfx(&dgp0);
 	}
-	} // end of patch paragraph
 
 }
 

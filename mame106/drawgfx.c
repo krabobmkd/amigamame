@@ -928,57 +928,78 @@ void drawgfx(struct drawgfxParams *p DGREG(a0))
 {
 //	assert(p->gfx, "drawgfx() gfx == 0");
 //	assert(p->gfx->colortable || is_raw[p->transparency], "drawgfx() gfx->colortable == 0");
+    UINT32 code = p->code;
+    int transparency = p->transparency;
+    int transparent_color = p->transparent_color;
+    UINT32 color = p->color;
+    int prev_transparency = transparency;
+    int prev_transparent_color = transparent_color;
 
-	p->code %= p->gfx->total_elements;
-	if (!is_raw[p->transparency])
-		p->color %= p->gfx->total_colors;
+	code %= p->gfx->total_elements;
+	if (!is_raw[transparency])
+		color %= p->gfx->total_colors;
 
 	if (!(Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
-		(p->transparency == TRANSPARENCY_ALPHAONE ||
-		p->transparency == TRANSPARENCY_ALPHA ||
-		p->transparency == TRANSPARENCY_ALPHARANGE))
+		(transparency == TRANSPARENCY_ALPHAONE ||
+		transparency == TRANSPARENCY_ALPHA ||
+		transparency == TRANSPARENCY_ALPHARANGE))
 	{
-		if (p->transparency == TRANSPARENCY_ALPHAONE && (cpu_getcurrentframe() & 1))
+		if (transparency == TRANSPARENCY_ALPHAONE && (cpu_getcurrentframe() & 1))
 		{
-			p->transparency = TRANSPARENCY_PENS;
-			p->transparent_color = (1 << (p->transparent_color & 0xff))|(1 << (p->transparent_color >> 8));
+			transparency = TRANSPARENCY_PENS;
+			transparent_color = (1 << (UINT8)(transparent_color & 0x1f))|(1 << (UINT8)(transparent_color >> 8));
 		}
 		else
 		{
-			p->transparency = TRANSPARENCY_PEN;
-			p->transparent_color &= 0xff;
+			transparency = TRANSPARENCY_PEN;
+			transparent_color &= 0xff;
 		}
 	}
 
-	if (p->gfx->pen_usage && (p->transparency == TRANSPARENCY_PEN ||
-                                p->transparency == TRANSPARENCY_PENS))
+	if (p->gfx->pen_usage && (transparency == TRANSPARENCY_PEN ||
+                                transparency == TRANSPARENCY_PENS))
 	{
-		int transmask = 0;
+		UINT32 transmask = 0;
 
-		if (p->transparency == TRANSPARENCY_PEN)
+		if (transparency == TRANSPARENCY_PEN)
 		{
-			transmask = 1 << (p->transparent_color & 0xff);
+			transmask = 1 << (transparent_color & 0x1f);
 		}
 		else	/* transparency == TRANSPARENCY_PENS */
 		{
-			transmask = p->transparent_color;
+			transmask = transparent_color;
 		}
-
-		if ((p->gfx->pen_usage[p->code] & ~transmask) == 0)
+        UINT32 pen_usage = p->gfx->pen_usage[code];
+		if ((pen_usage & ~transmask) == 0)
 			/* character is totally transparent, no need to draw */
 			return;
-		else if ((p->gfx->pen_usage[p->code] & transmask) == 0)
+		else if ((pen_usage & transmask) == 0)
 			/* character is totally opaque, can disable transparency */
-			p->transparency = TRANSPARENCY_NONE;
+			transparency = TRANSPARENCY_NONE;
 	}
+
+    p->code = code;
+    p->color = color;
+    p->transparency = transparency;
+
+    // did something like that for pdrawgfx case. mdrawgfx was never called (so far ?)
+//   if(p->pri_buffer)  p->priority_mask |= (1<<31);
+
     int depth = p->dest->depth ;
-    if (depth == 8)
-		drawgfx_core8(p);
-	else if(/*depth == 15 ||depth == 16*/ depth<=16)
+
+
+    // 8bit depth that does not exists in Mame106
+//    if (depth == 8)
+//    	drawgfx_core8(p);
+//	 else
+    if(/*depth == 15 ||depth == 16*/ depth<=16)
 		drawgfx_core16(p);
 	else
 		drawgfx_core32(p);
 
+    // magic is struct is now shared between calls
+    p->transparency =prev_transparency;
+    p->transparent_color = prev_transparent_color;
 }
 
 

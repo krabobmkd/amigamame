@@ -185,7 +185,7 @@ static void contcirc_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 	int zoomx, zoomy, zx, zy;
 	int sprite_chunk,map_offset,code,j,k,px,py;
 	int bad_chunks;
-	static const int primasks[2] = {0xf0,0xfc};
+	static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
 
 	
 	{ 
@@ -204,7 +204,7 @@ static void contcirc_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		primasks[priority] 	// priority_mask
+		0//primasks[priority] 	// priority_mask
 	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
 	{
@@ -217,6 +217,8 @@ static void contcirc_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 
 		data = spriteram16[offs+2];
 		priority = (data & 0x8000) >> 15;
+        dgpz0.priority_mask = primasks[priority];
+
 		flipx = (data & 0x4000) >> 14;
 		flipy = (data & 0x2000) >> 13;	// ???
 		x = data & 0x1ff;   // correct mask?
@@ -301,8 +303,44 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 	int zoomx, zoomy, zx, zy;
 	int sprite_chunk,map_offset,code,j,k,px,py;
 	int bad_chunks;
-	static const int primasks[2] = {0xf0,0xfc};
 
+	static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
+
+
+    struct drawgfxParams dgpz1={
+        bitmap, 	// dest
+        Machine->gfx[0], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        cliprect, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        0, 	// transparent_color
+        0x00010000, 	// scalex
+        0x00010000, 	// scaley
+        priority_bitmap, 	// pri_buffer
+        0//primasks[priority] 	// priority_mask
+      };
+    struct drawgfxParams dgpz2={
+        bitmap, 	// dest
+        Machine->gfx[2], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        cliprect, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        0, 	// transparent_color
+        0x00010000, 	// scalex
+        0x00010000, 	// scaley
+        priority_bitmap, 	// pri_buffer
+        0,// primasks[priority] 	// priority_mask
+      };
 	for (offs = spriteram_size/2-4;offs >=0;offs -= 4)
 	{
 		data = spriteram16[offs+0];
@@ -311,6 +349,8 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 
 		data = spriteram16[offs+1];
 		priority = (data & 0x8000) >> 15;
+        dgpz1.priority_mask = primasks[priority];
+        dgpz2.priority_mask = primasks[priority];
 		color = (data & 0x7f80) >> 7;
 		zoomx = (data & 0x7f);
 
@@ -342,24 +382,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 			map_offset = tilenum << 6;
 
 			
-			{ 
-			struct drawgfxParams dgpz1={
-				bitmap, 	// dest
-				Machine->gfx[0], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0x00010000, 	// scalex
-				0x00010000, 	// scaley
-				priority_bitmap, 	// pri_buffer
-				primasks[priority] 	// priority_mask
-			  };
+
 			for (sprite_chunk=0;sprite_chunk<64;sprite_chunk++)
 			{
 				j = sprite_chunk / 8;   /* 8 rows */
@@ -401,32 +424,11 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				dgpz1.scaley = zy<<12;
 				drawgfxzoom(&dgpz1);
 			}
-			} // end of patch paragraph
-
 		}
 		else if ((zoomx-1) & 0x20)	/* 64x128 sprites, $40000-$5ffff in spritemap rom, OBJB */
 		{
 			map_offset = (tilenum << 5) + 0x20000;
 
-			
-			{ 
-			struct drawgfxParams dgpz2={
-				bitmap, 	// dest
-				Machine->gfx[2], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0x00010000, 	// scalex
-				0x00010000, 	// scaley
-				priority_bitmap, 	// pri_buffer
-				primasks[priority] 	// priority_mask
-			  };
 			for (sprite_chunk=0;sprite_chunk<32;sprite_chunk++)
 			{
 				j = sprite_chunk / 4;   /* 8 rows */
@@ -468,32 +470,13 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				dgpz2.scaley = zy<<12;
 				drawgfxzoom(&dgpz2);
 			}
-			} // end of patch paragraph
+
 
 		}
 		else if (!((zoomx-1) & 0x60))	/* 32x128 sprites, $60000-$7ffff in spritemap rom, OBJB */
 		{
 			map_offset = (tilenum << 4) + 0x30000;
 
-			
-			{ 
-			struct drawgfxParams dgpz3={
-				bitmap, 	// dest
-				Machine->gfx[2], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0x00010000, 	// scalex
-				0x00010000, 	// scaley
-				priority_bitmap, 	// pri_buffer
-				primasks[priority] 	// priority_mask
-			  };
 			for (sprite_chunk=0;sprite_chunk<16;sprite_chunk++)
 			{
 				j = sprite_chunk / 2;   /* 8 rows */
@@ -524,19 +507,16 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 					flipy = !flipy;
 				}
 
-				
-				dgpz3.code = code;
-				dgpz3.color = color;
-				dgpz3.flipx = flipx;
-				dgpz3.flipy = flipy;
-				dgpz3.sx = curx;
-				dgpz3.sy = cury;
-				dgpz3.scalex = zx<<12;
-				dgpz3.scaley = zy<<12;
-				drawgfxzoom(&dgpz3);
+				dgpz2.code = code;
+				dgpz2.color = color;
+				dgpz2.flipx = flipx;
+				dgpz2.flipy = flipy;
+				dgpz2.sx = curx;
+				dgpz2.sy = cury;
+				dgpz2.scalex = zx<<12;
+				dgpz2.scaley = zy<<12;
+				drawgfxzoom(&dgpz2);
 			}
-			} // end of patch paragraph
-
 		}
 
 		if (bad_chunks)
@@ -555,10 +535,9 @@ static void bshark_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clipre
 	int zoomx, zoomy, zx, zy;
 	int sprite_chunk,map_offset,code,j,k,px,py;
 	int bad_chunks;
-	static const int primasks[2] = {0xf0,0xfc};
 
+	static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
 	
-	{ 
 	struct drawgfxParams dgpz4={
 		bitmap, 	// dest
 		Machine->gfx[0], 	// gfx
@@ -574,7 +553,7 @@ static void bshark_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clipre
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		primasks[priority] 	// priority_mask
+		0,//primasks[priority] 	// priority_mask
 	  };
 	for (offs = spriteram_size/2-4;offs >= 0;offs -= 4)
 	{
@@ -584,6 +563,7 @@ static void bshark_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clipre
 
 		data = spriteram16[offs+1];
 		priority = (data & 0x8000) >> 15;
+        dgpz4.priority_mask = primasks[priority];
 		color = (data & 0x7f80) >> 7;
 		zoomx = (data & 0x3f);
 
@@ -656,7 +636,6 @@ static void bshark_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clipre
 		if (bad_chunks)
 logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
-	} // end of patch paragraph
 
 }
 
@@ -671,8 +650,8 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 	int zoomx, zoomy, zx, zy;
 	int sprite_chunk,map_offset,code,j,k,px,py;
 	int bad_chunks;
-	static const int primasks[2] = {0xf0,0xfc};
 
+	static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
 	/* SCI alternates between two areas of its spriteram */
 
 	// This gave back to front frames causing bad flicker... but
@@ -699,7 +678,7 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		primasks[priority] 	// priority_mask
+		0,//primasks[priority] 	// priority_mask
 	  };
 	for (offs = (start_offs + 0x800 - 4);offs >= start_offs;offs -= 4)
 	{
@@ -709,6 +688,7 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 
 		data = spriteram16[offs+1];
 		priority = (data & 0x8000) >> 15;
+        dgpz5.priority_mask = primasks[priority] ;
 		color = (data & 0x7f80) >> 7;
 		zoomx = (data & 0x3f);
 
@@ -796,8 +776,8 @@ static void aquajack_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 	int zoomx, zoomy, zx, zy;
 	int sprite_chunk,map_offset,code,j,k,px,py;
 	int bad_chunks;
-	static const int primasks[2] = {0xf0,0xfc};
 
+	static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
 	
 	{ 
 	struct drawgfxParams dgpz6={
@@ -815,7 +795,7 @@ static void aquajack_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		primasks[priority] 	// priority_mask
+		0,//primasks[priority] 	// priority_mask
 	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
 	{
@@ -825,6 +805,7 @@ static void aquajack_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 
 		data = spriteram16[offs+1];
 		priority = (data & 0x8000) >> 15;
+        dgpz6.priority_mask = primasks[priority] ;
 		flipx = (data & 0x4000) >> 14;
 		x = data & 0x1ff;   // correct mask?
 
@@ -911,7 +892,7 @@ static void spacegun_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 	int zoomx, zoomy, zx, zy;
 	int sprite_chunk,map_offset,code,j,k,px,py;
 	int bad_chunks;
-	static const int primasks[2] = {0xf0,0xfc};
+	static const int primasks[2] = {0xf0|(1<<31),0xfc0|(1<<31)};
 
 	
 	{ 
@@ -930,7 +911,7 @@ static void spacegun_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		primasks[priority] 	// priority_mask
+		0,//primasks[priority] 	// priority_mask
 	  };
 	for (offs = 0; offs < spriteram_size/2-4;offs += 4)
 	{
@@ -940,6 +921,8 @@ static void spacegun_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 
 		data = spriteram16[offs+1];
 		priority = (data & 0x8000) >> 15;
+        dgpz7.priority_mask = primasks[priority];
+
 		flipx = (data & 0x4000) >> 14;
 		x = data & 0x1ff;   // correct mask?
 

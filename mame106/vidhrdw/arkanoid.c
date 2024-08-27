@@ -92,6 +92,24 @@ static void arkanoid_draw_sprites( mame_bitmap *bitmap )
 {
 	int offs;
 
+    struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[0], 	// gfx
+		0, 	// code
+		0, 	// color
+		0, 	// flipx
+		0, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		&Machine->visible_area, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		int sx,sy,code;
@@ -103,8 +121,21 @@ static void arkanoid_draw_sprites( mame_bitmap *bitmap )
 
 		code = spriteram[offs + 3] + ((spriteram[offs + 2] & 0x03) << 8) + 1024 * gfxbank;
 
-		;
-		;
+        dgp0.code = 2 * code;
+		dgp0.color = ((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank;
+		dgp0.flipx = flip_screen_x;
+		dgp0.flipy = flip_screen_y;
+		dgp0.sx = sx;
+		dgp0.sy = sy + (flip_screen_y ? 8 : -8);
+		drawgfx(&dgp0);
+
+        dgp0.code = 2 * code + 1;
+		dgp0.color = ((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank;
+		dgp0.flipx = flip_screen_x;
+		dgp0.flipy = flip_screen_y;
+		dgp0.sx = sx;
+		dgp0.sy = sy;
+		drawgfx(&dgp0);
 	}
 }
 

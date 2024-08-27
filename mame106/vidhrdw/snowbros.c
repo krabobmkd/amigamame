@@ -67,12 +67,12 @@ VIDEO_UPDATE( snowbros )
 	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{
-		int dx = spriteram16[offs+4] & 0xff;
-		int dy = spriteram16[offs+5] & 0xff;
-		int tilecolour = spriteram16[offs+3];
-		int attr = spriteram16[offs+7];
-		int flipx =   attr & 0x80;
-		int flipy =  (attr & 0x40) << 1;
+		UINT16 dx = spriteram16[offs+4] & 0xff;
+		UINT16 dy = spriteram16[offs+5] & 0xff;
+		UINT16 tilecolour = spriteram16[offs+3];
+		UINT16 attr = spriteram16[offs+7];
+		int flipx =   (attr & 0x80)!=0;
+		int flipy =  (attr & 0x40)!=0;
 		int tile  = ((attr & 0x3f) << 8) + (spriteram16[offs+6] & 0xff);
 
 		if (tilecolour & 1) dx = -1 - (dx ^ 0xff);
@@ -361,10 +361,10 @@ VIDEO_UPDATE( snowbro3 )
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{
 		gfx_element *gfx = Machine->gfx[0];
-		int dx = spriteram16[offs+4] & 0xff;
-		int dy = spriteram16[offs+5] & 0xff;
-		int tilecolour = spriteram16[offs+3];
-		int attr = spriteram16[offs+7];
+		UINT16 dx = spriteram16[offs+4] & 0xff;
+		UINT16 dy = spriteram16[offs+5] & 0xff;
+		UINT16 tilecolour = spriteram16[offs+3];
+		UINT16 attr = spriteram16[offs+7];
 		int flipx =   attr & 0x80;
 		int flipy =  (attr & 0x40) << 1;
 		int tile  = ((attr & 0xff) << 8) + (spriteram16[offs+6] & 0xff);

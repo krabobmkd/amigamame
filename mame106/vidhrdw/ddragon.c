@@ -161,9 +161,6 @@ WRITE8_HANDLER( ddragon_fgvideoram_w )
 
 ***************************************************************************/
 
-//#define DRAW_SPRITE( order, sx, sy ) drawgfx( bitmap, gfx, \
-//					(which+order),color,flipx,flipy,sx,sy, \
-//					cliprect,TRANSPARENCY_PEN,0);
 
 static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
@@ -234,6 +231,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
             dgp.flipx = flipx;
             dgp.flipy = flipy;
 
+
 			switch ( size ) {
 				case 0: /* normal */
                     dgp.code = which;
@@ -266,15 +264,15 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
                     dgp.sx = sx+dx; dgp.sy = sy +dy;
                     drawgfx(&dgp);
 
-                    dgp.code++;
+                    dgp.code = which+1;
                     dgp.sx = sx+dx; dgp.sy = sy;
                     drawgfx(&dgp);
 
-                    dgp.code++;
+                    dgp.code = which+2;
                     dgp.sx = sx; dgp.sy = sy + dy;
                     drawgfx(&dgp);
 
-                    dgp.code++;
+                    dgp.code = which+3;
                     dgp.sx = sx; dgp.sy = sy;
                     drawgfx(&dgp);
 
