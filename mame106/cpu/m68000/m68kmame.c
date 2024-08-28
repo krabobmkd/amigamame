@@ -170,7 +170,17 @@ static const struct m68k_memory_interface interface_d32 =
 	writeword_d32,
 	writelong_d32
 };
-
+/* krb */
+static const struct m68k_memory_interface interface_fast32 =
+{
+	WORD_XOR_BE(0),
+	program_read_byte_32be,
+	program_read_word_32be,
+	program_read_dword_32be,
+	program_write_byte_32be,
+	program_write_word_32be,
+	program_write_dword_32be
+};
 
 /* global access */
 struct m68k_memory_interface m68k_memory_intf;
@@ -228,8 +238,12 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 {
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
-	m68k_memory_intf = interface_d16;
-	m68k_state_register("m68000", index);
+
+//krb	m68k_memory_intf = interface_d16;
+    // by just using
+	m68k_memory_intf = interface_fast32;
+
+    m68k_state_register("m68000", index);
 	m68k_set_int_ack_callback(irqcallback);
 }
 

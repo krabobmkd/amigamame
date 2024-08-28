@@ -1968,7 +1968,8 @@ INLINE void advance_eg(void)
 
 	PSG->eg_timer += PSG->eg_timer_add;
 
-	while (PSG->eg_timer >= PSG->eg_timer_overflow)
+	//while (PSG->eg_timer >= PSG->eg_timer_overflow)
+    if(PSG->eg_timer >= PSG->eg_timer_overflow)
 	{
 		PSG->eg_timer -= PSG->eg_timer_overflow;
 
