@@ -1298,25 +1298,6 @@ void cps1_find_last_sprite(void)    /* Find the offset of last sprite */
 void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 
-//#define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)
-//{
-//	if (flip_screen)
-//		pdr awgfx(bitmap,Machine->gfx[2],
-//				CODE,
-//				COLOR,
-//				!(FLIPX),!(FLIPY),
-//				511-16-(SX),255-16-(SY),
-//				cliprect,TRANSPARENCY_PEN,15,0x02);
-//	else
-//		pd rawgfx(bitmap,Machine->gfx[2],
-//				CODE,
-//				COLOR,
-//				FLIPX,FLIPY,
-//				SX,SY,
-//				cliprect,TRANSPARENCY_PEN,15,0x02);
-//}
-
-
 	int i, baseadd;
 	UINT16 *base=cps1_buffered_obj;
 
@@ -1354,7 +1335,7 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	{
 		UINT16 x=*(base+0);
 		UINT16 y=*(base+1);
-		UINT16 code  =*(base+2);
+		UINT32 code  =*(base+2); // krb note: can't be UINT16 because kludge 7 (forgotten world) got greater codes.
 		UINT16 colour=*(base+3);
 
         int col=  palette_basecolor[0] + (colour&0x1f) ;
@@ -1573,12 +1554,12 @@ void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 	  };
 	for (i=cps2_last_sprite_offset; i>=0; i-=4)
 	{
-		int x=base[i+0];
-		int y=base[i+1];
-		int priority=(x>>13)&0x07;
+		UINT16 x=base[i+0];
+		UINT16 y=base[i+1];
+		UINT16 priority=(x>>13)&0x07;
 		int code  = base[i+2]+((y & 0x6000) <<3);
-		int colour= base[i+3];
-		int col=(colour&0x1f) + palette_basecolor[0];
+		UINT16 colour= base[i+3];
+		int col= palette_basecolor[0]+ (colour&0x1f) ;
 
         int flipx = ((colour &0x20)!=0);
         int flipy = ((colour &0x40)!=0);

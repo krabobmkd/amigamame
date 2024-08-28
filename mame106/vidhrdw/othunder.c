@@ -257,7 +257,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		sprite_ptr->primask 	// priority_mask
+		0//sprite_ptr->primask 	// priority_mask
 	  };
 	while (sprite_ptr != spritelist)
 	{
@@ -272,6 +272,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 		dgpz0.sy = sprite_ptr->y;
 		dgpz0.scalex = sprite_ptr->zoomx;
 		dgpz0.scaley = sprite_ptr->zoomy;
+        dgpz0.priority_mask = sprite_ptr->primask  | (1<<31);
 		drawgfxzoom(&dgpz0);
 	}
 	} // end of patch paragraph

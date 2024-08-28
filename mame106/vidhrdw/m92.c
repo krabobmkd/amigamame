@@ -481,8 +481,8 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		y=(buffered_spriteram[offs+0] | (buffered_spriteram[offs+1]<<8))&0x1ff;
 		x=(buffered_spriteram[offs+6] | (buffered_spriteram[offs+7]<<8))&0x1ff;
 
-		if ((buffered_spriteram[offs+4]&0x80)==0x80) pri=0; else pri=2;
-        dgp0.priority_mask = pri;
+		if ((buffered_spriteram[offs+4]&0x80)==0x80) pri=(0|(1<<31)); else pri=(2|(1<<31));
+
 
 		x = x - 16;
 		y = 512 - 16 - y;
@@ -507,22 +507,22 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 			for (i=0; i<y_multi; i++)
 			{
+                dgp0.code = sprite + s_ptr;
+                dgp0.priority_mask = pri;
+				dgp0.color = colour;
 				if (flip_screen) {
 					int ffx=fx,ffy=fy;
 					if (ffx) ffx=0; else ffx=1;
 					if (ffy) ffy=0; else ffy=1;
 					
-					dgp0.code = sprite + s_ptr;
-					dgp0.color = colour;
 					dgp0.flipx = ffx;
 					dgp0.flipy = ffy;
 					dgp0.sx = 496-x;
 					dgp0.sy = 496-(y-i*16);
+
 					drawgfx(&dgp0);
 				} else {
-					
-					dgp0.code = sprite + s_ptr;
-					dgp0.color = colour;
+
 					dgp0.flipx = fx;
 					dgp0.flipy = fy;
 					dgp0.sx = x;
