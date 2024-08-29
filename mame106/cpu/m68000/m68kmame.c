@@ -257,10 +257,10 @@ static void m68000_exit(void)
 	/* nothing to do */
 }
 
-static int m68000_execute(int cycles)
-{
-	return m68k_execute(cycles);
-}
+//static int m68000_execute(int cycles)
+//{
+//	return m68k_execute(cycles);
+//}
 
 static void m68000_get_context(void *dst)
 {
@@ -309,10 +309,10 @@ static void m68008_exit(void)
 	/* nothing to do */
 }
 
-static int m68008_execute(int cycles)
-{
-	return m68k_execute(cycles);
-}
+//static int m68008_execute(int cycles)
+//{
+//	return m68k_execute(cycles);
+//}
 
 static void m68008_get_context(void *dst)
 {
@@ -419,7 +419,9 @@ static void m68020_init(int index, int clock, const void *config, int (*irqcallb
 {
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68020);
-	m68k_memory_intf = interface_d32;
+//krb	m68k_memory_intf = interface_d32;
+    m68k_memory_intf = interface_fast32;
+
 	m68k_state_register("m68020", index);
 	m68k_set_int_ack_callback(irqcallback);
 }
@@ -434,10 +436,10 @@ static void m68020_exit(void)
 	/* nothing to do */
 }
 
-static int m68020_execute(int cycles)
-{
-	return m68k_execute(cycles);
-}
+//static int m68020_execute(int cycles)
+//{
+//	return m68k_execute(cycles);
+//}
 
 static void m68020_get_context(void *dst)
 {
@@ -541,10 +543,10 @@ static void m68040_exit(void)
 	/* nothing to do */
 }
 
-static int m68040_execute(int cycles)
-{
-	return m68k_execute(cycles);
-}
+//static int m68040_execute(int cycles)
+//{
+//	return m68k_execute(cycles);
+//}
 
 static void m68040_get_context(void *dst)
 {
@@ -700,7 +702,7 @@ void m68000_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_PTR_INIT:							info->init = m68000_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68000_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68000_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m68000_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = m68k_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE_NEW:				info->disassemble_new = m68000_dasm;	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k_ICount;			break;
@@ -1130,7 +1132,7 @@ void m68020_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_PTR_INIT:							info->init = m68020_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68020_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68020_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m68020_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = m68k_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE_NEW:				info->disassemble_new = m68020_dasm;	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k_ICount;			break;
@@ -1376,7 +1378,7 @@ void m68040_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_PTR_INIT:							info->init = m68040_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68040_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68040_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m68040_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = m68k_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE_NEW:				info->disassemble_new = m68040_dasm;	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k_ICount;			break;

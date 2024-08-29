@@ -2409,7 +2409,43 @@ static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t of
 		entry = space.lookup[LEVEL2_INDEX(entry,address)];								\
 
 
-// - -- - - - KRB
+
+void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p REG(a0))
+{
+	UINT32 entry;
+
+    /* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+
+	/* handle banks inline */
+	UINT32 adrmask = active_address_space[0].readhandlers[entry].mask;
+	address = (address - active_address_space[0].readhandlers[entry].offset)
+            & adrmask;
+	if (entry < STATIC_RAM)
+	{
+        UINT32 *pr = (UINT32 *)&bank_ptr[entry][address];
+        while(l>0)
+        {
+            *p++ = *pr++;
+            l--;
+        }
+    }
+	/* fall back to the handler */
+	else
+	{
+        address>>=2;
+        while(l>0)
+        {
+            *p++ = (*active_address_space[0].readhandlers[entry].handler.read.handler32)
+                (address,0);
+            address++;
+            l--;
+        }
+    }
+}
 
 UINT8 s16program_read_byte_8(UINT32 address REG(d0))
 {

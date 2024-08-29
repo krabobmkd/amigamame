@@ -393,7 +393,8 @@ void qsound_set_command(struct qsound_info *chip, int data, int value)
 void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
 {
 	struct qsound_info *chip = param;
-	int i,j;
+	UINT16 i,j; // on 68k word loops are faster/
+	UINT16 slength = (UINT16)length;
 	int rvol, lvol, count;
 	struct QSOUND_CHANNEL *pC=&chip->channel[0];
 	QSOUND_SRC_SAMPLE * pST;
@@ -401,9 +402,9 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 
 	datap[0] = buffer[0];
 	datap[1] = buffer[1];
-	memset( datap[0], 0x00, length * sizeof(*datap[0]) );
-	memset( datap[1], 0x00, length * sizeof(*datap[1]) );
-
+//	memset( datap[0], 0x00, length * sizeof(*datap[0]) );
+//	memset( datap[1], 0x00, length * sizeof(*datap[1]) );
+    int firstdone=0;
 	for (i=0; i<QSOUND_CHANNELS; i++)
 	{
 		if (pC->key)
@@ -414,7 +415,10 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 			rvol=(pC->rvol*pC->vol)>>(8*LENGTH_DIV);
 			lvol=(pC->lvol*pC->vol)>>(8*LENGTH_DIV);
 
-			for (j=length-1; j>=0; j--)
+            if(!firstdone)
+            {
+            firstdone=1;
+ 			for (j=0; j<slength; j++)
 			{
 				count=(pC->offset)>>16;
 				pC->offset &= 0xffff;
@@ -435,10 +439,35 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 					pC->lastdt=pST[pC->address];
 				}
 
-				(*pOutL) += ((pC->lastdt * lvol) >> 6);
-				(*pOutR) += ((pC->lastdt * rvol) >> 6);
-				pOutL++;
-				pOutR++;
+				(*pOutL++) = ((pC->lastdt * lvol) >> 6);
+				(*pOutR++) = ((pC->lastdt * rvol) >> 6);
+				pC->offset += pC->pitch;
+			}
+            }
+             else
+			for (j=0; j<slength; j++)
+			{
+				count=(pC->offset)>>16;
+				pC->offset &= 0xffff;
+				if (count)
+				{
+					pC->address += count;
+					if (pC->address >= pC->end)
+					{
+						if (!pC->loop)
+						{
+							/* Reached the end of a non-looped sample */
+							pC->key=0;
+							break;
+						}
+						/* Reached the end, restart the loop */
+						pC->address = (pC->end - pC->loop) & 0xffff;
+					}
+					pC->lastdt=pST[pC->address];
+				}
+
+				(*pOutL++) += ((pC->lastdt * lvol) >> 6);
+				(*pOutR++) += ((pC->lastdt * rvol) >> 6);
 				pC->offset += pC->pitch;
 			}
 		}

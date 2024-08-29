@@ -764,6 +764,9 @@ extern const char *address_space_names[ADDRESS_SPACES];
 #define LEVEL2_INDEX(e,a)		((1 << LEVEL1_BITS) + (((e) - SUBTABLE_BASE) << LEVEL2_BITS) + ((a) & ((1 << LEVEL2_BITS) - 1)))
 
 
+// - - - - krb
+// used by 68k cpu instruction fetch
+void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p REG(a0));
 
 /***************************************************************************
 

@@ -1,4 +1,4 @@
-#include <stdio.h>
+
 /* ======================================================================== */
 /* ========================= LICENSING & COPYRIGHT ======================== */
 /* ======================================================================== */
@@ -29,9 +29,15 @@
 #include "m68k.h"
 #include <limits.h>
 
+
+
 #if M68K_EMULATE_ADDRESS_ERROR
 #include <setjmp.h>
 #endif /* M68K_EMULATE_ADDRESS_ERROR */
+
+#include <stdio.h>
+#include <stdlib.h>
+
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
@@ -619,7 +625,7 @@
 #define EA_AY_PD_8()   (--AY)                                /* predecrement (size = byte) */
 #define EA_AY_PD_16()  (AY-=2)                               /* predecrement (size = word) */
 #define EA_AY_PD_32()  (AY-=4)                               /* predecrement (size = long) */
-#define EA_AY_DI_8()   (AY+MAKE_INT_16(m68ki_read_imm_16())) /* displacement */
+#define EA_AY_DI_8()   (AY+MAKE_INT_16(m68ki_read_imm_16_c16())) /* displacement */
 #define EA_AY_DI_16()  EA_AY_DI_8()
 #define EA_AY_DI_32()  EA_AY_DI_8()
 #define EA_AY_IX_8()   m68ki_get_ea_ix(AY)                   /* indirect + index */
@@ -635,7 +641,7 @@
 #define EA_AX_PD_8()   (--AX)
 #define EA_AX_PD_16()  (AX-=2)
 #define EA_AX_PD_32()  (AX-=4)
-#define EA_AX_DI_8()   (AX+MAKE_INT_16(m68ki_read_imm_16()))
+#define EA_AX_DI_8()   (AX+MAKE_INT_16(m68ki_read_imm_16_c16()))
 #define EA_AX_DI_16()  EA_AX_DI_8()
 #define EA_AX_DI_32()  EA_AX_DI_8()
 #define EA_AX_IX_8()   m68ki_get_ea_ix(AX)
@@ -645,7 +651,7 @@
 #define EA_A7_PI_8()   ((REG_A[7]+=2)-2)
 #define EA_A7_PD_8()   (REG_A[7]-=2)
 
-#define EA_AW_8()      MAKE_INT_16(m68ki_read_imm_16())      /* absolute word */
+#define EA_AW_8()      MAKE_INT_16(m68ki_read_imm_16_c16())      /* absolute word */
 #define EA_AW_16()     EA_AW_8()
 #define EA_AW_32()     EA_AW_8()
 #define EA_AL_8()      m68ki_read_imm_32()                   /* absolute long */
@@ -660,7 +666,7 @@
 
 
 #define OPER_I_8()     m68ki_read_imm_8()
-#define OPER_I_16()    m68ki_read_imm_16()
+#define OPER_I_16()    m68ki_read_imm_16_c16()
 #define OPER_I_32()    m68ki_read_imm_32()
 
 
@@ -805,7 +811,7 @@
 #endif
 
 /* map read immediate 8 to read immediate 16 */
-#define m68ki_read_imm_8() MASK_OUT_ABOVE_8(m68ki_read_imm_16())
+#define m68ki_read_imm_8() MASK_OUT_ABOVE_8(m68ki_read_imm_16_c16())
 
 /* Map PC-relative reads */
 #define m68ki_read_pcrel_8(A) m68k_read_pcrelative_8(A)
@@ -866,6 +872,17 @@ typedef struct
 	uint stopped;      /* Stopped state */
 	uint pref_addr;    /* Last prefetch address */
 	uint pref_data;    /* Data in the prefetch queue */
+
+	// - - - - - - -
+	// krb 16b instruction cache (experimental optimisation)  - - -  -
+	// *2 in bytes, 68k instructions are 2/4/6/8/+ bytes but this is just used to retreive opcodes.
+	#define C16CACHE_LENGTH 16
+	#define C16CACHE_HMASK 0xffffffe0
+	#define C16CACHE_LMASK 0x0000001e
+	uint c16_addr;
+	uint16 c16_data[C16CACHE_LENGTH]; // +4b for 32bit bit non aligned trick
+	// - - - --  - -
+
 	uint address_mask; /* Available address pins */
 	uint sr_mask;      /* Implemented status register bits */
 	uint instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
@@ -912,8 +929,8 @@ extern uint           m68ki_aerr_write_mode;
 extern uint           m68ki_aerr_fc;
 
 /* Read data immediately after the program counter */
-INLINE uint m68ki_read_imm_16(void);
-INLINE uint m68ki_read_imm_32(void);
+//INLINE uint m68ki_read_imm_16(void);
+//INLINE uint m68ki_read_imm_32(void);
 
 /* Read data with specific function code */
 INLINE uint m68ki_read_8_fc  (uint address, uint fc);
@@ -1041,52 +1058,90 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
 /* Handles all immediate reads, does address error check, function code setting,
  * and prefetching if they are enabled in m68kconf.h
  */
-INLINE uint m68ki_read_imm_16(void)
+//INLINE uint m68ki_read_imm_16(void)
+//{
+//	uint align4pc = MASK_OUT_BELOW_2(REG_PC);
+//	if(align4pc != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = align4pc;
+//		//CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//		CPU_PREF_DATA = program_read_dword_32be(align4pc);
+//		//printf("prefetch\n");
+//	}
+//	int sv = ((2-(REG_PC&2))<<3);
+//	REG_PC += 2;
+
+//	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
+//}
+
+INLINE uint m68ki_read_imm_16_c16(void)
 {
-	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-#if M68K_EMULATE_PREFETCH
-	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+	uint pc = m68ki_cpu.pc;
+	uint alignadr = pc & C16CACHE_HMASK;
+	if(alignadr != m68ki_cpu.c16_addr)
 	{
-		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
-		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+		m68ki_cpu.c16_addr = alignadr;
+		// actually copy (8+1)x4b 36b
+		program_read_copy32be(alignadr,(C16CACHE_LENGTH/2),(uint*)&m68ki_cpu.c16_data[0]);
 	}
-	REG_PC += 2;
-	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
-#else
-	REG_PC += 2;
-	return m68k_read_immediate_16(ADDRESS_68K(REG_PC-2));
-#endif /* M68K_EMULATE_PREFETCH */
+	uint16 d = m68ki_cpu.c16_data[((uint8)pc & C16CACHE_LMASK)>>1];
+	m68ki_cpu.pc = pc+2;
+	return (uint)d;
 }
+
 INLINE uint m68ki_read_imm_32(void)
 {
-#if M68K_EMULATE_PREFETCH
-	uint temp_val;
+//#if M68K_EMULATE_PREFETCH
+//	uint temp_val;
 
-	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
-	{
-		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
-		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
-	}
-	temp_val = CPU_PREF_DATA;
-	REG_PC += 2;
-	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
-	{
-		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
-		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
-		temp_val = MASK_OUT_ABOVE_32((temp_val << 16) | (CPU_PREF_DATA >> 16));
-	}
-	REG_PC += 2;
+//	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+//	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+//	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
+//		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//	}
+//	temp_val = CPU_PREF_DATA;
+//	REG_PC += 2;
+//	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
+//		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//		temp_val = MASK_OUT_ABOVE_32((temp_val << 16) | (CPU_PREF_DATA >> 16));
+//	}
+//	REG_PC += 2;
 
-	return temp_val;
-#else
-	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+//	return temp_val;
+//#else
+//	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+//	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 	REG_PC += 4;
 	return m68k_read_immediate_32(ADDRESS_68K(REG_PC-4));
-#endif /* M68K_EMULATE_PREFETCH */
+//#endif /* M68K_EMULATE_PREFETCH */
+
+
+/* why not ?
+	uint pc = m68ki_cpu.pc;
+	m68ki_cpu.pc = pc+4; // done.
+
+	uint8 lowadr = ((uint8)pc & 0x1e);
+	if(lowadr >= 0x1e) {
+		// can't cache this one
+		return m68k_read_immediate_32(ADDRESS_68K(pc));
+	}
+
+	uint alignadr = pc & C16CACHE_HMASK;
+
+	if(alignadr != m68ki_cpu.c16_addr)
+	{
+		m68ki_cpu.c16_addr = alignadr;
+		// actually copy 5x4b 32b
+		program_read_copy32be(alignadr,C16CACHE_LENGTH/2,(uint*)&m68ki_cpu.c16_data[0]);
+	}
+	uint d = *((uint *)&m68ki_cpu.c16_data[lowadr>>1]);
+
+	return d;
+*/
 }
 
 
@@ -1154,7 +1209,7 @@ INLINE uint m68ki_get_ea_pcdi(void)
 {
 	uint old_pc = REG_PC;
 	m68ki_use_program_space(); /* auto-disable */
-	return old_pc + MAKE_INT_16(m68ki_read_imm_16());
+	return old_pc + MAKE_INT_16(m68ki_read_imm_16_c16());
 }
 
 
@@ -1209,7 +1264,7 @@ INLINE uint m68ki_get_ea_pcix(void)
 INLINE uint m68ki_get_ea_ix(uint An)
 {
 	/* An = base register */
-	uint extension = m68ki_read_imm_16();
+	uint extension = m68ki_read_imm_16_c16();
 	uint Xn = 0;                        /* Index register */
 	uint bd = 0;                        /* Base Displacement */
 	uint od = 0;                        /* Outer Displacement */
@@ -1259,7 +1314,7 @@ INLINE uint m68ki_get_ea_ix(uint An)
 
 	/* Check if base displacement is present */
 	if(BIT_5(extension))                /* BD SIZE */
-		bd = BIT_4(extension) ? m68ki_read_imm_32() : MAKE_INT_16(m68ki_read_imm_16());
+		bd = BIT_4(extension) ? m68ki_read_imm_32() : MAKE_INT_16(m68ki_read_imm_16_c16());
 
 	/* If no indirect action, we are done */
 	if(!(extension&7))                  /* No Memory Indirect */
@@ -1267,7 +1322,7 @@ INLINE uint m68ki_get_ea_ix(uint An)
 
 	/* Check if outer displacement is present */
 	if(BIT_1(extension))                /* I/IS:  od */
-		od = BIT_0(extension) ? m68ki_read_imm_32() : MAKE_INT_16(m68ki_read_imm_16());
+		od = BIT_0(extension) ? m68ki_read_imm_32() : MAKE_INT_16(m68ki_read_imm_16_c16());
 
 	/* Postindex */
 	if(BIT_2(extension))                /* I/IS:  0 = preindex, 1 = postindex */

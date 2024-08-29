@@ -803,9 +803,12 @@ int m68k_execute(int num_cycles)
 			REG_PPC = REG_PC;
 
 			/* Read an instruction and call its handler */
-			REG_IR = m68ki_read_imm_16();
-			m68ki_instruction_jump_table[REG_IR]();
-			USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
+		//classic
+		//uint inst = m68ki_read_imm_16();
+		uint inst = m68ki_read_imm_16_c16();
+			REG_IR = inst;
+			m68ki_instruction_jump_table[inst]();
+			USE_CYCLES(CYC_INSTRUCTION[inst]);
 
 			/* Trace m68k_exception, if necessary */
 			m68ki_exception_if_trace(); /* auto-disable (see m68kcpu.h) */
