@@ -415,7 +415,7 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 			rvol=(pC->rvol*pC->vol)>>(8*LENGTH_DIV);
 			lvol=(pC->lvol*pC->vol)>>(8*LENGTH_DIV);
 
-            if(!firstdone)
+            if(!firstdone) // this one just "=" the channels
             {
             firstdone=1;
  			for (j=0; j<slength; j++)
@@ -445,7 +445,7 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 			}
             }
              else
-			for (j=0; j<slength; j++)
+			for (j=0; j<slength; j++)  // this one does "+=" the channels
 			{
 				count=(pC->offset)>>16;
 				pC->offset &= 0xffff;
@@ -472,6 +472,12 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 			}
 		}
 		pC++;
+	}
+	if(!firstdone)
+	{
+        // then if no chan activated at all, zeroes.
+        memset( datap[0], 0x00, length * sizeof(*datap[0]) );
+        memset( datap[1], 0x00, length * sizeof(*datap[1]) );
 	}
 
 #if LOG_WAVE
