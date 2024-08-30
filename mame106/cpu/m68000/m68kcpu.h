@@ -876,11 +876,15 @@ typedef struct
 	// - - - - - - -
 	// krb 16b instruction cache (experimental optimisation)  - - -  -
 	// *2 in bytes, 68k instructions are 2/4/6/8/+ bytes but this is just used to retreive opcodes.
-	#define C16CACHE_LENGTH 16
+	#define C16CACHE_WLENGTH 16
+	#define C16CACHE_LLENGTH 8
 	#define C16CACHE_HMASK 0xffffffe0
 	#define C16CACHE_LMASK 0x0000001e
 	uint c16_addr;
-	uint16 c16_data[C16CACHE_LENGTH]; // +4b for 32bit bit non aligned trick
+	union {
+		uint16	c16_data[C16CACHE_WLENGTH];
+		uint	c32_data[C16CACHE_LLENGTH];
+	};
 	// - - - --  - -
 
 	uint address_mask; /* Available address pins */
@@ -1076,6 +1080,7 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
 
 INLINE uint m68ki_read_imm_16_c16(void)
 {
+/*
 	uint pc = m68ki_cpu.pc;
 	uint alignadr = pc & C16CACHE_HMASK;
 	if(alignadr != m68ki_cpu.c16_addr)
@@ -1087,6 +1092,17 @@ INLINE uint m68ki_read_imm_16_c16(void)
 	uint16 d = m68ki_cpu.c16_data[((uint8)pc & C16CACHE_LMASK)>>1];
 	m68ki_cpu.pc = pc+2;
 	return (uint)d;
+*/
+	uint align4pc = MASK_OUT_BELOW_2(REG_PC);
+	if(align4pc != CPU_PREF_ADDR)
+	{
+		CPU_PREF_ADDR = align4pc;
+		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+		//CPU_PREF_DATA = program_read_dword_32be(align4pc);
+		//printf("prefetch\n");
+	}
+	REG_PC += 2;
+	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
 }
 
 INLINE uint m68ki_read_imm_32(void)

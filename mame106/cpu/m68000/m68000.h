@@ -36,22 +36,22 @@ struct m68k_memory_interface
 
     // For Encrypted Stuff
 
-	UINT8		(*read8pc)(offs_t);				// PC Relative read 8 bit
-	UINT16	(*read16pc)(offs_t);			// PC Relative read 16 bit
-	UINT32	(*read32pc)(offs_t);			// PC Relative read 32 bit
+	UINT8		(*read8pc)(offs_t REG(d0));				// PC Relative read 8 bit
+	UINT16	(*read16pc)(offs_t REG(d0));			// PC Relative read 16 bit
+	UINT32	(*read32pc)(offs_t REG(d0));			// PC Relative read 32 bit
 
-	UINT16	(*read16d)(offs_t);				// Direct read 16 bit
-	UINT32	(*read32d)(offs_t);				// Direct read 32 bit
+	UINT16	(*read16d)(offs_t REG(d0));				// Direct read 16 bit
+	UINT32	(*read32d)(offs_t REG(d0));				// Direct read 32 bit
 };
-
+ // just used by capcom cps2
 struct m68k_encryption_interface
 {
-	UINT8		(*read8pc)(offs_t);				// PC Relative read 8 bit
-	UINT16	(*read16pc)(offs_t);			// PC Relative read 16 bit
-	UINT32	(*read32pc)(offs_t);			// PC Relative read 32 bit
+	UINT8		(*read8pc)(offs_t REG(d0));				// PC Relative read 8 bit
+	UINT16	(*read16pc)(offs_t REG(d0));			// PC Relative read 16 bit
+	UINT32	(*read32pc)(offs_t REG(d0));			// PC Relative read 32 bit
 
-	UINT16	(*read16d)(offs_t);				// Direct read 16 bit
-	UINT32	(*read32d)(offs_t);				// Direct read 32 bit
+	UINT16	(*read16d)(offs_t REG(d0));				// Direct read 16 bit
+	UINT32	(*read32d)(offs_t REG(d0));				// Direct read 32 bit
 };
 
 /* The MAME API for MC68000 */

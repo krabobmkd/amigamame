@@ -239,8 +239,9 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
 
-//krb	m68k_memory_intf = interface_d16;
-    // by just using
+//krb
+    m68k_memory_intf = interface_d16;
+    // experimental
 	m68k_memory_intf = interface_fast32;
 
     m68k_state_register("m68000", index);
