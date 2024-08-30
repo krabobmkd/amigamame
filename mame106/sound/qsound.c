@@ -402,6 +402,7 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 
 	datap[0] = buffer[0];
 	datap[1] = buffer[1];
+// krb: moved, now we "overwrite or accumulate" on the stream, not accumulation all the time.
 //	memset( datap[0], 0x00, length * sizeof(*datap[0]) );
 //	memset( datap[1], 0x00, length * sizeof(*datap[1]) );
     int firstdone=0;
@@ -415,7 +416,7 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 			rvol=(pC->rvol*pC->vol)>>(8*LENGTH_DIV);
 			lvol=(pC->lvol*pC->vol)>>(8*LENGTH_DIV);
 
-            if(!firstdone) // this one just "=" the channels
+            if(!firstdone) //krb: this one just "=" the channels
             {
             firstdone=1;
  			for (j=0; j<slength; j++)
@@ -445,7 +446,7 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 			}
             }
              else
-			for (j=0; j<slength; j++)  // this one does "+=" the channels
+			for (j=0; j<slength; j++)  // krb: this one does "+=" the channels
 			{
 				count=(pC->offset)>>16;
 				pC->offset &= 0xffff;
@@ -475,9 +476,9 @@ void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buf
 	}
 	if(!firstdone)
 	{
-        // then if no chan activated at all, zeroes.
-        memset( datap[0], 0x00, length * sizeof(*datap[0]) );
-        memset( datap[1], 0x00, length * sizeof(*datap[1]) );
+        // krb: then if no chan activated at all, zeroes.
+        memset( datap[0], 0x00, length * sizeof(stream_sample_t) );
+        memset( datap[1], 0x00, length * sizeof(stream_sample_t) );
 	}
 
 #if LOG_WAVE
