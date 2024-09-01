@@ -341,8 +341,8 @@
 #define CPU_INT_LEVEL    m68ki_cpu.int_level /* ASG: changed from CPU_INTS_PENDING */
 #define CPU_INT_CYCLES   m68ki_cpu.int_cycles /* ASG */
 #define CPU_STOPPED      m68ki_cpu.stopped
-#define CPU_PREF_ADDR    m68ki_cpu.pref_addr
-#define CPU_PREF_DATA    m68ki_cpu.pref_data
+//#define CPU_PREF_ADDR    m68ki_cpu.pref_addr
+//#define CPU_PREF_DATA    m68ki_cpu.pref_data
 #define CPU_ADDRESS_MASK m68ki_cpu.address_mask
 #define CPU_SR_MASK      m68ki_cpu.sr_mask
 #define CPU_INSTR_MODE   m68ki_cpu.instr_mode
@@ -870,22 +870,9 @@ typedef struct
 	uint int_level;    /* State of interrupt pins IPL0-IPL2 -- ASG: changed from ints_pending */
 	uint int_cycles;   /* ASG: extra cycles from generated interrupts */
 	uint stopped;      /* Stopped state */
-	uint pref_addr;    /* Last prefetch address */
-	uint pref_data;    /* Data in the prefetch queue */
 
-	// - - - - - - -
-	// krb 16b instruction cache (experimental optimisation)  - - -  -
-	// *2 in bytes, 68k instructions are 2/4/6/8/+ bytes but this is just used to retreive opcodes.
-	#define C16CACHE_WLENGTH 16
-	#define C16CACHE_LLENGTH 8
-	#define C16CACHE_HMASK 0xffffffe0
-	#define C16CACHE_LMASK 0x0000001e
-	uint c16_addr;
-	union {
-		uint16	c16_data[C16CACHE_WLENGTH];
-		uint	c32_data[C16CACHE_LLENGTH];
-	};
-	// - - - --  - -
+   //krb uint pref_addr;    /* Last prefetch address */
+   //krb uint pref_data;    /* Data in the prefetch queue */
 
 	uint address_mask; /* Available address pins */
 	uint sr_mask;      /* Implemented status register bits */
@@ -1069,7 +1056,7 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
 //	{
 //		CPU_PREF_ADDR = align4pc;
 //		//CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
-//		CPU_PREF_DATA = program_read_dword_32be(align4pc);
+//		pref_addr = program_read_dword_32be(align4pc);
 //		//printf("prefetch\n");
 //	}
 //	int sv = ((2-(REG_PC&2))<<3);
@@ -1080,19 +1067,47 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
 
 INLINE uint m68ki_read_imm_16_c16(void)
 {
-/*
-	uint pc = m68ki_cpu.pc;
-	uint alignadr = pc & C16CACHE_HMASK;
-	if(alignadr != m68ki_cpu.c16_addr)
-	{
-		m68ki_cpu.c16_addr = alignadr;
-		// actually copy (8+1)x4b 36b
-		program_read_copy32be(alignadr,(C16CACHE_LENGTH/2),(uint*)&m68ki_cpu.c16_data[0]);
-	}
-	uint16 d = m68ki_cpu.c16_data[((uint8)pc & C16CACHE_LMASK)>>1];
-	m68ki_cpu.pc = pc+2;
-	return (uint)d;
-*/
+    // what m68k_read_immediate_16 actually does:
+    // no need to prefech really, this is "direct rom reading"
+    UINT16 v= (*(UINT16 *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
+
+    REG_PC+=2;
+    return (uint)v;
+    // original:
+
+//#if 1
+//    if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
+//		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//	}
+//	REG_PC += 2;
+//	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
+//#endif
+//    uint r = REG_PC;
+//    uint rb = MASK_OUT_BELOW_2(r);
+//    if( rb != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = rb;
+//		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//	}
+//    uint v = m68ki_cpu.pref_data16[(r&2)>>1];
+//	REG_PC = r+ 2;
+
+
+//	uint pc = m68ki_cpu.pc;
+//	uint alignadr = pc & C16CACHE_HMASK;
+//	if(alignadr != m68ki_cpu.c16_addr)
+//	{
+//		m68ki_cpu.c16_addr = alignadr;
+//		// actually copy (8+1)x4b 36b
+//		program_read_copy32be(alignadr,C16CACHE_LLENGTH,(uint*)&m68ki_cpu.c32_data[0]);
+//	}
+//	uint16 d = m68ki_cpu.c16_data[(pc & C16CACHE_LMASK )>>1];
+//	m68ki_cpu.pc = pc+2;
+//	return (uint)d;
+
+    /*
 	uint align4pc = MASK_OUT_BELOW_2(REG_PC);
 	if(align4pc != CPU_PREF_ADDR)
 	{
@@ -1103,11 +1118,27 @@ INLINE uint m68ki_read_imm_16_c16(void)
 	}
 	REG_PC += 2;
 	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
+    */
 }
 
 INLINE uint m68ki_read_imm_32(void)
 {
-//#if M68K_EMULATE_PREFETCH
+
+    #ifdef LSB_FIRST
+        uint v= m68k_read_immediate_32();
+        REG_PC+=4;
+        return v;
+    #else
+        // no need to prefech really, this is "direct rom reading"
+        uint v= (*(uint *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
+        REG_PC+=4;
+        return v;
+    #endif
+
+ //m68k_read_immediate_32(ADDRESS_68K(pc));
+
+
+ //#if M68K_EMULATE_PREF^ETCH
 //	uint temp_val;
 
 //	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
@@ -1131,8 +1162,8 @@ INLINE uint m68ki_read_imm_32(void)
 //#else
 //	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 //	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	REG_PC += 4;
-	return m68k_read_immediate_32(ADDRESS_68K(REG_PC-4));
+//	REG_PC += 4;
+//	return m68k_read_immediate_32(ADDRESS_68K(REG_PC-4));
 //#endif /* M68K_EMULATE_PREFETCH */
 
 

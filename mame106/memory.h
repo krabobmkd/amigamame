@@ -1143,15 +1143,15 @@ UINT32	cpu_readop_arg32_safe(offs_t offset);
 UINT64	cpu_readop_arg64_safe(offs_t offset);
 
 /* ----- unsafe opcode and opcode argument reading ----- */
-#define cpu_opptr_unsafe(A)			((void *)&opcode_base[(A) & opcode_mask])
-#define cpu_readop_unsafe(A)		(opcode_base[(A) & opcode_mask])
-#define cpu_readop16_unsafe(A)		(*(UINT16 *)&opcode_base[(A) & opcode_mask])
-#define cpu_readop32_unsafe(A)		(*(UINT32 *)&opcode_base[(A) & opcode_mask])
+#define cpu_opptr_unsafe(A)			((void *)&opcode_base[(A) /*& opcode_mask*/])
+#define cpu_readop_unsafe(A)		(opcode_base[(A) /*& opcode_mask*/])
+#define cpu_readop16_unsafe(A)		(*(UINT16 *)&opcode_base[(A) /*& opcode_mask*/])
+#define cpu_readop32_unsafe(A)		(*(UINT32 *)&opcode_base[(A)/*& opcode_mask*/])
 #define cpu_readop64_unsafe(A)		(*(UINT64 *)&opcode_base[(A) & opcode_mask])
-#define cpu_readop_arg_unsafe(A)	(opcode_arg_base[(A) & opcode_mask])
-#define cpu_readop_arg16_unsafe(A)	(*(UINT16 *)&opcode_arg_base[(A) & opcode_mask])
-#define cpu_readop_arg32_unsafe(A)	(*(UINT32 *)&opcode_arg_base[(A) & opcode_mask])
-#define cpu_readop_arg64_unsafe(A)	(*(UINT64 *)&opcode_arg_base[(A) & opcode_mask])
+#define cpu_readop_arg_unsafe(A)	(opcode_arg_base[(A) /*& opcode_mask*/])
+#define cpu_readop_arg16_unsafe(A)	(*(UINT16 *)&opcode_arg_base[(A) /*& opcode_mask*/])
+#define cpu_readop_arg32_unsafe(A)	(*(UINT32 *)&opcode_arg_base[(A) /*& opcode_mask*/])
+#define cpu_readop_arg64_unsafe(A)	(*(UINT64 *)&opcode_arg_base[(A) /*& opcode_mask*/])
 
 /* ----- opcode and opcode argument reading ----- */
 INLINE void * cpu_opptr(offs_t A)			{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_opptr_unsafe(A); }

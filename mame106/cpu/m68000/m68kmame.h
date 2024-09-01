@@ -87,12 +87,18 @@ INLINE void m68k_write_memory_32_pd(unsigned int address REG(d0), unsigned int v
 
 INLINE unsigned int m68kx_read_immediate_16(unsigned int address REG(d0))
 {
-	return cpu_readop16((address) ^ m68k_memory_intf.opcode_xor);
+	return cpu_readop16((address)  /* ^ m68k_memory_intf.opcode_xor */);
 }
 
 INLINE unsigned int m68kx_read_immediate_32(unsigned int address REG(d0))
 {
+#ifdef LSB_FIRST
 	return ((m68k_read_immediate_16(address) << 16) | m68k_read_immediate_16((address)+2));
+#else
+    return (*(uint *)&opcode_base[address & opcode_mask]);
+#endif
+
+
 }
 
 INLINE unsigned int m68kx_read_pcrelative_8(unsigned int address REG(d0) )

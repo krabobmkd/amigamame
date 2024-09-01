@@ -2436,6 +2436,7 @@ void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p RE
 	/* fall back to the handler */
 	else
 	{
+        //ok
         address>>=2;
         while(l>0)
         {
@@ -2444,6 +2445,16 @@ void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p RE
             address++;
             l--;
         }
+//test gives nothing                UINT16 *pp = (UINT16 *)p;
+//               l<<=1;
+//                while(l>0)
+//                {
+//                    *pp++ = (*active_address_space[0].readhandlers[entry].handler.read.handler16)
+//                        (address,0);
+//                    address++;
+//                    l--;
+//                }
+
     }
 }
 
