@@ -756,6 +756,40 @@ void *memory_get_write_ptr(int cpunum, int spacenum, offs_t offset)
 	return &bank_ptr[entry][offset];
 }
 
+// krb
+// return number of bits actually applied
+//int memory_readmovem32(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
+//{
+//    active_address_space
+//    addrspace_data *space = &cpudata[activecpu].space[0];
+//	UINT8 entry;
+
+//	/* perform the lookup */
+//	offset &= space->mask;
+//	entry = space->write.table[LEVEL1_INDEX(offset)];
+//	if (entry >= SUBTABLE_BASE)
+//		entry = space->write.table[LEVEL2_INDEX(entry, offset)];
+
+//	/* 8-bit case: RAM/ROM */
+//	if (entry >= STATIC_RAM)
+//		return 0;
+//	offset = (offset - space->write.handlers[entry].offset) & space->write.handlers[entry].mask;
+
+//    // - - - - - - - - -
+//    UINT32 *pread = (UINT32 *) &bank_ptr[entry][offset];
+//    UINT16 i = 0;
+//    uint count = 0;
+//	for(; i < 16; i++)
+//		if(bits & 1)
+//		{
+//			preg[i] = *pread++;
+//			count++;
+//            bits>>=1;
+//		}
+//    return count;
+
+//}
+
 
 /*-------------------------------------------------
     memory_get_op_ptr - return a pointer to the

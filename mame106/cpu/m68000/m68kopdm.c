@@ -1,4 +1,5 @@
 #include "m68kcpu.h"
+#include "memory.h"
 extern void m68040_fpu_op0(void);
 extern void m68040_fpu_op1(void);
 
@@ -10458,12 +10459,16 @@ void m68k_op_movem_32_re_pd(void)
 	uint count = 0;
 
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+	{
+		if(register_list & 1)
 		{
 			ea -= 4;
-			m68ki_write_32(ea, REG_DA[15-i]);
+            m68ki_write_32(ea, REG_DA[15-i]);
 			count++;
+          
 		}
+		register_list>>=1;
+	}
 	AY = ea;
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
@@ -10478,13 +10483,15 @@ void m68k_op_movem_32_re_ai(void)
 	uint count = 0;
 
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+	{
+		if(register_list & 1)
 		{
 			m68ki_write_32(ea, REG_DA[i]);
 			ea += 4;
 			count++;
 		}
-
+		register_list>>=1;
+	}
 	USE_CYCLES(count<<CYC_MOVEM_L);
 }
 
@@ -10724,17 +10731,20 @@ void m68k_op_movem_32_er_pi(void)
 	uint register_list = OPER_I_16();
 	uint ea = AY;
 	uint count = 0;
-
+    uint countadd = 1<<CYC_MOVEM_L;
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+    {
+		if(register_list & 1)
 		{
 			REG_DA[i] = m68ki_read_32(ea);
 			ea += 4;
-			count++;
+			count+=countadd;
 		}
+        register_list>>=1;
+    }
 	AY = ea;
 
-	USE_CYCLES(count<<CYC_MOVEM_L);
+	USE_CYCLES(count);
 }
 
 
@@ -10744,15 +10754,16 @@ void m68k_op_movem_32_er_pcdi(void)
 	uint register_list = OPER_I_16();
 	uint ea = EA_PCDI_32();
 	uint count = 0;
-
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+    {
+		if(register_list & 1)
 		{
 			REG_DA[i] = m68ki_read_pcrel_32(ea);
 			ea += 4;
 			count++;
 		}
-
+        register_list>>=1;
+    }
 	USE_CYCLES(count<<CYC_MOVEM_L);
 }
 
@@ -10763,35 +10774,47 @@ void m68k_op_movem_32_er_pcix(void)
 	uint register_list = OPER_I_16();
 	uint ea = EA_PCIX_32();
 	uint count = 0;
-
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+    {
+		if(register_list & 1)
 		{
 			REG_DA[i] = m68ki_read_pcrel_32(ea);
 			ea += 4;
 			count++;
 		}
-
+        register_list>>=1;
+    }
 	USE_CYCLES(count<<CYC_MOVEM_L);
 }
 
 
 void m68k_op_movem_32_er_ai(void)
 {
+
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = EA_AY_AI_32();
 	uint count = 0;
 
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+    {
+		if(register_list & 1)
 		{
 			REG_DA[i] = m68ki_read_32(ea);
 			ea += 4;
 			count++;
 		}
+        register_list>>=1;
+    }
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
+
+
+//    uint ea = EA_AY_AI_32();
+//    uint register_list = OPER_I_16();
+//    uint count = memory_readmovem32( ea , register_list , REG_DA );
+
+//    USE_CYCLES(count<<CYC_MOVEM_L);
 }
 
 
@@ -10801,15 +10824,16 @@ void m68k_op_movem_32_er_di(void)
 	uint register_list = OPER_I_16();
 	uint ea = EA_AY_DI_32();
 	uint count = 0;
-
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+    {
+		if(register_list & 1)
 		{
 			REG_DA[i] = m68ki_read_32(ea);
 			ea += 4;
-			count++;
+			count++;            
 		}
-
+        register_list>>=1;
+    }
 	USE_CYCLES(count<<CYC_MOVEM_L);
 }
 
@@ -10822,13 +10846,15 @@ void m68k_op_movem_32_er_ix(void)
 	uint count = 0;
 
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+    {
+		if(register_list & 1)
 		{
 			REG_DA[i] = m68ki_read_32(ea);
 			ea += 4;
 			count++;
 		}
-
+        register_list>>=1;
+    }
 	USE_CYCLES(count<<CYC_MOVEM_L);
 }
 
@@ -10841,13 +10867,15 @@ void m68k_op_movem_32_er_aw(void)
 	uint count = 0;
 
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+    {
+		if(register_list & 1)
 		{
 			REG_DA[i] = m68ki_read_32(ea);
 			ea += 4;
 			count++;
 		}
-
+        register_list>>=1;
+    }
 	USE_CYCLES(count<<CYC_MOVEM_L);
 }
 
@@ -10860,13 +10888,15 @@ void m68k_op_movem_32_er_al(void)
 	uint count = 0;
 
 	for(; i < 16; i++)
-		if(register_list & (1 << i))
+    {
+		if(register_list & 1)
 		{
 			REG_DA[i] = m68ki_read_32(ea);
 			ea += 4;
 			count++;
 		}
-
+        register_list>>=1;
+    }
 	USE_CYCLES(count<<CYC_MOVEM_L);
 }
 

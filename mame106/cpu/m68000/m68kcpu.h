@@ -257,8 +257,8 @@
 #endif /* M68K_INT_GT_32_BIT || M68K_USE_64_BIT */
 
 /* Simulate address lines of 68k family */
-#define ADDRESS_68K(A) ((A)&CPU_ADDRESS_MASK)
-
+#define ADDRESS_68K(A) (A)
+// #define ADDRESS_68K(A) ((A)&CPU_ADDRESS_MASK)
 
 /* Shift & Rotate Macros. */
 #define LSL(A, C) ((A) << (C))
@@ -795,14 +795,22 @@
 /* ----------------------------- Read / Write ----------------------------- */
 
 /* Read from the current address space */
+// krb
 #define m68ki_read_8(A)  m68ki_read_8_fc (A, FLAG_S | m68ki_get_address_space())
 #define m68ki_read_16(A) m68ki_read_16_fc(A, FLAG_S | m68ki_get_address_space())
 #define m68ki_read_32(A) m68ki_read_32_fc(A, FLAG_S | m68ki_get_address_space())
+
+//#define m68ki_read_8(A)  m68k_memory_intf.read8(A);
+//#define m68ki_read_16(A) m68k_memory_intf.read16(A);
+//#define m68ki_read_32(A) m68k_memory_intf.read32(A);
 
 /* Write to the current data space */
 #define m68ki_write_8(A, V)  m68ki_write_8_fc (A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #define m68ki_write_16(A, V) m68ki_write_16_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #define m68ki_write_32(A, V) m68ki_write_32_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
+//#define m68ki_write_8(A, V)  m68k_memory_intf.write8(A,V);
+//#define m68ki_write_16(A, V)  m68k_memory_intf.write16(A,V);
+//#define m68ki_write_32(A, V)  m68k_memory_intf.write32(A,V);
 
 #if M68K_SIMULATE_PD_WRITES
 #define m68ki_write_32_pd(A, V) m68ki_write_32_pd_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
@@ -1203,37 +1211,37 @@ INLINE uint m68ki_read_imm_32(void)
  */
 INLINE uint m68ki_read_8_fc(uint address, uint fc)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
 	return m68k_read_memory_8(ADDRESS_68K(address));
 }
 INLINE uint m68ki_read_16_fc(uint address, uint fc)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error_010_less(address, MODE_READ, fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_check_address_error_010_less(address, MODE_READ, fc); /* auto-disable (see m68kcpu.h) */
 	return m68k_read_memory_16(ADDRESS_68K(address));
 }
 INLINE uint m68ki_read_32_fc(uint address, uint fc)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error_010_less(address, MODE_READ, fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_check_address_error_010_less(address, MODE_READ, fc); /* auto-disable (see m68kcpu.h) */
 	return m68k_read_memory_32(ADDRESS_68K(address));
 }
 
 INLINE void m68ki_write_8_fc(uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
 	m68k_write_memory_8(ADDRESS_68K(address), value);
 }
 INLINE void m68ki_write_16_fc(uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
+//	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+//	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
 	m68k_write_memory_16(ADDRESS_68K(address), value);
 }
 INLINE void m68ki_write_32_fc(uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
+//	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+//	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
 	m68k_write_memory_32(ADDRESS_68K(address), value);
 }
 
