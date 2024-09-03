@@ -68,15 +68,15 @@ extern "C" {
 #endif
 
 
-#define M_RDROM(A)		TMS32010_ROM_RDMEM(A)
-#define M_WRTROM(A,V)	TMS32010_ROM_WRMEM(A,V)
-#define M_RDRAM(A)		TMS32010_RAM_RDMEM(A)
+#define M_RDROM(A)		(UINT32)TMS32010_ROM_RDMEM((UINT32)A)
+#define M_WRTROM(A,V)	TMS32010_ROM_WRMEM((UINT32)A,(UINT32)V)
+//#define M_RDRAM(A)		TMS32010_RAM_RDMEM(A)
 // wouldnt work #define M_WRTRAM(A,V)	TMS32010_RAM_WRMEM(A,V)
-#define M_RDOP(A)		TMS32010_RDOP(A)
-#define M_RDOP_ARG(A)	TMS32010_RDOP_ARG(A)
-#define P_IN(A)			TMS32010_In(A)
-#define P_OUT(A,V)		TMS32010_Out(A,V)
-#define BIO_IN			TMS32010_BIO_In
+#define M_RDOP(A)		(UINT32)TMS32010_RDOP((UINT32)A)
+#define M_RDOP_ARG(A)	(UINT32)TMS32010_RDOP_ARG((UINT32)A)
+#define P_IN(A)			(UINT32)TMS32010_In((UINT32)A)
+#define P_OUT(A,V)		TMS32010_Out((UINT32)A,(UINT32)V)
+#define BIO_IN			(UINT32)TMS32010_BIO_In
 
 
 static UINT8 tms32010_reg_layout[] = {
@@ -338,10 +338,11 @@ INLINE void UPDATE_ARP(void)
 }
 
 
-INLINE void getdata(UINT8 shift,UINT8 signext)
+/*INLINE*/ void getdata(UINT8 shift,UINT8 signext)
 {
 	GET_MEM_ADDR(DMA_DP);
-	R.ALU.d = (UINT16)M_RDRAM((UINT32)memaccess);
+	R.ALU.d = (UINT32) (data_read_word_16be(((UINT32)memaccess)<<1));
+            //M_RDRAM((UINT32)memaccess);
 	if (signext) R.ALU.d = (INT16)R.ALU.d;
 	R.ALU.d <<= shift;
 	if (R.opcode.b.l & 0x80) {
@@ -360,7 +361,7 @@ INLINE void getdata(UINT8 shift,UINT8 signext)
 //	data_write_word_16be((memaccess<<1),(UINT32)data);
 ////	M_WRTRAM(memaccess,data);
 //}
-INLINE void putdata_sar(UINT8 data)
+ void putdata_sar(UINT8 data)
 {
 	GET_MEM_ADDR(DMA_DP);
 	if (R.opcode.b.l & 0x80) {
@@ -368,15 +369,15 @@ INLINE void putdata_sar(UINT8 data)
 		UPDATE_ARP();
 	}
 //	M_WRTRAM(memaccess,R.AR[data]);
-    data_write_word_16be((memaccess<<1),(UINT32)R.AR[data]);
+    data_write_word_16be(((UINT32)memaccess<<1),(UINT32)R.AR[data]);
 }
-INLINE void putdata_sst(UINT16 data )
+ void putdata_sst(UINT16 data )
 {
 	GET_MEM_ADDR(DMA_DP1);		/* Page 1 only */
 	if (R.opcode.b.l & 0x80) {
 		UPDATE_AR();
 	}
-	data_write_word_16be((memaccess<<1),(UINT32)data);
+	data_write_word_16be(((UINT32)memaccess<<1),(UINT32)data);
 	//M_WRTRAM(memaccess,data);
 }
 
@@ -540,7 +541,7 @@ void dint(void)
 void dmov(void)
 {
 	getdata(0,0);
-	data_write_word_16be(((memaccess+1)<<1),R.ALU.w.l);
+	data_write_word_16be((((UINT32)memaccess+1)<<1),(UINT32)R.ALU.w.l);
 //	M_WRTRAM((memaccess + 1),R.ALU.w.l);
 }
 static void eint(void)
@@ -556,7 +557,7 @@ static void in_p(void)
 		UPDATE_AR();
 		UPDATE_ARP();
 	}
-	data_write_word_16be((memaccess<<1),(UINT32)R.ALU.w.l);
+	data_write_word_16be(((UINT32)memaccess<<1),(UINT32)R.ALU.w.l);
 
 }
 static void lac_sh(void)
@@ -635,7 +636,7 @@ static void ltd(void)
 	oldacc.d = R.ACC.d;
 	getdata(0,0);
 	R.Treg = R.ALU.w.l;
-		data_write_word_16be(((memaccess+1)<<1),R.ALU.w.l);
+		data_write_word_16be(((memaccess+1)<<1),(UINT32)R.ALU.w.l);
 //	M_WRTRAM((memaccess + 1),R.ALU.w.l);
 	R.ACC.d += R.Preg.d;
 	CALCULATE_ADD_OVERFLOW(R.Preg.d);
@@ -695,7 +696,7 @@ static void sach_sh(void)
 		UPDATE_AR();
 		UPDATE_ARP();
 	}
-	data_write_word_16be((memaccess<<1),R.ALU.w.h);
+	data_write_word_16be((memaccess<<1),(UINT32)R.ALU.w.h);
 }
 static void sacl(void)
 {
@@ -707,7 +708,7 @@ static void sacl(void)
 		UPDATE_AR();
 		UPDATE_ARP();
 	}
-	data_write_word_16be((memaccess<<1),R.ACC.w.l);
+	data_write_word_16be((memaccess<<1),(UINT32)R.ACC.w.l);
 
 }
 static void sar_ar0(void)

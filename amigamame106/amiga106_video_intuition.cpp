@@ -60,7 +60,7 @@ TripleBuffer::TripleBuffer()
 
 IntuitionDrawable::IntuitionDrawable(int flags)
 : _width(0),_height(0),_useScale(0)
-, _flags(flags)
+, _flags(flags), _heightBufferSwitch(0)
 {
 //  _trp._checkw=0;
 //  _trp._rp.BitMap = NULL;
@@ -144,6 +144,9 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
         }
 
     }
+    // magic for height double buffer is used
+    if(_heightBufferSwitch) ceny += _height;
+
     // could happen if screen more little than source.
     if(cenx<0) cenx=0;
     if(ceny<0) ceny=0;
@@ -250,11 +253,15 @@ bool Intuition_Screen::open()
     // that stupid OS function (or driver) want SA_Depth,24 for 32bit depth, or fail.
     if(_screenDepthAsked == 32 )_screenDepthAsked =24;
 
+
+    ULONG appliedHeight = _fullscreenHeight;
+    if(_flags & DISPFLAG_USEHEIGHTBUFFER) appliedHeight*=2;
+
  	_pScreen = OpenScreenTags( NULL,
 			SA_DisplayID,_ScreenModeId,
                         SA_Title, (ULONG)"MAME", // used as ID by promotion tools and else ?
                         SA_Width, _fullscreenWidth,
-                        SA_Height,_fullscreenHeight,
+                        SA_Height,appliedHeight,
                         SA_Depth,_screenDepthAsked,
 //                        SA_Behind,TRUE,    /* Open behind */
                         SA_Quiet,TRUE,     /* quiet */
@@ -295,12 +302,12 @@ bool Intuition_Screen::open()
     _width = _fullscreenWidth;
     _height = _fullscreenHeight;
 
-    if(_flags & DISPFLAG_USETRIPLEBUFFER)
-    {
-        if(_pTripleBufferImpl) delete _pTripleBufferImpl;
-        _pTripleBufferImpl = new TripleBuffer_CSB(*this); // could fail, in which case back to direct rendering
-        _pTripleBufferImpl->init();
-    }
+//    if(_flags & DISPFLAG_USETRIPLEBUFFER)
+//    {
+//        if(_pTripleBufferImpl) delete _pTripleBufferImpl;
+//        _pTripleBufferImpl = new TripleBuffer_CSB(*this); // could fail, in which case back to direct rendering
+//        _pTripleBufferImpl->init();
+//    }
 
     return true;
 }

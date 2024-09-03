@@ -58,7 +58,7 @@ static void *ym2151_start(int sndindex, int clock, const void *config)
 //        printf("2151 rate:%d\n",rate);
 //    }
     if(Machine && Machine->sample_rate>0) rate = Machine->sample_rate;
-    printf("2151 rate:%d\n",rate);
+//    printf("2151 rate:%d\n",rate);
 
 	/* stream setup */
 	info->stream = stream_create(0,2,rate,info,ym2151_update);

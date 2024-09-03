@@ -14,11 +14,11 @@
 
 #include "mamecore.h"
 
-//#if defined(__GNUC__) && defined(__AMIGA__)
+#if defined(__GNUC__) && defined(__AMIGA__)
 #define REG(r) __asm(#r)
-//#else
-//#define REG(r)
-//#endif
+#else
+#define REG(r)
+#endif
 
 
 /***************************************************************************

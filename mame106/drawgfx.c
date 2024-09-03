@@ -635,6 +635,7 @@ int pdrawgfx_shadow_lowpri = 0;
 #define SETPIXELCOLOR(dest,n) { if (((1 << (pridata[dest] & 0x1f)) & pmask) == 0) { if (pridata[dest] & 0x80) { dstdata[dest] = palette_shadow_table[n];} else { dstdata[dest] = (n);} } pridata[dest] = (pridata[dest] & 0x7f) | afterdrawmask; }
 #define DECLARE_SWAP_RAW_PRI(function,args,body) void function##_raw_pri8 args body
 #include "drawgfx.c"
+
 #undef DECLARE_SWAP_RAW_PRI
 #undef COLOR_ARG
 #undef LOOKUP
@@ -992,7 +993,8 @@ void drawgfx(struct drawgfxParams *p DGREG(a0))
 //    if (depth == 8)
 //    	drawgfx_core8(p);
 //	 else
-    if(/*depth == 15 ||depth == 16*/ depth<=16)
+
+    if(depth<=16)
 		drawgfx_core16(p);
 	else
 		drawgfx_core32(p);
@@ -1058,9 +1060,10 @@ void copybitmap_remap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int
 {
 	profiler_mark(PROFILER_COPYBITMAP);
 
-	if (dest->depth == 8)
-		copybitmap_core8(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
-	else if(dest->depth == 15 || dest->depth == 16)
+//	if (dest->depth == 8)
+//		copybitmap_core8(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
+	//else
+    if(/*dest->depth == 15 || dest->depth == 16*/dest->depth <=16)
 		copybitmap_core16(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
 	else
 		copybitmap_core32(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
@@ -1365,9 +1368,11 @@ void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
 		return;
 	}
 
-	if (dest->depth == 8)
-		copyrozbitmap_core8(dest,src,startx,starty,incxx,incxy,incyx,incyy,wraparound,clip,transparency,transparent_color,priority);
-	else if(dest->depth == 15 || dest->depth == 16)
+//	if (dest->depth == 8)
+//		copyrozbitmap_core8(dest,src,startx,starty,incxx,incxy,incyx,incyy,wraparound,clip,transparency,transparent_color,priority);
+//	else
+
+    if(dest->depth <=16)
 		copyrozbitmap_core16(dest,src,startx,starty,incxx,incxy,incyx,incyy,wraparound,clip,transparency,transparent_color,priority);
 	else
 		copyrozbitmap_core32(dest,src,startx,starty,incxx,incxy,incyx,incyy,wraparound,clip,transparency,transparent_color,priority);
@@ -5167,6 +5172,8 @@ DECLARE(blockmove_NtoN_blend_remap_flipx,(
 		srcheight--;
 	}
 })
+
+
 
 //    int transparency = p->transparency;
 //    int transparent_color = p->transparent_color;

@@ -161,23 +161,22 @@ WRITE8_HANDLER( ddragon_fgvideoram_w )
 
 ***************************************************************************/
 
-
 static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
+	//const gfx_element *gfx = Machine->gfx[1];
     struct drawgfxParams dgp={
             bitmap, Machine->gfx[1],
             0,//code,
             0,//color,
             0,0,//flipx, flipy,
             0,0,// //sx, sy,
-            &Machine->visible_area,
+            cliprect,
             TRANSPARENCY_PEN, 0,
             // - - optionals
             0,0,NULL,0
     };
-    UINT8 *src;
+	UINT8 *src;
 	int i;
-
 
 	if ( technos_video_hw == 1 ) {		/* China Gate Sprite RAM */
 		src = (UINT8 *) (spriteram);
@@ -185,118 +184,88 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		src = (UINT8 *) (&( ddragon_spriteram[0x800] ));
 	}
 
-
- //   printf("f ");
 	for( i = 0; i < ( 64 * 5 ); i += 5 ) {
 		int attr = src[i+1];
-		if ( (attr & 0x80) == 0 ) continue;
+		if ( attr & 0x80 ) { /* visible */
+			int sx = 240 - src[i+4] + ( ( attr & 2 ) << 7 );
+			int sy = 240 - src[i+0] + ( ( attr & 1 ) << 8 );
+			int size = ( attr & 0x30 ) >> 4;
+			int flipx = ( attr & 8 );
+			int flipy = ( attr & 4 );
+			int dx = -16,dy = -16;
 
-        /* visible */
-        int sx = 240 - src[i+4] + ( ( attr & 2 ) << 7 );
-        int sy = 240 - src[i+0] + ( ( attr & 1 ) << 8 );
-        int size = ( attr & 0x30 ) >> 4;
-        int flipx = ( attr & 8 );
-        int flipy = ( attr & 4 );
-        int dx = -16,dy = -16;
-        int which;
+			int which;
+			int color;
 
-        if ( technos_video_hw == 2 )		/* Double Dragon 2 */
-        {
-            dgp.color = ( src[i+2] >> 5 );
-            which = src[i+3] + ( ( src[i+2] & 0x1f ) << 8 );
-        }
-        else
-        {
-            if ( technos_video_hw == 1 )		/* China Gate */
-            {
-                if ((sx < -7) && (sx > -16)) sx += 256; /* fix sprite clip */
-                if ((sy < -7) && (sy > -16)) sy += 256; /* fix sprite clip */
-            }
-            dgp.color = ( src[i+2] >> 4 ) & 0x07;
-            which = src[i+3] + ( ( src[i+2] & 0x0f ) << 8 );
-        }
+			if ( technos_video_hw == 2 )		/* Double Dragon 2 */
+			{
+				color = ( src[i+2] >> 5 );
+				which = src[i+3] + ( ( src[i+2] & 0x1f ) << 8 );
+			}
+			else
+			{
+				if ( technos_video_hw == 1 )		/* China Gate */
+				{
+					if ((sx < -7) && (sx > -16)) sx += 256; /* fix sprite clip */
+					if ((sy < -7) && (sy > -16)) sy += 256; /* fix sprite clip */
+				}
+				color = ( src[i+2] >> 4 ) & 0x07;
+				which = src[i+3] + ( ( src[i+2] & 0x0f ) << 8 );
+			}
 
-        if (flip_screen)
-        {
-            sx = 240 - sx;
-            sy = 240 - sy;
-            flipx = !flipx;
-            flipy = !flipy;
-            dx = -dx;
-            dy = -dy;
-        }
+			if (flip_screen)
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+				dx = -dx;
+				dy = -dy;
+			}
 
-        which &= ~size;
+			which &= ~size;
 
-       // dgp.code = which+order;
-        dgp.flipx = flipx;
-        dgp.flipy = flipy;
+            dgp.code = (which+size);
+            dgp.color = color;
+            dgp.flipx = flipx;
+            dgp.flipy = flipy;
 
+            dgp.sx = sx;
+            dgp.sy = sy;
+            drawgfx(&dgp);
 
-        switch ( size ) {
-            case 0: /* normal */
-        {
-//                printf("%d:0 ",i);
-                dgp.code = which;
-                dgp.sx = sx; dgp.sy = sy;
-                drawgfx(&dgp);
-        }
-            break;
+			switch ( size ) {
+				case 1: /* double y */
+                    dgp.code = which;
+                    dgp.sy = sy+dy;
+                    drawgfx(&dgp);
+				break;
+				case 2: /* double x */
+                    dgp.code = which;
+                    dgp.sx = sx+dx;
+                    drawgfx(&dgp);
+				break;
 
-            case 1: /* double y */
-        {
-      //      printf("%d:1 ",i);
-                dgp.code = which;
-                dgp.sx = sx; dgp.sy = sy+dy;
-                drawgfx(&dgp);
+				case 3:
+                    dgp.code = which;
+                    dgp.sx = sx+dx;
+                    dgp.sy = sy+dy;
+                    drawgfx(&dgp);
 
-                dgp.code = which+1;
-                dgp.sx = sx;  dgp.sy = sy;
-                drawgfx(&dgp);
-        }
-            break;
+                    dgp.code = which+1;
+                    dgp.sx = sx+dx;
+                    dgp.sy = sy;
+                    drawgfx(&dgp);
 
-            case 2: /* double x */
-        {
-         //   printf("%d:2 ",i);
-                dgp.code = which;
-                dgp.sx = sx+dx; dgp.sy = sy;
-                drawgfx(&dgp);
-
-                dgp.code = which+2;
-                dgp.sx = sx; dgp.sy = sy;
-                drawgfx(&dgp);
-        }
-            break;
-
-            case 3:
-        {
-          //  printf("%d:3 ",i);
-                dgp.code = which;
-                dgp.sx = sx+dx; dgp.sy = sy +dy;
-                drawgfx(&dgp);
-
-                dgp.code = which+1;
-                dgp.sx = sx+dx; dgp.sy = sy;
-                drawgfx(&dgp);
-
-
-                dgp.code = which+2;
-                dgp.sx = sx; dgp.sy = sy + dy;
-                drawgfx(&dgp);
-
-                dgp.code = which+3;
-                dgp.sx = sx; dgp.sy = sy;
-                drawgfx(&dgp);
-            }
-            break;
-        }
-
-
+                    dgp.code = which+2;
+                    dgp.sx = sx;
+                    dgp.sy = sy+dy;
+                    drawgfx(&dgp);
+				break;
+			}
+		}
 	}
-//    printf("\n");
 }
-
 
 VIDEO_UPDATE( ddragon )
 {
@@ -307,6 +276,6 @@ VIDEO_UPDATE( ddragon )
 	tilemap_set_scrolly(bg_tilemap,0,scrolly);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-//	draw_sprites(bitmap,cliprect);
-//	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	draw_sprites(bitmap,cliprect);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 }

@@ -189,7 +189,6 @@ struct drawgfxParams {
     UINT32 priority_mask;
 };
 
-
 void drawgfx(struct drawgfxParams *p DGREG(a0));
 //void pdrawgfx(struct drawgfxParams *p DGREG(a0));
 //void mdrawgfx(struct drawgfxParams *p DGREG(a0));

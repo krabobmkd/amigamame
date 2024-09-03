@@ -207,9 +207,9 @@ void Drawable_CGX::drawCGX_DirectCPU16(_mame_display *display)
 
 void Drawable_CGX::drawCGX_DirectCPU32(_mame_display *display)
 {
-    RastPort *pRPort = _drawable.rastPort();
+    //RastPort *pRPort = _drawable.rastPort();
     BitMap *pBitmap = _drawable.bitmap();
-    if(!pRPort || !pBitmap || !directDrawARGB32) return;
+    if(/*!pRPort ||*/ !pBitmap || !directDrawARGB32) return;
 
     // applied width height if using scale or not, and centering.
     int sourcewidth,sourceheight;
@@ -372,6 +372,10 @@ void Intuition_Screen_CGX::draw(_mame_display *display)
         drawCGX_DirectCPU16(display);
     }
    if(_pTripleBufferImpl) _pTripleBufferImpl->afterBufferDrawn();
+   if(_flags & DISPFLAG_USEHEIGHTBUFFER) {
+        if(_pScreen) MoveScreen(_pScreen,0,(_heightBufferSwitch)?-_height:0);
+        _heightBufferSwitch^=1;
+   }
 
 }
 // - - -- -  - - --

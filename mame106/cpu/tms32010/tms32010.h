@@ -70,21 +70,21 @@ void tms32010_get_info(UINT32 state, union cpuinfo *info);
  *  Read the state of the BIO pin
  */
 
-#define TMS32010_BIO_In (io_read_word_16be(TMS32010_BIO<<1))
+#define TMS32010_BIO_In (UINT32)(io_read_word_16be((UINT32)TMS32010_BIO<<1))
 
 
 /****************************************************************************
  *  Input a word from given I/O port
  */
 
-#define TMS32010_In(Port) (io_read_word_16be((Port)<<1))
+#define TMS32010_In(Port) ((UINT32)io_read_word_16be(((UINT32)Port)<<1))
 
 
 /****************************************************************************
  *  Output a word to given I/O port
  */
 
-#define TMS32010_Out(Port,Value) (io_write_word_16be((Port)<<1,Value))
+#define TMS32010_Out(Port,Value) (io_write_word_16be(((UINT32)Port)<<1,Value))
 
 
 
@@ -92,14 +92,14 @@ void tms32010_get_info(UINT32 state, union cpuinfo *info);
  *  Read a word from given ROM memory location
  */
 
-#define TMS32010_ROM_RDMEM(A) (program_read_word_16be((A)<<1))
+#define TMS32010_ROM_RDMEM(A) ((UINT32)program_read_word_16be(((UINT32)A)<<1))
 
 
 /****************************************************************************
  *  Write a word to given ROM memory location
  */
 
-#define TMS32010_ROM_WRMEM(A,V) (program_write_word_16be((A)<<1,V))
+#define TMS32010_ROM_WRMEM(A,V) (program_write_word_16be(((UINT32)A)<<1,V))
 
 
 
@@ -107,14 +107,14 @@ void tms32010_get_info(UINT32 state, union cpuinfo *info);
  *  Read a word from given RAM memory location
  */
 
-#define TMS32010_RAM_RDMEM(A) (data_read_word_16be((A)<<1))
+#define TMS32010_RAM_RDMEM(A) ((UINT32)data_read_word_16be(((UINT32)A)<<1))
 
 
 /****************************************************************************
  *  Write a word to given RAM memory location
  */
 
-#define TMS32010_RAM_WRMEM(A,V) (data_write_word_16be((A)<<1,V))
+#define TMS32010_RAM_WRMEM(A,V) (data_write_word_16be(((UINT32)A)<<1,V))
 
 
 
@@ -124,7 +124,7 @@ void tms32010_get_info(UINT32 state, union cpuinfo *info);
  *  used to greatly speed up emulation
  */
 
-#define TMS32010_RDOP(A) (cpu_readop16((A)<<1))
+#define TMS32010_RDOP(A) ((UINT32)cpu_readop16(((UINT32)A)<<1))
 
 
 /****************************************************************************
@@ -133,7 +133,7 @@ void tms32010_get_info(UINT32 state, union cpuinfo *info);
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define TMS32010_RDOP_ARG(A) (cpu_readop_arg16((A)<<1))
+#define TMS32010_RDOP_ARG(A) (cpu_readop_arg16(((UINT32)A)<<1))
 
 
 
