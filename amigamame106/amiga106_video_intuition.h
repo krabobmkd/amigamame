@@ -44,27 +44,10 @@ protected:
     int _width,_height;
     int _useScale;
     int _flags;
-//    virtual BitMap *bitmap() = 0;
-    // used for drawRastPortWPA8
-//    std::vector<UBYTE> _wpatempbm;
-//    struct wpa8temprastport {
-//        int _checkw;
-//        RastPort _rp;
-
-//    };
-//    wpa8temprastport _trp;
-//    void checkWpa8TmpRp(RastPort *,int linewidth);
 
 };
-// this differenciate Drawing API
-//class IntuitionDrawer {
-//public:
-//    IntuitionDrawer(int flags);
-//    virtual ~IntuitionDrawer();
-//    virtual void draw(IntuitionDrawable &d,_mame_display *pmame_display) = 0;
-//protected:
 
-//};
+class TripleBuffer;
 
 class Intuition_Screen : public IntuitionDrawable
 {
@@ -85,6 +68,43 @@ protected:
     int _screenDepthAsked; // 8 or 16, needed for screen opening.
     void *_pMouseRaster;
 
+    TripleBuffer *_pTripleBufferImpl;
+
+};
+
+class TripleBuffer
+{
+public:
+    TripleBuffer();
+    virtual ~TripleBuffer(){}
+    virtual int init() =0;
+    virtual void close() =0;
+    virtual RastPort *rastPort() = 0;
+    virtual BitMap *bitmap() =0;
+    virtual int beforeBufferDrawn() =0;
+    virtual void afterBufferDrawn() =0;
+    char _tripleBufferInitOk;
+    char _lastIndexDrawn;
+    char _indexToDraw;
+    char _d;
+};
+//class TripleBuffer_YPos : public TripleBuffer
+//{
+//public:
+//    TripleBuffer_YPos(Intuition_Screen &screen);
+//    int init() override;
+//    void close() override;
+//    int beforeBufferDrawn();
+//    void afterBufferDrawn();
+//    Intuition_Screen &_screen;
+//};
+
+
+class TripleBuffer_CSB : public TripleBuffer
+{
+public:
+    TripleBuffer_CSB(Intuition_Screen &screen);
+    ~TripleBuffer_CSB();
     // - - -triple buffer management
     struct SBuffer {
          ScreenBuffer *_pScreenBuffer;
@@ -92,14 +112,17 @@ protected:
     };
 
     SBuffer _screenBuffer[3];
-    int _tripleBufferInitOk;
-    int _lastIndexDrawn,_indexToDraw;
-
-    int initTripleBuffer();
-    void closeTripleBuffer();
-    int beforeBufferDrawn();
-    void afterBufferDrawn();
+    int init() override;
+    void close() override;
+    RastPort *rastPort() override;
+    BitMap *bitmap() override;
+    int beforeBufferDrawn() override;
+    void afterBufferDrawn() override;
+    Intuition_Screen &_screen;
 };
+
+
+
 class Intuition_Window : public IntuitionDrawable
 {
 public:

@@ -31,7 +31,7 @@ set(MAME_CORE_SRC
  artwork.c
    cpuint.c    inptport.c  palette.c   streams_krb.c   video.c
 	cpuintrf.c  input.c     png.c       tilemap.c
-	cdrom.c    drawgfx.c   jedparse.c  timer.c     xml2info.c
+	cdrom.c    drawgfx.c    jedparse.c  timer.c     xml2info.c
 	chd.c      driver.c    jedutil.c   xmlfile.c
 	chdcd.c    mame.c      romload.c   ui_text.c
 	  harddisk.c  mamecore.c  sha1.c      unzip.c
@@ -40,7 +40,7 @@ set(MAME_CORE_SRC
 	cpuexec.c  info.c      memory.c    state.c     version.c
 #  artwork.h
  debugger.h   jedparse.h            png.h        ui_text.h
- audit.h      drawgfx.h    mame.h                profiler.h   unzip.h
+ audit.h      drawgfx.h drawgfxn.h    mame.h                profiler.h   unzip.h
  cdrom.h      driver.h     mamecore.h            romload.h    usrintrf.h
  chd.h        fileio.h     md5.h                 sha1.h       video.h
  chdcd.h      harddisk.h   memconv.h             sndintrf.h   x86drc.h

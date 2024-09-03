@@ -307,6 +307,6 @@ VIDEO_UPDATE( ddragon )
 	tilemap_set_scrolly(bg_tilemap,0,scrolly);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+//	draw_sprites(bitmap,cliprect);
+//	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 }

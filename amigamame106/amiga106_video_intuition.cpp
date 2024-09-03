@@ -46,24 +46,15 @@ extern "C" {
 
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
+TripleBuffer::TripleBuffer()
+    : _tripleBufferInitOk(0)
+    ,_lastIndexDrawn(0)
+    ,_indexToDraw(0)
+    ,_d(0)
+{
 
-//void Intuition_Window::drawRastPort_CGX(_mame_display *display,Paletted *pRemap)
-//{
-//    if(_pWbWindow && _sWbWinSBitmap)
-//    {
-//        _width = (int)(_pWbWindow->GZZWidth);
-//        _height = (int)(_pWbWindow->GZZHeight);
-//        IntuitionDrawable::drawRastPort_CGX(display,pRemap);
+}
 
-////        BltBitMapRastPort( _sWbWinSBitmap,//CONST struct BitMap *srcBitMap,
-////                           0,0, //LONG xSrc, LONG ySrc,
-////                           _pWbWindow->RPort,//struct RastPort *destRP,
-////                           0,0,//LONG xDest, LONG yDest,
-////                           _width, _height,
-////                           0x00c0//ULONG minterm  -> copy minterm.
-////                           );
-//    }
-//}
 
 
 
@@ -169,13 +160,82 @@ Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
     , _fullscreenWidth(0)
     , _fullscreenHeight(0)
     , _screenDepthAsked(8) // default.
-    , _pMouseRaster(NULL)    
-    , _tripleBufferInitOk(0)
-    , _lastIndexDrawn(0),_indexToDraw(1)
+    , _pMouseRaster(NULL)
+    , _pTripleBufferImpl(NULL)
+{
+
+}
+
+TripleBuffer_CSB::TripleBuffer_CSB(Intuition_Screen &screen)
+ : TripleBuffer(), _screen(screen)
 {
     memset(&_screenBuffer[0],0,sizeof(_screenBuffer));
 }
+TripleBuffer_CSB::~TripleBuffer_CSB()
+{
+    close();
+}
 
+int TripleBuffer_CSB::init()
+{
+    _tripleBufferInitOk = 0;
+    if(!_screen.screen()) return 0;
+
+    if(_screenBuffer[0]._pScreenBuffer ||
+         _screenBuffer[1]._pScreenBuffer ||
+         _screenBuffer[2]._pScreenBuffer)
+            close();
+
+    // the AGA/CGX unified os3 way
+    _screenBuffer[0]._pScreenBuffer = AllocScreenBuffer(_screen.screen(),NULL,SB_SCREEN_BITMAP);
+    if(!_screenBuffer[0]._pScreenBuffer) return 0;
+
+    for(int i=0; i<3 ;i++)
+    {
+        if(!_screenBuffer[i]._pScreenBuffer)
+            _screenBuffer[i]._pScreenBuffer = AllocScreenBuffer(_screen.screen(),NULL,SB_COPY_BITMAP );
+        if(! _screenBuffer[i]._pScreenBuffer)
+        {
+            close();
+            return 0;
+        }
+        // init rastport
+        // " Initialize a RastPort structure to standard values."
+        // I feel super 100% reasured by this marvellous function.
+        InitRastPort( &_screenBuffer[i]._rport );
+        _screenBuffer[i]._rport.BitMap = _screenBuffer[i]._pScreenBuffer->sb_BitMap;
+        _screenBuffer[i]._pScreenBuffer->sb_DBufInfo->dbi_UserData1 = (APTR)i;
+    //    printf("msgport at init:%08x\n",_screenBuffer[i]._pScreenBuffer->sb_DBufInfo->dbi_DispMessage);
+    // we have to fill the port to receive "displayed screen buffer" message
+
+        // myDBI->dbi_DispMessage.mn_ReplyPort=ports[1];
+    }
+    _lastIndexDrawn = 0;
+    _indexToDraw = 1;
+    _tripleBufferInitOk = 1;
+    return 1;
+}
+void TripleBuffer_CSB::close()
+{
+    if(!_screen.screen()) return;
+
+    for(int i=2;i>=0;i--)
+    {
+        if(_screenBuffer[i]._pScreenBuffer) FreeScreenBuffer(_screen.screen(),_screenBuffer[i]._pScreenBuffer);
+        _screenBuffer[i]._pScreenBuffer = NULL;
+    }
+
+}
+RastPort *TripleBuffer_CSB::rastPort()
+{
+    if(!_tripleBufferInitOk) return NULL;
+    return &_screenBuffer[_indexToDraw]._rport;
+}
+BitMap *TripleBuffer_CSB::bitmap()
+{
+    if(!_tripleBufferInitOk) return NULL;
+    return _screenBuffer[_indexToDraw]._pScreenBuffer->sb_BitMap;
+}
 bool Intuition_Screen::open()
 {
      if(_pScreenWindow) return true; // already open.
@@ -237,73 +297,25 @@ bool Intuition_Screen::open()
 
     if(_flags & DISPFLAG_USETRIPLEBUFFER)
     {
-        initTripleBuffer(); // could fail, in which case back to direct rendering
+        if(_pTripleBufferImpl) delete _pTripleBufferImpl;
+        _pTripleBufferImpl = new TripleBuffer_CSB(*this); // could fail, in which case back to direct rendering
+        _pTripleBufferImpl->init();
     }
 
     return true;
-}
-int Intuition_Screen::initTripleBuffer()
-{
-    _tripleBufferInitOk = 0;
-    if(!_pScreen) return 0;
-
-    if(_screenBuffer[0]._pScreenBuffer ||
-         _screenBuffer[1]._pScreenBuffer ||
-         _screenBuffer[2]._pScreenBuffer)
-            closeTripleBuffer();
-
-    // the AGA/CGX unified os3 way
-    _screenBuffer[0]._pScreenBuffer = AllocScreenBuffer(_pScreen,NULL,SB_SCREEN_BITMAP);
-    if(!_screenBuffer[0]._pScreenBuffer) return 0;
-
-    for(int i=0; i<3 ;i++)
-    {
-        if(!_screenBuffer[i]._pScreenBuffer)
-            _screenBuffer[i]._pScreenBuffer = AllocScreenBuffer(_pScreen,NULL,SB_COPY_BITMAP );
-        if(! _screenBuffer[i]._pScreenBuffer)
-        {
-            closeTripleBuffer();
-            return 0;
-        }
-        // init rastport
-        // " Initialize a RastPort structure to standard values."
-        // I feel super 100% reasured by this marvellous function.
-        InitRastPort( &_screenBuffer[i]._rport );
-        _screenBuffer[i]._rport.BitMap = _screenBuffer[i]._pScreenBuffer->sb_BitMap;
-        _screenBuffer[i]._pScreenBuffer->sb_DBufInfo->dbi_UserData1 = (APTR)i;
-    //    printf("msgport at init:%08x\n",_screenBuffer[i]._pScreenBuffer->sb_DBufInfo->dbi_DispMessage);
-    // we have to fill the port to receive "displayed screen buffer" message
-
-        // myDBI->dbi_DispMessage.mn_ReplyPort=ports[1];
-    }
-    _lastIndexDrawn = 0;
-    _indexToDraw = 1;
-    _tripleBufferInitOk = 1;
-    return 1;
-}
-void Intuition_Screen::closeTripleBuffer()
-{
-    if(!_pScreen) return; // must be closed before screen !!
-    // set the screen initial bitmap back to screen, else not sure what heresia could happen.
-//    if(_screenBuffer[0]._pScreenBuffer)
-//        ChangeScreenBuffer(_pScreen,_screenBuffer[0]._pScreenBuffer);
-
-    for(int i=2;i>=0;i--)
-    {
-        if(_screenBuffer[i]._pScreenBuffer) FreeScreenBuffer(_pScreen,_screenBuffer[i]._pScreenBuffer);
-        _screenBuffer[i]._pScreenBuffer = NULL;
-    }
 }
 
 void Intuition_Screen::close()
 {
     IntuitionDrawable::close();
-    closeTripleBuffer();
 
     if(_pScreenWindow) CloseWindow(_pScreenWindow);
     _pScreenWindow = NULL;
 
-
+    if(_pTripleBufferImpl){
+        delete _pTripleBufferImpl;
+        _pTripleBufferImpl = NULL;
+    }
     if(_pScreen) CloseScreen(_pScreen);
     _pScreen = NULL;
     if(_pMouseRaster) FreeRaster( (PLANEPTR) _pMouseRaster ,8,8);
@@ -318,8 +330,9 @@ RastPort *Intuition_Screen::rastPort()
 {
     if(!_pScreen) return NULL;
     // may use triple buffer
-   if(_tripleBufferInitOk)
-        return &_screenBuffer[_indexToDraw]._rport;
+    if(_pTripleBufferImpl &&
+    _pTripleBufferImpl->_tripleBufferInitOk)
+        return _pTripleBufferImpl->rastPort();
 
    return &_pScreen->RastPort;
 }
@@ -328,12 +341,13 @@ Screen *Intuition_Screen::screen()
 }
 BitMap *Intuition_Screen::bitmap()
 {    
-   if(_tripleBufferInitOk)  // may use triple buffer
-       return _screenBuffer[_indexToDraw]._pScreenBuffer->sb_BitMap;
+    if(_pTripleBufferImpl &&
+    _pTripleBufferImpl->_tripleBufferInitOk)  // may use triple buffer
+       return _pTripleBufferImpl->bitmap();
 
     return _pScreen->RastPort.BitMap;
 }
-int Intuition_Screen::beforeBufferDrawn()
+int TripleBuffer_CSB::beforeBufferDrawn()
 {
     if(_tripleBufferInitOk)
     {
@@ -345,12 +359,12 @@ int Intuition_Screen::beforeBufferDrawn()
     }
     return 1;// ok, do draw
 }
-void Intuition_Screen::afterBufferDrawn()
+void TripleBuffer_CSB::afterBufferDrawn()
 {
     // may apply double buffer
     if(_tripleBufferInitOk)
     {
-        auto success =  ChangeScreenBuffer(_pScreen,_screenBuffer[_indexToDraw]._pScreenBuffer);
+        auto success =  ChangeScreenBuffer(_screen.screen(),_screenBuffer[_indexToDraw]._pScreenBuffer);
         if(!success) {
             printf("failed !\n");
         }
