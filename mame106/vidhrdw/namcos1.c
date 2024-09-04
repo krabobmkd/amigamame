@@ -5,7 +5,7 @@ Namco System 1 Video Hardware
 *******************************************************************/
 
 #include "driver.h"
-
+#include <stdio.h>
 
 /*
   video ram map
@@ -51,9 +51,6 @@ static UINT8 namcos1_playfield_control[0x20];
 static tilemap *bg_tilemap[6];
 static UINT8 *tilemap_maskdata;
 
-
-
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -94,10 +91,17 @@ static void fg_get_info5(int tile_index) { fg_get_info(tile_index,&namcos1_video
   Start the video hardware emulation.
 
 ***************************************************************************/
+//void almost_reset_namcos1();
+void machine_reset_namcos1();
+
 
 VIDEO_START( namcos1 )
 {
 	int i;
+
+    // krb
+
+ //   memset(namcos1_playfield_control,0,sizeof(namcos1_playfield_control));
 
 	tilemap_maskdata = (UINT8 *)memory_region(REGION_GFX1);
 
@@ -122,6 +126,7 @@ VIDEO_START( namcos1 )
 	tilemap_set_scrolldy(bg_tilemap[5],0x10,0x110);
 
 	/* register videoram to the save state system (post-allocation) */
+    // krb test
 	state_save_register_global_pointer(namcos1_videoram, 0x8000);
 	state_save_register_global_array(namcos1_cus116);
 	state_save_register_global_pointer(namcos1_spriteram, 0x1000);
@@ -133,7 +138,7 @@ VIDEO_START( namcos1 )
 
 	/* clear paletteram */
 	memset(namcos1_paletteram, 0, 0x8000);
-	memset(namcos1_cus116, 0, 0x10);
+	memset(namcos1_cus116, 0, sizeof(namcos1_cus116));
 	for (i = 0; i < 0x2000; i++)
 		palette_set_color(i, 0, 0, 0);
 
@@ -146,6 +151,7 @@ VIDEO_START( namcos1 )
 
 	spriteram = &namcos1_spriteram[0x800];
 
+    machine_reset_namcos1();
 	return 0;
 }
 
@@ -354,7 +360,9 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		dgp0.sx = sx & 0x1ff;
 		dgp0.sy = ((sy + 16) & 0xff) - 16;
 		dgp0.transparency = (color != 0x7f) ? TRANSPARENCY_PEN : TRANSPARENCY_PEN_TABLE;
+
 		dgp0.priority_mask = pri_mask;
+
 		drawgfx(&dgp0);
 
 		source -= 0x10;
@@ -367,6 +375,21 @@ VIDEO_UPDATE( namcos1 )
 {
 	int i, j, scrollx, scrolly, priority;
 	rectangle new_clip = *cliprect;
+
+//    printf("namcos1_cus116:\n" );
+//    for(int ii=0;ii<sizeof(namcos1_cus116);ii++)
+//    {
+//        printf("%02x",namcos1_cus116[ii]);
+//    }
+//    printf("\n" );
+
+//    printf("namcos1_playfield_control:\n" );
+//    for(int ii=0;ii<sizeof(namcos1_playfield_control);ii++)
+//    {
+//        printf("%02x",namcos1_playfield_control[ii]);
+//    }
+//    printf("\n" );
+
 
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set() because the visible area is asymmetrical */

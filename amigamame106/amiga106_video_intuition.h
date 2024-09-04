@@ -45,6 +45,7 @@ protected:
     int _useScale;
     int _flags;
     int _heightBufferSwitch;
+    int _heightBufferSwitchApplied;
 };
 
 class TripleBuffer;

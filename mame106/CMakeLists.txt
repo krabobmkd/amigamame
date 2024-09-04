@@ -76,7 +76,7 @@ set(MAME_CORE_SRC
 set(MAME_INCLUDE_DIRS "src" "../amigamame106" "." "./includes" ${EXPATPATH})
 
 # force specific implementation of drivers like this:
-
+replace_list_item(MAME_CPU_SRC "cpu/tms32010/tms32010.c" "cpu/tms32010/tms32010.cpp")
 #replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaic16.c" "vidhrdw/segaic16_krb.c")
 #replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaorun.c" "vidhrdw/segaorun_krb.c")
 #replace_list_item(MAME_CORE_SRC "usrintrf.c" "usrintrf_krb.c")

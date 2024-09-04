@@ -60,7 +60,7 @@ TripleBuffer::TripleBuffer()
 
 IntuitionDrawable::IntuitionDrawable(int flags)
 : _width(0),_height(0),_useScale(0)
-, _flags(flags), _heightBufferSwitch(0)
+, _flags(flags), _heightBufferSwitch(0),_heightBufferSwitchApplied(0)
 {
 //  _trp._checkw=0;
 //  _trp._rp.BitMap = NULL;
@@ -144,8 +144,7 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
         }
 
     }
-    // magic for height double buffer is used
-    if(_heightBufferSwitch) ceny += _height;
+    if(_heightBufferSwitch) ceny+= _heightBufferSwitchApplied;
 
     // could happen if screen more little than source.
     if(cenx<0) cenx=0;
@@ -255,8 +254,12 @@ bool Intuition_Screen::open()
 
 
     ULONG appliedHeight = _fullscreenHeight;
-    if(_flags & DISPFLAG_USEHEIGHTBUFFER) appliedHeight*=2;
-
+    if(_flags & DISPFLAG_USEHEIGHTBUFFER)
+    {
+        _heightBufferSwitch = 1;
+        _heightBufferSwitchApplied = _fullscreenHeight;
+        appliedHeight*=2;
+    }
  	_pScreen = OpenScreenTags( NULL,
 			SA_DisplayID,_ScreenModeId,
                         SA_Title, (ULONG)"MAME", // used as ID by promotion tools and else ?
