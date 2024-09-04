@@ -23,21 +23,38 @@ class TGameDriver {
      string _company;
      string _fullname;
      string _flags;
+
     // these ones are parsed from MDRV_ macros and should be quite exact.
     map<string,int>  _sound_defs;
     map<string,int>  _cpu_defs;
+    int _useful = 0;
+    TGameDriver *_parentptr = nullptr;
 };
+
+vector<string>::iterator findInV(vector<string> &v,string n)
+{
+    vector<string>::iterator it = v.begin();
+    while(it != v.end())
+    {
+        if(*it == n) return it;
+        it++;
+    }
+    return v.end();
+}
 
 // actully more "per constructor" list of many machines.
 class TMachine {
     public:
     string          _name;
     vector<string>  _sources;
+    map<string,vector<string>> _sourceWithDrivers; // int is nb working games.
+
     map<string,TGameDriver>  _gamedrivers;
     map<string,TGameDriver>  _machinedrivers; // some machines are not gamedrivers.
     // these ones are by
     map<string,int>  _sound_defs;
     map<string,int>  _cpu_defs;
+    int _useful = 1;
 };
 
 class TChip {
@@ -174,8 +191,11 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
     const vector<string> &sounds = vars["SOUNDS"];
     const vector<string> &cpus = vars["CPUS"];
 
+   // machine._sourceWithDrivers.clear();
+
     for(const string &s : machine._sources)
     {
+
         // these are heavy non working beta codes in v0.106, do not implement.
         if(s == "drivers/model2.c" ||
             s =="drivers/model3.c")
@@ -240,6 +260,16 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
                      _soundchipstats[addsound]++;
                      _soundchip_use[addsound].push_back(currentMachineDefInStream);
                 }
+                addsound = getMacroSecondParam(line,"MDRV_SOUND_ADD_TAG(");
+                if(!addsound.empty()) {
+                    toUpper(addsound);
+                    // note: may be not a game:
+                  machine._machinedrivers[currentMachineDefInStream]._sound_defs[addsound] = 1;
+                     // but a dependency for sure:
+                     machine._sound_defs[addsound] = 1;
+                     _soundchipstats[addsound]++;
+                     _soundchip_use[addsound].push_back(currentMachineDefInStream);
+                }
             }
 
             // ----------------- old parsing always OK
@@ -267,6 +297,8 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
                         game._company = trimquotes(v[7]);
                         game._fullname = trimquotes(v[8]);
                         game._flags = trimquotes(v[9]);
+
+                        machine._sourceWithDrivers[s].push_back(name);
                     }
                 }
             } else
@@ -290,6 +322,8 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
                         game._company = trimquotes(v[8]);
                         game._fullname = trimquotes(v[9]);
                         game._flags = trimquotes(v[10]);
+
+                        machine._sourceWithDrivers[s].push_back(name);
                     }
                 }
             } // if GAMEB
@@ -352,6 +386,7 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
             } // end if sound include
 
         } // end while line
+        // - - -
     } // end loop per each c source
     return EXIT_SUCCESS;
 }
@@ -491,7 +526,59 @@ int patchMiniMachines(
 
     } // end mini dteast
 
+    {
+        // just for pacmania
+        TMachine  &src=machinetargets["namcos"];
+        string mname=string("mininamcos1");
+        TMachine  &m=machinetargets[mname];
+        m._name = mname;
+        m._sources = {"drivers/namcos1.c","machine/namcos1.c","vidhrdw/namcos1.c"
+            };
 
+        m._gamedrivers["shadowld"] = src._gamedrivers["shadowld"];
+        m._gamedrivers["youkaidk"] = src._gamedrivers["youkaidk"];
+        m._gamedrivers["yokaidko"] = src._gamedrivers["yokaidko"];
+        m._gamedrivers["dspirit"] = src._gamedrivers["dspirit"];
+        m._gamedrivers["dspirito"] = src._gamedrivers["dspirito"];
+        m._gamedrivers["blazer"] = src._gamedrivers["blazer"];
+        m._gamedrivers["quester"] = src._gamedrivers["quester"];
+        m._gamedrivers["pacmania"] = src._gamedrivers["pacmania"];
+        m._gamedrivers["pacmanij"] = src._gamedrivers["pacmanij"];
+
+        m._gamedrivers["galaga88"] = src._gamedrivers["galaga88"];
+        m._gamedrivers["galag88j"] = src._gamedrivers["galag88j"];
+        m._gamedrivers["ws"] = src._gamedrivers["ws"];
+        m._gamedrivers["berabohm"] = src._gamedrivers["berabohm"];
+        m._gamedrivers["beraboho"] = src._gamedrivers["beraboho"];
+        m._gamedrivers["mmaze"] = src._gamedrivers["mmaze"];
+        m._gamedrivers["bakutotu"] = src._gamedrivers["bakutotu"];
+
+        m._gamedrivers["wldcourt"] = src._gamedrivers["wldcourt"];
+        m._gamedrivers["splatter"] = src._gamedrivers["splatter"];
+        m._gamedrivers["splattej"] = src._gamedrivers["splattej"];
+        m._gamedrivers["faceoff"] = src._gamedrivers["faceoff"];
+
+        m._gamedrivers["rompers"] = src._gamedrivers["rompers"];
+        m._gamedrivers["romperso"] = src._gamedrivers["romperso"];
+        m._gamedrivers["blastoff"] = src._gamedrivers["blastoff"];
+        m._gamedrivers["ws89"] = src._gamedrivers["ws89"];
+        m._gamedrivers["dangseed"] = src._gamedrivers["dangseed"];
+        m._gamedrivers["ws90"] = src._gamedrivers["ws90"];
+        m._gamedrivers["pistoldm"] = src._gamedrivers["pistoldm"];
+        m._gamedrivers["boxyboy"] = src._gamedrivers["boxyboy"];
+        m._gamedrivers["soukobdx"] = src._gamedrivers["soukobdx"];
+        m._gamedrivers["puzlclub"] = src._gamedrivers["puzlclub"];
+        m._gamedrivers["tankfrce"] = src._gamedrivers["tankfrce"];
+        m._gamedrivers["tankfrcj"] = src._gamedrivers["tankfrcj"];
+
+        m._cpu_defs["M6809"]=1;
+        m._cpu_defs["HD63701"]=1;
+
+        m._sound_defs["YM2151"]=1;
+        m._sound_defs["NAMCO_CUS30"]=1;
+        m._sound_defs["DAC"]=1;
+
+    }
     {
         TMachine  &src=machinetargets["konami"];
         string mname=string("minikonami");
@@ -746,12 +833,15 @@ int createCmake(map<string,TMachine> machinetargets,
         string upname = p.first;
         toUpper(upname);
         bool onShouldBeDefault=false;
+
         // this is actually a common dependance lib that most machine use.
         if(upname == "SHARED") onShouldBeDefault=true;
         // this is optional
         if(upname == "SEGA" ) onShouldBeDefault = true;
-       //reactivate when corrected : if(upname == "NEOGEO" ) onShouldBeDefault = false;
-        if(upname == "CAPCOM" ) onShouldBeDefault = true;
+         // pacmania,...
+         if(upname == "MININAMCOS1") onShouldBeDefault=true;
+
+         if(upname == "CAPCOM" ) onShouldBeDefault = true;
         if(upname == "TAITO" ) onShouldBeDefault = true;
  //       if(upname == "NAMCO" ) onShouldBeDefault = true; -> too horizontaly dependent.
  //       if(upname == "PACMAN" ) onShouldBeDefault = true;
@@ -762,6 +852,8 @@ int createCmake(map<string,TMachine> machinetargets,
 //        if(upname == "DATAEAST" ) onShouldBeDefault = true; -> too big/shitty
         if(upname == "MINIDTEA" ) onShouldBeDefault = true;
 
+        // because Q*BERT !
+        if(upname == "GOTTLIEB" ) onShouldBeDefault = true;
         // just for buggy boy :) ->DOESNT WORK On 0.106 :(
 //        if(upname == "TATSUMI" ) onShouldBeDefault = true; // tested ok
 
@@ -1400,6 +1492,251 @@ void completeDefinitionsByHand(
         machinetargets[pkgname]._gamedrivers["tmnt2"] = src._gamedrivers["tmnt2"];
     }*/
 }
+
+int recurseEverWork(std::string drv,
+    map<string,TGameDriver *> &driverMap,
+    map<string,vector<string>> &reverseDependencies)
+{
+    if(reverseDependencies[drv].size()==0) return 0;
+    for(const string &name : reverseDependencies[drv])
+    {
+        TGameDriver *tgd =driverMap[name];
+        if(!tgd) continue;
+        int works = (tgd->_flags.find("GAME_NOT_WORKING")==string::npos);
+        if(works) return 1;
+        works = recurseEverWork(tgd->_name,driverMap,reverseDependencies);
+        if(works) return 1;
+    }
+    return 0;
+
+}
+void removeUselessDrivers(
+            map<string,TMachine> &machinetargets,
+            map<string,TChip> &cpusources
+            )
+{
+    // - --  init drivermap
+    map<string,TGameDriver *> driverMap;
+    map<string,vector<string>> reverseDependencies;
+
+
+    for(pair<const string,TMachine> &p : machinetargets)
+    {
+        TMachine &machine = p.second;
+        int nbGameDrivers=0;
+        int nbWorkingDrivers=0;
+
+        for(pair<const string,TGameDriver> &p : machine._gamedrivers)
+        {
+            TGameDriver &drv = p.second;
+            drv._useful = 0;
+            driverMap[p.first] = &drv;
+            if(drv._parent.length()>0)
+            {
+                reverseDependencies[drv._parent].push_back(p.first);
+            }
+        }
+        for(pair<const string,TGameDriver> &p : machine._machinedrivers)
+        {
+            TGameDriver &drv = p.second;
+            drv._useful = 0;
+            driverMap[p.first] = &drv;
+            if(drv._parent.length()>0)
+            {
+                reverseDependencies[drv._parent].push_back(p.first);
+            }
+        }
+    }
+    // - - -tells who is usefull at all.
+    for(pair<const string,TMachine> &p : machinetargets)
+    {
+        TMachine &machine = p.second;
+        machine._useful = 0;
+        if(p.first == "shared")
+        {
+            machine._useful = 1;
+            continue;
+        }
+
+        for(pair<const string,TGameDriver> &p : machine._gamedrivers)
+        {
+            TGameDriver &drv = p.second;
+            int works = (drv._flags.find("GAME_NOT_WORKING")==string::npos);
+            drv._useful = works;
+            // search if a dependence ever works...
+            if(! drv._useful)
+            {
+                drv._useful = recurseEverWork(p.first,driverMap,reverseDependencies);
+
+            }
+            if(drv._useful) machine._useful = 1;
+        }
+        for(pair<const string,TGameDriver> &p : machine._machinedrivers)
+        {
+            TGameDriver &drv = p.second;
+            int works = (drv._flags.find("GAME_NOT_WORKING")==string::npos);
+            drv._useful = works;
+            // search if a dependence ever works...
+            if(! drv._useful)
+            {
+                drv._useful = recurseEverWork(p.first,driverMap,reverseDependencies);
+            }
+            if(drv._useful) machine._useful = 1;
+        }                              
+    }
+    // - - - machine level
+
+
+ //   map<string,TGameDriver *> driverMap;
+//    for(pair<const string,TGameDriver *> &p :driverMap)
+//    {
+//        TGameDriver *pdrv = p.second;
+//        if(pdrv->_useful==0)
+//        {
+//            // useless:
+//            cout << "**** useless: " << pdrv->_name << " ";
+//           cout << endl;
+
+//            pdrv->_sound_defs.clear();
+//            pdrv->_cpu_defs.clear();
+
+
+//        }
+//    }
+
+// remove source
+ for (map<const string,TMachine>::iterator mit = machinetargets.begin(); mit != machinetargets.end();)
+    {
+        TMachine &machine = mit->second;
+        for(pair<const string,vector<string>> &p : machine._sourceWithDrivers)
+        {
+            int usefull=0;
+            for(const string &g : p.second)
+            {
+                if( machine._gamedrivers.find(g) !=  machine._gamedrivers.end() )
+                {
+                    if(machine._gamedrivers[g]._useful) usefull=1;
+                }
+                if( machine._machinedrivers.find(g) !=  machine._machinedrivers.end() )
+                {
+                    if(machine._machinedrivers[g]._useful) usefull=1;
+
+                }
+                if(usefull) break;
+            }
+            if(usefull==0)
+            {
+                vector<string> vpath = splitt(p.first,"/");
+                if(vpath.size()!=2) continue;
+                vector<string>::iterator itf = findInV(machine._sources,string("drivers/")+vpath[1]);
+                if(itf != machine._sources.end())
+                {
+                    cout << "remove source: "<< string("drivers/")+vpath[1] << endl;
+                    machine._sources.erase(itf);
+                 }
+                 itf = findInV(machine._sources,string("machine/")+vpath[1]);
+                if(itf != machine._sources.end())
+                {
+                cout << "remove source: "<< string("machine/")+vpath[1] << endl;
+                    machine._sources.erase(itf);
+                }
+                 itf = findInV(machine._sources,string("vidhrdw/")+vpath[1]);
+                if(itf != machine._sources.end())
+                {
+                cout << "remove source: "<< string("vidhrdw/")+vpath[1] << endl;
+                    machine._sources.erase(itf);
+                }
+            }
+
+        }
+        mit++;
+    }
+  // for(pair<const string,TMachine> &p : machinetargets)
+ for (map<const string,TMachine>::iterator mit = machinetargets.begin(); mit != machinetargets.end();)
+    {
+        TMachine &machine = mit->second;
+        if(machine._useful ==0)
+        {
+            cout << " *** useless machine: "<< mit->first << " remove: ";
+            for(const string &s : machine._sources)
+            {
+                cout << s << " ";
+            }
+            cout << endl;
+           // machinesToremove.push_back(mit->first);
+           machinetargets.erase(mit++);
+        } else
+        {
+            // games to remove
+            for (auto it = machine._gamedrivers.begin(); it != machine._gamedrivers.end();)
+            {
+                if(it->second._name == "tx1")
+                {
+                    cout << "tx1" << endl;
+                }
+              if (it->second._useful==0)
+              {
+                cout << "remove NW game: "<<it->first << endl;
+                machine._gamedrivers.erase(it++);    // or "it = m.erase(it)" since C++11
+              }
+              else
+              {
+                ++it;
+              }
+            }
+            for (auto it = machine._machinedrivers.begin(); it != machine._machinedrivers.end();)
+            {
+              if (it->second._useful==0)
+              {
+                cout << "remove NW machine: "<<it->first << endl;
+                machine._machinedrivers.erase(it++);    // or "it = m.erase(it)" since C++11
+              }
+              else
+              {
+                ++it;
+              }
+            }
+            mit++;
+        }
+
+//        // erase source
+//        for(pair<const string,int> &p: machine._sourceWithDrivers)
+//        {
+//            if(p.second >0) continue;
+//            vector<string> vpath = splitt(p.first,"/");
+//            if(vpath.size()==2 )
+//            {
+//               // machine._sources.remove(p.first);
+//                vector<string>::iterator itf = findInV(machine._sources,string("drivers/")+vpath[1]);
+//                if(itf != machine._sources.end())
+//                {
+//                    cout << "remove source: "<< string("drivers/")+vpath[1] << endl;
+//                    machine._sources.erase(itf);
+//                 }
+//                 itf = findInV(machine._sources,string("machine/")+vpath[1]);
+//                if(itf != machine._sources.end())
+//                {
+//                cout << "remove source: "<< string("machine/")+vpath[1] << endl;
+//                    machine._sources.erase(itf);
+//                }
+//                 itf = findInV(machine._sources,string("vidhrdw/")+vpath[1]);
+//                if(itf != machine._sources.end())
+//                {
+//                cout << "remove source: "<< string("vidhrdw/")+vpath[1] << endl;
+//                    machine._sources.erase(itf);
+//                }
+
+//            }
+//        }
+
+
+    } // end loop per machine
+
+
+
+
+
+}
 int main(int argc, char **argv)
 {
 
@@ -1422,6 +1759,9 @@ int main(int argc, char **argv)
 //    TMachine &tm = machinetargets["sega"];
 
     completeDefinitionsByHand(machinetargets,cpusources);
+
+    removeUselessDrivers(machinetargets,cpusources);
+
 
     createCmake(machinetargets,soundsources,cpusources);
 

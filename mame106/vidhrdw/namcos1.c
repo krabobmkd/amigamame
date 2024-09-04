@@ -288,8 +288,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = spriteram[0x07f7];
 
-	
-	{ 
+
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
 		&mygfx, 	// gfx
@@ -300,13 +299,14 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		0, 	// sx
 		0, 	// sy
 		cliprect, 	// clip
-		(color != 0x7f) ? TRANSPARENCY_PEN : TRANSPARENCY_PEN_TABLE, 	// transparency
+		0,//handmod (color != 0x7f) ? TRANSPARENCY_PEN : TRANSPARENCY_PEN_TABLE, 	// transparency
 		0xf, 	// transparent_color
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		pri_mask 	// priority_mask
+		0,//pri_mask 	// priority_mask
 	  };
+
 	while (source >= finish)
 	{
 		static const int sprite_size[4] = { 16, 8, 32, 4 };
@@ -324,7 +324,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		int sprite = source[11];
 		int sprite_bank = attr1 & 7;
 		int priority = (source[14] & 0xe0) >> 5;
-		int pri_mask = (0xff << (priority + 1)) & 0xff;
+		int pri_mask = ((0xff << (priority + 1)) & 0xff) | (1<<31);
 
 		sprite += sprite_bank * 256;
 		color = color >> 1;
@@ -346,7 +346,6 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		mygfx.width = sizex;
 		mygfx.height = sizey;
 		mygfx.gfxdata = gfx->gfxdata + tx + ty * gfx->line_modulo;
-
 		
 		dgp0.code = sprite;
 		dgp0.color = color;
@@ -354,12 +353,12 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		dgp0.flipy = flipy;
 		dgp0.sx = sx & 0x1ff;
 		dgp0.sy = ((sy + 16) & 0xff) - 16;
+		dgp0.transparency = (color != 0x7f) ? TRANSPARENCY_PEN : TRANSPARENCY_PEN_TABLE;
+		dgp0.priority_mask = pri_mask;
 		drawgfx(&dgp0);
 
 		source -= 0x10;
 	}
-	} // end of patch paragraph
-
 }
 
 

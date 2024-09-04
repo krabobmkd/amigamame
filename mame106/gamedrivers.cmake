@@ -21,7 +21,7 @@ option(OPT_FUUKI "" OFF)
 option(OPT_GAELCO "" OFF)
 option(OPT_GAMEPLAN "" OFF)
 option(OPT_GAMETRON "" OFF)
-option(OPT_GOTTLIEB "" OFF)
+option(OPT_GOTTLIEB "" ON)
 option(OPT_GREYHND "" OFF)
 option(OPT_IGS "" OFF)
 option(OPT_IREM "" ON)
@@ -39,8 +39,10 @@ option(OPT_MIDWAY "" OFF)
 option(OPT_MIDWAYTUNIT "" ON)
 option(OPT_MINIDTEA "" ON)
 option(OPT_MINIKONAMI "" ON)
+option(OPT_MININAMCOS1 "" ON)
 option(OPT_MISC "" OFF)
 option(OPT_NAMCO "" OFF)
+option(OPT_NAMCOS "" OFF)
 option(OPT_NASCO "" OFF)
 option(OPT_NEOGEO "" ON)
 option(OPT_NICHIBUT "" OFF)
@@ -171,29 +173,29 @@ if(OPT_ATARI)
 		drivers/gauntlet.c vidhrdw/gauntlet.c drivers/harddriv.c machine/harddriv.c 
 		sndhrdw/harddriv.c vidhrdw/harddriv.c drivers/irobot.c machine/irobot.c 
 		vidhrdw/irobot.c drivers/jedi.c vidhrdw/jedi.c drivers/klax.c 
-		vidhrdw/klax.c drivers/liberatr.c vidhrdw/liberatr.c drivers/mediagx.c 
-		drivers/mgolf.c drivers/mhavoc.c machine/mhavoc.c drivers/missile.c 
-		vidhrdw/missile.c drivers/nitedrvr.c machine/nitedrvr.c sndhrdw/nitedrvr.c 
-		vidhrdw/nitedrvr.c drivers/offtwall.c vidhrdw/offtwall.c drivers/orbit.c 
-		sndhrdw/orbit.c vidhrdw/orbit.c drivers/poolshrk.c sndhrdw/poolshrk.c 
-		vidhrdw/poolshrk.c drivers/quantum.c drivers/rampart.c vidhrdw/rampart.c 
-		drivers/relief.c vidhrdw/relief.c drivers/runaway.c vidhrdw/runaway.c 
-		drivers/sbrkout.c machine/sbrkout.c vidhrdw/sbrkout.c drivers/shuuz.c 
-		vidhrdw/shuuz.c drivers/skullxbo.c vidhrdw/skullxbo.c drivers/skydiver.c 
-		sndhrdw/skydiver.c vidhrdw/skydiver.c drivers/skyraid.c vidhrdw/skyraid.c 
-		drivers/sprint2.c sndhrdw/sprint2.c vidhrdw/sprint2.c drivers/sprint4.c 
-		sndhrdw/sprint4.c vidhrdw/sprint4.c drivers/sprint8.c vidhrdw/sprint8.c 
-		drivers/starshp1.c vidhrdw/starshp1.c drivers/starwars.c machine/starwars.c 
-		sndhrdw/starwars.c drivers/subs.c machine/subs.c sndhrdw/subs.c 
-		vidhrdw/subs.c drivers/tank8.c sndhrdw/tank8.c vidhrdw/tank8.c 
-		drivers/tempest.c drivers/thunderj.c vidhrdw/thunderj.c drivers/toobin.c 
-		vidhrdw/toobin.c drivers/tourtabl.c vidhrdw/tia.c drivers/triplhnt.c 
-		sndhrdw/triplhnt.c vidhrdw/triplhnt.c drivers/tunhunt.c vidhrdw/tunhunt.c 
-		drivers/videopin.c sndhrdw/videopin.c vidhrdw/videopin.c drivers/vindictr.c 
-		vidhrdw/vindictr.c drivers/wolfpack.c vidhrdw/wolfpack.c drivers/xybots.c 
-		vidhrdw/xybots.c machine/asic65.c machine/atari_vg.c machine/atarigen.c 
-		machine/mathbox.c machine/slapstic.c sndhrdw/atarijsa.c sndhrdw/cage.c 
-		sndhrdw/redbaron.c vidhrdw/atarimo.c vidhrdw/atarirle.c 	)
+		vidhrdw/klax.c drivers/liberatr.c vidhrdw/liberatr.c drivers/mgolf.c 
+		drivers/mhavoc.c machine/mhavoc.c drivers/missile.c vidhrdw/missile.c 
+		drivers/nitedrvr.c machine/nitedrvr.c sndhrdw/nitedrvr.c vidhrdw/nitedrvr.c 
+		drivers/offtwall.c vidhrdw/offtwall.c drivers/orbit.c sndhrdw/orbit.c 
+		vidhrdw/orbit.c drivers/poolshrk.c sndhrdw/poolshrk.c vidhrdw/poolshrk.c 
+		drivers/quantum.c drivers/rampart.c vidhrdw/rampart.c drivers/relief.c 
+		vidhrdw/relief.c drivers/runaway.c vidhrdw/runaway.c drivers/sbrkout.c 
+		machine/sbrkout.c vidhrdw/sbrkout.c drivers/shuuz.c vidhrdw/shuuz.c 
+		drivers/skullxbo.c vidhrdw/skullxbo.c drivers/skydiver.c sndhrdw/skydiver.c 
+		vidhrdw/skydiver.c drivers/skyraid.c vidhrdw/skyraid.c drivers/sprint2.c 
+		sndhrdw/sprint2.c vidhrdw/sprint2.c drivers/sprint4.c sndhrdw/sprint4.c 
+		vidhrdw/sprint4.c drivers/sprint8.c vidhrdw/sprint8.c drivers/starshp1.c 
+		vidhrdw/starshp1.c drivers/starwars.c machine/starwars.c sndhrdw/starwars.c 
+		drivers/subs.c machine/subs.c sndhrdw/subs.c vidhrdw/subs.c 
+		drivers/tank8.c sndhrdw/tank8.c vidhrdw/tank8.c drivers/tempest.c 
+		drivers/thunderj.c vidhrdw/thunderj.c drivers/toobin.c vidhrdw/toobin.c 
+		drivers/tourtabl.c vidhrdw/tia.c drivers/triplhnt.c sndhrdw/triplhnt.c 
+		vidhrdw/triplhnt.c drivers/tunhunt.c vidhrdw/tunhunt.c drivers/videopin.c 
+		sndhrdw/videopin.c vidhrdw/videopin.c drivers/vindictr.c vidhrdw/vindictr.c 
+		drivers/wolfpack.c vidhrdw/wolfpack.c drivers/xybots.c vidhrdw/xybots.c 
+		machine/asic65.c machine/atari_vg.c machine/atarigen.c machine/mathbox.c 
+		machine/slapstic.c sndhrdw/atarijsa.c sndhrdw/cage.c sndhrdw/redbaron.c 
+		vidhrdw/atarimo.c vidhrdw/atarirle.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_CUSTOM ON)
 	set(MSND_DAC ON)
@@ -277,17 +279,16 @@ if(OPT_CAPCOM)
 		drivers/1942.c vidhrdw/1942.c drivers/1943.c vidhrdw/1943.c 
 		drivers/bionicc.c vidhrdw/bionicc.c drivers/blktiger.c vidhrdw/blktiger.c 
 		drivers/cbasebal.c vidhrdw/cbasebal.c drivers/commando.c vidhrdw/commando.c 
-		drivers/cps1.c vidhrdw/cps1.c drivers/cps2.c drivers/cps3.c 
-		drivers/egghunt.c drivers/fcrash.c drivers/gng.c vidhrdw/gng.c 
-		drivers/gunsmoke.c vidhrdw/gunsmoke.c drivers/exedexes.c vidhrdw/exedexes.c 
-		drivers/higemaru.c vidhrdw/higemaru.c drivers/lastduel.c vidhrdw/lastduel.c 
-		drivers/lwings.c vidhrdw/lwings.c drivers/mitchell.c vidhrdw/mitchell.c 
-		drivers/sf.c vidhrdw/sf.c drivers/sidearms.c vidhrdw/sidearms.c 
-		drivers/sonson.c vidhrdw/sonson.c drivers/srumbler.c vidhrdw/srumbler.c 
-		drivers/vulgus.c vidhrdw/vulgus.c drivers/tigeroad.c vidhrdw/tigeroad.c 
-		drivers/zn.c machine/znsec.c machine/at28c16.c machine/mb3773.c 
-		machine/kabuki.c machine/psx.c vidhrdw/psx.c sndhrdw/taitosnd.c 
-	)
+		drivers/cps1.c vidhrdw/cps1.c drivers/cps2.c drivers/egghunt.c 
+		drivers/fcrash.c drivers/gng.c vidhrdw/gng.c drivers/gunsmoke.c 
+		vidhrdw/gunsmoke.c drivers/exedexes.c vidhrdw/exedexes.c drivers/higemaru.c 
+		vidhrdw/higemaru.c drivers/lastduel.c vidhrdw/lastduel.c drivers/lwings.c 
+		vidhrdw/lwings.c drivers/mitchell.c vidhrdw/mitchell.c drivers/sf.c 
+		vidhrdw/sf.c drivers/sidearms.c vidhrdw/sidearms.c drivers/sonson.c 
+		vidhrdw/sonson.c drivers/srumbler.c vidhrdw/srumbler.c drivers/vulgus.c 
+		vidhrdw/vulgus.c drivers/tigeroad.c vidhrdw/tigeroad.c drivers/zn.c 
+		machine/znsec.c machine/at28c16.c machine/mb3773.c machine/kabuki.c 
+		machine/psx.c vidhrdw/psx.c sndhrdw/taitosnd.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_MSM5205 ON)
 	set(MSND_OKIM6295 ON)
@@ -540,6 +541,7 @@ if(OPT_EXIDY)
 		sndhrdw/targ.c 	)
 	set(MSND_CUSTOM ON)
 	set(MSND_DAC ON)
+	set(MSND_DISCRETE ON)
 	set(MSND_HC55516 ON)
 	set(MSND_POKEY ON)
 	set(MSND_SAMPLES ON)
@@ -551,8 +553,8 @@ if(OPT_EXIDY)
 	set(MCPU_M68705 ON)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
-		HAS_CUSTOM=1 HAS_DAC=1 HAS_HC55516=1 HAS_POKEY=1 
-		HAS_SAMPLES=1 HAS_TMS5220=1 	)
+		HAS_CUSTOM=1 HAS_DAC=1 HAS_DISCRETE=1 HAS_HC55516=1 
+		HAS_POKEY=1 HAS_SAMPLES=1 HAS_TMS5220=1 	)
 	list(APPEND CPU_DEFS
 		HAS_M6502=1 HAS_M68000=1 HAS_M6805=1 HAS_M6809=1 
 		HAS_M68705=1 HAS_Z80=1 	)
@@ -846,32 +848,34 @@ if(OPT_KONAMI)
 		vidhrdw/hyperspt.c drivers/ironhors.c vidhrdw/ironhors.c drivers/jackal.c 
 		machine/jackal.c vidhrdw/jackal.c drivers/jailbrek.c vidhrdw/jailbrek.c 
 		drivers/junofrst.c drivers/konamigq.c drivers/konamigv.c drivers/konamigx.c 
-		machine/konamigx.c vidhrdw/konamigx.c drivers/konamim2.c drivers/labyrunr.c 
-		vidhrdw/labyrunr.c drivers/lethal.c vidhrdw/lethal.c drivers/mainevt.c 
-		vidhrdw/mainevt.c drivers/megazone.c vidhrdw/megazone.c drivers/mikie.c 
-		vidhrdw/mikie.c drivers/mogura.c drivers/moo.c vidhrdw/moo.c 
-		drivers/mystwarr.c vidhrdw/mystwarr.c drivers/nemesis.c vidhrdw/nemesis.c 
-		drivers/nwk-tr.c drivers/overdriv.c vidhrdw/overdriv.c drivers/pandoras.c 
-		vidhrdw/pandoras.c drivers/parodius.c vidhrdw/parodius.c drivers/pingpong.c 
-		vidhrdw/pingpong.c drivers/plygonet.c vidhrdw/plygonet.c drivers/pooyan.c 
-		vidhrdw/pooyan.c drivers/qdrmfgp.c vidhrdw/qdrmfgp.c drivers/rockrage.c 
-		vidhrdw/rockrage.c drivers/rocnrope.c vidhrdw/rocnrope.c drivers/rollerg.c 
-		vidhrdw/rollerg.c drivers/rungun.c vidhrdw/rungun.c drivers/sbasketb.c 
-		vidhrdw/sbasketb.c drivers/scobra.c drivers/scotrsht.c vidhrdw/scotrsht.c 
-		drivers/scramble.c machine/scramble.c sndhrdw/scramble.c drivers/shaolins.c 
-		vidhrdw/shaolins.c drivers/simpsons.c machine/simpsons.c vidhrdw/simpsons.c 
-		drivers/spy.c vidhrdw/spy.c drivers/surpratk.c vidhrdw/surpratk.c 
-		drivers/thunderx.c vidhrdw/thunderx.c drivers/timeplt.c sndhrdw/timeplt.c 
-		vidhrdw/timeplt.c drivers/tmnt.c vidhrdw/tmnt.c drivers/tp84.c 
-		vidhrdw/tp84.c drivers/trackfld.c machine/konami.c sndhrdw/trackfld.c 
-		vidhrdw/trackfld.c drivers/tutankhm.c vidhrdw/tutankhm.c drivers/twin16.c 
-		vidhrdw/twin16.c drivers/ultraman.c vidhrdw/ultraman.c drivers/vendetta.c 
-		vidhrdw/vendetta.c drivers/wecleman.c vidhrdw/wecleman.c drivers/xexex.c 
-		vidhrdw/xexex.c drivers/xmen.c vidhrdw/xmen.c drivers/yiear.c 
-		vidhrdw/yiear.c drivers/zr107.c vidhrdw/konamiic.c 	)
+		machine/konamigx.c vidhrdw/konamigx.c drivers/labyrunr.c vidhrdw/labyrunr.c 
+		drivers/lethal.c vidhrdw/lethal.c drivers/mainevt.c vidhrdw/mainevt.c 
+		drivers/megazone.c vidhrdw/megazone.c drivers/mikie.c vidhrdw/mikie.c 
+		drivers/mogura.c drivers/moo.c vidhrdw/moo.c drivers/mystwarr.c 
+		vidhrdw/mystwarr.c drivers/nemesis.c vidhrdw/nemesis.c drivers/overdriv.c 
+		vidhrdw/overdriv.c drivers/pandoras.c vidhrdw/pandoras.c drivers/parodius.c 
+		vidhrdw/parodius.c drivers/pingpong.c vidhrdw/pingpong.c drivers/plygonet.c 
+		vidhrdw/plygonet.c drivers/pooyan.c vidhrdw/pooyan.c drivers/qdrmfgp.c 
+		vidhrdw/qdrmfgp.c drivers/rockrage.c vidhrdw/rockrage.c drivers/rocnrope.c 
+		vidhrdw/rocnrope.c drivers/rollerg.c vidhrdw/rollerg.c drivers/rungun.c 
+		vidhrdw/rungun.c drivers/sbasketb.c vidhrdw/sbasketb.c drivers/scobra.c 
+		drivers/scotrsht.c vidhrdw/scotrsht.c drivers/scramble.c machine/scramble.c 
+		sndhrdw/scramble.c drivers/shaolins.c vidhrdw/shaolins.c drivers/simpsons.c 
+		machine/simpsons.c vidhrdw/simpsons.c drivers/spy.c vidhrdw/spy.c 
+		drivers/surpratk.c vidhrdw/surpratk.c drivers/thunderx.c vidhrdw/thunderx.c 
+		drivers/timeplt.c sndhrdw/timeplt.c vidhrdw/timeplt.c drivers/tmnt.c 
+		vidhrdw/tmnt.c drivers/tp84.c vidhrdw/tp84.c drivers/trackfld.c 
+		machine/konami.c sndhrdw/trackfld.c vidhrdw/trackfld.c drivers/tutankhm.c 
+		vidhrdw/tutankhm.c drivers/twin16.c vidhrdw/twin16.c drivers/ultraman.c 
+		vidhrdw/ultraman.c drivers/vendetta.c vidhrdw/vendetta.c drivers/wecleman.c 
+		vidhrdw/wecleman.c drivers/xexex.c vidhrdw/xexex.c drivers/xmen.c 
+		vidhrdw/xmen.c drivers/yiear.c vidhrdw/yiear.c vidhrdw/konamiic.c 
+	)
 	set(MSND_AY8910 ON)
 	set(MSND_CDDA ON)
 	set(MSND_DAC ON)
+	set(MSND_FILTER_RC ON)
+	set(MSND_FILTER_VOLUME ON)
 	set(MSND_K005289 ON)
 	set(MSND_K007232 ON)
 	set(MSND_K051649 ON)
@@ -904,12 +908,12 @@ if(OPT_KONAMI)
 	set(MCPU_S2650 ON)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
-		HAS_AY8910=1 HAS_CDDA=1 HAS_DAC=1 HAS_K005289=1 
-		HAS_K007232=1 HAS_K051649=1 HAS_K053260=1 HAS_K054539=1 
-		HAS_MSM5205=1 HAS_OKIM6295=1 HAS_PSXSPU=1 HAS_RF5C400=1 
-		HAS_SAMPLES=1 HAS_SN76496=1 HAS_TMS5110=1 HAS_UPD7759=1 
-		HAS_VLM5030=1 HAS_YM2151=1 HAS_YM2203=1 HAS_YM3812=1 
-		HAS_YMZ280B=1 	)
+		HAS_AY8910=1 HAS_CDDA=1 HAS_DAC=1 HAS_FILTER_RC=1 
+		HAS_FILTER_VOLUME=1 HAS_K005289=1 HAS_K007232=1 HAS_K051649=1 
+		HAS_K053260=1 HAS_K054539=1 HAS_MSM5205=1 HAS_OKIM6295=1 
+		HAS_PSXSPU=1 HAS_RF5C400=1 HAS_SAMPLES=1 HAS_SN76496=1 
+		HAS_TMS5110=1 HAS_UPD7759=1 HAS_VLM5030=1 HAS_YM2151=1 
+		HAS_YM2203=1 HAS_YM3812=1 HAS_YMZ280B=1 	)
 	list(APPEND CPU_DEFS
 		HAS_ADSP21062=1 HAS_DSP56156=1 HAS_HD6309=1 HAS_I8039=1 
 		HAS_KONAMI=1 HAS_M68000=1 HAS_M6809=1 HAS_M68EC020=1 
@@ -1004,10 +1008,9 @@ if(OPT_MIDWAY)
 		vidhrdw/mcr68.c drivers/midtunit.c machine/midtunit.c vidhrdw/midtunit.c 
 		drivers/midvunit.c vidhrdw/midvunit.c drivers/midwunit.c machine/midwunit.c 
 		drivers/midxunit.c drivers/midyunit.c machine/midyunit.c vidhrdw/midyunit.c 
-		drivers/midzeus.c drivers/omegrace.c drivers/seattle.c drivers/vegas.c 
-		drivers/williams.c machine/williams.c sndhrdw/williams.c vidhrdw/williams.c 
-		machine/midwayic.c sndhrdw/dcs.c sndhrdw/gorf.c sndhrdw/wow.c 
-	)
+		drivers/omegrace.c drivers/seattle.c drivers/vegas.c drivers/williams.c 
+		machine/williams.c sndhrdw/williams.c vidhrdw/williams.c machine/midwayic.c 
+		sndhrdw/dcs.c sndhrdw/gorf.c sndhrdw/wow.c 	)
 	set(MSND_ASTROCADE ON)
 	set(MSND_AY8910 ON)
 	set(MSND_CEM3394 ON)
@@ -1108,6 +1111,20 @@ if(OPT_MINIKONAMI)
 	list(APPEND CPU_DEFS
 		HAS_KONAMI=1 HAS_M68000=1 HAS_Z80=1 	)
 endif()
+if(OPT_MININAMCOS1)
+	add_compile_definitions(LINK_MININAMCOS1=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/namcos1.c machine/namcos1.c vidhrdw/namcos1.c 	)
+	set(MSND_DAC ON)
+	set(MSND_NAMCO_CUS30 ON)
+	set(MSND_YM2151 ON)
+	set(MCPU_HD63701 ON)
+	set(MCPU_M6809 ON)
+	list(APPEND CPU_DEFS
+		HAS_DAC=1 HAS_NAMCO_CUS30=1 HAS_YM2151=1 	)
+	list(APPEND CPU_DEFS
+		HAS_HD63701=1 HAS_M6809=1 	)
+endif()
 if(OPT_MISC)
 	add_compile_definitions(LINK_MISC=1)
 	list(APPEND MAME_DRIVERS_SRC
@@ -1117,37 +1134,36 @@ if(OPT_MISC)
 		drivers/attckufo.c sndhrdw/attckufo.c vidhrdw/attckufo.c drivers/aztarac.c 
 		sndhrdw/aztarac.c vidhrdw/aztarac.c drivers/beaminv.c vidhrdw/beaminv.c 
 		drivers/bmcbowl.c drivers/cave.c vidhrdw/cave.c drivers/cherrym.c 
-		drivers/coinmstr.c drivers/coolpool.c drivers/crystal.c machine/ds1302.c 
-		vidhrdw/vrender0.c drivers/cybertnk.c drivers/dambustr.c drivers/dcheese.c 
-		vidhrdw/dcheese.c drivers/dgpix.c drivers/dorachan.c vidhrdw/dorachan.c 
-		drivers/dreamwld.c drivers/dribling.c vidhrdw/dribling.c drivers/dwarfd.c 
-		drivers/dynadice.c drivers/epos.c vidhrdw/epos.c drivers/ertictac.c 
-		drivers/esd16.c vidhrdw/esd16.c drivers/ettrivia.c drivers/flower.c 
-		sndhrdw/flower.c vidhrdw/flower.c drivers/fortecar.c drivers/freekick.c 
-		vidhrdw/freekick.c drivers/funworld.c drivers/go2000.c drivers/gotcha.c 
-		vidhrdw/gotcha.c drivers/gumbo.c vidhrdw/gumbo.c drivers/gunpey.c 
-		drivers/hexa.c vidhrdw/hexa.c drivers/homedata.c vidhrdw/homedata.c 
-		drivers/hotblock.c drivers/intrscti.c drivers/jackpool.c drivers/kyugo.c 
-		vidhrdw/kyugo.c drivers/ladyfrog.c vidhrdw/ladyfrog.c drivers/laserbas.c 
-		drivers/lastfght.c drivers/lethalj.c vidhrdw/lethalj.c drivers/ltcasino.c 
-		drivers/lucky8.c drivers/magic10.c drivers/malzak.c vidhrdw/malzak.c 
-		drivers/mcatadv.c vidhrdw/mcatadv.c drivers/micro3d.c vidhrdw/micro3d.c 
-		drivers/mirax.c drivers/mole.c vidhrdw/mole.c drivers/monzagp.c 
-		drivers/mosaic.c vidhrdw/mosaic.c drivers/mrjong.c vidhrdw/mrjong.c 
-		drivers/murogem.c drivers/news.c vidhrdw/news.c drivers/oneshot.c 
-		vidhrdw/oneshot.c drivers/onetwo.c drivers/othldrby.c vidhrdw/othldrby.c 
-		drivers/pass.c vidhrdw/pass.c drivers/pipeline.c drivers/pkscram.c 
-		drivers/pntnpuzl.c drivers/policetr.c vidhrdw/policetr.c drivers/polyplay.c 
-		sndhrdw/polyplay.c vidhrdw/polyplay.c drivers/rbmk.c drivers/shangkid.c 
-		vidhrdw/shangkid.c drivers/skyarmy.c drivers/sliver.c drivers/sprcros2.c 
-		vidhrdw/sprcros2.c drivers/ssfindo.c drivers/ssingles.c drivers/starspnr.c 
-		drivers/statriv2.c drivers/supertnk.c drivers/tattack.c drivers/taxidrvr.c 
-		vidhrdw/taxidrvr.c drivers/tcl.c drivers/thedeep.c vidhrdw/thedeep.c 
-		drivers/tickee.c vidhrdw/tickee.c drivers/truco.c vidhrdw/truco.c 
-		drivers/trucocl.c vidhrdw/trucocl.c drivers/trvquest.c drivers/ttchamp.c 
-		drivers/tugboat.c drivers/turbosub.c drivers/usgames.c vidhrdw/usgames.c 
-		drivers/vamphalf.c drivers/vp906iii.c drivers/vroulet.c drivers/wldarrow.c 
-		drivers/xyonix.c vidhrdw/xyonix.c 	)
+		drivers/coolpool.c drivers/crystal.c machine/ds1302.c vidhrdw/vrender0.c 
+		drivers/cybertnk.c drivers/dambustr.c drivers/dcheese.c vidhrdw/dcheese.c 
+		drivers/dgpix.c drivers/dorachan.c vidhrdw/dorachan.c drivers/dreamwld.c 
+		drivers/dribling.c vidhrdw/dribling.c drivers/dwarfd.c drivers/dynadice.c 
+		drivers/epos.c vidhrdw/epos.c drivers/ertictac.c drivers/esd16.c 
+		vidhrdw/esd16.c drivers/ettrivia.c drivers/flower.c sndhrdw/flower.c 
+		vidhrdw/flower.c drivers/fortecar.c drivers/freekick.c vidhrdw/freekick.c 
+		drivers/funworld.c drivers/go2000.c drivers/gotcha.c vidhrdw/gotcha.c 
+		drivers/gumbo.c vidhrdw/gumbo.c drivers/gunpey.c drivers/hexa.c 
+		vidhrdw/hexa.c drivers/homedata.c vidhrdw/homedata.c drivers/hotblock.c 
+		drivers/intrscti.c drivers/jackpool.c drivers/kyugo.c vidhrdw/kyugo.c 
+		drivers/ladyfrog.c vidhrdw/ladyfrog.c drivers/laserbas.c drivers/lastfght.c 
+		drivers/lethalj.c vidhrdw/lethalj.c drivers/ltcasino.c drivers/lucky8.c 
+		drivers/magic10.c drivers/malzak.c vidhrdw/malzak.c drivers/mcatadv.c 
+		vidhrdw/mcatadv.c drivers/mirax.c drivers/mole.c vidhrdw/mole.c 
+		drivers/monzagp.c drivers/mosaic.c vidhrdw/mosaic.c drivers/mrjong.c 
+		vidhrdw/mrjong.c drivers/murogem.c drivers/news.c vidhrdw/news.c 
+		drivers/oneshot.c vidhrdw/oneshot.c drivers/onetwo.c drivers/othldrby.c 
+		vidhrdw/othldrby.c drivers/pass.c vidhrdw/pass.c drivers/pipeline.c 
+		drivers/pkscram.c drivers/pntnpuzl.c drivers/policetr.c vidhrdw/policetr.c 
+		drivers/polyplay.c sndhrdw/polyplay.c vidhrdw/polyplay.c drivers/rbmk.c 
+		drivers/shangkid.c vidhrdw/shangkid.c drivers/skyarmy.c drivers/sliver.c 
+		drivers/sprcros2.c vidhrdw/sprcros2.c drivers/ssfindo.c drivers/ssingles.c 
+		drivers/starspnr.c drivers/statriv2.c drivers/supertnk.c drivers/tattack.c 
+		drivers/taxidrvr.c vidhrdw/taxidrvr.c drivers/tcl.c drivers/thedeep.c 
+		vidhrdw/thedeep.c drivers/tickee.c vidhrdw/tickee.c drivers/truco.c 
+		vidhrdw/truco.c drivers/trucocl.c vidhrdw/trucocl.c drivers/trvquest.c 
+		drivers/ttchamp.c drivers/tugboat.c drivers/turbosub.c drivers/usgames.c 
+		vidhrdw/usgames.c drivers/vamphalf.c drivers/vp906iii.c drivers/vroulet.c 
+		drivers/wldarrow.c drivers/xyonix.c vidhrdw/xyonix.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_BSMT2000 ON)
 	set(MSND_CUSTOM ON)
@@ -1223,22 +1239,23 @@ if(OPT_NAMCO)
 		drivers/namcofl.c vidhrdw/namcofl.c drivers/namcoic.c drivers/namcona1.c 
 		vidhrdw/namcona1.c drivers/namconb1.c vidhrdw/namconb1.c drivers/namcond1.c 
 		machine/namcond1.c vidhrdw/ygv608.c drivers/namcos1.c machine/namcos1.c 
-		vidhrdw/namcos1.c drivers/namcos10.c drivers/namcos11.c drivers/namcos12.c 
-		drivers/namcos2.c machine/namcos2.c vidhrdw/namcos2.c drivers/namcos21.c 
-		vidhrdw/namcos21.c drivers/namcos22.c vidhrdw/namcos22.c drivers/namcos23.c 
-		drivers/namcos86.c vidhrdw/namcos86.c drivers/pacland.c vidhrdw/pacland.c 
-		drivers/polepos.c sndhrdw/polepos.c vidhrdw/polepos.c drivers/rallyx.c 
-		vidhrdw/rallyx.c drivers/skykid.c vidhrdw/skykid.c drivers/tankbatt.c 
-		vidhrdw/tankbatt.c drivers/tceptor.c vidhrdw/tceptor.c drivers/toypop.c 
-		vidhrdw/toypop.c drivers/warpwarp.c sndhrdw/warpwarp.c vidhrdw/warpwarp.c 
-		machine/namcoio.c sndhrdw/geebee.c sndhrdw/namcoc7x.c vidhrdw/bosco.c 
-		vidhrdw/digdug.c machine/psx.c vidhrdw/psx.c machine/xevious.c 
-		vidhrdw/xevious.c machine/scramble.c 	)
+		vidhrdw/namcos1.c drivers/namcos11.c drivers/namcos12.c drivers/namcos2.c 
+		machine/namcos2.c vidhrdw/namcos2.c drivers/namcos21.c vidhrdw/namcos21.c 
+		drivers/namcos22.c vidhrdw/namcos22.c drivers/namcos86.c vidhrdw/namcos86.c 
+		drivers/pacland.c vidhrdw/pacland.c drivers/polepos.c sndhrdw/polepos.c 
+		vidhrdw/polepos.c drivers/rallyx.c vidhrdw/rallyx.c drivers/skykid.c 
+		vidhrdw/skykid.c drivers/tankbatt.c vidhrdw/tankbatt.c drivers/tceptor.c 
+		vidhrdw/tceptor.c drivers/toypop.c vidhrdw/toypop.c drivers/warpwarp.c 
+		sndhrdw/warpwarp.c vidhrdw/warpwarp.c machine/namcoio.c sndhrdw/geebee.c 
+		sndhrdw/namcoc7x.c vidhrdw/bosco.c vidhrdw/digdug.c machine/psx.c 
+		vidhrdw/psx.c machine/xevious.c vidhrdw/xevious.c machine/scramble.c 
+	)
 	set(MSND_AY8910 ON)
 	set(MSND_C140 ON)
 	set(MSND_C352 ON)
 	set(MSND_CUSTOM ON)
 	set(MSND_DAC ON)
+	set(MSND_FILTER_RC ON)
 	set(MSND_NAMCO ON)
 	set(MSND_NAMCONA ON)
 	set(MSND_NAMCO_15XX ON)
@@ -1272,9 +1289,10 @@ if(OPT_NAMCO)
 	set(MCPU_Z8000 ON)
 	list(APPEND CPU_DEFS
 		HAS_AY8910=1 HAS_C140=1 HAS_C352=1 HAS_CUSTOM=1 
-		HAS_DAC=1 HAS_NAMCO=1 HAS_NAMCONA=1 HAS_NAMCO_15XX=1 
-		HAS_NAMCO_52XX=1 HAS_NAMCO_54XX=1 HAS_NAMCO_63701X=1 HAS_NAMCO_CUS30=1 
-		HAS_SAMPLES=1 HAS_SN76496=1 HAS_YM2151=1 	)
+		HAS_DAC=1 HAS_FILTER_RC=1 HAS_NAMCO=1 HAS_NAMCONA=1 
+		HAS_NAMCO_15XX=1 HAS_NAMCO_52XX=1 HAS_NAMCO_54XX=1 HAS_NAMCO_63701X=1 
+		HAS_NAMCO_CUS30=1 HAS_SAMPLES=1 HAS_SN76496=1 HAS_YM2151=1 
+	)
 	list(APPEND CPU_DEFS
 		HAS_8080=1 HAS_H83002=1 HAS_HD63701=1 HAS_HD63705=1 
 		HAS_I960=1 HAS_M37702=1 HAS_M37710=1 HAS_M6502=1 
@@ -1282,6 +1300,11 @@ if(OPT_NAMCO)
 		HAS_M6805=1 HAS_M6809=1 HAS_M68EC020=1 HAS_PSXCPU=1 
 		HAS_R4650BE=1 HAS_S2650=1 HAS_TMS32025=1 HAS_Z80=1 
 		HAS_Z8000=1 	)
+endif()
+if(OPT_NAMCOS)
+	add_compile_definitions(LINK_NAMCOS=1)
+	list(APPEND MAME_DRIVERS_SRC
+	)
 endif()
 if(OPT_NASCO)
 	add_compile_definitions(LINK_NASCO=1)
@@ -1488,14 +1511,15 @@ if(OPT_PHOENIX)
 		vidhrdw/phoenix.c drivers/safarir.c sndhrdw/pleiads.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_CUSTOM ON)
+	set(MSND_DISCRETE ON)
 	set(MSND_SN76477 ON)
 	set(MSND_TMS36XX ON)
 	set(MCPU_8080 ON)
 	set(MCPU_8085A ON)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
-		HAS_AY8910=1 HAS_CUSTOM=1 HAS_SN76477=1 HAS_TMS36XX=1 
-	)
+		HAS_AY8910=1 HAS_CUSTOM=1 HAS_DISCRETE=1 HAS_SN76477=1 
+		HAS_TMS36XX=1 	)
 	list(APPEND CPU_DEFS
 		HAS_8080=1 HAS_8085A=1 HAS_Z80=1 	)
 endif()
@@ -1687,12 +1711,11 @@ endif()
 if(OPT_SETA)
 	add_compile_definitions(LINK_SETA=1)
 	list(APPEND MAME_DRIVERS_SRC
-		drivers/aleck64.c machine/n64.c vidhrdw/n64.c drivers/darkhors.c 
-		drivers/hanaawas.c vidhrdw/hanaawas.c drivers/macs.c drivers/seta.c 
-		vidhrdw/seta.c drivers/seta2.c vidhrdw/seta2.c drivers/speedatk.c 
-		vidhrdw/speedatk.c drivers/srmp2.c vidhrdw/srmp2.c drivers/srmp6.c 
-		drivers/ssv.c vidhrdw/ssv.c drivers/st0016.c vidhrdw/st0016.c 
-	)
+		machine/n64.c vidhrdw/n64.c drivers/darkhors.c drivers/hanaawas.c 
+		vidhrdw/hanaawas.c drivers/macs.c drivers/seta.c vidhrdw/seta.c 
+		drivers/seta2.c vidhrdw/seta2.c drivers/speedatk.c vidhrdw/speedatk.c 
+		drivers/srmp2.c vidhrdw/srmp2.c drivers/srmp6.c drivers/ssv.c 
+		vidhrdw/ssv.c drivers/st0016.c vidhrdw/st0016.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_CUSTOM ON)
 	set(MSND_ES5506 ON)
@@ -1748,24 +1771,25 @@ if(OPT_SIGMA)
 		machine/spiders.c sndhrdw/spiders.c vidhrdw/spiders.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
+	set(MSND_DISCRETE ON)
 	set(MCPU_M6800 ON)
 	set(MCPU_M6802 ON)
 	set(MCPU_M6809 ON)
 	list(APPEND CPU_DEFS
-		HAS_AY8910=1 HAS_DAC=1 	)
+		HAS_AY8910=1 HAS_DAC=1 HAS_DISCRETE=1 	)
 	list(APPEND CPU_DEFS
 		HAS_M6800=1 HAS_M6802=1 HAS_M6809=1 	)
 endif()
 if(OPT_SNK)
 	add_compile_definitions(LINK_SNK=1)
 	list(APPEND MAME_DRIVERS_SRC
-		drivers/bbusters.c vidhrdw/bbusters.c drivers/dmndrby.c drivers/hal21.c 
-		drivers/hng64.c vidhrdw/hng64.c drivers/jcross.c vidhrdw/jcross.c 
-		drivers/lasso.c vidhrdw/lasso.c drivers/mainsnk.c vidhrdw/mainsnk.c 
-		drivers/marvins.c vidhrdw/marvins.c drivers/munchmo.c vidhrdw/munchmo.c 
-		drivers/prehisle.c vidhrdw/prehisle.c drivers/rockola.c sndhrdw/rockola.c 
-		vidhrdw/rockola.c drivers/sgladiat.c drivers/snk.c vidhrdw/snk.c 
-		drivers/snk68.c vidhrdw/snk68.c 	)
+		drivers/bbusters.c vidhrdw/bbusters.c drivers/hal21.c drivers/hng64.c 
+		vidhrdw/hng64.c drivers/jcross.c vidhrdw/jcross.c drivers/lasso.c 
+		vidhrdw/lasso.c drivers/mainsnk.c vidhrdw/mainsnk.c drivers/marvins.c 
+		vidhrdw/marvins.c drivers/munchmo.c vidhrdw/munchmo.c drivers/prehisle.c 
+		vidhrdw/prehisle.c drivers/rockola.c sndhrdw/rockola.c vidhrdw/rockola.c 
+		drivers/sgladiat.c drivers/snk.c vidhrdw/snk.c drivers/snk68.c 
+		vidhrdw/snk68.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_CUSTOM ON)
 	set(MSND_DAC ON)
@@ -1902,9 +1926,8 @@ if(OPT_TAITO)
 		drivers/taito_b.c vidhrdw/taito_b.c drivers/taito_f2.c vidhrdw/taito_f2.c 
 		drivers/taito_f3.c vidhrdw/taito_f3.c sndhrdw/taito_f3.c drivers/taito_h.c 
 		vidhrdw/taito_h.c drivers/taito_l.c vidhrdw/taito_l.c drivers/taito_x.c 
-		machine/cchip.c drivers/taito_z.c vidhrdw/taito_z.c drivers/taitoair.c 
-		vidhrdw/taitoair.c drivers/taitojc.c drivers/taitosj.c machine/taitosj.c 
-		vidhrdw/taitosj.c drivers/taitowlf.c drivers/tnzs.c machine/tnzs.c 
+		machine/cchip.c drivers/taito_z.c vidhrdw/taito_z.c drivers/taitosj.c 
+		machine/taitosj.c vidhrdw/taitosj.c drivers/tnzs.c machine/tnzs.c 
 		vidhrdw/tnzs.c drivers/topspeed.c vidhrdw/topspeed.c drivers/tsamurai.c 
 		vidhrdw/tsamurai.c drivers/undrfire.c vidhrdw/undrfire.c drivers/volfied.c 
 		machine/volfied.c vidhrdw/volfied.c drivers/warriorb.c vidhrdw/warriorb.c 
@@ -1916,6 +1939,7 @@ if(OPT_TAITO)
 	set(MSND_DISCRETE ON)
 	set(MSND_ES5505 ON)
 	set(MSND_ES5506 ON)
+	set(MSND_FILTER_VOLUME ON)
 	set(MSND_MSM5205 ON)
 	set(MSND_MSM5232 ON)
 	set(MSND_OKIM6295 ON)
@@ -1950,11 +1974,11 @@ if(OPT_TAITO)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
 		HAS_AY8910=1 HAS_CUSTOM=1 HAS_DAC=1 HAS_DISCRETE=1 
-		HAS_ES5505=1 HAS_ES5506=1 HAS_MSM5205=1 HAS_MSM5232=1 
-		HAS_OKIM6295=1 HAS_SAMPLES=1 HAS_SN76477=1 HAS_SN76496=1 
-		HAS_X1_010=1 HAS_YM2151=1 HAS_YM2203=1 HAS_YM2610=1 
-		HAS_YM2610B=1 HAS_YM3438=1 HAS_YM3526=1 HAS_YM3812=1 
-	)
+		HAS_ES5505=1 HAS_ES5506=1 HAS_FILTER_VOLUME=1 HAS_MSM5205=1 
+		HAS_MSM5232=1 HAS_OKIM6295=1 HAS_SAMPLES=1 HAS_SN76477=1 
+		HAS_SN76496=1 HAS_X1_010=1 HAS_YM2151=1 HAS_YM2203=1 
+		HAS_YM2610=1 HAS_YM2610B=1 HAS_YM3438=1 HAS_YM3526=1 
+		HAS_YM3812=1 	)
 	list(APPEND CPU_DEFS
 		HAS_8080=1 HAS_I386=1 HAS_I8039=1 HAS_I8751=1 
 		HAS_I8X41=1 HAS_M6800=1 HAS_M68000=1 HAS_M6802=1 
@@ -2745,7 +2769,7 @@ if(MCPU_T11)
 	list(APPEND MAME_CPU_SRC cpu/t11/t11.c )
 endif()
 if(MCPU_TMS32010)
-	list(APPEND MAME_CPU_SRC cpu/tms32010/tms32010.cpp )
+	list(APPEND MAME_CPU_SRC cpu/tms32010/tms32010.c )
 endif()
 if(MCPU_TMS32025)
 	list(APPEND MAME_CPU_SRC cpu/tms32025/tms32025.c )
