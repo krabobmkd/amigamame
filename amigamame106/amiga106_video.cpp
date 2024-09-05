@@ -315,15 +315,15 @@ void osd_update_video_and_audio(struct _mame_display *display)
         {
             ResetWatchTimer();
         }
-//re
-//        while(framesThatShouldbeNow<FrameCounter)
-//        {
-//            // something known to actually does pass priority to system
-//            // and waits between 1/50 hz or less.
-//            g_pMameDisplay->WaitFrame();
 
-//            framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
-//        }
+        while(framesThatShouldbeNow<FrameCounter)
+        {
+            // something known to actually does pass priority to system
+            // and waits between 1/50 hz or less.
+            g_pMameDisplay->WaitFrame();
+
+           framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
+        }
     }
 
     g_pMameDisplay->draw(display);

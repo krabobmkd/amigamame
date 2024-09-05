@@ -778,24 +778,15 @@ m68k_op_movem_32_er_al		m68ki_read_32
 // return number of bits actually applied
 UINT32 memory_readmovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
 {
-/*
-	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;
-	if (entry < STATIC_RAM)
-		MEMREADEND(*(UINT32 *)&bank_ptr[entry][address]);
-
-	/* fall back to the handler
-	else
-		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler32)(address >> 2,0));
-*/
-
 	UINT32 entry;
 	/* perform lookup */
-	address &= active_address_space[0].addrmask & ~3;
+	address &= active_address_space[0].addrmask ;
 	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
 	/* handle banks inline */
-	address = (address - active_address_space[0].readhandlers[entry].offset) & active_address_space[0].readhandlers[entry].mask;
+	address = (address - active_address_space[0].readhandlers[entry].offset)
+            & active_address_space[0].readhandlers[entry].mask;
 	if (entry >= STATIC_RAM)
 	{
     	read32_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler32;
@@ -803,13 +794,15 @@ UINT32 memory_readmovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *p
         uint count = 0;
         address>>=2;
         for(; i < 16; i++)
+        {
             if(bits & 1)
             {
                 preg[i] = (*reader)(address,0);
                 address++;
                 count++;
-                bits>>=1;
             }
+            bits>>=1;
+        }
         return count;
 	}
 
@@ -818,16 +811,113 @@ UINT32 memory_readmovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *p
     UINT16 i = 0;
     uint count = 0;
 	for(; i < 16; i++)
+    {
 		if(bits & 1)
 		{
 			preg[i] = *pread++;
 			count++;
-            bits>>=1;
 		}
+        bits>>=1;
+    }
     return count;
 
 }
+UINT32 memory_writemovem32rr(UINT32 address /*REG(d0)*/, UINT32 bits /*REG(d1)*/, UINT32 *preg /*REG(a0)*/ )
+{
+    UINT32 entry;
+	/* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
+	/* handle banks inline */
+	address = (address - active_address_space[0].writehandlers[entry].offset)
+            & active_address_space[0].writehandlers[entry].mask;
+	if (entry >= STATIC_RAM)
+	{
+    	//write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
+    	write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
+        UINT16 i = 0;
+        uint count = 0;
+        address>>=1;
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {   // some games minimix, ... need handled 16b writings
+                UINT32 reg = preg[15-i];
+                address--;
+                (*writer16)(address,reg,0);
+                address--;
+                (*writer16)(address,reg>>16,0);
+                //(*writer)(address,preg[15-i],0);
+                count++;
+            }
+            bits>>=1;
+        }
+        return count;
+	}
 
+    // - - - - - - - - -
+    UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
+    UINT16 i = 0;
+    uint count = 0;
+	for(; i < 16; i++)
+    {
+		if(bits & 1)
+		{
+            pwrite--;
+            *pwrite = preg[15-i];
+			count++;
+		}
+        bits>>=1;
+    }
+    return count;
+}
+UINT32 memory_writemovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
+{
+    UINT32 entry;
+	/* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
+	/* handle banks inline */
+	address = (address - active_address_space[0].writehandlers[entry].offset)
+            & active_address_space[0].writehandlers[entry].mask;
+	if (entry >= STATIC_RAM)
+	{
+    	write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
+        UINT16 i = 0;
+        uint count = 0;
+        address>>=2;
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                (*writer)(address,preg[i],0);
+                address++;
+                count++;
+            }
+            bits>>=1;
+        }
+        return count;
+	}
+
+    // - - - - - - - - -
+    UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
+    UINT16 i = 0;
+    uint count = 0;
+	for(; i < 16; i++)
+    {
+		if(bits & 1)
+		{
+            *pwrite++ = preg[i];
+			count++;
+		}
+        bits>>=1;
+    }
+    return count;
+}
 
 /*-------------------------------------------------
     memory_get_op_ptr - return a pointer to the

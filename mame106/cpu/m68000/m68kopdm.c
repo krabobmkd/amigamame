@@ -3,6 +3,8 @@
 extern void m68040_fpu_op0(void);
 extern void m68040_fpu_op1(void);
 
+#define USEMOVEM_OPTIM 1
+
 /* ======================================================================== */
 /* ========================= INSTRUCTION HANDLERS ========================= */
 /* ======================================================================== */
@@ -10449,10 +10451,21 @@ void m68k_op_movem_16_re_al(void)
 
 	USE_CYCLES(count<<CYC_MOVEM_W);
 }
-
+extern UINT32 memory_writemovem32rr(UINT32 address /*REG(d0)*/, UINT32 bits /*REG(d1)*/, UINT32 *preg /*REG(a0)*/ );
 
 void m68k_op_movem_32_re_pd(void)
 {
+/*
+    for(; i < 16; i++)
+		if(register_list & (1 << i))
+		{
+			ea -= 2;
+			m68ki_write_16(ea, MASK_OUT_ABOVE_16(REG_DA[15-i]));
+			count++;
+		}
+	AY = ea;
+*/
+#ifndef USEMOVEM_OPTIM
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = AY;
@@ -10472,11 +10485,21 @@ void m68k_op_movem_32_re_pd(void)
 	AY = ea;
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
+#else
+
+    uint register_list = OPER_I_16();
+	uint ea = AY;
+    uint count = memory_writemovem32rr(ea,register_list,&REG_DA[0]);
+    AY = ea - (count<<2);
+    USE_CYCLES(count<<CYC_MOVEM_L);
+
+#endif
 }
 
 
 void m68k_op_movem_32_re_ai(void)
 {
+
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = EA_AY_AI_32();
@@ -10493,6 +10516,11 @@ void m68k_op_movem_32_re_ai(void)
 		register_list>>=1;
 	}
 	USE_CYCLES(count<<CYC_MOVEM_L);
+
+//    uint register_list = OPER_I_16();
+//	uint ea = EA_AY_AI_32();
+//    uint count = memory_writemovem32(ea,register_list,&REG_DA[0]);
+//    USE_CYCLES(count<<CYC_MOVEM_L);
 }
 
 
@@ -10512,6 +10540,11 @@ void m68k_op_movem_32_re_di(void)
 		}
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
+    /*
+    uint register_list = OPER_I_16();
+	uint ea = EA_AY_DI_32();
+    uint count = memory_writemovem32(ea,register_list,&REG_DA[0]);
+    USE_CYCLES(count<<CYC_MOVEM_L);*/
 }
 
 
@@ -10531,6 +10564,10 @@ void m68k_op_movem_32_re_ix(void)
 		}
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
+/*    uint register_list = OPER_I_16();
+	uint ea = EA_AY_IX_32();
+    uint count = memory_writemovem32(ea,register_list,&REG_DA[0]);
+    USE_CYCLES(count<<CYC_MOVEM_L);*/
 }
 
 
@@ -10550,6 +10587,11 @@ void m68k_op_movem_32_re_aw(void)
 		}
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
+    /*
+    uint register_list = OPER_I_16();
+	uint ea = EA_AW_32();
+    uint count = memory_writemovem32(ea,register_list,&REG_DA[0]);
+    USE_CYCLES(count<<CYC_MOVEM_L);*/
 }
 
 
@@ -10569,6 +10611,12 @@ void m68k_op_movem_32_re_al(void)
 		}
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
+    /*
+    uint register_list = OPER_I_16();
+	uint ea = EA_AL_32();
+    uint count = memory_writemovem32(ea,register_list,&REG_DA[0]);
+    USE_CYCLES(count<<CYC_MOVEM_L);
+    */
 }
 
 
@@ -10727,7 +10775,7 @@ void m68k_op_movem_16_er_al(void)
 
 void m68k_op_movem_32_er_pi(void)
 {
-/*
+#ifndef USEMOVEM_OPTIM
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = AY;
@@ -10746,7 +10794,7 @@ void m68k_op_movem_32_er_pi(void)
 	AY = ea;
 
 	USE_CYCLES(count);
-*/
+#else
 	// m68ki_read_32 -> (*m68k_memory_intf.read32)(address)
 	// -> program_read_dword_32be
 	// ->    READDWORD32(program_read_dword_32be,
@@ -10756,7 +10804,7 @@ void m68k_op_movem_32_er_pi(void)
 	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
     AY = ea+(4*count);
     USE_CYCLES(count<<CYC_MOVEM_L);
-
+#endif
 }
 
 
@@ -10802,7 +10850,7 @@ void m68k_op_movem_32_er_pcix(void)
 
 void m68k_op_movem_32_er_ai(void)
 {
-
+#ifndef USEMOVEM_OPTIM
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = EA_AY_AI_32();
@@ -10820,19 +10868,19 @@ void m68k_op_movem_32_er_ai(void)
     }
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
+#else
 
-/*
 	uint register_list = OPER_I_16();
 	uint ea = EA_AY_AI_32();
 	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
-*/
-
+#endif
 }
 
 
 void m68k_op_movem_32_er_di(void)
 {
+#ifndef USEMOVEM_OPTIM
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = EA_AY_DI_32();
@@ -10848,17 +10896,19 @@ void m68k_op_movem_32_er_di(void)
         register_list>>=1;
     }
 	USE_CYCLES(count<<CYC_MOVEM_L);
-	/*
+
+#else
 	uint register_list = OPER_I_16();
 	uint ea = EA_AY_DI_32();
 	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
-*/
+#endif
 }
 
 
 void m68k_op_movem_32_er_ix(void)
 {
+#ifndef USEMOVEM_OPTIM
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = EA_AY_IX_32();
@@ -10875,18 +10925,19 @@ void m68k_op_movem_32_er_ix(void)
         register_list>>=1;
     }
 	USE_CYCLES(count<<CYC_MOVEM_L);
-	/*
+#else
+
 	uint register_list = OPER_I_16();
 	uint ea = EA_AY_IX_32();
 	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
-    */
+#endif
 }
 
 
 void m68k_op_movem_32_er_aw(void)
 {
-
+#ifndef USEMOVEM_OPTIM
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = EA_AW_32();
@@ -10903,18 +10954,20 @@ void m68k_op_movem_32_er_aw(void)
         register_list>>=1;
     }
 	USE_CYCLES(count<<CYC_MOVEM_L);
-	/*
+#else
+
 	uint register_list = OPER_I_16();
 	uint ea = EA_AW_32();
 	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
-    */
+#endif
 }
 
 
 void m68k_op_movem_32_er_al(void)
 {
-	uint i = 0;
+#ifndef USEMOVEM_OPTIM
+    uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = EA_AL_32();
 	uint count = 0;
@@ -10930,12 +10983,12 @@ void m68k_op_movem_32_er_al(void)
         register_list>>=1;
     }
 	USE_CYCLES(count<<CYC_MOVEM_L);
-	/*
+#else
 	uint register_list = OPER_I_16();
 	uint ea = EA_AL_32();
 	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
-    */
+#endif
 }
 
 
