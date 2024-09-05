@@ -215,9 +215,9 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         g_pMameDisplay = new IntuitionDisplay();
 
         if(config._flags & CONFDISPLAYFLAGS_ONWORKBENCH ) params._flags |= DISPFLAG_STARTWITHWINDOW;
-        if(config._flags & CONFDISPLAYFLAGS_TRIPLEBUFFER )
-            params._flags |= DISPFLAG_USEHEIGHTBUFFER;
-            //params._flags |= DISPFLAG_USETRIPLEBUFFER;
+//        if(config._flags & CONFDISPLAYFLAGS_TRIPLEBUFFER )
+//            //params._flags |= DISPFLAG_USEHEIGHTBUFFER;
+//            params._flags |= DISPFLAG_USETRIPLEBUFFER;
         if(config._drawEngine == MameConfig::DrawEngine::CgxScalePixelArray)
                 params._flags |= DISPFLAG_USESCALEPIXARRAY;
 
@@ -315,15 +315,15 @@ void osd_update_video_and_audio(struct _mame_display *display)
         {
             ResetWatchTimer();
         }
+//re
+//        while(framesThatShouldbeNow<FrameCounter)
+//        {
+//            // something known to actually does pass priority to system
+//            // and waits between 1/50 hz or less.
+//            g_pMameDisplay->WaitFrame();
 
-        while(framesThatShouldbeNow<FrameCounter)
-        {
-            // something known to actually does pass priority to system
-            // and waits between 1/50 hz or less.
-            g_pMameDisplay->WaitFrame();
-
-            framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
-        }
+//            framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
+//        }
     }
 
     g_pMameDisplay->draw(display);

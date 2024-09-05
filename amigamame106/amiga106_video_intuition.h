@@ -33,12 +33,14 @@ public:
     virtual RastPort *rastPort() = 0;
     virtual Screen *screen() { return NULL; }
     virtual BitMap *bitmap() { return NULL; }
+    virtual void waitFrame();
     //inline ULONG pixelFmt() const { return _PixelFmt; }
     //inline ULONG pixelBytes() const { return _PixelBytes; }
     inline int flags() const { return _flags; }
     void getGeometry(_mame_display *display,int &cenx,int &ceny,int &ww,int &hh, int &sourceWidth,int &sourceHeight);
   //  virtual void drawRastPort_CGX(_mame_display *display,Paletted *pRemap);
   //   void drawRastPortWPA8(_mame_display *display,Paletted *pRemap);
+
 
 protected:
     int _width,_height;
@@ -60,6 +62,7 @@ public:
     MsgPort *userPort() override;
     RastPort *rastPort() override;
     BitMap *bitmap() override;
+    void waitFrame() override;
 protected:
     Screen *_pScreen;
     Window *_pScreenWindow;
@@ -82,46 +85,14 @@ public:
     virtual void close() =0;
     virtual RastPort *rastPort() = 0;
     virtual BitMap *bitmap() =0;
-    virtual int beforeBufferDrawn() =0;
+    //virtual int beforeBufferDrawn() =0;
+    virtual void waitFrame() = 0;
     virtual void afterBufferDrawn() =0;
     char _tripleBufferInitOk;
     char _lastIndexDrawn;
     char _indexToDraw;
     char _d;
 };
-//class TripleBuffer_YPos : public TripleBuffer
-//{
-//public:
-//    TripleBuffer_YPos(Intuition_Screen &screen);
-//    int init() override;
-//    void close() override;
-//    int beforeBufferDrawn();
-//    void afterBufferDrawn();
-//    Intuition_Screen &_screen;
-//};
-
-
-class TripleBuffer_CSB : public TripleBuffer
-{
-public:
-    TripleBuffer_CSB(Intuition_Screen &screen);
-    ~TripleBuffer_CSB();
-    // - - -triple buffer management
-    struct SBuffer {
-         ScreenBuffer *_pScreenBuffer;
-         struct RastPort _rport;  // may need this per screen buffer for special draw func.
-    };
-
-    SBuffer _screenBuffer[3];
-    int init() override;
-    void close() override;
-    RastPort *rastPort() override;
-    BitMap *bitmap() override;
-    int beforeBufferDrawn() override;
-    void afterBufferDrawn() override;
-    Intuition_Screen &_screen;
-};
-
 
 
 class Intuition_Window : public IntuitionDrawable

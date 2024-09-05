@@ -10727,6 +10727,7 @@ void m68k_op_movem_16_er_al(void)
 
 void m68k_op_movem_32_er_pi(void)
 {
+/*
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = AY;
@@ -10745,6 +10746,17 @@ void m68k_op_movem_32_er_pi(void)
 	AY = ea;
 
 	USE_CYCLES(count);
+*/
+	// m68ki_read_32 -> (*m68k_memory_intf.read32)(address)
+	// -> program_read_dword_32be
+	// ->    READDWORD32(program_read_dword_32be,
+
+	uint register_list = OPER_I_16();
+	uint ea = AY;
+	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+    AY = ea+(4*count);
+    USE_CYCLES(count<<CYC_MOVEM_L);
+
 }
 
 
@@ -10809,12 +10821,13 @@ void m68k_op_movem_32_er_ai(void)
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
 
+/*
+	uint register_list = OPER_I_16();
+	uint ea = EA_AY_AI_32();
+	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+    USE_CYCLES(count<<CYC_MOVEM_L);
+*/
 
-//    uint ea = EA_AY_AI_32();
-//    uint register_list = OPER_I_16();
-//    uint count = memory_readmovem32( ea , register_list , REG_DA );
-
-//    USE_CYCLES(count<<CYC_MOVEM_L);
 }
 
 
@@ -10835,6 +10848,12 @@ void m68k_op_movem_32_er_di(void)
         register_list>>=1;
     }
 	USE_CYCLES(count<<CYC_MOVEM_L);
+	/*
+	uint register_list = OPER_I_16();
+	uint ea = EA_AY_DI_32();
+	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+    USE_CYCLES(count<<CYC_MOVEM_L);
+*/
 }
 
 
@@ -10856,11 +10875,18 @@ void m68k_op_movem_32_er_ix(void)
         register_list>>=1;
     }
 	USE_CYCLES(count<<CYC_MOVEM_L);
+	/*
+	uint register_list = OPER_I_16();
+	uint ea = EA_AY_IX_32();
+	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+    USE_CYCLES(count<<CYC_MOVEM_L);
+    */
 }
 
 
 void m68k_op_movem_32_er_aw(void)
 {
+
 	uint i = 0;
 	uint register_list = OPER_I_16();
 	uint ea = EA_AW_32();
@@ -10877,6 +10903,12 @@ void m68k_op_movem_32_er_aw(void)
         register_list>>=1;
     }
 	USE_CYCLES(count<<CYC_MOVEM_L);
+	/*
+	uint register_list = OPER_I_16();
+	uint ea = EA_AW_32();
+	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+    USE_CYCLES(count<<CYC_MOVEM_L);
+    */
 }
 
 
@@ -10898,6 +10930,12 @@ void m68k_op_movem_32_er_al(void)
         register_list>>=1;
     }
 	USE_CYCLES(count<<CYC_MOVEM_L);
+	/*
+	uint register_list = OPER_I_16();
+	uint ea = EA_AL_32();
+	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+    USE_CYCLES(count<<CYC_MOVEM_L);
+    */
 }
 
 

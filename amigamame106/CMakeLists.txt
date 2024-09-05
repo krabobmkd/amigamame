@@ -84,13 +84,15 @@ set(AMIGA_SRC
 	amiga_video_remap.h
 	amiga_video_remap.cpp
 	amiga106_video_intuition.h
-	amiga106_video_intuition.cpp
+	amiga106_video_intuition.cpp	
 	amiga106_video_os3.h
 	amiga106_video_os3.cpp
 	amiga106_video_cgx.h
 	amiga106_video_cgx.cpp
 	amiga106_video_cgxscalepixelarray.h
 	amiga106_video_cgxscalepixelarray.cpp
+	amiga106_video_intuition_tbufcsb.h
+	amiga106_video_intuition_tbufcsb.cpp
 	amiga106_inputs.h
 	amiga106_inputs.cpp
 	amiga_locale.h

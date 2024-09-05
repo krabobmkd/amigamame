@@ -757,38 +757,76 @@ void *memory_get_write_ptr(int cpunum, int spacenum, offs_t offset)
 }
 
 // krb
+/*
+m68k_op_movem_32_re_pd 	m68ki_write_32
+m68k_op_movem_32_re_ai	m68ki_write_32
+m68k_op_movem_32_re_di	m68ki_write_32
+m68k_op_movem_32_re_ix	m68ki_write_32
+m68k_op_movem_32_re_aw	m68ki_write_32
+m68k_op_movem_32_re_al	m68ki_write_32
+
+m68k_op_movem_32_er_pi		m68ki_read_32
+m68k_op_movem_32_er_pcdi	m68ki_read_pcrel_32
+m68k_op_movem_32_er_pcix	m68ki_read_pcrel_32
+m68k_op_movem_32_er_ai		m68ki_read_32
+m68k_op_movem_32_er_di		m68ki_read_32
+m68k_op_movem_32_er_ix		m68ki_read_32
+m68k_op_movem_32_er_aw		m68ki_read_32
+m68k_op_movem_32_er_al		m68ki_read_32
+
+*/
 // return number of bits actually applied
-//int memory_readmovem32(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
-//{
-//    active_address_space
-//    addrspace_data *space = &cpudata[activecpu].space[0];
-//	UINT8 entry;
+UINT32 memory_readmovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
+{
+/*
+	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;
+	if (entry < STATIC_RAM)
+		MEMREADEND(*(UINT32 *)&bank_ptr[entry][address]);
 
-//	/* perform the lookup */
-//	offset &= space->mask;
-//	entry = space->write.table[LEVEL1_INDEX(offset)];
-//	if (entry >= SUBTABLE_BASE)
-//		entry = space->write.table[LEVEL2_INDEX(entry, offset)];
+	/* fall back to the handler
+	else
+		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler32)(address >> 2,0));
+*/
 
-//	/* 8-bit case: RAM/ROM */
-//	if (entry >= STATIC_RAM)
-//		return 0;
-//	offset = (offset - space->write.handlers[entry].offset) & space->write.handlers[entry].mask;
+	UINT32 entry;
+	/* perform lookup */
+	address &= active_address_space[0].addrmask & ~3;
+	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+	/* handle banks inline */
+	address = (address - active_address_space[0].readhandlers[entry].offset) & active_address_space[0].readhandlers[entry].mask;
+	if (entry >= STATIC_RAM)
+	{
+    	read32_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler32;
+        UINT16 i = 0;
+        uint count = 0;
+        address>>=2;
+        for(; i < 16; i++)
+            if(bits & 1)
+            {
+                preg[i] = (*reader)(address,0);
+                address++;
+                count++;
+                bits>>=1;
+            }
+        return count;
+	}
 
-//    // - - - - - - - - -
-//    UINT32 *pread = (UINT32 *) &bank_ptr[entry][offset];
-//    UINT16 i = 0;
-//    uint count = 0;
-//	for(; i < 16; i++)
-//		if(bits & 1)
-//		{
-//			preg[i] = *pread++;
-//			count++;
-//            bits>>=1;
-//		}
-//    return count;
+    // - - - - - - - - -
+    UINT32 *pread = (UINT32 *) &bank_ptr[entry][address];
+    UINT16 i = 0;
+    uint count = 0;
+	for(; i < 16; i++)
+		if(bits & 1)
+		{
+			preg[i] = *pread++;
+			count++;
+            bits>>=1;
+		}
+    return count;
 
-//}
+}
 
 
 /*-------------------------------------------------

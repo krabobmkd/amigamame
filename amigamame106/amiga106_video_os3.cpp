@@ -210,7 +210,7 @@ void Intuition_Screen_OS3::close()
 }
 void Intuition_Screen_OS3::draw(_mame_display *display)
 {
-    if(_pTripleBufferImpl && !_pTripleBufferImpl->beforeBufferDrawn()) return;
+//    if(_pTripleBufferImpl && !_pTripleBufferImpl->beforeBufferDrawn()) return;
     // WritePixelArrays is OS3.0, We could use WriteChunkyPixels which is OS3.1.
     Drawable_OS3::draw_WPA8(display);
    if(_pTripleBufferImpl) _pTripleBufferImpl->afterBufferDrawn();
