@@ -1,6 +1,6 @@
 #include "amiga106_video_intuition.h"
 
-//#include "amiga106_video_intuition_tbufcsb.h"
+#include "amiga106_video_intuition_tbufcsb.h"
 #include "amiga106_video_os3.h"
 #include "amiga106_video_cgx.h"
 #include "amiga106_video_cgxscalepixelarray.h"
@@ -238,14 +238,14 @@ bool Intuition_Screen::open()
     }
     _width = _fullscreenWidth;
     _height = _fullscreenHeight;
-/*re
+
     if(_flags & DISPFLAG_USETRIPLEBUFFER)
     {
         if(_pTripleBufferImpl) delete _pTripleBufferImpl;
         _pTripleBufferImpl = new TripleBuffer_CSB(*this); // could fail, in which case back to direct rendering
         _pTripleBufferImpl->init();
     }
-*/
+
     return true;
 }
 

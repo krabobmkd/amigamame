@@ -91,13 +91,12 @@ set(AMIGA_SRC
 	amiga106_video_cgx.cpp
 	amiga106_video_cgxscalepixelarray.h
 	amiga106_video_cgxscalepixelarray.cpp
-#	amiga106_video_intuition_tbufcsb.h
-#	amiga106_video_intuition_tbufcsb.cpp
+	amiga106_video_intuition_tbufcsb.h
+	amiga106_video_intuition_tbufcsb.cpp
 	amiga106_inputs.h
 	amiga106_inputs.cpp
 	amiga_locale.h
 	amiga_locale.cpp
-#	inptport_krb.c
 	amiga_parallelpads.h
 	amiga_parallelpads.c
 
