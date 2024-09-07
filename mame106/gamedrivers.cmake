@@ -39,8 +39,10 @@ option(OPT_MIDWAY "" OFF)
 option(OPT_MIDWAYTUNIT "" ON)
 option(OPT_MINIDTEA "" ON)
 option(OPT_MINIKONAMI "" ON)
+option(OPT_MININAMCOS1 "" ON)
 option(OPT_MISC "" OFF)
 option(OPT_NAMCO "" OFF)
+option(OPT_NAMCOS "" OFF)
 option(OPT_NASCO "" OFF)
 option(OPT_NEOGEO "" ON)
 option(OPT_NICHIBUT "" OFF)
@@ -171,29 +173,29 @@ if(OPT_ATARI)
 		drivers/gauntlet.c vidhrdw/gauntlet.c drivers/harddriv.c machine/harddriv.c 
 		sndhrdw/harddriv.c vidhrdw/harddriv.c drivers/irobot.c machine/irobot.c 
 		vidhrdw/irobot.c drivers/jedi.c vidhrdw/jedi.c drivers/klax.c 
-		vidhrdw/klax.c drivers/liberatr.c vidhrdw/liberatr.c drivers/mediagx.c 
-		drivers/mgolf.c drivers/mhavoc.c machine/mhavoc.c drivers/missile.c 
-		vidhrdw/missile.c drivers/nitedrvr.c machine/nitedrvr.c sndhrdw/nitedrvr.c 
-		vidhrdw/nitedrvr.c drivers/offtwall.c vidhrdw/offtwall.c drivers/orbit.c 
-		sndhrdw/orbit.c vidhrdw/orbit.c drivers/poolshrk.c sndhrdw/poolshrk.c 
-		vidhrdw/poolshrk.c drivers/quantum.c drivers/rampart.c vidhrdw/rampart.c 
-		drivers/relief.c vidhrdw/relief.c drivers/runaway.c vidhrdw/runaway.c 
-		drivers/sbrkout.c machine/sbrkout.c vidhrdw/sbrkout.c drivers/shuuz.c 
-		vidhrdw/shuuz.c drivers/skullxbo.c vidhrdw/skullxbo.c drivers/skydiver.c 
-		sndhrdw/skydiver.c vidhrdw/skydiver.c drivers/skyraid.c vidhrdw/skyraid.c 
-		drivers/sprint2.c sndhrdw/sprint2.c vidhrdw/sprint2.c drivers/sprint4.c 
-		sndhrdw/sprint4.c vidhrdw/sprint4.c drivers/sprint8.c vidhrdw/sprint8.c 
-		drivers/starshp1.c vidhrdw/starshp1.c drivers/starwars.c machine/starwars.c 
-		sndhrdw/starwars.c drivers/subs.c machine/subs.c sndhrdw/subs.c 
-		vidhrdw/subs.c drivers/tank8.c sndhrdw/tank8.c vidhrdw/tank8.c 
-		drivers/tempest.c drivers/thunderj.c vidhrdw/thunderj.c drivers/toobin.c 
-		vidhrdw/toobin.c drivers/tourtabl.c vidhrdw/tia.c drivers/triplhnt.c 
-		sndhrdw/triplhnt.c vidhrdw/triplhnt.c drivers/tunhunt.c vidhrdw/tunhunt.c 
-		drivers/videopin.c sndhrdw/videopin.c vidhrdw/videopin.c drivers/vindictr.c 
-		vidhrdw/vindictr.c drivers/wolfpack.c vidhrdw/wolfpack.c drivers/xybots.c 
-		vidhrdw/xybots.c machine/asic65.c machine/atari_vg.c machine/atarigen.c 
-		machine/mathbox.c machine/slapstic.c sndhrdw/atarijsa.c sndhrdw/cage.c 
-		sndhrdw/redbaron.c vidhrdw/atarimo.c vidhrdw/atarirle.c 	)
+		vidhrdw/klax.c drivers/liberatr.c vidhrdw/liberatr.c drivers/mgolf.c 
+		drivers/mhavoc.c machine/mhavoc.c drivers/missile.c vidhrdw/missile.c 
+		drivers/nitedrvr.c machine/nitedrvr.c sndhrdw/nitedrvr.c vidhrdw/nitedrvr.c 
+		drivers/offtwall.c vidhrdw/offtwall.c drivers/orbit.c sndhrdw/orbit.c 
+		vidhrdw/orbit.c drivers/poolshrk.c sndhrdw/poolshrk.c vidhrdw/poolshrk.c 
+		drivers/quantum.c drivers/rampart.c vidhrdw/rampart.c drivers/relief.c 
+		vidhrdw/relief.c drivers/runaway.c vidhrdw/runaway.c drivers/sbrkout.c 
+		machine/sbrkout.c vidhrdw/sbrkout.c drivers/shuuz.c vidhrdw/shuuz.c 
+		drivers/skullxbo.c vidhrdw/skullxbo.c drivers/skydiver.c sndhrdw/skydiver.c 
+		vidhrdw/skydiver.c drivers/skyraid.c vidhrdw/skyraid.c drivers/sprint2.c 
+		sndhrdw/sprint2.c vidhrdw/sprint2.c drivers/sprint4.c sndhrdw/sprint4.c 
+		vidhrdw/sprint4.c drivers/sprint8.c vidhrdw/sprint8.c drivers/starshp1.c 
+		vidhrdw/starshp1.c drivers/starwars.c machine/starwars.c sndhrdw/starwars.c 
+		drivers/subs.c machine/subs.c sndhrdw/subs.c vidhrdw/subs.c 
+		drivers/tank8.c sndhrdw/tank8.c vidhrdw/tank8.c drivers/tempest.c 
+		drivers/thunderj.c vidhrdw/thunderj.c drivers/toobin.c vidhrdw/toobin.c 
+		drivers/tourtabl.c vidhrdw/tia.c drivers/triplhnt.c sndhrdw/triplhnt.c 
+		vidhrdw/triplhnt.c drivers/tunhunt.c vidhrdw/tunhunt.c drivers/videopin.c 
+		sndhrdw/videopin.c vidhrdw/videopin.c drivers/vindictr.c vidhrdw/vindictr.c 
+		drivers/wolfpack.c vidhrdw/wolfpack.c drivers/xybots.c vidhrdw/xybots.c 
+		machine/asic65.c machine/atari_vg.c machine/atarigen.c machine/mathbox.c 
+		machine/slapstic.c sndhrdw/atarijsa.c sndhrdw/cage.c sndhrdw/redbaron.c 
+		vidhrdw/atarimo.c vidhrdw/atarirle.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_CUSTOM ON)
 	set(MSND_DAC ON)
@@ -277,17 +279,16 @@ if(OPT_CAPCOM)
 		drivers/1942.c vidhrdw/1942.c drivers/1943.c vidhrdw/1943.c 
 		drivers/bionicc.c vidhrdw/bionicc.c drivers/blktiger.c vidhrdw/blktiger.c 
 		drivers/cbasebal.c vidhrdw/cbasebal.c drivers/commando.c vidhrdw/commando.c 
-		drivers/cps1.c vidhrdw/cps1.c drivers/cps2.c drivers/cps3.c 
-		drivers/egghunt.c drivers/fcrash.c drivers/gng.c vidhrdw/gng.c 
-		drivers/gunsmoke.c vidhrdw/gunsmoke.c drivers/exedexes.c vidhrdw/exedexes.c 
-		drivers/higemaru.c vidhrdw/higemaru.c drivers/lastduel.c vidhrdw/lastduel.c 
-		drivers/lwings.c vidhrdw/lwings.c drivers/mitchell.c vidhrdw/mitchell.c 
-		drivers/sf.c vidhrdw/sf.c drivers/sidearms.c vidhrdw/sidearms.c 
-		drivers/sonson.c vidhrdw/sonson.c drivers/srumbler.c vidhrdw/srumbler.c 
-		drivers/vulgus.c vidhrdw/vulgus.c drivers/tigeroad.c vidhrdw/tigeroad.c 
-		drivers/zn.c machine/znsec.c machine/at28c16.c machine/mb3773.c 
-		machine/kabuki.c machine/psx.c vidhrdw/psx.c sndhrdw/taitosnd.c 
-	)
+		drivers/cps1.c vidhrdw/cps1.c drivers/cps2.c drivers/egghunt.c 
+		drivers/fcrash.c drivers/gng.c vidhrdw/gng.c drivers/gunsmoke.c 
+		vidhrdw/gunsmoke.c drivers/exedexes.c vidhrdw/exedexes.c drivers/higemaru.c 
+		vidhrdw/higemaru.c drivers/lastduel.c vidhrdw/lastduel.c drivers/lwings.c 
+		vidhrdw/lwings.c drivers/mitchell.c vidhrdw/mitchell.c drivers/sf.c 
+		vidhrdw/sf.c drivers/sidearms.c vidhrdw/sidearms.c drivers/sonson.c 
+		vidhrdw/sonson.c drivers/srumbler.c vidhrdw/srumbler.c drivers/vulgus.c 
+		vidhrdw/vulgus.c drivers/tigeroad.c vidhrdw/tigeroad.c drivers/zn.c 
+		machine/znsec.c machine/at28c16.c machine/mb3773.c machine/kabuki.c 
+		machine/psx.c vidhrdw/psx.c sndhrdw/taitosnd.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_MSM5205 ON)
 	set(MSND_OKIM6295 ON)
@@ -540,6 +541,7 @@ if(OPT_EXIDY)
 		sndhrdw/targ.c 	)
 	set(MSND_CUSTOM ON)
 	set(MSND_DAC ON)
+	set(MSND_DISCRETE ON)
 	set(MSND_HC55516 ON)
 	set(MSND_POKEY ON)
 	set(MSND_SAMPLES ON)
@@ -551,8 +553,8 @@ if(OPT_EXIDY)
 	set(MCPU_M68705 ON)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
-		HAS_CUSTOM=1 HAS_DAC=1 HAS_HC55516=1 HAS_POKEY=1 
-		HAS_SAMPLES=1 HAS_TMS5220=1 	)
+		HAS_CUSTOM=1 HAS_DAC=1 HAS_DISCRETE=1 HAS_HC55516=1 
+		HAS_POKEY=1 HAS_SAMPLES=1 HAS_TMS5220=1 	)
 	list(APPEND CPU_DEFS
 		HAS_M6502=1 HAS_M68000=1 HAS_M6805=1 HAS_M6809=1 
 		HAS_M68705=1 HAS_Z80=1 	)
@@ -846,32 +848,34 @@ if(OPT_KONAMI)
 		vidhrdw/hyperspt.c drivers/ironhors.c vidhrdw/ironhors.c drivers/jackal.c 
 		machine/jackal.c vidhrdw/jackal.c drivers/jailbrek.c vidhrdw/jailbrek.c 
 		drivers/junofrst.c drivers/konamigq.c drivers/konamigv.c drivers/konamigx.c 
-		machine/konamigx.c vidhrdw/konamigx.c drivers/konamim2.c drivers/labyrunr.c 
-		vidhrdw/labyrunr.c drivers/lethal.c vidhrdw/lethal.c drivers/mainevt.c 
-		vidhrdw/mainevt.c drivers/megazone.c vidhrdw/megazone.c drivers/mikie.c 
-		vidhrdw/mikie.c drivers/mogura.c drivers/moo.c vidhrdw/moo.c 
-		drivers/mystwarr.c vidhrdw/mystwarr.c drivers/nemesis.c vidhrdw/nemesis.c 
-		drivers/nwk-tr.c drivers/overdriv.c vidhrdw/overdriv.c drivers/pandoras.c 
-		vidhrdw/pandoras.c drivers/parodius.c vidhrdw/parodius.c drivers/pingpong.c 
-		vidhrdw/pingpong.c drivers/plygonet.c vidhrdw/plygonet.c drivers/pooyan.c 
-		vidhrdw/pooyan.c drivers/qdrmfgp.c vidhrdw/qdrmfgp.c drivers/rockrage.c 
-		vidhrdw/rockrage.c drivers/rocnrope.c vidhrdw/rocnrope.c drivers/rollerg.c 
-		vidhrdw/rollerg.c drivers/rungun.c vidhrdw/rungun.c drivers/sbasketb.c 
-		vidhrdw/sbasketb.c drivers/scobra.c drivers/scotrsht.c vidhrdw/scotrsht.c 
-		drivers/scramble.c machine/scramble.c sndhrdw/scramble.c drivers/shaolins.c 
-		vidhrdw/shaolins.c drivers/simpsons.c machine/simpsons.c vidhrdw/simpsons.c 
-		drivers/spy.c vidhrdw/spy.c drivers/surpratk.c vidhrdw/surpratk.c 
-		drivers/thunderx.c vidhrdw/thunderx.c drivers/timeplt.c sndhrdw/timeplt.c 
-		vidhrdw/timeplt.c drivers/tmnt.c vidhrdw/tmnt.c drivers/tp84.c 
-		vidhrdw/tp84.c drivers/trackfld.c machine/konami.c sndhrdw/trackfld.c 
-		vidhrdw/trackfld.c drivers/tutankhm.c vidhrdw/tutankhm.c drivers/twin16.c 
-		vidhrdw/twin16.c drivers/ultraman.c vidhrdw/ultraman.c drivers/vendetta.c 
-		vidhrdw/vendetta.c drivers/wecleman.c vidhrdw/wecleman.c drivers/xexex.c 
-		vidhrdw/xexex.c drivers/xmen.c vidhrdw/xmen.c drivers/yiear.c 
-		vidhrdw/yiear.c drivers/zr107.c vidhrdw/konamiic.c 	)
+		machine/konamigx.c vidhrdw/konamigx.c drivers/labyrunr.c vidhrdw/labyrunr.c 
+		drivers/lethal.c vidhrdw/lethal.c drivers/mainevt.c vidhrdw/mainevt.c 
+		drivers/megazone.c vidhrdw/megazone.c drivers/mikie.c vidhrdw/mikie.c 
+		drivers/mogura.c drivers/moo.c vidhrdw/moo.c drivers/mystwarr.c 
+		vidhrdw/mystwarr.c drivers/nemesis.c vidhrdw/nemesis.c drivers/overdriv.c 
+		vidhrdw/overdriv.c drivers/pandoras.c vidhrdw/pandoras.c drivers/parodius.c 
+		vidhrdw/parodius.c drivers/pingpong.c vidhrdw/pingpong.c drivers/plygonet.c 
+		vidhrdw/plygonet.c drivers/pooyan.c vidhrdw/pooyan.c drivers/qdrmfgp.c 
+		vidhrdw/qdrmfgp.c drivers/rockrage.c vidhrdw/rockrage.c drivers/rocnrope.c 
+		vidhrdw/rocnrope.c drivers/rollerg.c vidhrdw/rollerg.c drivers/rungun.c 
+		vidhrdw/rungun.c drivers/sbasketb.c vidhrdw/sbasketb.c drivers/scobra.c 
+		drivers/scotrsht.c vidhrdw/scotrsht.c drivers/scramble.c machine/scramble.c 
+		sndhrdw/scramble.c drivers/shaolins.c vidhrdw/shaolins.c drivers/simpsons.c 
+		machine/simpsons.c vidhrdw/simpsons.c drivers/spy.c vidhrdw/spy.c 
+		drivers/surpratk.c vidhrdw/surpratk.c drivers/thunderx.c vidhrdw/thunderx.c 
+		drivers/timeplt.c sndhrdw/timeplt.c vidhrdw/timeplt.c drivers/tmnt.c 
+		vidhrdw/tmnt.c drivers/tp84.c vidhrdw/tp84.c drivers/trackfld.c 
+		machine/konami.c sndhrdw/trackfld.c vidhrdw/trackfld.c drivers/tutankhm.c 
+		vidhrdw/tutankhm.c drivers/twin16.c vidhrdw/twin16.c drivers/ultraman.c 
+		vidhrdw/ultraman.c drivers/vendetta.c vidhrdw/vendetta.c drivers/wecleman.c 
+		vidhrdw/wecleman.c drivers/xexex.c vidhrdw/xexex.c drivers/xmen.c 
+		vidhrdw/xmen.c drivers/yiear.c vidhrdw/yiear.c vidhrdw/konamiic.c 
+	)
 	set(MSND_AY8910 ON)
 	set(MSND_CDDA ON)
 	set(MSND_DAC ON)
+	set(MSND_FILTER_RC ON)
+	set(MSND_FILTER_VOLUME ON)
 	set(MSND_K005289 ON)
 	set(MSND_K007232 ON)
 	set(MSND_K051649 ON)
@@ -904,12 +908,12 @@ if(OPT_KONAMI)
 	set(MCPU_S2650 ON)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
-		HAS_AY8910=1 HAS_CDDA=1 HAS_DAC=1 HAS_K005289=1 
-		HAS_K007232=1 HAS_K051649=1 HAS_K053260=1 HAS_K054539=1 
-		HAS_MSM5205=1 HAS_OKIM6295=1 HAS_PSXSPU=1 HAS_RF5C400=1 
-		HAS_SAMPLES=1 HAS_SN76496=1 HAS_TMS5110=1 HAS_UPD7759=1 
-		HAS_VLM5030=1 HAS_YM2151=1 HAS_YM2203=1 HAS_YM3812=1 
-		HAS_YMZ280B=1 	)
+		HAS_AY8910=1 HAS_CDDA=1 HAS_DAC=1 HAS_FILTER_RC=1 
+		HAS_FILTER_VOLUME=1 HAS_K005289=1 HAS_K007232=1 HAS_K051649=1 
+		HAS_K053260=1 HAS_K054539=1 HAS_MSM5205=1 HAS_OKIM6295=1 
+		HAS_PSXSPU=1 HAS_RF5C400=1 HAS_SAMPLES=1 HAS_SN76496=1 
+		HAS_TMS5110=1 HAS_UPD7759=1 HAS_VLM5030=1 HAS_YM2151=1 
+		HAS_YM2203=1 HAS_YM3812=1 HAS_YMZ280B=1 	)
 	list(APPEND CPU_DEFS
 		HAS_ADSP21062=1 HAS_DSP56156=1 HAS_HD6309=1 HAS_I8039=1 
 		HAS_KONAMI=1 HAS_M68000=1 HAS_M6809=1 HAS_M68EC020=1 
@@ -1004,10 +1008,9 @@ if(OPT_MIDWAY)
 		vidhrdw/mcr68.c drivers/midtunit.c machine/midtunit.c vidhrdw/midtunit.c 
 		drivers/midvunit.c vidhrdw/midvunit.c drivers/midwunit.c machine/midwunit.c 
 		drivers/midxunit.c drivers/midyunit.c machine/midyunit.c vidhrdw/midyunit.c 
-		drivers/midzeus.c drivers/omegrace.c drivers/seattle.c drivers/vegas.c 
-		drivers/williams.c machine/williams.c sndhrdw/williams.c vidhrdw/williams.c 
-		machine/midwayic.c sndhrdw/dcs.c sndhrdw/gorf.c sndhrdw/wow.c 
-	)
+		drivers/omegrace.c drivers/seattle.c drivers/vegas.c drivers/williams.c 
+		machine/williams.c sndhrdw/williams.c vidhrdw/williams.c machine/midwayic.c 
+		sndhrdw/dcs.c sndhrdw/gorf.c sndhrdw/wow.c 	)
 	set(MSND_ASTROCADE ON)
 	set(MSND_AY8910 ON)
 	set(MSND_CEM3394 ON)
@@ -1108,6 +1111,20 @@ if(OPT_MINIKONAMI)
 	list(APPEND CPU_DEFS
 		HAS_KONAMI=1 HAS_M68000=1 HAS_Z80=1 	)
 endif()
+if(OPT_MININAMCOS1)
+	add_compile_definitions(LINK_MININAMCOS1=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/namcos1.c machine/namcos1.c vidhrdw/namcos1.c 	)
+	set(MSND_DAC ON)
+	set(MSND_NAMCO_CUS30 ON)
+	set(MSND_YM2151 ON)
+	set(MCPU_HD63701 ON)
+	set(MCPU_M6809 ON)
+	list(APPEND CPU_DEFS
+		HAS_DAC=1 HAS_NAMCO_CUS30=1 HAS_YM2151=1 	)
+	list(APPEND CPU_DEFS
+		HAS_HD63701=1 HAS_M6809=1 	)
+endif()
 if(OPT_MISC)
 	add_compile_definitions(LINK_MISC=1)
 	list(APPEND MAME_DRIVERS_SRC
@@ -1117,37 +1134,36 @@ if(OPT_MISC)
 		drivers/attckufo.c sndhrdw/attckufo.c vidhrdw/attckufo.c drivers/aztarac.c 
 		sndhrdw/aztarac.c vidhrdw/aztarac.c drivers/beaminv.c vidhrdw/beaminv.c 
 		drivers/bmcbowl.c drivers/cave.c vidhrdw/cave.c drivers/cherrym.c 
-		drivers/coinmstr.c drivers/coolpool.c drivers/crystal.c machine/ds1302.c 
-		vidhrdw/vrender0.c drivers/cybertnk.c drivers/dambustr.c drivers/dcheese.c 
-		vidhrdw/dcheese.c drivers/dgpix.c drivers/dorachan.c vidhrdw/dorachan.c 
-		drivers/dreamwld.c drivers/dribling.c vidhrdw/dribling.c drivers/dwarfd.c 
-		drivers/dynadice.c drivers/epos.c vidhrdw/epos.c drivers/ertictac.c 
-		drivers/esd16.c vidhrdw/esd16.c drivers/ettrivia.c drivers/flower.c 
-		sndhrdw/flower.c vidhrdw/flower.c drivers/fortecar.c drivers/freekick.c 
-		vidhrdw/freekick.c drivers/funworld.c drivers/go2000.c drivers/gotcha.c 
-		vidhrdw/gotcha.c drivers/gumbo.c vidhrdw/gumbo.c drivers/gunpey.c 
-		drivers/hexa.c vidhrdw/hexa.c drivers/homedata.c vidhrdw/homedata.c 
-		drivers/hotblock.c drivers/intrscti.c drivers/jackpool.c drivers/kyugo.c 
-		vidhrdw/kyugo.c drivers/ladyfrog.c vidhrdw/ladyfrog.c drivers/laserbas.c 
-		drivers/lastfght.c drivers/lethalj.c vidhrdw/lethalj.c drivers/ltcasino.c 
-		drivers/lucky8.c drivers/magic10.c drivers/malzak.c vidhrdw/malzak.c 
-		drivers/mcatadv.c vidhrdw/mcatadv.c drivers/micro3d.c vidhrdw/micro3d.c 
-		drivers/mirax.c drivers/mole.c vidhrdw/mole.c drivers/monzagp.c 
-		drivers/mosaic.c vidhrdw/mosaic.c drivers/mrjong.c vidhrdw/mrjong.c 
-		drivers/murogem.c drivers/news.c vidhrdw/news.c drivers/oneshot.c 
-		vidhrdw/oneshot.c drivers/onetwo.c drivers/othldrby.c vidhrdw/othldrby.c 
-		drivers/pass.c vidhrdw/pass.c drivers/pipeline.c drivers/pkscram.c 
-		drivers/pntnpuzl.c drivers/policetr.c vidhrdw/policetr.c drivers/polyplay.c 
-		sndhrdw/polyplay.c vidhrdw/polyplay.c drivers/rbmk.c drivers/shangkid.c 
-		vidhrdw/shangkid.c drivers/skyarmy.c drivers/sliver.c drivers/sprcros2.c 
-		vidhrdw/sprcros2.c drivers/ssfindo.c drivers/ssingles.c drivers/starspnr.c 
-		drivers/statriv2.c drivers/supertnk.c drivers/tattack.c drivers/taxidrvr.c 
-		vidhrdw/taxidrvr.c drivers/tcl.c drivers/thedeep.c vidhrdw/thedeep.c 
-		drivers/tickee.c vidhrdw/tickee.c drivers/truco.c vidhrdw/truco.c 
-		drivers/trucocl.c vidhrdw/trucocl.c drivers/trvquest.c drivers/ttchamp.c 
-		drivers/tugboat.c drivers/turbosub.c drivers/usgames.c vidhrdw/usgames.c 
-		drivers/vamphalf.c drivers/vp906iii.c drivers/vroulet.c drivers/wldarrow.c 
-		drivers/xyonix.c vidhrdw/xyonix.c 	)
+		drivers/coolpool.c drivers/crystal.c machine/ds1302.c vidhrdw/vrender0.c 
+		drivers/cybertnk.c drivers/dambustr.c drivers/dcheese.c vidhrdw/dcheese.c 
+		drivers/dgpix.c drivers/dorachan.c vidhrdw/dorachan.c drivers/dreamwld.c 
+		drivers/dribling.c vidhrdw/dribling.c drivers/dwarfd.c drivers/dynadice.c 
+		drivers/epos.c vidhrdw/epos.c drivers/ertictac.c drivers/esd16.c 
+		vidhrdw/esd16.c drivers/ettrivia.c drivers/flower.c sndhrdw/flower.c 
+		vidhrdw/flower.c drivers/fortecar.c drivers/freekick.c vidhrdw/freekick.c 
+		drivers/funworld.c drivers/go2000.c drivers/gotcha.c vidhrdw/gotcha.c 
+		drivers/gumbo.c vidhrdw/gumbo.c drivers/gunpey.c drivers/hexa.c 
+		vidhrdw/hexa.c drivers/homedata.c vidhrdw/homedata.c drivers/hotblock.c 
+		drivers/intrscti.c drivers/jackpool.c drivers/kyugo.c vidhrdw/kyugo.c 
+		drivers/ladyfrog.c vidhrdw/ladyfrog.c drivers/laserbas.c drivers/lastfght.c 
+		drivers/lethalj.c vidhrdw/lethalj.c drivers/ltcasino.c drivers/lucky8.c 
+		drivers/magic10.c drivers/malzak.c vidhrdw/malzak.c drivers/mcatadv.c 
+		vidhrdw/mcatadv.c drivers/mirax.c drivers/mole.c vidhrdw/mole.c 
+		drivers/monzagp.c drivers/mosaic.c vidhrdw/mosaic.c drivers/mrjong.c 
+		vidhrdw/mrjong.c drivers/murogem.c drivers/news.c vidhrdw/news.c 
+		drivers/oneshot.c vidhrdw/oneshot.c drivers/onetwo.c drivers/othldrby.c 
+		vidhrdw/othldrby.c drivers/pass.c vidhrdw/pass.c drivers/pipeline.c 
+		drivers/pkscram.c drivers/pntnpuzl.c drivers/policetr.c vidhrdw/policetr.c 
+		drivers/polyplay.c sndhrdw/polyplay.c vidhrdw/polyplay.c drivers/rbmk.c 
+		drivers/shangkid.c vidhrdw/shangkid.c drivers/skyarmy.c drivers/sliver.c 
+		drivers/sprcros2.c vidhrdw/sprcros2.c drivers/ssfindo.c drivers/ssingles.c 
+		drivers/starspnr.c drivers/statriv2.c drivers/supertnk.c drivers/tattack.c 
+		drivers/taxidrvr.c vidhrdw/taxidrvr.c drivers/tcl.c drivers/thedeep.c 
+		vidhrdw/thedeep.c drivers/tickee.c vidhrdw/tickee.c drivers/truco.c 
+		vidhrdw/truco.c drivers/trucocl.c vidhrdw/trucocl.c drivers/trvquest.c 
+		drivers/ttchamp.c drivers/tugboat.c drivers/turbosub.c drivers/usgames.c 
+		vidhrdw/usgames.c drivers/vamphalf.c drivers/vp906iii.c drivers/vroulet.c 
+		drivers/wldarrow.c drivers/xyonix.c vidhrdw/xyonix.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_BSMT2000 ON)
 	set(MSND_CUSTOM ON)
@@ -1223,22 +1239,23 @@ if(OPT_NAMCO)
 		drivers/namcofl.c vidhrdw/namcofl.c drivers/namcoic.c drivers/namcona1.c 
 		vidhrdw/namcona1.c drivers/namconb1.c vidhrdw/namconb1.c drivers/namcond1.c 
 		machine/namcond1.c vidhrdw/ygv608.c drivers/namcos1.c machine/namcos1.c 
-		vidhrdw/namcos1.c drivers/namcos10.c drivers/namcos11.c drivers/namcos12.c 
-		drivers/namcos2.c machine/namcos2.c vidhrdw/namcos2.c drivers/namcos21.c 
-		vidhrdw/namcos21.c drivers/namcos22.c vidhrdw/namcos22.c drivers/namcos23.c 
-		drivers/namcos86.c vidhrdw/namcos86.c drivers/pacland.c vidhrdw/pacland.c 
-		drivers/polepos.c sndhrdw/polepos.c vidhrdw/polepos.c drivers/rallyx.c 
-		vidhrdw/rallyx.c drivers/skykid.c vidhrdw/skykid.c drivers/tankbatt.c 
-		vidhrdw/tankbatt.c drivers/tceptor.c vidhrdw/tceptor.c drivers/toypop.c 
-		vidhrdw/toypop.c drivers/warpwarp.c sndhrdw/warpwarp.c vidhrdw/warpwarp.c 
-		machine/namcoio.c sndhrdw/geebee.c sndhrdw/namcoc7x.c vidhrdw/bosco.c 
-		vidhrdw/digdug.c machine/psx.c vidhrdw/psx.c machine/xevious.c 
-		vidhrdw/xevious.c machine/scramble.c 	)
+		vidhrdw/namcos1.c drivers/namcos11.c drivers/namcos12.c drivers/namcos2.c 
+		machine/namcos2.c vidhrdw/namcos2.c drivers/namcos21.c vidhrdw/namcos21.c 
+		drivers/namcos22.c vidhrdw/namcos22.c drivers/namcos86.c vidhrdw/namcos86.c 
+		drivers/pacland.c vidhrdw/pacland.c drivers/polepos.c sndhrdw/polepos.c 
+		vidhrdw/polepos.c drivers/rallyx.c vidhrdw/rallyx.c drivers/skykid.c 
+		vidhrdw/skykid.c drivers/tankbatt.c vidhrdw/tankbatt.c drivers/tceptor.c 
+		vidhrdw/tceptor.c drivers/toypop.c vidhrdw/toypop.c drivers/warpwarp.c 
+		sndhrdw/warpwarp.c vidhrdw/warpwarp.c machine/namcoio.c sndhrdw/geebee.c 
+		sndhrdw/namcoc7x.c vidhrdw/bosco.c vidhrdw/digdug.c machine/psx.c 
+		vidhrdw/psx.c machine/xevious.c vidhrdw/xevious.c machine/scramble.c 
+	)
 	set(MSND_AY8910 ON)
 	set(MSND_C140 ON)
 	set(MSND_C352 ON)
 	set(MSND_CUSTOM ON)
 	set(MSND_DAC ON)
+	set(MSND_FILTER_RC ON)
 	set(MSND_NAMCO ON)
 	set(MSND_NAMCONA ON)
 	set(MSND_NAMCO_15XX ON)
@@ -1272,9 +1289,10 @@ if(OPT_NAMCO)
 	set(MCPU_Z8000 ON)
 	list(APPEND CPU_DEFS
 		HAS_AY8910=1 HAS_C140=1 HAS_C352=1 HAS_CUSTOM=1 
-		HAS_DAC=1 HAS_NAMCO=1 HAS_NAMCONA=1 HAS_NAMCO_15XX=1 
-		HAS_NAMCO_52XX=1 HAS_NAMCO_54XX=1 HAS_NAMCO_63701X=1 HAS_NAMCO_CUS30=1 
-		HAS_SAMPLES=1 HAS_SN76496=1 HAS_YM2151=1 	)
+		HAS_DAC=1 HAS_FILTER_RC=1 HAS_NAMCO=1 HAS_NAMCONA=1 
+		HAS_NAMCO_15XX=1 HAS_NAMCO_52XX=1 HAS_NAMCO_54XX=1 HAS_NAMCO_63701X=1 
+		HAS_NAMCO_CUS30=1 HAS_SAMPLES=1 HAS_SN76496=1 HAS_YM2151=1 
+	)
 	list(APPEND CPU_DEFS
 		HAS_8080=1 HAS_H83002=1 HAS_HD63701=1 HAS_HD63705=1 
 		HAS_I960=1 HAS_M37702=1 HAS_M37710=1 HAS_M6502=1 
@@ -1282,6 +1300,11 @@ if(OPT_NAMCO)
 		HAS_M6805=1 HAS_M6809=1 HAS_M68EC020=1 HAS_PSXCPU=1 
 		HAS_R4650BE=1 HAS_S2650=1 HAS_TMS32025=1 HAS_Z80=1 
 		HAS_Z8000=1 	)
+endif()
+if(OPT_NAMCOS)
+	add_compile_definitions(LINK_NAMCOS=1)
+	list(APPEND MAME_DRIVERS_SRC
+	)
 endif()
 if(OPT_NASCO)
 	add_compile_definitions(LINK_NASCO=1)
@@ -1488,14 +1511,15 @@ if(OPT_PHOENIX)
 		vidhrdw/phoenix.c drivers/safarir.c sndhrdw/pleiads.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_CUSTOM ON)
+	set(MSND_DISCRETE ON)
 	set(MSND_SN76477 ON)
 	set(MSND_TMS36XX ON)
 	set(MCPU_8080 ON)
 	set(MCPU_8085A ON)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
-		HAS_AY8910=1 HAS_CUSTOM=1 HAS_SN76477=1 HAS_TMS36XX=1 
-	)
+		HAS_AY8910=1 HAS_CUSTOM=1 HAS_DISCRETE=1 HAS_SN76477=1 
+		HAS_TMS36XX=1 	)
 	list(APPEND CPU_DEFS
 		HAS_8080=1 HAS_8085A=1 HAS_Z80=1 	)
 endif()
@@ -1687,12 +1711,11 @@ endif()
 if(OPT_SETA)
 	add_compile_definitions(LINK_SETA=1)
 	list(APPEND MAME_DRIVERS_SRC
-		drivers/aleck64.c machine/n64.c vidhrdw/n64.c drivers/darkhors.c 
-		drivers/hanaawas.c vidhrdw/hanaawas.c drivers/macs.c drivers/seta.c 
-		vidhrdw/seta.c drivers/seta2.c vidhrdw/seta2.c drivers/speedatk.c 
-		vidhrdw/speedatk.c drivers/srmp2.c vidhrdw/srmp2.c drivers/srmp6.c 
-		drivers/ssv.c vidhrdw/ssv.c drivers/st0016.c vidhrdw/st0016.c 
-	)
+		machine/n64.c vidhrdw/n64.c drivers/darkhors.c drivers/hanaawas.c 
+		vidhrdw/hanaawas.c drivers/macs.c drivers/seta.c vidhrdw/seta.c 
+		drivers/seta2.c vidhrdw/seta2.c drivers/speedatk.c vidhrdw/speedatk.c 
+		drivers/srmp2.c vidhrdw/srmp2.c drivers/srmp6.c drivers/ssv.c 
+		vidhrdw/ssv.c drivers/st0016.c vidhrdw/st0016.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_CUSTOM ON)
 	set(MSND_ES5506 ON)
@@ -1748,24 +1771,25 @@ if(OPT_SIGMA)
 		machine/spiders.c sndhrdw/spiders.c vidhrdw/spiders.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
+	set(MSND_DISCRETE ON)
 	set(MCPU_M6800 ON)
 	set(MCPU_M6802 ON)
 	set(MCPU_M6809 ON)
 	list(APPEND CPU_DEFS
-		HAS_AY8910=1 HAS_DAC=1 	)
+		HAS_AY8910=1 HAS_DAC=1 HAS_DISCRETE=1 	)
 	list(APPEND CPU_DEFS
 		HAS_M6800=1 HAS_M6802=1 HAS_M6809=1 	)
 endif()
 if(OPT_SNK)
 	add_compile_definitions(LINK_SNK=1)
 	list(APPEND MAME_DRIVERS_SRC
-		drivers/bbusters.c vidhrdw/bbusters.c drivers/dmndrby.c drivers/hal21.c 
-		drivers/hng64.c vidhrdw/hng64.c drivers/jcross.c vidhrdw/jcross.c 
-		drivers/lasso.c vidhrdw/lasso.c drivers/mainsnk.c vidhrdw/mainsnk.c 
-		drivers/marvins.c vidhrdw/marvins.c drivers/munchmo.c vidhrdw/munchmo.c 
-		drivers/prehisle.c vidhrdw/prehisle.c drivers/rockola.c sndhrdw/rockola.c 
-		vidhrdw/rockola.c drivers/sgladiat.c drivers/snk.c vidhrdw/snk.c 
-		drivers/snk68.c vidhrdw/snk68.c 	)
+		drivers/bbusters.c vidhrdw/bbusters.c drivers/hal21.c drivers/hng64.c 
+		vidhrdw/hng64.c drivers/jcross.c vidhrdw/jcross.c drivers/lasso.c 
+		vidhrdw/lasso.c drivers/mainsnk.c vidhrdw/mainsnk.c drivers/marvins.c 
+		vidhrdw/marvins.c drivers/munchmo.c vidhrdw/munchmo.c drivers/prehisle.c 
+		vidhrdw/prehisle.c drivers/rockola.c sndhrdw/rockola.c vidhrdw/rockola.c 
+		drivers/sgladiat.c drivers/snk.c vidhrdw/snk.c drivers/snk68.c 
+		vidhrdw/snk68.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_CUSTOM ON)
 	set(MSND_DAC ON)
@@ -1902,9 +1926,8 @@ if(OPT_TAITO)
 		drivers/taito_b.c vidhrdw/taito_b.c drivers/taito_f2.c vidhrdw/taito_f2.c 
 		drivers/taito_f3.c vidhrdw/taito_f3.c sndhrdw/taito_f3.c drivers/taito_h.c 
 		vidhrdw/taito_h.c drivers/taito_l.c vidhrdw/taito_l.c drivers/taito_x.c 
-		machine/cchip.c drivers/taito_z.c vidhrdw/taito_z.c drivers/taitoair.c 
-		vidhrdw/taitoair.c drivers/taitojc.c drivers/taitosj.c machine/taitosj.c 
-		vidhrdw/taitosj.c drivers/taitowlf.c drivers/tnzs.c machine/tnzs.c 
+		machine/cchip.c drivers/taito_z.c vidhrdw/taito_z.c drivers/taitosj.c 
+		machine/taitosj.c vidhrdw/taitosj.c drivers/tnzs.c machine/tnzs.c 
 		vidhrdw/tnzs.c drivers/topspeed.c vidhrdw/topspeed.c drivers/tsamurai.c 
 		vidhrdw/tsamurai.c drivers/undrfire.c vidhrdw/undrfire.c drivers/volfied.c 
 		machine/volfied.c vidhrdw/volfied.c drivers/warriorb.c vidhrdw/warriorb.c 
@@ -1916,6 +1939,7 @@ if(OPT_TAITO)
 	set(MSND_DISCRETE ON)
 	set(MSND_ES5505 ON)
 	set(MSND_ES5506 ON)
+	set(MSND_FILTER_VOLUME ON)
 	set(MSND_MSM5205 ON)
 	set(MSND_MSM5232 ON)
 	set(MSND_OKIM6295 ON)
@@ -1950,11 +1974,11 @@ if(OPT_TAITO)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
 		HAS_AY8910=1 HAS_CUSTOM=1 HAS_DAC=1 HAS_DISCRETE=1 
-		HAS_ES5505=1 HAS_ES5506=1 HAS_MSM5205=1 HAS_MSM5232=1 
-		HAS_OKIM6295=1 HAS_SAMPLES=1 HAS_SN76477=1 HAS_SN76496=1 
-		HAS_X1_010=1 HAS_YM2151=1 HAS_YM2203=1 HAS_YM2610=1 
-		HAS_YM2610B=1 HAS_YM3438=1 HAS_YM3526=1 HAS_YM3812=1 
-	)
+		HAS_ES5505=1 HAS_ES5506=1 HAS_FILTER_VOLUME=1 HAS_MSM5205=1 
+		HAS_MSM5232=1 HAS_OKIM6295=1 HAS_SAMPLES=1 HAS_SN76477=1 
+		HAS_SN76496=1 HAS_X1_010=1 HAS_YM2151=1 HAS_YM2203=1 
+		HAS_YM2610=1 HAS_YM2610B=1 HAS_YM3438=1 HAS_YM3526=1 
+		HAS_YM3812=1 	)
 	list(APPEND CPU_DEFS
 		HAS_8080=1 HAS_I386=1 HAS_I8039=1 HAS_I8751=1 
 		HAS_I8X41=1 HAS_M6800=1 HAS_M68000=1 HAS_M6802=1 
@@ -2298,472 +2322,472 @@ if(OPT_ZACCARIA)
 		HAS_M6802=1 HAS_S2650=1 HAS_Z80=1 	)
 endif()
 if(MSND_ASTROCADE)
-	list(APPEND MAME_SOUND_SRC sound/astrocde.c )
+	list(APPEND MAME_SOUND_SRC sound/astrocde.c sound/astrocde.h )
 endif()
 if(MSND_AY8910)
-	list(APPEND MAME_SOUND_SRC sound/ay8910.c )
+	list(APPEND MAME_SOUND_SRC sound/ay8910.c sound/ay8910.h )
 endif()
 if(MSND_BSMT2000)
-	list(APPEND MAME_SOUND_SRC sound/bsmt2000.c )
+	list(APPEND MAME_SOUND_SRC sound/bsmt2000.c sound/bsmt2000.h )
 endif()
 if(MSND_C140)
-	list(APPEND MAME_SOUND_SRC sound/c140.c )
+	list(APPEND MAME_SOUND_SRC sound/c140.c sound/c140.h )
 endif()
 if(MSND_C352)
-	list(APPEND MAME_SOUND_SRC sound/c352.c )
+	list(APPEND MAME_SOUND_SRC sound/c352.c sound/c352.h )
 endif()
 if(MSND_C6280)
-	list(APPEND MAME_SOUND_SRC sound/c6280.c )
+	list(APPEND MAME_SOUND_SRC sound/c6280.c sound/c6280.h )
 endif()
 if(MSND_CDDA)
-	list(APPEND MAME_SOUND_SRC sound/cdda.c )
+	list(APPEND MAME_SOUND_SRC sound/cdda.c sound/cdda.h )
 endif()
 if(MSND_CEM3394)
-	list(APPEND MAME_SOUND_SRC sound/cem3394.c )
+	list(APPEND MAME_SOUND_SRC sound/cem3394.c sound/cem3394.h )
 endif()
 if(MSND_CUSTOM)
-	list(APPEND MAME_SOUND_SRC sound/custom.c )
+	list(APPEND MAME_SOUND_SRC sound/custom.c sound/custom.h )
 endif()
 if(MSND_DAC)
-	list(APPEND MAME_SOUND_SRC sound/dac.c )
+	list(APPEND MAME_SOUND_SRC sound/dac.c sound/dac.h )
 endif()
 if(MSND_DISCRETE)
-	list(APPEND MAME_SOUND_SRC sound/discrete.c )
+	list(APPEND MAME_SOUND_SRC sound/discrete.c sound/discrete.h )
 endif()
 if(MSND_DMADAC)
-	list(APPEND MAME_SOUND_SRC sound/dmadac.c )
+	list(APPEND MAME_SOUND_SRC sound/dmadac.c sound/dmadac.h )
 endif()
 if(MSND_ES5503)
-	list(APPEND MAME_SOUND_SRC sound/es5503.c )
+	list(APPEND MAME_SOUND_SRC sound/es5503.c sound/es5503.h )
 endif()
 if(MSND_ES5505)
-	list(APPEND MAME_SOUND_SRC sound/es5506.c )
+	list(APPEND MAME_SOUND_SRC sound/es5506.c sound/es5506.h )
 endif()
 if(MSND_ES5506)
-	list(APPEND MAME_SOUND_SRC sound/es5506.c )
+	list(APPEND MAME_SOUND_SRC sound/es5506.c sound/es5506.h )
 endif()
 if(MSND_ES8712)
-	list(APPEND MAME_SOUND_SRC sound/es8712.c )
+	list(APPEND MAME_SOUND_SRC sound/es8712.c sound/es8712.h )
 endif()
 if(MSND_GAELCO_CG1V)
-	list(APPEND MAME_SOUND_SRC sound/gaelco.c )
+	list(APPEND MAME_SOUND_SRC sound/gaelco.c sound/gaelco.h )
 endif()
 if(MSND_GAELCO_GAE1)
-	list(APPEND MAME_SOUND_SRC sound/gaelco.c )
+	list(APPEND MAME_SOUND_SRC sound/gaelco.c sound/gaelco.h )
 endif()
 if(MSND_HC55516)
-	list(APPEND MAME_SOUND_SRC sound/hc55516.c )
+	list(APPEND MAME_SOUND_SRC sound/hc55516.c sound/hc55516.h )
 endif()
 if(MSND_ICS2115)
-	list(APPEND MAME_SOUND_SRC sound/ics2115.c )
+	list(APPEND MAME_SOUND_SRC sound/ics2115.c sound/ics2115.h )
 endif()
 if(MSND_IREMGA20)
-	list(APPEND MAME_SOUND_SRC sound/iremga20.c )
+	list(APPEND MAME_SOUND_SRC sound/iremga20.c sound/iremga20.h )
 endif()
 if(MSND_K005289)
-	list(APPEND MAME_SOUND_SRC sound/k005289.c )
+	list(APPEND MAME_SOUND_SRC sound/k005289.c sound/k005289.h )
 endif()
 if(MSND_K007232)
-	list(APPEND MAME_SOUND_SRC sound/k007232.c )
+	list(APPEND MAME_SOUND_SRC sound/k007232.c sound/k007232.h )
 endif()
 if(MSND_K051649)
-	list(APPEND MAME_SOUND_SRC sound/k051649.c )
+	list(APPEND MAME_SOUND_SRC sound/k051649.c sound/k051649.h )
 endif()
 if(MSND_K053260)
-	list(APPEND MAME_SOUND_SRC sound/k053260.c )
+	list(APPEND MAME_SOUND_SRC sound/k053260.c sound/k053260.h )
 endif()
 if(MSND_K054539)
-	list(APPEND MAME_SOUND_SRC sound/k054539.c )
+	list(APPEND MAME_SOUND_SRC sound/k054539.c sound/k054539.h )
 endif()
 if(MSND_MSM5205)
-	list(APPEND MAME_SOUND_SRC sound/msm5205.c )
+	list(APPEND MAME_SOUND_SRC sound/msm5205.c sound/msm5205.h )
 endif()
 if(MSND_MSM5232)
-	list(APPEND MAME_SOUND_SRC sound/msm5232.c )
+	list(APPEND MAME_SOUND_SRC sound/msm5232.c sound/msm5232.h )
 endif()
 if(MSND_MULTIPCM)
-	list(APPEND MAME_SOUND_SRC sound/multipcm.c )
+	list(APPEND MAME_SOUND_SRC sound/multipcm.c sound/multipcm.h )
 endif()
 if(MSND_NAMCO)
-	list(APPEND MAME_SOUND_SRC sound/namco.c )
+	list(APPEND MAME_SOUND_SRC sound/namco.c sound/namco.h )
 endif()
 if(MSND_NAMCONA)
-	list(APPEND MAME_SOUND_SRC sound/namcona.c )
+	list(APPEND MAME_SOUND_SRC sound/namcona.c sound/namcona.h )
 endif()
 if(MSND_NAMCO_15XX)
-	list(APPEND MAME_SOUND_SRC sound/namco.c )
+	list(APPEND MAME_SOUND_SRC sound/namco.c sound/namco.h )
 endif()
 if(MSND_NAMCO_52XX)
-	list(APPEND MAME_SOUND_SRC sound/namco52.c )
+	list(APPEND MAME_SOUND_SRC sound/namco52.c sound/namco52.h )
 endif()
 if(MSND_NAMCO_54XX)
-	list(APPEND MAME_SOUND_SRC sound/namco54.c )
+	list(APPEND MAME_SOUND_SRC sound/namco54.c sound/namco54.h )
 endif()
 if(MSND_NAMCO_63701X)
-	list(APPEND MAME_SOUND_SRC sound/n63701x.c )
+	list(APPEND MAME_SOUND_SRC sound/n63701x.c sound/n63701x.h )
 endif()
 if(MSND_NAMCO_CUS30)
-	list(APPEND MAME_SOUND_SRC sound/namco.c )
+	list(APPEND MAME_SOUND_SRC sound/namco.c sound/namco.h )
 endif()
 if(MSND_NES)
-	list(APPEND MAME_SOUND_SRC sound/nes_apu.c )
+	list(APPEND MAME_SOUND_SRC sound/nes_apu.c sound/nes_apu.h )
 endif()
 if(MSND_OKIM6295)
-	list(APPEND MAME_SOUND_SRC sound/okim6295.c )
+	list(APPEND MAME_SOUND_SRC sound/okim6295.c sound/okim6295.h )
 endif()
 if(MSND_POKEY)
-	list(APPEND MAME_SOUND_SRC sound/pokey.c )
+	list(APPEND MAME_SOUND_SRC sound/pokey.c sound/pokey.h )
 endif()
 if(MSND_PSXSPU)
-	list(APPEND MAME_SOUND_SRC sound/psx.c )
+	list(APPEND MAME_SOUND_SRC sound/psx.c sound/psx.h )
 endif()
 if(MSND_QSOUND)
-	list(APPEND MAME_SOUND_SRC sound/qsound.c )
+	list(APPEND MAME_SOUND_SRC sound/qsound.c sound/qsound.h )
 endif()
 if(MSND_RF5C400)
-	list(APPEND MAME_SOUND_SRC sound/rf5c400.c )
+	list(APPEND MAME_SOUND_SRC sound/rf5c400.c sound/rf5c400.h )
 endif()
 if(MSND_RF5C68)
-	list(APPEND MAME_SOUND_SRC sound/rf5c68.c )
+	list(APPEND MAME_SOUND_SRC sound/rf5c68.c sound/rf5c68.h )
 endif()
 if(MSND_SAA1099)
-	list(APPEND MAME_SOUND_SRC sound/saa1099.c )
+	list(APPEND MAME_SOUND_SRC sound/saa1099.c sound/saa1099.h )
 endif()
 if(MSND_SAMPLES)
-	list(APPEND MAME_SOUND_SRC sound/samples.c )
+	list(APPEND MAME_SOUND_SRC sound/samples.c sound/samples.h )
 endif()
 if(MSND_SCSP)
-	list(APPEND MAME_SOUND_SRC sound/scsp.c )
+	list(APPEND MAME_SOUND_SRC sound/scsp.c sound/scsp.h )
 endif()
 if(MSND_SEGAPCM)
-	list(APPEND MAME_SOUND_SRC sound/segapcm.c )
+	list(APPEND MAME_SOUND_SRC sound/segapcm.c sound/segapcm.h )
 endif()
 if(MSND_SN76477)
-	list(APPEND MAME_SOUND_SRC sound/sn76477.c )
+	list(APPEND MAME_SOUND_SRC sound/sn76477.c sound/sn76477.h )
 endif()
 if(MSND_SN76496)
-	list(APPEND MAME_SOUND_SRC sound/sn76496.c )
+	list(APPEND MAME_SOUND_SRC sound/sn76496.c sound/sn76496.h )
 endif()
 if(MSND_SP0250)
-	list(APPEND MAME_SOUND_SRC sound/sp0250.c )
+	list(APPEND MAME_SOUND_SRC sound/sp0250.c sound/sp0250.h )
 endif()
 if(MSND_ST0016)
-	list(APPEND MAME_SOUND_SRC sound/st0016.c )
+	list(APPEND MAME_SOUND_SRC sound/st0016.c sound/st0016.h )
 endif()
 if(MSND_TIA)
-	list(APPEND MAME_SOUND_SRC sound/tiasound.c sound/tiaintf.c )
+	list(APPEND MAME_SOUND_SRC sound/tiasound.c sound/tiaintf.c sound/tiasound.h sound/tiaintf.h )
 endif()
 if(MSND_TMS36XX)
-	list(APPEND MAME_SOUND_SRC sound/tms36xx.c )
+	list(APPEND MAME_SOUND_SRC sound/tms36xx.c sound/tms36xx.h )
 endif()
 if(MSND_TMS5110)
-	list(APPEND MAME_SOUND_SRC sound/tms5110.c sound/5110intf.c )
+	list(APPEND MAME_SOUND_SRC sound/tms5110.c sound/5110intf.c sound/tms5110.h sound/5110intf.h )
 endif()
 if(MSND_TMS5220)
-	list(APPEND MAME_SOUND_SRC sound/tms5220.c sound/5220intf.c )
+	list(APPEND MAME_SOUND_SRC sound/tms5220.c sound/5220intf.c sound/tms5220.h sound/5220intf.h )
 endif()
 if(MSND_UPD7759)
-	list(APPEND MAME_SOUND_SRC sound/upd7759.c )
+	list(APPEND MAME_SOUND_SRC sound/upd7759.c sound/upd7759.h )
 endif()
 if(MSND_VLM5030)
-	list(APPEND MAME_SOUND_SRC sound/vlm5030.c )
+	list(APPEND MAME_SOUND_SRC sound/vlm5030.c sound/vlm5030.h )
 endif()
 if(MSND_VRENDER0)
-	list(APPEND MAME_SOUND_SRC sound/vrender0.c )
+	list(APPEND MAME_SOUND_SRC sound/vrender0.c sound/vrender0.h )
 endif()
 if(MSND_X1_010)
-	list(APPEND MAME_SOUND_SRC sound/x1_010.c )
+	list(APPEND MAME_SOUND_SRC sound/x1_010.c sound/x1_010.h )
 endif()
 if(MSND_Y8950)
-	list(APPEND MAME_SOUND_SRC sound/3812intf.c sound/fmopl.c sound/ymdeltat.c )
+	list(APPEND MAME_SOUND_SRC sound/3812intf.c sound/fmopl.c sound/ymdeltat.c sound/3812intf.h sound/fmopl.h sound/ymdeltat.h )
 endif()
 if(MSND_YM2151)
-	list(APPEND MAME_SOUND_SRC sound/2151intf.c sound/ym2151.c )
+	list(APPEND MAME_SOUND_SRC sound/2151intf.c sound/ym2151.c sound/2151intf.h sound/ym2151.h )
 endif()
 if(MSND_YM2203)
-	list(APPEND MAME_SOUND_SRC sound/2203intf.c sound/ay8910.c sound/fm.c )
+	list(APPEND MAME_SOUND_SRC sound/2203intf.c sound/ay8910.c sound/fm.c sound/2203intf.h sound/ay8910.h sound/fm.h )
 endif()
 if(MSND_YM2413)
-	list(APPEND MAME_SOUND_SRC sound/2413intf.c sound/ym2413.c )
+	list(APPEND MAME_SOUND_SRC sound/2413intf.c sound/ym2413.c sound/2413intf.h sound/ym2413.h )
 endif()
 if(MSND_YM2608)
-	list(APPEND MAME_SOUND_SRC sound/2608intf.c sound/ay8910.c sound/fm.c sound/ymdeltat.c )
+	list(APPEND MAME_SOUND_SRC sound/2608intf.c sound/ay8910.c sound/fm.c sound/ymdeltat.c sound/2608intf.h sound/ay8910.h sound/fm.h sound/ymdeltat.h )
 endif()
 if(MSND_YM2610)
-	list(APPEND MAME_SOUND_SRC sound/2610intf.c sound/ay8910.c sound/fm.c sound/ymdeltat.c )
+	list(APPEND MAME_SOUND_SRC sound/2610intf.c sound/ay8910.c sound/fm.c sound/ymdeltat.c sound/2610intf.h sound/ay8910.h sound/fm.h sound/ymdeltat.h )
 endif()
 if(MSND_YM2610B)
-	list(APPEND MAME_SOUND_SRC sound/2610intf.c sound/ay8910.c sound/fm.c sound/ymdeltat.c )
+	list(APPEND MAME_SOUND_SRC sound/2610intf.c sound/ay8910.c sound/fm.c sound/ymdeltat.c sound/2610intf.h sound/ay8910.h sound/fm.h sound/ymdeltat.h )
 endif()
 if(MSND_YM3438)
-	list(APPEND MAME_SOUND_SRC sound/2612intf.c sound/ay8910.c sound/fm.c )
+	list(APPEND MAME_SOUND_SRC sound/2612intf.c sound/ay8910.c sound/fm.c sound/2612intf.h sound/ay8910.h sound/fm.h )
 endif()
 if(MSND_YM3526)
-	list(APPEND MAME_SOUND_SRC sound/3812intf.c sound/fmopl.c )
+	list(APPEND MAME_SOUND_SRC sound/3812intf.c sound/fmopl.c sound/3812intf.h sound/fmopl.h )
 endif()
 if(MSND_YM3812)
-	list(APPEND MAME_SOUND_SRC sound/3812intf.c sound/fmopl.c )
+	list(APPEND MAME_SOUND_SRC sound/3812intf.c sound/fmopl.c sound/3812intf.h sound/fmopl.h )
 endif()
 if(MSND_YMF262)
-	list(APPEND MAME_SOUND_SRC sound/ymf262.c sound/262intf.c )
+	list(APPEND MAME_SOUND_SRC sound/ymf262.c sound/262intf.c sound/ymf262.h sound/262intf.h )
 endif()
 if(MSND_YMF271)
-	list(APPEND MAME_SOUND_SRC sound/ymf271.c )
+	list(APPEND MAME_SOUND_SRC sound/ymf271.c sound/ymf271.h )
 endif()
 if(MSND_YMF278B)
-	list(APPEND MAME_SOUND_SRC sound/ymf278b.c )
+	list(APPEND MAME_SOUND_SRC sound/ymf278b.c sound/ymf278b.h )
 endif()
 if(MSND_YMZ280B)
-	list(APPEND MAME_SOUND_SRC sound/ymz280b.c )
+	list(APPEND MAME_SOUND_SRC sound/ymz280b.c sound/ymz280b.h )
 endif()
 if(MCPU_8080)
-	list(APPEND MAME_CPU_SRC cpu/i8085/i8085.c )
+	list(APPEND MAME_CPU_SRC cpu/i8085/i8085.c cpu/i8085/i8085.h )
 endif()
 if(MCPU_8085A)
-	list(APPEND MAME_CPU_SRC cpu/i8085/i8085.c )
+	list(APPEND MAME_CPU_SRC cpu/i8085/i8085.c cpu/i8085/i8085.h )
 endif()
 if(MCPU_ADSP2100)
-	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c )
+	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c cpu/adsp2100/adsp2100.h )
 endif()
 if(MCPU_ADSP2101)
-	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c )
+	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c cpu/adsp2100/adsp2100.h )
 endif()
 if(MCPU_ADSP2104)
-	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c )
+	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c cpu/adsp2100/adsp2100.h )
 endif()
 if(MCPU_ADSP2105)
-	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c )
+	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c cpu/adsp2100/adsp2100.h )
 endif()
 if(MCPU_ADSP21062)
-	list(APPEND MAME_CPU_SRC cpu/sharc/sharc.c )
+	list(APPEND MAME_CPU_SRC cpu/sharc/sharc.c cpu/sharc/sharc.h )
 endif()
 if(MCPU_ADSP2115)
-	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c )
+	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c cpu/adsp2100/adsp2100.h )
 endif()
 if(MCPU_ADSP2181)
-	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c )
+	list(APPEND MAME_CPU_SRC cpu/adsp2100/adsp2100.c cpu/adsp2100/adsp2100.h )
 endif()
 if(MCPU_ALPHA8201)
-	list(APPEND MAME_CPU_SRC cpu/alph8201/alph8201.c )
+	list(APPEND MAME_CPU_SRC cpu/alph8201/alph8201.c cpu/alph8201/alph8201.h )
 endif()
 if(MCPU_ALPHA8301)
-	list(APPEND MAME_CPU_SRC cpu/alph8201/alph8201.c )
+	list(APPEND MAME_CPU_SRC cpu/alph8201/alph8201.c cpu/alph8201/alph8201.h )
 endif()
 if(MCPU_ARM)
-	list(APPEND MAME_CPU_SRC cpu/arm/arm.c )
+	list(APPEND MAME_CPU_SRC cpu/arm/arm.c cpu/arm/arm.h )
 endif()
 if(MCPU_ARM7)
-	list(APPEND MAME_CPU_SRC cpu/arm7/arm7.c )
+	list(APPEND MAME_CPU_SRC cpu/arm7/arm7.c cpu/arm7/arm7.h )
 endif()
 if(MCPU_ASAP)
-	list(APPEND MAME_CPU_SRC cpu/asap/asap.c )
+	list(APPEND MAME_CPU_SRC cpu/asap/asap.c cpu/asap/asap.h )
 endif()
 if(MCPU_CCPU)
-	list(APPEND MAME_CPU_SRC cpu/ccpu/ccpu.c )
+	list(APPEND MAME_CPU_SRC cpu/ccpu/ccpu.c cpu/ccpu/ccpu.h )
 endif()
 if(MCPU_DECO16)
-	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c )
+	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c cpu/m6502/m6502.h )
 endif()
 if(MCPU_DSP32C)
-	list(APPEND MAME_CPU_SRC cpu/dsp32/dsp32.c )
+	list(APPEND MAME_CPU_SRC cpu/dsp32/dsp32.c cpu/dsp32/dsp32.h )
 endif()
 if(MCPU_DSP56156)
-	list(APPEND MAME_CPU_SRC cpu/dsp56k/dsp56k.c )
+	list(APPEND MAME_CPU_SRC cpu/dsp56k/dsp56k.c cpu/dsp56k/dsp56k.h )
 endif()
 if(MCPU_E116T)
-	list(APPEND MAME_CPU_SRC cpu/e132xs/e132xs.c )
+	list(APPEND MAME_CPU_SRC cpu/e132xs/e132xs.c cpu/e132xs/e132xs.h )
 endif()
 if(MCPU_E132N)
-	list(APPEND MAME_CPU_SRC cpu/e132xs/e132xs.c )
+	list(APPEND MAME_CPU_SRC cpu/e132xs/e132xs.c cpu/e132xs/e132xs.h )
 endif()
 if(MCPU_E132XT)
-	list(APPEND MAME_CPU_SRC cpu/e132xs/e132xs.c )
+	list(APPEND MAME_CPU_SRC cpu/e132xs/e132xs.c cpu/e132xs/e132xs.h )
 endif()
 if(MCPU_G65816)
-	list(APPEND MAME_CPU_SRC cpu/g65816/g65816.c cpu/g65816/g65816o0.c cpu/g65816/g65816o1.c cpu/g65816/g65816o2.c cpu/g65816/g65816o3.c cpu/g65816/g65816o4.c )
+	list(APPEND MAME_CPU_SRC cpu/g65816/g65816.c cpu/g65816/g65816o0.c cpu/g65816/g65816o1.c cpu/g65816/g65816o2.c cpu/g65816/g65816o3.c cpu/g65816/g65816o4.c cpu/g65816/g65816.h )
 endif()
 if(MCPU_H6280)
-	list(APPEND MAME_CPU_SRC cpu/h6280/h6280.c )
+	list(APPEND MAME_CPU_SRC cpu/h6280/h6280.c cpu/h6280/h6280.h )
 endif()
 if(MCPU_H83002)
-	list(APPEND MAME_CPU_SRC cpu/h83002/h83002.c cpu/h83002/h8periph.c )
+	list(APPEND MAME_CPU_SRC cpu/h83002/h83002.c cpu/h83002/h8periph.c cpu/h83002/h83002.h )
 endif()
 if(MCPU_HD6309)
-	list(APPEND MAME_CPU_SRC cpu/hd6309/hd6309.c )
+	list(APPEND MAME_CPU_SRC cpu/hd6309/hd6309.c cpu/hd6309/hd6309.h )
 endif()
 if(MCPU_HD63701)
-	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c )
+	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c cpu/m6800/m6800.h )
 endif()
 if(MCPU_HD63705)
-	list(APPEND MAME_CPU_SRC cpu/m6805/m6805.c )
+	list(APPEND MAME_CPU_SRC cpu/m6805/m6805.c cpu/m6805/m6805.h )
 endif()
 if(MCPU_I186)
-	list(APPEND MAME_CPU_SRC cpu/i86/i86.c )
+	list(APPEND MAME_CPU_SRC cpu/i86/i86.c cpu/i86/i86.h )
 endif()
 if(MCPU_I386)
-	list(APPEND MAME_CPU_SRC cpu/i386/i386.c )
+	list(APPEND MAME_CPU_SRC cpu/i386/i386.c cpu/i386/i386.h )
 endif()
 if(MCPU_I8035)
-	list(APPEND MAME_CPU_SRC cpu/i8039/i8039.c )
+	list(APPEND MAME_CPU_SRC cpu/i8039/i8039.c cpu/i8039/i8039.h )
 endif()
 if(MCPU_I8039)
-	list(APPEND MAME_CPU_SRC cpu/i8039/i8039.c )
+	list(APPEND MAME_CPU_SRC cpu/i8039/i8039.c cpu/i8039/i8039.h )
 endif()
 if(MCPU_I8048)
-	list(APPEND MAME_CPU_SRC cpu/i8039/i8039.c )
+	list(APPEND MAME_CPU_SRC cpu/i8039/i8039.c cpu/i8039/i8039.h )
 endif()
 if(MCPU_I8051)
-	list(APPEND MAME_CPU_SRC cpu/i8051/i8051.c )
+	list(APPEND MAME_CPU_SRC cpu/i8051/i8051.c cpu/i8051/i8051.h )
 endif()
 if(MCPU_I8052)
-	list(APPEND MAME_CPU_SRC cpu/i8051/i8051.c )
+	list(APPEND MAME_CPU_SRC cpu/i8051/i8051.c cpu/i8051/i8051.h )
 endif()
 if(MCPU_I86)
-	list(APPEND MAME_CPU_SRC cpu/i86/i86.c )
+	list(APPEND MAME_CPU_SRC cpu/i86/i86.c cpu/i86/i86.h )
 endif()
 if(MCPU_I8751)
-	list(APPEND MAME_CPU_SRC cpu/i8051/i8051.c )
+	list(APPEND MAME_CPU_SRC cpu/i8051/i8051.c cpu/i8051/i8051.h )
 endif()
 if(MCPU_I88)
-	list(APPEND MAME_CPU_SRC cpu/i86/i86.c )
+	list(APPEND MAME_CPU_SRC cpu/i86/i86.c cpu/i86/i86.h )
 endif()
 if(MCPU_I8X41)
-	list(APPEND MAME_CPU_SRC cpu/i8x41/i8x41.c )
+	list(APPEND MAME_CPU_SRC cpu/i8x41/i8x41.c cpu/i8x41/i8x41.h )
 endif()
 if(MCPU_I960)
-	list(APPEND MAME_CPU_SRC cpu/i960/i960.c )
+	list(APPEND MAME_CPU_SRC cpu/i960/i960.c cpu/i960/i960.h )
 endif()
 if(MCPU_JAGUAR)
-	list(APPEND MAME_CPU_SRC cpu/jaguar/jaguar.c )
+	list(APPEND MAME_CPU_SRC cpu/jaguar/jaguar.c cpu/jaguar/jaguar.h )
 endif()
 if(MCPU_KONAMI)
-	list(APPEND MAME_CPU_SRC cpu/konami/konami.c )
+	list(APPEND MAME_CPU_SRC cpu/konami/konami.c cpu/konami/konami.h )
 endif()
 if(MCPU_M37702)
-	list(APPEND MAME_CPU_SRC cpu/m37710/m37710.c cpu/m37710/m37710o0.c cpu/m37710/m37710o1.c cpu/m37710/m37710o2.c cpu/m37710/m37710o3.c cpu/m37710/m7700ds.c )
+	list(APPEND MAME_CPU_SRC cpu/m37710/m37710.c cpu/m37710/m37710o0.c cpu/m37710/m37710o1.c cpu/m37710/m37710o2.c cpu/m37710/m37710o3.c cpu/m37710/m7700ds.c cpu/m37710/m37710.h cpu/m37710/m7700ds.h )
 endif()
 if(MCPU_M37710)
-	list(APPEND MAME_CPU_SRC cpu/m37710/m37710.c cpu/m37710/m37710o0.c cpu/m37710/m37710o1.c cpu/m37710/m37710o2.c cpu/m37710/m37710o3.c cpu/m37710/m7700ds.c )
+	list(APPEND MAME_CPU_SRC cpu/m37710/m37710.c cpu/m37710/m37710o0.c cpu/m37710/m37710o1.c cpu/m37710/m37710o2.c cpu/m37710/m37710o3.c cpu/m37710/m7700ds.c cpu/m37710/m37710.h cpu/m37710/m7700ds.h )
 endif()
 if(MCPU_M6502)
-	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c )
+	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c cpu/m6502/m6502.h )
 endif()
 if(MCPU_M65C02)
-	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c )
+	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c cpu/m6502/m6502.h )
 endif()
 if(MCPU_M65SC02)
-	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c )
+	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c cpu/m6502/m6502.h )
 endif()
 if(MCPU_M6800)
-	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c )
+	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c cpu/m6800/m6800.h )
 endif()
 if(MCPU_M68000)
-	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c )
+	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c cpu/m68000/m68kcpu.h cpu/m68000/m68kmame.h cpu/m68000/m68kops.h )
 endif()
 if(MCPU_M68010)
-	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c )
+	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c cpu/m68000/m68kcpu.h cpu/m68000/m68kmame.h cpu/m68000/m68kops.h )
 endif()
 if(MCPU_M6802)
-	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c )
+	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c cpu/m6800/m6800.h )
 endif()
 if(MCPU_M68020)
-	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c )
+	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c cpu/m68000/m68kcpu.h cpu/m68000/m68kmame.h cpu/m68000/m68kops.h )
 endif()
 if(MCPU_M6803)
-	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c )
+	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c cpu/m6800/m6800.h )
 endif()
 if(MCPU_M68040)
-	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c )
+	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c cpu/m68000/m68kcpu.h cpu/m68000/m68kmame.h cpu/m68000/m68kops.h )
 endif()
 if(MCPU_M6805)
-	list(APPEND MAME_CPU_SRC cpu/m6805/m6805.c )
+	list(APPEND MAME_CPU_SRC cpu/m6805/m6805.c cpu/m6805/m6805.h )
 endif()
 if(MCPU_M6808)
-	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c )
+	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c cpu/m6800/m6800.h )
 endif()
 if(MCPU_M6809)
-	list(APPEND MAME_CPU_SRC cpu/m6809/m6809.c )
+	list(APPEND MAME_CPU_SRC cpu/m6809/m6809.c cpu/m6809/m6809.h )
 endif()
 if(MCPU_M6809E)
-	list(APPEND MAME_CPU_SRC cpu/m6809/m6809.c )
+	list(APPEND MAME_CPU_SRC cpu/m6809/m6809.c cpu/m6809/m6809.h )
 endif()
 if(MCPU_M68705)
-	list(APPEND MAME_CPU_SRC cpu/m6805/m6805.c )
+	list(APPEND MAME_CPU_SRC cpu/m6805/m6805.c cpu/m6805/m6805.h )
 endif()
 if(MCPU_M68EC020)
-	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c )
+	list(APPEND MAME_CPU_SRC cpu/m68000/m68kcpu.c cpu/m68000/m68kmame.c cpu/m68000/m68kops.c cpu/m68000/m68kopac.c cpu/m68000/m68kopdm.c cpu/m68000/m68kopnz.c cpu/m68000/m68kcpu.h cpu/m68000/m68kmame.h cpu/m68000/m68kops.h )
 endif()
 if(MCPU_MC68HC11)
-	list(APPEND MAME_CPU_SRC cpu/mc68hc11/mc68hc11.c )
+	list(APPEND MAME_CPU_SRC cpu/mc68hc11/mc68hc11.c cpu/mc68hc11/mc68hc11.h )
 endif()
 if(MCPU_MEDIAGX)
-	list(APPEND MAME_CPU_SRC cpu/i386/i386.c )
+	list(APPEND MAME_CPU_SRC cpu/i386/i386.c cpu/i386/i386.h )
 endif()
 if(MCPU_N2A03)
-	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c )
+	list(APPEND MAME_CPU_SRC cpu/m6502/m6502.c cpu/m6502/m6502.h )
 endif()
 if(MCPU_N7751)
-	list(APPEND MAME_CPU_SRC cpu/i8039/i8039.c )
+	list(APPEND MAME_CPU_SRC cpu/i8039/i8039.c cpu/i8039/i8039.h )
 endif()
 if(MCPU_NSC8105)
-	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c )
+	list(APPEND MAME_CPU_SRC cpu/m6800/m6800.c cpu/m6800/m6800.h )
 endif()
 if(MCPU_PENTIUM)
-	list(APPEND MAME_CPU_SRC cpu/i386/i386.c )
+	list(APPEND MAME_CPU_SRC cpu/i386/i386.c cpu/i386/i386.h )
 endif()
 if(MCPU_PIC16C55)
-	list(APPEND MAME_CPU_SRC cpu/pic16c5x/pic16c5x.c )
+	list(APPEND MAME_CPU_SRC cpu/pic16c5x/pic16c5x.c cpu/pic16c5x/pic16c5x.h )
 endif()
 if(MCPU_PIC16C57)
-	list(APPEND MAME_CPU_SRC cpu/pic16c5x/pic16c5x.c )
+	list(APPEND MAME_CPU_SRC cpu/pic16c5x/pic16c5x.c cpu/pic16c5x/pic16c5x.h )
 endif()
 if(MCPU_PPC403)
-	list(APPEND MAME_CPU_SRC cpu/powerpc/ppcdrc.c cpu/powerpc/ppc.c )
+	list(APPEND MAME_CPU_SRC cpu/powerpc/ppcdrc.c cpu/powerpc/ppc.c cpu/powerpc/ppc.h )
 endif()
 if(MCPU_PPC602)
-	list(APPEND MAME_CPU_SRC cpu/powerpc/ppcdrc.c cpu/powerpc/ppc.c )
+	list(APPEND MAME_CPU_SRC cpu/powerpc/ppcdrc.c cpu/powerpc/ppc.c cpu/powerpc/ppc.h )
 endif()
 if(MCPU_PSXCPU)
-	list(APPEND MAME_CPU_SRC cpu/mips/psx.c )
+	list(APPEND MAME_CPU_SRC cpu/mips/psx.c cpu/mips/psx.h )
 endif()
 if(MCPU_RSP)
-	list(APPEND MAME_CPU_SRC cpu/rsp/rsp.c )
+	list(APPEND MAME_CPU_SRC cpu/rsp/rsp.c cpu/rsp/rsp.h )
 endif()
 if(MCPU_S2650)
-	list(APPEND MAME_CPU_SRC cpu/s2650/s2650.c )
+	list(APPEND MAME_CPU_SRC cpu/s2650/s2650.c cpu/s2650/s2650.h )
 endif()
 if(MCPU_SE3208)
-	list(APPEND MAME_CPU_SRC cpu/se3208/se3208.c )
+	list(APPEND MAME_CPU_SRC cpu/se3208/se3208.c cpu/se3208/se3208.h )
 endif()
 if(MCPU_SH2)
-	list(APPEND MAME_CPU_SRC cpu/sh2/sh2.c )
+	list(APPEND MAME_CPU_SRC cpu/sh2/sh2.c cpu/sh2/sh2.h )
 endif()
 if(MCPU_SPC700)
-	list(APPEND MAME_CPU_SRC cpu/spc700/spc700.c )
+	list(APPEND MAME_CPU_SRC cpu/spc700/spc700.c cpu/spc700/spc700.h )
 endif()
 if(MCPU_T11)
-	list(APPEND MAME_CPU_SRC cpu/t11/t11.c )
+	list(APPEND MAME_CPU_SRC cpu/t11/t11.c cpu/t11/t11.h )
 endif()
 if(MCPU_TMS32010)
-	list(APPEND MAME_CPU_SRC cpu/tms32010/tms32010.c )
+	list(APPEND MAME_CPU_SRC cpu/tms32010/tms32010.c cpu/tms32010/tms32010.h )
 endif()
 if(MCPU_TMS32025)
-	list(APPEND MAME_CPU_SRC cpu/tms32025/tms32025.c )
+	list(APPEND MAME_CPU_SRC cpu/tms32025/tms32025.c cpu/tms32025/tms32025.h )
 endif()
 if(MCPU_TMS32026)
-	list(APPEND MAME_CPU_SRC cpu/tms32025/tms32025.c )
+	list(APPEND MAME_CPU_SRC cpu/tms32025/tms32025.c cpu/tms32025/tms32025.h )
 endif()
 if(MCPU_TMS32031)
-	list(APPEND MAME_CPU_SRC cpu/tms32031/tms32031.c )
+	list(APPEND MAME_CPU_SRC cpu/tms32031/tms32031.c cpu/tms32031/tms32031.h )
 endif()
 if(MCPU_TMS32051)
-	list(APPEND MAME_CPU_SRC cpu/tms32051/tms32051.c )
+	list(APPEND MAME_CPU_SRC cpu/tms32051/tms32051.c cpu/tms32051/tms32051.h )
 endif()
 if(MCPU_TMS34010)
-	list(APPEND MAME_CPU_SRC cpu/tms34010/tms34010.c cpu/tms34010/34010fld.c )
+	list(APPEND MAME_CPU_SRC cpu/tms34010/tms34010.c cpu/tms34010/34010fld.c cpu/tms34010/tms34010.h )
 endif()
 if(MCPU_TMS34020)
-	list(APPEND MAME_CPU_SRC cpu/tms34010/tms34010.c cpu/tms34010/34010fld.c )
+	list(APPEND MAME_CPU_SRC cpu/tms34010/tms34010.c cpu/tms34010/34010fld.c cpu/tms34010/tms34010.h )
 endif()
 if(MCPU_TMS9980)
 	list(APPEND MAME_CPU_SRC cpu/tms9900/tms9980a.c )
@@ -2772,37 +2796,37 @@ if(MCPU_TMS9995)
 	list(APPEND MAME_CPU_SRC cpu/tms9900/tms9995.c )
 endif()
 if(MCPU_UPD7807)
-	list(APPEND MAME_CPU_SRC cpu/upd7810/upd7810.c )
+	list(APPEND MAME_CPU_SRC cpu/upd7810/upd7810.c cpu/upd7810/upd7810.h )
 endif()
 if(MCPU_UPD7810)
-	list(APPEND MAME_CPU_SRC cpu/upd7810/upd7810.c )
+	list(APPEND MAME_CPU_SRC cpu/upd7810/upd7810.c cpu/upd7810/upd7810.h )
 endif()
 if(MCPU_V20)
-	list(APPEND MAME_CPU_SRC cpu/nec/nec.c )
+	list(APPEND MAME_CPU_SRC cpu/nec/nec.c cpu/nec/nec.h )
 endif()
 if(MCPU_V30)
-	list(APPEND MAME_CPU_SRC cpu/nec/nec.c )
+	list(APPEND MAME_CPU_SRC cpu/nec/nec.c cpu/nec/nec.h )
 endif()
 if(MCPU_V33)
-	list(APPEND MAME_CPU_SRC cpu/nec/nec.c )
+	list(APPEND MAME_CPU_SRC cpu/nec/nec.c cpu/nec/nec.h )
 endif()
 if(MCPU_V60)
-	list(APPEND MAME_CPU_SRC cpu/v60/v60.c )
+	list(APPEND MAME_CPU_SRC cpu/v60/v60.c cpu/v60/v60.h )
 endif()
 if(MCPU_V70)
-	list(APPEND MAME_CPU_SRC cpu/v60/v60.c )
+	list(APPEND MAME_CPU_SRC cpu/v60/v60.c cpu/v60/v60.h )
 endif()
 if(MCPU_V810)
-	list(APPEND MAME_CPU_SRC cpu/v810/v810.c )
+	list(APPEND MAME_CPU_SRC cpu/v810/v810.c cpu/v810/v810.h )
 endif()
 if(MCPU_Z180)
-	list(APPEND MAME_CPU_SRC cpu/z180/z180.c cpu/z80/z80daisy.c )
+	list(APPEND MAME_CPU_SRC cpu/z180/z180.c cpu/z80/z80daisy.c cpu/z180/z180.h cpu/z80/z80daisy.h )
 endif()
 if(MCPU_Z80)
-	list(APPEND MAME_CPU_SRC cpu/z80/z80.c cpu/z80/z80daisy.c )
+	list(APPEND MAME_CPU_SRC cpu/z80/z80.c cpu/z80/z80daisy.c cpu/z80/z80.h cpu/z80/z80daisy.h )
 endif()
 if(MCPU_Z8000)
-	list(APPEND MAME_CPU_SRC cpu/z8000/z8000.c )
+	list(APPEND MAME_CPU_SRC cpu/z8000/z8000.c cpu/z8000/z8000.h )
 endif()
 list(REMOVE_DUPLICATES MAME_DRIVERS_SRC)
 list(REMOVE_DUPLICATES MAME_SOUND_SRC)

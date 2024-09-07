@@ -1,5 +1,6 @@
 #include "amiga106_video_intuition.h"
 
+#include "amiga106_video_intuition_tbufcsb.h"
 #include "amiga106_video_os3.h"
 #include "amiga106_video_cgx.h"
 #include "amiga106_video_cgxscalepixelarray.h"
@@ -15,9 +16,7 @@ extern "C" {
     #include <intuition/intuition.h>
     #include <intuition/screens.h>
     #include <graphics/modeid.h>
-   // #include <graphics/displayinfo.h>
 }
-//#include "intuiuncollide.h"
 
 extern "C" {
     // from mame
@@ -26,7 +25,6 @@ extern "C" {
     #include "mamecore.h"
     #include "osdepend.h"
     #include "palette.h"
-//    #include "driver.h"
 }
 
 #include <stdio.h>
@@ -46,30 +44,21 @@ extern "C" {
 
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
+TripleBuffer::TripleBuffer()
+    : _tripleBufferInitOk(0)
+    ,_lastIndexDrawn(0)
+    ,_indexToDraw(0)
+    ,_d(0)
+{
 
-//void Intuition_Window::drawRastPort_CGX(_mame_display *display,Paletted *pRemap)
-//{
-//    if(_pWbWindow && _sWbWinSBitmap)
-//    {
-//        _width = (int)(_pWbWindow->GZZWidth);
-//        _height = (int)(_pWbWindow->GZZHeight);
-//        IntuitionDrawable::drawRastPort_CGX(display,pRemap);
+}
 
-////        BltBitMapRastPort( _sWbWinSBitmap,//CONST struct BitMap *srcBitMap,
-////                           0,0, //LONG xSrc, LONG ySrc,
-////                           _pWbWindow->RPort,//struct RastPort *destRP,
-////                           0,0,//LONG xDest, LONG yDest,
-////                           _width, _height,
-////                           0x00c0//ULONG minterm  -> copy minterm.
-////                           );
-//    }
-//}
 
 
 
 IntuitionDrawable::IntuitionDrawable(int flags)
 : _width(0),_height(0),_useScale(0)
-, _flags(flags)
+, _flags(flags), _heightBufferSwitch(0),_heightBufferSwitchApplied(0)
 {
 //  _trp._checkw=0;
 //  _trp._rp.BitMap = NULL;
@@ -153,12 +142,21 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
         }
 
     }
+
     // could happen if screen more little than source.
     if(cenx<0) cenx=0;
     if(ceny<0) ceny=0;
     if(hh+ceny>_height){ hh=_height; ceny=0; }// fast cheap clipping
     if(ww+cenx>_width) { ww=_width; cenx=0; }
+
+    if(_heightBufferSwitch) ceny+= _heightBufferSwitchApplied;
 }
+void IntuitionDrawable::waitFrame()
+{
+    // default behaviour, 50Hz or less.
+    WaitTOF();
+}
+
 // - - - - - - - - -
 Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
     : IntuitionDrawable((params._flags/*&15*/))
@@ -169,11 +167,10 @@ Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
     , _fullscreenWidth(0)
     , _fullscreenHeight(0)
     , _screenDepthAsked(8) // default.
-    , _pMouseRaster(NULL)    
-    , _tripleBufferInitOk(0)
-    , _lastIndexDrawn(0),_indexToDraw(1)
+    , _pMouseRaster(NULL)
+    , _pTripleBufferImpl(NULL)
 {
-    memset(&_screenBuffer[0],0,sizeof(_screenBuffer));
+
 }
 
 bool Intuition_Screen::open()
@@ -190,11 +187,19 @@ bool Intuition_Screen::open()
     // that stupid OS function (or driver) want SA_Depth,24 for 32bit depth, or fail.
     if(_screenDepthAsked == 32 )_screenDepthAsked =24;
 
+
+    ULONG appliedHeight = _fullscreenHeight;
+    if(_flags & DISPFLAG_USEHEIGHTBUFFER)
+    {
+        _heightBufferSwitch = 1;
+        _heightBufferSwitchApplied = _fullscreenHeight;
+        appliedHeight*=2;
+    }
  	_pScreen = OpenScreenTags( NULL,
 			SA_DisplayID,_ScreenModeId,
                         SA_Title, (ULONG)"MAME", // used as ID by promotion tools and else ?
                         SA_Width, _fullscreenWidth,
-                        SA_Height,_fullscreenHeight,
+                        SA_Height,appliedHeight,
                         SA_Depth,_screenDepthAsked,
 //                        SA_Behind,TRUE,    /* Open behind */
                         SA_Quiet,TRUE,     /* quiet */
@@ -237,73 +242,26 @@ bool Intuition_Screen::open()
 
     if(_flags & DISPFLAG_USETRIPLEBUFFER)
     {
-        initTripleBuffer(); // could fail, in which case back to direct rendering
+        if(_pTripleBufferImpl) delete _pTripleBufferImpl;
+        _pTripleBufferImpl = new TripleBuffer_CSB(*this); // could fail, in which case back to direct rendering
+        _pTripleBufferImpl->init();
+        printf("TRP IMPL!\n");
     }
 
     return true;
-}
-int Intuition_Screen::initTripleBuffer()
-{
-    _tripleBufferInitOk = 0;
-    if(!_pScreen) return 0;
-
-    if(_screenBuffer[0]._pScreenBuffer ||
-         _screenBuffer[1]._pScreenBuffer ||
-         _screenBuffer[2]._pScreenBuffer)
-            closeTripleBuffer();
-
-    // the AGA/CGX unified os3 way
-    _screenBuffer[0]._pScreenBuffer = AllocScreenBuffer(_pScreen,NULL,SB_SCREEN_BITMAP);
-    if(!_screenBuffer[0]._pScreenBuffer) return 0;
-
-    for(int i=0; i<3 ;i++)
-    {
-        if(!_screenBuffer[i]._pScreenBuffer)
-            _screenBuffer[i]._pScreenBuffer = AllocScreenBuffer(_pScreen,NULL,SB_COPY_BITMAP );
-        if(! _screenBuffer[i]._pScreenBuffer)
-        {
-            closeTripleBuffer();
-            return 0;
-        }
-        // init rastport
-        // " Initialize a RastPort structure to standard values."
-        // I feel super 100% reasured by this marvellous function.
-        InitRastPort( &_screenBuffer[i]._rport );
-        _screenBuffer[i]._rport.BitMap = _screenBuffer[i]._pScreenBuffer->sb_BitMap;
-        _screenBuffer[i]._pScreenBuffer->sb_DBufInfo->dbi_UserData1 = (APTR)i;
-    //    printf("msgport at init:%08x\n",_screenBuffer[i]._pScreenBuffer->sb_DBufInfo->dbi_DispMessage);
-    // we have to fill the port to receive "displayed screen buffer" message
-
-        // myDBI->dbi_DispMessage.mn_ReplyPort=ports[1];
-    }
-    _lastIndexDrawn = 0;
-    _indexToDraw = 1;
-    _tripleBufferInitOk = 1;
-    return 1;
-}
-void Intuition_Screen::closeTripleBuffer()
-{
-    if(!_pScreen) return; // must be closed before screen !!
-    // set the screen initial bitmap back to screen, else not sure what heresia could happen.
-//    if(_screenBuffer[0]._pScreenBuffer)
-//        ChangeScreenBuffer(_pScreen,_screenBuffer[0]._pScreenBuffer);
-
-    for(int i=2;i>=0;i--)
-    {
-        if(_screenBuffer[i]._pScreenBuffer) FreeScreenBuffer(_pScreen,_screenBuffer[i]._pScreenBuffer);
-        _screenBuffer[i]._pScreenBuffer = NULL;
-    }
 }
 
 void Intuition_Screen::close()
 {
     IntuitionDrawable::close();
-    closeTripleBuffer();
 
     if(_pScreenWindow) CloseWindow(_pScreenWindow);
     _pScreenWindow = NULL;
 
-
+    if(_pTripleBufferImpl){
+        delete _pTripleBufferImpl;
+        _pTripleBufferImpl = NULL;
+    }
     if(_pScreen) CloseScreen(_pScreen);
     _pScreen = NULL;
     if(_pMouseRaster) FreeRaster( (PLANEPTR) _pMouseRaster ,8,8);
@@ -318,8 +276,9 @@ RastPort *Intuition_Screen::rastPort()
 {
     if(!_pScreen) return NULL;
     // may use triple buffer
-   if(_tripleBufferInitOk)
-        return &_screenBuffer[_indexToDraw]._rport;
+    if(_pTripleBufferImpl &&
+    _pTripleBufferImpl->_tripleBufferInitOk)
+        return _pTripleBufferImpl->rastPort();
 
    return &_pScreen->RastPort;
 }
@@ -328,34 +287,20 @@ Screen *Intuition_Screen::screen()
 }
 BitMap *Intuition_Screen::bitmap()
 {    
-   if(_tripleBufferInitOk)  // may use triple buffer
-       return _screenBuffer[_indexToDraw]._pScreenBuffer->sb_BitMap;
+    if(_pTripleBufferImpl &&
+    _pTripleBufferImpl->_tripleBufferInitOk)  // may use triple buffer
+       return _pTripleBufferImpl->bitmap();
 
     return _pScreen->RastPort.BitMap;
 }
-int Intuition_Screen::beforeBufferDrawn()
+void Intuition_Screen::waitFrame()
 {
-    if(_tripleBufferInitOk)
-    {
-        // check last changescreen message ?
-        _indexToDraw++; // simple test
-        if(_indexToDraw == 3 ) _indexToDraw = 0;
-        // could mean last frame not shown yet, do not draw.
-        return (int)(_lastIndexDrawn != _indexToDraw);
+    //
+    if(!_pTripleBufferImpl) {
+        WaitTOF();
+        return;
     }
-    return 1;// ok, do draw
-}
-void Intuition_Screen::afterBufferDrawn()
-{
-    // may apply double buffer
-    if(_tripleBufferInitOk)
-    {
-        auto success =  ChangeScreenBuffer(_pScreen,_screenBuffer[_indexToDraw]._pScreenBuffer);
-        if(!success) {
-            printf("failed !\n");
-        }
-        _lastIndexDrawn = _indexToDraw;
-    }
+    _pTripleBufferImpl->waitFrame();
 }
 // - - - - - - - - -
 
@@ -564,15 +509,8 @@ MsgPort *IntuitionDisplay::userPort()
 
 void IntuitionDisplay::WaitFrame()
 {
-//    RastPort *rp = _drawable->rastPort();
-//    if(!CyberGfxBase || !rp || GetCyberMapAttr(rp->BitMap,CYBRMATTR_ISCYBERGFX)==0 )
-//    {
-         WaitTOF();
-         return;
-//    }
-    // would theorically do 60Hz on 60Hz screens...
- //   WaitBOVP(rp->S);
-
+    if(!_drawable) return
+    _drawable->waitFrame();
 }
 
 

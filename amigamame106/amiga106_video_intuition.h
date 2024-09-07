@@ -33,6 +33,7 @@ public:
     virtual RastPort *rastPort() = 0;
     virtual Screen *screen() { return NULL; }
     virtual BitMap *bitmap() { return NULL; }
+    virtual void waitFrame();
     //inline ULONG pixelFmt() const { return _PixelFmt; }
     //inline ULONG pixelBytes() const { return _PixelBytes; }
     inline int flags() const { return _flags; }
@@ -40,31 +41,16 @@ public:
   //  virtual void drawRastPort_CGX(_mame_display *display,Paletted *pRemap);
   //   void drawRastPortWPA8(_mame_display *display,Paletted *pRemap);
 
+
 protected:
     int _width,_height;
     int _useScale;
     int _flags;
-//    virtual BitMap *bitmap() = 0;
-    // used for drawRastPortWPA8
-//    std::vector<UBYTE> _wpatempbm;
-//    struct wpa8temprastport {
-//        int _checkw;
-//        RastPort _rp;
-
-//    };
-//    wpa8temprastport _trp;
-//    void checkWpa8TmpRp(RastPort *,int linewidth);
-
+    int _heightBufferSwitch;
+    int _heightBufferSwitchApplied;
 };
-// this differenciate Drawing API
-//class IntuitionDrawer {
-//public:
-//    IntuitionDrawer(int flags);
-//    virtual ~IntuitionDrawer();
-//    virtual void draw(IntuitionDrawable &d,_mame_display *pmame_display) = 0;
-//protected:
 
-//};
+class TripleBuffer;
 
 class Intuition_Screen : public IntuitionDrawable
 {
@@ -76,6 +62,7 @@ public:
     MsgPort *userPort() override;
     RastPort *rastPort() override;
     BitMap *bitmap() override;
+    void waitFrame() override;
 protected:
     Screen *_pScreen;
     Window *_pScreenWindow;
@@ -85,21 +72,29 @@ protected:
     int _screenDepthAsked; // 8 or 16, needed for screen opening.
     void *_pMouseRaster;
 
-    // - - -triple buffer management
-    struct SBuffer {
-         ScreenBuffer *_pScreenBuffer;
-         struct RastPort _rport;  // may need this per screen buffer for special draw func.
-    };
+    TripleBuffer *_pTripleBufferImpl;
 
-    SBuffer _screenBuffer[3];
-    int _tripleBufferInitOk;
-    int _lastIndexDrawn,_indexToDraw;
-
-    int initTripleBuffer();
-    void closeTripleBuffer();
-    int beforeBufferDrawn();
-    void afterBufferDrawn();
 };
+
+class TripleBuffer
+{
+public:
+    TripleBuffer();
+    virtual ~TripleBuffer(){}
+    virtual int init() =0;
+    virtual void close() =0;
+    virtual RastPort *rastPort() = 0;
+    virtual BitMap *bitmap() =0;
+    //virtual int beforeBufferDrawn() =0;
+    virtual void waitFrame() = 0;
+    virtual void afterBufferDrawn() =0;
+    char _tripleBufferInitOk;
+    char _lastIndexDrawn;
+    char _indexToDraw;
+    char _d;
+};
+
+
 class Intuition_Window : public IntuitionDrawable
 {
 public:

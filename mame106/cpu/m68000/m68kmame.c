@@ -3,6 +3,8 @@
 #include "m68k.h"
 #include "m68000.h"
 #include "state.h"
+#include "m68kkrbopt.h"
+
 
 /* global access */
 
@@ -21,19 +23,19 @@ void m68k_set_encrypted_opcode_range(int cpunum, offs_t start, offs_t end)
  * 8-bit data memory interface
  ****************************************************************************/
 
-static UINT16 readword_d8(offs_t address)
+static UINT16 readword_d8(offs_t address REG(d0))
 {
 	UINT16 result = program_read_byte_8(address) << 8;
 	return result | program_read_byte_8(address + 1);
 }
 
-static void writeword_d8(offs_t address, UINT16 data)
+static void writeword_d8(offs_t address REG(d0), UINT16 data REG(d1))
 {
 	program_write_byte_8(address, data >> 8);
 	program_write_byte_8(address + 1, data);
 }
 
-static UINT32 readlong_d8(offs_t address)
+static UINT32 readlong_d8(offs_t address REG(d0))
 {
 	UINT32 result = program_read_byte_8(address) << 24;
 	result |= program_read_byte_8(address + 1) << 16;
@@ -41,7 +43,7 @@ static UINT32 readlong_d8(offs_t address)
 	return result | program_read_byte_8(address + 3);
 }
 
-static void writelong_d8(offs_t address, UINT32 data)
+static void writelong_d8(offs_t address REG(d0), UINT32 data REG(d1))
 {
 	program_write_byte_8(address, data >> 24);
 	program_write_byte_8(address + 1, data >> 16);
@@ -68,13 +70,13 @@ static const struct m68k_memory_interface interface_d8 =
  * 16-bit data memory interface
  ****************************************************************************/
 
-static UINT32 readlong_d16(offs_t address)
+static UINT32 readlong_d16(offs_t address REG(d0))
 {
 	UINT32 result = program_read_word_16be(address) << 16;
 	return result | program_read_word_16be(address + 2);
 }
 
-static void writelong_d16(offs_t address, UINT32 data)
+static void writelong_d16(offs_t address REG(d0), UINT32 data REG(d1))
 {
 	program_write_word_16be(address, data >> 16);
 	program_write_word_16be(address + 2, data);
@@ -101,7 +103,7 @@ static const struct m68k_memory_interface interface_d16 =
 #ifndef A68K2
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT16 readword_d32(offs_t address)
+static UINT16 readword_d32(offs_t address REG(d0))
 {
 	UINT16 result;
 
@@ -112,7 +114,7 @@ static UINT16 readword_d32(offs_t address)
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writeword_d32(offs_t address, UINT16 data)
+static void writeword_d32(offs_t address REG(d0), UINT16 data REG(d1))
 {
 	if (!(address & 1))
 	{
@@ -124,7 +126,7 @@ static void writeword_d32(offs_t address, UINT16 data)
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT32 readlong_d32(offs_t address)
+static UINT32 readlong_d32(offs_t address REG(d0))
 {
 	UINT32 result;
 
@@ -141,7 +143,7 @@ static UINT32 readlong_d32(offs_t address)
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writelong_d32(offs_t address, UINT32 data)
+static void writelong_d32(offs_t address REG(d0), UINT32 data REG(d1))
 {
 	if (!(address & 3))
 	{
@@ -170,7 +172,17 @@ static const struct m68k_memory_interface interface_d32 =
 	writeword_d32,
 	writelong_d32
 };
-
+/* krb */
+static const struct m68k_memory_interface interface_fast32 =
+{
+	WORD_XOR_BE(0),
+	program_read_byte_32be,
+	program_read_word_32be,
+	program_read_dword_32be,
+	program_write_byte_32be,
+	program_write_word_32be,
+	program_write_dword_32be
+};
 
 /* global access */
 struct m68k_memory_interface m68k_memory_intf;
@@ -228,8 +240,13 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 {
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
-	m68k_memory_intf = interface_d16;
-	m68k_state_register("m68000", index);
+
+#ifdef OPTIM68K_USEFAST32INTRF
+    m68k_memory_intf = interface_fast32;
+#else
+    m68k_memory_intf = interface_d16;
+#endif
+    m68k_state_register("m68000", index);
 	m68k_set_int_ack_callback(irqcallback);
 }
 
@@ -243,10 +260,10 @@ static void m68000_exit(void)
 	/* nothing to do */
 }
 
-static int m68000_execute(int cycles)
-{
-	return m68k_execute(cycles);
-}
+//static int m68000_execute(int cycles)
+//{
+//	return m68k_execute(cycles);
+//}
 
 static void m68000_get_context(void *dst)
 {
@@ -295,10 +312,10 @@ static void m68008_exit(void)
 	/* nothing to do */
 }
 
-static int m68008_execute(int cycles)
-{
-	return m68k_execute(cycles);
-}
+//static int m68008_execute(int cycles)
+//{
+//	return m68k_execute(cycles);
+//}
 
 static void m68008_get_context(void *dst)
 {
@@ -405,7 +422,13 @@ static void m68020_init(int index, int clock, const void *config, int (*irqcallb
 {
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68020);
-	m68k_memory_intf = interface_d32;
+
+#ifdef OPTIM68K_USEFAST32INTRF
+    m68k_memory_intf = interface_fast32;
+#else
+    m68k_memory_intf = interface_d32;
+#endif
+
 	m68k_state_register("m68020", index);
 	m68k_set_int_ack_callback(irqcallback);
 }
@@ -420,10 +443,10 @@ static void m68020_exit(void)
 	/* nothing to do */
 }
 
-static int m68020_execute(int cycles)
-{
-	return m68k_execute(cycles);
-}
+//static int m68020_execute(int cycles)
+//{
+//	return m68k_execute(cycles);
+//}
 
 static void m68020_get_context(void *dst)
 {
@@ -527,10 +550,10 @@ static void m68040_exit(void)
 	/* nothing to do */
 }
 
-static int m68040_execute(int cycles)
-{
-	return m68k_execute(cycles);
-}
+//static int m68040_execute(int cycles)
+//{
+//	return m68k_execute(cycles);
+//}
 
 static void m68040_get_context(void *dst)
 {
@@ -566,6 +589,7 @@ static offs_t m68040_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, i
 
 static void m68000_set_info(UINT32 state, union cpuinfo *info)
 {
+//    printf("m68000_set_info:%d\n",state);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -601,7 +625,7 @@ static void m68000_set_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_A5:  		m68k_set_reg(M68K_REG_A5, info->i);			break;
 		case CPUINFO_INT_REGISTER + M68K_A6:  		m68k_set_reg(M68K_REG_A6, info->i);			break;
 		case CPUINFO_INT_REGISTER + M68K_A7:  		m68k_set_reg(M68K_REG_A7, info->i);			break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:	m68k_set_reg(M68K_REG_PREF_ADDR, info->i);	break;
+//		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:	m68k_set_reg(M68K_REG_PREF_ADDR, info->i);	break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_M68K_RESET_CALLBACK:		m68k_set_reset_instr_callback(info->f);		break;
@@ -618,7 +642,7 @@ static void m68000_set_info(UINT32 state, union cpuinfo *info)
 void m68000_get_info(UINT32 state, union cpuinfo *info)
 {
 	int sr;
-
+//    printf("m68000_get_info:%d\n",(int)state);
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -676,8 +700,8 @@ void m68000_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_A5:			info->i = m68k_get_reg(NULL, M68K_REG_A5); break;
 		case CPUINFO_INT_REGISTER + M68K_A6:			info->i = m68k_get_reg(NULL, M68K_REG_A6); break;
 		case CPUINFO_INT_REGISTER + M68K_A7:			info->i = m68k_get_reg(NULL, M68K_REG_A7); break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_ADDR); break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_DATA:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_DATA); break;
+//		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_ADDR); break;
+//		case CPUINFO_INT_REGISTER + M68K_PREF_DATA:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_DATA); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68000_set_info;		break;
@@ -686,7 +710,7 @@ void m68000_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_PTR_INIT:							info->init = m68000_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68000_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68000_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m68000_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = m68k_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE_NEW:				info->disassemble_new = m68000_dasm;	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k_ICount;			break;
@@ -742,8 +766,8 @@ void m68000_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_STR_REGISTER + M68K_A5:			sprintf(info->s = cpuintrf_temp_str(), "A5 :%08X", m68k_get_reg(NULL, M68K_REG_A5)); break;
 		case CPUINFO_STR_REGISTER + M68K_A6:			sprintf(info->s = cpuintrf_temp_str(), "A6 :%08X", m68k_get_reg(NULL, M68K_REG_A6)); break;
 		case CPUINFO_STR_REGISTER + M68K_A7:			sprintf(info->s = cpuintrf_temp_str(), "A7 :%08X", m68k_get_reg(NULL, M68K_REG_A7)); break;
-		case CPUINFO_STR_REGISTER + M68K_PREF_ADDR:		sprintf(info->s = cpuintrf_temp_str(), "PAR:%08X", m68k_get_reg(NULL, M68K_REG_PREF_ADDR)); break;
-		case CPUINFO_STR_REGISTER + M68K_PREF_DATA:		sprintf(info->s = cpuintrf_temp_str(), "PDA:%08X", m68k_get_reg(NULL, M68K_REG_PREF_DATA)); break;
+//		case CPUINFO_STR_REGISTER + M68K_PREF_ADDR:		sprintf(info->s = cpuintrf_temp_str(), "PAR:%08X", m68k_get_reg(NULL, M68K_REG_PREF_ADDR)); break;
+//		case CPUINFO_STR_REGISTER + M68K_PREF_DATA:		sprintf(info->s = cpuintrf_temp_str(), "PDA:%08X", m68k_get_reg(NULL, M68K_REG_PREF_DATA)); break;
 	}
 }
 
@@ -1100,8 +1124,8 @@ void m68020_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_A5:			info->i = m68k_get_reg(NULL, M68K_REG_A5); break;
 		case CPUINFO_INT_REGISTER + M68K_A6:			info->i = m68k_get_reg(NULL, M68K_REG_A6); break;
 		case CPUINFO_INT_REGISTER + M68K_A7:			info->i = m68k_get_reg(NULL, M68K_REG_A7); break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_ADDR); break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_DATA:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_DATA); break;
+//		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_ADDR); break;
+//		case CPUINFO_INT_REGISTER + M68K_PREF_DATA:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_DATA); break;
 		case CPUINFO_INT_REGISTER + M68K_MSP:			info->i = m68k_get_reg(NULL, M68K_REG_MSP); /* 68020+ */ break;
 		case CPUINFO_INT_REGISTER + M68K_CACR: 			info->i = m68k_get_reg(NULL, M68K_REG_CACR); /* 68020+ */ break;
 		case CPUINFO_INT_REGISTER + M68K_CAAR: 			info->i = m68k_get_reg(NULL, M68K_REG_CAAR); /* 68020+ */ break;
@@ -1116,7 +1140,7 @@ void m68020_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_PTR_INIT:							info->init = m68020_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68020_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68020_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m68020_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = m68k_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE_NEW:				info->disassemble_new = m68020_dasm;	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k_ICount;			break;
@@ -1172,8 +1196,8 @@ void m68020_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_STR_REGISTER + M68K_A5:			sprintf(info->s = cpuintrf_temp_str(), "A5 :%08X", m68k_get_reg(NULL, M68K_REG_A5)); break;
 		case CPUINFO_STR_REGISTER + M68K_A6:			sprintf(info->s = cpuintrf_temp_str(), "A6 :%08X", m68k_get_reg(NULL, M68K_REG_A6)); break;
 		case CPUINFO_STR_REGISTER + M68K_A7:			sprintf(info->s = cpuintrf_temp_str(), "A7 :%08X", m68k_get_reg(NULL, M68K_REG_A7)); break;
-		case CPUINFO_STR_REGISTER + M68K_PREF_ADDR:		sprintf(info->s = cpuintrf_temp_str(), "PAR:%08X", m68k_get_reg(NULL, M68K_REG_PREF_ADDR)); break;
-		case CPUINFO_STR_REGISTER + M68K_PREF_DATA:		sprintf(info->s = cpuintrf_temp_str(), "PDA:%08X", m68k_get_reg(NULL, M68K_REG_PREF_DATA)); break;
+//		case CPUINFO_STR_REGISTER + M68K_PREF_ADDR:		sprintf(info->s = cpuintrf_temp_str(), "PAR:%08X", m68k_get_reg(NULL, M68K_REG_PREF_ADDR)); break;
+//		case CPUINFO_STR_REGISTER + M68K_PREF_DATA:		sprintf(info->s = cpuintrf_temp_str(), "PDA:%08X", m68k_get_reg(NULL, M68K_REG_PREF_DATA)); break;
 		case CPUINFO_STR_REGISTER + M68K_MSP:			sprintf(info->s = cpuintrf_temp_str(), "MSP:%08X", m68k_get_reg(NULL, M68K_REG_MSP)); break;
 		case CPUINFO_STR_REGISTER + M68K_CACR:			sprintf(info->s = cpuintrf_temp_str(), "CCR:%08X", m68k_get_reg(NULL, M68K_REG_CACR)); break;
 		case CPUINFO_STR_REGISTER + M68K_CAAR:			sprintf(info->s = cpuintrf_temp_str(), "CAR:%08X", m68k_get_reg(NULL, M68K_REG_CAAR)); break;
@@ -1346,8 +1370,8 @@ void m68040_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_A5:			info->i = m68k_get_reg(NULL, M68K_REG_A5); break;
 		case CPUINFO_INT_REGISTER + M68K_A6:			info->i = m68k_get_reg(NULL, M68K_REG_A6); break;
 		case CPUINFO_INT_REGISTER + M68K_A7:			info->i = m68k_get_reg(NULL, M68K_REG_A7); break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_ADDR); break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_DATA:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_DATA); break;
+//		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_ADDR); break;
+//		case CPUINFO_INT_REGISTER + M68K_PREF_DATA:		info->i = m68k_get_reg(NULL, M68K_REG_PREF_DATA); break;
 		case CPUINFO_INT_REGISTER + M68K_MSP:			info->i = m68k_get_reg(NULL, M68K_REG_MSP); /* 68020+ */ break;
 		case CPUINFO_INT_REGISTER + M68K_CACR: 			info->i = m68k_get_reg(NULL, M68K_REG_CACR); /* 68020+ */ break;
 		case CPUINFO_INT_REGISTER + M68K_CAAR: 			info->i = m68k_get_reg(NULL, M68K_REG_CAAR); /* 68020+ */ break;
@@ -1362,7 +1386,7 @@ void m68040_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_PTR_INIT:							info->init = m68040_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68040_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68040_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m68040_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = m68k_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE_NEW:				info->disassemble_new = m68040_dasm;	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k_ICount;			break;
@@ -1418,8 +1442,8 @@ void m68040_get_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_STR_REGISTER + M68K_A5:			sprintf(info->s = cpuintrf_temp_str(), "A5 :%08X", m68k_get_reg(NULL, M68K_REG_A5)); break;
 		case CPUINFO_STR_REGISTER + M68K_A6:			sprintf(info->s = cpuintrf_temp_str(), "A6 :%08X", m68k_get_reg(NULL, M68K_REG_A6)); break;
 		case CPUINFO_STR_REGISTER + M68K_A7:			sprintf(info->s = cpuintrf_temp_str(), "A7 :%08X", m68k_get_reg(NULL, M68K_REG_A7)); break;
-		case CPUINFO_STR_REGISTER + M68K_PREF_ADDR:		sprintf(info->s = cpuintrf_temp_str(), "PAR:%08X", m68k_get_reg(NULL, M68K_REG_PREF_ADDR)); break;
-		case CPUINFO_STR_REGISTER + M68K_PREF_DATA:		sprintf(info->s = cpuintrf_temp_str(), "PDA:%08X", m68k_get_reg(NULL, M68K_REG_PREF_DATA)); break;
+//		case CPUINFO_STR_REGISTER + M68K_PREF_ADDR:		sprintf(info->s = cpuintrf_temp_str(), "PAR:%08X", m68k_get_reg(NULL, M68K_REG_PREF_ADDR)); break;
+//		case CPUINFO_STR_REGISTER + M68K_PREF_DATA:		sprintf(info->s = cpuintrf_temp_str(), "PDA:%08X", m68k_get_reg(NULL, M68K_REG_PREF_DATA)); break;
 		case CPUINFO_STR_REGISTER + M68K_MSP:			sprintf(info->s = cpuintrf_temp_str(), "MSP:%08X", m68k_get_reg(NULL, M68K_REG_MSP)); break;
 		case CPUINFO_STR_REGISTER + M68K_CACR:			sprintf(info->s = cpuintrf_temp_str(), "CCR:%08X", m68k_get_reg(NULL, M68K_REG_CACR)); break;
 		case CPUINFO_STR_REGISTER + M68K_CAAR:			sprintf(info->s = cpuintrf_temp_str(), "CAR:%08X", m68k_get_reg(NULL, M68K_REG_CAAR)); break;

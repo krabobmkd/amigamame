@@ -2,12 +2,12 @@
 #define M68000__HEADER
 
 #include "cpuintrf.h"
-
+//  M68K_PREF_ADDR, M68K_PREF_DATA,
 enum
 {
 	/* NOTE: M68K_SP fetches the current SP, be it USP, ISP, or MSP */
 	M68K_PC=1, M68K_SP, M68K_ISP, M68K_USP, M68K_MSP, M68K_SR, M68K_VBR,
-	M68K_SFC, M68K_DFC, M68K_CACR, M68K_CAAR, M68K_PREF_ADDR, M68K_PREF_DATA,
+	M68K_SFC, M68K_DFC, M68K_CACR, M68K_CAAR,
 	M68K_D0, M68K_D1, M68K_D2, M68K_D3, M68K_D4, M68K_D5, M68K_D6, M68K_D7,
 	M68K_A0, M68K_A1, M68K_A2, M68K_A3, M68K_A4, M68K_A5, M68K_A6, M68K_A7
 };
@@ -26,32 +26,32 @@ extern int m68k_ICount;
 struct m68k_memory_interface
 {
 	offs_t		opcode_xor;						// Address Calculation
-	UINT8		(*read8)(offs_t);				// Normal read 8 bit
-	UINT16	(*read16)(offs_t);				// Normal read 16 bit
-	UINT32	(*read32)(offs_t);				// Normal read 32 bit
-	void		(*write8)(offs_t, UINT8);		// Write 8 bit
-	void		(*write16)(offs_t, UINT16);	// Write 16 bit
-	void		(*write32)(offs_t, UINT32);	// Write 32 bit
+	UINT8		(*read8)(offs_t a REG(d0));				// Normal read 8 bit
+	UINT16	(*read16)(offs_t a REG(d0));				// Normal read 16 bit
+	UINT32	(*read32)(offs_t a REG(d0));				// Normal read 32 bit
+	void		(*write8)(offs_t a REG(d0), UINT8 d REG(d1) );		// Write 8 bit
+	void		(*write16)(offs_t a REG(d0), UINT16 d REG(d1) );	// Write 16 bit
+	void		(*write32)(offs_t a REG(d0), UINT32 d REG(d1) );	// Write 32 bit
 	void		(*changepc)(offs_t);			// Change PC
 
     // For Encrypted Stuff
 
-	UINT8		(*read8pc)(offs_t);				// PC Relative read 8 bit
-	UINT16	(*read16pc)(offs_t);			// PC Relative read 16 bit
-	UINT32	(*read32pc)(offs_t);			// PC Relative read 32 bit
+	UINT8		(*read8pc)(offs_t REG(d0));				// PC Relative read 8 bit
+	UINT16	(*read16pc)(offs_t REG(d0));			// PC Relative read 16 bit
+	UINT32	(*read32pc)(offs_t REG(d0));			// PC Relative read 32 bit
 
-	UINT16	(*read16d)(offs_t);				// Direct read 16 bit
-	UINT32	(*read32d)(offs_t);				// Direct read 32 bit
+	UINT16	(*read16d)(offs_t REG(d0));				// Direct read 16 bit
+	UINT32	(*read32d)(offs_t REG(d0));				// Direct read 32 bit
 };
-
+ // just used by capcom cps2
 struct m68k_encryption_interface
 {
-	UINT8		(*read8pc)(offs_t);				// PC Relative read 8 bit
-	UINT16	(*read16pc)(offs_t);			// PC Relative read 16 bit
-	UINT32	(*read32pc)(offs_t);			// PC Relative read 32 bit
+	UINT8		(*read8pc)(offs_t REG(d0));				// PC Relative read 8 bit
+	UINT16	(*read16pc)(offs_t REG(d0));			// PC Relative read 16 bit
+	UINT32	(*read32pc)(offs_t REG(d0));			// PC Relative read 32 bit
 
-	UINT16	(*read16d)(offs_t);				// Direct read 16 bit
-	UINT32	(*read32d)(offs_t);				// Direct read 32 bit
+	UINT16	(*read16d)(offs_t REG(d0));				// Direct read 16 bit
+	UINT32	(*read32d)(offs_t REG(d0));				// Direct read 32 bit
 };
 
 /* The MAME API for MC68000 */

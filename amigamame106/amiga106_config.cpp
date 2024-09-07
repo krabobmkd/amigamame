@@ -106,6 +106,7 @@ int MameConfig::save()
             ssroms << string((*d)->name) << sep;
             i++;
         }
+
         string romslist = ssroms.str();
         xml_add_child(confignode,pcf_roms, romslist.c_str());
     }
@@ -230,7 +231,8 @@ void MameConfig::toDefault()
     _display._perScreenMode.clear();
     _display._color_brightness = 1.0f;
     _display._color_gamma = 1.0f;
-    _display._flags = CONFDISPLAYFLAGS_TRIPLEBUFFER;
+    _display._flags = 0;
+    _display._buffering = ScreenBufferMode::Single;
 
     _audio._mode = AudioMode::AHI;
     _audio._freq = 22050;
@@ -300,9 +302,15 @@ void MameConfig::Display::serialize(ASerializer &serializer)
 {
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU Or WPA8",
                                                  "CPU Remap+ScalePixelArray"});
+
+    //
+    serializer("Screen Buffer",(int&)_buffering,{"Single","Triple Buffer CSB (slow if nasty driver)","Double Buffer SVP (Also slow if...)"});
+
     serializer(" ",_flags,0,{
-               "On Workbench","Bad FrameSkip","Triple Buffer"
+               "On Workbench","Bad FrameSkip"
                });
+
+
                                             // min,max,step, default
     serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
                                          // min,max,step, default

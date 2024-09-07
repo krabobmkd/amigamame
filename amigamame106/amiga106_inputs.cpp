@@ -144,7 +144,7 @@ static USHORT askedPadsRawKey = 0;
 static USHORT useAnyMouse = 0;
 void ConfigureLowLevelLib()
 {
-printf(" ***** ConfigureLowLevelLib\n");
+//printf(" ***** ConfigureLowLevelLib\n");
     if(!LowLevelBase) return;
 
     /*
@@ -176,11 +176,10 @@ printf(" ***** ConfigureLowLevelLib\n");
     for(int iLLPort=0;iLLPort<4;iLLPort++) // actually 2
     {
         int iPlayer = configControls._llPort_Player[iLLPort] ;
-        printf("iPlayer:%d\n",iPlayer);
         if( iPlayer == 0) continue;
 
         int lowlevelState = configControls._llPort_Type[iLLPort];
-                printf("type:%d\n",lowlevelState);
+
         if(lowlevelState<0 || lowlevelState>3) continue; // shouldnt
 
 //        if(lowlevelState == SJA_TYPE_AUTOSENSE)
@@ -888,7 +887,7 @@ void RawKeyMap::init()
 */
 const os_code_info *osd_get_code_list(void)
 {
-    printf(" * * * ** osd_get_key_list  * * * *  *\n");
+//    printf(" * * * ** osd_get_key_list  * * * *  *\n");
 
     ConfigureLowLevelLib();
 
@@ -945,7 +944,7 @@ INT32 osd_get_code_value(os_code oscode)
             llm._lastMouseStateX = s;
             if(delta<-minswitch) delta +=256;
             else if(delta>minswitch) delta -=256;
-            return delta<<9;
+            return delta<<10;
         }
         case 1: // mouse y
         {
@@ -955,7 +954,7 @@ INT32 osd_get_code_value(os_code oscode)
             // delta should be some pixels ...
             if(delta<-minswitch) delta +=256;
             else if(delta>minswitch) delta -=256;
-            return delta<<9;
+            return delta<<10;
         }
         case 2: // mouse bt 1
             return (state &JPF_BUTTON_RED)!=0 ;

@@ -1,0 +1,8 @@
+#ifndef M68KKRBOPT_H_
+#define M68KKRBOPT_H_
+
+#define OPTIM68K_NOXOR 1
+#define OPTIM68K_USEFAST32INTRF 1
+#define OPTIM68K_NOMASK_A 1
+
+#endif

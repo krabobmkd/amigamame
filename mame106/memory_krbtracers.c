@@ -97,7 +97,7 @@
 #include "debug/debugcpu.h"
 #endif
 #include <stdarg.h>
-
+#include <stdio.h>
 
 #define MEM_DUMP		(0)
 #define VERBOSE			(0)
@@ -110,7 +110,21 @@
 #endif
 
 
+// krb
+	/* 8-bit case: RAM/ROM */
+//	if (entry >= STATIC_RAM)
 
+#define TRACE_MEMCASEUSE 1
+
+extern int activecpu;
+#define CPUTOTEST 0
+
+#ifdef TRACE_MEMCASEUSE
+int tm_ge_subtable=0;
+int tm_l_subtable=0;
+int tm_nbSubStatic=0;
+int tm_nbStatic=0;
+#endif
 /***************************************************************************
 
     Basic theory of memory handling:
@@ -135,11 +149,44 @@
 
 ***************************************************************************/
 
+//FILE *fmemlog = NULL;
+//unsigned int logcount=0;
+//void initLog() {
+//    if(fmemlog) return;
+//    fmemlog = fopen("memlog.txt","wb");
+//}
+//void logcountpp()
+//{
+//    if(logcount == 0x000e03ed)
+//    {
+//      printf("this is it.\n");
+//    }
+//    if(logcount == 0x000e03ed +2)
+//    {
+//        exit(0);
+//    }
+//    logcount++;
+//}
+
 /* macros for the profiler */
-#define MEMREADSTART()			do { profiler_mark(PROFILER_MEMREAD); } while (0)
+//#define MEMREADSTART()			do { profiler_mark(PROFILER_MEMREAD); } while (0)
+// initLog(); fprintf(fmemlog,"r c:%08x o:%08x\n",(unsigned int)logcount,(unsigned int)address);
+#define MEMREADSTART()
+// fprintf(fmemlog,"r c:%08x o:%08x\n",(unsigned int)logcount,(unsigned int)address);  logcountpp();
+
+//#define MEMREADEND(ret)		{ INT32 r = ret; initLog(); fprintf(fmemlog,"r c:%08x o:%08x  d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)(r) );  logcountpp();	 return r; }
 #define MEMREADEND(ret)			do { profiler_mark(PROFILER_END); return ret; } while (0)
-#define MEMWRITESTART()			do { profiler_mark(PROFILER_MEMWRITE); } while (0)
+//#define MEMREADEND(ret)			do { INT32 r = ret; initLog();  fprintf(fmemlog,"r c:%08x o:%08x  d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)(r) );  logcountpp();  return r; } while (0)
+
+
+
+//#define MEMWRITESTART()			do { profiler_mark(PROFILER_MEMWRITE); } while (0)
+#define MEMWRITESTART()
+//  initLog(); fprintf(fmemlog,"w c:%08x o:%08x d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)data);
+//#define MEMWRITESTART()  {initLog(); fprintf(fmemlog,"w c:%08x o:%08x d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)data);  logcountpp();}
+
 #define MEMWRITEEND(ret)		do { (ret); profiler_mark(PROFILER_END); return; } while (0)
+
 
 /* helper macros */
 #define HANDLER_IS_RAM(h)		((FPTR)(h) == STATIC_RAM)
@@ -188,9 +235,12 @@ struct _bank_data
 	UINT8 					spacenum;				/* the address space it is used for */
 	UINT8 					read;					/* is this bank used for reads? */
 	UINT8 					write;					/* is this bank used for writes? */
+	UINT16 _dddum;
 	offs_t 					base;					/* the base offset */
 	offs_t 					end;					/* the end offset */
 	UINT8					curentry;				/* current entry */
+	UINT8 _dummy; // krb align
+	UINT16 _duumy;
 	void *					entry[MAX_BANK_ENTRIES];/* array of entries for this bank */
 	void *					entryd[MAX_BANK_ENTRIES];/* array of decrypted entries for this bank */
 };
@@ -2373,15 +2423,99 @@ static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t of
 	address &= space.addrmask & extraand;												\
 	entry = space.lookup[LEVEL1_INDEX(address)];										\
 	if (entry >= SUBTABLE_BASE)															\
+	{\
+        if(activecpu==CPUTOTEST)tm_ge_subtable++; \
 		entry = space.lookup[LEVEL2_INDEX(entry,address)];								\
+    } else if(activecpu==CPUTOTEST)tm_l_subtable++;
+
+
+void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p REG(a0))
+{
+	UINT32 entry;
+
+    /* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+
+	/* handle banks inline */
+	UINT32 adrmask = active_address_space[0].readhandlers[entry].mask;
+	address = (address - active_address_space[0].readhandlers[entry].offset)
+            & adrmask;
+	if (entry < STATIC_RAM)
+	{
+        UINT32 *pr = (UINT32 *)&bank_ptr[entry][address];
+        while(l>0)
+        {
+            *p++ = *pr++;
+            l--;
+        }
+    }
+	/* fall back to the handler */
+	else
+	{
+        address>>=2;
+        while(l>0)
+        {
+            *p++ = (*active_address_space[0].readhandlers[entry].handler.read.handler32)
+                (address,0);
+            address++;
+            l--;
+        }
+    }
+}
+
+//UINT8 s16program_read_byte_8(UINT32 address REG(d0))
+//{
+//	UINT32 entry;
+
+//    /* perform lookup */
+//	address &= active_address_space[0].addrmask ;
+//	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+//	if (entry >= SUBTABLE_BASE)
+//		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+
+//	/* handle banks inline */
+//	address = (address - active_address_space[0].readhandlers[entry].offset)
+//            & active_address_space[0].readhandlers[entry].mask;
+//	if (entry < STATIC_RAM)
+//		return(bank_ptr[entry][address]);
+
+//	/* fall back to the handler */
+//	else
+//		return((*active_address_space[0].readhandlers[entry].handler.read.handler8)
+//                (address));
+//	return 0;
+//}
+
+//void s16program_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1))
+//{
+//	UINT32 entry;
+//    /* perform lookup */
+//	address &= active_address_space[0].addrmask ;
+//	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+//	if (entry >= SUBTABLE_BASE)
+//		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
+
+//	/* handle banks inline */
+//	address = (address - active_address_space[0].writehandlers[entry].offset) & active_address_space[0].writehandlers[entry].mask;
+//	if (entry < STATIC_RAM)
+//		bank_ptr[entry][address] = data;
+
+//	/* fall back to the handler */
+//	else
+//		(*active_address_space[0].writehandlers[entry].handler.write.handler8)(address, data);
+//}
 
 
 /*-------------------------------------------------
     READBYTE - generic byte-sized read handler
 -------------------------------------------------*/
 
+
 #define READBYTE8(name,spacenum)														\
-UINT8 name(offs_t address)																\
+UINT8 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2391,16 +2525,18 @@ UINT8 name(offs_t address)																\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;\
 	if (entry < STATIC_RAM) 															\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMREADEND(bank_ptr[entry][address]);											\
+    }\
 																						\
 	/* fall back to the handler */														\
-	else																				\
+	else{if(activecpu==CPUTOTEST)tm_nbStatic++;																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler8)(address));\
-	return 0;																			\
+}	return 0;																			\
 }																						\
 
 #define READBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
-UINT8 name(offs_t address)																\
+UINT8 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2410,11 +2546,13 @@ UINT8 name(offs_t address)																\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMREADEND(bank_ptr[entry][xormacro(address)]);									\
+    }\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-	{																					\
+	{if(activecpu==CPUTOTEST)tm_nbStatic++;																					\
 		int shift = 8 * (shiftbytes);													\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handlertype)(address >> (ignorebits), ~((masktype)0xff << shift)) >> shift);\
 	}																					\
@@ -2435,7 +2573,7 @@ UINT8 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define READWORD16(name,spacenum)														\
-UINT16 name(offs_t address)																\
+UINT16 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2445,16 +2583,18 @@ UINT16 name(offs_t address)																\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMREADEND(*(UINT16 *)&bank_ptr[entry][address]);								\
+    }\
 																						\
 	/* fall back to the handler */														\
-	else																				\
+	else{if(activecpu==CPUTOTEST)tm_nbStatic++;																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler16)(address >> 1,0));\
-	return 0;																			\
+	}return 0;																			\
 }																						\
 
 #define READWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
-UINT16 name(offs_t address)																\
+UINT16 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2464,11 +2604,13 @@ UINT16 name(offs_t address)																\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMREADEND(*(UINT16 *)&bank_ptr[entry][xormacro(address)]);						\
+    }\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-	{																					\
+	{if(activecpu==CPUTOTEST)tm_nbStatic++;																					\
 		int shift = 8 * (shiftbytes);													\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handlertype)(address >> (ignorebits), ~((masktype)0xffff << shift)) >> shift);\
 	}																					\
@@ -2487,7 +2629,7 @@ UINT16 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define READDWORD32(name,spacenum)														\
-UINT32 name(offs_t address)																\
+UINT32 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2497,16 +2639,18 @@ UINT32 name(offs_t address)																\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMREADEND(*(UINT32 *)&bank_ptr[entry][address]);								\
+    }\
 																						\
 	/* fall back to the handler */														\
-	else																				\
+	else{if(activecpu==CPUTOTEST)tm_nbStatic++;																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler32)(address >> 2,0));\
-	return 0;																			\
+	}return 0;																			\
 }																						\
 
 #define READDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-UINT32 name(offs_t address)																\
+UINT32 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2516,11 +2660,13 @@ UINT32 name(offs_t address)																\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMREADEND(*(UINT32 *)&bank_ptr[entry][xormacro(address)]);						\
+    }\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-	{																					\
+	{if(activecpu==CPUTOTEST)tm_nbStatic++;																					\
 		int shift = 8 * (shiftbytes);													\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handlertype)(address >> (ignorebits), ~((masktype)0xffffffff << shift)) >> shift);\
 	}																					\
@@ -2537,7 +2683,7 @@ UINT32 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define READQWORD64(name,spacenum)														\
-UINT64 name(offs_t address)																\
+UINT64 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2561,7 +2707,7 @@ UINT64 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define WRITEBYTE8(name,spacenum)														\
-void name(offs_t address, UINT8 data)													\
+void name(offs_t address REG(d0), UINT8 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2571,15 +2717,16 @@ void name(offs_t address, UINT8 data)													\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].writehandlers[entry].offset) & active_address_space[spacenum].writehandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMWRITEEND(bank_ptr[entry][address] = data);									\
-																						\
+    }																						\
 	/* fall back to the handler */														\
-	else																				\
+	else{if(activecpu==CPUTOTEST)tm_nbStatic++;																				\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handler8)(address, data));\
-}																						\
+}}																						\
 
 #define WRITEBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address, UINT8 data)													\
+void name(offs_t address REG(d0), UINT8 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2589,11 +2736,12 @@ void name(offs_t address, UINT8 data)													\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].writehandlers[entry].offset) & active_address_space[spacenum].writehandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMWRITEEND(bank_ptr[entry][xormacro(address)] = data);							\
-																						\
+    }																						\
 	/* fall back to the handler */														\
 	else																				\
-	{																					\
+	{if(activecpu==CPUTOTEST)tm_nbStatic++;																					\
 		int shift = 8 * (shiftbytes);													\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handlertype)(address >> (ignorebits), (masktype)data << shift, ~((masktype)0xff << shift)));\
 	}																					\
@@ -2613,7 +2761,7 @@ void name(offs_t address, UINT8 data)													\
 -------------------------------------------------*/
 
 #define WRITEWORD16(name,spacenum)														\
-void name(offs_t address, UINT16 data)													\
+void name(offs_t address REG(d0), UINT16 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2623,15 +2771,16 @@ void name(offs_t address, UINT16 data)													\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].writehandlers[entry].offset) & active_address_space[spacenum].writehandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMWRITEEND(*(UINT16 *)&bank_ptr[entry][address] = data);						\
-																						\
+    }																						\
 	/* fall back to the handler */														\
-	else																				\
+	else{if(activecpu==CPUTOTEST)tm_nbStatic++;																				\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handler16)(address >> 1, data, 0));\
-}																						\
+}}																						\
 
 #define WRITEWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address, UINT16 data)													\
+void name(offs_t address REG(d0), UINT16 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2640,12 +2789,13 @@ void name(offs_t address, UINT16 data)													\
 																						\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].writehandlers[entry].offset) & active_address_space[spacenum].writehandlers[entry].mask;\
-	if (entry < STATIC_RAM)																\
+	if (entry < STATIC_RAM)\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;																	\
 		MEMWRITEEND(*(UINT16 *)&bank_ptr[entry][xormacro(address)] = data);				\
-																						\
+    }																						\
 	/* fall back to the handler */														\
 	else																				\
-	{																					\
+	{if(activecpu==CPUTOTEST)tm_nbStatic++;																					\
 		int shift = 8 * (shiftbytes);													\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handlertype)(address >> (ignorebits), (masktype)data << shift, ~((masktype)0xffff << shift)));\
 	}																					\
@@ -2663,7 +2813,7 @@ void name(offs_t address, UINT16 data)													\
 -------------------------------------------------*/
 
 #define WRITEDWORD32(name,spacenum)														\
-void name(offs_t address, UINT32 data)													\
+void name(offs_t address REG(d0), UINT32 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2673,15 +2823,16 @@ void name(offs_t address, UINT32 data)													\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].writehandlers[entry].offset) & active_address_space[spacenum].writehandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMWRITEEND(*(UINT32 *)&bank_ptr[entry][address] = data);						\
-																						\
+    }																						\
 	/* fall back to the handler */														\
-	else																				\
+	else{if(activecpu==CPUTOTEST)tm_nbStatic++;																				\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handler32)(address >> 2, data, 0));\
-}																						\
+}}																						\
 
 #define WRITEDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address, UINT32 data)													\
+void name(offs_t address REG(d0), UINT32 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2691,11 +2842,12 @@ void name(offs_t address, UINT32 data)													\
 	/* handle banks inline */															\
 	address = (address - active_address_space[spacenum].writehandlers[entry].offset) & active_address_space[spacenum].writehandlers[entry].mask;\
 	if (entry < STATIC_RAM)																\
+    {if(activecpu==CPUTOTEST)tm_nbSubStatic++;\
 		MEMWRITEEND(*(UINT32 *)&bank_ptr[entry][xormacro(address)] = data);				\
-																						\
+	}																					\
 	/* fall back to the handler */														\
 	else																				\
-	{																					\
+	{if(activecpu==CPUTOTEST)tm_nbStatic++;																					\
 		int shift = 8 * (shiftbytes);													\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handlertype)(address >> (ignorebits), (masktype)data << shift, ~((masktype)0xffffffff << shift)));\
 	}																					\
@@ -2711,7 +2863,7 @@ void name(offs_t address, UINT32 data)													\
 -------------------------------------------------*/
 
 #define WRITEQWORD64(name,spacenum)														\
-void name(offs_t address, UINT64 data)													\
+void name(offs_t address REG(d0), UINT64 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\

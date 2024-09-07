@@ -28,7 +28,8 @@
 
 /* Import the configuration for this build */
 #include "m68kconf.h"
-
+#include "m68kkrbopt.h"
+#include "memory.h"
 
 /* ======================================================================== */
 /* ============================ GENERAL DEFINES =========================== */

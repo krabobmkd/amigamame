@@ -105,9 +105,9 @@ static INT16 *finalmix;
 static INT32 *leftmix, *rightmix;
 */
 
-static const int nbSampleFrame=4;
+static const int nbSampleFrame=8;
 int currentSampleFrame=0;
-struct SampleFrame SampleFrames[4];
+struct SampleFrame SampleFrames[8];
 // set when starting machine, before osd_start_audio_stream
 //int sound_machine_is_stereo=0; // 0 mono, 1 stereo.
 //int sound_machine_nb_streams=0; // actual number of things mixed.
@@ -724,11 +724,11 @@ void sound_frame_update(void)
 	profiler_mark(PROFILER_SOUND);
 
     // get next frame
-    icurrentSampleFrame = (currentSampleFrame+1)& 3;
+    icurrentSampleFrame = (currentSampleFrame+1)& 7;
     pFrame = &SampleFrames[icurrentSampleFrame];
     if(pFrame->_readlock)
     {
-        icurrentSampleFrame = (currentSampleFrame+2)& 3;
+        icurrentSampleFrame = (currentSampleFrame+2)& 7;
         pFrame = &SampleFrames[icurrentSampleFrame];
     }
    // pFrame->_read = 0;
@@ -741,8 +741,8 @@ void sound_frame_update(void)
 //	memset(pFrame->_leftmix, 0, samples_this_frame * sizeof(INT32)*2);
 //	memset(pFrame->_rightmix, 0, samples_this_frame * sizeof(INT32));
 
-    int nbconsumedStreams =0;
-    int lastspeakerDirection=1337;
+   // int nbconsumedStreams =0;
+   // int lastspeakerDirection=1337;
 
 	/* if we're not paused, keep the sounds going */
 	if (!mame_is_paused())

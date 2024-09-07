@@ -14,6 +14,12 @@
 
 #include "mamecore.h"
 
+#if defined(__GNUC__) && defined(__AMIGA__)
+//#define REG(r) __asm(#r)
+#define REG(r)
+#else
+#define REG(r)
+#endif
 
 
 /***************************************************************************
@@ -50,28 +56,28 @@
 typedef UINT32			offs_t;
 
 /* ----- typedefs for the various common data access handlers ----- */
-typedef UINT8			(*read8_handler)  (ATTR_UNUSED offs_t offset);
-typedef void			(*write8_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
-typedef UINT16			(*read16_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
-typedef void			(*write16_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
-typedef UINT32			(*read32_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
-typedef void			(*write32_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
-typedef UINT64			(*read64_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
-typedef void			(*write64_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+typedef UINT8			(*read8_handler)  (ATTR_UNUSED offs_t offset REG(d0));
+typedef void			(*write8_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT8 data REG(d1));
+typedef UINT16			(*read16_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT16 mem_mask REG(d1));
+typedef void			(*write16_handler)(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT16 data REG(d1), ATTR_UNUSED UINT16 mem_mask REG(d2));
+typedef UINT32			(*read32_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 mem_mask REG(d1));
+typedef void			(*write32_handler)(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT32 data REG(d1), ATTR_UNUSED UINT32 mem_mask REG(d2));
+typedef UINT64			(*read64_handler) (ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT64 mem_mask);
+typedef void			(*write64_handler)(ATTR_UNUSED offs_t offset REG(d0), ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
 typedef offs_t			(*opbase_handler) (ATTR_UNUSED offs_t address);
 
 /* ----- this struct contains pointers to the live read/write routines ----- */
 struct _data_accessors
 {
-	UINT8			(*read_byte)(offs_t offset);
-	UINT16			(*read_word)(offs_t offset);
-	UINT32			(*read_dword)(offs_t offset);
-	UINT64			(*read_qword)(offs_t offset);
+	UINT8			(*read_byte)(offs_t offset REG(d0));
+	UINT16			(*read_word)(offs_t offset REG(d0));
+	UINT32			(*read_dword)(offs_t offset REG(d0));
+	UINT64			(*read_qword)(offs_t offset  REG(d0));
 
-	void			(*write_byte)(offs_t offset, UINT8 data);
-	void			(*write_word)(offs_t offset, UINT16 data);
-	void			(*write_dword)(offs_t offset, UINT32 data);
-	void			(*write_qword)(offs_t offset, UINT64 data);
+	void			(*write_byte)(offs_t offset REG(d0), UINT8 data REG(d1));
+	void			(*write_word)(offs_t offset REG(d0), UINT16 data REG(d1));
+	void			(*write_dword)(offs_t offset REG(d0), UINT32 data REG(d1));
+	void			(*write_qword)(offs_t offset REG(d0), UINT64 data);
 };
 typedef struct _data_accessors data_accessors;
 
@@ -84,15 +90,15 @@ typedef struct _data_accessors data_accessors;
 ***************************************************************************/
 
 /* ----- macros for declaring the various common data access handlers ----- */
-#define READ8_HANDLER(name) 	UINT8  name(ATTR_UNUSED offs_t offset)
-#define WRITE8_HANDLER(name) 	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
-#define READ16_HANDLER(name)	UINT16 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
-#define WRITE16_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
-#define READ32_HANDLER(name)	UINT32 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
-#define WRITE32_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
-#define READ64_HANDLER(name)	UINT64 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
-#define WRITE64_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
-#define OPBASE_HANDLER(name)	offs_t name(ATTR_UNUSED offs_t address)
+#define READ8_HANDLER(name) 	UINT8  name(offs_t offset REG(d0))
+#define WRITE8_HANDLER(name) 	void   name(offs_t offset REG(d0), UINT8 data REG(d1))
+#define READ16_HANDLER(name)	UINT16 name(offs_t offset REG(d0), UINT16 mem_mask REG(d1))
+#define WRITE16_HANDLER(name)	void   name(offs_t offset REG(d0), UINT16 data REG(d1), UINT16 mem_mask REG(d2))
+#define READ32_HANDLER(name)	UINT32 name(offs_t offset REG(d0), UINT32 mem_mask REG(d1) )
+#define WRITE32_HANDLER(name)	void   name(offs_t offset REG(d0), UINT32 data REG(d1), UINT32 mem_mask REG(d2))
+#define READ64_HANDLER(name)	UINT64 name(offs_t offset, UINT64 mem_mask)
+#define WRITE64_HANDLER(name)	void   name(offs_t offset, UINT64 data, UINT64 mem_mask)
+#define OPBASE_HANDLER(name)	offs_t name(offs_t address)
 
 /* ----- macros for accessing bytes and words within larger chunks ----- */
 #ifdef LSB_FIRST
@@ -759,58 +765,68 @@ extern const char *address_space_names[ADDRESS_SPACES];
 #define LEVEL2_INDEX(e,a)		((1 << LEVEL1_BITS) + (((e) - SUBTABLE_BASE) << LEVEL2_BITS) + ((a) & ((1 << LEVEL2_BITS) - 1)))
 
 
+// - - - - krb
+// used by 68k cpu instruction fetch ->NO
+void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p REG(a0));
+UINT32 memory_readmovem32(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
+UINT32 memory_writemovem32r(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
+UINT32 memory_writemovem32(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
 
 /***************************************************************************
 
     Function prototypes for core readmem/writemem routines
 
 ***************************************************************************/
+// krb added for 8bit 16 acess
+UINT8 s16program_read_byte_8(offs_t address REG(d0));
+void s16program_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1));
+
 
 /* ----- declare program address space handlers ----- */
-UINT8 program_read_byte_8(offs_t address);
-void program_write_byte_8(offs_t address, UINT8 data);
+UINT8 program_read_byte_8(offs_t address REG(d0));
+void program_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1));
 
-UINT8 program_read_byte_16be(offs_t address);
-UINT16 program_read_word_16be(offs_t address);
-void program_write_byte_16be(offs_t address, UINT8 data);
-void program_write_word_16be(offs_t address, UINT16 data);
+UINT8 program_read_byte_16be(offs_t address REG(d0));
+UINT16 program_read_word_16be(offs_t address REG(d0));
+void program_write_byte_16be(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_16be(offs_t address REG(d0), UINT16 data REG(d1));
 
-UINT8 program_read_byte_16le(offs_t address);
-UINT16 program_read_word_16le(offs_t address);
-void program_write_byte_16le(offs_t address, UINT8 data);
-void program_write_word_16le(offs_t address, UINT16 data);
+UINT8 program_read_byte_16le(offs_t address REG(d0));
+UINT16 program_read_word_16le(offs_t address REG(d0));
+void program_write_byte_16le(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_16le(offs_t address REG(d0), UINT16 data REG(d1));
 
-UINT8 program_read_byte_32be(offs_t address);
-UINT16 program_read_word_32be(offs_t address);
-UINT32 program_read_dword_32be(offs_t address);
-void program_write_byte_32be(offs_t address, UINT8 data);
-void program_write_word_32be(offs_t address, UINT16 data);
-void program_write_dword_32be(offs_t address, UINT32 data);
+UINT8 program_read_byte_32be(offs_t address REG(d0));
+UINT16 program_read_word_32be(offs_t address REG(d0));
+UINT32 program_read_dword_32be(offs_t address REG(d0));
+void program_write_byte_32be(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_32be(offs_t address REG(d0), UINT16 data REG(d1));
+void program_write_dword_32be(offs_t address REG(d0), UINT32 data REG(d1));
 
-UINT8 program_read_byte_32le(offs_t address);
-UINT16 program_read_word_32le(offs_t address);
-UINT32 program_read_dword_32le(offs_t address);
-void program_write_byte_32le(offs_t address, UINT8 data);
-void program_write_word_32le(offs_t address, UINT16 data);
-void program_write_dword_32le(offs_t address, UINT32 data);
+UINT8 program_read_byte_32le(offs_t address REG(d0));
+UINT16 program_read_word_32le(offs_t address REG(d0));
+UINT32 program_read_dword_32le(offs_t address REG(d0));
+void program_write_byte_32le(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_32le(offs_t address REG(d0), UINT16 data REG(d1));
+void program_write_dword_32le(offs_t address REG(d0), UINT32 data REG(d1));
 
-UINT8 program_read_byte_64be(offs_t address);
-UINT16 program_read_word_64be(offs_t address);
-UINT32 program_read_dword_64be(offs_t address);
-UINT64 program_read_qword_64be(offs_t address);
-void program_write_byte_64be(offs_t address, UINT8 data);
-void program_write_word_64be(offs_t address, UINT16 data);
-void program_write_dword_64be(offs_t address, UINT32 data);
-void program_write_qword_64be(offs_t address, UINT64 data);
+UINT8 program_read_byte_64be(offs_t address REG(d0));
+UINT16 program_read_word_64be(offs_t address REG(d0));
+UINT32 program_read_dword_64be(offs_t address REG(d0));
+UINT64 program_read_qword_64be(offs_t address REG(d0));
+void program_write_byte_64be(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_64be(offs_t address REG(d0), UINT16 data REG(d1));
+void program_write_dword_64be(offs_t address REG(d0), UINT32 data REG(d1));
+void program_write_qword_64be(offs_t address REG(d0), UINT64 data);
 
-UINT8 program_read_byte_64le(offs_t address);
-UINT16 program_read_word_64le(offs_t address);
-UINT32 program_read_dword_64le(offs_t address);
-UINT64 program_read_qword_64le(offs_t address);
-void program_write_byte_64le(offs_t address, UINT8 data);
-void program_write_word_64le(offs_t address, UINT16 data);
-void program_write_dword_64le(offs_t address, UINT32 data);
-void program_write_qword_64le(offs_t address, UINT64 data);
+UINT8 program_read_byte_64le(offs_t address REG(d0));
+UINT16 program_read_word_64le(offs_t address REG(d0));
+UINT32 program_read_dword_64le(offs_t address REG(d0));
+UINT64 program_read_qword_64le(offs_t address REG(d0));
+void program_write_byte_64le(offs_t address REG(d0), UINT8 data REG(d1));
+void program_write_word_64le(offs_t address REG(d0), UINT16 data REG(d1));
+void program_write_dword_64le(offs_t address REG(d0), UINT32 data REG(d1));
+void program_write_qword_64le(offs_t address REG(d0), UINT64 data);
 
 /* -----SPECIAL KRB for Z80 repeater ops ----- */
 // LDIR CPIR INIR OTIR
@@ -836,96 +852,96 @@ void program_rcopy_to_io(UINT8 port,UINT16 readAddress, UINT8 n);
 
 
 /* ----- declare data address space handlers ----- */
-UINT8 data_read_byte_8(offs_t address);
-void data_write_byte_8(offs_t address, UINT8 data);
+UINT8 data_read_byte_8(offs_t address REG(d0));
+void data_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1));
 
-UINT8 data_read_byte_16be(offs_t address);
-UINT16 data_read_word_16be(offs_t address);
-void data_write_byte_16be(offs_t address, UINT8 data);
-void data_write_word_16be(offs_t address, UINT16 data);
+UINT8 data_read_byte_16be(offs_t address REG(d0));
+UINT16 data_read_word_16be(offs_t address REG(d0));
+void data_write_byte_16be(offs_t address REG(d0), UINT8 data);
+void data_write_word_16be(offs_t address REG(d0), UINT16 data);
 
-UINT8 data_read_byte_16le(offs_t address);
-UINT16 data_read_word_16le(offs_t address);
-void data_write_byte_16le(offs_t address, UINT8 data);
-void data_write_word_16le(offs_t address, UINT16 data);
+UINT8 data_read_byte_16le(offs_t address REG(d0));
+UINT16 data_read_word_16le(offs_t address REG(d0));
+void data_write_byte_16le(offs_t address REG(d0), UINT8 data);
+void data_write_word_16le(offs_t address REG(d0), UINT16 data);
 
-UINT8 data_read_byte_32be(offs_t address);
-UINT16 data_read_word_32be(offs_t address);
-UINT32 data_read_dword_32be(offs_t address);
-void data_write_byte_32be(offs_t address, UINT8 data);
-void data_write_word_32be(offs_t address, UINT16 data);
-void data_write_dword_32be(offs_t address, UINT32 data);
+UINT8 data_read_byte_32be(offs_t address REG(d0));
+UINT16 data_read_word_32be(offs_t address REG(d0));
+UINT32 data_read_dword_32be(offs_t address REG(d0));
+void data_write_byte_32be(offs_t address REG(d0), UINT8 data);
+void data_write_word_32be(offs_t address REG(d0), UINT16 data);
+void data_write_dword_32be(offs_t address REG(d0), UINT32 data);
 
-UINT8 data_read_byte_32le(offs_t address);
-UINT16 data_read_word_32le(offs_t address);
-UINT32 data_read_dword_32le(offs_t address);
-void data_write_byte_32le(offs_t address, UINT8 data);
-void data_write_word_32le(offs_t address, UINT16 data);
-void data_write_dword_32le(offs_t address, UINT32 data);
+UINT8 data_read_byte_32le(offs_t address REG(d0));
+UINT16 data_read_word_32le(offs_t address REG(d0));
+UINT32 data_read_dword_32le(offs_t address REG(d0));
+void data_write_byte_32le(offs_t address REG(d0), UINT8 data);
+void data_write_word_32le(offs_t address REG(d0), UINT16 data);
+void data_write_dword_32le(offs_t address REG(d0), UINT32 data);
 
-UINT8 data_read_byte_64be(offs_t address);
-UINT16 data_read_word_64be(offs_t address);
-UINT32 data_read_dword_64be(offs_t address);
-UINT64 data_read_qword_64be(offs_t address);
-void data_write_byte_64be(offs_t address, UINT8 data);
-void data_write_word_64be(offs_t address, UINT16 data);
-void data_write_dword_64be(offs_t address, UINT32 data);
-void data_write_qword_64be(offs_t address, UINT64 data);
+UINT8 data_read_byte_64be(offs_t offset REG(d0));
+UINT16 data_read_word_64be(offs_t offset REG(d0));
+UINT32 data_read_dword_64be(offs_t offset REG(d0));
+UINT64 data_read_qword_64be(offs_t offset REG(d0));
+void data_write_byte_64be(offs_t offset REG(d0), UINT8 data);
+void data_write_word_64be(offs_t offset REG(d0), UINT16 data);
+void data_write_dword_64be(offs_t offset REG(d0), UINT32 data);
+void data_write_qword_64be(offs_t offset REG(d0), UINT64 data);
 
-UINT8 data_read_byte_64le(offs_t address);
-UINT16 data_read_word_64le(offs_t address);
-UINT32 data_read_dword_64le(offs_t address);
-UINT64 data_read_qword_64le(offs_t address);
-void data_write_byte_64le(offs_t address, UINT8 data);
-void data_write_word_64le(offs_t address, UINT16 data);
-void data_write_dword_64le(offs_t address, UINT32 data);
-void data_write_qword_64le(offs_t address, UINT64 data);
+UINT8 data_read_byte_64le(offs_t offset REG(d0));
+UINT16 data_read_word_64le(offs_t offset REG(d0));
+UINT32 data_read_dword_64le(offs_t offset REG(d0));
+UINT64 data_read_qword_64le(offs_t offset REG(d0));
+void data_write_byte_64le(offs_t offset REG(d0), UINT8 data);
+void data_write_word_64le(offs_t offset REG(d0), UINT16 data);
+void data_write_dword_64le(offs_t offset REG(d0), UINT32 data);
+void data_write_qword_64le(offs_t offset REG(d0), UINT64 data);
 
 /* ----- declare I/O address space handlers ----- */
-UINT8 io_read_byte_8(offs_t address);
-void io_write_byte_8(offs_t address, UINT8 data);
+UINT8 io_read_byte_8(offs_t address REG(d0));
+void io_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1));
 
-UINT8 io_read_byte_16be(offs_t address);
-UINT16 io_read_word_16be(offs_t address);
-void io_write_byte_16be(offs_t address, UINT8 data);
-void io_write_word_16be(offs_t address, UINT16 data);
+UINT8 io_read_byte_16be(offs_t address REG(d0));
+UINT16 io_read_word_16be(offs_t address REG(d0));
+void io_write_byte_16be(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_16be(offs_t address REG(d0), UINT16 data REG(d1));
 
-UINT8 io_read_byte_16le(offs_t address);
-UINT16 io_read_word_16le(offs_t address);
-void io_write_byte_16le(offs_t address, UINT8 data);
-void io_write_word_16le(offs_t address, UINT16 data);
+UINT8 io_read_byte_16le(offs_t address REG(d0));
+UINT16 io_read_word_16le(offs_t address REG(d0));
+void io_write_byte_16le(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_16le(offs_t address REG(d0), UINT16 data REG(d1));
 
-UINT8 io_read_byte_32be(offs_t address);
-UINT16 io_read_word_32be(offs_t address);
-UINT32 io_read_dword_32be(offs_t address);
-void io_write_byte_32be(offs_t address, UINT8 data);
-void io_write_word_32be(offs_t address, UINT16 data);
-void io_write_dword_32be(offs_t address, UINT32 data);
+UINT8 io_read_byte_32be(offs_t address REG(d0));
+UINT16 io_read_word_32be(offs_t address REG(d0));
+UINT32 io_read_dword_32be(offs_t address REG(d0));
+void io_write_byte_32be(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_32be(offs_t address REG(d0), UINT16 data REG(d1));
+void io_write_dword_32be(offs_t address REG(d0), UINT32 data REG(d1));
 
-UINT8 io_read_byte_32le(offs_t address);
-UINT16 io_read_word_32le(offs_t address);
-UINT32 io_read_dword_32le(offs_t address);
-void io_write_byte_32le(offs_t address, UINT8 data);
-void io_write_word_32le(offs_t address, UINT16 data);
-void io_write_dword_32le(offs_t address, UINT32 data);
+UINT8 io_read_byte_32le(offs_t address REG(d0));
+UINT16 io_read_word_32le(offs_t address REG(d0));
+UINT32 io_read_dword_32le(offs_t address REG(d0));
+void io_write_byte_32le(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_32le(offs_t address REG(d0), UINT16 data REG(d1));
+void io_write_dword_32le(offs_t address REG(d0), UINT32 data REG(d1));
 
-UINT8 io_read_byte_64be(offs_t address);
-UINT16 io_read_word_64be(offs_t address);
-UINT32 io_read_dword_64be(offs_t address);
-UINT64 io_read_qword_64be(offs_t address);
-void io_write_byte_64be(offs_t address, UINT8 data);
-void io_write_word_64be(offs_t address, UINT16 data);
-void io_write_dword_64be(offs_t address, UINT32 data);
-void io_write_qword_64be(offs_t address, UINT64 data);
+UINT8 io_read_byte_64be(offs_t address REG(d0));
+UINT16 io_read_word_64be(offs_t address REG(d0));
+UINT32 io_read_dword_64be(offs_t address REG(d0));
+UINT64 io_read_qword_64be(offs_t address REG(d0));
+void io_write_byte_64be(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_64be(offs_t address REG(d0), UINT16 data REG(d1));
+void io_write_dword_64be(offs_t address REG(d0), UINT32 data REG(d1));
+void io_write_qword_64be(offs_t address REG(d0), UINT64 data);
 
-UINT8 io_read_byte_64le(offs_t address);
-UINT16 io_read_word_64le(offs_t address);
-UINT32 io_read_dword_64le(offs_t address);
-UINT64 io_read_qword_64le(offs_t address);
-void io_write_byte_64le(offs_t address, UINT8 data);
-void io_write_word_64le(offs_t address, UINT16 data);
-void io_write_dword_64le(offs_t address, UINT32 data);
-void io_write_qword_64le(offs_t address, UINT64 data);
+UINT8 io_read_byte_64le(offs_t address REG(d0));
+UINT16 io_read_word_64le(offs_t address REG(d0));
+UINT32 io_read_dword_64le(offs_t address REG(d0));
+UINT64 io_read_qword_64le(offs_t address REG(d0));
+void io_write_byte_64le(offs_t address REG(d0), UINT8 data REG(d1));
+void io_write_word_64le(offs_t address REG(d0), UINT16 data REG(d1));
+void io_write_dword_64le(offs_t address REG(d0), UINT32 data REG(d1));
+void io_write_qword_64le(offs_t address REG(d0), UINT64 data);
 
 
 
@@ -1090,35 +1106,35 @@ extern address_map *	construct_map_0(address_map *map);
 	_memory_install_write64_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
 
 /* ----- generic memory access ----- */
-INLINE UINT8  program_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_byte)(offset); }
-INLINE UINT16 program_read_word (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_word)(offset); }
-INLINE UINT32 program_read_dword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_dword)(offset); }
-INLINE UINT64 program_read_qword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_qword)(offset); }
+INLINE UINT8  program_read_byte (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_byte)(offset); }
+INLINE UINT16 program_read_word (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_word)(offset); }
+INLINE UINT32 program_read_dword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_dword)(offset); }
+INLINE UINT64 program_read_qword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_qword)(offset); }
 
-INLINE void	program_write_byte (offs_t offset, UINT8  data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_byte)(offset, data); }
-INLINE void	program_write_word (offs_t offset, UINT16 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_word)(offset, data); }
-INLINE void	program_write_dword(offs_t offset, UINT32 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_dword)(offset, data); }
-INLINE void	program_write_qword(offs_t offset, UINT64 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_qword)(offset, data); }
+INLINE void	program_write_byte (offs_t offset REG(d0), UINT8 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_byte)(offset, data); }
+INLINE void	program_write_word (offs_t offset REG(d0), UINT16 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_word)(offset, data); }
+INLINE void	program_write_dword(offs_t offset REG(d0), UINT32 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_dword)(offset, data); }
+INLINE void	program_write_qword(offs_t offset REG(d0), UINT64 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_qword)(offset, data); }
 
-INLINE UINT8  data_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_byte)(offset); }
-INLINE UINT16 data_read_word (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_word)(offset); }
-INLINE UINT32 data_read_dword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_dword)(offset); }
-INLINE UINT64 data_read_qword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_qword)(offset); }
+INLINE UINT8  data_read_byte (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_byte)(offset); }
+INLINE UINT16 data_read_word (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_word)(offset); }
+INLINE UINT32 data_read_dword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_dword)(offset); }
+INLINE UINT64 data_read_qword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_qword)(offset); }
 
-INLINE void	data_write_byte (offs_t offset, UINT8  data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_byte)(offset, data); }
-INLINE void	data_write_word (offs_t offset, UINT16 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_word)(offset, data); }
-INLINE void	data_write_dword(offs_t offset, UINT32 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_dword)(offset, data); }
-INLINE void	data_write_qword(offs_t offset, UINT64 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_qword)(offset, data); }
+INLINE void	data_write_byte (offs_t offset REG(d0), UINT8  data REG(d1)) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_byte)(offset, data); }
+INLINE void	data_write_word (offs_t offset REG(d0), UINT16 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_word)(offset, data); }
+INLINE void	data_write_dword(offs_t offset REG(d0), UINT32 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_dword)(offset, data); }
+INLINE void	data_write_qword(offs_t offset REG(d0), UINT64 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_qword)(offset, data); }
 
-INLINE UINT8  io_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_byte)(offset); }
-INLINE UINT16 io_read_word (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_word)(offset); }
-INLINE UINT32 io_read_dword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_dword)(offset); }
-INLINE UINT64 io_read_qword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_qword)(offset); }
+INLINE UINT8  io_read_byte (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_byte)(offset); }
+INLINE UINT16 io_read_word (offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_word)(offset); }
+INLINE UINT32 io_read_dword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_dword)(offset); }
+INLINE UINT64 io_read_qword(offs_t offset REG(d0)) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_qword)(offset); }
 
-INLINE void	io_write_byte (offs_t offset, UINT8  data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_byte)(offset, data); }
-INLINE void	io_write_word (offs_t offset, UINT16 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_word)(offset, data); }
-INLINE void	io_write_dword(offs_t offset, UINT32 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_dword)(offset, data); }
-INLINE void	io_write_qword(offs_t offset, UINT64 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_qword)(offset, data); }
+INLINE void	io_write_byte (offs_t offset REG(d0), UINT8  data REG(d1)) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_byte)(offset, data); }
+INLINE void	io_write_word (offs_t offset REG(d0), UINT16 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_word)(offset, data); }
+INLINE void	io_write_dword(offs_t offset REG(d0), UINT32 data REG(d1)) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_dword)(offset, data); }
+INLINE void	io_write_qword(offs_t offset REG(d0), UINT64 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_qword)(offset, data); }
 
 /* ----- safe opcode and opcode argument reading ----- */
 UINT8	cpu_readop_safe(offs_t offset);
@@ -1131,15 +1147,15 @@ UINT32	cpu_readop_arg32_safe(offs_t offset);
 UINT64	cpu_readop_arg64_safe(offs_t offset);
 
 /* ----- unsafe opcode and opcode argument reading ----- */
-#define cpu_opptr_unsafe(A)			((void *)&opcode_base[(A) & opcode_mask])
-#define cpu_readop_unsafe(A)		(opcode_base[(A) & opcode_mask])
-#define cpu_readop16_unsafe(A)		(*(UINT16 *)&opcode_base[(A) & opcode_mask])
-#define cpu_readop32_unsafe(A)		(*(UINT32 *)&opcode_base[(A) & opcode_mask])
+#define cpu_opptr_unsafe(A)			((void *)&opcode_base[(A) /*& opcode_mask*/])
+#define cpu_readop_unsafe(A)		(opcode_base[(A) /*& opcode_mask*/])
+#define cpu_readop16_unsafe(A)		(*(UINT16 *)&opcode_base[(A) /*& opcode_mask*/])
+#define cpu_readop32_unsafe(A)		(*(UINT32 *)&opcode_base[(A)/*& opcode_mask*/])
 #define cpu_readop64_unsafe(A)		(*(UINT64 *)&opcode_base[(A) & opcode_mask])
-#define cpu_readop_arg_unsafe(A)	(opcode_arg_base[(A) & opcode_mask])
-#define cpu_readop_arg16_unsafe(A)	(*(UINT16 *)&opcode_arg_base[(A) & opcode_mask])
-#define cpu_readop_arg32_unsafe(A)	(*(UINT32 *)&opcode_arg_base[(A) & opcode_mask])
-#define cpu_readop_arg64_unsafe(A)	(*(UINT64 *)&opcode_arg_base[(A) & opcode_mask])
+#define cpu_readop_arg_unsafe(A)	(opcode_arg_base[(A) /*& opcode_mask*/])
+#define cpu_readop_arg16_unsafe(A)	(*(UINT16 *)&opcode_arg_base[(A) /*& opcode_mask*/])
+#define cpu_readop_arg32_unsafe(A)	(*(UINT32 *)&opcode_arg_base[(A) /*& opcode_mask*/])
+#define cpu_readop_arg64_unsafe(A)	(*(UINT64 *)&opcode_arg_base[(A) /*& opcode_mask*/])
 
 /* ----- opcode and opcode argument reading ----- */
 INLINE void * cpu_opptr(offs_t A)			{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_opptr_unsafe(A); }

@@ -14,6 +14,13 @@
 #ifndef __DRAWGFX_H__
 #define __DRAWGFX_H__
 
+#if defined(__GNUC__) && defined(__AMIGA__)
+    #define DGREG(r) __asm(#r)
+#else
+    #define DGREG(r)
+#endif
+
+
 #include "mamecore.h"
 
 #define MAX_GFX_PLANES		8
@@ -161,17 +168,31 @@ void decodechar(gfx_element *gfx,int num,const unsigned char *src,const gfx_layo
 gfx_element *allocgfx(const gfx_layout *gl);
 void decodegfx(gfx_element *gfx, const UINT8 *src, UINT32 first, UINT32 count);
 void freegfx(gfx_element *gfx);
-void drawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color);
-void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		UINT32 priority_mask);
-void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		UINT32 priority_mask);
+
+
+// krb 2024: this anihilates lots of copy during calls, which can be numberous.
+struct drawgfxParams {
+    mame_bitmap *dest;
+    const gfx_element *gfx;
+    unsigned int code;
+    unsigned int color;
+    int flipx,flipy;
+    int sx,sy;
+    const rectangle *clip;
+    int transparency;
+    int transparent_color;
+    // - - - -
+    int scalex,scaley; // only for drawgfxzoom
+
+    // - - - -
+    mame_bitmap *pri_buffer; // optional
+    UINT32 priority_mask;
+};
+
+void drawgfx(struct drawgfxParams *p DGREG(a0));
+//void pdrawgfx(struct drawgfxParams *p DGREG(a0));
+//void mdrawgfx(struct drawgfxParams *p DGREG(a0));
+
 void copybitmap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color);
 void copybitmap_remap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
@@ -262,22 +283,16 @@ static inline UINT32 alpha_blend_r32( UINT32 d, UINT32 s, UINT8 level )
   Optionally the bitmap can be tiled across the screen instead of doing a single
   copy. This is obtained by setting the wraparound parameter to true.
  */
+
 void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
 		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 priority);
 
 void fillbitmap(mame_bitmap *dest,pen_t pen,const rectangle *clip);
-void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley);
-void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
-		UINT32 priority_mask);
-void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
-		UINT32 priority_mask);
+
+void drawgfxzoom(struct drawgfxParams *p DGREG(a0));
+//void pdrawgfxzoom(struct drawgfxParams *p DGREG(a0));
+//void mdrawgfxzoom( struct drawgfxParams *p DGREG(a0));
 
 void drawgfx_toggle_crosshair(void);
 void draw_crosshair(mame_bitmap *bitmap,int x,int y,const rectangle *clip,int player);
