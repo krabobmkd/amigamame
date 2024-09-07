@@ -28,9 +28,7 @@
 
 #include "m68k.h"
 #include <limits.h>
-
-#define OPTIM68K_NOMASK_A 1
-
+#include "m68kkrbopt.h"
 
 #if M68K_EMULATE_ADDRESS_ERROR
 #include <setjmp.h>

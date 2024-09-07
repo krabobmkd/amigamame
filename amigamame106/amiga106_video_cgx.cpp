@@ -272,7 +272,7 @@ void Drawable_CGX::initARGB32DrawFunctionFromPixelFormat()
             case PIXFMT_BGR24:
         directDrawARGB32=&directDraw_type24_ARGB32;
         break;
-        case PIXFMT_ARGB32:directDrawARGB32=&directDrawBGRA32_ARGB32; break;
+        case PIXFMT_ARGB32:directDrawARGB32=&directDrawARGB32_ARGB32; break;
         case PIXFMT_BGRA32:directDrawARGB32=&directDrawBGRA32_ARGB32; break;
         case PIXFMT_RGBA32:directDrawARGB32=&directDrawRGBA32_ARGB32; break;
     default:

@@ -15,8 +15,8 @@
 #include "mamecore.h"
 
 #if defined(__GNUC__) && defined(__AMIGA__)
-#define REG(r) __asm(#r)
-//#define REG(r)
+//#define REG(r) __asm(#r)
+#define REG(r)
 #else
 #define REG(r)
 #endif

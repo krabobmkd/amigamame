@@ -3,6 +3,8 @@
 #include "m68k.h"
 #include "m68000.h"
 #include "state.h"
+#include "m68kkrbopt.h"
+
 
 /* global access */
 
@@ -239,13 +241,11 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
 
-//krb
+#ifdef OPTIM68K_USEFAST32INTRF
+    m68k_memory_intf = interface_fast32;
+#else
     m68k_memory_intf = interface_d16;
-    // experimental
-//	m68k_memory_intf = interface_fast32;
-
-//    printf(" **** m68000_init -> fast_32 ****\n");
-
+#endif
     m68k_state_register("m68000", index);
 	m68k_set_int_ack_callback(irqcallback);
 }
@@ -422,8 +422,12 @@ static void m68020_init(int index, int clock, const void *config, int (*irqcallb
 {
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68020);
-//krb	m68k_memory_intf = interface_d32;
+
+#ifdef OPTIM68K_USEFAST32INTRF
     m68k_memory_intf = interface_fast32;
+#else
+    m68k_memory_intf = interface_d32;
+#endif
 
 	m68k_state_register("m68020", index);
 	m68k_set_int_ack_callback(irqcallback);

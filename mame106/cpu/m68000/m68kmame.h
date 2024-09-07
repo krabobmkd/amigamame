@@ -9,7 +9,9 @@
 #include "debugger.h"
 #include "m68000.h"
 
-#define OPTIM68K_NOXOR 1
+#include "m68kkrbopt.h"
+
+
 
 /* Configuration switches (see m68kconf.h for explanation) */
 #define M68K_SEPARATE_READS         OPT_ON

@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <stdlib.h>
+#include <filesystem>
 using namespace std;
 
 string sourcebase("../mame106/");
@@ -852,8 +853,8 @@ int createCmake(map<string,TMachine> machinetargets,
 //        if(upname == "DATAEAST" ) onShouldBeDefault = true; -> too big/shitty
         if(upname == "MINIDTEA" ) onShouldBeDefault = true;
 
-        // because Q*BERT !
-        if(upname == "GOTTLIEB" ) onShouldBeDefault = true;
+        // because Q*BERT ! ->doesnt work
+        //if(upname == "GOTTLIEB" ) onShouldBeDefault = true;
         // just for buggy boy :) ->DOESNT WORK On 0.106 :(
 //        if(upname == "TATSUMI" ) onShouldBeDefault = true; // tested ok
 
@@ -1737,6 +1738,50 @@ void removeUselessDrivers(
 
 
 }
+
+void addHeadersWhenPossible(map<string,TChip> &sources)
+{
+    for(pair<const string,TChip> &p : sources)
+    {
+        for(pair<const string,vector<string>> &pp : p.second._vars)
+        {
+            vector<string> srcsh;
+            vector<string> &srcs = pp.second;
+            for(string sc : srcs)
+            {
+//                if(sc.find("cpu/m68000")==0)
+//                {
+//                    cout <<"";
+//                }
+                //cout << "source:" << endl;
+                if((sc.rfind(".c") == sc.length()-2)
+                        ||
+                   (sc.rfind(".cpp") == sc.length()-4)
+                        )
+                {
+                    string phpath = sc;
+                    phpath = replace(phpath,".cpp",".h");
+                    phpath = replace(phpath,".c",".h");
+
+                   if( filesystem::exists(sourcebase+phpath) )
+                   {
+                        srcsh.push_back(phpath);
+                   }
+
+
+                }
+
+            }
+            if(srcsh.size()>0)
+            {
+                srcs.insert(srcs.end(),srcsh.begin(),srcsh.end());
+            }
+
+        }
+    }
+}
+
+
 int main(int argc, char **argv)
 {
 
@@ -1756,12 +1801,16 @@ int main(int argc, char **argv)
     r = read_mak_cpus(cpusources);
     if(r) return r;
 
+
+
 //    TMachine &tm = machinetargets["sega"];
 
     completeDefinitionsByHand(machinetargets,cpusources);
 
     removeUselessDrivers(machinetargets,cpusources);
 
+    addHeadersWhenPossible(soundsources);
+    addHeadersWhenPossible(cpusources);
 
     createCmake(machinetargets,soundsources,cpusources);
 

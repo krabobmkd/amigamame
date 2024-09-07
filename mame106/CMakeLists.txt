@@ -50,6 +50,7 @@ set(MAME_CORE_SRC
  cpuint.h     inptport.h   osdepend.h            tilemap.h
  cpuintrf.h   input.h      palette.h             timer.h
 
+  cpu/m68000/m68kkrbopt.h
  sound_krb.h
 	# minimal common driver needs:
 	vidhrdw/generic.c vidhrdw/vector.c
