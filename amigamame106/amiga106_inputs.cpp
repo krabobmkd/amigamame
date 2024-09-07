@@ -944,7 +944,7 @@ INT32 osd_get_code_value(os_code oscode)
             llm._lastMouseStateX = s;
             if(delta<-minswitch) delta +=256;
             else if(delta>minswitch) delta -=256;
-            return delta<<9;
+            return delta<<10;
         }
         case 1: // mouse y
         {
@@ -954,7 +954,7 @@ INT32 osd_get_code_value(os_code oscode)
             // delta should be some pixels ...
             if(delta<-minswitch) delta +=256;
             else if(delta>minswitch) delta -=256;
-            return delta<<9;
+            return delta<<10;
         }
         case 2: // mouse bt 1
             return (state &JPF_BUTTON_RED)!=0 ;

@@ -142,13 +142,14 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
         }
 
     }
-    if(_heightBufferSwitch) ceny+= _heightBufferSwitchApplied;
 
     // could happen if screen more little than source.
     if(cenx<0) cenx=0;
     if(ceny<0) ceny=0;
     if(hh+ceny>_height){ hh=_height; ceny=0; }// fast cheap clipping
     if(ww+cenx>_width) { ww=_width; cenx=0; }
+
+    if(_heightBufferSwitch) ceny+= _heightBufferSwitchApplied;
 }
 void IntuitionDrawable::waitFrame()
 {
@@ -244,6 +245,7 @@ bool Intuition_Screen::open()
         if(_pTripleBufferImpl) delete _pTripleBufferImpl;
         _pTripleBufferImpl = new TripleBuffer_CSB(*this); // could fail, in which case back to direct rendering
         _pTripleBufferImpl->init();
+        printf("TRP IMPL!\n");
     }
 
     return true;

@@ -214,6 +214,17 @@ void Intuition_Screen_OS3::draw(_mame_display *display)
     // WritePixelArrays is OS3.0, We could use WriteChunkyPixels which is OS3.1.
     Drawable_OS3::draw_WPA8(display);
    if(_pTripleBufferImpl) _pTripleBufferImpl->afterBufferDrawn();
+
+   if(_flags & DISPFLAG_USEHEIGHTBUFFER) {
+        if(_pScreen)
+        {
+            _pScreen->ViewPort.DyOffset = ((_heightBufferSwitch)?_heightBufferSwitchApplied:0);
+            ScrollVPort(&(_pScreen->ViewPort));
+         }
+
+        _heightBufferSwitch^=1;
+   }
+
 }
 
 // - - -- - - -- - - -

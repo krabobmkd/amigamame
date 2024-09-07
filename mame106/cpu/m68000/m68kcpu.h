@@ -29,6 +29,7 @@
 #include "m68k.h"
 #include <limits.h>
 
+#define OPTIM68K_NOMASK_A 1
 
 
 #if M68K_EMULATE_ADDRESS_ERROR
@@ -257,9 +258,11 @@
 #endif /* M68K_INT_GT_32_BIT || M68K_USE_64_BIT */
 
 /* Simulate address lines of 68k family */
-#define ADDRESS_68K(A) (A)
-// #define ADDRESS_68K(A) ((A)&CPU_ADDRESS_MASK)
-
+#ifdef OPTIM68K_NOMASK_A 
+ #define ADDRESS_68K(A) (A)
+#else
+ #define ADDRESS_68K(A) ((A)&CPU_ADDRESS_MASK)
+#endif
 /* Shift & Rotate Macros. */
 #define LSL(A, C) ((A) << (C))
 #define LSR(A, C) ((A) >> (C))
@@ -625,7 +628,7 @@
 #define EA_AY_PD_8()   (--AY)                                /* predecrement (size = byte) */
 #define EA_AY_PD_16()  (AY-=2)                               /* predecrement (size = word) */
 #define EA_AY_PD_32()  (AY-=4)                               /* predecrement (size = long) */
-#define EA_AY_DI_8()   (AY+MAKE_INT_16(m68ki_read_imm_16_c16())) /* displacement */
+#define EA_AY_DI_8()   (AY+MAKE_INT_16(m68ki_read_imm_16())) /* displacement */
 #define EA_AY_DI_16()  EA_AY_DI_8()
 #define EA_AY_DI_32()  EA_AY_DI_8()
 #define EA_AY_IX_8()   m68ki_get_ea_ix(AY)                   /* indirect + index */
@@ -641,7 +644,7 @@
 #define EA_AX_PD_8()   (--AX)
 #define EA_AX_PD_16()  (AX-=2)
 #define EA_AX_PD_32()  (AX-=4)
-#define EA_AX_DI_8()   (AX+MAKE_INT_16(m68ki_read_imm_16_c16()))
+#define EA_AX_DI_8()   (AX+MAKE_INT_16(m68ki_read_imm_16()))
 #define EA_AX_DI_16()  EA_AX_DI_8()
 #define EA_AX_DI_32()  EA_AX_DI_8()
 #define EA_AX_IX_8()   m68ki_get_ea_ix(AX)
@@ -651,7 +654,7 @@
 #define EA_A7_PI_8()   ((REG_A[7]+=2)-2)
 #define EA_A7_PD_8()   (REG_A[7]-=2)
 
-#define EA_AW_8()      MAKE_INT_16(m68ki_read_imm_16_c16())      /* absolute word */
+#define EA_AW_8()      MAKE_INT_16(m68ki_read_imm_16())      /* absolute word */
 #define EA_AW_16()     EA_AW_8()
 #define EA_AW_32()     EA_AW_8()
 #define EA_AL_8()      m68ki_read_imm_32()                   /* absolute long */
@@ -666,7 +669,7 @@
 
 
 #define OPER_I_8()     m68ki_read_imm_8()
-#define OPER_I_16()    m68ki_read_imm_16_c16()
+#define OPER_I_16()    m68ki_read_imm_16()
 #define OPER_I_32()    m68ki_read_imm_32()
 
 
@@ -819,7 +822,7 @@
 #endif
 
 /* map read immediate 8 to read immediate 16 */
-#define m68ki_read_imm_8() MASK_OUT_ABOVE_8(m68ki_read_imm_16_c16())
+#define m68ki_read_imm_8() MASK_OUT_ABOVE_8(m68ki_read_imm_16())
 
 /* Map PC-relative reads */
 #define m68ki_read_pcrel_8(A) m68k_read_pcrelative_8(A)
@@ -1073,7 +1076,7 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
 //	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
 //}
 
-INLINE uint m68ki_read_imm_16_c16(void)
+INLINE uint m68ki_read_imm_16(void)
 {
     // what m68k_read_immediate_16 actually does:
     // no need to prefech really, this is "direct rom reading"
@@ -1264,7 +1267,7 @@ INLINE uint m68ki_get_ea_pcdi(void)
 {
 	uint old_pc = REG_PC;
 	m68ki_use_program_space(); /* auto-disable */
-	return old_pc + MAKE_INT_16(m68ki_read_imm_16_c16());
+	return old_pc + MAKE_INT_16(m68ki_read_imm_16());
 }
 
 
@@ -1319,7 +1322,7 @@ INLINE uint m68ki_get_ea_pcix(void)
 INLINE uint m68ki_get_ea_ix(uint An)
 {
 	/* An = base register */
-	uint extension = m68ki_read_imm_16_c16();
+	uint extension = m68ki_read_imm_16();
 	uint Xn = 0;                        /* Index register */
 	uint bd = 0;                        /* Base Displacement */
 	uint od = 0;                        /* Outer Displacement */
@@ -1369,7 +1372,7 @@ INLINE uint m68ki_get_ea_ix(uint An)
 
 	/* Check if base displacement is present */
 	if(BIT_5(extension))                /* BD SIZE */
-		bd = BIT_4(extension) ? m68ki_read_imm_32() : MAKE_INT_16(m68ki_read_imm_16_c16());
+		bd = BIT_4(extension) ? m68ki_read_imm_32() : MAKE_INT_16(m68ki_read_imm_16());
 
 	/* If no indirect action, we are done */
 	if(!(extension&7))                  /* No Memory Indirect */
@@ -1377,7 +1380,7 @@ INLINE uint m68ki_get_ea_ix(uint An)
 
 	/* Check if outer displacement is present */
 	if(BIT_1(extension))                /* I/IS:  od */
-		od = BIT_0(extension) ? m68ki_read_imm_32() : MAKE_INT_16(m68ki_read_imm_16_c16());
+		od = BIT_0(extension) ? m68ki_read_imm_32() : MAKE_INT_16(m68ki_read_imm_16());
 
 	/* Postindex */
 	if(BIT_2(extension))                /* I/IS:  0 = preindex, 1 = postindex */

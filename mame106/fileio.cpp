@@ -20,6 +20,7 @@ extern "C" {
     #include "unzip.h"
 
     #include <stdio.h>
+    #include <string.h>
 
     #ifdef MESS
     #include "image.h"
@@ -798,29 +799,31 @@ UINT32 mame_fwrite_swap(mame_file *file, const void *buffer, UINT32 length)
 
 int mame_fputs(mame_file *f, const char *s)
 {
-	char convbuf[1024];
-	char *pconvbuf;
+    // krb: this would crash with lines >1024
+//	char convbuf[1024];
+//	char *pconvbuf;
 
-	for (pconvbuf = convbuf; *s; s++)
-	{
-		if (*s == '\n')
-		{
-			if (CRLF == 1)		/* CR only */
-				*pconvbuf++ = 13;
-			else if (CRLF == 2)	/* LF only */
-				*pconvbuf++ = 10;
-			else if (CRLF == 3)	/* CR+LF */
-			{
-				*pconvbuf++ = 13;
-				*pconvbuf++ = 10;
-			}
-		}
-		else
-			*pconvbuf++ = *s;
-	}
-	*pconvbuf++ = 0;
+//	for (pconvbuf = convbuf; *s; s++)
+//	{
+//		if (*s == '\n')
+//		{
+//			if (CRLF == 1)		/* CR only */
+//				*pconvbuf++ = 13;
+//			else if (CRLF == 2)	/* LF only */
+//				*pconvbuf++ = 10;
+//			else if (CRLF == 3)	/* CR+LF */
+//			{
+//				*pconvbuf++ = 13;
+//				*pconvbuf++ = 10;
+//			}
+//		}
+//		else
+//			*pconvbuf++ = *s;
+//	}
+//	*pconvbuf++ = 0;
+//	return mame_fwrite(f, convbuf, strlen(convbuf));
 
-	return mame_fwrite(f, convbuf, strlen(convbuf));
+    return mame_fwrite(f, s, strlen(s));
 }
 
 

@@ -9,6 +9,8 @@
 #include "debugger.h"
 #include "m68000.h"
 
+#define OPTIM68K_NOXOR 1
+
 /* Configuration switches (see m68kconf.h for explanation) */
 #define M68K_SEPARATE_READS         OPT_ON
 
@@ -88,7 +90,11 @@ INLINE void m68k_write_memory_32_pd(unsigned int address REG(d0), unsigned int v
 
 INLINE unsigned int m68kx_read_immediate_16(unsigned int address REG(d0))
 {
+#ifdef OPTIM68K_NOXOR
 	return cpu_readop16((address)  /* ^ m68k_memory_intf.opcode_xor */);
+#else
+	return cpu_readop16((address) ^ m68k_memory_intf.opcode_xor);
+#endif
 }
 
 INLINE unsigned int m68kx_read_immediate_32(unsigned int address REG(d0))

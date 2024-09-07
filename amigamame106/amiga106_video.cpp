@@ -214,10 +214,15 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         // this will decide video implemntation against available hardware and config.
         g_pMameDisplay = new IntuitionDisplay();
 
-        if(config._flags & CONFDISPLAYFLAGS_ONWORKBENCH ) params._flags |= DISPFLAG_STARTWITHWINDOW;
-//        if(config._flags & CONFDISPLAYFLAGS_TRIPLEBUFFER )
-//            //params._flags |= DISPFLAG_USEHEIGHTBUFFER;
-//            params._flags |= DISPFLAG_USETRIPLEBUFFER;
+        if(config._flags & CONFDISPLAYFLAGS_ONWORKBENCH )
+            params._flags |= DISPFLAG_STARTWITHWINDOW;
+
+        // these 2 are exclusive:
+        if(config._buffering == MameConfig::ScreenBufferMode::TripleBufferCSB )
+             params._flags |= DISPFLAG_USETRIPLEBUFFER;
+        if(config._buffering == MameConfig::ScreenBufferMode::DoubleBufferSVP )
+             params._flags |= DISPFLAG_USEHEIGHTBUFFER;
+
         if(config._drawEngine == MameConfig::DrawEngine::CgxScalePixelArray)
                 params._flags |= DISPFLAG_USESCALEPIXARRAY;
 

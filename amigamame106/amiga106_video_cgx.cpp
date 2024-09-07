@@ -373,7 +373,12 @@ void Intuition_Screen_CGX::draw(_mame_display *display)
     }
    if(_pTripleBufferImpl) _pTripleBufferImpl->afterBufferDrawn();
    if(_flags & DISPFLAG_USEHEIGHTBUFFER) {
-        if(_pScreen) MoveScreen(_pScreen,0,(_heightBufferSwitch)?-_heightBufferSwitchApplied:0);
+        if(_pScreen)
+        {
+            _pScreen->ViewPort.DyOffset = ((_heightBufferSwitch)?_heightBufferSwitchApplied:0);
+            ScrollVPort(&(_pScreen->ViewPort));
+         }
+
         _heightBufferSwitch^=1;
    }
 
