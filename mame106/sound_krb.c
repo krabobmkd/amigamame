@@ -105,9 +105,9 @@ static INT16 *finalmix;
 static INT32 *leftmix, *rightmix;
 */
 
-static const int nbSampleFrame=4;
+static const int nbSampleFrame=8;
 int currentSampleFrame=0;
-struct SampleFrame SampleFrames[4];
+struct SampleFrame SampleFrames[8];
 // set when starting machine, before osd_start_audio_stream
 //int sound_machine_is_stereo=0; // 0 mono, 1 stereo.
 //int sound_machine_nb_streams=0; // actual number of things mixed.
@@ -199,18 +199,24 @@ int sound_init(void)
 //    sound_machine_is_stereo=0; // 0 mono, 1 stereo.
 //    sound_machine_nb_streams=0; // actual number of things mixed.
 
-	for (totalspeakers = 0; Machine->drv->speaker[totalspeakers].tag; totalspeakers++)
-	{
-        speaker_config *speaker = &Machine->drv->speaker[totalspeakers];
-      //  if(speaker->x != 0.0f)  sound_machine_is_stereo = 1;
-      //  sound_machine_nb_streams++; // same as totalspeakers
-	}
+//	for (totalspeakers = 0; Machine->drv->speaker[totalspeakers].tag; totalspeakers++)
+//	{
+//        speaker_config *speaker = &Machine->drv->speaker[totalspeakers];
+//      //  if(speaker->x != 0.0f)  sound_machine_is_stereo = 1;
+//      //  sound_machine_nb_streams++; // same as totalspeakers
+//	}
 //	printf(" **** total speakers = %d  stereo:%d \n",(int)sound_machine_is_stereo);
 	VPRINTF(("total speakers = %d\n", totalspeakers));
 
 	/* initialize the OSD layer */
 	VPRINTF(("osd_start_audio_stream\n"));
-	samples_this_frame = osd_start_audio_stream(1/*sound_machine_is_stereo*/);
+    // normal cod for stereo/mono switch look likes:
+      	samples_this_frame = osd_start_audio_stream(0);
+
+    // patched code to force mono looks like:
+//	samples_this_frame = osd_start_audio_stream(0);
+    // - - - - -
+
 	if (!samples_this_frame)
 		return 1;
 
@@ -702,9 +708,13 @@ static void sound_save(int config_type, xml_data_node *parentnode)
 
 extern int amigamame_audio_forcemono;
 
+cycles_t lastSoundFrameUpdate = 0;
+
 void sound_frame_update(void)
 {
 	int resetstreamleft=1,resetstreamright=(amigamame_audio_forcemono)?0:1;
+
+    lastSoundFrameUpdate = osd_cycles();
 
 	int sample, spknum;
     struct SampleFrame *pFrame;
@@ -714,11 +724,11 @@ void sound_frame_update(void)
 	profiler_mark(PROFILER_SOUND);
 
     // get next frame
-    icurrentSampleFrame = (currentSampleFrame+1)& 3;
+    icurrentSampleFrame = (currentSampleFrame+1)& 7;
     pFrame = &SampleFrames[icurrentSampleFrame];
     if(pFrame->_readlock)
     {
-        icurrentSampleFrame = (currentSampleFrame+2)& 3;
+        icurrentSampleFrame = (currentSampleFrame+2)& 7;
         pFrame = &SampleFrames[icurrentSampleFrame];
     }
    // pFrame->_read = 0;
@@ -731,8 +741,8 @@ void sound_frame_update(void)
 //	memset(pFrame->_leftmix, 0, samples_this_frame * sizeof(INT32)*2);
 //	memset(pFrame->_rightmix, 0, samples_this_frame * sizeof(INT32));
 
-    int nbconsumedStreams =0;
-    int lastspeakerDirection=1337;
+   // int nbconsumedStreams =0;
+   // int lastspeakerDirection=1337;
 
 	/* if we're not paused, keep the sounds going */
 	if (!mame_is_paused())

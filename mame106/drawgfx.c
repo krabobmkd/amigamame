@@ -635,6 +635,7 @@ int pdrawgfx_shadow_lowpri = 0;
 #define SETPIXELCOLOR(dest,n) { if (((1 << (pridata[dest] & 0x1f)) & pmask) == 0) { if (pridata[dest] & 0x80) { dstdata[dest] = palette_shadow_table[n];} else { dstdata[dest] = (n);} } pridata[dest] = (pridata[dest] & 0x7f) | afterdrawmask; }
 #define DECLARE_SWAP_RAW_PRI(function,args,body) void function##_raw_pri8 args body
 #include "drawgfx.c"
+
 #undef DECLARE_SWAP_RAW_PRI
 #undef COLOR_ARG
 #undef LOOKUP
@@ -923,25 +924,31 @@ static inline UINT32 SHADOW32(UINT32 c) {
 
 ***************************************************************************/
 
-static inline void common_drawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		mame_bitmap *pri_buffer,UINT32 pri_mask)
+//was: static inline void common_drawgfx(struct drawgfxParams *p DGREG(a0))
+void drawgfx(struct drawgfxParams *p DGREG(a0))
 {
-	assert_always(gfx, "drawgfx() gfx == 0");
-	assert_always(gfx->colortable || is_raw[transparency], "drawgfx() gfx->colortable == 0");
+//	assert(p->gfx, "drawgfx() gfx == 0");
+//	assert(p->gfx->colortable || is_raw[p->transparency], "drawgfx() gfx->colortable == 0");
+    UINT32 code = p->code;
+    int transparency = p->transparency;
+    int transparent_color = p->transparent_color;
+    UINT32 color = p->color;
+    int prev_transparency = transparency;
+    int prev_transparent_color = transparent_color;
 
-	code %= gfx->total_elements;
+	code %= p->gfx->total_elements;
 	if (!is_raw[transparency])
-		color %= gfx->total_colors;
+		color %= p->gfx->total_colors;
 
 	if (!(Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
-		(transparency == TRANSPARENCY_ALPHAONE || transparency == TRANSPARENCY_ALPHA || transparency == TRANSPARENCY_ALPHARANGE))
+		(transparency == TRANSPARENCY_ALPHAONE ||
+		transparency == TRANSPARENCY_ALPHA ||
+		transparency == TRANSPARENCY_ALPHARANGE))
 	{
 		if (transparency == TRANSPARENCY_ALPHAONE && (cpu_getcurrentframe() & 1))
 		{
 			transparency = TRANSPARENCY_PENS;
-			transparent_color = (1 << (transparent_color & 0xff))|(1 << (transparent_color >> 8));
+			transparent_color = (1 << (UINT8)(transparent_color & 0x1f))|(1 << (UINT8)(transparent_color >> 8));
 		}
 		else
 		{
@@ -950,61 +957,78 @@ static inline void common_drawgfx(mame_bitmap *dest,const gfx_element *gfx,
 		}
 	}
 
-	if (gfx->pen_usage && (transparency == TRANSPARENCY_PEN || transparency == TRANSPARENCY_PENS))
+	if (p->gfx->pen_usage && (transparency == TRANSPARENCY_PEN ||
+                                transparency == TRANSPARENCY_PENS))
 	{
-		int transmask = 0;
+		UINT32 transmask = 0;
 
 		if (transparency == TRANSPARENCY_PEN)
 		{
-			transmask = 1 << (transparent_color & 0xff);
+			transmask = 1 << (transparent_color & 0x1f);
 		}
 		else	/* transparency == TRANSPARENCY_PENS */
 		{
 			transmask = transparent_color;
 		}
-
-		if ((gfx->pen_usage[code] & ~transmask) == 0)
+        UINT32 pen_usage = p->gfx->pen_usage[code];
+		if ((pen_usage & ~transmask) == 0)
 			/* character is totally transparent, no need to draw */
 			return;
-		else if ((gfx->pen_usage[code] & transmask) == 0)
+		else if ((pen_usage & transmask) == 0)
 			/* character is totally opaque, can disable transparency */
 			transparency = TRANSPARENCY_NONE;
 	}
 
-	if (dest->depth == 8)
-		drawgfx_core8(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
-	else if(dest->depth == 15 || dest->depth == 16)
-		drawgfx_core16(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
+    p->code = code;
+    p->color = color;
+    p->transparency = transparency;
+
+    // did something like that for pdrawgfx case. mdrawgfx was never called (so far ?)
+//   if(p->pri_buffer)  p->priority_mask |= (1<<31);
+
+    int depth = p->dest->depth ;
+
+
+    // 8bit depth that does not exists in Mame106
+//    if (depth == 8)
+//    	drawgfx_core8(p);
+//	 else
+
+    if(depth<=16)
+		drawgfx_core16(p);
 	else
-		drawgfx_core32(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
+		drawgfx_core32(p);
+
+    // magic is struct is now shared between calls
+    p->transparency =prev_transparency;
+    p->transparent_color = prev_transparent_color;
 }
 
-void drawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,NULL,0);
-	profiler_mark(PROFILER_END);
-}
 
-void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,priority_bitmap,priority_mask | (1<<31));
-	profiler_mark(PROFILER_END);
-}
+//void drawgfx(struct drawgfxParams *p DGREG(a0))
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,NULL,0);
+//	profiler_mark(PROFILER_END);
+//}
 
-void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,priority_bitmap,priority_mask);
-	profiler_mark(PROFILER_END);
-}
+//void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,priority_bitmap,priority_mask | (1<<31));
+//	profiler_mark(PROFILER_END);
+//}
+
+//void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfx(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,priority_bitmap,priority_mask);
+//	profiler_mark(PROFILER_END);
+//}
 
 
 /***************************************************************************
@@ -1036,9 +1060,10 @@ void copybitmap_remap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int
 {
 	profiler_mark(PROFILER_COPYBITMAP);
 
-	if (dest->depth == 8)
-		copybitmap_core8(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
-	else if(dest->depth == 15 || dest->depth == 16)
+//	if (dest->depth == 8)
+//		copybitmap_core8(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
+	//else
+    if(/*dest->depth == 15 || dest->depth == 16*/dest->depth <=16)
 		copybitmap_core16(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
 	else
 		copybitmap_core32(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
@@ -1343,9 +1368,11 @@ void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
 		return;
 	}
 
-	if (dest->depth == 8)
-		copyrozbitmap_core8(dest,src,startx,starty,incxx,incxy,incyx,incyy,wraparound,clip,transparency,transparent_color,priority);
-	else if(dest->depth == 15 || dest->depth == 16)
+//	if (dest->depth == 8)
+//		copyrozbitmap_core8(dest,src,startx,starty,incxx,incxy,incyx,incyy,wraparound,clip,transparency,transparent_color,priority);
+//	else
+
+    if(dest->depth <=16)
 		copyrozbitmap_core16(dest,src,startx,starty,incxx,incxy,incyx,incyy,wraparound,clip,transparency,transparent_color,priority);
 	else
 		copyrozbitmap_core32(dest,src,startx,starty,incxx,incxy,incyx,incyy,wraparound,clip,transparency,transparent_color,priority);
@@ -1417,26 +1444,44 @@ void fillbitmap(mame_bitmap *dest,pen_t pen,const rectangle *clip)
 	}
 }
 
-static inline void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		int scalex, int scaley,mame_bitmap *pri_buffer,UINT32 pri_mask)
+//void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,
+//		int scalex, int scaley,mame_bitmap *pri_buffer,UINT32 pri_mask)
+void drawgfxzoom(struct drawgfxParams *p DGREG(a0))
 {
 	rectangle myclip;
 	int alphapen = 0;
 
 	UINT8 ah, al;
 
-	al = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
+    int scalex = p->scalex;
+    int scaley = p->scaley;
 
 	if (!scalex || !scaley) return;
 
 	if (scalex == 0x10000 && scaley == 0x10000)
 	{
-		common_drawgfx(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
+		drawgfx(p);
 		return;
 	}
+    al = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
 
+    mame_bitmap *dest_bmp = p->dest;
+    const gfx_element *gfx = p->gfx;
+    unsigned int code = p->code;
+    unsigned int color = p->color;
+    int flipx = p->flipx,flipy = p->flipy;
+    int sx=p->sx,sy=p->sy;
+    const rectangle *clip = p->clip;
+    int transparency = p->transparency;
+    int transparent_color = p->transparent_color;
+
+    // - - - -
+    mame_bitmap *pri_buffer = p->pri_buffer; // optional
+    UINT32 pri_mask = p->priority_mask;
+
+#ifdef DO_SECURE_TESTS
 	if (transparency != TRANSPARENCY_PEN && transparency != TRANSPARENCY_PEN_RAW
 			&& transparency != TRANSPARENCY_PENS && transparency != TRANSPARENCY_COLOR
 			&& transparency != TRANSPARENCY_PEN_TABLE && transparency != TRANSPARENCY_PEN_TABLE_RAW
@@ -1447,7 +1492,7 @@ static inline void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *
 		ui_popup("drawgfxzoom unsupported trans %02x",transparency);
 		return;
 	}
-
+#endif
 	if (!(Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
 		(transparency == TRANSPARENCY_ALPHAONE || transparency == TRANSPARENCY_ALPHA || transparency == TRANSPARENCY_ALPHARANGE))
 	{
@@ -3507,37 +3552,37 @@ static inline void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *
 	}
 }
 
-void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
-			clip,transparency,transparent_color,scalex,scaley,NULL,0);
-	profiler_mark(PROFILER_END);
-}
+//void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
+//			clip,transparency,transparent_color,scalex,scaley,NULL,0);
+//	profiler_mark(PROFILER_END);
+//}
 
-void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
-		UINT32 priority_mask)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
-			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask | (1<<31));
-	profiler_mark(PROFILER_END);
-}
+//void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
+//		UINT32 priority_mask)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
+//			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask | (1<<31));
+//	profiler_mark(PROFILER_END);
+//}
 
-void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
-		UINT32 priority_mask)
-{
-	profiler_mark(PROFILER_DRAWGFX);
-	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
-			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask);
-	profiler_mark(PROFILER_END);
-}
+//void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+//		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
+//		UINT32 priority_mask)
+//{
+//	profiler_mark(PROFILER_DRAWGFX);
+//	common_drawgfxzoom(dest_bmp,gfx,code,color,flipx,flipy,sx,sy,
+//			clip,transparency,transparent_color,scalex,scaley,priority_bitmap,priority_mask);
+//	profiler_mark(PROFILER_END);
+//}
 
 static inline void plotclip(mame_bitmap *bitmap,int x,int y,int pen,const rectangle *clip)
 {
@@ -5130,25 +5175,39 @@ DECLARE(blockmove_NtoN_blend_remap_flipx,(
 
 
 
-
+//    int transparency = p->transparency;
+//    int transparent_color = p->transparent_color;
+//    mame_bitmap *pri_buffer = p->pri_buffer; // optional
+//    UINT32 priority_mask = p->priority_mask;
+//    mame_bitmap *dest = p->dest;
+//    unsigned int code = p->code;
+//    unsigned int color = p->color;
+//    int flipx = p->flipx,flipy = p->flipy;
 
 DECLARE(drawgfx_core,(
-		mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		mame_bitmap *pri_buffer,UINT32 pri_mask),
+    struct drawgfxParams *p DGREG(a0)),
 {
+    mame_bitmap *dest = p->dest;
+    const gfx_element *gfx = p->gfx;
+    int flipx = p->flipx;
+    int flipy = p->flipy;
+    int sx = p->sx;
+    int sy = p->sy;
+    UINT32 pri_mask = p->priority_mask;
+    int transparent_color = p->transparent_color;
+
+    const rectangle *clip = p->clip;
+
 	int ox;
 	int oy;
 	int ex;
 	int ey;
 
-
 	/* check bounds */
-	ox = sx;
-	oy = sy;
+	ox = p->sx;
+	oy = p->sy;
 
-	ex = sx + gfx->width-1;
+	ex = sx + p->gfx->width-1;
 	if (sx < 0) sx = 0;
 	if (clip && sx < clip->min_x) sx = clip->min_x;
 	if (ex >= dest->width) ex = dest->width-1;
@@ -5163,6 +5222,9 @@ DECLARE(drawgfx_core,(
 	if (sy > ey) return;
 
 	{
+        const unsigned int code = p->code;
+        unsigned int color = p->color;
+
 		UINT8 *sd = gfx->gfxdata + code * gfx->char_modulo;		/* source data */
 		int sw = gfx->width;									/* source width */
 		int sh = gfx->height;									/* source height */
@@ -5174,7 +5236,9 @@ DECLARE(drawgfx_core,(
 		int dh = ey-sy+1;										/* dest height */
 		int dm = ((DATA_TYPE *)dest->line[1])-((DATA_TYPE *)dest->line[0]);	/* dest modulo */
 		const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
-		UINT8 *pribuf = (pri_buffer) ? ((UINT8 *)pri_buffer->line[sy]) + sx : NULL;
+		UINT8 *pribuf = (p->pri_buffer) ? ((UINT8 *)p->pri_buffer->line[sy]) + sx : NULL;
+
+        int transparency = p->transparency;
 
 		/* optimizations for 1:1 mapping */
 		if (Machine->drv->color_table_len == 0 &&

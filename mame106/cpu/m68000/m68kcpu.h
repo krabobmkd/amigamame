@@ -1,4 +1,4 @@
-#include <stdio.h>
+
 /* ======================================================================== */
 /* ========================= LICENSING & COPYRIGHT ======================== */
 /* ======================================================================== */
@@ -28,10 +28,15 @@
 
 #include "m68k.h"
 #include <limits.h>
+#include "m68kkrbopt.h"
 
 #if M68K_EMULATE_ADDRESS_ERROR
 #include <setjmp.h>
 #endif /* M68K_EMULATE_ADDRESS_ERROR */
+
+#include <stdio.h>
+#include <stdlib.h>
+
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
@@ -251,9 +256,11 @@
 #endif /* M68K_INT_GT_32_BIT || M68K_USE_64_BIT */
 
 /* Simulate address lines of 68k family */
-#define ADDRESS_68K(A) ((A)&CPU_ADDRESS_MASK)
-
-
+#ifdef OPTIM68K_NOMASK_A 
+ #define ADDRESS_68K(A) (A)
+#else
+ #define ADDRESS_68K(A) ((A)&CPU_ADDRESS_MASK)
+#endif
 /* Shift & Rotate Macros. */
 #define LSL(A, C) ((A) << (C))
 #define LSR(A, C) ((A) >> (C))
@@ -335,8 +342,8 @@
 #define CPU_INT_LEVEL    m68ki_cpu.int_level /* ASG: changed from CPU_INTS_PENDING */
 #define CPU_INT_CYCLES   m68ki_cpu.int_cycles /* ASG */
 #define CPU_STOPPED      m68ki_cpu.stopped
-#define CPU_PREF_ADDR    m68ki_cpu.pref_addr
-#define CPU_PREF_DATA    m68ki_cpu.pref_data
+//#define CPU_PREF_ADDR    m68ki_cpu.pref_addr
+//#define CPU_PREF_DATA    m68ki_cpu.pref_data
 #define CPU_ADDRESS_MASK m68ki_cpu.address_mask
 #define CPU_SR_MASK      m68ki_cpu.sr_mask
 #define CPU_INSTR_MODE   m68ki_cpu.instr_mode
@@ -789,14 +796,22 @@
 /* ----------------------------- Read / Write ----------------------------- */
 
 /* Read from the current address space */
+// krb
 #define m68ki_read_8(A)  m68ki_read_8_fc (A, FLAG_S | m68ki_get_address_space())
 #define m68ki_read_16(A) m68ki_read_16_fc(A, FLAG_S | m68ki_get_address_space())
 #define m68ki_read_32(A) m68ki_read_32_fc(A, FLAG_S | m68ki_get_address_space())
+
+//#define m68ki_read_8(A)  m68k_memory_intf.read8(A);
+//#define m68ki_read_16(A) m68k_memory_intf.read16(A);
+//#define m68ki_read_32(A) m68k_memory_intf.read32(A);
 
 /* Write to the current data space */
 #define m68ki_write_8(A, V)  m68ki_write_8_fc (A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #define m68ki_write_16(A, V) m68ki_write_16_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #define m68ki_write_32(A, V) m68ki_write_32_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
+//#define m68ki_write_8(A, V)  m68k_memory_intf.write8(A,V);
+//#define m68ki_write_16(A, V)  m68k_memory_intf.write16(A,V);
+//#define m68ki_write_32(A, V)  m68k_memory_intf.write32(A,V);
 
 #if M68K_SIMULATE_PD_WRITES
 #define m68ki_write_32_pd(A, V) m68ki_write_32_pd_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
@@ -864,8 +879,10 @@ typedef struct
 	uint int_level;    /* State of interrupt pins IPL0-IPL2 -- ASG: changed from ints_pending */
 	uint int_cycles;   /* ASG: extra cycles from generated interrupts */
 	uint stopped;      /* Stopped state */
-	uint pref_addr;    /* Last prefetch address */
-	uint pref_data;    /* Data in the prefetch queue */
+
+   //krb uint pref_addr;    /* Last prefetch address */
+   //krb uint pref_data;    /* Data in the prefetch queue */
+
 	uint address_mask; /* Available address pins */
 	uint sr_mask;      /* Implemented status register bits */
 	uint instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
@@ -912,8 +929,8 @@ extern uint           m68ki_aerr_write_mode;
 extern uint           m68ki_aerr_fc;
 
 /* Read data immediately after the program counter */
-INLINE uint m68ki_read_imm_16(void);
-INLINE uint m68ki_read_imm_32(void);
+//INLINE uint m68ki_read_imm_16(void);
+//INLINE uint m68ki_read_imm_32(void);
 
 /* Read data with specific function code */
 INLINE uint m68ki_read_8_fc  (uint address, uint fc);
@@ -1041,52 +1058,146 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
 /* Handles all immediate reads, does address error check, function code setting,
  * and prefetching if they are enabled in m68kconf.h
  */
+//INLINE uint m68ki_read_imm_16(void)
+//{
+//	uint align4pc = MASK_OUT_BELOW_2(REG_PC);
+//	if(align4pc != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = align4pc;
+//		//CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//		pref_addr = program_read_dword_32be(align4pc);
+//		//printf("prefetch\n");
+//	}
+//	int sv = ((2-(REG_PC&2))<<3);
+//	REG_PC += 2;
+
+//	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
+//}
+
 INLINE uint m68ki_read_imm_16(void)
 {
-	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-#if M68K_EMULATE_PREFETCH
-	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+    // what m68k_read_immediate_16 actually does:
+    // no need to prefech really, this is "direct rom reading"
+    UINT16 v= (*(UINT16 *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
+
+    REG_PC+=2;
+    return (uint)v;
+    // original:
+
+//#if 1
+//    if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
+//		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//	}
+//	REG_PC += 2;
+//	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
+//#endif
+//    uint r = REG_PC;
+//    uint rb = MASK_OUT_BELOW_2(r);
+//    if( rb != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = rb;
+//		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//	}
+//    uint v = m68ki_cpu.pref_data16[(r&2)>>1];
+//	REG_PC = r+ 2;
+
+
+//	uint pc = m68ki_cpu.pc;
+//	uint alignadr = pc & C16CACHE_HMASK;
+//	if(alignadr != m68ki_cpu.c16_addr)
+//	{
+//		m68ki_cpu.c16_addr = alignadr;
+//		// actually copy (8+1)x4b 36b
+//		program_read_copy32be(alignadr,C16CACHE_LLENGTH,(uint*)&m68ki_cpu.c32_data[0]);
+//	}
+//	uint16 d = m68ki_cpu.c16_data[(pc & C16CACHE_LMASK )>>1];
+//	m68ki_cpu.pc = pc+2;
+//	return (uint)d;
+
+    /*
+	uint align4pc = MASK_OUT_BELOW_2(REG_PC);
+	if(align4pc != CPU_PREF_ADDR)
 	{
-		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
+		CPU_PREF_ADDR = align4pc;
 		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+		//CPU_PREF_DATA = program_read_dword_32be(align4pc);
+		//printf("prefetch\n");
 	}
 	REG_PC += 2;
 	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
-#else
-	REG_PC += 2;
-	return m68k_read_immediate_16(ADDRESS_68K(REG_PC-2));
-#endif /* M68K_EMULATE_PREFETCH */
+    */
 }
+
 INLINE uint m68ki_read_imm_32(void)
 {
-#if M68K_EMULATE_PREFETCH
-	uint temp_val;
 
-	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
-	{
-		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
-		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
-	}
-	temp_val = CPU_PREF_DATA;
-	REG_PC += 2;
-	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
-	{
-		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
-		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
-		temp_val = MASK_OUT_ABOVE_32((temp_val << 16) | (CPU_PREF_DATA >> 16));
-	}
-	REG_PC += 2;
+    #ifdef LSB_FIRST
+        uint v= m68k_read_immediate_32();
+        REG_PC+=4;
+        return v;
+    #else
+        // no need to prefech really, this is "direct rom reading"
+        uint v= (*(uint *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
+        REG_PC+=4;
+        return v;
+    #endif
 
-	return temp_val;
-#else
-	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	REG_PC += 4;
-	return m68k_read_immediate_32(ADDRESS_68K(REG_PC-4));
-#endif /* M68K_EMULATE_PREFETCH */
+ //m68k_read_immediate_32(ADDRESS_68K(pc));
+
+
+ //#if M68K_EMULATE_PREF^ETCH
+//	uint temp_val;
+
+//	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+//	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+//	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
+//		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//	}
+//	temp_val = CPU_PREF_DATA;
+//	REG_PC += 2;
+//	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+//	{
+//		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
+//		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+//		temp_val = MASK_OUT_ABOVE_32((temp_val << 16) | (CPU_PREF_DATA >> 16));
+//	}
+//	REG_PC += 2;
+
+//	return temp_val;
+//#else
+//	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+//	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+//	REG_PC += 4;
+//	return m68k_read_immediate_32(ADDRESS_68K(REG_PC-4));
+//#endif /* M68K_EMULATE_PREFETCH */
+
+
+/* why not ?
+	uint pc = m68ki_cpu.pc;
+	m68ki_cpu.pc = pc+4; // done.
+
+	uint8 lowadr = ((uint8)pc & 0x1e);
+	if(lowadr >= 0x1e) {
+		// can't cache this one
+		return m68k_read_immediate_32(ADDRESS_68K(pc));
+	}
+
+	uint alignadr = pc & C16CACHE_HMASK;
+
+	if(alignadr != m68ki_cpu.c16_addr)
+	{
+		m68ki_cpu.c16_addr = alignadr;
+		// actually copy 5x4b 32b
+		program_read_copy32be(alignadr,C16CACHE_LENGTH/2,(uint*)&m68ki_cpu.c16_data[0]);
+	}
+	uint d = *((uint *)&m68ki_cpu.c16_data[lowadr>>1]);
+
+	return d;
+*/
 }
 
 
@@ -1101,37 +1212,37 @@ INLINE uint m68ki_read_imm_32(void)
  */
 INLINE uint m68ki_read_8_fc(uint address, uint fc)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
 	return m68k_read_memory_8(ADDRESS_68K(address));
 }
 INLINE uint m68ki_read_16_fc(uint address, uint fc)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error_010_less(address, MODE_READ, fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_check_address_error_010_less(address, MODE_READ, fc); /* auto-disable (see m68kcpu.h) */
 	return m68k_read_memory_16(ADDRESS_68K(address));
 }
 INLINE uint m68ki_read_32_fc(uint address, uint fc)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error_010_less(address, MODE_READ, fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_check_address_error_010_less(address, MODE_READ, fc); /* auto-disable (see m68kcpu.h) */
 	return m68k_read_memory_32(ADDRESS_68K(address));
 }
 
 INLINE void m68ki_write_8_fc(uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	//m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
 	m68k_write_memory_8(ADDRESS_68K(address), value);
 }
 INLINE void m68ki_write_16_fc(uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
+//	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+//	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
 	m68k_write_memory_16(ADDRESS_68K(address), value);
 }
 INLINE void m68ki_write_32_fc(uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
+//	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+//	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
 	m68k_write_memory_32(ADDRESS_68K(address), value);
 }
 

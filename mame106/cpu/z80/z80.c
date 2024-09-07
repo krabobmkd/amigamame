@@ -598,6 +598,7 @@ INLINE void BURNODD(int cycles, int opcodes, int cyclesum)
 /***************************************************************
  * Read a word from given memory location
  ***************************************************************/
+//#define RM16( UINT32 addr, PAIR *r ) s16program_read_byte_16(addr)
 INLINE void RM16( UINT32 addr, PAIR *r )
 {
 	r->b.l = RM(addr);
@@ -612,6 +613,7 @@ INLINE void RM16( UINT32 addr, PAIR *r )
 /***************************************************************
  * Write a word to given memory location
  ***************************************************************/
+//#define WM16(UINT32 addr, PAIR *r) s16program_write_byte_16(addr,value)
 INLINE void WM16( UINT32 addr, PAIR *r )
 {
 	WM(addr,r->b.l);

@@ -1,4 +1,19 @@
 
+ Todo for beta3:
+ - O Mouse twice faster
+ - X bug when reloading list
+
+
+
+  - O- implement triple buffer at intuition level
+  - X mouse as optional input for analog input -> play arkanoid with mouse
+     X - idealy could have mouse+joy for same player
+     X - could have 2 mouses for 2 players (arkanoid return ?).
+  - try to reactivate 8bit window remap.
+  - X no sound buzing when moving windows
+  - O remember windows position and size per resolution.
+  - O try to manage feeze init pass
+
  Done from Beta 1 to Beta 2:
   - Corrected a bug on joystick config SetJoyPortAttrs(): missing the final TAG_DONE.
      What a silly mistake: It is not tagged "Beta" for nothing.

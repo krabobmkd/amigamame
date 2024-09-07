@@ -55,6 +55,11 @@ if(AMIGA)
 		list(APPEND AMIGA_COMPILER_OPTIONS -msoft-float)
 	endif()
 
+	# can't use  -malign-int with code that call os.
+	# or between libs that uses structs not completely 4b aligned.
+	# -mnobitfield
+	# test -msep-data
+	#list(APPEND AMIGA_COMPILER_OPTIONS -mnobitfield)
 endif()
 
 # test -fsingle-precision-constant
@@ -79,19 +84,21 @@ set(AMIGA_SRC
 	amiga_video_remap.h
 	amiga_video_remap.cpp
 	amiga106_video_intuition.h
-	amiga106_video_intuition.cpp
+	amiga106_video_intuition.cpp	
 	amiga106_video_os3.h
 	amiga106_video_os3.cpp
 	amiga106_video_cgx.h
 	amiga106_video_cgx.cpp
+	amiga106_video_cgxscalepixelarray.h
+	amiga106_video_cgxscalepixelarray.cpp
+	amiga106_video_intuition_tbufcsb.h
+	amiga106_video_intuition_tbufcsb.cpp
 	amiga106_inputs.h
 	amiga106_inputs.cpp
 	amiga_locale.h
 	amiga_locale.cpp
-#	inptport_krb.c
 	amiga_parallelpads.h
 	amiga_parallelpads.c
-		amiga_audiomixer.cpp
 
 	serializer_mamexml.cpp
 	serializer_mamexml.h
@@ -149,9 +156,10 @@ set(AMIGA_SRC
 	endif()
 	target_include_directories(Mame106AmigaO3 PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
 	# -funroll-loops -ftree-loop-ivcanon -ftree-loop-im
-	target_compile_options(Mame106AmigaO3 PRIVATE
-			 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -DNDEBUG>
-	  ${AMIGA_COMPILER_OPTIONS} )
+	target_compile_options(Mame106AmigaO3 PRIVATE -O3 -funroll-loops -ftree-loop-ivcanon -DNDEBUG  ${AMIGA_COMPILER_OPTIONS} )
+#	 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im
+#			 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -DNDEBUG>
+#	  ${AMIGA_COMPILER_OPTIONS} )
 	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/MUI/include")
 	# those for mame includes
 	target_compile_definitions(Mame106AmigaO3 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 MUISERIALIZER_USES_FLOAT=1 ${CPU_DEFS} )

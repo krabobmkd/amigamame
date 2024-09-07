@@ -176,6 +176,7 @@ static ULONG ASM DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG 
 
             muiConfigCreator.selectGroup("Display.Per Screen Mode",screenconf);
 
+            set(BU_Start,  MUIA_Disabled, FALSE);
             //   printf("screen:%s:\n",screenconf.c_str());
 
         }
@@ -1080,7 +1081,7 @@ int MainGUI(void)
         TAG_DONE,0};
         MainWin =  MUI_NewObjectA(MUIC_Window, (struct TagItem *) &mainwintags[0]);// MUINewObject(MUIC_Window,
 //        printf("after MUINewObject():%08x\n",(int)MainWin);
-
+// MUIA_Disabled
         if(MainWin)
         {
           DoMethod(App, OM_ADDMEMBER, MainWin);
@@ -1149,6 +1150,8 @@ int MainGUI(void)
 //        printf("after UpdateUIToConfig\n");
 
         }
+        // BU_Start disabled at init
+        set(BU_Start,  MUIA_Disabled, TRUE);
       }
       if(MainWin)
       {

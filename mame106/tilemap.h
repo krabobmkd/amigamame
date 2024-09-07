@@ -145,8 +145,12 @@ void tilemap_set_user_data( tilemap *tmap, void *user_data );
 void tilemap_set_flip( tilemap *tmap, int attributes );
 void tilemap_set_enable( tilemap *tmap, int enable );
 
-void tilemap_draw( mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority );
 void tilemap_draw_primask( mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority, UINT32 priority_mask );
+
+static inline void tilemap_draw( mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority )
+{
+	tilemap_draw_primask( dest, cliprect, tmap, flags, priority, 0xff );
+}
 
 void tilemap_draw_roz(mame_bitmap *dest,const rectangle *cliprect,tilemap *tmap,
 		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,

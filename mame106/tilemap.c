@@ -1173,10 +1173,6 @@ void tilemap_set_user_data( tilemap *tmap, void *user_data )
 
 /***********************************************************************************/
 
-void tilemap_draw( mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority )
-{
-	tilemap_draw_primask( dest, cliprect, tmap, flags, priority, 0xff );
-}
 
 void tilemap_draw_primask( mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority, UINT32 priority_mask )
 {

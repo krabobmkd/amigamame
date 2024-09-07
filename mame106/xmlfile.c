@@ -14,7 +14,7 @@
 #include "xmlfile.h"
 #include <ctype.h>
 #include <expat.h>
-
+#include <string.h>
 #define TEMP_BUFFER_SIZE		4096
 
 
@@ -464,9 +464,14 @@ static void xml_write_node_recursive(xml_data_node *node, int indent, mame_file 
 		mame_fprintf(file, ">\n");
 
 		/* if there is a value, output that here */
-		if (node->value)
-			mame_fprintf(file, "%*s%s\n", indent + 4, "", node->value);
-
+        // was havin a 1kb limit
+//		if (node->value)
+//			mame_fprintf(file, "%*s%s\n", indent + 4, "", node->value);
+        if (node->value){
+          //  mame_fprintf(file, "%*s",indent+4,"");
+            mame_fputs(file,node->value);
+            mame_fputs(file,"\n");
+        }
 		/* loop over children and output them as well */
 		if (node->child)
 		{

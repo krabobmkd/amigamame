@@ -359,6 +359,20 @@ int osd_start_audio_stream(int stereo)
  // printf("osd_start_audio_stream ok to start thread\n");
 
    // let's update sound 30 times per sec when 60hz...
+    /* beta 3 important note
+      For Beta 1 and 2 we used to ask the double frame length
+      which was wrong.
+      Amiga AHI doesn't support very short sound streams,
+        which happens with 11khz mono and 1sec/60 streams.
+        So we have to ask for the double.
+        But Mame wants to deliver sounds parts by video frame,
+        and we have to actually ask the right number.
+        Some PCM emulation will just consume their sample too fast.
+        So now we let the emulation fills 8 round buffers at possibly 60Hz.
+        and the AHI thread will consume 2 of them at 30Hz,
+        so AHI still use longer frames.
+    */
+    // sound thread will work at 30Hz:
     ULONG updateLength = ((freq*2/ifps)+3)&0xfffffffc;
     // AHI crash if too short it seems
     if(updateLength<256) updateLength=256;
@@ -417,16 +431,20 @@ int osd_start_audio_stream(int stereo)
 	}
 // printf("sound thread ok, samples:%d\n",_pThreadAHI->m_nextSamples);
     // must return samples to do next.
-    return _pThreadAHI->m_nextSamples;
+
+    // important ask emulation to generate half of what the 30Hz thread
+    // consume:
+    return _pThreadAHI->m_nextSamples >>1; // * (stereo+1);
 
 }
 
 // from mame main thread engine.
+/* this is useless due to mixer rewrite in sound_krb.c
 int osd_update_audio_stream(INT16 *buffer)
 {
     return (_pThreadAHI)?_pThreadAHI->m_nextSamples:0;
 }
-
+*/
 void osd_stop_audio_stream(void)
 {
     AHIS_Delete();

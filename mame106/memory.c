@@ -97,7 +97,7 @@
 #include "debug/debugcpu.h"
 #endif
 #include <stdarg.h>
-
+#include <stdio.h>
 
 #define MEM_DUMP		(0)
 #define VERBOSE			(0)
@@ -135,11 +135,44 @@
 
 ***************************************************************************/
 
+//FILE *fmemlog = NULL;
+//unsigned int logcount=0;
+//void initLog() {
+//    if(fmemlog) return;
+//    fmemlog = fopen("memlog.txt","wb");
+//}
+//void logcountpp()
+//{
+//    if(logcount == 0x000e03ed)
+//    {
+//      printf("this is it.\n");
+//    }
+//    if(logcount == 0x000e03ed +2)
+//    {
+//        exit(0);
+//    }
+//    logcount++;
+//}
+
 /* macros for the profiler */
-#define MEMREADSTART()			do { profiler_mark(PROFILER_MEMREAD); } while (0)
+//#define MEMREADSTART()			do { profiler_mark(PROFILER_MEMREAD); } while (0)
+// initLog(); fprintf(fmemlog,"r c:%08x o:%08x\n",(unsigned int)logcount,(unsigned int)address);
+#define MEMREADSTART()
+// fprintf(fmemlog,"r c:%08x o:%08x\n",(unsigned int)logcount,(unsigned int)address);  logcountpp();
+
+//#define MEMREADEND(ret)		{ INT32 r = ret; initLog(); fprintf(fmemlog,"r c:%08x o:%08x  d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)(r) );  logcountpp();	 return r; }
 #define MEMREADEND(ret)			do { profiler_mark(PROFILER_END); return ret; } while (0)
-#define MEMWRITESTART()			do { profiler_mark(PROFILER_MEMWRITE); } while (0)
+//#define MEMREADEND(ret)			do { INT32 r = ret; initLog();  fprintf(fmemlog,"r c:%08x o:%08x  d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)(r) );  logcountpp();  return r; } while (0)
+
+
+
+//#define MEMWRITESTART()			do { profiler_mark(PROFILER_MEMWRITE); } while (0)
+#define MEMWRITESTART()
+//  initLog(); fprintf(fmemlog,"w c:%08x o:%08x d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)data);
+//#define MEMWRITESTART()  {initLog(); fprintf(fmemlog,"w c:%08x o:%08x d:%08x\n",(unsigned int)logcount,(unsigned int)address,(unsigned int)data);  logcountpp();}
+
 #define MEMWRITEEND(ret)		do { (ret); profiler_mark(PROFILER_END); return; } while (0)
+
 
 /* helper macros */
 #define HANDLER_IS_RAM(h)		((FPTR)(h) == STATIC_RAM)
@@ -723,6 +756,168 @@ void *memory_get_write_ptr(int cpunum, int spacenum, offs_t offset)
 	return &bank_ptr[entry][offset];
 }
 
+// krb
+/*
+m68k_op_movem_32_re_pd 	m68ki_write_32
+m68k_op_movem_32_re_ai	m68ki_write_32
+m68k_op_movem_32_re_di	m68ki_write_32
+m68k_op_movem_32_re_ix	m68ki_write_32
+m68k_op_movem_32_re_aw	m68ki_write_32
+m68k_op_movem_32_re_al	m68ki_write_32
+
+m68k_op_movem_32_er_pi		m68ki_read_32
+m68k_op_movem_32_er_pcdi	m68ki_read_pcrel_32
+m68k_op_movem_32_er_pcix	m68ki_read_pcrel_32
+m68k_op_movem_32_er_ai		m68ki_read_32
+m68k_op_movem_32_er_di		m68ki_read_32
+m68k_op_movem_32_er_ix		m68ki_read_32
+m68k_op_movem_32_er_aw		m68ki_read_32
+m68k_op_movem_32_er_al		m68ki_read_32
+
+*/
+// return number of bits actually applied
+UINT32 memory_readmovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
+{
+	UINT32 entry;
+	/* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+	/* handle banks inline */
+	address = (address - active_address_space[0].readhandlers[entry].offset)
+            & active_address_space[0].readhandlers[entry].mask;
+	if (entry >= STATIC_RAM)
+	{
+    	read32_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler32;
+        UINT16 i = 0;
+        uint count = 0;
+        address>>=2;
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                preg[i] = (*reader)(address,0);
+                address++;
+                count++;
+            }
+            bits>>=1;
+        }
+        return count;
+	}
+
+    // - - - - - - - - -
+    UINT32 *pread = (UINT32 *) &bank_ptr[entry][address];
+    UINT16 i = 0;
+    uint count = 0;
+	for(; i < 16; i++)
+    {
+		if(bits & 1)
+		{
+			preg[i] = *pread++;
+			count++;
+		}
+        bits>>=1;
+    }
+    return count;
+
+}
+UINT32 memory_writemovem32rr(UINT32 address /*REG(d0)*/, UINT32 bits /*REG(d1)*/, UINT32 *preg /*REG(a0)*/ )
+{
+    UINT32 entry;
+	/* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
+	/* handle banks inline */
+	address = (address - active_address_space[0].writehandlers[entry].offset)
+            & active_address_space[0].writehandlers[entry].mask;
+	if (entry >= STATIC_RAM)
+	{
+    	//write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
+    	write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
+        UINT16 i = 0;
+        uint count = 0;
+        address>>=1;
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {   // some games minimix, ... need handled 16b writings
+                UINT32 reg = preg[15-i];
+                address--;
+                (*writer16)(address,reg,0);
+                address--;
+                (*writer16)(address,reg>>16,0);
+                //(*writer)(address,preg[15-i],0);
+                count++;
+            }
+            bits>>=1;
+        }
+        return count;
+	}
+
+    // - - - - - - - - -
+    UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
+    UINT16 i = 0;
+    uint count = 0;
+	for(; i < 16; i++)
+    {
+		if(bits & 1)
+		{
+            pwrite--;
+            *pwrite = preg[15-i];
+			count++;
+		}
+        bits>>=1;
+    }
+    return count;
+}
+UINT32 memory_writemovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
+{
+    UINT32 entry;
+	/* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
+	/* handle banks inline */
+	address = (address - active_address_space[0].writehandlers[entry].offset)
+            & active_address_space[0].writehandlers[entry].mask;
+	if (entry >= STATIC_RAM)
+	{
+    	write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
+        UINT16 i = 0;
+        uint count = 0;
+        address>>=2;
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                (*writer)(address,preg[i],0);
+                address++;
+                count++;
+            }
+            bits>>=1;
+        }
+        return count;
+	}
+
+    // - - - - - - - - -
+    UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
+    UINT16 i = 0;
+    uint count = 0;
+	for(; i < 16; i++)
+    {
+		if(bits & 1)
+		{
+            *pwrite++ = preg[i];
+			count++;
+		}
+        bits>>=1;
+    }
+    return count;
+}
 
 /*-------------------------------------------------
     memory_get_op_ptr - return a pointer to the
@@ -2376,12 +2571,107 @@ static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t of
 		entry = space.lookup[LEVEL2_INDEX(entry,address)];								\
 
 
+
+void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p REG(a0))
+{
+	UINT32 entry;
+
+    /* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+
+	/* handle banks inline */
+	UINT32 adrmask = active_address_space[0].readhandlers[entry].mask;
+	address = (address - active_address_space[0].readhandlers[entry].offset)
+            & adrmask;
+	if (entry < STATIC_RAM)
+	{
+        UINT32 *pr = (UINT32 *)&bank_ptr[entry][address];
+        while(l>0)
+        {
+            *p++ = *pr++;
+            l--;
+        }
+    }
+	/* fall back to the handler */
+	else
+	{
+        //ok
+        address>>=2;
+        while(l>0)
+        {
+            *p++ = (*active_address_space[0].readhandlers[entry].handler.read.handler32)
+                (address,0);
+            address++;
+            l--;
+        }
+//test gives nothing                UINT16 *pp = (UINT16 *)p;
+//               l<<=1;
+//                while(l>0)
+//                {
+//                    *pp++ = (*active_address_space[0].readhandlers[entry].handler.read.handler16)
+//                        (address,0);
+//                    address++;
+//                    l--;
+//                }
+
+    }
+}
+
+UINT8 s16program_read_byte_8(UINT32 address REG(d0))
+{
+	UINT32 entry;
+
+    /* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+
+	PERFORM_LOOKUP(readlookup,active_address_space[0],~0);
+
+	/* handle banks inline */
+	address = (address - active_address_space[0].readhandlers[entry].offset)
+            & active_address_space[0].readhandlers[entry].mask;
+	if (entry < STATIC_RAM)
+		return(bank_ptr[entry][address]);
+
+	/* fall back to the handler */
+	else
+		return((*active_address_space[0].readhandlers[entry].handler.read.handler8)
+                (address));
+	return 0;
+}
+
+void s16program_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1))
+{
+	UINT32 entry;
+    /* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
+
+	/* handle banks inline */
+	address = (address - active_address_space[0].writehandlers[entry].offset) & active_address_space[0].writehandlers[entry].mask;
+	if (entry < STATIC_RAM)
+		bank_ptr[entry][address] = data;
+
+	/* fall back to the handler */
+	else
+		(*active_address_space[0].writehandlers[entry].handler.write.handler8)(address, data);
+}
+
+
 /*-------------------------------------------------
     READBYTE - generic byte-sized read handler
 -------------------------------------------------*/
 
+
 #define READBYTE8(name,spacenum)														\
-UINT8 name(offs_t address)																\
+UINT8 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2400,7 +2690,7 @@ UINT8 name(offs_t address)																\
 }																						\
 
 #define READBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
-UINT8 name(offs_t address)																\
+UINT8 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2435,7 +2725,7 @@ UINT8 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define READWORD16(name,spacenum)														\
-UINT16 name(offs_t address)																\
+UINT16 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2454,7 +2744,7 @@ UINT16 name(offs_t address)																\
 }																						\
 
 #define READWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
-UINT16 name(offs_t address)																\
+UINT16 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2487,7 +2777,7 @@ UINT16 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define READDWORD32(name,spacenum)														\
-UINT32 name(offs_t address)																\
+UINT32 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2506,7 +2796,7 @@ UINT32 name(offs_t address)																\
 }																						\
 
 #define READDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-UINT32 name(offs_t address)																\
+UINT32 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2537,7 +2827,7 @@ UINT32 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define READQWORD64(name,spacenum)														\
-UINT64 name(offs_t address)																\
+UINT64 name(offs_t address REG(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2561,7 +2851,7 @@ UINT64 name(offs_t address)																\
 -------------------------------------------------*/
 
 #define WRITEBYTE8(name,spacenum)														\
-void name(offs_t address, UINT8 data)													\
+void name(offs_t address REG(d0), UINT8 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2579,7 +2869,7 @@ void name(offs_t address, UINT8 data)													\
 }																						\
 
 #define WRITEBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address, UINT8 data)													\
+void name(offs_t address REG(d0), UINT8 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2613,7 +2903,7 @@ void name(offs_t address, UINT8 data)													\
 -------------------------------------------------*/
 
 #define WRITEWORD16(name,spacenum)														\
-void name(offs_t address, UINT16 data)													\
+void name(offs_t address REG(d0), UINT16 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2631,7 +2921,7 @@ void name(offs_t address, UINT16 data)													\
 }																						\
 
 #define WRITEWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address, UINT16 data)													\
+void name(offs_t address REG(d0), UINT16 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2663,7 +2953,7 @@ void name(offs_t address, UINT16 data)													\
 -------------------------------------------------*/
 
 #define WRITEDWORD32(name,spacenum)														\
-void name(offs_t address, UINT32 data)													\
+void name(offs_t address REG(d0), UINT32 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2681,7 +2971,7 @@ void name(offs_t address, UINT32 data)													\
 }																						\
 
 #define WRITEDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address, UINT32 data)													\
+void name(offs_t address REG(d0), UINT32 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2711,7 +3001,7 @@ void name(offs_t address, UINT32 data)													\
 -------------------------------------------------*/
 
 #define WRITEQWORD64(name,spacenum)														\
-void name(offs_t address, UINT64 data)													\
+void name(offs_t address REG(d0), UINT64 data REG(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2727,6 +3017,53 @@ void name(offs_t address, UINT64 data)													\
 	else																				\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handler64)(address >> 3, data, 0));\
 }																						\
+
+
+/* -----SPECIAL KRB for Z80 repeater ops ----- */
+// LDIR CPIR INIR OTIR
+// LDIR, copy mem
+void program_copy(UINT16 readAddress,UINT16 writeAddress,UINT16 n )
+{
+
+}
+// CPIR find the occurence of A and stop, or counter (BC) is 0
+void program_find(UINT16 startAdress,UINT8 a,UINT16 n )
+{
+
+}
+// INIR Reads from the (C) port, then writes to (HL). HL is incremented and B is decremented. Repeats until B = 0.
+void io_copy_to_program(UINT8 port,UINT16 writeAddress, UINT8 n)
+{
+
+}
+// OTIR Reads from (HL) and writes to the (C) port. HL is incremented and B is decremented. Repeats until B = 0.
+void program_copy_to_io(UINT8 port,UINT16 readAddress, UINT8 n)
+{
+
+}
+
+//  LDDR CPDR INDR OTDR
+// LDDR copy from end, point first copied. Does a LD (DE),(HL) and decrements each of DE, HL, and BC) until BC=0.
+void program_rcopy(UINT16 readAddress,UINT16 writeAddress,UINT16 n )
+{
+
+}
+// CPDR rfind
+// in that case adress is decreased first ? -> no test then dec.
+void program_rfind(UINT16 startAdress,UINT8 a,UINT16 n )
+{
+
+}
+// INDR   Reads the (C) port and writes the result to (HL). HL and B are decremented. Repeats until B = 0.
+void io_rcopy_to_program(UINT8 port,UINT16 writeAddress, UINT8 n)
+{
+
+}
+//OTDR  Reads from (HL) and writes to the (C) port. HL and B are then decremented. Repeats until B = 0.
+void program_rcopy_to_io(UINT8 port,UINT16 readAddress, UINT8 n)
+{
+
+}
 
 
 /*-------------------------------------------------

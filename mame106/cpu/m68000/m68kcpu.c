@@ -552,8 +552,8 @@ unsigned int m68k_get_reg(void* context, m68k_register_t regnum)
 		case M68K_REG_VBR:	return cpu->vbr;
 		case M68K_REG_CACR:	return cpu->cacr;
 		case M68K_REG_CAAR:	return cpu->caar;
-		case M68K_REG_PREF_ADDR:	return cpu->pref_addr;
-		case M68K_REG_PREF_DATA:	return cpu->pref_data;
+//		case M68K_REG_PREF_ADDR:	return cpu->pref_addr;
+//		case M68K_REG_PREF_DATA:	return cpu->pref_data;
 		case M68K_REG_PPC:	return MASK_OUT_ABOVE_32(cpu->ppc);
 		case M68K_REG_IR:	return cpu->ir;
 		case M68K_REG_CPU_TYPE:
@@ -617,7 +617,7 @@ void m68k_set_reg(m68k_register_t regnum, unsigned int value)
 		case M68K_REG_CAAR:	REG_CAAR = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_PPC:	REG_PPC = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_IR:	REG_IR = MASK_OUT_ABOVE_16(value); return;
-		case M68K_REG_PREF_ADDR:	CPU_PREF_ADDR = MASK_OUT_ABOVE_32(value); return;
+	//	case M68K_REG_PREF_ADDR:	CPU_PREF_ADDR = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_CPU_TYPE: m68k_set_cpu_type(value); return;
 		default:			return;
 	}
@@ -913,10 +913,10 @@ void m68k_pulse_reset(void)
 	m68ki_set_sm_flag(SFLAG_SET | MFLAG_CLEAR);
 
 	/* Invalidate the prefetch queue */
-#if M68K_EMULATE_PREFETCH
-	/* Set to arbitrary number since our first fetch is from 0 */
-	CPU_PREF_ADDR = 0x1000;
-#endif /* M68K_EMULATE_PREFETCH */
+//#if M68K_EMULATE_PREFETCH
+//	/* Set to arbitrary number since our first fetch is from 0 */
+//	CPU_PREF_ADDR = 0x1000;
+//#endif /* M68K_EMULATE_PREFETCH */
 
 	/* Read the initial stack pointer and program counter */
 	m68ki_jump(0);
@@ -1002,8 +1002,8 @@ void m68k_state_register(const char *type, int index)
 	state_save_register_item(type, index, CPU_INT_CYCLES);
 	state_save_register_item(type, index, m68k_substate.stopped);
 	state_save_register_item(type, index, m68k_substate.halted);
-	state_save_register_item(type, index, CPU_PREF_ADDR);
-	state_save_register_item(type, index, CPU_PREF_DATA);
+//	state_save_register_item(type, index, CPU_PREF_ADDR);
+//	state_save_register_item(type, index, CPU_PREF_DATA);
 	state_save_register_func_presave(m68k_prepare_substate);
 	state_save_register_func_postload(m68k_post_load);
 }

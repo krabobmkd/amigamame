@@ -766,6 +766,25 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		if (banked)
 		{
+			
+			{ 
+			struct drawgfxParams dgp0={
+				bitmap, 	// dest
+				gfx, 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (y=cliprect->min_y / 8; y <= cliprect->max_y / 8; y++)
 			{
 				for (x = 0; x < 40; x++)
@@ -788,17 +807,38 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 
 					if ((pen_usage[byte1] & ~1) == 0) continue;
 
-					drawgfx(bitmap,gfx,
-							byte1,
-							byte2,
-							0,0,
-							x*8,y*8,
-							cliprect,TRANSPARENCY_PEN,0);
+					
+					dgp0.code = byte1;
+					dgp0.color = byte2;
+					dgp0.sx = x*8;
+					dgp0.sy = y*8;
+					drawgfx(&dgp0);
 				}
 			}
+			} // end of patch paragraph
+
 		} //Banked
 		else
 		{
+			
+			{ 
+			struct drawgfxParams dgp1={
+				bitmap, 	// dest
+				gfx, 	// gfx
+				0, 	// code
+				0, 	// color
+				0, 	// flipx
+				0, 	// flipy
+				0, 	// sx
+				0, 	// sy
+				cliprect, 	// clip
+				TRANSPARENCY_PEN, 	// transparency
+				0, 	// transparent_color
+				0, 	// scalex
+				0, 	// scaley
+				NULL, 	// pri_buffer
+				0 	// priority_mask
+			  };
 			for (y=cliprect->min_y / 8; y <= cliprect->max_y / 8; y++)
 			{
 				for (x = 0; x < 40; x++)
@@ -809,15 +849,17 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 
 					if ((pen_usage[byte1] & ~1) == 0) continue;
 
-					drawgfx(bitmap,gfx,
-							byte1,
-							byte2,
-							0,0,
-							x*8,y*8,
-							cliprect,TRANSPARENCY_PEN,0);
+					
+					dgp1.code = byte1;
+					dgp1.color = byte2;
+					dgp1.sx = x*8;
+					dgp1.sy = y*8;
+					drawgfx(&dgp1);
 							//x = x +8;
 				}
 			}
+			} // end of patch paragraph
+
 		} // Not banked
 	}
 

@@ -31,16 +31,16 @@ set(MAME_CORE_SRC
  artwork.c
    cpuint.c    inptport.c  palette.c   streams_krb.c   video.c
 	cpuintrf.c  input.c     png.c       tilemap.c
-	cdrom.c    drawgfx.c   jedparse.c  timer.c     xml2info.c
+	cdrom.c    drawgfx.c    jedparse.c  timer.c     xml2info.c
 	chd.c      driver.c    jedutil.c   xmlfile.c
 	chdcd.c    mame.c      romload.c   ui_text.c
 	  harddisk.c  mamecore.c  sha1.c      unzip.c
 	cheat.c    hash.c      mamedriv.c  sndintrf.c  usrintrf.c
 	config.c   hiscore.c   md5.c       sound_krb.c     validity.c
-	cpuexec.c  info.c      memory_krb.c    state.c     version.c
+	cpuexec.c  info.c      memory.c    state.c     version.c
 #  artwork.h
  debugger.h   jedparse.h            png.h        ui_text.h
- audit.h      drawgfx.h    mame.h                profiler.h   unzip.h
+ audit.h      drawgfx.h drawgfxn.h    mame.h                profiler.h   unzip.h
  cdrom.h      driver.h     mamecore.h            romload.h    usrintrf.h
  chd.h        fileio.h     md5.h                 sha1.h       video.h
  chdcd.h      harddisk.h   memconv.h             sndintrf.h   x86drc.h
@@ -50,6 +50,7 @@ set(MAME_CORE_SRC
  cpuint.h     inptport.h   osdepend.h            tilemap.h
  cpuintrf.h   input.h      palette.h             timer.h
 
+  cpu/m68000/m68kkrbopt.h
  sound_krb.h
 	# minimal common driver needs:
 	vidhrdw/generic.c vidhrdw/vector.c
@@ -76,7 +77,7 @@ set(MAME_CORE_SRC
 set(MAME_INCLUDE_DIRS "src" "../amigamame106" "." "./includes" ${EXPATPATH})
 
 # force specific implementation of drivers like this:
-
+replace_list_item(MAME_CPU_SRC "cpu/tms32010/tms32010.c" "cpu/tms32010/tms32010.cpp")
 #replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaic16.c" "vidhrdw/segaic16_krb.c")
 #replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaorun.c" "vidhrdw/segaorun_krb.c")
 #replace_list_item(MAME_CORE_SRC "usrintrf.c" "usrintrf_krb.c")
@@ -93,6 +94,8 @@ target_compile_definitions(mamecore PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRL
 
  target_compile_options(mamecore PRIVATE ${AMIGA_COMPILER_OPTIONS} )
 #it's all O3 for release only
+if(AMIGA)
  target_compile_options(mamecore PRIVATE
 		 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -fno-tree-vectorize -DNDEBUG>
 		  )
+endif()

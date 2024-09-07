@@ -2,25 +2,59 @@
 #include "sound_krb.h"
 #include "streams.h"
 #include <stdio.h>
+
+extern "C" {
+    #include "osdepend.h"
+}
+
+extern  cycles_t  lastSoundFrameUpdate;// = osd_cycles();
+
+inline bool goodFrame( SampleFrame *pFrame ) {
+    return( pFrame->_writelock==0 && pFrame->_read==0);
+}
+
+inline bool goodFrame( int iframe ) {
+     SampleFrame *pFrame =  &SampleFrames[iframe&7];
+    return( pFrame->_writelock==0 && pFrame->_read==0);
+}
+
 // return how much done.
 ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
 {
-    UWORD ntodo = (UWORD) pSoundToWrite->m_nbSampleToFill;
     WORD *ps = pSoundToWrite->m_pBuffer;
-
     // note: mame frames and AHI buffers are meant to have the exact same size.
-
-    SampleFrame *pFrame = &SampleFrames[(currentSampleFrame-1)&3]; // test if missed previous
-    if(pFrame->_writelock || pFrame->_read>=pFrame->_written)
+    cycles_t delta = (osd_cycles()-lastSoundFrameUpdate);
+    if(delta>(1000000LL>>2)) // 0.25 sec
     {
-        pFrame = &SampleFrames[currentSampleFrame];
+        // the engine looks blocked, it happens when window resize. fill blank.
+        UWORD lh = ((UWORD) pSoundToWrite->m_nbSampleToFill);
+        LONG *psl = (LONG *)ps; // copy 4 bytes
+        if(pSoundToWrite->m_stereo)
+        {
+            for(UWORD i=0; i<lh ; i++ ) *psl++ = 0;
+        } else
+        {
+            lh>>=1;
+            // mono
+            for(UWORD i=0; i<lh ; i++ ) *psl++ = 0;
+        }
+        return pSoundToWrite->m_nbSampleToFill;
     }
 
-    if(pFrame->_writelock || pFrame->_read >=pFrame->_written )
-    {
-        //pFrame = &SampleFrames[(currentSampleFrame-1)&3];
-        //if(pFrame->_written ==0) return pSoundToWrite->m_nbSampleToFill;
+    // beta 3, now ntodo is exact double of emulated frames.
+    // and emulated frames round buffers are now 8
+    WORD nToStillDo = (WORD) pSoundToWrite->m_nbSampleToFill;
 
+    int icurrent = (currentSampleFrame-3)&0x06;
+    // search 2 good frame consecutive frame and lock them.
+   // SampleFrame *pFrame = &SampleFrames[icurrent&7]; // test if missed previous
+    if(!goodFrame(icurrent) || !goodFrame(icurrent+1))
+    {
+        icurrent+=2;
+    }
+    // no good frame, emu too slow: mirror last consumed.
+    if(!goodFrame(icurrent) || !goodFrame(icurrent+1)  )
+    {
         // just mirror alternate buffer if late.
         UWORD lh = ((UWORD) pSoundToWrite->m_nbSampleToFill)>>1;
         // point end of prev buffer
@@ -38,7 +72,7 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
             {
                 *psl++ = *prl++;
             }
-        }
+        } else
         {
             WORD *pr = pSoundToWrite->m_pPrevBuffer+(pSoundToWrite->m_nbSampleToFill);
             // mono
@@ -53,49 +87,157 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite)
         }
         return pSoundToWrite->m_nbSampleToFill; // this will reuse
     }
+    SampleFrame *pFrame =  &SampleFrames[icurrent&7];
+    // else readlock the 2
     pFrame->_readlock = 1;
-   // UWORD sampleleft = (UWORD)(pFrame->_written-pFrame->_read);
-   // if(sampleleft<minl) minl=sampleleft;
-    INT32 *leftmix = pFrame->_leftmix;
-    INT32 *rightmix = pFrame->_rightmix;
+    SampleFrames[(icurrent+1)&7]._readlock = 1;
+
+    while(nToStillDo>0)
+    {
+        // here we are good.
+        INT32 *leftmix = pFrame->_leftmix;
+        INT32 *rightmix = pFrame->_rightmix;
+
+        WORD ntodo =pSoundToWrite->m_nbSampleToFill>>1;
+
+                /* (UWORD) pFrame->_written;
+        if(nToStillDo<ntodo) ntodo = nToStillDo;*/
+        nToStillDo -= ntodo;
 
     if(pSoundToWrite->m_stereo)
     {
-        for(UWORD i=0; i<ntodo ; i++ )
+//        UWORD ntodo2 = ntodo;
+//        asm volatile(
+//           "move.l #-32768,d1\n"
+//           "\tmove.l #32767,d2\n"
+//           "\tsubq.l #1,%3\n" // because dbf loop
+//           ".loop:\n"
+//           "\tmove.l (%0)+,d3\n"
+//           "\tmove.l (%1)+,d4\n"
+
+//           "\tcmp.l d1,d3\n"
+//           "\tbge.b .ncl1\n"
+//           "\tmove.l d1,d3\n"
+//           "\tbra.b .ncl2\n"
+//           ".ncl1:\n"
+
+//           "\tcmp.l d2,d3\n"
+//           "\tble.b .ncl2\n"
+//           "\tmove.l d2,d3\n"
+//           ".ncl2:\n"
+
+//           "\tswap d3\n"
+
+//           "\tcmp.l d1,d4\n"
+//           "\tbge.b .ncl3\n"
+//           "\tmove.l d1,d4\n"
+//           "\tbra.b .ncl4\n"
+//           ".ncl3:\n"
+
+//           "\tcmp.l d2,d4\n"
+//           "\tble.b .ncl4\n"
+//           "\tmove.l d2,d4\n"
+//           ".ncl4:\n"
+//           "\tmove.w d4,d3\n"
+//           "\tmove.l d3,(%2)+\n"
+
+//           "\tdbf %3,.loop\n"
+//           "\n"
+//// this syntax is a hell, I hope you like pain .
+//// it is "asm code" : "spec"(varoutput) : "spec"(varinput), : (extra register used)
+////  'd' for d0->d7 'a' for a0->a7 , also can put constants
+//           :
+//           : "a" (leftmix), "a" (rightmix),"a"(ps), "d"(ntodo2)
+//           : "d1","d2","d3","d4"
+//           );
+
+        LONG cmin =-32768;
+        LONG cmax =32767;
+        for(WORD i=0; i<ntodo ; i++ )
         {
             /* clamp the left side */
             INT32 samp = leftmix[i];
-            if (samp < -32768)
-                samp = -32768;
-            else if (samp > 32767)
-                samp = 32767;
+            if (samp < cmin)
+                samp = cmin;
+            else if (samp > cmax)
+                samp = cmax;
             *ps++ = (WORD)samp;
 
             /* clamp the right side */
             samp = rightmix[i];
-            if (samp < -32768)
-                samp = -32768;
-            else if (samp > 32767)
-                samp = 32767;
+            if (samp < cmin)
+                samp = cmin;
+            else if (samp > cmax)
+                samp = cmax;
             *ps++ = (WORD)samp;
-
         }
 
     } else
     {
-        for(UWORD i=0; i<ntodo ; i++ )
+//        UWORD ntodo2 = ntodo;
+//        asm volatile(
+//           "move.l #-32768,d1\n"
+//           "\tmove.l #32767,d2\n"
+//           "\tlsr.w #1,%2\n"
+//           "\tsubq.l #1,%2\n" // because dbf loop
+//           ".loopb:\n"
+//           "\tmove.l (%0)+,d3\n"
+//           "\tmove.l (%0)+,d4\n"
+
+//           "\tcmp.l d1,d3\n"
+//           "\tbge.b .ncl1b\n"
+//           "\tmove.l d1,d3\n"
+//           "\tbra.b .ncl2b\n"
+//           ".ncl1b:\n"
+
+//           "\tcmp.l d2,d3\n"
+//           "\tble.b .ncl2b\n"
+//           "\tmove.l d2,d3\n"
+//           ".ncl2b:\n"
+
+//           "\tswap d3\n"
+
+//           "\tcmp.l d1,d4\n"
+//           "\tbge.b .ncl3b\n"
+//           "\tmove.l d1,d4\n"
+//           "\tbra.b .ncl4b\n"
+//           ".ncl3b:\n"
+
+//           "\tcmp.l d2,d4\n"
+//           "\tble.b .ncl4b\n"
+//           "\tmove.l d2,d4\n"
+//           ".ncl4b:\n"
+//           "\tmove.w d4,d3\n"
+//           "\tmove.l d3,(%1)+\n"
+
+//           "\tdbf %2,.loopb\n"
+//           "\n"
+//           :
+//           : "a" (leftmix), "a"(ps), "d"(ntodo2)
+//           : "d1","d2","d3","d4"
+//           );
+
+        LONG cmin =-32768;
+        LONG cmax =32767;
+        for(WORD i=0; i<ntodo ; i++ )
         {
             INT32 samp = leftmix[i]; //on mono now, all sounds forced to left. +rightmix[i];
-            if (samp < -32768)
-                samp = -32768;
-            else if (samp > 32767)
-                samp = 32767;
+            if (samp < cmin)
+                samp = cmin;
+            else if (samp > cmax)
+                samp = cmax;
             *ps++ = (WORD)samp;
+
         }
+
     }
     pFrame->_read = ntodo;
     pFrame->_readlock = 0;
 
+    icurrent++;
+    pFrame = &SampleFrames[icurrent&7];
+
+    } // end while todo
     return pSoundToWrite->m_nbSampleToFill;
 }
 

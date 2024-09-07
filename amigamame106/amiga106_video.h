@@ -25,13 +25,15 @@ public:
     #define DISPFLAG_STARTWITHWINDOW 8
     #define DISPFLAG_INTUITIONPALETTE  16
     #define DISPFLAG_USESCALEPIXARRAY  32
+    #define DISPFLAG_USETRIPLEBUFFER  64
+    #define DISPFLAG_USEHEIGHTBUFFER  128
     struct params {
         ULONG _flags;
         ULONG _forcedModeID;
         int _width,_height;
         int _colorsIndexLength;
         int _video_attributes;
-        int _driverDepth;
+        int _driverDepth;        
     };
     virtual bool open(const params &params) = 0;
     virtual void init_rgb_components(unsigned int *rgbcomponents) = 0; // needed for RGB mode.

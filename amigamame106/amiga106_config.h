@@ -121,6 +121,12 @@ public:
         Best,
         Choose
     };
+    enum class ScreenBufferMode :  int
+    {
+        Single,
+        TripleBufferCSB,
+        DoubleBufferSVP,
+    };
     struct Display_PerScreenMode : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
@@ -138,7 +144,9 @@ public:
         DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;        
 #define CONFDISPLAYFLAGS_ONWORKBENCH 1
 #define CONFDISPLAYFLAGS_FRAMESKIP 2
+//#define CONFDISPLAYFLAGS_TRIPLEBUFFER 4
         ULONG_FLAGS _flags = 0;
+        ScreenBufferMode  _buffering = ScreenBufferMode::Single;
         //bool    _startOnWorkbench = false;
         Display_PerScreenMode &getActiveMode();
      protected:
@@ -166,23 +174,27 @@ public:
     };
     Audio &audio() { return _audio; }
 
-    enum class ControlPort :  int
+
+    enum class ControlPortPrl :  int
     {
         None,
-        Port1llMouse,
-        Port2llJoy,
-        Port3ll,
-        Port4ll,
         Para3,
         Para4,
         Para3Bt4
     };
 
+
     struct Controls : public ASerializable
     {
         void serialize(ASerializer &serializer) override;
-        ControlPort _PlayerPort[4];
-        int _PlayerPortType[4];
+        int _llPort_Player[4]; // value 1-4
+        int _llPort_Type[4];
+        int _parallelPort_Player[2]; // value 1-4
+        int _parallel_type[2];
+        strText _ll,_pr;
+
+        //ControlPortLL _PlayerPort[4];
+        //int _PlayerPortType[4];
     };
     Controls &controls() { return _controls; }
 
@@ -233,7 +245,7 @@ protected:
     // this is meant to be sorted a way or another    
     std::vector<const _game_driver *const*> _romsFound;
     std::vector<UBYTE> _romsFoundReverse;
-    int initDriverIndex();
+    void initDriverIndex();
     int scanDriversRecurse(BPTR lock, FileInfoBlock*fib);
 
     std::vector<std::string> _resolutionStrings;
