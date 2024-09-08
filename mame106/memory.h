@@ -768,9 +768,11 @@ extern const char *address_space_names[ADDRESS_SPACES];
 // - - - - krb
 // used by 68k cpu instruction fetch ->NO
 void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p REG(a0));
+
+
 UINT32 memory_readmovem32(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
-UINT32 memory_writemovem32r(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
-UINT32 memory_writemovem32(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
+UINT32 memory_writemovem32_wr16_reverse(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
+UINT32 memory_writemovem32_wr32_reverse(UINT32 offset REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
 
 /***************************************************************************
 

@@ -822,7 +822,8 @@ UINT32 memory_readmovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *p
     return count;
 
 }
-UINT32 memory_writemovem32rr(UINT32 address /*REG(d0)*/, UINT32 bits /*REG(d1)*/, UINT32 *preg /*REG(a0)*/ )
+// needed by 68k interface because video drivers would just patch write16.
+UINT32 memory_writemovem32_wr16_reverse(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
 {
     UINT32 entry;
 	/* perform lookup */
@@ -873,7 +874,45 @@ UINT32 memory_writemovem32rr(UINT32 address /*REG(d0)*/, UINT32 bits /*REG(d1)*/
     }
     return count;
 }
-UINT32 memory_writemovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
+UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
+{
+    UINT16 i = 0;
+    uint count = 0;
+
+    if (!(address & 3))
+    {
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                address-=4;
+                program_write_dword_32be(address, preg[15-i]);
+                count++;
+            }
+            bits>>=1;
+        }
+
+    } else
+    {
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                address-=4;
+                uint v = preg[15-i];
+                //krb: in the 68k world, pair writing crash, let's economise a test.
+                program_write_word_32be(address, v >> 16);
+                program_write_word_32be(address + 2, v);
+                count++;
+            }
+            bits>>=1;
+        }
+    }
+    return count;
+}
+
+// needed by 68020 interface because video drivers taito_f3 would just patch write32 !!
+UINT32 memory_writemovem32_wr32_reverse(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
 {
     UINT32 entry;
 	/* perform lookup */
@@ -886,22 +925,51 @@ UINT32 memory_writemovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *
             & active_address_space[0].writehandlers[entry].mask;
 	if (entry >= STATIC_RAM)
 	{
-    	write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
-        UINT16 i = 0;
-        uint count = 0;
-        address>>=2;
-        for(; i < 16; i++)
-        {
-            if(bits & 1)
+        // arkanoid return has both a 68000 and a 68020 and needs something like that
+       // if (!(address & 3))
+       // {   // 4 bytes aligned
+            //program_write_dword_32be(address, data);
+            write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
+            UINT16 i = 0;
+            uint count = 0;
+            address>>=2;
+            for(; i < 16; i++)
             {
-                (*writer)(address,preg[i],0);
-                address++;
-                count++;
+                if(bits & 1)
+                {
+                    address--;
+                    (*writer)(address,preg[15-i],0);
+                    count++;
+                }
+                bits>>=1;
             }
-            bits>>=1;
-        }
-        return count;
-	}
+            return count;
+        /*} else
+        //{
+            // 16bit aligned ? we hope.
+            write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
+            UINT16 i = 0;
+            uint count = 0;
+            address>>=1;
+            for(; i < 16; i++)
+            {
+                if(bits & 1)
+                {   // some games minimix, ... need handled 16b writings
+                    UINT32 reg = preg[15-i];
+                    address--;
+                    (*writer16)(address,reg,0);
+                    address--;
+                    (*writer16)(address,reg>>16,0);
+                    //(*writer)(address,preg[15-i],0);
+                    count++;
+                }
+                bits>>=1;
+            }
+            return count;
+
+        } // end 16b aligned
+        */
+	} // end if need handler.
 
     // - - - - - - - - -
     UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
@@ -911,7 +979,8 @@ UINT32 memory_writemovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *
     {
 		if(bits & 1)
 		{
-            *pwrite++ = preg[i];
+            pwrite--;
+            *pwrite = preg[15-i];
 			count++;
 		}
         bits>>=1;

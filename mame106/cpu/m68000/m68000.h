@@ -34,6 +34,17 @@ struct m68k_memory_interface
 	void		(*write32)(offs_t a REG(d0), UINT32 d REG(d1) );	// Write 32 bit
 	void		(*changepc)(offs_t);			// Change PC
 
+
+    // - - -krb
+    // accelerate movems as possible having less entry test hell.
+    // note: in the 68k world, movem.w are almost not used.
+    // it always return the "count of register treated"
+   // UINT32 (*readmovem32)(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
+    // note movem.l dxxx,-(sp) bits order are different than movem.l dxxx,(ax)
+    UINT32 (*writemovem32reverse)(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
+    //UINT32 (*writemovem32)(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) );
+
+
     // For Encrypted Stuff
 
 	UINT8		(*read8pc)(offs_t REG(d0));				// PC Relative read 8 bit
@@ -42,6 +53,7 @@ struct m68k_memory_interface
 
 	UINT16	(*read16d)(offs_t REG(d0));				// Direct read 16 bit
 	UINT32	(*read32d)(offs_t REG(d0));				// Direct read 32 bit
+
 };
  // just used by capcom cps2
 struct m68k_encryption_interface
