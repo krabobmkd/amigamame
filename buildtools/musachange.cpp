@@ -307,29 +307,21 @@ cout << "check: " <<ofilepath << endl;
     while(i<bfile.length())
     {
         size_t inxt = bfile.find("m68k_op_",i); // m68k_op_add_32_er_d
-        size_t l,c;
-
         if(inxt ==string::npos)
         {
-            inxt = bfile.length();
-            bfile.substros(ofsb,i,inxt-i);
-        } else {
-        bfile.getPosition(l,c,inxt);
-        cout << "l:" << l << " c:"<< c << endl;
-            bfile.substros(ofsb,i,inxt-i);
-            i = inxt;
-            inxt = bfile.find("(void)",i);
-            if(inxt != string::npos && (inxt-i<48))
-            {
-                bfile.substros(ofsb,inxt,inxt-i);
-                ofsb<< "(M68KOPT_PARAMS)";
-                inxt = inxt+6;
-            } else
-            {
-                //ok, fill next
-            }
+            bfile.substros(ofsb,i,bfile.length()-i);
+            break;
         }
-        i = inxt;
+        size_t inxt2 = bfile.find("(void)",inxt);
+        if(inxt2 == string::npos || (inxt2-inxt)>64 )
+        {
+            bfile.substros(ofsb,i,bfile.length()-i);
+            break;
+        }
+        bfile.substros(ofsb,i,inxt2-i);
+        ofsb<< "(M68KOPT_PARAMS)";
+        i= inxt2+6;
+
     }
 
 
