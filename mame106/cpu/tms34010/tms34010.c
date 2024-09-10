@@ -93,11 +93,11 @@ typedef struct tms34010_regs
 	UINT32 fw[2];
 	UINT32 fw_inc[2];  /* Same as fw[], except when fw = 0, fw_inc = 32 */
 	UINT32 reset_deferred;
-	void (*f0_write)(offs_t offset REG(d0),UINT32 data REG(d1));
-	void (*f1_write)(offs_t offset REG(d0),UINT32 data REG(d1));
+	void (*f0_write)(offs_t offset REGM(d0),UINT32 data REGM(d1));
+	void (*f1_write)(offs_t offset REGM(d0),UINT32 data REGM(d1));
 	void (*pixel_write)(offs_t offset,UINT32 data);
-	UINT32 (*f0_read)(offs_t offset REG(d0));
-	UINT32 (*f1_read)(offs_t offset REG(d0));
+	UINT32 (*f0_read)(offs_t offset REGM(d0));
+	UINT32 (*f1_read)(offs_t offset REGM(d0));
 	UINT32 (*pixel_read)(offs_t offset);
 	UINT32 transparency;
 	UINT32 window_checking;
