@@ -48,6 +48,8 @@ int  m68ki_remaining_cycles = 0;                     /* Number of clocks remaini
 uint m68ki_tracing = 0;
 uint m68ki_address_space;
 
+m68ki_cpu_core *m68ki_cpus[8]={NULL};
+
 #ifdef M68K_LOG_ENABLE
 const char* m68ki_cpu_names[] =
 {
@@ -72,7 +74,7 @@ const char* m68ki_cpu_names[] =
 #endif /* M68K_LOG_ENABLE */
 
 /* The CPU core */
-m68ki_cpu_core m68ki_cpu = {0};
+//olde m68ki_cpu_core m68ki_cpu = {0};
 
 #if M68K_EMULATE_ADDRESS_ERROR
 jmp_buf m68ki_aerr_trap;
@@ -81,6 +83,8 @@ jmp_buf m68ki_aerr_trap;
 uint    m68ki_aerr_address;
 uint    m68ki_aerr_write_mode;
 uint    m68ki_aerr_fc;
+
+
 
 /* Used by shift & rotate instructions */
 uint8 m68ki_shift_8_table[65] =
@@ -443,6 +447,10 @@ uint8 m68ki_ea_idx_cycle_table[64] =
 /* ======================================================================== */
 /* =============================== CALLBACKS ============================== */
 /* ======================================================================== */
+extern int activecpu;
+static inline m68ki_cpu_core *getActivecpu() {
+    return m68ki_cpus[activecpu];
+}
 
 /* Default callbacks used if the callback hasn't been set yet, or if the
  * callback is set to NULL
@@ -452,6 +460,7 @@ uint8 m68ki_ea_idx_cycle_table[64] =
 static int default_int_ack_callback_data;
 static int default_int_ack_callback(int int_level)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	default_int_ack_callback_data = int_level;
 	CPU_INT_LEVEL = 0;
 	return M68K_INT_ACK_AUTOVECTOR;
@@ -574,6 +583,7 @@ unsigned int m68k_get_reg(void* context, m68k_register_t regnum)
 
 void m68k_set_reg(m68k_register_t regnum, unsigned int value)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	switch(regnum)
 	{
 		case M68K_REG_D0:	REG_D[0] = MASK_OUT_ABOVE_32(value); return;
@@ -626,41 +636,49 @@ void m68k_set_reg(m68k_register_t regnum, unsigned int value)
 /* Set the callbacks */
 void m68k_set_int_ack_callback(int  (*callback)(int int_level))
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_INT_ACK = callback ? callback : default_int_ack_callback;
 }
 
 void m68k_set_bkpt_ack_callback(void  (*callback)(unsigned int data))
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_BKPT_ACK = callback ? callback : default_bkpt_ack_callback;
 }
 
 void m68k_set_reset_instr_callback(void  (*callback)(void))
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_RESET_INSTR = callback ? callback : default_reset_instr_callback;
 }
 
 void m68k_set_cmpild_instr_callback(void  (*callback)(unsigned int, int))
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_CMPILD_INSTR = callback ? callback : default_cmpild_instr_callback;
 }
 
 void m68k_set_rte_instr_callback(void  (*callback)(void))
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_RTE_INSTR = callback ? callback : default_rte_instr_callback;
 }
 
 void m68k_set_pc_changed_callback(void  (*callback)(unsigned int new_pc))
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_PC_CHANGED = callback ? callback : default_pc_changed_callback;
 }
 
 void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc))
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_SET_FC = callback ? callback : default_set_fc_callback;
 }
 
 void m68k_set_instr_hook_callback(void  (*callback)(void))
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_INSTR_HOOK = callback ? callback : default_instr_hook_callback;
 }
 
@@ -668,6 +686,7 @@ void m68k_set_instr_hook_callback(void  (*callback)(void))
 /* Set the CPU type. */
 void m68k_set_cpu_type(unsigned int cpu_type)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	switch(cpu_type)
 	{
 		case M68K_CPU_TYPE_68000:
@@ -773,6 +792,7 @@ void m68k_set_cpu_type(unsigned int cpu_type)
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(int num_cycles)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	/* Make sure we're not stopped */
 	if(!CPU_STOPPED)
 	{
@@ -832,6 +852,7 @@ int m68k_execute(int num_cycles)
 
 int m68k_cycles_run(void)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	return m68ki_initial_cycles - GET_CYCLES();
 }
 
@@ -861,6 +882,7 @@ void m68k_end_timeslice(void)
  */
 void m68k_set_irq(unsigned int int_level)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	uint old_level = CPU_INT_LEVEL;
 	CPU_INT_LEVEL = int_level << 8;
 
@@ -896,6 +918,7 @@ void m68k_init(void)
 /* Pulse the RESET line on the CPU */
 void m68k_pulse_reset(void)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	/* Clear all stop levels and eat up all remaining cycles */
 	CPU_STOPPED = 0;
 	SET_CYCLES(0);
@@ -930,6 +953,7 @@ void m68k_pulse_reset(void)
 /* Pulse the HALT line on the CPU */
 void m68k_pulse_halt(void)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	CPU_STOPPED |= STOP_LEVEL_HALT;
 }
 
@@ -938,18 +962,26 @@ void m68k_pulse_halt(void)
 /* This is to allow for multiple CPUs */
 unsigned int m68k_context_size()
 {
+    return sizeof();
+    /*
 	return sizeof(m68ki_cpu_core);
+    */
 }
 
 unsigned int m68k_get_context(void* dst)
 {
-	if(dst) *(m68ki_cpu_core*)dst = m68ki_cpu;
+    /*
+    m68ki_cpu_core *p68k = getActivecpu();
+	if(dst) *(m68ki_cpu_core*)dst = *p68k; // m68ki_cpu;
 	return sizeof(m68ki_cpu_core);
+    */
 }
 
 void m68k_set_context(void* src)
 {
+    /*
 	if(src) m68ki_cpu = *(m68ki_cpu_core*)src;
+    */
 }
 
 
@@ -968,8 +1000,10 @@ static struct {
 	UINT8 halted;
 } m68k_substate;
 
+// must be void f(void)
 static void m68k_prepare_substate(void)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	m68k_substate.sr = m68ki_get_sr();
 	m68k_substate.stopped = (CPU_STOPPED & STOP_LEVEL_STOP) != 0;
 	m68k_substate.halted  = (CPU_STOPPED & STOP_LEVEL_HALT) != 0;
@@ -977,6 +1011,7 @@ static void m68k_prepare_substate(void)
 
 static void m68k_post_load(void)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
 	m68ki_set_sr_noint_nosp(m68k_substate.sr);
 	CPU_STOPPED = m68k_substate.stopped ? STOP_LEVEL_STOP : 0
 		        | m68k_substate.halted  ? STOP_LEVEL_HALT : 0;
@@ -985,7 +1020,9 @@ static void m68k_post_load(void)
 
 void m68k_state_register(const char *type, int index)
 {
+    m68ki_cpu_core *p68k = getActivecpu();
         /* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
+    /*TODO
 	state_save_register_item_array(type, index, REG_D);
 	state_save_register_item(type, index, REG_PPC);
 	state_save_register_item(type, index, REG_PC);
@@ -1006,6 +1043,7 @@ void m68k_state_register(const char *type, int index)
 //	state_save_register_item(type, index, CPU_PREF_DATA);
 	state_save_register_func_presave(m68k_prepare_substate);
 	state_save_register_func_postload(m68k_post_load);
+    */
 }
 
 #endif /* M68K_COMPILE_FOR_MAME */

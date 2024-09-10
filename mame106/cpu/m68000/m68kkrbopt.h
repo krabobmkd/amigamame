@@ -1,16 +1,32 @@
 #ifndef M68KKRBOPT_H_
 #define M68KKRBOPT_H_
 
+
 #define OPTIM68K_NOXOR 1
 #define OPTIM68K_USEFAST32INTRF 1
 #define OPTIM68K_NOMASK_A 1
 #define OPTIM68K_USEFASTMOVEMREAD 1
 #define OPTIM68K_USEFASTMOVEMWRITE 1
 
+#if defined(__GNUC__) && defined(__AMIGA__)
+#define REG68KCORE(r) __asm(#r)
+//#define REG68KCORE(r)
+#else
+#define REG68KCORE(r)
+#endif
+
+
+
+#define COREREG REG68KCORE(a2)
+
+struct m68ki_cpu_core;
+
 #define OPTIM68K_USEINSTANCE 1
 #if OPTIM68K_USEINSTANCE
-    #define M68KOPT_PARAMS void
+    #define M68KOPT_PARAMS struct m68ki_cpu_core *p68k COREREG
+    #define M68KOPT_PASSPARAMS p68k
 #else
     #define M68KOPT_PARAMS void
+    #define M68KOPT_PASSPARAMS
 #endif
 #endif
