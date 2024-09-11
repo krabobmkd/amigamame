@@ -666,9 +666,9 @@
 #define EA_PCIX_32()   EA_PCIX_8()
 
 
-#define OPER_I_8()     m68ki_read_imm_8()
-#define OPER_I_16()    m68ki_read_imm_16(M68KOPT_PASSPARAMS)
-#define OPER_I_32()    m68ki_read_imm_32(M68KOPT_PASSPARAMS)
+#define OPER_I_8(M68KOPT_PASSPARAMS)     m68ki_read_imm_8()
+#define OPER_I_16(M68KOPT_PASSPARAMS)    m68ki_read_imm_16(M68KOPT_PASSPARAMS)
+#define OPER_I_32(M68KOPT_PASSPARAMS)    m68ki_read_imm_32(M68KOPT_PASSPARAMS)
 
 
 

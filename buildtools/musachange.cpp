@@ -175,8 +175,12 @@ struct fstr {
     void substros(ostream &os, size_t i, size_t l) const {
         for(size_t j=0;j<l && i+j<_b.size(); j++)
         {
-
-            os << (char) _b[i+j];
+            if(_b[i+j]==0)
+            {
+            } else
+            {
+                os << (char) _b[i+j];
+            }
         }
     }
 
@@ -289,7 +293,7 @@ cout << "check: " <<ofilepath << endl;
     fstr bfile;
     bfile._filename = ofilepath;
     { //
-        ifstream ifs(ofilepath);
+        ifstream ifs(ofilepath,ios::binary| ios::in);
         if(!ifs.good()) return 1;
         ifs.seekg(0,ios::end);
         size_t sz = (size_t)ifs.tellg();
@@ -297,30 +301,34 @@ cout << "check: " <<ofilepath << endl;
         ifs.clear();
 
         bfile._b.reserve(sz+1);
-        bfile._b.resize(sz+1);
+        bfile._b.resize(sz+1,0);
         ifs.read(bfile._b.data(),sz);
         bfile._b[sz] = 0;
     }
-    ofstream ofsb(nfilepath);
+    ofstream ofsb(nfilepath,ios::binary| ios::out);
 
     size_t i=0;
     while(i<bfile.length())
     {
-        size_t inxt = bfile.find("m68k_op_",i); // m68k_op_add_32_er_d
+     //   size_t inxt = bfile.find("m68k_op_",i); // m68k_op_add_32_er_d
+        size_t inxt = bfile.find("OPER_",i); // m68k_op_add_32_er_d
         if(inxt ==string::npos)
         {
             bfile.substros(ofsb,i,bfile.length()-i);
             break;
         }
-        size_t inxt2 = bfile.find("(void)",inxt);
-        if(inxt2 == string::npos || (inxt2-inxt)>64 )
+   //     size_t inxt2 = bfile.find("(void)",inxt);
+        size_t inxt2 = bfile.find("()",inxt);
+        if(inxt2 == string::npos || (inxt2-inxt)>32 )
         {
-            bfile.substros(ofsb,i,bfile.length()-i);
-            break;
+            bfile.substros(ofsb,i,inxt+5-i);
+            i=inxt+5;
+            continue;
         }
         bfile.substros(ofsb,i,inxt2-i);
-        ofsb<< "(M68KOPT_PARAMS)";
-        i= inxt2+6;
+       // ofsb<< "(M68KOPT_PARAMS)";
+        ofsb<< "(M68KOPT_PASSPARAMS)";
+        i= inxt2+2;
 
     }
 
