@@ -1,6 +1,6 @@
 #include "m68kcpu.h"
-extern void m68040_fpu_op0(void);
-extern void m68040_fpu_op1(void);
+extern void m68040_fpu_op0(M68KOPT_PARAMS);
+extern void m68040_fpu_op1(M68KOPT_PARAMS);
 
 /* ======================================================================== */
 /* ========================= INSTRUCTION HANDLERS ========================= */
@@ -23,7 +23,7 @@ void m68k_op_040fpu0_32(M68KOPT_PARAMS)
 {
 	if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
 	{
-		m68040_fpu_op0();
+		m68040_fpu_op0(M68KOPT_PASSPARAMS);
 		return;
 	}
 	m68ki_exception_1111(M68KOPT_PASSPARAMS);
@@ -34,7 +34,7 @@ void m68k_op_040fpu1_32(M68KOPT_PARAMS)
 {
 	if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
 	{
-		m68040_fpu_op1();
+		m68040_fpu_op1(M68KOPT_PASSPARAMS);
 		return;
 	}
 	m68ki_exception_1111(M68KOPT_PASSPARAMS);
@@ -147,7 +147,7 @@ void m68k_op_abcd_8_mm_axy7(M68KOPT_PARAMS)
 
 void m68k_op_abcd_8_mm(M68KOPT_PARAMS)
 {
-	uint src = OPER_AY_PD_8PD_8(M68KOPT_PASSPARAMS);
+	uint src = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_AX_PD_8();
 	uint dst = m68k_memory_intf.read8(ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
@@ -238,7 +238,7 @@ void m68k_op_add_8_er_pi7(M68KOPT_PARAMS)
 void m68k_op_add_8_er_pd(M68KOPT_PARAMS)
 {
 	uint* r_dst = &DX;
-	uint src = OPER_AY_PD_8PD_8(M68KOPT_PASSPARAMS);
+	uint src = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint dst = MASK_OUT_ABOVE_8(*r_dst);
 	uint res = src + dst;
 
@@ -2239,7 +2239,7 @@ void m68k_op_addx_32_rr(M68KOPT_PARAMS)
 
 void m68k_op_addx_8_mm_ax7(M68KOPT_PARAMS)
 {
-	uint src = OPER_AY_PD_8PD_8(M68KOPT_PASSPARAMS);
+	uint src = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_A7_PD_8();
 	uint dst = m68k_memory_intf.read8(ea);
 	uint res = src + dst + XFLAG_AS_1();
@@ -2293,7 +2293,7 @@ void m68k_op_addx_8_mm_axy7(M68KOPT_PARAMS)
 
 void m68k_op_addx_8_mm(M68KOPT_PARAMS)
 {
-	uint src = OPER_AY_PD_8PD_8(M68KOPT_PASSPARAMS);
+	uint src = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_AX_PD_8();
 	uint dst = m68k_memory_intf.read8(ea);
 	uint res = src + dst + XFLAG_AS_1();
@@ -2387,7 +2387,7 @@ void m68k_op_and_8_er_pi7(M68KOPT_PARAMS)
 
 void m68k_op_and_8_er_pd(M68KOPT_PARAMS)
 {
-	FLAG_Z = MASK_OUT_ABOVE_8(DX &= (OPER_AY_PD_8PD_8(M68KOPT_PASSPARAMS) | 0xffffff00));
+	FLAG_Z = MASK_OUT_ABOVE_8(DX &= (OPER_AY_PD_8(M68KOPT_PASSPARAMS) | 0xffffff00));
 
 	FLAG_N = NFLAG_8(FLAG_Z);
 	FLAG_C = CFLAG_CLEAR;
@@ -8380,7 +8380,7 @@ void m68k_op_btst_8_r_pi7(M68KOPT_PARAMS)
 
 void m68k_op_btst_8_r_pd(M68KOPT_PARAMS)
 {
-	FLAG_Z = OPER_AY_PD_8PD_8(M68KOPT_PASSPARAMS) & (1 << (DX & 7));
+	FLAG_Z = OPER_AY_PD_8(M68KOPT_PASSPARAMS) & (1 << (DX & 7));
 }
 
 
@@ -8466,7 +8466,7 @@ void m68k_op_btst_8_s_pd(M68KOPT_PARAMS)
 {
 	uint bit = OPER_I_8(M68KOPT_PASSPARAMS) & 7;
 
-	FLAG_Z = OPER_AY_PD_8PD_8(M68KOPT_PASSPARAMS) & (1 << bit);
+	FLAG_Z = OPER_AY_PD_8(M68KOPT_PASSPARAMS) & (1 << bit);
 }
 
 
@@ -10891,7 +10891,7 @@ void m68k_op_cmp_8_pi7(M68KOPT_PARAMS)
 
 void m68k_op_cmp_8_pd(M68KOPT_PARAMS)
 {
-	uint src = OPER_AY_PD_8PD_8(M68KOPT_PASSPARAMS);
+	uint src = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint dst = MASK_OUT_ABOVE_8(DX);
 	uint res = dst - src;
 
@@ -11685,7 +11685,7 @@ void m68k_op_cmpi_8_pi7(M68KOPT_PARAMS)
 void m68k_op_cmpi_8_pd(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
-	uint dst = OPER_AY_PD_8PD_8(M68KOPT_PASSPARAMS);
+	uint dst = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_8(res);

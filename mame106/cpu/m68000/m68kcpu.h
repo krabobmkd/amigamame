@@ -905,12 +905,12 @@ struct m68ki_cpu_core
 	/* Callbacks to host */
 	int  (*int_ack_callback)(int int_line);           /* Interrupt Acknowledge */
 	void (*bkpt_ack_callback)(unsigned int data);     /* Breakpoint Acknowledge */
-	void (*reset_instr_callback)(M68KOPT_PARAMS);               /* Called when a RESET instruction is encountered */
+	void (*reset_instr_callback)(void);               /* Called when a RESET instruction is encountered */
 	void (*cmpild_instr_callback)(unsigned int, int); /* Called when a CMPI.L #v, Dn instruction is encountered */
-	void (*rte_instr_callback)(M68KOPT_PARAMS);                 /* Called when a RTE instruction is encountered */
+	void (*rte_instr_callback)(void);                 /* Called when a RTE instruction is encountered */
 	void (*pc_changed_callback)(unsigned int new_pc); /* Called when the PC changes by a large amount */
 	void (*set_fc_callback)(unsigned int new_fc);     /* Called when the CPU function code changes */
-	void (*instr_hook_callback)(M68KOPT_PARAMS);                /* Called every instruction cycle prior to execution */
+	void (*instr_hook_callback)(void);                /* Called every instruction cycle prior to execution */
 
 } ;
 

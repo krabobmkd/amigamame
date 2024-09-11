@@ -32,12 +32,13 @@ static const char* copyright_notice =
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
-extern void m68040_fpu_op0(void);
-extern void m68040_fpu_op1(void);
-
 #include "m68kops.h"
 #include "m68kcpu.h"
 #include "m68kfpu.c"
+
+extern void m68040_fpu_op0(M68KOPT_PARAMS);
+extern void m68040_fpu_op1(M68KOPT_PARAMS);
+
 
 /* ======================================================================== */
 /* ================================= DATA ================================= */
@@ -1022,7 +1023,7 @@ void m68k_state_register(const char *type, int index)
 {
     struct m68ki_cpu_core *p68k = getActivecpu();
         /* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
-    /*TODO
+
 	state_save_register_item_array(type, index, REG_D);
 	state_save_register_item(type, index, REG_PPC);
 	state_save_register_item(type, index, REG_PC);
@@ -1043,7 +1044,7 @@ void m68k_state_register(const char *type, int index)
 //	state_save_register_item(type, index, CPU_PREF_DATA);
 	state_save_register_func_presave(m68k_prepare_substate);
 	state_save_register_func_postload(m68k_post_load);
-    */
+
 }
 
 #endif /* M68K_COMPILE_FOR_MAME */
