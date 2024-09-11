@@ -299,10 +299,10 @@ static void m68000_exit(void)
 //	return m68k_execute(cycles);
 //}
 
-static void m68000_get_context(void *dst)
-{
-	m68k_get_context(dst);
-}
+//static void m68000_get_context(void *dst)
+//{
+//	m68k_get_context(dst);
+//}
 
 static void m68000_set_context(void *src)
 {
@@ -739,7 +739,7 @@ void m68000_get_info(UINT32 state, union cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68000_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68000_get_context;	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68k_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68000_set_context;	break;
 		case CPUINFO_PTR_INIT:							info->init = m68000_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68000_reset;				break;

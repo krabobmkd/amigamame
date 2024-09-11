@@ -1,7 +1,9 @@
+#include "m68kkrbopt.h"
 #include "cpuintrf.h"
 #include <math.h>
 
-static UINT8 READ_EA_8(int ea)
+/*TODO
+static UINT8 READ_EA_8(M68KOPT_PARAMS, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -45,7 +47,7 @@ static UINT8 READ_EA_8(int ea)
 	}
 }
 
-static UINT16 READ_EA_16(int ea)
+static UINT16 READ_EA_16(M68KOPT_PARAMS, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -70,7 +72,7 @@ static UINT16 READ_EA_16(int ea)
 	}
 }
 
-static UINT32 READ_EA_32(int ea)
+static UINT32 READ_EA_32(M68KOPT_PARAMS, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -129,7 +131,7 @@ static UINT32 READ_EA_32(int ea)
 	}
 }
 
-static void WRITE_EA_32(int ea, UINT32 data)
+static void WRITE_EA_32(M68KOPT_PARAMS, int ea, UINT32 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -197,7 +199,7 @@ static void WRITE_EA_32(int ea, UINT32 data)
 	}
 }
 
-static UINT64 READ_EA_64(int ea)
+static UINT64 READ_EA_64(M68KOPT_PARAMS, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -252,7 +254,7 @@ static UINT64 READ_EA_64(int ea)
 	}
 }
 
-static void WRITE_EA_64(int ea, UINT64 data)
+static void WRITE_EA_64(M68KOPT_PARAMS, int ea, UINT64 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -306,7 +308,7 @@ fp_reg READ_EA_FPE(int ea)
 	return r;
 }
 
-void WRITE_EA_FPE(int ea, fp_reg fpr)
+void WRITE_EA_FPE(M68KOPT_PARAMS, int ea, fp_reg fpr)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -330,7 +332,7 @@ void WRITE_EA_FPE(int ea, fp_reg fpr)
 }
 
 
-static void fpgen_rm_reg(UINT16 w2)
+static void fpgen_rm_reg(M68KOPT_PARAMS, UINT16 w2)
 {
 	int ea = REG_IR & 0x3f;
 	int rm = (w2 >> 14) & 0x1;
@@ -464,7 +466,7 @@ static void fpgen_rm_reg(UINT16 w2)
 	}
 }
 
-static void fmove_reg_mem(UINT16 w2)
+static void fmove_reg_mem(M68KOPT_PARAMS, UINT16 w2)
 {
 	int ea = REG_IR & 0x3f;
 	int src = (w2 >>  7) & 0x7;
@@ -522,7 +524,7 @@ static void fmove_reg_mem(UINT16 w2)
 	USE_CYCLES(12);
 }
 
-static void fmove_fpcr(UINT16 w2)
+static void fmove_fpcr(M68KOPT_PARAMS, UINT16 w2)
 {
 	int ea = REG_IR & 0x3f;
 	int dir = (w2 >> 13) & 0x1;
@@ -552,7 +554,7 @@ static void fmove_fpcr(UINT16 w2)
 	USE_CYCLES(10);
 }
 
-static void fmovem(UINT16 w2)
+static void fmovem(M68KOPT_PARAMS, UINT16 w2)
 {
 	int i;
 	int ea = REG_IR & 0x3f;
@@ -602,7 +604,7 @@ static void fmovem(UINT16 w2)
 	}
 }
 
-static void fbcc(void)
+static void fbcc(M68KOPT_PARAMS)
 {
 	INT32 disp;
 //  int condition = REG_IR & 0x3f;
@@ -623,7 +625,7 @@ static void fbcc(void)
 }
 
 
-void m68040_fpu_op0(void)
+void m68040_fpu_op0(M68KOPT_PARAMS)
 {
 	switch ((REG_IR >> 6) & 0x3)
 	{
@@ -675,7 +677,7 @@ void m68040_fpu_op0(void)
 	}
 }
 
-void m68040_fpu_op1(void)
+void m68040_fpu_op1(M68KOPT_PARAMS)
 {
 	int ea = REG_IR & 0x3f;
 
@@ -699,5 +701,5 @@ void m68040_fpu_op1(void)
 	}
 }
 
-
+*/
 

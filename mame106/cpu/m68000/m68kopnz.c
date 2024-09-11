@@ -1687,7 +1687,7 @@ void m68k_op_or_16_er_d(M68KOPT_PARAMS)
 
 void m68k_op_or_16_er_ai(M68KOPT_PARAMS)
 {
-	uint res = MASK_OUT_ABOVE_16((DX |= OPER_AY_AI_16()));
+	uint res = MASK_OUT_ABOVE_16((DX |= OPER_AY_AI_16(M68KOPT_PASSPARAMS)));
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -5546,7 +5546,7 @@ void m68k_op_sub_16_er_a(M68KOPT_PARAMS)
 void m68k_op_sub_16_er_ai(M68KOPT_PARAMS)
 {
 	uint* r_dst = &DX;
-	uint src = OPER_AY_AI_16();
+	uint src = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 	uint dst = MASK_OUT_ABOVE_16(*r_dst);
 	uint res = dst - src;
 
@@ -6283,7 +6283,7 @@ void m68k_op_suba_16_ai(M68KOPT_PARAMS)
 {
 	uint* r_dst = &AX;
 
-	*r_dst = MASK_OUT_ABOVE_32(*r_dst - MAKE_INT_16(OPER_AY_AI_16()));
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst - MAKE_INT_16(OPER_AY_AI_16(M68KOPT_PASSPARAMS)));
 }
 
 
@@ -8493,7 +8493,7 @@ void m68k_op_tst_16_a(M68KOPT_PARAMS)
 
 void m68k_op_tst_16_ai(M68KOPT_PARAMS)
 {
-	uint res = OPER_AY_AI_16();
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;

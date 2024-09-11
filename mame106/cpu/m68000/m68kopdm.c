@@ -28,7 +28,7 @@ void m68k_op_dbf_16(M68KOPT_PARAMS)
 		uint offset = OPER_I_16();
 		REG_PC -= 2;
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_branch_16(offset);
+		m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 		USE_CYCLES(CYC_DBCC_F_NOEXP);
 		return;
 	}
@@ -50,7 +50,7 @@ void m68k_op_dbhi_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -75,7 +75,7 @@ void m68k_op_dbls_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -100,7 +100,7 @@ void m68k_op_dbcc_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -125,7 +125,7 @@ void m68k_op_dbcs_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -150,7 +150,7 @@ void m68k_op_dbne_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -175,7 +175,7 @@ void m68k_op_dbeq_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -200,7 +200,7 @@ void m68k_op_dbvc_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -225,7 +225,7 @@ void m68k_op_dbvs_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -250,7 +250,7 @@ void m68k_op_dbpl_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -275,7 +275,7 @@ void m68k_op_dbmi_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -300,7 +300,7 @@ void m68k_op_dbge_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -325,7 +325,7 @@ void m68k_op_dblt_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -350,7 +350,7 @@ void m68k_op_dbgt_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -375,7 +375,7 @@ void m68k_op_dble_16(M68KOPT_PARAMS)
 			uint offset = OPER_I_16();
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(M68KOPT_PASSPARAMS, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -421,14 +421,14 @@ void m68k_op_divs_16_d(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
 void m68k_op_divs_16_ai(M68KOPT_PARAMS)
 {
 	uint* r_dst = &DX;
-	sint src = MAKE_INT_16(OPER_AY_AI_16());
+	sint src = MAKE_INT_16(OPER_AY_AI_16(M68KOPT_PASSPARAMS));
 	sint quotient;
 	sint remainder;
 
@@ -459,7 +459,7 @@ void m68k_op_divs_16_ai(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -497,7 +497,7 @@ void m68k_op_divs_16_pi(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -535,7 +535,7 @@ void m68k_op_divs_16_pd(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -573,7 +573,7 @@ void m68k_op_divs_16_di(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -611,7 +611,7 @@ void m68k_op_divs_16_ix(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -649,7 +649,7 @@ void m68k_op_divs_16_aw(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -687,7 +687,7 @@ void m68k_op_divs_16_al(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -725,7 +725,7 @@ void m68k_op_divs_16_pcdi(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -763,7 +763,7 @@ void m68k_op_divs_16_pcix(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -801,7 +801,7 @@ void m68k_op_divs_16_i(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -827,14 +827,14 @@ void m68k_op_divu_16_d(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
 void m68k_op_divu_16_ai(M68KOPT_PARAMS)
 {
 	uint* r_dst = &DX;
-	uint src = OPER_AY_AI_16();
+	uint src = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 
 	if(src != 0)
 	{
@@ -853,7 +853,7 @@ void m68k_op_divu_16_ai(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -879,7 +879,7 @@ void m68k_op_divu_16_pi(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -905,7 +905,7 @@ void m68k_op_divu_16_pd(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -931,7 +931,7 @@ void m68k_op_divu_16_di(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -957,7 +957,7 @@ void m68k_op_divu_16_ix(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -983,7 +983,7 @@ void m68k_op_divu_16_aw(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -1009,7 +1009,7 @@ void m68k_op_divu_16_al(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -1035,7 +1035,7 @@ void m68k_op_divu_16_pcdi(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -1061,7 +1061,7 @@ void m68k_op_divu_16_pcix(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -1087,7 +1087,7 @@ void m68k_op_divu_16_i(M68KOPT_PARAMS)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -1156,7 +1156,7 @@ void m68k_op_divl_32_d(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -1293,7 +1293,7 @@ void m68k_op_divl_32_d(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -1367,7 +1367,7 @@ void m68k_op_divl_32_ai(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -1504,7 +1504,7 @@ void m68k_op_divl_32_ai(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -1578,7 +1578,7 @@ void m68k_op_divl_32_pi(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -1715,7 +1715,7 @@ void m68k_op_divl_32_pi(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -1789,7 +1789,7 @@ void m68k_op_divl_32_pd(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -1926,7 +1926,7 @@ void m68k_op_divl_32_pd(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2000,7 +2000,7 @@ void m68k_op_divl_32_di(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2137,7 +2137,7 @@ void m68k_op_divl_32_di(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2211,7 +2211,7 @@ void m68k_op_divl_32_ix(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2348,7 +2348,7 @@ void m68k_op_divl_32_ix(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2422,7 +2422,7 @@ void m68k_op_divl_32_aw(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2559,7 +2559,7 @@ void m68k_op_divl_32_aw(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2633,7 +2633,7 @@ void m68k_op_divl_32_al(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2770,7 +2770,7 @@ void m68k_op_divl_32_al(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2844,7 +2844,7 @@ void m68k_op_divl_32_pcdi(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -2981,7 +2981,7 @@ void m68k_op_divl_32_pcdi(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -3055,7 +3055,7 @@ void m68k_op_divl_32_pcix(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -3192,7 +3192,7 @@ void m68k_op_divl_32_pcix(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -3266,7 +3266,7 @@ void m68k_op_divl_32_i(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -3403,7 +3403,7 @@ void m68k_op_divl_32_i(M68KOPT_PARAMS)
 			FLAG_C = CFLAG_CLEAR;
 			return;
 		}
-		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+		m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 		return;
 	}
 	m68ki_exception_illegal();
@@ -6852,7 +6852,7 @@ void m68k_op_move_16_d_a(M68KOPT_PARAMS)
 
 void m68k_op_move_16_d_ai(M68KOPT_PARAMS)
 {
-	uint res = OPER_AY_AI_16();
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 	uint* r_dst = &DX;
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
@@ -7020,7 +7020,7 @@ void m68k_op_move_16_ai_a(M68KOPT_PARAMS)
 
 void m68k_op_move_16_ai_ai(M68KOPT_PARAMS)
 {
-	uint res = OPER_AY_AI_16();
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 	uint ea = EA_AX_AI_16();
 
 	m68ki_write_16(ea, res);
@@ -7188,7 +7188,7 @@ void m68k_op_move_16_pi_a(M68KOPT_PARAMS)
 
 void m68k_op_move_16_pi_ai(M68KOPT_PARAMS)
 {
-	uint res = OPER_AY_AI_16();
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 	uint ea = EA_AX_PI_16();
 
 	m68ki_write_16(ea, res);
@@ -7356,7 +7356,7 @@ void m68k_op_move_16_pd_a(M68KOPT_PARAMS)
 
 void m68k_op_move_16_pd_ai(M68KOPT_PARAMS)
 {
-	uint res = OPER_AY_AI_16();
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 	uint ea = EA_AX_PD_16();
 
 	m68ki_write_16(ea, res);
@@ -7524,7 +7524,7 @@ void m68k_op_move_16_di_a(M68KOPT_PARAMS)
 
 void m68k_op_move_16_di_ai(M68KOPT_PARAMS)
 {
-	uint res = OPER_AY_AI_16();
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 	uint ea = EA_AX_DI_16();
 
 	m68ki_write_16(ea, res);
@@ -7692,7 +7692,7 @@ void m68k_op_move_16_ix_a(M68KOPT_PARAMS)
 
 void m68k_op_move_16_ix_ai(M68KOPT_PARAMS)
 {
-	uint res = OPER_AY_AI_16();
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 	uint ea = EA_AX_IX_16();
 
 	m68ki_write_16(ea, res);
@@ -7860,7 +7860,7 @@ void m68k_op_move_16_aw_a(M68KOPT_PARAMS)
 
 void m68k_op_move_16_aw_ai(M68KOPT_PARAMS)
 {
-	uint res = OPER_AY_AI_16();
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 	uint ea = EA_AW_16();
 
 	m68ki_write_16(ea, res);
@@ -8028,7 +8028,7 @@ void m68k_op_move_16_al_a(M68KOPT_PARAMS)
 
 void m68k_op_move_16_al_ai(M68KOPT_PARAMS)
 {
-	uint res = OPER_AY_AI_16();
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 	uint ea = EA_AL_16();
 
 	m68ki_write_16(ea, res);
@@ -9524,7 +9524,7 @@ void m68k_op_movea_16_a(M68KOPT_PARAMS)
 
 void m68k_op_movea_16_ai(M68KOPT_PARAMS)
 {
-	AX = MAKE_INT_16(OPER_AY_AI_16());
+	AX = MAKE_INT_16(OPER_AY_AI_16(M68KOPT_PASSPARAMS));
 }
 
 
@@ -9750,7 +9750,7 @@ void m68k_op_move_16_toc_d(M68KOPT_PARAMS)
 
 void m68k_op_move_16_toc_ai(M68KOPT_PARAMS)
 {
-	m68ki_set_ccr(OPER_AY_AI_16());
+	m68ki_set_ccr(OPER_AY_AI_16(M68KOPT_PASSPARAMS));
 }
 
 
@@ -9918,7 +9918,7 @@ void m68k_op_move_16_tos_ai(M68KOPT_PARAMS)
 {
 	if(FLAG_S)
 	{
-		uint new_sr = OPER_AY_AI_16();
+		uint new_sr = OPER_AY_AI_16(M68KOPT_PASSPARAMS);
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
 		m68ki_set_sr(new_sr);
 		return;
@@ -11051,13 +11051,13 @@ void m68k_op_moves_8_ai(M68KOPT_PARAMS)
 			}
 			if(BIT_F(word2))		   /* Memory to address register */
 			{
-				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, REG_SFC));
+				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68k_read_memory_8(ea));
 				if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 					USE_CYCLES(2);
 				return;
 			}
 			/* Memory to data register */
-			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, REG_SFC);
+			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68k_read_memory_8(ea);
 			if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 				USE_CYCLES(2);
 			return;
@@ -11086,13 +11086,13 @@ void m68k_op_moves_8_pi(M68KOPT_PARAMS)
 			}
 			if(BIT_F(word2))		   /* Memory to address register */
 			{
-				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, REG_SFC));
+				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68k_read_memory_8(ea));
 				if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 					USE_CYCLES(2);
 				return;
 			}
 			/* Memory to data register */
-			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, REG_SFC);
+			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68k_read_memory_8(ea);
 			if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 				USE_CYCLES(2);
 			return;
@@ -11121,13 +11121,13 @@ void m68k_op_moves_8_pi7(M68KOPT_PARAMS)
 			}
 			if(BIT_F(word2))		   /* Memory to address register */
 			{
-				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, REG_SFC));
+				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68k_read_memory_8(ea));
 				if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 					USE_CYCLES(2);
 				return;
 			}
 			/* Memory to data register */
-			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, REG_SFC);
+			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68k_read_memory_8(ea);
 			if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 				USE_CYCLES(2);
 			return;
@@ -11156,13 +11156,13 @@ void m68k_op_moves_8_pd(M68KOPT_PARAMS)
 			}
 			if(BIT_F(word2))		   /* Memory to address register */
 			{
-				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, REG_SFC));
+				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68k_read_memory_8(ea));
 				if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 					USE_CYCLES(2);
 				return;
 			}
 			/* Memory to data register */
-			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, REG_SFC);
+			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68k_read_memory_8(ea);
 			if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 				USE_CYCLES(2);
 			return;
@@ -11191,13 +11191,13 @@ void m68k_op_moves_8_pd7(M68KOPT_PARAMS)
 			}
 			if(BIT_F(word2))		   /* Memory to address register */
 			{
-				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, REG_SFC));
+				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68k_read_memory_8(ea));
 				if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 					USE_CYCLES(2);
 				return;
 			}
 			/* Memory to data register */
-			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, REG_SFC);
+			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68k_read_memory_8(ea);
 			if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 				USE_CYCLES(2);
 			return;
@@ -11226,13 +11226,13 @@ void m68k_op_moves_8_di(M68KOPT_PARAMS)
 			}
 			if(BIT_F(word2))		   /* Memory to address register */
 			{
-				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, REG_SFC));
+				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68k_read_memory_8(ea));
 				if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 					USE_CYCLES(2);
 				return;
 			}
 			/* Memory to data register */
-			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, REG_SFC);
+			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68k_read_memory_8(ea);
 			if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 				USE_CYCLES(2);
 			return;
@@ -11261,13 +11261,13 @@ void m68k_op_moves_8_ix(M68KOPT_PARAMS)
 			}
 			if(BIT_F(word2))		   /* Memory to address register */
 			{
-				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, REG_SFC));
+				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68k_read_memory_8(ea));
 				if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 					USE_CYCLES(2);
 				return;
 			}
 			/* Memory to data register */
-			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, REG_SFC);
+			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68k_read_memory_8(ea);
 			if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 				USE_CYCLES(2);
 			return;
@@ -11296,13 +11296,13 @@ void m68k_op_moves_8_aw(M68KOPT_PARAMS)
 			}
 			if(BIT_F(word2))		   /* Memory to address register */
 			{
-				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, REG_SFC));
+				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68k_read_memory_8(ea));
 				if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 					USE_CYCLES(2);
 				return;
 			}
 			/* Memory to data register */
-			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, REG_SFC);
+			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68k_read_memory_8(ea);
 			if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 				USE_CYCLES(2);
 			return;
@@ -11331,13 +11331,13 @@ void m68k_op_moves_8_al(M68KOPT_PARAMS)
 			}
 			if(BIT_F(word2))		   /* Memory to address register */
 			{
-				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, REG_SFC));
+				REG_A[(word2 >> 12) & 7] = MAKE_INT_8(m68k_read_memory_8(ea));
 				if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 					USE_CYCLES(2);
 				return;
 			}
 			/* Memory to data register */
-			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, REG_SFC);
+			REG_D[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D[(word2 >> 12) & 7]) | m68k_read_memory_8(ea);
 			if(CPU_TYPE_IS_020_VARIANT(CPU_TYPE))
 				USE_CYCLES(2);
 			return;
@@ -11848,7 +11848,7 @@ void m68k_op_muls_16_d(M68KOPT_PARAMS)
 void m68k_op_muls_16_ai(M68KOPT_PARAMS)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AY_AI_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AY_AI_16(M68KOPT_PASSPARAMS)) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -12002,7 +12002,7 @@ void m68k_op_mulu_16_d(M68KOPT_PARAMS)
 void m68k_op_mulu_16_ai(M68KOPT_PARAMS)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_AY_AI_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint res = OPER_AY_AI_16(M68KOPT_PASSPARAMS) * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
