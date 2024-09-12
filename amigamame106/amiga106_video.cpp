@@ -383,36 +383,5 @@ const char *osd_get_fps_text(const performance_info *performance)
     perfo_line[27]=0;
     return perfo_line;
 }
-// memory.c 2569
-// #define WRITEBYTE8(name,spacenum)
-//  WRITEBYTE8(program_write_byte_8,     ADDRESS_SPACE_PROGRAM)
-//  WRITEBYTE8(data_write_byte_8,     ADDRESS_SPACE_DATA)
 
-//#define ADDRESS_SPACES			3						/* maximum number of address spaces */
-//#define ADDRESS_SPACE_PROGRAM	0						/* program address space */
-//#define ADDRESS_SPACE_DATA		1						/* data address space */
-//#define ADDRESS_SPACE_IO		2						/* I/O address space */
-//struct _address_space
-//{
-//	offs_t				addrmask;			/* address mask */
-//	UINT8 *				readlookup;			/* read table lookup */
-//	UINT8 *				writelookup;		/* write table lookup */
-//	handler_data *		readhandlers;		/* read handlers */
-//	handler_data *		writehandlers;		/* write handlers */
-//	data_accessors *	accessors;			/* pointers to the data access handlers */
-//};
-//extern "C" {
-//void mywrite8(UINT32 adress,UINT8 data)
-//{
-//    struct _address_space &space = [ADDRESS_SPACE_PROGRAM];
-//    /* perform lookup */
-//    // PERFORM_LOOKUP(lookup,space,extraand)
-//    // PERFORM_LOOKUP(writelookup,active_address_space[spacenum],~0);
-//	address &= space.addrmask & extraand;
-//	entry = space.lookup[LEVEL1_INDEX(address)];
-//	if (entry >= SUBTABLE_BASE)
-//		entry = space.lookup[LEVEL2_INDEX(entry,address)];
 
-//}
-
-//}

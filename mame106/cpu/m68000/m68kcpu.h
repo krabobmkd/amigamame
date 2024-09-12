@@ -26,6 +26,7 @@
 #ifndef M68KCPU__HEADER
 #define M68KCPU__HEADER
 
+#include "driver.h"
 #include "m68k.h"
 #include <limits.h>
 #include "m68kkrbopt.h"
@@ -915,8 +916,15 @@ struct m68ki_cpu_core
 } ;
 
 
+struct m68k_cpu_instance
+{
+    struct m68ki_cpu_core m_cpu;
+
+};
+
+
 //extern m68ki_cpu_core m68ki_cpu;
-extern struct m68ki_cpu_core *m68ki_cpus[8];
+extern struct m68k_cpu_instance *m68ki_cpus[MAX_CPU];
 
 extern sint           m68ki_remaining_cycles;
 extern uint           m68ki_tracing;

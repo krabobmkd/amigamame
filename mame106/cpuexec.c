@@ -202,7 +202,7 @@ static void watchdog_setup(int alloc_new);
 int cpuexec_init(void)
 {
 	int cpunum;
-
+  printf("cpuexec_init\n");
 	/* initialize the refresh timer */
 	init_refresh_timer();
 

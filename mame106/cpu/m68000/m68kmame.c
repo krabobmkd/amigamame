@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "driver.h"
 #include "m68k.h"
 #include "m68000.h"
 #include "state.h"
@@ -272,8 +273,11 @@ static UINT8 m68000_win_layout[] = {
 
 static void m68000_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	m68k_init();
-	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
+    printf(" ***** m68000_init\n");
+	m68k_init(index);
+    struct m68k_cpu_core *p68k = m68k_getcpu(index);
+
+	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68000);
 
 #ifdef OPTIM68K_USEFAST32INTRF
     m68k_memory_intf = interface_fast16;
@@ -281,7 +285,7 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
     m68k_memory_intf = interface_d16;
 #endif
     m68k_state_register("m68000", index);
-	m68k_set_int_ack_callback(irqcallback);
+	m68k_set_int_ack_callback(p68k, irqcallback);
 }
 
 static void m68000_reset(void)
@@ -329,7 +333,7 @@ static offs_t m68000_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, i
 
 static void m68008_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	m68k_init();
+	m68k_init(index);
 	m68k_set_cpu_type(M68K_CPU_TYPE_68008);
 	m68k_memory_intf = interface_d8;
 	m68k_state_register("m68008", index);
@@ -398,7 +402,7 @@ static UINT8 m68010_reg_layout[] = {
 
 void m68010_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	m68k_init();
+	m68k_init(index);
 	m68k_set_cpu_type(M68K_CPU_TYPE_68010);
 	m68k_memory_intf = interface_d16;
 	m68k_state_register("m68010", index);
@@ -454,7 +458,9 @@ static UINT8 m68020_win_layout[] = {
 
 static void m68020_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	m68k_init();
+    printf(" ***** m68020_init\n");
+
+	m68k_init(index);
 	m68k_set_cpu_type(M68K_CPU_TYPE_68020);
 
 #ifdef OPTIM68K_USEFAST32INTRF
@@ -513,8 +519,9 @@ static offs_t m68020_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, i
 #if HAS_M68EC020
 
 static void m68ec020_init(int index, int clock, const void *config, int (*irqcallback)(int))
-{
-	m68k_init();
+{   
+    printf(" **** m68ec020_init\n");
+	m68k_init(index);
 	m68k_set_cpu_type(M68K_CPU_TYPE_68EC020);
 	m68k_memory_intf = interface_d32;
 	m68k_state_register("m68ec020", index);
@@ -567,7 +574,7 @@ static UINT8 m68040_win_layout[] = {
 
 static void m68040_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	m68k_init();
+	m68k_init(index);
 	m68k_set_cpu_type(M68K_CPU_TYPE_68040);
 	m68k_memory_intf = interface_d32;
 	m68k_state_register("m68040", index);

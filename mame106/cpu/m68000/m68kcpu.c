@@ -1,7 +1,7 @@
 /* ======================================================================== */
 /* ========================= LICENSING & COPYRIGHT ======================== */
 /* ======================================================================== */
-
+#include "driver.h"
 #if 0
 static const char* copyright_notice =
 "MUSASHI\n"
@@ -32,9 +32,13 @@ static const char* copyright_notice =
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "m68kops.h"
 #include "m68kcpu.h"
 #include "m68kfpu.c"
+
 
 extern void m68040_fpu_op0(M68KOPT_PARAMS);
 extern void m68040_fpu_op1(M68KOPT_PARAMS);
@@ -49,7 +53,7 @@ int  m68ki_remaining_cycles = 0;                     /* Number of clocks remaini
 uint m68ki_tracing = 0;
 uint m68ki_address_space;
 
-struct m68ki_cpu_core *m68ki_cpus[8]={NULL};
+struct m68k_cpu_instance *m68ki_cpus[MAX_CPU]={NULL};
 
 #ifdef M68K_LOG_ENABLE
 const char* m68ki_cpu_names[] =
@@ -450,6 +454,14 @@ uint8 m68ki_ea_idx_cycle_table[64] =
 /* ======================================================================== */
 extern int activecpu;
 static inline struct m68ki_cpu_core *getActivecpu() {
+    if(activecpu <0 ) {
+        printf("68k: getActivecpu() called when activecpu<0\n");
+        exit(1);
+    }
+    if(activecpu >3 ) {
+        printf("68k:getActivecpu() >3 not supported atm\n");
+        exit(1);
+    }
     return m68ki_cpus[activecpu];
 }
 
@@ -635,59 +647,52 @@ void m68k_set_reg(m68k_register_t regnum, unsigned int value)
 }
 
 /* Set the callbacks */
-void m68k_set_int_ack_callback(int  (*callback)(int int_level))
+void m68k_set_int_ack_callback(M68KOPT_PARAMS, int  (*callback)(int int_level))
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_INT_ACK = callback ? callback : default_int_ack_callback;
 }
 
-void m68k_set_bkpt_ack_callback(void  (*callback)(unsigned int data))
+void m68k_set_bkpt_ack_callback(M68KOPT_PARAMS, void  (*callback)(unsigned int data))
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_BKPT_ACK = callback ? callback : default_bkpt_ack_callback;
 }
 
-void m68k_set_reset_instr_callback(void  (*callback)(void))
+void m68k_set_reset_instr_callback(M68KOPT_PARAMS, void  (*callback)(void))
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_RESET_INSTR = callback ? callback : default_reset_instr_callback;
 }
 
-void m68k_set_cmpild_instr_callback(void  (*callback)(unsigned int, int))
+void m68k_set_cmpild_instr_callback(M68KOPT_PARAMS, void  (*callback)(unsigned int, int))
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_CMPILD_INSTR = callback ? callback : default_cmpild_instr_callback;
 }
 
-void m68k_set_rte_instr_callback(void  (*callback)(void))
+void m68k_set_rte_instr_callback(M68KOPT_PARAMS, void  (*callback)(void))
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_RTE_INSTR = callback ? callback : default_rte_instr_callback;
 }
 
-void m68k_set_pc_changed_callback(void  (*callback)(unsigned int new_pc))
+void m68k_set_pc_changed_callback(M68KOPT_PARAMS, void  (*callback)(unsigned int new_pc))
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
 	CALLBACK_PC_CHANGED = callback ? callback : default_pc_changed_callback;
 }
 
-void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc))
-{
-    struct m68ki_cpu_core *p68k = getActivecpu();
-	CALLBACK_SET_FC = callback ? callback : default_set_fc_callback;
-}
+//void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc))
+//{
+//    struct m68ki_cpu_core *p68k = getActivecpu();
+//	CALLBACK_SET_FC = callback ? callback : default_set_fc_callback;
+//}
 
-void m68k_set_instr_hook_callback(void  (*callback)(void))
-{
-    struct m68ki_cpu_core *p68k = getActivecpu();
-	CALLBACK_INSTR_HOOK = callback ? callback : default_instr_hook_callback;
-}
+//void m68k_set_instr_hook_callback(void  (*callback)(void))
+//{
+//    struct m68ki_cpu_core *p68k = getActivecpu();
+//	CALLBACK_INSTR_HOOK = callback ? callback : default_instr_hook_callback;
+//}
 
 #include <stdio.h>
 /* Set the CPU type. */
 void m68k_set_cpu_type(unsigned int cpu_type)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
 	switch(cpu_type)
 	{
 		case M68K_CPU_TYPE_68000:
@@ -895,25 +900,37 @@ void m68k_set_irq(unsigned int int_level)
 		m68ki_check_interrupts(p68k); /* Level triggered (IRQ) */
 }
 
-void m68k_init(void)
+struct m68k_cpu_core *m68k_getcpu(int index)
 {
+  struct m68ki_cpu_core *p68k = &(m68ki_cpus[cpuindex]->m_cpu);
+  return p68k;
+}
+
+void m68k_init(int cpuindex)
+{
+    m68ki_cpus[cpuindex] = auto_malloc(sizeof(struct m68k_cpu_instance));
+	memset(m68ki_cpus[cpuindex], 0, sizeof(struct m68k_cpu_instance));
+
+    struct m68ki_cpu_core *p68k = &(m68ki_cpus[cpuindex]->m_cpu);
+
+    printf(" ** m68k_init, may do m68ki_build_opcode_table\n");
 	static uint emulation_initialized = 0;
 
 	/* The first call to this function initializes the opcode handler jump table */
 	if(!emulation_initialized)
-		{
+	{
 		m68ki_build_opcode_table();
 		emulation_initialized = 1;
 	}
 
-	m68k_set_int_ack_callback(NULL);
-	m68k_set_bkpt_ack_callback(NULL);
-	m68k_set_reset_instr_callback(NULL);
-	m68k_set_cmpild_instr_callback(NULL);
-	m68k_set_rte_instr_callback(NULL);
-	m68k_set_pc_changed_callback(NULL);
-	m68k_set_fc_callback(NULL);
-	m68k_set_instr_hook_callback(NULL);
+	m68k_set_int_ack_callback( p68k, NULL);
+	m68k_set_bkpt_ack_callback( p68k, NULL);
+	m68k_set_reset_instr_callback( p68k, NULL);
+	m68k_set_cmpild_instr_callback( p68k, NULL);
+	m68k_set_rte_instr_callback( p68k, NULL);
+	m68k_set_pc_changed_callback( p68k, NULL);
+//	m68k_set_fc_callback(NULL);
+//	m68k_set_instr_hook_callback(NULL);
 }
 
 /* Pulse the RESET line on the CPU */
@@ -1019,10 +1036,9 @@ static void m68k_post_load(void)
 	m68ki_jump(p68k,REG_PC);
 }
 
-void m68k_state_register(const char *type, int index)
+void m68k_state_register(M68KOPT_PARAMS, const char *type, int index)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
-        /* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
+    /* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
 
 	state_save_register_item_array(type, index, REG_D);
 	state_save_register_item(type, index, REG_PPC);

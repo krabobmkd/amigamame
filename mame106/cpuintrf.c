@@ -11,7 +11,7 @@
 
 #include "driver.h"
 
-
+#include <stdio.h>
 
 /*************************************
  *
@@ -779,6 +779,7 @@ static int temp_string_pool_index;
 
 INLINE void set_cpu_context(int cpunum)
 {
+//   printf("    set_cpu_context:%d\n",cpunum);
 	int newfamily = cpu[cpunum].family;
 	int oldcontext = cpu_active_context[newfamily];
 
@@ -808,6 +809,7 @@ INLINE void set_cpu_context(int cpunum)
 
 void cpuintrf_push_context(int cpunum)
 {
+   //printf("cpuintrf_push_context:\n");
 	/* push the old context onto the stack */
 	cpu_context_stack[cpu_context_stack_ptr++] = activecpu;
 
@@ -822,6 +824,7 @@ void cpuintrf_push_context(int cpunum)
 
 void cpuintrf_pop_context(void)
 {
+   //printf("    cpuintrf_pop_context:%d\n",cpunum);
 	/* push the old context onto the stack */
 	int cpunum = cpu_context_stack[--cpu_context_stack_ptr];
 
@@ -1001,6 +1004,8 @@ void cpuintrf_set_dasm_override(unsigned (*dasm_override)(int cpunum, char *buff
 
 int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, int (*irqcallback)(int))
 {
+//printf("cpuintrf_init_cpu:%d, %d\n",cpunum,cputype);
+//printf("cpu[cpunum].intf.context_size:%d\n",cpu[cpunum].intf.context_size);
 	/* allocate a context buffer for the CPU */
 	cpu[cpunum].context = auto_malloc(cpu[cpunum].intf.context_size);
 	memset(cpu[cpunum].context, 0, cpu[cpunum].intf.context_size);
@@ -1026,6 +1031,8 @@ int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, in
 
 void cpuintrf_exit_cpu(int cpunum)
 {
+    printf("cpuintrf_exit_cpu:%d ->may use exit()\n",cpunum);
+
 	/* if the CPU core defines an exit function, call it now */
 	if (cpu[cpunum].intf.exit)
 	{
@@ -1449,7 +1456,7 @@ void cpunum_set_info_fct(int cpunum, UINT32 state, genf *data)
 int cpunum_execute(int cpunum, int cycles)
 {
 	int ran;
-	VERIFY_CPUNUM(cpunum_execute);
+//krb	VERIFY_CPUNUM(cpunum_execute);
 	cpuintrf_push_context(cpunum);
 	executingcpu = cpunum;
 	memory_set_opbase(activecpu_get_physical_pc_byte());
