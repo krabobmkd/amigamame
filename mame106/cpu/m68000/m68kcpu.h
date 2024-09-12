@@ -852,11 +852,19 @@ typedef union
 
 struct m68ki_cpu_core
 {
-	uint cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, or 68020 */
 	uint dar[16];      /* Data and Address Registers */
-	uint ppc;		   /* Previous program counter */
+	uint ppc;		   /* Previous program counter */    
 	uint pc;           /* Program Counter */
+
+    // ccr is used a lot so keep it near.
+    uint x_flag;       /* Extend */
+	uint n_flag;       /* Negative */
+	uint not_z_flag;   /* Zero, inverted for speedups */
+	uint v_flag;       /* Overflow */
+	uint c_flag;       /* Carry */
+
 	uint sp[7];        /* User, Interrupt, and Master Stack Pointers */
+
 	uint vbr;          /* Vector Base Register (m68010+) */
 	uint sfc;          /* Source Function Code Register (m68010+) */
 	uint dfc;          /* Destination Function Code Register (m68010+) */
@@ -873,15 +881,12 @@ struct m68ki_cpu_core
 	uint s_flag;       /* Supervisor */
 	uint m_flag;       /* Master/Interrupt state */
 
-    uint x_flag;       /* Extend */
-	uint n_flag;       /* Negative */
-	uint not_z_flag;   /* Zero, inverted for speedups */
-	uint v_flag;       /* Overflow */
-	uint c_flag;       /* Carry */
 	uint int_mask;     /* I0-I2 */
 	uint int_level;    /* State of interrupt pins IPL0-IPL2 -- ASG: changed from ints_pending */
 	uint int_cycles;   /* ASG: extra cycles from generated interrupts */
 	uint stopped;      /* Stopped state */
+    uint cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, or 68020 */
+
 
    //krb uint pref_addr;    /* Last prefetch address */
    //krb uint pref_data;    /* Data in the prefetch queue */
