@@ -360,7 +360,7 @@ static void pit( void *dest, const void *source, const UINT8 *pMask, int mask, i
 /***********************************************************************************/
 
 #ifndef pdo16
-static void pdo16( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+void pdo16( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
 {
 	int i;
 	memcpy( dest,source,count*sizeof(UINT16) );

@@ -281,7 +281,7 @@ void m68k_set_pc_changed_callback(M68KOPT_PARAMS, void  (*callback)(unsigned int
  */
 void m68k_set_cpu_type(M68KOPT_PARAMS, unsigned int cpu_type);
 
-struct m68k_cpu_core *m68k_getcpu(int index);
+struct m68ki_cpu_core *m68k_getcpu(int index);
 /* Do whatever initialisations the core requires.  Should be called
  * at least once at init time.
  */
@@ -331,7 +331,7 @@ unsigned int m68k_get_context(void* dst);
 void m68k_set_context(void* dst);
 
 /* Register the CPU state information */
-void m68k_state_register(const char *type, int index);
+void m68k_state_register(M68KOPT_PARAMS, const char *type, int index);
 
 
 /* Peek at the internals of a CPU context.  This can either be a context

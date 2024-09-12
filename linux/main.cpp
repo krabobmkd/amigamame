@@ -68,7 +68,8 @@ int main(int argc, char **argv)
 
     int idriver = -1;
     // test if just "mame romname".
-    int itest = getMainConfig().driverIndex().index("bublbobl");
+//    int itest = getMainConfig().driverIndex().index("bublbobl");
+    int itest = getMainConfig().driverIndex().index("outrun");
     if(itest>0) idriver= itest;
 
 

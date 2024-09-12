@@ -5,7 +5,7 @@
 #include "m68000.h"
 #include "state.h"
 #include "m68kkrbopt.h"
-
+#include "m68kcpu.h"
 
 /* global access */
 
@@ -275,7 +275,7 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 {
     printf(" ***** m68000_init\n");
 	m68k_init(index);
-    struct m68k_cpu_core *p68k = m68k_getcpu(index);
+    struct m68ki_cpu_core *p68k = m68k_getcpu(index);
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68000);
 
@@ -284,7 +284,7 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 #else
     m68k_memory_intf = interface_d16;
 #endif
-    m68k_state_register("m68000", index);
+    m68k_state_register(p68k,"m68000", index);
 	m68k_set_int_ack_callback(p68k, irqcallback);
 }
 
@@ -461,7 +461,9 @@ static void m68020_init(int index, int clock, const void *config, int (*irqcallb
     printf(" ***** m68020_init\n");
 
 	m68k_init(index);
-	m68k_set_cpu_type(M68K_CPU_TYPE_68020);
+    struct m68ki_cpu_core *p68k = m68k_getcpu(index);
+
+	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68020);
 
 #ifdef OPTIM68K_USEFAST32INTRF
     m68k_memory_intf = interface_fast32;
@@ -469,8 +471,8 @@ static void m68020_init(int index, int clock, const void *config, int (*irqcallb
     m68k_memory_intf = interface_d32;
 #endif
 
-	m68k_state_register("m68020", index);
-	m68k_set_int_ack_callback(irqcallback);
+	m68k_state_register(p68k,"m68020", index);
+	m68k_set_int_ack_callback(p68k,irqcallback);
 }
 
 static void m68020_reset(void)
@@ -522,10 +524,12 @@ static void m68ec020_init(int index, int clock, const void *config, int (*irqcal
 {   
     printf(" **** m68ec020_init\n");
 	m68k_init(index);
-	m68k_set_cpu_type(M68K_CPU_TYPE_68EC020);
+    struct m68ki_cpu_core *p68k = m68k_getcpu(index);
+
+	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68EC020);
 	m68k_memory_intf = interface_d32;
-	m68k_state_register("m68ec020", index);
-	m68k_set_int_ack_callback(irqcallback);
+	m68k_state_register(p68k,"m68ec020", index);
+	m68k_set_int_ack_callback(p68k,irqcallback);
 }
 
 static offs_t m68ec020_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, int bytes)
@@ -575,10 +579,12 @@ static UINT8 m68040_win_layout[] = {
 static void m68040_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	m68k_init(index);
-	m68k_set_cpu_type(M68K_CPU_TYPE_68040);
+    struct m68ki_cpu_core *p68k = m68k_getcpu(index);
+
+	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68040);
 	m68k_memory_intf = interface_d32;
-	m68k_state_register("m68040", index);
-	m68k_set_int_ack_callback(irqcallback);
+	m68k_state_register(p68k,"m68040", index);
+	m68k_set_int_ack_callback(p68k,irqcallback);
 }
 
 static void m68040_reset(void)
@@ -630,6 +636,7 @@ static offs_t m68040_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, i
 
 static void m68000_set_info(UINT32 state, union cpuinfo *info)
 {
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 //    printf("m68000_set_info:%d\n",state);
 	switch (state)
 	{
@@ -669,9 +676,9 @@ static void m68000_set_info(UINT32 state, union cpuinfo *info)
 //		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:	m68k_set_reg(M68K_REG_PREF_ADDR, info->i);	break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M68K_RESET_CALLBACK:		m68k_set_reset_instr_callback(info->f);		break;
-		case CPUINFO_PTR_M68K_CMPILD_CALLBACK:		m68k_set_cmpild_instr_callback((void (*)(unsigned int,int))(info->f));		break;
-		case CPUINFO_PTR_M68K_RTE_CALLBACK:			m68k_set_rte_instr_callback(info->f);		break;
+		case CPUINFO_PTR_M68K_RESET_CALLBACK:		m68k_set_reset_instr_callback(p68k,info->f);		break;
+		case CPUINFO_PTR_M68K_CMPILD_CALLBACK:		m68k_set_cmpild_instr_callback(p68k,(void (*)(unsigned int,int))(info->f));		break;
+		case CPUINFO_PTR_M68K_RTE_CALLBACK:			m68k_set_rte_instr_callback(p68k,info->f);		break;
 	}
 }
 
@@ -687,7 +694,7 @@ void m68000_get_info(UINT32 state, union cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = m68k_get_context(NULL);		break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = m68k_context_size();		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
@@ -866,7 +873,7 @@ void m68008_get_info(UINT32 state, union cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = m68k_get_context(NULL);		break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = m68k_context_size();		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
@@ -1055,6 +1062,7 @@ void m68010_get_info(UINT32 state, union cpuinfo *info)
 
 static void m68020_set_info(UINT32 state, union cpuinfo *info)
 {
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1098,9 +1106,9 @@ static void m68020_set_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_DFC:		m68k_set_reg(M68K_REG_DFC, info->i);		break; /* 68010+ */
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M68K_RESET_CALLBACK:		m68k_set_reset_instr_callback(info->f);		break;
-		case CPUINFO_PTR_M68K_CMPILD_CALLBACK:		m68k_set_cmpild_instr_callback((void (*)(unsigned int,int))(info->f));		break;
-		case CPUINFO_PTR_M68K_RTE_CALLBACK:			m68k_set_rte_instr_callback(info->f);		break;
+		case CPUINFO_PTR_M68K_RESET_CALLBACK:		m68k_set_reset_instr_callback(p68k,info->f);		break;
+		case CPUINFO_PTR_M68K_CMPILD_CALLBACK:		m68k_set_cmpild_instr_callback(p68k,(void (*)(unsigned int,int))(info->f));		break;
+		case CPUINFO_PTR_M68K_RTE_CALLBACK:			m68k_set_rte_instr_callback(p68k,info->f);		break;
 	}
 }
 
@@ -1111,7 +1119,7 @@ void m68020_get_info(UINT32 state, union cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = m68k_get_context(NULL);		break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = m68k_context_size();		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
@@ -1271,11 +1279,18 @@ static void m68ec020_set_info(UINT32 state, union cpuinfo *info)
 
 void m68ec020_get_info(UINT32 state, union cpuinfo *info)
 {
+#define THAT_REG_PC  (CPUINFO_INT_PC - CPUINFO_INT_REGISTER)
+    if(state == (CPUINFO_INT_REGISTER + THAT_REG_PC))
+    {
+        info->i = m68k_get_reg(NULL, M68K_REG_PC)&0x00ffffff;
+        return;
+    }
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 24;					break;
-		case CPUINFO_INT_REGISTER + REG_PC:				info->i = m68k_get_reg(NULL, M68K_REG_PC)&0x00ffffff; break;
+//		case CPUINFO_INT_REGISTER + THAT_REG_PC:				info->i = m68k_get_reg(NULL, M68K_REG_PC)&0x00ffffff; break;
+
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68ec020_set_info;		break;
@@ -1298,6 +1313,7 @@ void m68ec020_get_info(UINT32 state, union cpuinfo *info)
 
 static void m68040_set_info(UINT32 state, union cpuinfo *info)
 {
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1341,9 +1357,9 @@ static void m68040_set_info(UINT32 state, union cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_DFC:		m68k_set_reg(M68K_REG_DFC, info->i);		break; /* 68010+ */
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M68K_RESET_CALLBACK:		m68k_set_reset_instr_callback(info->f);		break;
-		case CPUINFO_PTR_M68K_CMPILD_CALLBACK:		m68k_set_cmpild_instr_callback((void (*)(unsigned int,int))(info->f));		break;
-		case CPUINFO_PTR_M68K_RTE_CALLBACK:			m68k_set_rte_instr_callback(info->f);		break;
+		case CPUINFO_PTR_M68K_RESET_CALLBACK:		m68k_set_reset_instr_callback(p68k,info->f);		break;
+		case CPUINFO_PTR_M68K_CMPILD_CALLBACK:		m68k_set_cmpild_instr_callback(p68k,(void (*)(unsigned int,int))(info->f));		break;
+		case CPUINFO_PTR_M68K_RTE_CALLBACK:			m68k_set_rte_instr_callback(p68k,info->f);		break;
 	}
 }
 
@@ -1357,7 +1373,7 @@ void m68040_get_info(UINT32 state, union cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = m68k_get_context(NULL);		break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = m68k_context_size();		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;

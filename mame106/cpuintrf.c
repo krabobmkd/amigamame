@@ -753,9 +753,9 @@ UINT8 default_win_layout[] =
  *
  *************************************/
 
-int activecpu;		/* index of active CPU (or -1) */
-int executingcpu;	/* index of executing CPU (or -1) */
-int totalcpu;		/* total number of CPUs */
+int activecpu=-1;		/* index of active CPU (or -1) */
+int executingcpu=-1;	/* index of executing CPU (or -1) */
+int totalcpu=0;		/* total number of CPUs */
 
 static cpuintrf_data cpu[MAX_CPU];
 
@@ -1011,9 +1011,12 @@ int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, in
 	memset(cpu[cpunum].context, 0, cpu[cpunum].intf.context_size);
 
 	/* initialize the CPU and stash the context */
+    printf("cpuintrf_init_cpu:%d\n",cpunum);
 	activecpu = cpunum;
 	(*cpu[cpunum].intf.init)(cpunum, clock, config, irqcallback);
 	(*cpu[cpunum].intf.get_context)(cpu[cpunum].context);
+
+    printf("cpuintrf_init_cpu: activecpu -1\n");
 	activecpu = -1;
 
 	/* clear out the registered CPU for this family */

@@ -452,17 +452,20 @@ uint8 m68ki_ea_idx_cycle_table[64] =
 /* ======================================================================== */
 /* =============================== CALLBACKS ============================== */
 /* ======================================================================== */
+// kepp the last set
 extern int activecpu;
-static inline struct m68ki_cpu_core *getActivecpu() {
-    if(activecpu <0 ) {
+int m68k_activecpu=-1;
+struct m68ki_cpu_core *m68k_getActivecpu() {
+    if(m68k_activecpu==-1 && activecpu != -1) m68k_activecpu = activecpu;
+    if(m68k_activecpu <0 ) {
         printf("68k: getActivecpu() called when activecpu<0\n");
         exit(1);
     }
-    if(activecpu >3 ) {
+    if(m68k_activecpu >=MAX_CPU ) {
         printf("68k:getActivecpu() >3 not supported atm\n");
         exit(1);
     }
-    return m68ki_cpus[activecpu];
+    return &m68ki_cpus[m68k_activecpu]->m_cpu;
 }
 
 /* Default callbacks used if the callback hasn't been set yet, or if the
@@ -473,7 +476,7 @@ static inline struct m68ki_cpu_core *getActivecpu() {
 static int default_int_ack_callback_data;
 static int default_int_ack_callback(int int_level)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	default_int_ack_callback_data = int_level;
 	CPU_INT_LEVEL = 0;
 	return M68K_INT_ACK_AUTOVECTOR;
@@ -534,7 +537,7 @@ static void default_instr_hook_callback(void)
 /* Access the internals of the CPU */
 unsigned int m68k_get_reg(void* context, m68k_register_t regnum)
 {
-	struct m68ki_cpu_core* cpu = context != NULL ?(struct m68ki_cpu_core*)context : getActivecpu();
+	struct m68ki_cpu_core* cpu = context != NULL ?(struct m68ki_cpu_core*)context : m68k_getActivecpu();
 
 	switch(regnum)
 	{
@@ -596,7 +599,7 @@ unsigned int m68k_get_reg(void* context, m68k_register_t regnum)
 
 void m68k_set_reg(m68k_register_t regnum, unsigned int value)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	switch(regnum)
 	{
 		case M68K_REG_D0:	REG_D[0] = MASK_OUT_ABOVE_32(value); return;
@@ -641,7 +644,7 @@ void m68k_set_reg(m68k_register_t regnum, unsigned int value)
 		case M68K_REG_PPC:	REG_PPC = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_IR:	REG_IR = MASK_OUT_ABOVE_16(value); return;
 	//	case M68K_REG_PREF_ADDR:	CPU_PREF_ADDR = MASK_OUT_ABOVE_32(value); return;
-		case M68K_REG_CPU_TYPE: m68k_set_cpu_type(value); return;
+		case M68K_REG_CPU_TYPE: m68k_set_cpu_type(p68k,value); return;
 		default:			return;
 	}
 }
@@ -691,7 +694,7 @@ void m68k_set_pc_changed_callback(M68KOPT_PARAMS, void  (*callback)(unsigned int
 
 #include <stdio.h>
 /* Set the CPU type. */
-void m68k_set_cpu_type(unsigned int cpu_type)
+void m68k_set_cpu_type(M68KOPT_PARAMS, unsigned int cpu_type)
 {
 	switch(cpu_type)
 	{
@@ -798,7 +801,7 @@ void m68k_set_cpu_type(unsigned int cpu_type)
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(int num_cycles)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	/* Make sure we're not stopped */
 	if(!CPU_STOPPED)
 	{
@@ -858,7 +861,7 @@ int m68k_execute(int num_cycles)
 
 int m68k_cycles_run(void)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	return m68ki_initial_cycles - GET_CYCLES();
 }
 
@@ -888,7 +891,7 @@ void m68k_end_timeslice(void)
  */
 void m68k_set_irq(unsigned int int_level)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	uint old_level = CPU_INT_LEVEL;
 	CPU_INT_LEVEL = int_level << 8;
 
@@ -900,10 +903,10 @@ void m68k_set_irq(unsigned int int_level)
 		m68ki_check_interrupts(p68k); /* Level triggered (IRQ) */
 }
 
-struct m68k_cpu_core *m68k_getcpu(int index)
+struct m68ki_cpu_core *m68k_getcpu(int index)
 {
-  struct m68ki_cpu_core *p68k = &(m68ki_cpus[cpuindex]->m_cpu);
-  return p68k;
+//  struct m68ki_cpu_core *p68k = &(m68ki_cpus[index]->m_cpu);
+  return &(m68ki_cpus[index]->m_cpu);
 }
 
 void m68k_init(int cpuindex)
@@ -936,7 +939,7 @@ void m68k_init(int cpuindex)
 /* Pulse the RESET line on the CPU */
 void m68k_pulse_reset(void)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	/* Clear all stop levels and eat up all remaining cycles */
 	CPU_STOPPED = 0;
 	SET_CYCLES(0);
@@ -971,7 +974,7 @@ void m68k_pulse_reset(void)
 /* Pulse the HALT line on the CPU */
 void m68k_pulse_halt(void)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	CPU_STOPPED |= STOP_LEVEL_HALT;
 }
 
@@ -980,26 +983,22 @@ void m68k_pulse_halt(void)
 /* This is to allow for multiple CPUs */
 unsigned int m68k_context_size()
 {
-    return sizeof(struct m68ki_cpu_core *);
-    /*
-	return sizeof(m68ki_cpu_core);
-    */
+	return sizeof(struct m68ki_cpu_core);
 }
 
 unsigned int m68k_get_context(void* dst)
-{
-    /*
-    struct m68ki_cpu_core *p68k = getActivecpu();
-	if(dst) *(m68ki_cpu_core*)dst = *p68k; // m68ki_cpu;
-	return sizeof(m68ki_cpu_core);
-    */
+{    
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
+	if(dst && p68k) *(struct m68ki_cpu_core*)dst = *p68k;  // nasty struct copy that can happens  a lot.
+	return sizeof(struct m68ki_cpu_core);
+
 }
 
 void m68k_set_context(void* src)
-{
-    /*
-	if(src) m68ki_cpu = *(m68ki_cpu_core*)src;
-    */
+{    
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
+	if(src && p68k) (*p68k) = *(struct m68ki_cpu_core*)src;
+
 }
 
 
@@ -1021,7 +1020,7 @@ static struct {
 // must be void f(void)
 static void m68k_prepare_substate(void)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	m68k_substate.sr = m68ki_get_sr();
 	m68k_substate.stopped = (CPU_STOPPED & STOP_LEVEL_STOP) != 0;
 	m68k_substate.halted  = (CPU_STOPPED & STOP_LEVEL_HALT) != 0;
@@ -1029,7 +1028,7 @@ static void m68k_prepare_substate(void)
 
 static void m68k_post_load(void)
 {
-    struct m68ki_cpu_core *p68k = getActivecpu();
+    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
 	m68ki_set_sr_noint_nosp(p68k, m68k_substate.sr);
 	CPU_STOPPED = m68k_substate.stopped ? STOP_LEVEL_STOP : 0
 		        | m68k_substate.halted  ? STOP_LEVEL_HALT : 0;
