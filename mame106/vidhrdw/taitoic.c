@@ -5217,7 +5217,7 @@ READ16_HANDLER( TC0220IOC_halfword_port_r )
 
 WRITE16_HANDLER( TC0220IOC_halfword_port_w )
 {
-	if (ACCESSING_LSB)
+//Re	if (ACCESSING_LSB)
 		TC0220IOC_port_w( offset, data & 0xff );
 }
 
@@ -5228,7 +5228,7 @@ READ16_HANDLER( TC0220IOC_halfword_portreg_r )
 
 WRITE16_HANDLER( TC0220IOC_halfword_portreg_w )
 {
-	if (ACCESSING_LSB)
+//	if (ACCESSING_LSB)
 		TC0220IOC_portreg_w( offset, data & 0xff );
 }
 

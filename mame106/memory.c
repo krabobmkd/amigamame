@@ -791,7 +791,7 @@ UINT32 memory_readmovem32(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 
 	{
     	read32_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler32;
         UINT16 i = 0;
-        uint count = 0;
+        UINT32 count = 0;
         address>>=2;
         for(; i < 16; i++)
         {
@@ -809,7 +809,7 @@ UINT32 memory_readmovem32(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 
     // - - - - - - - - -
     UINT32 *pread = (UINT32 *) &bank_ptr[entry][address];
     UINT16 i = 0;
-    uint count = 0;
+    UINT32 count = 0;
 	for(; i < 16; i++)
     {
 		if(bits & 1)
@@ -839,7 +839,7 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
     	//write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
     	write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
         UINT16 i = 0;
-        uint count = 0;
+        UINT32 count = 0;
         address>>=1;
         for(; i < 16; i++)
         {
@@ -861,7 +861,7 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
     // - - - - - - - - -
     UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
     UINT16 i = 0;
-    uint count = 0;
+    UINT32 count = 0;
 	for(; i < 16; i++)
     {
 		if(bits & 1)
@@ -877,7 +877,7 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
 UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
 {
     UINT16 i = 0;
-    uint count = 0;
+    UINT32 count = 0;
 
     if (!(address & 3))
     {
@@ -899,7 +899,7 @@ UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits
             if(bits & 1)
             {
                 address-=4;
-                uint v = preg[15-i];
+                UINT32 v = preg[15-i];
                 //krb: in the 68k world, pair writing crash, let's economise a test.
                 program_write_word_32be(address, v >> 16);
                 program_write_word_32be(address + 2, v);
@@ -931,7 +931,7 @@ UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REG
             //program_write_dword_32be(address, data);
             write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
             UINT16 i = 0;
-            uint count = 0;
+            UINT32 count = 0;
             address>>=2;
             for(; i < 16; i++)
             {
@@ -949,7 +949,7 @@ UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REG
             // 16bit aligned ? we hope.
             write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
             UINT16 i = 0;
-            uint count = 0;
+            UINT32 count = 0;
             address>>=1;
             for(; i < 16; i++)
             {
@@ -974,7 +974,7 @@ UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REG
     // - - - - - - - - -
     UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
     UINT16 i = 0;
-    uint count = 0;
+    UINT32 count = 0;
 	for(; i < 16; i++)
     {
 		if(bits & 1)

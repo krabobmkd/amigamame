@@ -1005,7 +1005,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 WRITE16_HANDLER( contcirc_out_w )
 {
-	if (ACCESSING_LSB)
+//Re	if (ACCESSING_LSB)
 	{
 		/* bit 0 = reset sub CPU */
 		cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
