@@ -813,28 +813,28 @@ int m68k_execute(int num_cycles)
 		m68ki_set_address_error_trap(); /* auto-disable (see m68kcpu.h) */
 
 		/* Main loop.  Keep going until we run out of clock cycles */
+
 		do
 		{
-			/* Set tracing accodring to T1. (T0 is done inside instruction) */
-			//m68ki_trace_t1(); /* auto-disable (see m68kcpu.h) */
-
-			/* Set the address space for reads */
-			//m68ki_use_data_space(); /* auto-disable (see m68kcpu.h) */
-
-			/* Call external hook to peek at CPU */
-			//m68ki_instr_hook(); /* auto-disable (see m68kcpu.h) */
-
-			/* Record previous program counter */
+#ifndef OPTIM68K_SQUEEZEPPCREG
+			// Record previous program counter
 			REG_PPC = REG_PC;
+#endif
+			// Read an instruction and call its handler
+			int ir = REG_IR = m68ki_read_imm_16(p68k);
+			m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
+			m68ki_instruction_jump_table[ir](M68KOPT_PASSPARAMS);
 
-			/* Read an instruction and call its handler */
+		} while(m68k_ICount > 0);
+        /* original:
+        do
+		{
+			REG_PPC = REG_PC;
 			REG_IR = m68ki_read_imm_16(p68k);
 			m68ki_instruction_jump_table[REG_IR](M68KOPT_PASSPARAMS);
-			USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
-
-			/* Trace m68k_exception, if necessary */
-			//m68ki_exception_if_trace(); /* auto-disable (see m68kcpu.h) */
-		} while(GET_CYCLES() > 0);
+            m68k_ICount -= CYC_INSTRUCTION[REG_IR]; // krb moved before exec
+		} while(m68k_ICount > 0);
+*/
 
 		/* set previous PC to current PC for the next entry into the loop */
 		REG_PPC = REG_PC;

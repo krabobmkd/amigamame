@@ -4375,8 +4375,10 @@ void m68k_op_jmp_32_ai(M68KOPT_PARAMS)
 {
 	m68ki_jump(M68KOPT_PASSPARAMS, EA_AY_AI_32());
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	if(REG_PC == REG_PPC)
+#ifndef OPTIM68K_SQUEEZEPPCREG
+    if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
+#endif
 }
 
 
@@ -4384,8 +4386,10 @@ void m68k_op_jmp_32_di(M68KOPT_PARAMS)
 {
 	m68ki_jump(M68KOPT_PASSPARAMS, EA_AY_DI_32());
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	if(REG_PC == REG_PPC)
+#ifndef OPTIM68K_SQUEEZEPPCREG
+    if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
+#endif
 }
 
 
@@ -4393,8 +4397,10 @@ void m68k_op_jmp_32_ix(M68KOPT_PARAMS)
 {
 	m68ki_jump(M68KOPT_PASSPARAMS, EA_AY_IX_32());
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	if(REG_PC == REG_PPC)
+#ifndef OPTIM68K_SQUEEZEPPCREG
+    if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
+#endif
 }
 
 
@@ -4402,8 +4408,10 @@ void m68k_op_jmp_32_aw(M68KOPT_PARAMS)
 {
 	m68ki_jump(M68KOPT_PASSPARAMS, EA_AW_32());
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	if(REG_PC == REG_PPC)
+#ifndef OPTIM68K_SQUEEZEPPCREG
+    if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
+#endif
 }
 
 
@@ -4411,8 +4419,10 @@ void m68k_op_jmp_32_al(M68KOPT_PARAMS)
 {
 	m68ki_jump(M68KOPT_PASSPARAMS, EA_AL_32());
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
+#ifndef OPTIM68K_SQUEEZEPPCREG
 	if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
+#endif
 }
 
 
@@ -4420,8 +4430,10 @@ void m68k_op_jmp_32_pcdi(M68KOPT_PARAMS)
 {
 	m68ki_jump(M68KOPT_PASSPARAMS, EA_PCDI_32());
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	if(REG_PC == REG_PPC)
+#ifndef OPTIM68K_SQUEEZEPPCREG
+    if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
+#endif
 }
 
 
@@ -4429,8 +4441,10 @@ void m68k_op_jmp_32_pcix(M68KOPT_PARAMS)
 {
 	m68ki_jump(M68KOPT_PASSPARAMS, EA_PCIX_32());
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
+#ifndef OPTIM68K_SQUEEZEPPCREG
 	if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
+#endif
 }
 
 
@@ -12321,8 +12335,8 @@ void m68k_op_mull_32_d(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = DY;
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -12386,8 +12400,8 @@ void m68k_op_mull_32_d(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -12445,8 +12459,8 @@ void m68k_op_mull_32_ai(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_AY_AI_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -12510,8 +12524,8 @@ void m68k_op_mull_32_ai(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -12569,8 +12583,8 @@ void m68k_op_mull_32_pi(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_AY_PI_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -12634,8 +12648,8 @@ void m68k_op_mull_32_pi(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -12693,8 +12707,8 @@ void m68k_op_mull_32_pd(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_AY_PD_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -12758,8 +12772,8 @@ void m68k_op_mull_32_pd(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -12817,8 +12831,8 @@ void m68k_op_mull_32_di(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_AY_DI_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -12882,8 +12896,8 @@ void m68k_op_mull_32_di(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -12941,8 +12955,8 @@ void m68k_op_mull_32_ix(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_AY_IX_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -13006,8 +13020,8 @@ void m68k_op_mull_32_ix(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -13065,8 +13079,8 @@ void m68k_op_mull_32_aw(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_AW_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -13130,8 +13144,8 @@ void m68k_op_mull_32_aw(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -13189,8 +13203,8 @@ void m68k_op_mull_32_al(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_AL_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -13254,8 +13268,8 @@ void m68k_op_mull_32_al(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -13313,8 +13327,8 @@ void m68k_op_mull_32_pcdi(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_PCDI_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -13378,8 +13392,8 @@ void m68k_op_mull_32_pcdi(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -13437,8 +13451,8 @@ void m68k_op_mull_32_pcix(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+//	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+//	{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_PCIX_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -13502,8 +13516,8 @@ void m68k_op_mull_32_pcix(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }
@@ -13561,8 +13575,8 @@ void m68k_op_mull_32_i(M68KOPT_PARAMS)
 
 #else
 
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{
+	//if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+	//{
 		uint word2 = OPER_I_16(M68KOPT_PASSPARAMS);
 		uint src = OPER_I_32(M68KOPT_PASSPARAMS);
 		uint dst = REG_D[(word2 >> 12) & 7];
@@ -13626,8 +13640,8 @@ void m68k_op_mull_32_i(M68KOPT_PARAMS)
 		else
 			FLAG_V = (hi != 0) << 7;
 		return;
-	}
-	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
+//	}
+//	m68ki_exception_illegal(M68KOPT_PASSPARAMS);
 
 #endif
 }

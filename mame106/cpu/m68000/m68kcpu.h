@@ -323,7 +323,14 @@ struct m68ki_cpu_core *m68k_getActivecpu();
 #define REG_DFC          p68k->dfc
 #define REG_CACR         p68k->cacr
 #define REG_CAAR         p68k->caar
-#define REG_IR           p68k->ir
+
+#ifdef OPTIM68K_DOUSEREGIRMAGIC
+    #define REG_IR           regir
+    #define REG_IRSLOT       p68k->ir
+#else
+    #define REG_IR           p68k->ir
+    #define REG_IRSLOT       p68k->ir
+#endif
 
 #define REG_FP           p68k->fpr
 #define REG_FPCR         p68k->fpcr
@@ -850,7 +857,7 @@ typedef union
 	double f;
 } fp_reg;
 
-#if 1
+#if 0
 struct m68ki_cpu_core
 {
 	uint cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, or 68020 */

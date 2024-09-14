@@ -6,6 +6,8 @@
 #define OPTIM68K_NOMASK_A 1
 #define OPTIM68K_USEFASTMOVEMREAD 1
 #define OPTIM68K_USEFASTMOVEMWRITE 1
+//this was silly #define OPTIM68K_USEREGIRMAGIC 1
+#define OPTIM68K_SQUEEZEPPCREG 1
 
 #ifdef __AMIGA__
 #define OPTIM68K_USEDIRECT68KASM 1
@@ -19,13 +21,22 @@
 #endif
 
 #define COREREG REG68KCORE(a2)
+#define COREIRREG REG68KCORE(d1)
 
 struct m68ki_cpu_core;
 
 #define OPTIM68K_USEINSTANCE 1
 #if OPTIM68K_USEINSTANCE
-    #define M68KOPT_PARAMS struct m68ki_cpu_core *p68k COREREG
-    #define M68KOPT_PASSPARAMS p68k
+
+    #if OPTIM68K_USEREGIRMAGIC
+        #define OPTIM68K_DOUSEREGIRMAGIC 1
+        #define M68KOPT_PARAMS1 struct m68ki_cpu_core *p68k COREREG
+        #define M68KOPT_PARAMS struct m68ki_cpu_core *p68k COREREG, uint regir COREIRREG
+        #define M68KOPT_PASSPARAMS p68k,regir
+    #else
+        #define M68KOPT_PARAMS struct m68ki_cpu_core *p68k COREREG
+        #define M68KOPT_PASSPARAMS p68k
+    #endif
 #else
     #define M68KOPT_PARAMS void
     #define M68KOPT_PASSPARAMS

@@ -5703,8 +5703,57 @@ void m68k_op_sub_16_er_i(M68KOPT_PARAMS)
 }
 
 
+#ifdef OPTIM68K_USEDIRECT68KASM
+static inline void m68k_op_sub32_asm(M68KOPT_PARAMS, register uint src __asm("d0") )
+{
+    uint *pDX = (int  *)&DX;
+    uint dst = *pDX;
+
+    asm volatile(
+                // xor because FLAG_Z is inverted. -> no need xor.b #4,%1
+       "sub.l %1,%0\n\tmove.w ccr,%1"
+       : "+d" (dst),"+d" (src) // out
+       : // in
+       : // trashed
+       );
+    // src d0 with ccr, dst with result.
+    *pDX = dst;
+    FLAG_Z = dst;
+//#define offsetof(type, member)  __builtin_offsetof (type, member)
+//    FLAG_N = src<<4; //bit 3-> bit 7 in FLAG_N
+//    FLAG_V = src<<6; // 1->7
+//    FLAG_X = FLAG_C = src<<8;
+    /*
+    asm volatile(
+       "lsl.l #4,%0\n"
+       "\tmove.l %0,(%[n_flag],%1)\n"
+       "\tlsl.l #2,%0\n"
+       "\tmove.l %0,(%[v_flag],%1)\n"
+       "\tlsl.l #2,%0\n"
+       "\tmove.l %0,(%[c_flag],%1)\n"
+       "\tmove.l %0,(%[x_flag],%1)\n"
+       :
+       : "d"(src),"a"(p68k), // in
+         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
+         [v_flag] "n" (offsetof(struct m68ki_cpu_core, v_flag)),
+         [x_flag] "n" (offsetof(struct m68ki_cpu_core, x_flag)),
+         [c_flag] "n" (offsetof(struct m68ki_cpu_core, c_flag))
+       :
+       );*/
+    src<<=4;
+    FLAG_N = src;
+    src<<=2;
+    FLAG_V = src;
+    src<<=2;
+    FLAG_X = FLAG_C = src;
+}
+#endif
+
 void m68k_op_sub_32_er_d(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,DY);
+#else
 	uint* r_dst = &DX;
 	uint src = DY;
 	uint dst = *r_dst;
@@ -5716,11 +5765,15 @@ void m68k_op_sub_32_er_d(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_a(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,AY);
+#else
 	uint* r_dst = &DX;
 	uint src = AY;
 	uint dst = *r_dst;
@@ -5732,11 +5785,15 @@ void m68k_op_sub_32_er_a(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_ai(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_AY_AI_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_AY_AI_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5748,11 +5805,15 @@ void m68k_op_sub_32_er_ai(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_pi(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_AY_PI_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_AY_PI_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5764,11 +5825,15 @@ void m68k_op_sub_32_er_pi(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_pd(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_AY_PD_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_AY_PD_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5780,11 +5845,15 @@ void m68k_op_sub_32_er_pd(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_di(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_AY_DI_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_AY_DI_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5796,11 +5865,15 @@ void m68k_op_sub_32_er_di(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_ix(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_AY_IX_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_AY_IX_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5812,11 +5885,15 @@ void m68k_op_sub_32_er_ix(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_aw(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_AW_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_AW_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5828,11 +5905,15 @@ void m68k_op_sub_32_er_aw(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_al(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_AL_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_AL_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5844,11 +5925,15 @@ void m68k_op_sub_32_er_al(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_pcdi(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_PCDI_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_PCDI_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5860,11 +5945,15 @@ void m68k_op_sub_32_er_pcdi(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_pcix(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_PCIX_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_PCIX_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5876,11 +5965,15 @@ void m68k_op_sub_32_er_pcix(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
 void m68k_op_sub_32_er_i(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM
+    m68k_op_sub32_asm(M68KOPT_PASSPARAMS,OPER_I_32(M68KOPT_PASSPARAMS));
+#else
 	uint* r_dst = &DX;
 	uint src = OPER_I_32(M68KOPT_PASSPARAMS);
 	uint dst = *r_dst;
@@ -5892,6 +5985,7 @@ void m68k_op_sub_32_er_i(M68KOPT_PARAMS)
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
 	*r_dst = FLAG_Z;
+#endif
 }
 
 
