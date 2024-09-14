@@ -1,25 +1,22 @@
 #ifndef M68KKRBOPT_H_
 #define M68KKRBOPT_H_
 
-
-//#define OPTIM68K_NOXOR 1
-//#define OPTIM68K_USEFAST32INTRF 1
+#define OPTIM68K_NOXOR 1
+#define OPTIM68K_USEFAST32INTRF 1
 #define OPTIM68K_NOMASK_A 1
-//#define OPTIM68K_USEFASTMOVEMREAD 1
-//#define OPTIM68K_USEFASTMOVEMWRITE 1
+#define OPTIM68K_USEFASTMOVEMREAD 1
+#define OPTIM68K_USEFASTMOVEMWRITE 1
 
 #ifdef __AMIGA__
-//#define OPTIM68K_USEDIRECT68KASM 1
+#define OPTIM68K_USEDIRECT68KASM 1
 #endif
 
 #if defined(__GNUC__) && defined(__AMIGA__)
-//#define REG68KCORE(r) __asm(#r)
-#define REG68KCORE(r)
+#define REG68KCORE(r) __asm(#r)
+//#define REG68KCORE(r)
 #else
 #define REG68KCORE(r)
 #endif
-
-
 
 #define COREREG REG68KCORE(a2)
 

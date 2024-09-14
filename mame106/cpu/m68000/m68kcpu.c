@@ -454,18 +454,14 @@ uint8 m68ki_ea_idx_cycle_table[64] =
 /* ======================================================================== */
 // kepp the last set
 extern int activecpu;
-int m68k_activecpu=-1;
+//int m68k_activecpu=-1;
 struct m68ki_cpu_core *m68k_getActivecpu() {
-    if(m68k_activecpu==-1 && activecpu != -1) m68k_activecpu = activecpu;
-    if(m68k_activecpu <0 ) {
+ //noes   if(m68k_activecpu==-1 && activecpu != -1) m68k_activecpu = activecpu;
+    if(activecpu <0 ) {
         printf("68k: getActivecpu() called when activecpu<0\n");
         exit(1);
     }
-    if(m68k_activecpu >=MAX_CPU ) {
-        printf("68k:getActivecpu() >3 not supported atm\n");
-        exit(1);
-    }
-    return &m68ki_cpus[m68k_activecpu]->m_cpu;
+    return &m68ki_cpus[activecpu]->m_cpu;
 }
 
 /* Default callbacks used if the callback hasn't been set yet, or if the
@@ -916,7 +912,7 @@ void m68k_init(int cpuindex)
 
     struct m68ki_cpu_core *p68k = &(m68ki_cpus[cpuindex]->m_cpu);
 
-    printf(" ** m68k_init, may do m68ki_build_opcode_table\n");
+//    printf(" ** m68k_init, may do m68ki_build_opcode_table\n");
 	static uint emulation_initialized = 0;
 
 	/* The first call to this function initializes the opcode handler jump table */

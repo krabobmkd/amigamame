@@ -17,8 +17,8 @@
 
 
 #if defined(__GNUC__) && defined(__AMIGA__)
-//#define REGM(r) __asm(#r)
-#define REGM(r)
+#define REGM(r) __asm(#r)
+//#define REGM(r)
 #else
 #define REGM(r)
 #endif

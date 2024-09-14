@@ -273,7 +273,7 @@ static UINT8 m68000_win_layout[] = {
 
 static void m68000_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-    printf(" ***** m68000_init\n");
+//    printf(" ***** m68000_init\n");
 	m68k_init(index);
     struct m68ki_cpu_core *p68k = m68k_getcpu(index);
 
@@ -458,7 +458,7 @@ static UINT8 m68020_win_layout[] = {
 
 static void m68020_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-    printf(" ***** m68020_init\n");
+//    printf(" ***** m68020_init\n");
 
 	m68k_init(index);
     struct m68ki_cpu_core *p68k = m68k_getcpu(index);
@@ -522,7 +522,7 @@ static offs_t m68020_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, i
 
 static void m68ec020_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {   
-    printf(" **** m68ec020_init\n");
+//    printf(" **** m68ec020_init\n");
 	m68k_init(index);
     struct m68ki_cpu_core *p68k = m68k_getcpu(index);
 

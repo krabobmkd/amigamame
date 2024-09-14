@@ -785,16 +785,25 @@ INLINE void set_cpu_context(int cpunum)
 
 	/* if we need to change contexts, save the one that was there */
 	if (oldcontext != cpunum && oldcontext != -1)
+    {
+//        printf("set_cpu_contex: before intf.get_context()\n");
+        int keeplast = activecpu;  // krb , get_context need same instance activecpu
+        activecpu = oldcontext;
 		(*cpu[oldcontext].intf.get_context)(cpu[oldcontext].context);
-
+        activecpu = keeplast;
+//        printf("set_cpu_contex: after intf.get_context() ->");
+    }
 	/* swap memory spaces */
+//        printf("activecpu: %d\n",cpunum);
 	activecpu = cpunum;
 	memory_set_context(cpunum);
 
 	/* if the new CPU's context is not swapped in, do it now */
 	if (oldcontext != cpunum)
 	{
+//        printf("set_cpu_contex: before intf.set_context()\n");
 		(*cpu[cpunum].intf.set_context)(cpu[cpunum].context);
+//        printf("set_cpu_contex: after intf.set_context()\n");
 		cpu_active_context[newfamily] = cpunum;
 	}
 }
@@ -1011,12 +1020,12 @@ int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, in
 	memset(cpu[cpunum].context, 0, cpu[cpunum].intf.context_size);
 
 	/* initialize the CPU and stash the context */
-    printf("cpuintrf_init_cpu:%d\n",cpunum);
+//    printf("cpuintrf_init_cpu:%d\n",cpunum);
 	activecpu = cpunum;
 	(*cpu[cpunum].intf.init)(cpunum, clock, config, irqcallback);
 	(*cpu[cpunum].intf.get_context)(cpu[cpunum].context);
 
-    printf("cpuintrf_init_cpu: activecpu -1\n");
+//    printf("cpuintrf_init_cpu: activecpu -1\n");
 	activecpu = -1;
 
 	/* clear out the registered CPU for this family */
@@ -1034,7 +1043,7 @@ int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, in
 
 void cpuintrf_exit_cpu(int cpunum)
 {
-    printf("cpuintrf_exit_cpu:%d ->may use exit()\n",cpunum);
+//    printf("cpuintrf_exit_cpu:%d ->may use exit()\n",cpunum);
 
 	/* if the CPU core defines an exit function, call it now */
 	if (cpu[cpunum].intf.exit)
