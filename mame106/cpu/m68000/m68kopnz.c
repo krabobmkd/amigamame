@@ -2788,7 +2788,7 @@ void m68k_op_reset(M68KOPT_PARAMS)
 {
 	if(FLAG_S)
 	{
-		p68k->reset_instr_callback();		   /* auto-disable (see m68kcpu.h) */
+		p68k->m_cpu.reset_instr_callback();		   /* auto-disable (see m68kcpu.h) */
 		USE_CYCLES(CYC_RESET);
 		return;
 	}
@@ -5719,19 +5719,15 @@ static inline void m68k_op_sub32_asm(M68KOPT_PARAMS, register uint src __asm("d0
     // src d0 with ccr, dst with result.
     *pDX = dst;
     FLAG_Z = dst;
-//#define offsetof(type, member)  __builtin_offsetof (type, member)
-//    FLAG_N = src<<4; //bit 3-> bit 7 in FLAG_N
-//    FLAG_V = src<<6; // 1->7
-//    FLAG_X = FLAG_C = src<<8;
-    /*
+
     asm volatile(
-       "lsl.l #4,%0\n"
-       "\tmove.l %0,(%[n_flag],%1)\n"
-       "\tlsl.l #2,%0\n"
-       "\tmove.l %0,(%[v_flag],%1)\n"
-       "\tlsl.l #2,%0\n"
-       "\tmove.l %0,(%[c_flag],%1)\n"
-       "\tmove.l %0,(%[x_flag],%1)\n"
+        "lsl.l #4,%0\n"
+        "\tmove.l %0,%c[n_flag](%1)\n"
+        "\tlsl.l #2,%0\n"
+        "\tmove.l %0,%c[v_flag](%1)\n"
+        "\tlsl.l #2,%0\n"
+        "\tmove.l %0,%c[c_flag](%1)\n"
+        "\tmove.l %0,%c[x_flag](%1)"
        :
        : "d"(src),"a"(p68k), // in
          [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
@@ -5739,13 +5735,13 @@ static inline void m68k_op_sub32_asm(M68KOPT_PARAMS, register uint src __asm("d0
          [x_flag] "n" (offsetof(struct m68ki_cpu_core, x_flag)),
          [c_flag] "n" (offsetof(struct m68ki_cpu_core, c_flag))
        :
-       );*/
-    src<<=4;
-    FLAG_N = src;
-    src<<=2;
-    FLAG_V = src;
-    src<<=2;
-    FLAG_X = FLAG_C = src;
+       );
+//    src<<=4;
+//    FLAG_N = src;
+//    src<<=2;
+//    FLAG_V = src;
+//    src<<=2;
+//    FLAG_X = FLAG_C = src;
 }
 #endif
 

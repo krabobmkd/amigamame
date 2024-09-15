@@ -387,49 +387,61 @@ void m68k_op_dble_16(M68KOPT_PARAMS)
 }
 
 
-#ifdef OPTIM68K_USEDIRECT68KASM
-static inline void m68k_op_divs_dx_asm(M68KOPT_PARAMS, register int src __asm("d0") )
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
+static inline void m68k_op_divs_dx_asm(M68KOPT_PARAMS, register uint src __asm("d0") )
 {
-    uint *pDX = (int  *)&DX;
+    uint *pDX = (uint  *)&DX;
     uint dst = *pDX;
 //    if(src==0) m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 
+    asm volatile( "divs.w %1,%0\n\tmove.w ccr,%1" : "+d" (dst), "+d" (src) : : );
+    *pDX = dst; // have remain<<16|dividend
+
+    FLAG_Z = dst & 0x0000ffff;
+    FLAG_C = CFLAG_CLEAR;
+
+    // correct CCR is in src now.
     asm volatile(
-       "divs.w %1,%0"
-       : "+d" (dst)
-       : "d" (src)
+        "lsl.l #4,%0\n"
+        "\tmove.l %0,%c[n_flag](%1)\n"
+        "\tlsl.l #2,%0\n"
+        "\tmove.l %0,%c[v_flag](%1)"
+       :
+       : "d"(src),"a"(p68k), // in
+         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
+         [v_flag] "n" (offsetof(struct m68ki_cpu_core, v_flag))
        :
        );
-    *pDX = dst;
-    FLAG_Z = dst & 0x0000ffff;
-    FLAG_N = NFLAG_16(dst);
-    FLAG_V = VFLAG_CLEAR;
-    FLAG_C = CFLAG_CLEAR;
+
 }
 
-static inline void m68k_op_divu_dx_asm(M68KOPT_PARAMS, register int src __asm("d0") )
+static inline void m68k_op_divu_dx_asm(M68KOPT_PARAMS, register uint src __asm("d0") )
 {
-    uint *pDX = (int  *)&DX;
+    uint *pDX = (uint  *)&DX;
     uint dst = *pDX;
 //    if(src==0) m68ki_exception_trap(M68KOPT_PASSPARAMS, EXCEPTION_ZERO_DIVIDE);
 
-    asm volatile(
-       "divu.w %1,%0"
-       : "+d" (dst)
-       : "d" (src)
-       :
-       );
+    asm volatile( "divu.w %1,%0\n\tmove.w ccr,%1" : "+d" (dst), "+d" (src) : : );
     *pDX = dst;
     FLAG_Z = dst & 0x0000ffff;
-    FLAG_N = NFLAG_CLEAR;
-    FLAG_V = VFLAG_CLEAR;
     FLAG_C = CFLAG_CLEAR;
+    // correct CCR is in src now.
+    asm volatile(
+        "lsl.l #6,%0\n"
+        "\tmove.l %0,%c[v_flag](%1)"
+       :
+       : "d"(src),"a"(p68k), // in
+         [v_flag] "n" (offsetof(struct m68ki_cpu_core, v_flag))
+       :
+       );
+
+
 }
 #endif
 
 void m68k_op_divs_16_d(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
     m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,DY);
 #else
 
@@ -471,7 +483,7 @@ void m68k_op_divs_16_d(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_ai(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_AY_AI_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -513,7 +525,7 @@ void m68k_op_divs_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_pi(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_AY_PI_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -555,7 +567,7 @@ void m68k_op_divs_16_pi(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_pd(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_AY_PD_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -597,7 +609,7 @@ void m68k_op_divs_16_pd(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_di(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_AY_DI_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -639,7 +651,7 @@ void m68k_op_divs_16_di(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_ix(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_AY_IX_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -681,7 +693,7 @@ void m68k_op_divs_16_ix(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_aw(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_AW_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -723,7 +735,7 @@ void m68k_op_divs_16_aw(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_al(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_AL_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -765,7 +777,7 @@ void m68k_op_divs_16_al(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_pcdi(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_PCDI_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -807,7 +819,7 @@ void m68k_op_divs_16_pcdi(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_pcix(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_PCIX_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -849,7 +861,7 @@ void m68k_op_divs_16_pcix(M68KOPT_PARAMS)
 
 void m68k_op_divs_16_i(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divs_dx_asm(M68KOPT_PASSPARAMS,OPER_I_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -889,7 +901,7 @@ void m68k_op_divs_16_i(M68KOPT_PARAMS)
 }
 void m68k_op_divu_16_d(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS,DY);
 #else
 
@@ -920,7 +932,7 @@ void m68k_op_divu_16_d(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_ai(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_AY_AI_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -950,7 +962,7 @@ void m68k_op_divu_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_pi(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_AY_PI_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -980,7 +992,7 @@ void m68k_op_divu_16_pi(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_pd(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_AY_PD_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -1010,7 +1022,7 @@ void m68k_op_divu_16_pd(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_di(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_AY_DI_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -1040,7 +1052,7 @@ void m68k_op_divu_16_di(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_ix(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_AY_IX_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -1070,7 +1082,7 @@ void m68k_op_divu_16_ix(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_aw(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_AW_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -1100,7 +1112,7 @@ void m68k_op_divu_16_aw(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_al(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_AL_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -1130,7 +1142,7 @@ void m68k_op_divu_16_al(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_pcdi(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_PCDI_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -1160,7 +1172,7 @@ void m68k_op_divu_16_pcdi(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_pcix(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_PCIX_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;
@@ -1190,7 +1202,7 @@ void m68k_op_divu_16_pcix(M68KOPT_PARAMS)
 
 void m68k_op_divu_16_i(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM
+#ifdef OPTIM68K_USEDIRECT68KASM_DIVS
        m68k_op_divu_dx_asm(M68KOPT_PASSPARAMS, OPER_I_16(M68KOPT_PASSPARAMS));
 #else
 	uint* r_dst = &DX;

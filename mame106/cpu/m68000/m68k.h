@@ -281,7 +281,8 @@ void m68k_set_pc_changed_callback(M68KOPT_PARAMS, void  (*callback)(unsigned int
  */
 void m68k_set_cpu_type(M68KOPT_PARAMS, unsigned int cpu_type);
 
-struct m68ki_cpu_core *m68k_getcpu(int index);
+struct m68k_cpu_instance ;
+struct m68k_cpu_instance *m68k_getcpu(int index);
 /* Do whatever initialisations the core requires.  Should be called
  * at least once at init time.
  */

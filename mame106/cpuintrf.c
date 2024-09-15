@@ -786,24 +786,19 @@ INLINE void set_cpu_context(int cpunum)
 	/* if we need to change contexts, save the one that was there */
 	if (oldcontext != cpunum && oldcontext != -1)
     {
-//        printf("set_cpu_contex: before intf.get_context()\n");
         int keeplast = activecpu;  // krb , get_context need same instance activecpu
         activecpu = oldcontext;
 		(*cpu[oldcontext].intf.get_context)(cpu[oldcontext].context);
         activecpu = keeplast;
-//        printf("set_cpu_contex: after intf.get_context() ->");
     }
 	/* swap memory spaces */
-//        printf("activecpu: %d\n",cpunum);
 	activecpu = cpunum;
 	memory_set_context(cpunum);
 
 	/* if the new CPU's context is not swapped in, do it now */
 	if (oldcontext != cpunum)
 	{
-//        printf("set_cpu_contex: before intf.set_context()\n");
 		(*cpu[cpunum].intf.set_context)(cpu[cpunum].context);
-//        printf("set_cpu_contex: after intf.set_context()\n");
 		cpu_active_context[newfamily] = cpunum;
 	}
 }

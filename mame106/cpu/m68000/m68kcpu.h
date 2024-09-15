@@ -38,8 +38,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct m68ki_cpu_core;
-struct m68ki_cpu_core *m68k_getActivecpu();
+struct m68k_cpu_instance;
+struct m68k_cpu_instance *m68k_getActivecpu();
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
 /* ======================================================================== */
@@ -306,79 +306,79 @@ struct m68ki_cpu_core *m68k_getActivecpu();
 /* ------------------------------ CPU Access ------------------------------ */
 
 /* Access the CPU registers */
-#define CPU_TYPE         p68k->cpu_type
+#define CPU_TYPE         p68k->m_cpu.cpu_type
 
-#define REG_DA           p68k->dar /* easy access to data and address regs */
-#define REG_D            p68k->dar
-#define REG_A            (p68k->dar+8)
-#define REG_PPC 		 p68k->ppc
-#define REG_PC           p68k->pc
-#define REG_SP_BASE      p68k->sp
-#define REG_USP          p68k->sp[0]
-#define REG_ISP          p68k->sp[4]
-#define REG_MSP          p68k->sp[6]
-#define REG_SP           p68k->dar[15]
-#define REG_VBR          p68k->vbr
-#define REG_SFC          p68k->sfc
-#define REG_DFC          p68k->dfc
-#define REG_CACR         p68k->cacr
-#define REG_CAAR         p68k->caar
+#define REG_DA           p68k->m_cpu.dar /* easy access to data and address regs */
+#define REG_D            p68k->m_cpu.dar
+#define REG_A            (p68k->m_cpu.dar+8)
+#define REG_PPC 		 p68k->m_cpu.ppc
+#define REG_PC           p68k->m_cpu.pc
+#define REG_SP_BASE      p68k->m_cpu.sp
+#define REG_USP          p68k->m_cpu.sp[0]
+#define REG_ISP          p68k->m_cpu.sp[4]
+#define REG_MSP          p68k->m_cpu.sp[6]
+#define REG_SP           p68k->m_cpu.dar[15]
+#define REG_VBR          p68k->m_cpu.vbr
+#define REG_SFC          p68k->m_cpu.sfc
+#define REG_DFC          p68k->m_cpu.dfc
+#define REG_CACR         p68k->m_cpu.cacr
+#define REG_CAAR         p68k->m_cpu.caar
 
 #ifdef OPTIM68K_DOUSEREGIRMAGIC
     #define REG_IR           regir
-    #define REG_IRSLOT       p68k->ir
+    #define REG_IRSLOT       p68k->m_cpu.ir
 #else
-    #define REG_IR           p68k->ir
-    #define REG_IRSLOT       p68k->ir
+    #define REG_IR           p68k->m_cpu.ir
+    #define REG_IRSLOT       p68k->m_cpu.ir
 #endif
 
-#define REG_FP           p68k->fpr
-#define REG_FPCR         p68k->fpcr
-#define REG_FPSR         p68k->fpsr
-#define REG_FPIAR        p68k->fpiar
+#define REG_FP           p68k->m_cpu.fpr
+#define REG_FPCR         p68k->m_cpu.fpcr
+#define REG_FPSR         p68k->m_cpu.fpsr
+#define REG_FPIAR        p68k->m_cpu.fpiar
 
-#define FLAG_T1          p68k->t1_flag
-#define FLAG_T0          p68k->t0_flag
-#define FLAG_S           p68k->s_flag
-#define FLAG_M           p68k->m_flag
-#define FLAG_X           p68k->x_flag
-#define FLAG_N           p68k->n_flag
-#define FLAG_Z           p68k->not_z_flag
-#define FLAG_V           p68k->v_flag
-#define FLAG_C           p68k->c_flag
-#define FLAG_INT_MASK    p68k->int_mask
+#define FLAG_T1          p68k->m_cpu.t1_flag
+#define FLAG_T0          p68k->m_cpu.t0_flag
+#define FLAG_S           p68k->m_cpu.s_flag
+#define FLAG_M           p68k->m_cpu.m_flag
+#define FLAG_X           p68k->m_cpu.x_flag
+#define FLAG_N           p68k->m_cpu.n_flag
+#define FLAG_Z           p68k->m_cpu.not_z_flag
+#define FLAG_V           p68k->m_cpu.v_flag
+#define FLAG_C           p68k->m_cpu.c_flag
+#define FLAG_INT_MASK    p68k->m_cpu.int_mask
 
-#define CPU_INT_LEVEL    p68k->int_level /* ASG: changed from CPU_INTS_PENDING */
-#define CPU_INT_CYCLES   p68k->int_cycles /* ASG */
-#define CPU_STOPPED      p68k->stopped
-//#define CPU_PREF_ADDR    p68k->pref_addr
-//#define CPU_PREF_DATA    p68k->pref_data
-#define CPU_ADDRESS_MASK p68k->address_mask
-#define CPU_SR_MASK      p68k->sr_mask
-#define CPU_INSTR_MODE   p68k->instr_mode
-#define CPU_RUN_MODE     p68k->run_mode
+#define CPU_INT_LEVEL    p68k->m_cpu.int_level /* ASG: changed from CPU_INTS_PENDING */
+#define CPU_INT_CYCLES   p68k->m_cpu.int_cycles /* ASG */
+#define CPU_STOPPED      p68k->m_cpu.stopped
+//#define CPU_PREF_ADDR    p68k->m_cpu.pref_addr
+//#define CPU_PREF_DATA    p68k->m_cpu.pref_data
+#define CPU_ADDRESS_MASK p68k->m_cpu.address_mask
+#define CPU_SR_MASK      p68k->m_cpu.sr_mask
+#define CPU_INSTR_MODE   p68k->m_cpu.instr_mode
+#define CPU_RUN_MODE     p68k->m_cpu.run_mode
 
-#define CYC_INSTRUCTION  p68k->cyc_instruction
-#define CYC_EXCEPTION    p68k->cyc_exception
-#define CYC_BCC_NOTAKE_B p68k->cyc_bcc_notake_b
-#define CYC_BCC_NOTAKE_W p68k->cyc_bcc_notake_w
-#define CYC_DBCC_F_NOEXP p68k->cyc_dbcc_f_noexp
-#define CYC_DBCC_F_EXP   p68k->cyc_dbcc_f_exp
-#define CYC_SCC_R_TRUE   p68k->cyc_scc_r_true
-#define CYC_MOVEM_W      p68k->cyc_movem_w
-#define CYC_MOVEM_L      p68k->cyc_movem_l
-#define CYC_SHIFT        p68k->cyc_shift
-#define CYC_RESET        p68k->cyc_reset
+#define CYC_INSTRUCTION  p68k->m_cpu.cyc_instruction
+#define CYC_EXCEPTION    p68k->m_cpu.cyc_exception
+#define CYC_BCC_NOTAKE_B p68k->m_cpu.cyc_bcc_notake_b
+#define CYC_BCC_NOTAKE_W p68k->m_cpu.cyc_bcc_notake_w
+#define CYC_DBCC_F_NOEXP p68k->m_cpu.cyc_dbcc_f_noexp
+#define CYC_DBCC_F_EXP   p68k->m_cpu.cyc_dbcc_f_exp
+#define CYC_SCC_R_TRUE   p68k->m_cpu.cyc_scc_r_true
+#define CYC_MOVEM_W      p68k->m_cpu.cyc_movem_w
+#define CYC_MOVEM_L      p68k->m_cpu.cyc_movem_l
+#define CYC_SHIFT        p68k->m_cpu.cyc_shift
+#define CYC_RESET        p68k->m_cpu.cyc_reset
 
 
-#define CALLBACK_INT_ACK      p68k->int_ack_callback
-#define CALLBACK_BKPT_ACK     p68k->bkpt_ack_callback
-#define CALLBACK_RESET_INSTR  p68k->reset_instr_callback
-#define CALLBACK_CMPILD_INSTR p68k->cmpild_instr_callback
-#define CALLBACK_RTE_INSTR    p68k->rte_instr_callback
-#define CALLBACK_PC_CHANGED   p68k->pc_changed_callback
-#define CALLBACK_SET_FC       p68k->set_fc_callback
-#define CALLBACK_INSTR_HOOK   p68k->instr_hook_callback
+#define CALLBACK_INT_ACK      p68k->m_cpu.int_ack_callback
+#define CALLBACK_BKPT_ACK     p68k->m_cpu.bkpt_ack_callback
+#define CALLBACK_RESET_INSTR  p68k->m_cpu.reset_instr_callback
+#define CALLBACK_CMPILD_INSTR p68k->m_cpu.cmpild_instr_callback
+#define CALLBACK_RTE_INSTR    p68k->m_cpu.rte_instr_callback
+#define CALLBACK_PC_CHANGED   p68k->m_cpu.pc_changed_callback
+#define CALLBACK_SET_FC       p68k->m_cpu.set_fc_callback
+#define CALLBACK_INSTR_HOOK   p68k->m_cpu.instr_hook_callback
 
 
 
@@ -992,12 +992,32 @@ struct m68ki_cpu_core
 } ;
 #endif
 
+typedef struct m68k_opcode {
+    UINT8 *						m_opcode_base;					/* opcode base */
+    UINT8 *						m_opcode_arg_base;				/* opcode argument base */
+    offs_t						m_opcode_mask;					/* mask to apply to the opcode address */
+    offs_t						m_opcode_memory_min;				/* opcode memory minimum */
+    offs_t						m_opcode_memory_max;				/* opcode memory maximum */
+    UINT8		 				m_opcode_entry;					/* opcode readmem entry */
 
-struct m68k_cpu_instance
+//    opcode_arg_base = cpudata[activecpu].op_ram;
+//	opcode_base = cpudata[activecpu].op_rom;
+//	opcode_mask = cpudata[activecpu].op_mask;
+//	opcode_memory_min = cpudata[activecpu].op_mem_min;
+//	opcode_memory_max = cpudata[activecpu].op_mem_max;
+//	opcode_entry = cpudata[activecpu].opcode_entry;
+} m68k_opcode;
+
+typedef struct m68k_cpu_instance
 {
     struct m68ki_cpu_core m_cpu;
+    // what was managed at slice by set_cpu_context()-> memory_set_context()
+    // replace active_address_space
+    m68k_opcode m_opcode;
+    address_space m_address_space[ADDRESS_SPACES];
 
-};
+
+} m68k_cpu_instance;
 
 
 //extern m68ki_cpu_core m68ki_cpu;

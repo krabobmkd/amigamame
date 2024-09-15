@@ -275,7 +275,7 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 {
 //    printf(" ***** m68000_init\n");
 	m68k_init(index);
-    struct m68ki_cpu_core *p68k = m68k_getcpu(index);
+    struct m68k_cpu_instance *p68k = m68k_getcpu(index);
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68000);
 
@@ -461,7 +461,7 @@ static void m68020_init(int index, int clock, const void *config, int (*irqcallb
 //    printf(" ***** m68020_init\n");
 
 	m68k_init(index);
-    struct m68ki_cpu_core *p68k = m68k_getcpu(index);
+    struct m68k_cpu_instance *p68k = m68k_getcpu(index);
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68020);
 
@@ -524,7 +524,7 @@ static void m68ec020_init(int index, int clock, const void *config, int (*irqcal
 {   
 //    printf(" **** m68ec020_init\n");
 	m68k_init(index);
-    struct m68ki_cpu_core *p68k = m68k_getcpu(index);
+    struct m68k_cpu_instance *p68k = m68k_getcpu(index);
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68EC020);
 	m68k_memory_intf = interface_d32;
@@ -579,7 +579,7 @@ static UINT8 m68040_win_layout[] = {
 static void m68040_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	m68k_init(index);
-    struct m68ki_cpu_core *p68k = m68k_getcpu(index);
+    struct m68k_cpu_instance *p68k = m68k_getcpu(index);
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68040);
 	m68k_memory_intf = interface_d32;
@@ -636,7 +636,7 @@ static offs_t m68040_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, i
 
 static void m68000_set_info(UINT32 state, union cpuinfo *info)
 {
-    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
+    struct m68k_cpu_instance *p68k = m68k_getActivecpu();
 //    printf("m68000_set_info:%d\n",state);
 	switch (state)
 	{
@@ -1062,7 +1062,7 @@ void m68010_get_info(UINT32 state, union cpuinfo *info)
 
 static void m68020_set_info(UINT32 state, union cpuinfo *info)
 {
-    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
+    struct m68k_cpu_instance *p68k = m68k_getActivecpu();
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1313,7 +1313,7 @@ void m68ec020_get_info(UINT32 state, union cpuinfo *info)
 
 static void m68040_set_info(UINT32 state, union cpuinfo *info)
 {
-    struct m68ki_cpu_core *p68k = m68k_getActivecpu();
+    struct m68k_cpu_instance *p68k = m68k_getActivecpu();
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
