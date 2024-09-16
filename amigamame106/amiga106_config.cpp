@@ -330,6 +330,9 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
     serializer("Frequency",_freq,11025,22050); // not more low hz than 11025 it does too little buffers for AHI.
   //hide this for the moment  serializer("Force Mono",_forceMono);
 }
+extern "C" {
+     int hasParallelPort();
+}
 void MameConfig::Controls::serialize(ASerializer &serializer)
 {
     static const vector<string> strPlayers={
@@ -371,10 +374,13 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
 //          " and can only manage one button joystick.";
 //    serializer(" ", _pr);
 
-    serializer("Parallel Port 3", (int&)_parallelPort_Player[0],strPlayers);
-    serializer("Types Pr3", (int&)_parallel_type[0],strPrlTypes);
-    serializer("Parallel Port 4", (int&)_parallelPort_Player[1],strPlayers);
-    serializer("Types Pr4", (int&)_parallel_type[1],strPrlTypes);
+    if(hasParallelPort())
+    {
+        serializer("Parallel Port 3", (int&)_parallelPort_Player[0],strPlayers);
+        serializer("Types Pr3", (int&)_parallel_type[0],strPrlTypes);
+        serializer("Parallel Port 4", (int&)_parallelPort_Player[1],strPlayers);
+        serializer("Types Pr4", (int&)_parallel_type[1],strPrlTypes);
+    }
 
 //old
 //    vector<string> ports={

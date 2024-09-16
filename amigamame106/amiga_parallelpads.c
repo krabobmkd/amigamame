@@ -32,7 +32,11 @@ https://github.com/niklasekstrom/amiga-par-to-spi-adapter/blob/master/spi-lib/sp
 //#include "cia_protos.h"
 //#include "misc_protos.h"
 
+
+#ifdef USE_CIA_INTERUPT
 #include "proto/cia.h"
+struct Library *ciaabase=NULL;
+#endif
 
 // now more like https://github.com/niklasekstrom/amiga-par-to-spi-adapter
 
@@ -44,9 +48,6 @@ https://github.com/niklasekstrom/amiga-par-to-spi-adapter/blob/master/spi-lib/sp
 
 //#define USE_CIA_INTERUPT 1
 
-#ifdef USE_CIA_INTERUPT
-struct Library *ciaabase=NULL;
-#endif
 
 static struct Interrupt flag_interrupt;
 
@@ -60,7 +61,12 @@ static struct Interrupt flag_interrupt;
 extern struct Custom custom;
 
 // https://wiki.amigaos.net/wiki/Exec_Interrupts
+extern struct Library    *MiscBase;
 
+int hasParallelPort()
+{
+    return (MiscBase != NULL);
+}
 
 void closeParallelPads(struct ParallelPads *parpads);
 
@@ -99,6 +105,7 @@ static void interuptfunc( register struct ParPadsInteruptData *ppi __asm("a1") )
 
 struct ParallelPads *createParallelPads()
 {
+    if(!MiscBase) return NULL;
     struct Interrupt *rbfint;
     struct ParPadsInteruptData *ppidata;
     BOOL priorenable;
@@ -109,6 +116,7 @@ struct ParallelPads *createParallelPads()
     pparpads->_signr = -1; // default error state for this.
 
     // - - -
+
 //	miscbase = (struct Library *)OpenResource(MISCNAME);
 //	if (!miscbase)
 //	{
@@ -233,7 +241,7 @@ error:
 
 void closeParallelPads(struct ParallelPads *pparpads)
 {
-    if(!pparpads) return;
+    if(!pparpads || !MiscBase) return;
 
 //	AbleICR(ciaabase, CIAICRF_FLG);
 

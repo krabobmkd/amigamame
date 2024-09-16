@@ -41,7 +41,7 @@ struct ParallelPads // : public AParallelPads
 };
 
 
-
+int hasParallelPort();
 
 struct ParallelPads *createParallelPads();
 void checkParallelPads();
