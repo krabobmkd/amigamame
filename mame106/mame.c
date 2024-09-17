@@ -376,6 +376,9 @@ int run_game(int game)
 // added by KRB /2024
 void mameExitCleanCtrlC(void)
 {
+    current_phase = MAME_PHASE_EXIT;
+	fatal_error_jmpbuf_valid = FALSE;
+
     callback_item *cb;
     /* call all exit callbacks registered */
     for (cb = exit_callback_list; cb; cb = cb->next)

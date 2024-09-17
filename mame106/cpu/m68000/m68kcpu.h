@@ -1134,7 +1134,7 @@ INLINE uint m68ki_read_imm_32(void)
 {
 
     #ifdef LSB_FIRST
-        uint v= m68k_read_immediate_32();
+        uint v= m68k_read_immediate_32(ADDRESS_68K(REG_PC));
         REG_PC+=4;
         return v;
     #else

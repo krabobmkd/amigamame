@@ -23,19 +23,19 @@ void m68k_set_encrypted_opcode_range(int cpunum, offs_t start, offs_t end)
  * 8-bit data memory interface
  ****************************************************************************/
 
-static UINT16 readword_d8(offs_t address REG(d0))
+static UINT16 readword_d8(offs_t address REGM(d0))
 {
 	UINT16 result = program_read_byte_8(address) << 8;
 	return result | program_read_byte_8(address + 1);
 }
 
-static void writeword_d8(offs_t address REG(d0), UINT16 data REG(d1))
+static void writeword_d8(offs_t address REGM(d0), UINT16 data REGM(d1))
 {
 	program_write_byte_8(address, data >> 8);
 	program_write_byte_8(address + 1, data);
 }
 
-static UINT32 readlong_d8(offs_t address REG(d0))
+static UINT32 readlong_d8(offs_t address REGM(d0))
 {
 	UINT32 result = program_read_byte_8(address) << 24;
 	result |= program_read_byte_8(address + 1) << 16;
@@ -43,7 +43,7 @@ static UINT32 readlong_d8(offs_t address REG(d0))
 	return result | program_read_byte_8(address + 3);
 }
 
-static void writelong_d8(offs_t address REG(d0), UINT32 data REG(d1))
+static void writelong_d8(offs_t address REGM(d0), UINT32 data REGM(d1))
 {
 	program_write_byte_8(address, data >> 24);
 	program_write_byte_8(address + 1, data >> 16);
@@ -70,13 +70,13 @@ static const struct m68k_memory_interface interface_d8 =
  * 16-bit data memory interface
  ****************************************************************************/
 
-static UINT32 readlong_d16(offs_t address REG(d0))
+static UINT32 readlong_d16(offs_t address REGM(d0))
 {
 	UINT32 result = program_read_word_16be(address) << 16;
 	return result | program_read_word_16be(address + 2);
 }
 
-static void writelong_d16(offs_t address REG(d0), UINT32 data REG(d1))
+static void writelong_d16(offs_t address REGM(d0), UINT32 data REGM(d1))
 {
 	program_write_word_16be(address, data >> 16);
 	program_write_word_16be(address + 2, data);
@@ -91,8 +91,11 @@ static const struct m68k_memory_interface interface_d16 =
 	readlong_d16,
 	program_write_byte_16be,
 	program_write_word_16be,
-	writelong_d16
+	writelong_d16,
+    NULL, // changepc
+    memory_writemovem32_wr16_reverse
 };
+
 
 #endif // A68K0
 
@@ -103,7 +106,7 @@ static const struct m68k_memory_interface interface_d16 =
 #ifndef A68K2
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT16 readword_d32(offs_t address REG(d0))
+static UINT16 readword_d32(offs_t address REGM(d0))
 {
 	UINT16 result;
 
@@ -114,7 +117,7 @@ static UINT16 readword_d32(offs_t address REG(d0))
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writeword_d32(offs_t address REG(d0), UINT16 data REG(d1))
+static void writeword_d32(offs_t address REGM(d0), UINT16 data REGM(d1))
 {
 	if (!(address & 1))
 	{
@@ -126,7 +129,7 @@ static void writeword_d32(offs_t address REG(d0), UINT16 data REG(d1))
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT32 readlong_d32(offs_t address REG(d0))
+static UINT32 readlong_d32(offs_t address REGM(d0))
 {
 	UINT32 result;
 
@@ -143,8 +146,9 @@ static UINT32 readlong_d32(offs_t address REG(d0))
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writelong_d32(offs_t address REG(d0), UINT32 data REG(d1))
+static void writelong_d32(offs_t address REGM(d0), UINT32 data REGM(d1))
 {
+    /* krb
 	if (!(address & 3))
 	{
 		program_write_dword_32be(address, data);
@@ -159,7 +163,18 @@ static void writelong_d32(offs_t address REG(d0), UINT32 data REG(d1))
 	program_write_byte_32be(address, data >> 24);
 	program_write_word_32be(address + 1, data >> 8);
 	program_write_byte_32be(address + 3, data);
+    */
+    if (!(address & 3))
+	{
+		program_write_dword_32be(address, data);
+		return;
+	}
+	//krb: in the 68k world, pair writing crash, let's economise a test.
+	program_write_word_32be(address, data >> 16);
+	program_write_word_32be(address + 2, data);
+
 }
+extern UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
 
 /* interface for 32-bit data bus (68EC020, 68020) */
 static const struct m68k_memory_interface interface_d32 =
@@ -170,8 +185,25 @@ static const struct m68k_memory_interface interface_d32 =
 	readlong_d32,
 	program_write_byte_32be,
 	writeword_d32,
-	writelong_d32
+	writelong_d32,
+    NULL, // changepc
+    memory_writemovem32_wr32_reverseSAFE
 };
+
+/* krb */
+static const struct m68k_memory_interface interface_fast16 =
+{
+	WORD_XOR_BE(0),
+	program_read_byte_32be, // force 32b bus to 68k, ...
+	program_read_word_32be,
+	program_read_dword_32be,
+	program_write_byte_32be,
+	program_write_word_32be,
+	program_write_dword_32be,
+    NULL,
+    memory_writemovem32_wr16_reverse,
+};
+
 /* krb */
 static const struct m68k_memory_interface interface_fast32 =
 {
@@ -181,7 +213,9 @@ static const struct m68k_memory_interface interface_fast32 =
 	program_read_dword_32be,
 	program_write_byte_32be,
 	program_write_word_32be,
-	program_write_dword_32be
+	program_write_dword_32be,
+    NULL,
+    memory_writemovem32_wr32_reverseSAFE,
 };
 
 /* global access */
@@ -242,7 +276,7 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
 
 #ifdef OPTIM68K_USEFAST32INTRF
-    m68k_memory_intf = interface_fast32;
+    m68k_memory_intf = interface_fast16;
 #else
     m68k_memory_intf = interface_d16;
 #endif

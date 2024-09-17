@@ -1331,7 +1331,7 @@ void PC090OJ_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,int pri
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		priority ? 0xfc : 0xf0 	// priority_mask
+		priority ? (0xfc|(1<<31)) : (0xf0|(1<<31)) 	// priority_mask
 	  };
 	for (offs = 0;offs < PC090OJ_ACTIVE_RAM_SIZE/2;offs += 4)
 	{

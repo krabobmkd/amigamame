@@ -1,4 +1,9 @@
 
+bublebobl 83%/86% cpu
+dino 76% cpu
+
+
+
  Todo for beta3:
  - O Mouse twice faster
  - X bug when reloading list

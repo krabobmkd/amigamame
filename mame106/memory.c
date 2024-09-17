@@ -776,7 +776,7 @@ m68k_op_movem_32_er_al		m68ki_read_32
 
 */
 // return number of bits actually applied
-UINT32 memory_readmovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
+UINT32 memory_readmovem32(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
 {
 	UINT32 entry;
 	/* perform lookup */
@@ -822,7 +822,8 @@ UINT32 memory_readmovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *p
     return count;
 
 }
-UINT32 memory_writemovem32rr(UINT32 address /*REG(d0)*/, UINT32 bits /*REG(d1)*/, UINT32 *preg /*REG(a0)*/ )
+// needed by 68k interface because video drivers would just patch write16.
+UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
 {
     UINT32 entry;
 	/* perform lookup */
@@ -873,7 +874,45 @@ UINT32 memory_writemovem32rr(UINT32 address /*REG(d0)*/, UINT32 bits /*REG(d1)*/
     }
     return count;
 }
-UINT32 memory_writemovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *preg REG(a0) )
+UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
+{
+    UINT16 i = 0;
+    uint count = 0;
+
+    if (!(address & 3))
+    {
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                address-=4;
+                program_write_dword_32be(address, preg[15-i]);
+                count++;
+            }
+            bits>>=1;
+        }
+
+    } else
+    {
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                address-=4;
+                uint v = preg[15-i];
+                //krb: in the 68k world, pair writing crash, let's economise a test.
+                program_write_word_32be(address, v >> 16);
+                program_write_word_32be(address + 2, v);
+                count++;
+            }
+            bits>>=1;
+        }
+    }
+    return count;
+}
+
+// needed by 68020 interface because video drivers taito_f3 would just patch write32 !!
+UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
 {
     UINT32 entry;
 	/* perform lookup */
@@ -886,22 +925,51 @@ UINT32 memory_writemovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *
             & active_address_space[0].writehandlers[entry].mask;
 	if (entry >= STATIC_RAM)
 	{
-    	write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
-        UINT16 i = 0;
-        uint count = 0;
-        address>>=2;
-        for(; i < 16; i++)
-        {
-            if(bits & 1)
+        // arkanoid return has both a 68000 and a 68020 and needs something like that
+       // if (!(address & 3))
+       // {   // 4 bytes aligned
+            //program_write_dword_32be(address, data);
+            write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
+            UINT16 i = 0;
+            uint count = 0;
+            address>>=2;
+            for(; i < 16; i++)
             {
-                (*writer)(address,preg[i],0);
-                address++;
-                count++;
+                if(bits & 1)
+                {
+                    address--;
+                    (*writer)(address,preg[15-i],0);
+                    count++;
+                }
+                bits>>=1;
             }
-            bits>>=1;
-        }
-        return count;
-	}
+            return count;
+        /*} else
+        //{
+            // 16bit aligned ? we hope.
+            write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
+            UINT16 i = 0;
+            uint count = 0;
+            address>>=1;
+            for(; i < 16; i++)
+            {
+                if(bits & 1)
+                {   // some games minimix, ... need handled 16b writings
+                    UINT32 reg = preg[15-i];
+                    address--;
+                    (*writer16)(address,reg,0);
+                    address--;
+                    (*writer16)(address,reg>>16,0);
+                    //(*writer)(address,preg[15-i],0);
+                    count++;
+                }
+                bits>>=1;
+            }
+            return count;
+
+        } // end 16b aligned
+        */
+	} // end if need handler.
 
     // - - - - - - - - -
     UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
@@ -911,7 +979,8 @@ UINT32 memory_writemovem32(UINT32 address REG(d0), UINT32 bits REG(d1), UINT32 *
     {
 		if(bits & 1)
 		{
-            *pwrite++ = preg[i];
+            pwrite--;
+            *pwrite = preg[15-i];
 			count++;
 		}
         bits>>=1;
@@ -2572,7 +2641,7 @@ static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t of
 
 
 
-void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p REG(a0))
+void program_read_copy32be(offs_t address REGM(d0),UINT32 l REGM(d1), UINT32 *p REGM(a0))
 {
 	UINT32 entry;
 
@@ -2620,7 +2689,7 @@ void program_read_copy32be(offs_t address REG(d0),UINT32 l REG(d1), UINT32 *p RE
     }
 }
 
-UINT8 s16program_read_byte_8(UINT32 address REG(d0))
+UINT8 s16program_read_byte_8(UINT32 address REGM(d0))
 {
 	UINT32 entry;
 
@@ -2645,7 +2714,7 @@ UINT8 s16program_read_byte_8(UINT32 address REG(d0))
 	return 0;
 }
 
-void s16program_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1))
+void s16program_write_byte_8(offs_t address REGM(d0), UINT8 data REGM(d1))
 {
 	UINT32 entry;
     /* perform lookup */
@@ -2671,7 +2740,7 @@ void s16program_write_byte_8(offs_t address REG(d0), UINT8 data REG(d1))
 
 
 #define READBYTE8(name,spacenum)														\
-UINT8 name(offs_t address REG(d0))																\
+UINT8 name(offs_t address REGM(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2690,7 +2759,7 @@ UINT8 name(offs_t address REG(d0))																\
 }																						\
 
 #define READBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
-UINT8 name(offs_t address REG(d0))																\
+UINT8 name(offs_t address REGM(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2725,7 +2794,7 @@ UINT8 name(offs_t address REG(d0))																\
 -------------------------------------------------*/
 
 #define READWORD16(name,spacenum)														\
-UINT16 name(offs_t address REG(d0))																\
+UINT16 name(offs_t address REGM(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2744,7 +2813,7 @@ UINT16 name(offs_t address REG(d0))																\
 }																						\
 
 #define READWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
-UINT16 name(offs_t address REG(d0))																\
+UINT16 name(offs_t address REGM(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2777,7 +2846,7 @@ UINT16 name(offs_t address REG(d0))																\
 -------------------------------------------------*/
 
 #define READDWORD32(name,spacenum)														\
-UINT32 name(offs_t address REG(d0))																\
+UINT32 name(offs_t address REGM(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2796,7 +2865,7 @@ UINT32 name(offs_t address REG(d0))																\
 }																						\
 
 #define READDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-UINT32 name(offs_t address REG(d0))																\
+UINT32 name(offs_t address REGM(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2827,7 +2896,7 @@ UINT32 name(offs_t address REG(d0))																\
 -------------------------------------------------*/
 
 #define READQWORD64(name,spacenum)														\
-UINT64 name(offs_t address REG(d0))																\
+UINT64 name(offs_t address REGM(d0))																\
 {																						\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
@@ -2851,7 +2920,7 @@ UINT64 name(offs_t address REG(d0))																\
 -------------------------------------------------*/
 
 #define WRITEBYTE8(name,spacenum)														\
-void name(offs_t address REG(d0), UINT8 data REG(d1))													\
+void name(offs_t address REGM(d0), UINT8 data REGM(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2869,7 +2938,7 @@ void name(offs_t address REG(d0), UINT8 data REG(d1))													\
 }																						\
 
 #define WRITEBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address REG(d0), UINT8 data REG(d1))													\
+void name(offs_t address REGM(d0), UINT8 data REGM(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2903,7 +2972,7 @@ void name(offs_t address REG(d0), UINT8 data REG(d1))													\
 -------------------------------------------------*/
 
 #define WRITEWORD16(name,spacenum)														\
-void name(offs_t address REG(d0), UINT16 data REG(d1))													\
+void name(offs_t address REGM(d0), UINT16 data REGM(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2921,7 +2990,7 @@ void name(offs_t address REG(d0), UINT16 data REG(d1))													\
 }																						\
 
 #define WRITEWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address REG(d0), UINT16 data REG(d1))													\
+void name(offs_t address REGM(d0), UINT16 data REGM(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2953,7 +3022,7 @@ void name(offs_t address REG(d0), UINT16 data REG(d1))													\
 -------------------------------------------------*/
 
 #define WRITEDWORD32(name,spacenum)														\
-void name(offs_t address REG(d0), UINT32 data REG(d1))													\
+void name(offs_t address REGM(d0), UINT32 data REGM(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -2971,7 +3040,7 @@ void name(offs_t address REG(d0), UINT32 data REG(d1))													\
 }																						\
 
 #define WRITEDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
-void name(offs_t address REG(d0), UINT32 data REG(d1))													\
+void name(offs_t address REGM(d0), UINT32 data REGM(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
@@ -3001,7 +3070,7 @@ void name(offs_t address REG(d0), UINT32 data REG(d1))													\
 -------------------------------------------------*/
 
 #define WRITEQWORD64(name,spacenum)														\
-void name(offs_t address REG(d0), UINT64 data REG(d1))													\
+void name(offs_t address REGM(d0), UINT64 data REGM(d1))													\
 {																						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\

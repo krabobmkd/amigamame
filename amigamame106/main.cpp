@@ -36,6 +36,7 @@ extern "C" {
 #include <proto/graphics.h>
 #include <proto/intuition.h>
 #include <proto/timer.h>
+#include <proto/misc.h>
 
 #include <proto/asl.h>
 #include <proto/utility.h>
@@ -44,6 +45,7 @@ extern "C" {
 extern "C" {
     // all C amiga stuffs should be included from C++ in extern "C" paragraph
     #include <cybergraphx/cybergraphics.h>
+    #include <resources/misc.h>
     #include "asmmacros.h"
 }
 
@@ -88,6 +90,10 @@ struct Library      *AslBase    = NULL;
 struct Library      *KeymapBase   = NULL;
 struct Library      *UtilityBase  = NULL;
 struct Library      *CyberGfxBase = NULL;
+
+// will only work on Amiga Classic and must be optional. Library opened by OpenResource(), not OpenLibrary
+struct Library    *MiscBase=NULL;
+
 //struct Library      *P96Base = NULL;
 
 }
@@ -126,6 +132,10 @@ int libs_init()
     // mui is done elsewhere.
 
     if(GadToolsBase) gui_gadtools_init();
+
+    // also, optional, used for parallel pads:
+    // "There is no CloseResource()"
+    MiscBase = (struct Library *)OpenResource(MISCNAME);
 
     initTimers();
 
@@ -170,8 +180,9 @@ void main_close()
 #endif
 }
 
-const char *pVersion="$VER: 0.106 a0.1";
-
+const char *pVersion="$VER:MAME 0.106 "
+        APPVERNUM
+        "68060 68882";
 
 // - - - - IF COMPILED WITH FLOAT, AND MACHINE HAS NO FPU, EXIT WITH MESSAGE - - - -
 #if defined(MAME_USE_HARD_FLOAT)
