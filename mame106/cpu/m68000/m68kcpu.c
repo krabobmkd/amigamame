@@ -913,6 +913,7 @@ struct m68k_cpu_instance *m68k_getcpu(int index)
   return m68ki_cpus[index];
 }
 
+
 void m68k_init(int cpuindex)
 {
     m68ki_cpus[cpuindex] = auto_malloc(sizeof(struct m68k_cpu_instance));
@@ -938,6 +939,27 @@ void m68k_init(int cpuindex)
 	m68k_set_pc_changed_callback( p68k, NULL);
 //	m68k_set_fc_callback(NULL);
 //	m68k_set_instr_hook_callback(NULL);
+
+    // - - - - - - - krb set opbase to instance:
+    //krb: reuse whats done in cpuintrf.c under activecpu_set_opbase()
+    extern offs_t activecpu_get_physical_pc_byte();
+
+     memory_set_opbase_instance(&p68k->m_opcode,cpuindex,activecpu_get_physical_pc_byte());
+//	memory_set_opbase(activecpu_get_physical_pc_byte());
+
+//	p68k->m_opcode.m_opcode_base = cpudata[activecpu].op_rom;
+//	p68k->m_opcode.m_opcode_arg_base = cpudata[activecpu].op_ram;
+//	p68k->m_opcode.m_opcode_mask = cpudata[activecpu].op_mask;
+//	p68k->m_opcode.m_opcode_memory_min = cpudata[activecpu].op_mem_min;
+//	p68k->m_opcode.m_opcode_memory_max = cpudata[activecpu].op_mem_max;
+//	p68k->m_opcode.m_opcode_entry = cpudata[activecpu].opcode_entry;
+
+
+
+    // - - - - krb set memory.c activeXXX to instance
+    //TODO
+
+
 }
 
 /* Pulse the RESET line on the CPU */

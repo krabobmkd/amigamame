@@ -1185,16 +1185,16 @@ offs_t activecpu_get_physical_pc_byte(void)
 {
 	offs_t pc;
 	int shift;
-
+    int localactivecpu = activecpu;
 	VERIFY_ACTIVECPU(activecpu_get_physical_pc_byte);
-	shift = cpu[activecpu].intf.address_shift;
+	shift = cpu[localactivecpu].intf.address_shift;
 	pc = activecpu_get_reg(REG_PC);
 	if (shift < 0)
 		pc <<= -shift;
 	else
 		pc >>= shift;
-	if (cpu[activecpu].intf.translate)
-		(*cpu[activecpu].intf.translate)(ADDRESS_SPACE_PROGRAM, &pc);
+	if (cpu[localactivecpu].intf.translate)
+		(*cpu[localactivecpu].intf.translate)(ADDRESS_SPACE_PROGRAM, &pc);
 	return pc;
 }
 

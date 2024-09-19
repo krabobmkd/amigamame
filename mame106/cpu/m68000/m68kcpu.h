@@ -992,28 +992,12 @@ struct m68ki_cpu_core
 } ;
 #endif
 
-typedef struct m68k_opcode {
-    UINT8 *						m_opcode_base;					/* opcode base */
-    UINT8 *						m_opcode_arg_base;				/* opcode argument base */
-    offs_t						m_opcode_mask;					/* mask to apply to the opcode address */
-    offs_t						m_opcode_memory_min;				/* opcode memory minimum */
-    offs_t						m_opcode_memory_max;				/* opcode memory maximum */
-    UINT8		 				m_opcode_entry;					/* opcode readmem entry */
-
-//    opcode_arg_base = cpudata[activecpu].op_ram;
-//	opcode_base = cpudata[activecpu].op_rom;
-//	opcode_mask = cpudata[activecpu].op_mask;
-//	opcode_memory_min = cpudata[activecpu].op_mem_min;
-//	opcode_memory_max = cpudata[activecpu].op_mem_max;
-//	opcode_entry = cpudata[activecpu].opcode_entry;
-} m68k_opcode;
-
 typedef struct m68k_cpu_instance
 {
     struct m68ki_cpu_core m_cpu;
     // what was managed at slice by set_cpu_context()-> memory_set_context()
     // replace active_address_space
-    m68k_opcode m_opcode;
+    struct sOpCode  m_opcode;
     address_space m_address_space[ADDRESS_SPACES];
 
 
@@ -1186,7 +1170,7 @@ INLINE uint m68ki_read_imm_16(M68KOPT_PARAMS)
 {
     // what m68k_read_immediate_16 actually does:
     // no need to prefech really, this is "direct rom reading"
-    UINT16 v= (*(UINT16 *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
+    UINT16 v= (*(UINT16 *)& p68k->m_opcode._opcode_base[(REG_PC) /*& opcode_mask*/]);
 
     REG_PC+=2;
     return (uint)v;
@@ -1202,7 +1186,7 @@ INLINE uint m68ki_read_imm_32(M68KOPT_PARAMS)
         return v;
     #else
         // no need to prefech really, this is "direct rom reading"
-        uint v= (*(uint *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
+        uint v= (*(uint *)&p68k->m_opcode._opcode_base[(REG_PC) /*& opcode_mask*/]);
         REG_PC+=4;
         return v;
     #endif
