@@ -16,6 +16,7 @@ option(MAME_USE_HARDFLOAT "compile using direct 68882 FPU, will not work on econ
 option(AMIGA_USE_68030 " use 68030" OFF)
 option(AMIGA_USE_68040 " use 68040" OFF)
 option(AMIGA_USE_68060 " use 68060" ON)
+option(DOMAMELOG " do output logs" ON)
 
 option(COMPILE_TESTS " compile extra dev tools/ test units" OFF)
 
@@ -55,13 +56,17 @@ if(AMIGA)
 		list(APPEND AMIGA_COMPILER_OPTIONS -msoft-float)
 	endif()
 
+
 	# can't use  -malign-int with code that call os.
 	# or between libs that uses structs not completely 4b aligned.
 	# -mnobitfield
 	# test -msep-data
 	#list(APPEND AMIGA_COMPILER_OPTIONS -mnobitfield)
 endif()
+if(DOMAMELOG)
+	list(APPEND AMIGA_COMPILER_OPTIONS -DDOMAMELOG=1)
 
+endif()
 # test -fsingle-precision-constant
 # test -mpc32
 #list(APPEND AMIGA_COMPILER_OPTIONS -fsingle-precision-constant )

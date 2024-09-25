@@ -2725,7 +2725,7 @@ static void showcharset(mame_bitmap *bitmap)
 	/* mark all the tilemaps dirty on entry so they are re-drawn consistently in the viewer */
 	tilemap_mark_all_tiles_dirty(NULL);
 
-   printf("ui: showcharset\n");
+ //  printf("ui: showcharset\n");
 
 	do
 	{

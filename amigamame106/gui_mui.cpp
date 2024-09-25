@@ -654,6 +654,9 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
 
 void AllocGUI(void)
 {
+#ifdef DOMAMELOG
+    printf("Open muimaster 16\n");
+#endif
     MUIMasterBase = OpenLibrary("muimaster.library", 16);
     if(!MUIMasterBase)
     {
@@ -677,7 +680,9 @@ void AllocGUI(void)
 
 //    qsort(&SortedDrivers[DRIVER_OFFSET], NumDrivers, sizeof(struct _game_driver **), (int (*)(const void *, const void *)) DriverCompare);
 
-
+#ifdef DOMAMELOG
+    printf("old locale init\n");
+#endif
     App     = NULL;
     MainWin   = NULL;
     AboutWin  = NULL;
@@ -733,9 +738,13 @@ void AllocGUI(void)
 //    BitmapGameDefaultsString = GetMessage(MSG_BITMAP_GAME_DEFAULTS);
 //    VectorGameDefaultsString = GetMessage(MSG_VECTOR_GAME_DEFAULTS);
 #endif
-
+#ifdef DOMAMELOG
+    printf("before MUI_CreateCustomClass()\n");
+#endif
     DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcher);
-
+#ifdef DOMAMELOG
+    printf("after MUI_CreateCustomClass()\n");
+#endif
 }
 
 void FreeGUI(void)
@@ -1034,7 +1043,15 @@ int MainGUI(void)
   if(MUIMasterBase)
   {
     if(!App)
+    {
+#ifdef DOMAMELOG
+    printf("before CreateApp()\n");
+#endif
       CreateApp();
+#ifdef DOMAMELOG
+    printf("after CreateApp()\n");
+#endif
+    }
 //  printf("after CreateApp()\n");
     if(App)
     {

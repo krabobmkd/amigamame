@@ -183,6 +183,11 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
             {
                 _fullscreenHeight = (int)(dims.MaxOScan.MaxY - dims.MaxOScan.MinY)+1;
             }
+#ifdef DOMAMELOG
+        printf("aga mode $%08x w:%d h:%d\n",
+              (int)_ScreenModeId, _fullscreenWidth,_fullscreenHeight);
+#endif
+
         } else
         {   // shouldnt happen, fallback
             _fullscreenWidth = width;

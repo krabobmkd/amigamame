@@ -111,32 +111,60 @@ int libs_init()
 #ifdef USE_OWN_DOSBASE
     if(!(DOSBase = (struct DosLibrary *) OpenLibrary("dos.library", 36))) return(1);
 #endif
+
+#ifdef DOMAMELOG
+    printf("Open graphics 39\n");
+#endif
     if(!(GfxBase = (struct GfxBase *) OpenLibrary("graphics.library", 39)))
     {
         printf("need at least OS3.0\n");
         return(1);
     }
+#ifdef DOMAMELOG
+    printf("Open intuition 39\n");
+#endif
     if(!(IntuitionBase = (struct IntuitionBase *) OpenLibrary("intuition.library", 39)))
     {
         return(1);
     }
+#ifdef DOMAMELOG
+    printf("Open utility 0\n");
+#endif
     if(!(UtilityBase = OpenLibrary("utility.library",0))) return(1);
+#ifdef DOMAMELOG
+    printf("Open keymap 36\n");
+#endif
     if(!(KeymapBase = OpenLibrary("keymap.library", 36))) return(1);
+#ifdef DOMAMELOG
+    printf("Open asl 36\n");
+#endif
     if(!(AslBase = OpenLibrary("asl.library", 36))) return(1);
 
     InitLowLevelLib();
     // optional:
+#ifdef DOMAMELOG
+    printf("Open cybergraphics 1\n");
+#endif
     CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
 //    P96Base  = OpenLibrary("Picasso96API.library", 0);
+#ifdef DOMAMELOG
+    printf("Open gadtools 1\n");
+#endif
     GadToolsBase  = OpenLibrary("gadtools.library", 1);
     // mui is done elsewhere.
-
+#ifdef DOMAMELOG
+    printf("gadtools_init\n");
+#endif
     if(GadToolsBase) gui_gadtools_init();
-
+#ifdef DOMAMELOG
+    printf("misc resource\n");
+#endif
     // also, optional, used for parallel pads:
     // "There is no CloseResource()"
     MiscBase = (struct Library *)OpenResource(MISCNAME);
-
+#ifdef DOMAMELOG
+    printf("initTimers\n");
+#endif
     initTimers();
 
     return(0);
@@ -149,31 +177,73 @@ void mameExitCleanCtrlC(void);
 void main_close()
 {
    // printf("does main_close\n");
-
+#ifdef DOMAMELOG
+    printf("mameExitCleanCtrlC\n");
+#endif
     mameExitCleanCtrlC(); // flush game allocs, ahcked from mame.c, in case stopped during game.
+#ifdef DOMAMELOG
+    printf("osd_close_display\n");
+#endif
     osd_close_display(); // also useful when ctrl-C
+#ifdef DOMAMELOG
+    printf("osd_stop_audio_stream\n");
+#endif
     osd_stop_audio_stream();
 //    printf("after  osd_stop_audio_stream\n");
+#ifdef DOMAMELOG
+    printf("unzip_cache_clear\n");
+#endif
     unzip_cache_clear();
 //    printf("after  unzip_cache_clear\n");
+#ifdef DOMAMELOG
+    printf("closeTimers\n");
+#endif
     closeTimers();
+#ifdef DOMAMELOG
+    printf("FreeGUI\n");
+#endif
 //    printf("after  closeTimers\n");
     FreeGUI();
 //    printf("after  FreeGUI\n");
    // FreeConfig(); -> static destructor in _config.
-
+#ifdef DOMAMELOG
+    printf("gui_gadtools_close\n");
+#endif
     gui_gadtools_close();
+#ifdef DOMAMELOG
+    printf("CloseLowLevelLib\n");
+#endif
 //    printf("after  gui_gadtools_close\n");
     CloseLowLevelLib();
 //    printf("after  CloseLowLevelLib\n");
+#ifdef DOMAMELOG
+    printf("close Gad\n");
+#endif
     if(GadToolsBase) CloseLibrary(GadToolsBase);
 //    if(P96Base) CloseLibrary(P96Base);
+#ifdef DOMAMELOG
+    printf("close cgx\n");
+#endif
     if(CyberGfxBase) CloseLibrary(CyberGfxBase);
-
+#ifdef DOMAMELOG
+    printf("close km\n");
+#endif
     if(KeymapBase) CloseLibrary(KeymapBase);
+#ifdef DOMAMELOG
+    printf("close u\n");
+#endif
     if(UtilityBase) CloseLibrary(UtilityBase);
+#ifdef DOMAMELOG
+    printf("close i\n");
+#endif
     if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
+#ifdef DOMAMELOG
+    printf("close g\n");
+#endif
     if(GfxBase) CloseLibrary((struct Library *)GfxBase);
+#ifdef DOMAMELOG
+    printf("-end-\n");
+#endif
 // done in  by compiler runtime or not.
 #ifdef USE_OWN_DOSBASE
    if(DOSBase) CloseLibrary((struct Library *)DOSBase);
@@ -227,6 +297,9 @@ int main(int argc, char **argv)
             return 1;
         }
     }
+#ifdef DOMAMELOG
+    printf("hello\n");
+#endif
 /* krb: looks messy to me, original stack should be restored and alloc freed , in an atexit().
   task  = FindTask(NULL);
   if((task->tc_SPReg - task->tc_SPLower) < (MIN_STACK - 1024))
@@ -252,9 +325,18 @@ int main(int argc, char **argv)
     atexit(&main_close);
     if(libs_init()!=0) exit(1);
 
+#ifdef DOMAMELOG
+    printf("gui_gadtools_init()\n");
+#endif
     if(GadToolsBase) gui_gadtools_init();
 
+#ifdef DOMAMELOG
+    printf("getMainConfig().init()\n");
+#endif
     getMainConfig().init(argc,argv);
+#ifdef DOMAMELOG
+    printf("getMainConfig().load()\n");
+#endif
     getMainConfig().load();
 
     int idriver=0; // romToLaunch;
@@ -278,9 +360,13 @@ int main(int argc, char **argv)
         StartGame();
         return 0;
     }
-
+#ifdef DOMAMELOG
+    printf("before AllocGUI()\n");
+#endif
     AllocGUI();
-
+#ifdef DOMAMELOG
+    printf("after AllocGUI()\n");
+#endif
     // go into interface loop
     ULONG quit=FALSE;
 
