@@ -245,7 +245,7 @@ bool Intuition_Screen::open()
         if(_pTripleBufferImpl) delete _pTripleBufferImpl;
         _pTripleBufferImpl = new TripleBuffer_CSB(*this); // could fail, in which case back to direct rendering
         _pTripleBufferImpl->init();
-        printf("TRP IMPL!\n");
+     //   printf("TRP IMPL!\n");
     }
 
     return true;

@@ -62,7 +62,7 @@ int TripleBuffer_CSB::init()
     _lastIndexDrawn = 0;
     _indexToDraw = 1;
     _tripleBufferInitOk = 1;
-    printf("trpl init ok\n");
+ //   printf("trpl init ok\n");
     return 1;
 }
 void TripleBuffer_CSB::close()
