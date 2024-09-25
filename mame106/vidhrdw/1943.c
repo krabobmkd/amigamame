@@ -213,6 +213,24 @@ static void c1943_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, 
 {
 	int offs;
 
+    struct drawgfxParams dgp0={
+		bitmap, 	// dest
+		Machine->gfx[3], 	// gfx
+		0, 	// code
+		0, 	// color
+		flip_screen, 	// flipx
+		flip_screen, 	// flipy
+		0, 	// sx
+		0, 	// sy
+		cliprect, 	// clip
+		TRANSPARENCY_PEN, 	// transparency
+		0, 	// transparent_color
+		0, 	// scalex
+		0, 	// scaley
+		NULL, 	// pri_buffer
+		0 	// priority_mask
+	  };
+
 	for (offs = spriteram_size - 32; offs >= 0; offs -= 32)
 	{
 		int attr = spriteram[offs + 1];
@@ -227,19 +245,24 @@ static void c1943_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, 
 			sy = 240 - sy;
 		}
 
+        dgp0.code = code;
+        dgp0.color = color;
+        dgp0.sx = sx;
+        dgp0.sy = sy;
+
 		// the priority is actually selected by bit 3 of BMPROM.07
 		if (priority)
 		{
 			if (color != 0x0a && color != 0x0b)
 			{
-				;
+                drawgfx(&dgp0);
 			}
 		}
 		else
 		{
 			if (color == 0x0a || color == 0x0b)
 			{
-				;
+                drawgfx(&dgp0);
 			}
 		}
 	}
