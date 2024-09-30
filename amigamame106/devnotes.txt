@@ -1,3 +1,34 @@
+rastan
+
+cpuexec:0 memory_set_opbase:0003a000
+cpuexec:1 memory_set_opbase:00000000
+cpuexec:0 memory_set_opbase:0003aeb2
+cpuexec:0 memory_set_opbase:0003aec4
+cpuexec:0 memory_set_opbase:0003aec2
+cpuexec:0 memory_set_opbase:0003aebc
+cpuexec:0 memory_set_opbase:0003aeb6
+cpuexec:0 memory_set_opbase:0003aec2
+cpuexec:0 memory_set_opbase:0003aec2
+cpuexec:0 memory_set_opbase:0003aebc
+cpuexec:0 memory_set_opbase:0003aeb6
+cpuexec:0 memory_set_opbase:0003aec2
+cpuexec:0 memory_set_opbase:0003aec2
+cpuexec:0 memory_set_opbase:0003aebc
+cpuexec:0 memory_set_opbase:0003aeb6
+cpuexec:0 memory_set_opbase:0003aec2
+
+
+cpunum_execute(0)
+ set_opbase() ->  0003 a000
+ cpunum_execute(1)
+  set_opbase() -> 0
+
+cpunum_execute(0)
+ set_opbase() ->     3aeb2
+ cpunum_execute(1)
+  set_opbase() ->  ---
+
+
 
 bublebobl 83%/86% cpu
 dino 76% cpu

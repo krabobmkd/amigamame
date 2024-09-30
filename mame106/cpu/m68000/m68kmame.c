@@ -192,32 +192,53 @@ static const struct m68k_memory_interface interface_d32 =
 
 /* krb */
 static const struct m68k_memory_interface interface_fast16 =
-{
+{ // force 32b bus to 68k, ...
 	WORD_XOR_BE(0),
-	program_read_byte_32be, // force 32b bus to 68k, ...
-	program_read_word_32be,
-	program_read_dword_32be,
-	program_write_byte_32be,
-	program_write_word_32be,
-	program_write_dword_32be,
+	program_read_byte_16be, // program_read_byte_32be,
+	program_read_word_16be, // program_read_word_32be,
+	memory_readlong_d16, // memory_readlong_d16B, // readlong_d16, //program_read_dword_32be, -> if 32b replaced, no more sound in arkretrn.
+
+	program_write_byte_16be, // program_write_byte_32be,
+	program_write_word_16be,//program_write_word_32be,
+	memory_writelong_d16, //writelong_d16, //memory_writelong_d16, // writelong_d16,//program_write_dword_32be,
     NULL,
     memory_writemovem32_wr16_reverse,
 };
-
+/*
+    0,
+	program_read_byte_16be,
+	program_read_word_16be,
+	readlong_d16,
+	program_write_byte_16be,
+	program_write_word_16be,
+	writelong_d16,
+    NULL, // changepc
+    memory_writemovem32_wr16_reverse
+*/
 /* krb */
 static const struct m68k_memory_interface interface_fast32 =
 {
 	WORD_XOR_BE(0),
 	program_read_byte_32be,
-	program_read_word_32be,
-	program_read_dword_32be,
+	program_read_word_32be,//readword_d32,
+	readlong_d32,
 	program_write_byte_32be,
-	program_write_word_32be,
-	program_write_dword_32be,
+	program_write_word_32be, //writeword_d32,
+	writelong_d32,
     NULL,
     memory_writemovem32_wr32_reverseSAFE,
 };
-
+/* original:
+	WORD_XOR_BE(0),
+	program_read_byte_32be,
+	readword_d32,
+	readlong_d32,
+	program_write_byte_32be,
+	writeword_d32,
+	writelong_d32,
+    NULL, // changepc
+    memory_writemovem32_wr32_reverseSAFE
+*/
 /* global access */
 struct m68k_memory_interface m68k_memory_intf;
 
@@ -306,8 +327,16 @@ static void m68000_get_context(void *dst)
 
 static void m68000_set_context(void *src)
 {
-	if (m68k_memory_intf.read8 != program_read_byte_16be)
+//    printf("m68000_set_context\n");
+#ifdef OPTIM68K_USEFAST32INTRF
+    if (m68k_memory_intf.writemovem32reverse != memory_writemovem32_wr16_reverse)
+		m68k_memory_intf = interface_fast16;
+#else
+    if (m68k_memory_intf.read8 != program_read_byte_16be)
 		m68k_memory_intf = interface_d16;
+#endif
+
+
 	m68k_set_context(src);
 }
 
@@ -489,8 +518,14 @@ static void m68020_get_context(void *dst)
 
 static void m68020_set_context(void *src)
 {
-	if (m68k_memory_intf.read8 != program_read_byte_32be)
+//    printf("m68020_set_context\n");
+#ifdef OPTIM68K_USEFAST32INTRF
+    if (m68k_memory_intf.writemovem32reverse != memory_writemovem32_wr32_reverseSAFE)
+        m68k_memory_intf = interface_fast32;
+#else
+    if (m68k_memory_intf.read8 != program_read_byte_32be)
 		m68k_memory_intf = interface_d32;
+#endif
 	m68k_set_context(src);
 }
 
