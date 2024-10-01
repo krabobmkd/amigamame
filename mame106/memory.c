@@ -612,7 +612,7 @@ opbase_handler memory_set_opbase_handler(int cpunum, opbase_handler function)
 /*-------------------------------------------------
     memory_set_opbase - generic opcode base changer
 -------------------------------------------------*/
-
+// krb sez: diz the original.
 void memory_set_opbase(offs_t pc)
 {
 	address_space *space = &active_address_space[ADDRESS_SPACE_PROGRAM];
@@ -670,6 +670,78 @@ void memory_set_opbase(offs_t pc)
 	opcode_base = based - (handlers->offset & opcode_mask);
 	opcode_memory_min = handlers->offset;
 	opcode_memory_max = handlers->top;
+}
+
+// krb, the same, for cpu instances
+void memory_set_opbase_instance(sOpCode *pOpcode,int icpu,offs_t pc)
+{
+	addrspace_data *space = &cpudata[icpu].space[ADDRESS_SPACE_PROGRAM];
+
+	//&active_address_space[ADDRESS_SPACE_PROGRAM];
+
+	UINT8 *base = NULL, *based = NULL;
+	handler_data *handlers;
+	UINT8 entry;
+
+	/* allow overrides KRB:TODO ??? re-use static one ? */
+	if (opbasefunc)
+	{
+		pc = (*opbasefunc)(pc);
+		if (pc == ~0UL)
+			return;
+	}
+	/* program address space */
+//	active_address_space[ADDRESS_SPACE_PROGRAM].addrmask = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].mask;
+//	active_address_space[ADDRESS_SPACE_PROGRAM].readlookup = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].read.table;
+//	active_address_space[ADDRESS_SPACE_PROGRAM].writelookup = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].write.table;
+//	active_address_space[ADDRESS_SPACE_PROGRAM].readhandlers = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].read.handlers;
+//	active_address_space[ADDRESS_SPACE_PROGRAM].writehandlers = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].write.handlers;
+//	active_address_space[ADDRESS_SPACE_PROGRAM].accessors = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].accessors;
+
+
+	/* perform the lookup */
+	pc &= space->mask;
+	entry = space->read.table[LEVEL1_INDEX(pc)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->read.table[LEVEL2_INDEX(entry,pc)];
+
+    if(pOpcode->_opcode_entry == entry) return; // already ok.
+	pOpcode->_opcode_entry = entry;
+
+	/* if we don't map to a bank, see if there are any banks we can map to */
+	if (entry < STATIC_BANK1 || entry >= STATIC_RAM)
+	{
+		/* loop over banks and find a match */
+		for (entry = 1; entry < STATIC_COUNT; entry++)
+		{
+			bank_data *bdata = &bankdata[entry];
+			if (bdata->used && bdata->cpunum == cur_context && bdata->spacenum == ADDRESS_SPACE_PROGRAM &&
+				bdata->base < pc && bdata->end > pc)
+				break;
+		}
+
+		/* if nothing was found, leave everything alone */
+		if (entry == STATIC_COUNT)
+		{
+			logerror("cpu #%d (PC=%08X): warning - op-code execute on mapped I/O\n",
+						cpu_getactivecpu(), activecpu_get_pc());
+			return;
+		}
+	}
+
+	/* if no decrypted opcodes, point to the same base */
+	base = bank_ptr[entry];
+	based = bankd_ptr[entry];
+	if (!based)
+		based = base;
+
+	/* compute the adjusted base */
+	handlers = &space->read.handlers[entry];
+	pOpcode->_opcode_mask = handlers->mask;
+	pOpcode->_opcode_arg_base = base - (handlers->offset & pOpcode->_opcode_mask);
+	pOpcode->_opcode_base = based - (handlers->offset & pOpcode->_opcode_mask);
+	pOpcode->_opcode_memory_min = handlers->offset;
+	pOpcode->_opcode_memory_max = handlers->top;
 }
 
 
@@ -775,22 +847,6 @@ m68k_op_movem_32_er_aw		m68ki_read_32
 m68k_op_movem_32_er_al		m68ki_read_32
 
 */
-/*
-    UINT32 entry;																		\
-	MEMREADSTART();																		\
-	PERFORM_LOOKUP(readlookup,active_address_space[spacenum],~1);						\
-	DEBUG_HOOK_READ(spacenum, 2, address);												\
-																						\
-														\
-	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;\
-	if (entry < STATIC_RAM)																\
-		MEMREADEND(*(UINT16 *)&bank_ptr[entry][address]);								\
-																						\													\
-	else																				\
-		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler16)(address >> 1,0));\
-	return 0;																			\
-
-*/
 UINT32 memory_readlong_d16(offs_t address REGM(d0))
 {
     UINT32 entry;
@@ -879,7 +935,7 @@ UINT32 memory_readmovem32(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 
 	{
     	read32_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler32;
         UINT16 i = 0;
-        uint count = 0;
+        UINT32 count = 0;
         address>>=2;
         for(; i < 16; i++)
         {
@@ -897,7 +953,7 @@ UINT32 memory_readmovem32(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 
     // - - - - - - - - -
     UINT32 *pread = (UINT32 *) &bank_ptr[entry][address];
     UINT16 i = 0;
-    uint count = 0;
+    UINT32 count = 0;
 	for(; i < 16; i++)
     {
 		if(bits & 1)
@@ -927,7 +983,7 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
     	//write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
     	write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
         UINT16 i = 0;
-        uint count = 0;
+        UINT32 count = 0;
         address>>=1;
         for(; i < 16; i++)
         {
@@ -949,7 +1005,7 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
     // - - - - - - - - -
     UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
     UINT16 i = 0;
-    uint count = 0;
+    UINT32 count = 0;
 	for(; i < 16; i++)
     {
 		if(bits & 1)
@@ -965,7 +1021,7 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
 UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
 {
     UINT16 i = 0;
-    uint count = 0;
+    UINT32 count = 0;
 
     if (!(address & 3))
     {
@@ -987,7 +1043,7 @@ UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits
             if(bits & 1)
             {
                 address-=4;
-                uint v = preg[15-i];
+                UINT32 v = preg[15-i];
                 //krb: in the 68k world, pair writing crash, let's economise a test.
                 program_write_word_32be(address, v >> 16);
                 program_write_word_32be(address + 2, v);
@@ -1019,7 +1075,7 @@ UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REG
             //program_write_dword_32be(address, data);
             write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
             UINT16 i = 0;
-            uint count = 0;
+            UINT32 count = 0;
             address>>=2;
             for(; i < 16; i++)
             {
@@ -1037,7 +1093,7 @@ UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REG
             // 16bit aligned ? we hope.
             write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
             UINT16 i = 0;
-            uint count = 0;
+            UINT32 count = 0;
             address>>=1;
             for(; i < 16; i++)
             {
@@ -1062,7 +1118,7 @@ UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REG
     // - - - - - - - - -
     UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
     UINT16 i = 0;
-    uint count = 0;
+    UINT32 count = 0;
 	for(; i < 16; i++)
     {
 		if(bits & 1)

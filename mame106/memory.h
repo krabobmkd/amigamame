@@ -968,7 +968,27 @@ const address_map *memory_get_map(int cpunum, int spacenum);
 
 /* ----- opcode base control ---- */
 opbase_handler memory_set_opbase_handler(int cpunum, opbase_handler function);
+
+
+// krb, link opcode to cpu instance
+struct sOpCode {
+    UINT8 			_opcode_entry;				/* current entry for opcode fetching */
+    UINT8 *			_opcode_base;				/* opcode ROM base */
+    UINT8 *			_opcode_arg_base;			/* opcode RAM base */
+    offs_t			_opcode_mask;				/* mask to apply to the opcode address */
+    offs_t			_opcode_memory_min;			/* opcode memory minimum */
+    offs_t			_opcode_memory_max;			/* opcode memory maximum */
+
+   // ? opbase_handler		opbasefunc;						/* opcode base override */
+
+};
+typedef struct sOpCode sOpCode;
+
+
 void		memory_set_opbase(offs_t offset);
+
+// krb, the same, for cpu instances
+void		memory_set_opbase_instance(sOpCode *pOpcode,int icpu,offs_t offset);
 
 /* ----- separate opcode/data encryption helper ---- */
 void 		memory_set_decrypted_region(int cpunum, offs_t start, offs_t end, void *base);
@@ -1181,6 +1201,14 @@ do {																					\
 	if (active_address_space[ADDRESS_SPACE_PROGRAM].readlookup[LEVEL1_INDEX((pc) & active_address_space[ADDRESS_SPACE_PROGRAM].addrmask)] != opcode_entry)	\
 		memory_set_opbase(pc);															\
 } while (0)																				\
+
+// krb for instance
+#define change_pc_cpu(pc,popcode,icpu)																	\
+do {																					\
+	if (active_address_space[ADDRESS_SPACE_PROGRAM].readlookup[LEVEL1_INDEX((pc) & active_address_space[ADDRESS_SPACE_PROGRAM].addrmask)] != opcode_entry)	\
+		memory_set_opbase_instance(popcode,icpu,pc);														\
+} while (0)																				\
+
 
 /* ----- forces the next branch to generate a call to the opbase handler ----- */
 #define catch_nextBranch()			(opcode_entry = 0xff)
