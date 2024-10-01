@@ -11,7 +11,7 @@
 
 #include "driver.h"
 
-
+#include <stdio.h>
 
 /*************************************
  *
@@ -753,9 +753,9 @@ UINT8 default_win_layout[] =
  *
  *************************************/
 
-int activecpu;		/* index of active CPU (or -1) */
-int executingcpu;	/* index of executing CPU (or -1) */
-int totalcpu;		/* total number of CPUs */
+int activecpu=-1;		/* index of active CPU (or -1) */
+int executingcpu=-1;	/* index of executing CPU (or -1) */
+int totalcpu=0;		/* total number of CPUs */
 
 static cpuintrf_data cpu[MAX_CPU];
 
@@ -779,13 +779,18 @@ static int temp_string_pool_index;
 
 INLINE void set_cpu_context(int cpunum)
 {
+//   printf("    set_cpu_context:%d\n",cpunum);
 	int newfamily = cpu[cpunum].family;
 	int oldcontext = cpu_active_context[newfamily];
 
 	/* if we need to change contexts, save the one that was there */
 	if (oldcontext != cpunum && oldcontext != -1)
+    {
+        int keeplast = activecpu;  // krb , get_context need same instance activecpu
+        activecpu = oldcontext;
 		(*cpu[oldcontext].intf.get_context)(cpu[oldcontext].context);
-
+        activecpu = keeplast;
+    }
 	/* swap memory spaces */
 	activecpu = cpunum;
 	memory_set_context(cpunum);
@@ -808,6 +813,7 @@ INLINE void set_cpu_context(int cpunum)
 
 void cpuintrf_push_context(int cpunum)
 {
+   //printf("cpuintrf_push_context:\n");
 	/* push the old context onto the stack */
 	cpu_context_stack[cpu_context_stack_ptr++] = activecpu;
 
@@ -822,6 +828,7 @@ void cpuintrf_push_context(int cpunum)
 
 void cpuintrf_pop_context(void)
 {
+   //printf("    cpuintrf_pop_context:%d\n",cpunum);
 	/* push the old context onto the stack */
 	int cpunum = cpu_context_stack[--cpu_context_stack_ptr];
 
@@ -1001,14 +1008,19 @@ void cpuintrf_set_dasm_override(unsigned (*dasm_override)(int cpunum, char *buff
 
 int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, int (*irqcallback)(int))
 {
+//printf("cpuintrf_init_cpu:%d, %d\n",cpunum,cputype);
+//printf("cpu[cpunum].intf.context_size:%d\n",cpu[cpunum].intf.context_size);
 	/* allocate a context buffer for the CPU */
 	cpu[cpunum].context = auto_malloc(cpu[cpunum].intf.context_size);
 	memset(cpu[cpunum].context, 0, cpu[cpunum].intf.context_size);
 
 	/* initialize the CPU and stash the context */
+//    printf("cpuintrf_init_cpu:%d\n",cpunum);
 	activecpu = cpunum;
 	(*cpu[cpunum].intf.init)(cpunum, clock, config, irqcallback);
 	(*cpu[cpunum].intf.get_context)(cpu[cpunum].context);
+
+//    printf("cpuintrf_init_cpu: activecpu -1\n");
 	activecpu = -1;
 
 	/* clear out the registered CPU for this family */
@@ -1026,6 +1038,8 @@ int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, in
 
 void cpuintrf_exit_cpu(int cpunum)
 {
+//    printf("cpuintrf_exit_cpu:%d ->may use exit()\n",cpunum);
+
 	/* if the CPU core defines an exit function, call it now */
 	if (cpu[cpunum].intf.exit)
 	{
@@ -1449,7 +1463,7 @@ void cpunum_set_info_fct(int cpunum, UINT32 state, genf *data)
 int cpunum_execute(int cpunum, int cycles)
 {
 	int ran;
-	VERIFY_CPUNUM(cpunum_execute);
+//krb	VERIFY_CPUNUM(cpunum_execute);
 	cpuintrf_push_context(cpunum);
 	executingcpu = cpunum;
 	memory_set_opbase(activecpu_get_physical_pc_byte());

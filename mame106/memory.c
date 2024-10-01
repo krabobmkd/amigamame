@@ -520,6 +520,7 @@ void memory_exit(void)
 
 void memory_set_context(int activecpu)
 {
+    //printf("memory_set_context:%d\n",activecpu);
 	/* remember dynamic RAM/ROM */
 	if (cur_context != -1)
 	{
@@ -673,76 +674,76 @@ void memory_set_opbase(offs_t pc)
 }
 
 // krb, the same, for cpu instances
-void memory_set_opbase_instance(sOpCode *pOpcode,int icpu,offs_t pc)
-{
-	addrspace_data *space = &cpudata[icpu].space[ADDRESS_SPACE_PROGRAM];
+//void memory_set_opbase_instance(sOpCode *pOpcode,int icpu,offs_t pc)
+//{
+//	addrspace_data *space = &cpudata[icpu].space[ADDRESS_SPACE_PROGRAM];
 
-	//&active_address_space[ADDRESS_SPACE_PROGRAM];
+//	//&active_address_space[ADDRESS_SPACE_PROGRAM];
 
-	UINT8 *base = NULL, *based = NULL;
-	handler_data *handlers;
-	UINT8 entry;
+//	UINT8 *base = NULL, *based = NULL;
+//	handler_data *handlers;
+//	UINT8 entry;
 
-	/* allow overrides KRB:TODO ??? re-use static one ? */
-	if (opbasefunc)
-	{
-		pc = (*opbasefunc)(pc);
-		if (pc == ~0UL)
-			return;
-	}
-	/* program address space */
-//	active_address_space[ADDRESS_SPACE_PROGRAM].addrmask = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].mask;
-//	active_address_space[ADDRESS_SPACE_PROGRAM].readlookup = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].read.table;
-//	active_address_space[ADDRESS_SPACE_PROGRAM].writelookup = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].write.table;
-//	active_address_space[ADDRESS_SPACE_PROGRAM].readhandlers = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].read.handlers;
-//	active_address_space[ADDRESS_SPACE_PROGRAM].writehandlers = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].write.handlers;
-//	active_address_space[ADDRESS_SPACE_PROGRAM].accessors = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].accessors;
+//	/* allow overrides KRB:TODO ??? re-use static one ? */
+//	if (opbasefunc)
+//	{
+//		pc = (*opbasefunc)(pc);
+//		if (pc == ~0UL)
+//			return;
+//	}
+//	/* program address space */
+////	active_address_space[ADDRESS_SPACE_PROGRAM].addrmask = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].mask;
+////	active_address_space[ADDRESS_SPACE_PROGRAM].readlookup = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].read.table;
+////	active_address_space[ADDRESS_SPACE_PROGRAM].writelookup = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].write.table;
+////	active_address_space[ADDRESS_SPACE_PROGRAM].readhandlers = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].read.handlers;
+////	active_address_space[ADDRESS_SPACE_PROGRAM].writehandlers = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].write.handlers;
+////	active_address_space[ADDRESS_SPACE_PROGRAM].accessors = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].accessors;
 
 
-	/* perform the lookup */
-	pc &= space->mask;
-	entry = space->read.table[LEVEL1_INDEX(pc)];
-	if (entry >= SUBTABLE_BASE)
-		entry = space->read.table[LEVEL2_INDEX(entry,pc)];
+//	/* perform the lookup */
+//	pc &= space->mask;
+//	entry = space->read.table[LEVEL1_INDEX(pc)];
+//	if (entry >= SUBTABLE_BASE)
+//		entry = space->read.table[LEVEL2_INDEX(entry,pc)];
 
-    if(pOpcode->_opcode_entry == entry) return; // already ok.
-	pOpcode->_opcode_entry = entry;
+//    if(pOpcode->_opcode_entry == entry) return; // already ok.
+//	pOpcode->_opcode_entry = entry;
 
-	/* if we don't map to a bank, see if there are any banks we can map to */
-	if (entry < STATIC_BANK1 || entry >= STATIC_RAM)
-	{
-		/* loop over banks and find a match */
-		for (entry = 1; entry < STATIC_COUNT; entry++)
-		{
-			bank_data *bdata = &bankdata[entry];
-			if (bdata->used && bdata->cpunum == cur_context && bdata->spacenum == ADDRESS_SPACE_PROGRAM &&
-				bdata->base < pc && bdata->end > pc)
-				break;
-		}
+//	/* if we don't map to a bank, see if there are any banks we can map to */
+//	if (entry < STATIC_BANK1 || entry >= STATIC_RAM)
+//	{
+//		/* loop over banks and find a match */
+//		for (entry = 1; entry < STATIC_COUNT; entry++)
+//		{
+//			bank_data *bdata = &bankdata[entry];
+//			if (bdata->used && bdata->cpunum == cur_context && bdata->spacenum == ADDRESS_SPACE_PROGRAM &&
+//				bdata->base < pc && bdata->end > pc)
+//				break;
+//		}
 
-		/* if nothing was found, leave everything alone */
-		if (entry == STATIC_COUNT)
-		{
-			logerror("cpu #%d (PC=%08X): warning - op-code execute on mapped I/O\n",
-						cpu_getactivecpu(), activecpu_get_pc());
-			return;
-		}
-	}
+//		/* if nothing was found, leave everything alone */
+//		if (entry == STATIC_COUNT)
+//		{
+//			logerror("cpu #%d (PC=%08X): warning - op-code execute on mapped I/O\n",
+//						cpu_getactivecpu(), activecpu_get_pc());
+//			return;
+//		}
+//	}
 
-	/* if no decrypted opcodes, point to the same base */
-	base = bank_ptr[entry];
-	based = bankd_ptr[entry];
-	if (!based)
-		based = base;
+//	/* if no decrypted opcodes, point to the same base */
+//	base = bank_ptr[entry];
+//	based = bankd_ptr[entry];
+//	if (!based)
+//		based = base;
 
-	/* compute the adjusted base */
-	handlers = &space->read.handlers[entry];
-	pOpcode->_opcode_mask = handlers->mask;
-	pOpcode->_opcode_arg_base = base - (handlers->offset & pOpcode->_opcode_mask);
-	pOpcode->_opcode_base = based - (handlers->offset & pOpcode->_opcode_mask);
-	pOpcode->_opcode_memory_min = handlers->offset;
-	pOpcode->_opcode_memory_max = handlers->top;
-}
+//	/* compute the adjusted base */
+//	handlers = &space->read.handlers[entry];
+//	pOpcode->_opcode_mask = handlers->mask;
+//	pOpcode->_opcode_arg_base = base - (handlers->offset & pOpcode->_opcode_mask);
+//	pOpcode->_opcode_base = based - (handlers->offset & pOpcode->_opcode_mask);
+//	pOpcode->_opcode_memory_min = handlers->offset;
+//	pOpcode->_opcode_memory_max = handlers->top;
+//}
 
 
 /*-------------------------------------------------

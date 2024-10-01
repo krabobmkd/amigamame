@@ -1182,22 +1182,28 @@ char* m68ki_disassemble_quick(M68KOPT_PARAMS,unsigned int pc, unsigned int cpu_t
 //	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
 //}
 
-INLINE uint m68ki_read_imm_16(M68KOPT_PARAMS)
+INLINE uint m68ki_read_imm_16( struct m68k_cpu_instance *p68k COREREG)
 {
-    // what m68k_read_immediate_16 actually does:
-    // no need to prefech really, this is "direct rom reading"
-    UINT16 v= (*(UINT16 *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
+    #ifdef LSB_FIRST
 
-    REG_PC+=2;
-    return (uint)v;
+        uint v= program_read_word_16be(ADDRESS_68K(REG_PC));
+        REG_PC+=2;
+        return v;
+    #else
+        // what m68k_read_immediate_16 actually does:
+        // no need to prefech really, this is "direct rom reading"
+        UINT16 v= (*(UINT16 *)&opcode_base[p68k->m_cpu.pc /*& opcode_mask*/]);
 
+        REG_PC+=2;
+        return (uint)v;
+    #endif
 }
 
 INLINE uint m68ki_read_imm_32(M68KOPT_PARAMS)
 {
 
     #ifdef LSB_FIRST
-        uint v= m68k_read_immediate_32(ADDRESS_68K(REG_PC));
+        uint v= readlong_d16(ADDRESS_68K(REG_PC));
         REG_PC+=4;
         return v;
     #else

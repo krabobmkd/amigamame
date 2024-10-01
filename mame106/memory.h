@@ -988,7 +988,7 @@ typedef struct sOpCode sOpCode;
 void		memory_set_opbase(offs_t offset);
 
 // krb, the same, for cpu instances
-void		memory_set_opbase_instance(sOpCode *pOpcode,int icpu,offs_t offset);
+//void		memory_set_opbase_instance(sOpCode *pOpcode,int icpu,offs_t offset);
 
 /* ----- separate opcode/data encryption helper ---- */
 void 		memory_set_decrypted_region(int cpunum, offs_t start, offs_t end, void *base);
@@ -1203,11 +1203,11 @@ do {																					\
 } while (0)																				\
 
 // krb for instance
-#define change_pc_cpu(pc,popcode,icpu)																	\
-do {																					\
-	if (active_address_space[ADDRESS_SPACE_PROGRAM].readlookup[LEVEL1_INDEX((pc) & active_address_space[ADDRESS_SPACE_PROGRAM].addrmask)] != opcode_entry)	\
-		memory_set_opbase_instance(popcode,icpu,pc);														\
-} while (0)																				\
+//#define change_pc_cpu(pc,popcode,icpu)																	\
+//do {																					\
+//	if (active_address_space[ADDRESS_SPACE_PROGRAM].readlookup[LEVEL1_INDEX((pc) & active_address_space[ADDRESS_SPACE_PROGRAM].addrmask)] != opcode_entry)	\
+//		memory_set_opbase_instance(popcode,icpu,pc);														\
+//} while (0)																				\
 
 
 /* ----- forces the next branch to generate a call to the opbase handler ----- */
