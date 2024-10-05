@@ -380,6 +380,7 @@ void resample_input_stream(struct stream_input *input, int samples)
 		}
 #else
         int hstep = (step >> (1+FRAC_BITS));
+        //printf("hstep:%d\n",hstep);
         if(gain== 0x0100)
         {
             while (samples--)

@@ -16,6 +16,13 @@
 
 #include "mamecore.h"
 
+#if defined(__GNUC__) && defined(__AMIGA__)
+#define REGTM(r) __asm(#r)
+#else
+#define REGTM(r)
+#endif
+
+
 typedef struct _tilemap tilemap;
 
 #define ALL_TILEMAPS	0

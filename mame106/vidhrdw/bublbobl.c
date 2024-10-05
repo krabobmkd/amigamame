@@ -7,7 +7,7 @@
 ***************************************************************************/
 #include "driver.h"
 #include <ctype.h>
-
+#include "drawgfxn.h"
 
 
 unsigned char *bublbobl_objectram;
@@ -25,8 +25,8 @@ int bublbobl_video_enable;
 VIDEO_UPDATE( bublbobl )
 {
 	int offs;
-	int sx,sy,xc,yc;
-	int gfx_num,gfx_attr,gfx_offs;
+	int sx,sy;
+	int gfx_num,gfx_offs;
 	const UINT8 *prom_line;
 
 
@@ -41,7 +41,11 @@ VIDEO_UPDATE( bublbobl )
 
 	sx = 0;
 
-	
+    // new drawgfx use excluded max.
+	rectangle clipex = Machine->visible_area;
+    clipex.max_x++;
+    clipex.max_y++;
+
 	{ 
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
@@ -52,7 +56,7 @@ VIDEO_UPDATE( bublbobl )
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		&Machine->visible_area, 	// clip
+		&clipex,//&Machine->visible_area, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		15, 	// transparent_color
 		0, 	// scalex
@@ -68,8 +72,8 @@ VIDEO_UPDATE( bublbobl )
 		if (*(UINT32 *)(&bublbobl_objectram[offs]) == 0)
 			continue;
 
-		gfx_num = bublbobl_objectram[offs + 1];
-		gfx_attr = bublbobl_objectram[offs + 3];
+		UINT8 gfx_num = bublbobl_objectram[offs + 1];
+		UINT8 gfx_attr = bublbobl_objectram[offs + 3];
 		prom_line = memory_region(REGION_PROMS) + 0x80 + ((gfx_num & 0xe0) >> 1);
 
 		gfx_offs = ((gfx_num & 0x1f) * 0x80);
@@ -78,7 +82,7 @@ VIDEO_UPDATE( bublbobl )
 
 		sy = -bublbobl_objectram[offs + 0];
 
-		for (yc = 0;yc < 32;yc++)
+		for (int yc = 0;yc < 32;yc++)
 		{
 			if (prom_line[yc/2] & 0x08)	continue;	/* NEXT */
 
@@ -87,14 +91,13 @@ VIDEO_UPDATE( bublbobl )
 				sx = bublbobl_objectram[offs + 2];
 				if (gfx_attr & 0x40) sx -= 256;
 			}
-
-			for (xc = 0;xc < 2;xc++)
+            int goffs = gfx_offs + ((yc & 7) <<1) +
+                    ((prom_line[yc/2] & 0x03)<<4);
+			for (int xc = 0;xc < 2;xc++)
 			{
-				int goffs,code,color,flipx,flipy,x,y;
+				int code,color,flipx,flipy,x,y;
 
-				goffs = gfx_offs + xc * 0x40 + (yc & 7) * 0x02 +
-						(prom_line[yc/2] & 0x03) * 0x10;
-				code = videoram[goffs] + 256 * (videoram[goffs + 1] & 0x03) + 1024 * (gfx_attr & 0x0f);
+				code = videoram[goffs] + ((videoram[goffs + 1] & 0x03)<<8) + 1024 * (gfx_attr & 0x0f);
 				color = (videoram[goffs + 1] & 0x3c) >> 2;
 				flipx = videoram[goffs + 1] & 0x40;
 				flipy = videoram[goffs + 1] & 0x80;
@@ -109,14 +112,15 @@ VIDEO_UPDATE( bublbobl )
 					flipy = !flipy;
 				}
 
-				
 				dgp0.code = code;
 				dgp0.color = color;
 				dgp0.flipx = flipx;
 				dgp0.flipy = flipy;
 				dgp0.sx = x;
 				dgp0.sy = y;
-				drawgfx(&dgp0);
+				//drawgfx(&dgp0); old
+                drawgfx_clut16_Src8(&dgp0);
+				goffs += 0x40;
 			}
 		}
 

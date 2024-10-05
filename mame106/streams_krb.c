@@ -113,7 +113,7 @@ static int stream_index;
  *************************************/
 
 static void stream_generate_samples(sound_stream *stream, int samples);
-static void resample_input_stream(struct stream_input *input, int samples);
+extern void resample_input_stream(struct stream_input *input, int samples);
 
 
 
@@ -614,73 +614,73 @@ static void stream_generate_samples(sound_stream *stream, int samples)
  *
  *************************************/
 
-static void resample_input_stream(struct stream_input *input, int samples)
-{
-	stream_sample_t *dest = input->resample + input->resample_in_pos;
-	stream_sample_t *source = input->source->buffer;
-	INT16 gain = (input->gain * input->source->gain) >> 8;
-	UINT32 pos = input->source_frac;
-	UINT32 step = input->step_frac;
-	INT32 sample;
+//static void resample_input_stream(struct stream_input *input, int samples)
+//{
+//	stream_sample_t *dest = input->resample + input->resample_in_pos;
+//	stream_sample_t *source = input->source->buffer;
+//	INT16 gain = (input->gain * input->source->gain) >> 8;
+//	UINT32 pos = input->source_frac;
+//	UINT32 step = input->step_frac;
+//	INT32 sample;
 
-	VPRINTF(("    resample_input_stream -- step = %d\n", step));
+//	VPRINTF(("    resample_input_stream -- step = %d\n", step));
 
-	/* perfectly matching */
-	if (step == FRAC_ONE)
-	{
-		while (samples--)
-		{
-			/* compute the sample */
-			sample = source[pos >> FRAC_BITS];
-			*dest++ = (sample * gain) >> 8;
-			pos += FRAC_ONE;
-		}
-	}
+//	/* perfectly matching */
+//	if (step == FRAC_ONE)
+//	{
+//		while (samples--)
+//		{
+//			/* compute the sample */
+//			sample = source[pos >> FRAC_BITS];
+//			*dest++ = (sample * gain) >> 8;
+//			pos += FRAC_ONE;
+//		}
+//	}
 
-	/* input is undersampled: use linear interpolation */
-	else if (step < FRAC_ONE)
-	{
-		while (samples--)
-		{
-			/* compute the sample */
-			sample  = source[(pos >> FRAC_BITS) + 0] * (FRAC_ONE - (pos & FRAC_MASK));
-			sample += source[(pos >> FRAC_BITS) + 1] * (pos & FRAC_MASK);
-			sample >>= FRAC_BITS;
-			*dest++ = (sample * gain) >> 8;
-			pos += step;
-		}
-	}
+//	/* input is undersampled: use linear interpolation */
+//	else if (step < FRAC_ONE)
+//	{
+//		while (samples--)
+//		{
+//			/* compute the sample */
+//			sample  = source[(pos >> FRAC_BITS) + 0] * (FRAC_ONE - (pos & FRAC_MASK));
+//			sample += source[(pos >> FRAC_BITS) + 1] * (pos & FRAC_MASK);
+//			sample >>= FRAC_BITS;
+//			*dest++ = (sample * gain) >> 8;
+//			pos += step;
+//		}
+//	}
 
-	/* input is oversampled: sum the energy */
-	else
-	{
-		/* use 8 bits to allow some extra headroom */
-		int smallstep = step >> (FRAC_BITS - 8);
+//	/* input is oversampled: sum the energy */
+//	else
+//	{
+//		/* use 8 bits to allow some extra headroom */
+//		int smallstep = step >> (FRAC_BITS - 8);
 
-		while (samples--)
-		{
-			int tpos = pos >> FRAC_BITS;
-			int remainder = smallstep;
-			int scale;
+//		while (samples--)
+//		{
+//			int tpos = pos >> FRAC_BITS;
+//			int remainder = smallstep;
+//			int scale;
 
-			/* compute the sample */
-			scale = (FRAC_ONE - (pos & FRAC_MASK)) >> (FRAC_BITS - 8);
-			sample = source[tpos++] * scale;
-			remainder -= scale;
-			while (remainder > 0x100)
-			{
-				sample += source[tpos++] * 0x100;
-				remainder -= 0x100;
-			}
-			sample += source[tpos] * remainder;
-			sample /= smallstep;
+//			/* compute the sample */
+//			scale = (FRAC_ONE - (pos & FRAC_MASK)) >> (FRAC_BITS - 8);
+//			sample = source[tpos++] * scale;
+//			remainder -= scale;
+//			while (remainder > 0x100)
+//			{
+//				sample += source[tpos++] * 0x100;
+//				remainder -= 0x100;
+//			}
+//			sample += source[tpos] * remainder;
+//			sample /= smallstep;
 
-			*dest++ = (sample * gain) >> 8;
-			pos += step;
-		}
-	}
+//			*dest++ = (sample * gain) >> 8;
+//			pos += step;
+//		}
+//	}
 
-	/* update the input parameters */
-	input->resample_in_pos = dest - input->resample;
-	input->source_frac = pos;
-}
+//	/* update the input parameters */
+//	input->resample_in_pos = dest - input->resample;
+//	input->source_frac = pos;
+//}

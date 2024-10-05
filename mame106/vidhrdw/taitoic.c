@@ -1192,7 +1192,13 @@ static void topspeed_custom_draw(mame_bitmap *bitmap,const rectangle *cliprect,i
 
 void PC080SN_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
 {
-	tilemap_draw(bitmap,cliprect,PC080SN_tilemap[chip][layer],flags,priority);
+    tilemap_draw_primask(bitmap,cliprect,PC080SN_tilemap[chip][layer],flags,priority,
+                         (priority<=1)?0x00:0xff);
+
+        //mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority, UINT32 priority_mask );
+
+
+	//olde tilemap_draw(bitmap,cliprect,PC080SN_tilemap[chip][layer],flags,priority);
 }
 
 void PC080SN_tilemap_draw_special(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram)

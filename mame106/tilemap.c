@@ -113,8 +113,23 @@ static tilemap *	first_tilemap; /* resource tracking */
 static UINT32			screen_width, screen_height;
 tile_data				tile_info;
 
-typedef void (*blitmask_t)( void *dest, const void *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode );
-typedef void (*blitopaque_t)( void *dest, const void *source, int count, UINT8 *pri, UINT32 pcode );
+typedef void (*blitmask_t)(
+        void *dest REGTM(a0),
+        const void *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        );
+typedef void (*blitopaque_t)(
+        void *dest REGTM(a0),
+        const void *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        );
 
 /* the following parameters are constant across tilemap_draw calls */
 static struct
@@ -332,7 +347,13 @@ static void mappings_update( tilemap *tmap )
 
 /***********************************************************************************/
 
-static void pio( void *dest, const void *source, int count, UINT8 *pri, UINT32 pcode )
+static void pio(
+        void *dest REGTM(a0),
+        const void *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 
@@ -343,7 +364,15 @@ static void pio( void *dest, const void *source, int count, UINT8 *pri, UINT32 p
 		}
 }
 
-static void pit( void *dest, const void *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void pit(
+        void *dest REGTM(a0),
+        const void *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3))
 {
 	int i;
 
@@ -360,7 +389,13 @@ static void pit( void *dest, const void *source, const UINT8 *pMask, int mask, i
 /***********************************************************************************/
 
 #ifndef pdo16
-static void pdo16( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+static void pdo16(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 	memcpy( dest,source,count*sizeof(UINT16) );
@@ -370,9 +405,30 @@ static void pdo16( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UI
 	}
 }
 #endif
+static void pdo16First(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
+{
+    // if here means mask is zero, reset prio layer.
+	int i;
+	memcpy( dest,source,count*sizeof(UINT16) );
+    memset( pri,(UINT8)pcode,count);
+
+}
+
 
 #ifndef pdo16pal
-static void pdo16pal( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+static void pdo16pal(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int pal = pcode >> 16;
 	int i;
@@ -385,13 +441,25 @@ static void pdo16pal( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri,
 #endif
 
 #ifndef pdo16np
-static void pdo16np( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+static void pdo16np(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	memcpy( dest,source,count*sizeof(UINT16) );
 }
 #endif
 
-static void pdo15( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+static void pdo15(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
@@ -403,7 +471,13 @@ static void pdo15( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UI
 }
 
 #ifndef pdo32
-static void pdo32( UINT32 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+static void pdo32(
+        UINT32 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
@@ -416,7 +490,13 @@ static void pdo32( UINT32 *dest, const UINT16 *source, int count, UINT8 *pri, UI
 #endif
 
 #ifndef npdo32
-static void npdo32( UINT32 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+static void npdo32(
+        UINT32 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int oddcount = count & 3;
 	int unrcount = count & ~3;
@@ -449,7 +529,16 @@ static void npdo32( UINT32 *dest, const UINT16 *source, int count, UINT8 *pri, U
 /***********************************************************************************/
 
 #ifndef pdt16
-static void pdt16( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void pdt16(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 
@@ -465,7 +554,16 @@ static void pdt16( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, int m
 #endif
 
 #ifndef pdt16pal
-static void pdt16pal( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void pdt16pal(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int pal = pcode >> 16;
 	int i;
@@ -482,7 +580,16 @@ static void pdt16pal( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, in
 #endif
 
 #ifndef pdt16np
-static void pdt16np( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void pdt16np(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 
@@ -494,7 +601,16 @@ static void pdt16np( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, int
 }
 #endif
 
-static void pdt15( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void pdt15(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
@@ -509,7 +625,16 @@ static void pdt15( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, int m
 }
 
 #ifndef pdt32
-static void pdt32( UINT32 *dest, const UINT16 *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void pdt32(
+        UINT32 *dest REGTM(a0),
+        const UINT32 *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
@@ -525,7 +650,16 @@ static void pdt32( UINT32 *dest, const UINT16 *source, const UINT8 *pMask, int m
 #endif
 
 #ifndef npdt32
-static void npdt32( UINT32 *dest, const UINT16 *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void npdt32(
+        UINT32 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int oddcount = count & 3;
 	int unrcount = count & ~3;
@@ -549,7 +683,13 @@ static void npdt32( UINT32 *dest, const UINT16 *source, const UINT8 *pMask, int 
 
 /***********************************************************************************/
 
-static void pbo15( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+static void pbo15(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
@@ -561,7 +701,13 @@ static void pbo15( UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UI
 }
 
 #ifndef pbo32
-static void pbo32( UINT32 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+static void pbo32(
+        UINT32 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
@@ -574,7 +720,13 @@ static void pbo32( UINT32 *dest, const UINT16 *source, int count, UINT8 *pri, UI
 #endif
 
 #ifndef npbo32
-static void npbo32( UINT32 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode )
+static void npbo32(
+        UINT32 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int oddcount = count & 3;
 	int unrcount = count & ~3;
@@ -597,7 +749,16 @@ static void npbo32( UINT32 *dest, const UINT16 *source, int count, UINT8 *pri, U
 
 /***********************************************************************************/
 
-static void pbt15( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void pbt15(
+        UINT16 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
@@ -612,7 +773,16 @@ static void pbt15( UINT16 *dest, const UINT16 *source, const UINT8 *pMask, int m
 }
 
 #ifndef pbt32
-static void pbt32( UINT32 *dest, const UINT16 *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void pbt32(
+        UINT32 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int i;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
@@ -628,7 +798,16 @@ static void pbt32( UINT32 *dest, const UINT16 *source, const UINT8 *pMask, int m
 #endif
 
 #ifndef npbt32
-static void npbt32( UINT32 *dest, const UINT16 *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode )
+static void npbt32(
+        UINT32 *dest REGTM(a0),
+        const UINT16 *source REGTM(a1),
+        const UINT8 *pMask REGTM(a2),
+        int mask REGTM(d1),
+        int value REGTM(d2),
+        int count REGTM(d0),
+        UINT8 *pri REGTM(a3),
+        UINT32 pcode REGTM(d3)
+        )
 {
 	int oddcount = count & 3;
 	int unrcount = count & ~3;
@@ -1183,311 +1362,313 @@ void tilemap_draw_primask( mame_bitmap *dest, const rectangle *cliprect, tilemap
 	int left, right, top, bottom;
 
 profiler_mark(PROFILER_TILEMAP_DRAW);
-	if( tmap->enable )
-	{
-		/* scroll registers */
-		rows		= tmap->cached_scroll_rows;
-		cols		= tmap->cached_scroll_cols;
-		rowscroll	= tmap->cached_rowscroll;
-		colscroll	= tmap->cached_colscroll;
+	if( !tmap->enable ) return;
 
-		/* clipping */
-		if( cliprect )
-		{
-			left	= cliprect->min_x;
-			top		= cliprect->min_y;
-			right	= cliprect->max_x+1;
-			bottom	= cliprect->max_y+1;
-		}
-		else
-		{
-			left	= 0;
-			top		= 0;
-			right	= tmap->cached_width;
-			bottom	= tmap->cached_height;
-		}
+    /* scroll registers */
+    rows		= tmap->cached_scroll_rows;
+    cols		= tmap->cached_scroll_cols;
+    rowscroll	= tmap->cached_rowscroll;
+    colscroll	= tmap->cached_colscroll;
 
-		/* tile priority */
-		mask		= TILE_FLAG_TILE_PRIORITY;
-		value		= TILE_FLAG_TILE_PRIORITY&flags;
+    /* clipping */
+    if( cliprect )
+    {
+        left	= cliprect->min_x;
+        top		= cliprect->min_y;
+        right	= cliprect->max_x+1;
+        bottom	= cliprect->max_y+1;
+    }
+    else
+    {
+        left	= 0;
+        top		= 0;
+        right	= tmap->cached_width;
+        bottom	= tmap->cached_height;
+    }
 
-		/* initialize defaults */
-		memset( &tile_info, 0x00, sizeof(tile_info) );
-		tile_info.user_data = tmap->user_data;
+    /* tile priority */
+    mask		= TILE_FLAG_TILE_PRIORITY;
+    value		= TILE_FLAG_TILE_PRIORITY&flags;
 
-		/* if the whole map is dirty, mark it as such */
-		if (tmap->all_tiles_dirty)
-		{
-			memset( tmap->transparency_data, TILE_FLAG_DIRTY, tmap->num_tiles );
-			tmap->all_tiles_dirty = 0;
-		}
+    /* initialize defaults */
+    memset( &tile_info, 0x00, sizeof(tile_info) );
+    tile_info.user_data = tmap->user_data;
 
-		/* priority_bitmap_pitch_row is tmap-specific */
-		priority_bitmap_pitch_row = priority_bitmap_pitch_line*tmap->cached_tile_height;
+    /* if the whole map is dirty, mark it as such */
+    if (tmap->all_tiles_dirty)
+    {
+        memset( tmap->transparency_data, TILE_FLAG_DIRTY, tmap->num_tiles );
+        tmap->all_tiles_dirty = 0;
+    }
 
-		blit.screen_bitmap = dest;
-		if( dest == NULL )
-		{
-			blit.draw_masked = (blitmask_t)pit;
-			blit.draw_opaque = (blitopaque_t)pio;
-		}
-		else
-		{
-			blit.screen_bitmap_pitch_line = ((UINT8 *)dest->line[1]) - ((UINT8 *)dest->line[0]);
-			switch( dest->depth )
-			{
-			case 32:
-				if (priority)
-				{
-					if( flags&TILEMAP_ALPHA )
-					{
-						blit.draw_masked = (blitmask_t)pbt32;
-						blit.draw_opaque = (blitopaque_t)pbo32;
-					}
-					else
-					{
-						blit.draw_masked = (blitmask_t)pdt32;
-						blit.draw_opaque = (blitopaque_t)pdo32;
-					}
-				}
-				else
-				{
-					//* AAT APR2003: added 32-bit no-priority counterpart
-					if( flags&TILEMAP_ALPHA )
-					{
-						blit.draw_masked = (blitmask_t)npbt32;
-						blit.draw_opaque = (blitopaque_t)npbo32;
-					}
-					else
-					{
-						blit.draw_masked = (blitmask_t)npdt32;
-						blit.draw_opaque = (blitopaque_t)npdo32;
-					}
-				}
-				blit.screen_bitmap_pitch_line /= 4;
-				break;
-			case 15:
-				if( flags&TILEMAP_ALPHA )
-				{
-					blit.draw_masked = (blitmask_t)pbt15;
-					blit.draw_opaque = (blitopaque_t)pbo15;
-				}
-				else
-				{
-					blit.draw_masked = (blitmask_t)pdt15;
-					blit.draw_opaque = (blitopaque_t)pdo15;
-				}
-				blit.screen_bitmap_pitch_line /= 2;
-				break;
+    /* priority_bitmap_pitch_row is tmap-specific */
+    priority_bitmap_pitch_row = priority_bitmap_pitch_line*tmap->cached_tile_height;
 
-			case 16:
-				if (tmap->palette_offset)
-				{
-					blit.draw_masked = (blitmask_t)pdt16pal;
-					blit.draw_opaque = (blitopaque_t)pdo16pal;
-				}
-				else if (priority)
-				{
-					blit.draw_masked = (blitmask_t)pdt16;
-					blit.draw_opaque = (blitopaque_t)pdo16;
-				}
-				else
-				{
-					blit.draw_masked = (blitmask_t)pdt16np;
-					blit.draw_opaque = (blitopaque_t)pdo16np;
-				}
-				blit.screen_bitmap_pitch_line /= 2;
-				break;
+    blit.screen_bitmap = dest;
+    if( dest == NULL )
+    {
+        blit.draw_masked = (blitmask_t)pit;
+        blit.draw_opaque = (blitopaque_t)pio;
+    }
+    else
+    {
+        blit.screen_bitmap_pitch_line = ((UINT8 *)dest->line[1]) - ((UINT8 *)dest->line[0]);
+        switch( dest->depth )
+        {
+        case 32:
+            if (priority)
+            {
+                if( flags&TILEMAP_ALPHA )
+                {
+                    blit.draw_masked = (blitmask_t)pbt32;
+                    blit.draw_opaque = (blitopaque_t)pbo32;
+                }
+                else
+                {
+                    blit.draw_masked = (blitmask_t)pdt32;
+                    blit.draw_opaque = (blitopaque_t)pdo32;
+                }
+            }
+            else
+            {
+                //* AAT APR2003: added 32-bit no-priority counterpart
+                if( flags&TILEMAP_ALPHA )
+                {
+                    blit.draw_masked = (blitmask_t)npbt32;
+                    blit.draw_opaque = (blitopaque_t)npbo32;
+                }
+                else
+                {
+                    blit.draw_masked = (blitmask_t)npdt32;
+                    blit.draw_opaque = (blitopaque_t)npdo32;
+                }
+            }
+            blit.screen_bitmap_pitch_line /= 4;
+            break;
+        case 15:
+            if( flags&TILEMAP_ALPHA )
+            {
+                blit.draw_masked = (blitmask_t)pbt15;
+                blit.draw_opaque = (blitopaque_t)pbo15;
+            }
+            else
+            {
+                blit.draw_masked = (blitmask_t)pdt15;
+                blit.draw_opaque = (blitopaque_t)pdo15;
+            }
+            blit.screen_bitmap_pitch_line /= 2;
+            break;
 
-			default:
-				exit(1);
-				break;
-			}
-			blit.screen_bitmap_pitch_row = blit.screen_bitmap_pitch_line*tmap->cached_tile_height;
-		} /* dest == bitmap */
+        case 16:
+            if (tmap->palette_offset)
+            {
+                blit.draw_masked = (blitmask_t)pdt16pal;
+                blit.draw_opaque = (blitopaque_t)pdo16pal;
+            }
+            else if (priority)
+            {
+                blit.draw_masked = (blitmask_t)pdt16;
+                blit.draw_opaque = (priority_mask==0)?
+                        (blitopaque_t)pdo16First:       // krb added
+                        (blitopaque_t)pdo16;
+            }
+            else
+            {
+                blit.draw_masked = (blitmask_t)pdt16np;
+                blit.draw_opaque = (blitopaque_t)pdo16np;
+            }
+            blit.screen_bitmap_pitch_line /= 2;
+            break;
 
-		if( !(tmap->type==TILEMAP_OPAQUE || (flags&TILEMAP_IGNORE_TRANSPARENCY)) )
-		{
-			if( flags&TILEMAP_BACK )
-			{
-				mask	|= TILE_FLAG_BG_OPAQUE;
-				value	|= TILE_FLAG_BG_OPAQUE;
-			}
-			else
-			{
-				mask	|= TILE_FLAG_FG_OPAQUE;
-				value	|= TILE_FLAG_FG_OPAQUE;
-			}
-		}
+        default:
+            exit(1);
+            break;
+        }
+        blit.screen_bitmap_pitch_row = blit.screen_bitmap_pitch_line*tmap->cached_tile_height;
+    } /* dest == bitmap */
 
-		blit.tilemap_priority_code = (priority & 0xff) | ((priority_mask & 0xff) << 8) | (tmap->palette_offset << 16);
+    if( !(tmap->type==TILEMAP_OPAQUE || (flags&TILEMAP_IGNORE_TRANSPARENCY)) )
+    {
+        if( flags&TILEMAP_BACK )
+        {
+            mask	|= TILE_FLAG_BG_OPAQUE;
+            value	|= TILE_FLAG_BG_OPAQUE;
+        }
+        else
+        {
+            mask	|= TILE_FLAG_FG_OPAQUE;
+            value	|= TILE_FLAG_FG_OPAQUE;
+        }
+    }
 
-		if( rows == 1 && cols == 1 )
-		{ /* XY scrolling playfield */
-			int scrollx = rowscroll[0];
-			int scrolly = colscroll[0];
+    blit.tilemap_priority_code = (priority & 0xff) | ((priority_mask & 0xff) << 8) | (tmap->palette_offset << 16);
 
-			if( scrollx < 0 )
-			{
-				scrollx = tmap->cached_width - (-scrollx) % tmap->cached_width;
-			}
-			else
-			{
-				scrollx = scrollx % tmap->cached_width;
-			}
+    if( rows == 1 && cols == 1 )
+    { /* XY scrolling playfield */
+        int scrollx = rowscroll[0];
+        int scrolly = colscroll[0];
 
-			if( scrolly < 0 )
-			{
-				scrolly = tmap->cached_height - (-scrolly) % tmap->cached_height;
-			}
-			else
-			{
-				scrolly = scrolly % tmap->cached_height;
-			}
+        if( scrollx < 0 )
+        {
+            scrollx = tmap->cached_width - (-scrollx) % tmap->cached_width;
+        }
+        else
+        {
+            scrollx = scrollx % tmap->cached_width;
+        }
 
-	 		blit.clip_left		= left;
-	 		blit.clip_top		= top;
-	 		blit.clip_right		= right;
-	 		blit.clip_bottom	= bottom;
+        if( scrolly < 0 )
+        {
+            scrolly = tmap->cached_height - (-scrolly) % tmap->cached_height;
+        }
+        else
+        {
+            scrolly = scrolly % tmap->cached_height;
+        }
 
-			for(
-				ypos = scrolly - tmap->cached_height;
-				ypos < blit.clip_bottom;
-				ypos += tmap->cached_height )
-			{
-				for(
-					xpos = scrollx - tmap->cached_width;
-					xpos < blit.clip_right;
-					xpos += tmap->cached_width )
-				{
-					drawfunc( tmap, xpos, ypos, mask, value );
-				}
-			}
-		}
-		else if( rows == 1 )
-		{ /* scrolling columns + horizontal scroll */
-			int col = 0;
-			int colwidth = tmap->cached_width / cols;
-			int scrollx = rowscroll[0];
+        blit.clip_left		= left;
+        blit.clip_top		= top;
+        blit.clip_right		= right;
+        blit.clip_bottom	= bottom;
 
-			if( scrollx < 0 )
-			{
-				scrollx = tmap->cached_width - (-scrollx) % tmap->cached_width;
-			}
-			else
-			{
-				scrollx = scrollx % tmap->cached_width;
-			}
+        for(
+            ypos = scrolly - tmap->cached_height;
+            ypos < blit.clip_bottom;
+            ypos += tmap->cached_height )
+        {
+            for(
+                xpos = scrollx - tmap->cached_width;
+                xpos < blit.clip_right;
+                xpos += tmap->cached_width )
+            {
+                drawfunc( tmap, xpos, ypos, mask, value );
+            }
+        }
+    }
+    else if( rows == 1 )
+    { /* scrolling columns + horizontal scroll */
+        int col = 0;
+        int colwidth = tmap->cached_width / cols;
+        int scrollx = rowscroll[0];
 
-			blit.clip_top		= top;
-			blit.clip_bottom	= bottom;
+        if( scrollx < 0 )
+        {
+            scrollx = tmap->cached_width - (-scrollx) % tmap->cached_width;
+        }
+        else
+        {
+            scrollx = scrollx % tmap->cached_width;
+        }
 
-			while( col < cols )
-			{
-				int cons	= 1;
-				int scrolly	= colscroll[col];
+        blit.clip_top		= top;
+        blit.clip_bottom	= bottom;
 
-	 			/* count consecutive columns scrolled by the same amount */
-				if( scrolly != TILE_LINE_DISABLED )
-				{
-					while( col + cons < cols &&	colscroll[col + cons] == scrolly ) cons++;
+        while( col < cols )
+        {
+            int cons	= 1;
+            int scrolly	= colscroll[col];
 
-					if( scrolly < 0 )
-					{
-						scrolly = tmap->cached_height - (-scrolly) % tmap->cached_height;
-					}
-					else
-					{
-						scrolly %= tmap->cached_height;
-					}
+            /* count consecutive columns scrolled by the same amount */
+            if( scrolly != TILE_LINE_DISABLED )
+            {
+                while( col + cons < cols &&	colscroll[col + cons] == scrolly ) cons++;
 
-					blit.clip_left = col * colwidth + scrollx;
-					if (blit.clip_left < left) blit.clip_left = left;
-					blit.clip_right = (col + cons) * colwidth + scrollx;
-					if (blit.clip_right > right) blit.clip_right = right;
+                if( scrolly < 0 )
+                {
+                    scrolly = tmap->cached_height - (-scrolly) % tmap->cached_height;
+                }
+                else
+                {
+                    scrolly %= tmap->cached_height;
+                }
 
-					for(
-						ypos = scrolly - tmap->cached_height;
-						ypos < blit.clip_bottom;
-						ypos += tmap->cached_height )
-					{
-						drawfunc( tmap, scrollx, ypos, mask, value );
-					}
+                blit.clip_left = col * colwidth + scrollx;
+                if (blit.clip_left < left) blit.clip_left = left;
+                blit.clip_right = (col + cons) * colwidth + scrollx;
+                if (blit.clip_right > right) blit.clip_right = right;
 
-					blit.clip_left = col * colwidth + scrollx - tmap->cached_width;
-					if (blit.clip_left < left) blit.clip_left = left;
-					blit.clip_right = (col + cons) * colwidth + scrollx - tmap->cached_width;
-					if (blit.clip_right > right) blit.clip_right = right;
+                for(
+                    ypos = scrolly - tmap->cached_height;
+                    ypos < blit.clip_bottom;
+                    ypos += tmap->cached_height )
+                {
+                    drawfunc( tmap, scrollx, ypos, mask, value );
+                }
 
-					for(
-						ypos = scrolly - tmap->cached_height;
-						ypos < blit.clip_bottom;
-						ypos += tmap->cached_height )
-					{
-						drawfunc( tmap, scrollx - tmap->cached_width, ypos, mask, value );
-					}
-				}
-				col += cons;
-			}
-		}
-		else if( cols == 1 )
-		{ /* scrolling rows + vertical scroll */
-			int row = 0;
-			int rowheight = tmap->cached_height / rows;
-			int scrolly = colscroll[0];
-			if( scrolly < 0 )
-			{
-				scrolly = tmap->cached_height - (-scrolly) % tmap->cached_height;
-			}
-			else
-			{
-				scrolly = scrolly % tmap->cached_height;
-			}
-			blit.clip_left = left;
-			blit.clip_right = right;
-			while( row < rows )
-			{
-				int cons = 1;
-				int scrollx = rowscroll[row];
-				/* count consecutive rows scrolled by the same amount */
-				if( scrollx != TILE_LINE_DISABLED )
-				{
-					while( row + cons < rows &&	rowscroll[row + cons] == scrollx ) cons++;
-					if( scrollx < 0)
-					{
-						scrollx = tmap->cached_width - (-scrollx) % tmap->cached_width;
-					}
-					else
-					{
-						scrollx %= tmap->cached_width;
-					}
-					blit.clip_top = row * rowheight + scrolly;
-					if (blit.clip_top < top) blit.clip_top = top;
-					blit.clip_bottom = (row + cons) * rowheight + scrolly;
-					if (blit.clip_bottom > bottom) blit.clip_bottom = bottom;
-					for(
-						xpos = scrollx - tmap->cached_width;
-						xpos < blit.clip_right;
-						xpos += tmap->cached_width )
-					{
-						drawfunc( tmap, xpos, scrolly, mask, value );
-					}
-					blit.clip_top = row * rowheight + scrolly - tmap->cached_height;
-					if (blit.clip_top < top) blit.clip_top = top;
-					blit.clip_bottom = (row + cons) * rowheight + scrolly - tmap->cached_height;
-					if (blit.clip_bottom > bottom) blit.clip_bottom = bottom;
-					for(
-						xpos = scrollx - tmap->cached_width;
-						xpos < blit.clip_right;
-						xpos += tmap->cached_width )
-					{
-						drawfunc( tmap, xpos, scrolly - tmap->cached_height, mask, value );
-					}
-				}
-				row += cons;
-			}
-		}
-	}
+                blit.clip_left = col * colwidth + scrollx - tmap->cached_width;
+                if (blit.clip_left < left) blit.clip_left = left;
+                blit.clip_right = (col + cons) * colwidth + scrollx - tmap->cached_width;
+                if (blit.clip_right > right) blit.clip_right = right;
+
+                for(
+                    ypos = scrolly - tmap->cached_height;
+                    ypos < blit.clip_bottom;
+                    ypos += tmap->cached_height )
+                {
+                    drawfunc( tmap, scrollx - tmap->cached_width, ypos, mask, value );
+                }
+            }
+            col += cons;
+        }
+    }
+    else if( cols == 1 )
+    { /* scrolling rows + vertical scroll */
+        int row = 0;
+        int rowheight = tmap->cached_height / rows;
+        int scrolly = colscroll[0];
+        if( scrolly < 0 )
+        {
+            scrolly = tmap->cached_height - (-scrolly) % tmap->cached_height;
+        }
+        else
+        {
+            scrolly = scrolly % tmap->cached_height;
+        }
+        blit.clip_left = left;
+        blit.clip_right = right;
+        while( row < rows )
+        {
+            int cons = 1;
+            int scrollx = rowscroll[row];
+            /* count consecutive rows scrolled by the same amount */
+            if( scrollx != TILE_LINE_DISABLED )
+            {
+                while( row + cons < rows &&	rowscroll[row + cons] == scrollx ) cons++;
+                if( scrollx < 0)
+                {
+                    scrollx = tmap->cached_width - (-scrollx) % tmap->cached_width;
+                }
+                else
+                {
+                    scrollx %= tmap->cached_width;
+                }
+                blit.clip_top = row * rowheight + scrolly;
+                if (blit.clip_top < top) blit.clip_top = top;
+                blit.clip_bottom = (row + cons) * rowheight + scrolly;
+                if (blit.clip_bottom > bottom) blit.clip_bottom = bottom;
+                for(
+                    xpos = scrollx - tmap->cached_width;
+                    xpos < blit.clip_right;
+                    xpos += tmap->cached_width )
+                {
+                    drawfunc( tmap, xpos, scrolly, mask, value );
+                }
+                blit.clip_top = row * rowheight + scrolly - tmap->cached_height;
+                if (blit.clip_top < top) blit.clip_top = top;
+                blit.clip_bottom = (row + cons) * rowheight + scrolly - tmap->cached_height;
+                if (blit.clip_bottom > bottom) blit.clip_bottom = bottom;
+                for(
+                    xpos = scrollx - tmap->cached_width;
+                    xpos < blit.clip_right;
+                    xpos += tmap->cached_width )
+                {
+                    drawfunc( tmap, xpos, scrolly - tmap->cached_height, mask, value );
+                }
+            }
+            row += cons;
+        }
+    }
+
 profiler_mark(PROFILER_END);
 }
 

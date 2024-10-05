@@ -30,8 +30,8 @@ set(MAME_CORE_SRC
  fileio.cpp
  artwork.c
    cpuint.c    inptport.c  palette.c   streams_krb.c   video.c
-	cpuintrf.c  input.c     png.c       tilemap.c
-	cdrom.c    drawgfx.c    jedparse.c  timer.c     xml2info.c
+	cpuintrf.c  input.c     png.c       tilemap.c tilemapn.cpp
+	cdrom.c    drawgfx.c  drawgfxn.cpp   jedparse.c  timer.c     xml2info.c
 	chd.c      driver.c    jedutil.c   xmlfile.c
 	chdcd.c    mame.c      romload.c   ui_text.c
 	  harddisk.c  mamecore.c  sha1.c      unzip.c

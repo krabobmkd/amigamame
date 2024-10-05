@@ -269,7 +269,7 @@ static void update_interrupts(void)
 		cpunum_set_input_line(0, 7, CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( neo_irqack_w )
+INLINE WRITE16_HANDLER( neo_irqack_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -542,17 +542,18 @@ static READ16_HANDLER( neo_control_16_r )
 
 
 /* this does much more than this, but I'm not sure exactly what */
-WRITE16_HANDLER( neo_control_16_w )
-{
-	logerror("%06x: neo_control_16_w %04x\n",activecpu_get_pc(),data);
+// moved
+//WRITE16_HANDLER( neo_control_16_w )
+//{
+//	logerror("%06x: neo_control_16_w %04x\n",activecpu_get_pc(),data);
 
-	/* Auto-Anim Speed Control */
-	neogeo_frame_counter_speed = (data >> 8) & 0xff;
+//	/* Auto-Anim Speed Control */
+//	neogeo_frame_counter_speed = (data >> 8) & 0xff;
 
-	irq2control = data & 0xff;
-}
+//	irq2control = data & 0xff;
+//}
 
-static WRITE16_HANDLER( neo_irq2pos_16_w )
+INLINE WRITE16_HANDLER( neo_irq2pos_16_w )
 {
 	logerror("%06x: neo_irq2pos_16_w offset %d %04x\n",activecpu_get_pc(),offset,data);
 
@@ -589,12 +590,12 @@ static READ16_HANDLER ( neogeo_video_r )
 
 	offset &=0x3;
 
-	switch (offset<<1)
+	switch (offset)
 	{
 		case 0: retdata=neogeo_vidram16_data_r(0,mem_mask);break;
-		case 2: retdata=neogeo_vidram16_data_r(0,mem_mask);break;
-		case 4:	retdata=neogeo_vidram16_modulo_r(0,mem_mask);break;
-		case 6:	retdata=neo_control_16_r(0,mem_mask);break;
+		case 1: retdata=neogeo_vidram16_data_r(0,mem_mask);break;
+		case 2:	retdata=neogeo_vidram16_modulo_r(0,mem_mask);break;
+		case 3:	retdata=neo_control_16_r(0,mem_mask);break;
 	}
 
 	return retdata;
@@ -605,21 +606,38 @@ static WRITE16_HANDLER( neogeo_video_w )
 	int line = RASTER_LINES - cpu_getiloops();
 
 	/* If Video RAM changes force a partial update to the previous line */
-	force_partial_update(line-24); // tuned by ssideki4 / msyogui
-
+    // krb: more exact for vertical effects, but slowestness
+//re	force_partial_update(line-24); // tuned by ssideki4 / msyogui
 
 	offset &=0x7;
 
-	switch (offset<<1)
+    // krb: inline all that.
+	switch (offset) // /2
 	{
 		case 0x0:neogeo_vidram16_offset_w(0,data,mem_mask); break;
-		case 0x2:neogeo_vidram16_data_w(0,data,mem_mask); break;
-		case 0x4:neogeo_vidram16_modulo_w(0,data,mem_mask); break;
-		case 0x6:neo_control_16_w(0,data,mem_mask); break;
-		case 0x8:neo_irq2pos_16_w(0,data,mem_mask); break;
-		case 0xa:neo_irq2pos_16_w(1,data,mem_mask); break;
-		case 0xc:neo_irqack_w(0,data,mem_mask); break;
-		case 0xe:break; /* Unknown, see control_r */
+		case 0x1:neogeo_vidram16_data_w(0,data,mem_mask); break;
+		case 0x2:neogeo_vidram16_modulo_w(0,data,mem_mask); break;
+		case 0x3:
+    { // neo_control_16_w(0,data,mem_mask);
+        /* Auto-Anim Speed Control */
+        neogeo_frame_counter_speed = (data >> 8) & 0xff;
+        irq2control = data & 0xff;
+    }
+         break;
+		case 0x4:
+    {
+        neo_irq2pos_16_w(0,data,mem_mask);
+    } break;
+		case 0x5:
+    {
+        neo_irq2pos_16_w(1,data,mem_mask);
+    } break;
+		case 0x6:
+    {
+        neo_irqack_w(0,data,mem_mask);
+    }
+        break;
+		case 0x7:break; /* Unknown, see control_r */
 	}
 }
 
