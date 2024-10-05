@@ -1,6 +1,19 @@
-
+#include <QApplication>
+#include <QString>
+#include <QList>
+#include <QVector>
+#include <iostream>
+#include <QImage>
+#include <QPixmap>
+#include <QLabel>
+#include <vector>
+#include <cmath>
+#include <QThread>
+#include <QMutex>
 #include "lconfig.h"
-
+#include "qtmain.h"
+#include <QMainWindow>
+#include <QVBoxLayout>
 extern "C" {
     #include "osdepend.h"
     #include "mamecore.h"
@@ -8,9 +21,12 @@ extern "C" {
     #include "driver.h"
     #include "input.h"
 }
-#ifdef __linux__
-#include <sys/time.h>
-#endif
+#include <chrono>
+
+using namespace std;
+
+
+
 void StartGame(int idriver)
 {
 
@@ -58,35 +74,108 @@ options.skip_warnings = 1;
 //    osd_fclose(options.record);
 }
 
-
-int main(int argc, char **argv)
+int w = 320;
+int h = 224;
+vector<uint8_t> bm(w * h * 3, 128);
+QProc *proc=nullptr;
+QThread *qthread = nullptr;
+struct _mame_display *_display=nullptr;
+QMutex m_mutex;
+QProc::QProc() : QObject()
+{}
+void QProc::process()
 {
-   // if(argc<2) return 0;
-
-    getMainConfig().init(argc,argv);
+    getMainConfig().init(0,nullptr);
 //    getMainConfig().load();
 
     int idriver = -1;
     // test if just "mame romname".
     int itest = getMainConfig().driverIndex().index(
     //"arkretrn"
-    "wb3"
+    //"wb3"
+    "bublbobl"
+//   "dino"
+//    "rastan"
     );
     if(itest>0) idriver= itest;
-
 
     //  if game was explicit, no GUI
     if(idriver>0)
     {
         getMainConfig().setActiveDriver(idriver);
         StartGame(idriver);
-        return 0;
+    }
+}
+
+QWin::QWin() : QLabel()
+{
+    m_mutex.lock(); // reverse mutex
+
+    qthread = new QThread();
+    qthread->start();
+
+    proc = new  QProc();
+    proc->moveToThread(qthread);
+    connect(this,&QWin::startproc, proc,&QProc::process);
+
+    emit startproc();
+    connect(&m_timer,&QTimer::timeout,this,&QWin::updateWin);
+    m_timer.setSingleShot(false);
+    m_timer.start(1000/60);
+    show();
+}
+void QWin::updateWin()
+{
+
+    if(!_display || !_display->game_bitmap ) return;
+    struct _mame_display *display=_display;
+
+    uint16_t *p = (uint16_t *) _display->game_bitmap->base;
+    int x1 = _display->game_visible_area.min_x;
+    int y1 = _display->game_visible_area.min_y;
+
+    if(w != _display->game_bitmap->width || h != _display->game_bitmap->height)
+    {
+        w = _display->game_bitmap->width;
+        h =  _display->game_bitmap->height;
+        bm.resize(w*h*3);
+    }
+    for(int y=0;y<_display->game_bitmap->height;y++)
+    {
+        uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
+        pline += x1;
+        for(int x=0;x<display->game_bitmap->width;x++)
+        {
+            uint16_t c = *pline++;
+            uint32_t rgb=0;
+            if(c<display->game_palette_entries)
+            rgb = display->game_palette[c];
+
+            int i = (x+y*w)*3;
+            bm[i]= rgb>>16;
+            bm[i+1]= rgb>>8;
+            bm[i+2]= rgb;
+
+        }
     }
 
 
+	const QImage image(bm.data(), w, h, QImage::Format_RGB888);
 
-    return 0;
+	this->setPixmap(QPixmap::fromImage(image).scaled(QSize(w*2,h*2)) );
+    this->setFixedSize(w*2,h*2);
+	//lbl.show();
+    m_mutex.unlock();
+    m_mutex.lock();
 }
+int main(int argc, char* argv[])
+{
+	QApplication a(argc, argv);
+    QWin w;
+	return a.exec();
+}
+
+
 int osd_init()
 {
   return(0);
@@ -106,10 +195,15 @@ int osd_skip_this_frame(void)
 }
 void osd_update_video_and_audio(struct _mame_display *display)
 {
+    _display = display;
+    m_mutex.lock();
+    m_mutex.unlock();
 
 }
 mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)
 {
+
+
     return bitmap;
 }
 const char *osd_get_fps_text(const performance_info *performance)
@@ -187,15 +281,20 @@ void osd_joystick_end_calibration(void)
 
 cycles_t osd_cycles(void)
 {
-#ifdef __linux__
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    return tv.tv_sec * 1000000L + tv.tv_usec;
-    #else
-    static cycles_t o=0;
-    o+= 5465;
-return o;
-    #endif
+    using namespace std::chrono;
+
+    system_clock::time_point now = system_clock::now();
+    microseconds micros_since_epoch = duration_cast<microseconds>(now.time_since_epoch());
+    return micros_since_epoch.count();
+//#ifdef __linux__
+//    struct timeval tv;
+//    gettimeofday(&tv,NULL);
+//    return tv.tv_sec * 1000000L + tv.tv_usec;
+//    #else
+//    static cycles_t o=0;
+//    o+= 5465;
+//return o;
+//    #endif
 }
 cycles_t osd_cycles_per_second(void)
 {
