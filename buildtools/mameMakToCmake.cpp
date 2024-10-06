@@ -842,6 +842,8 @@ int createCmake(map<string,TMachine> machinetargets,
          // pacmania,...
          if(upname == "MININAMCOS1") onShouldBeDefault=true;
 
+         if(upname == "JALECO") onShouldBeDefault=true;
+
          if(upname == "CAPCOM" ) onShouldBeDefault = true;
         if(upname == "TAITO" ) onShouldBeDefault = true;
  //       if(upname == "NAMCO" ) onShouldBeDefault = true; -> too horizontaly dependent.

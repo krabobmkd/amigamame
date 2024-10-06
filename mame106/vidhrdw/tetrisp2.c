@@ -445,13 +445,13 @@ static void tetrisp2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		&clip, 	// clip
+		NULL,//&clip, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		primask 	// priority_mask
+		0//primask 	// priority_mask
 	  };
 	for (; source <= finish; source += 0x10/2 )
 	{
@@ -542,8 +542,10 @@ static void tetrisp2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 				dgp0.color = color;
 				dgp0.flipx = flipx;
 				dgp0.flipy = flipy;
+                dgp0.clip = &clip;
 				dgp0.sx = sx + x * 8;
 				dgp0.sy = sy + y * 8;
+                dgp0.priority_mask = primask | (1<<31);
 				drawgfx(&dgp0);
 			}
 			code	+=	(0x100/8) - xnum;

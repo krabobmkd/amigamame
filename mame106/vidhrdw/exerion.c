@@ -395,10 +395,10 @@ VIDEO_UPDATE( exerion )
 
 	/* draw sprites */
 	
-	{ 
+
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
-		gfx, 	// gfx
+		NULL, 	// gfx
 		0, 	// code
 		0, 	// color
 		0, 	// flipx
@@ -428,6 +428,7 @@ VIDEO_UPDATE( exerion )
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (sprite_palette * 16);
 		const gfx_element *gfx = doubled ? Machine->gfx[2] : Machine->gfx[1];
+        dgp0.gfx = gfx;
 
 		if (exerion_cocktail_flip)
 		{
@@ -444,7 +445,6 @@ VIDEO_UPDATE( exerion )
 				code |= 0x10, code2 &= ~0x10;
 			else
 				code &= ~0x10, code2 |= 0x10;
-
 			
 			dgp0.code = code2;
 			dgp0.color = color;
@@ -466,7 +466,7 @@ VIDEO_UPDATE( exerion )
 
 		if (doubled) i += 4;
 	}
-	} // end of patch paragraph
+
 
 
 	/* draw the visible text layer */

@@ -486,157 +486,424 @@ WRITE16_HANDLER( neo_game_fix_16_w )
 {
 	fix_bank = 0;
 }
+#ifdef LSB_FIRST
+        // little endian: intel arm
+#define WR_ORD0  0
+#define WR_ORD1  1
+#define WR_ORD2  2
+#define WR_ORD3  3
+#define WR_ORD4  4
+#define WR_ORD5  5
+#define WR_ORD6  6
+#define WR_ORD7  7
 
+#else
+        // ppc, 68k:
+        // 10325476
+#define WR_ORD0  6
+#define WR_ORD1  7
+#define WR_ORD2  4
+#define WR_ORD3  5
+#define WR_ORD4  2
+#define WR_ORD5  3
+#define WR_ORD6  0
+#define WR_ORD7  1
+#endif
 /******************************************************************************/
-
-// VF debug colors...
-UINT32 backPalette[16]={0};
-int didsprite =0;
-int last_gra =0;
-int lastcol = 0;
-
-static void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
+// yoffs = sprite offset
+INLINE void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int sx,int sy,
 		int zx,int yoffs,const rectangle *clip)
 {
+    const UINT8 msk=0x0f;
 	UINT16 *bm = line[sy]+sx;
-	UINT8 col;
-	int mydword;
 
-	UINT8 *fspr = memory_region_gfx3;
+	UINT8 *fspr = (UINT32 *)memory_region_gfx3;
 	const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
-    didsprite = 1;
-last_gra = gfx->color_granularity;
-lastcol = color;
 
 	if (sx <= -16) return;
 
-	//
-    for(int i=0;i<16;i++)
-    {
-        backPalette[i]=paldata[i];
-    }
+	fspr += code*(128) + yoffs*(8);
+    // sprite lines are 16 pixels 16 colors each, va/vb contains 8 and 8 in pack4 mode
 
-
-    /* Safety feature */
-	code %= no_of_tiles;
-
-	/* Check for total transparency, no need to draw */
-	if ((gfx->pen_usage[code] & ~1) == 0)
-		return;
-
-	fspr += code*128 + 8*yoffs;
 
 	if (flipx)	/* X flip */
 	{
 		if (zx == 0x0f)
 		{
-			mydword = (fspr[4])|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
-			col = (mydword>>28)&0xf; if (col) bm[ 0] = paldata[col];
-			col = (mydword>>24)&0xf; if (col) bm[ 1] = paldata[col];
-			col = (mydword>>20)&0xf; if (col) bm[ 2] = paldata[col];
-			col = (mydword>>16)&0xf; if (col) bm[ 3] = paldata[col];
-			col = (mydword>>12)&0xf; if (col) bm[ 4] = paldata[col];
-			col = (mydword>> 8)&0xf; if (col) bm[ 5] = paldata[col];
-			col = (mydword>> 4)&0xf; if (col) bm[ 6] = paldata[col];
-			col = (mydword>> 0)&0xf; if (col) bm[ 7] = paldata[col];
+            UINT32 *fspr4 = (UINT32*)fspr;
+            UINT32 v = *fspr4++;
+            if(v)
+            {
+                //v = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
+                // pixel order bytewise in memory:
+                // 10 32
+                UINT8 col;
 
-			mydword = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
-			col = (mydword>>28)&0xf; if (col) bm[ 8] = paldata[col];
-			col = (mydword>>24)&0xf; if (col) bm[ 9] = paldata[col];
-			col = (mydword>>20)&0xf; if (col) bm[10] = paldata[col];
-			col = (mydword>>16)&0xf; if (col) bm[11] = paldata[col];
-			col = (mydword>>12)&0xf; if (col) bm[12] = paldata[col];
-			col = (mydword>> 8)&0xf; if (col) bm[13] = paldata[col];
-			col = (mydword>> 4)&0xf; if (col) bm[14] = paldata[col];
-			col = (mydword>> 0)&0xf; if (col) bm[15] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD7] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD6] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD5] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD4] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD3] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD2] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD1] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD0] = paldata[col];
+            }
+            v = *fspr4;
+            if(v)
+            {
+                UINT8 col;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD7] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD6] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD5] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD4] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD3] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD2] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD1] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD0] = paldata[col];
+            }
 		}
 		else
 		{
 			char *zoomx_draw = zoomx_draw_tables[zx];
+            fspr+=7;
+            UINT8 c = *fspr--;
+            if (zoomx_draw[0]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[1]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[2]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[3]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[4]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[5]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[6]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[7]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
 
-			mydword = (fspr[4])|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
-			if (zoomx_draw[ 0]) { col = (mydword>>28)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 1]) { col = (mydword>>24)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 2]) { col = (mydword>>20)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 3]) { col = (mydword>>16)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 4]) { col = (mydword>>12)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 5]) { col = (mydword>> 8)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 6]) { col = (mydword>> 4)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 7]) { col = (mydword>> 0)&0xf; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[8]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[9]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[10]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[11]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[12]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[13]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[14]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[15]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
 
-			mydword = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
-			if (zoomx_draw[ 8]) { col = (mydword>>28)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 9]) { col = (mydword>>24)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[10]) { col = (mydword>>20)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[11]) { col = (mydword>>16)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[12]) { col = (mydword>>12)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[13]) { col = (mydword>> 8)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[14]) { col = (mydword>> 4)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[15]) { col = (mydword>> 0)&0xf; if (col) *bm = paldata[col]; bm++; }
 		}
 	}
-	else		/* normal */
+	else		/* normal, no flip */
+	{
+
+		if (zx == 0x0f)		/* fixed */
+		{
+            UINT32 *fspr4 = (UINT32*)fspr;
+            UINT32 v = *fspr4++;
+            if(v)
+            {
+                //v = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
+                // pixel order bytewise in memory:
+                // 10 32
+                UINT8 col;
+
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD0] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD1] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD2] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD3] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD4] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD5] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD6] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD7] = paldata[col];
+            }
+            v = *fspr4;
+            if(v)
+            {
+                UINT8 col;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD0] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD1] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD2] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD3] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD4] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD5] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD6] = paldata[col];
+                v>>=4;
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD7] = paldata[col];
+            }
+		}
+		else
+		{
+			char *zoomx_draw = zoomx_draw_tables[zx];
+            UINT8 c = *fspr++;
+            if (zoomx_draw[0]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[1]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr++;
+            if (zoomx_draw[2]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[3]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr++;
+            if (zoomx_draw[4]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[5]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr++;
+            if (zoomx_draw[6]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[7]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+
+            c = *fspr++;
+            if (zoomx_draw[8]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[9]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr++;
+            if (zoomx_draw[10]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[11]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr++;
+            if (zoomx_draw[12]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[13]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr++;
+            if (zoomx_draw[14]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[15]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+
+		}
+	}
+}
+
+INLINE void NeoMVSDrawGfxLineOpaque(UINT16 **line,const gfx_element *gfx,
+		unsigned int code,unsigned int color,int flipx,int sx,int sy,
+		int zx,int yoffs,const rectangle *clip)
+{
+    const UINT8 msk=0x0f;
+	UINT16 *bm = line[sy]+sx;
+
+	UINT8 *fspr = (UINT32 *)memory_region_gfx3;
+	const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
+
+	if (sx <= -16) return;
+
+	fspr += code*(128) + yoffs*(8);
+    // sprite lines are 16 pixels 16 colors each, va/vb contains 8 and 8 in pack4 mode
+
+
+	if (flipx)	/* X flip */
+	{
+        if (zx == 0x0f)
+		{
+            UINT32 *fspr4 = (UINT32*)fspr;
+            UINT32 v = *fspr4++;
+
+            UINT8 col;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD7] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD6] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD5] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD4] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD3] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD2] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD1] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD0] = paldata[col];
+
+            v = *fspr4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD7] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD6] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD5] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD4] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD3] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD2] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD1] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD0] = paldata[col];
+
+		}
+		else
+		{
+			char *zoomx_draw = zoomx_draw_tables[zx];
+            fspr+=7;
+            UINT8 c = *fspr--;
+            if (zoomx_draw[0]) { UINT8 col=c>>4;  *bm = paldata[col]; bm++; }
+            if (zoomx_draw[1]) { UINT8 col=c&msk;  *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[2]) { UINT8 col=c>>4;  *bm = paldata[col]; bm++; }
+            if (zoomx_draw[3]) { UINT8 col=c&msk;  *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[4]) { UINT8 col=c>>4;  *bm = paldata[col]; bm++; }
+            if (zoomx_draw[5]) { UINT8 col=c&msk;  *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[6]) { UINT8 col=c>>4;  *bm = paldata[col]; bm++; }
+            if (zoomx_draw[7]) { UINT8 col=c&msk;  *bm = paldata[col]; bm++; }
+
+            c = *fspr--;
+            if (zoomx_draw[8]) { UINT8 col=c>>4;  *bm = paldata[col]; bm++; }
+            if (zoomx_draw[9]) { UINT8 col=c&msk;  *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[10]) { UINT8 col=c>>4;  *bm = paldata[col]; bm++; }
+            if (zoomx_draw[11]) { UINT8 col=c&msk;  *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[12]) { UINT8 col=c>>4;  *bm = paldata[col]; bm++; }
+            if (zoomx_draw[13]) { UINT8 col=c&msk;  *bm = paldata[col]; bm++; }
+            c = *fspr--;
+            if (zoomx_draw[14]) { UINT8 col=c>>4;  *bm = paldata[col]; bm++; }
+            if (zoomx_draw[15]) { UINT8 col=c&msk;  *bm = paldata[col]; bm++; }
+
+		}
+	}
+	else		/* normal no flip */
 	{
 		if (zx == 0x0f)		/* fixed */
 		{
-			mydword = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
-			col = (mydword>> 0)&0xf; if (col) bm[ 0] = paldata[col];
-			col = (mydword>> 4)&0xf; if (col) bm[ 1] = paldata[col];
-			col = (mydword>> 8)&0xf; if (col) bm[ 2] = paldata[col];
-			col = (mydword>>12)&0xf; if (col) bm[ 3] = paldata[col];
-			col = (mydword>>16)&0xf; if (col) bm[ 4] = paldata[col];
-			col = (mydword>>20)&0xf; if (col) bm[ 5] = paldata[col];
-			col = (mydword>>24)&0xf; if (col) bm[ 6] = paldata[col];
-			col = (mydword>>28)&0xf; if (col) bm[ 7] = paldata[col];
+            UINT32 *fspr4 = (UINT32*)fspr;
+            UINT32 v = *fspr4++;
 
-			mydword = (fspr[4])|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
-			col = (mydword>> 0)&0xf; if (col) bm[ 8] = paldata[col];
-			col = (mydword>> 4)&0xf; if (col) bm[ 9] = paldata[col];
-			col = (mydword>> 8)&0xf; if (col) bm[10] = paldata[col];
-			col = (mydword>>12)&0xf; if (col) bm[11] = paldata[col];
-			col = (mydword>>16)&0xf; if (col) bm[12] = paldata[col];
-			col = (mydword>>20)&0xf; if (col) bm[13] = paldata[col];
-			col = (mydword>>24)&0xf; if (col) bm[14] = paldata[col];
-			col = (mydword>>28)&0xf; if (col) bm[15] = paldata[col];
+            //v = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
+            // pixel order bytewise in memory:
+            // 10 32
+            UINT8 col;
+
+            col = ((UINT8)v)&msk;  bm[ WR_ORD0] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD1] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD2] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD3] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD4] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD5] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD6] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[ WR_ORD7] = paldata[col];
+
+            v = *fspr4;
+
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD0] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD1] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD2] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD3] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD4] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD5] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD6] = paldata[col];
+            v>>=4;
+            col = ((UINT8)v)&msk;  bm[8+ WR_ORD7] = paldata[col];
 		}
 		else
 		{
 			char *zoomx_draw = zoomx_draw_tables[zx];
+            UINT8 c = *fspr++;
+            if (zoomx_draw[0]) { UINT8 col=c&msk; *bm++ = paldata[col];  }
+            if (zoomx_draw[1]) { UINT8 col=c>>4;  *bm++ = paldata[col];  }
+            c = *fspr++;
+            if (zoomx_draw[2]) { UINT8 col=c&msk;  *bm++ = paldata[col];  }
+            if (zoomx_draw[3]) { UINT8 col=c>>4;  *bm++ = paldata[col];  }
+            c = *fspr++;
+            if (zoomx_draw[4]) { UINT8 col=c&msk;  *bm++ = paldata[col];  }
+            if (zoomx_draw[5]) { UINT8 col=c>>4;  *bm++ = paldata[col];  }
+            c = *fspr++;
+            if (zoomx_draw[6]) { UINT8 col=c&msk;  *bm++ = paldata[col];  }
+            if (zoomx_draw[7]) { UINT8 col=c>>4;  *bm++ = paldata[col];  }
 
-			mydword = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
-			if (zoomx_draw[ 0]) { col = (mydword>> 0)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 1]) { col = (mydword>> 4)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 2]) { col = (mydword>> 8)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 3]) { col = (mydword>>12)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 4]) { col = (mydword>>16)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 5]) { col = (mydword>>20)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 6]) { col = (mydword>>24)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 7]) { col = (mydword>>28)&0xf; if (col) *bm = paldata[col]; bm++; }
+            c = *fspr++;
+            if (zoomx_draw[8]) { UINT8 col=c&msk;  *bm++ = paldata[col];  }
+            if (zoomx_draw[9]) { UINT8 col=c>>4;  *bm++ = paldata[col];  }
+            c = *fspr++;
+            if (zoomx_draw[10]) { UINT8 col=c&msk;  *bm++ = paldata[col];  }
+            if (zoomx_draw[11]) { UINT8 col=c>>4;  *bm++ = paldata[col];  }
+            c = *fspr++;
+            if (zoomx_draw[12]) { UINT8 col=c&msk;  *bm++ = paldata[col];  }
+            if (zoomx_draw[13]) { UINT8 col=c>>4;  *bm++ = paldata[col];  }
+            c = *fspr++;
+            if (zoomx_draw[14]) { UINT8 col=c&msk;  *bm++ = paldata[col];  }
+            if (zoomx_draw[15]) { UINT8 col=c>>4;  *bm++ = paldata[col];  }
+            // 10325476
 
-			mydword = (fspr[4])|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
-			if (zoomx_draw[ 8]) { col = (mydword>> 0)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[ 9]) { col = (mydword>> 4)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[10]) { col = (mydword>> 8)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[11]) { col = (mydword>>12)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[12]) { col = (mydword>>16)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[13]) { col = (mydword>>20)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[14]) { col = (mydword>>24)&0xf; if (col) *bm = paldata[col]; bm++; }
-			if (zoomx_draw[15]) { col = (mydword>>28)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			v = (fspr[0])|(fspr[1]<<8)|(fspr[2]<<16)|(fspr[3]<<24);
+//			if (zoomx_draw[ 0]) { col = (v>> 0)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[ 1]) { col = (v>> 4)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[ 2]) { col = (v>> 8)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[ 3]) { col = (v>>12)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[ 4]) { col = (v>>16)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[ 5]) { col = (v>>20)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[ 6]) { col = (v>>24)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[ 7]) { col = (v>>28)&0xf; if (col) *bm = paldata[col]; bm++; }
+
+//			v = (fspr[4])|(fspr[5]<<8)|(fspr[6]<<16)|(fspr[7]<<24);
+//			if (zoomx_draw[ 8]) { col = (v>> 0)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[ 9]) { col = (v>> 4)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[10]) { col = (v>> 8)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[11]) { col = (v>>12)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[12]) { col = (v>>16)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[13]) { col = (v>>20)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[14]) { col = (v>>24)&0xf; if (col) *bm = paldata[col]; bm++; }
+//			if (zoomx_draw[15]) { col = (v>>28)&0xf; if (col) *bm = paldata[col]; bm++; }
 		}
 	}
 }
 
 
-
 /******************************************************************************/
+struct ngspriteparams {
+    int my;
+    int sx;
+    int sy;
+    int zx;
+    int zy;
+    int offs;
+    int fullmode;
+    UINT16 **line;
+    const rectangle *cliprect;
+    int scanline;
+};
 
-
-static void neogeo_draw_sprite( int my, int sx, int sy, int zx, int zy, int offs, int fullmode, UINT16 **line, const rectangle *cliprect, int scanline )
+INLINE void neogeo_draw_sprite(
+        int my, int sx, int sy, int zx, int zy, int offs, int fullmode, UINT16 **line, const rectangle *cliprect, int scanline
+        )
 {
 	int drawn_lines = 0;
 	UINT8 *zoomy_rom;
-	int tileno,tileatr;
+	UINT16 tileno,tileatr;
 	int min_spriteline;
 	int max_spriteline;
 	int tile,yoffs;
@@ -658,12 +925,14 @@ static void neogeo_draw_sprite( int my, int sx, int sy, int zx, int zy, int offs
 	}
 	else if (min_spriteline < max_spriteline)
 	{
-		/* if the minimum is lower than the maximum we draw anytihng between the two */
+		/* if the minimum is lower than the maximum we draw anything between the two */
 
 		if ((scanline >=min_spriteline) && (scanline < max_spriteline))
 			drawn_lines = (scanline - min_spriteline)&0x1ff;
 		else
+        {
 			return; /* outside of sprite */
+        }
 
 	}
 	else if (min_spriteline > max_spriteline)
@@ -672,12 +941,16 @@ static void neogeo_draw_sprite( int my, int sx, int sy, int zx, int zy, int offs
 		if ( (scanline < max_spriteline) || (scanline >= min_spriteline) )
 			drawn_lines = (scanline - min_spriteline)&0x1ff; // check!
 		else
+        {
 			return; /* outside of sprite */
+        }
 	}
 	else
 	{
 		return; /* outside of sprite */
 	}
+
+
 
 	zoom_line = drawn_lines & 0xff;
 	if (drawn_lines & 0x100)
@@ -718,14 +991,40 @@ static void neogeo_draw_sprite( int my, int sx, int sy, int zx, int zy, int offs
 
 	if (tileatr & 0x02) yoffs ^= 0x0f;	/* flip y */
 
-	NeoMVSDrawGfxLine((UINT16 **)line,
-			gfx,
-			tileno,
-			tileatr >> 8,
-			tileatr & 0x01,	/* flip x */
-			sx,scanline,zx,yoffs,
-			cliprect
-		);
+    /* Safety feature */
+	tileno %= no_of_tiles;
+
+    UINT32 penusage = gfx->pen_usage[tileno];
+
+    if ((penusage & ~1) == 0)
+    {
+		return; // full transparency
+    }
+
+//    if((penusage & 1)==0)
+//    {
+//        // no color 0 means opaque
+//        NeoMVSDrawGfxLineOpaque((UINT16 **)line,
+//                gfx,
+//                tileno,
+//                tileatr >> 8,
+//                tileatr & 0x01,	/* flip x */
+//                sx,scanline,zx,yoffs,
+//                cliprect
+//            );
+//    } else
+    {
+        NeoMVSDrawGfxLine((UINT16 **)line,
+                gfx,
+                tileno,
+                tileatr >> 8,
+                tileatr & 0x01,	/* flip x */
+                sx,scanline,zx,yoffs,
+                cliprect
+            );
+    }
+
+
 
 }
 
@@ -766,8 +1065,8 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		if (banked)
 		{
-			
-			{ 
+
+			{
 			struct drawgfxParams dgp0={
 				bitmap, 	// dest
 				gfx, 	// gfx
@@ -807,7 +1106,7 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 
 					if ((pen_usage[byte1] & ~1) == 0) continue;
 
-					
+
 					dgp0.code = byte1;
 					dgp0.color = byte2;
 					dgp0.sx = x*8;
@@ -820,8 +1119,8 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 		} //Banked
 		else
 		{
-			
-			{ 
+
+			{
 			struct drawgfxParams dgp1={
 				bitmap, 	// dest
 				gfx, 	// gfx
@@ -849,7 +1148,7 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 
 					if ((pen_usage[byte1] & ~1) == 0) continue;
 
-					
+
 					dgp1.code = byte1;
 					dgp1.color = byte2;
 					dgp1.sx = x*8;
@@ -865,12 +1164,17 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 
 }
 
+
+int exitbytile=0;
+int exitbyclipx2=0;
+
 VIDEO_UPDATE( neogeo )
 {
 	int sx =0,sy =0,my =0,zx = 0x0f, zy = 0xff;
 	int count;
 	int offs;
-	int t1,t2,t3;
+    UINT16 t3,t1;
+	int t2;
 	char fullmode = 0;
 	void **line=bitmap->line;
 	int scan;
@@ -880,17 +1184,15 @@ VIDEO_UPDATE( neogeo )
 	for (scan = cliprect->min_y; scan <= cliprect->max_y ; scan++)
 	{
 
-		/* Process Sprite List */
+		/* Process Sprite List -384 */
 		for (count = 0; count < 0x300 >> 1; count++)
 		{
-
-			t3 = neogeo_vidram16[(0x10000 >> 1) + count];
 			t1 = neogeo_vidram16[(0x10400 >> 1) + count];
-
-
+            t3 = neogeo_vidram16[(0x10000 >> 1) + count];
 			/* If this bit is set this new column is placed next to last one */
 			if (t1 & 0x40)
 			{
+
 				sx += zx+1;
 				if ( sx >= 0x1F0 )
 					sx -= 0x200;
@@ -900,6 +1202,14 @@ VIDEO_UPDATE( neogeo )
 			}
 			else /* nope it is a new block */
 			{
+                /* Number of tiles in this strip */
+				my = t1 & 0x3f;
+                // krb: has to do super fast escape as soon as possible. lots of sprites.
+                /* No point doing anything if tile strip is 0 */
+
+               // t3 = neogeo_vidram16[(0x10000 >> 1) + count];
+
+
 				/* Sprite scaling */
 				t2 = neogeo_vidram16[(0x10800 >> 1) + count];
 				zx = (t3 >> 8) & 0x0f;
@@ -909,8 +1219,7 @@ VIDEO_UPDATE( neogeo )
 				if ( sx >= 0x1F0 )
 					sx -= 0x200;
 
-				/* Number of tiles in this strip */
-				my = t1 & 0x3f;
+
 
 				sy = 0x200 - (t1 >> 7);
 
@@ -922,12 +1231,14 @@ VIDEO_UPDATE( neogeo )
 				else
 					fullmode = 0;
 			}
-
-			/* No point doing anything if tile strip is 0 */
-			if (my==0) continue;
-
+            if (my==0)
+            {   // most common case of escape.
+                continue;
+            }
 			if (sx >= 320)
+            {
 				continue;
+            }
 
 			offs = count<<6;
 
@@ -935,4 +1246,5 @@ VIDEO_UPDATE( neogeo )
 		}  /* for count */
 	}
 	neogeo_draw_s_layer(bitmap,cliprect);
+
 }

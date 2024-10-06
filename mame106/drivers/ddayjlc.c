@@ -356,8 +356,6 @@ VIDEO_UPDATE( ddayjlc )
 	UINT32 i;
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	
-	{ 
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
 		Machine->gfx[0], 	// gfx
@@ -385,7 +383,6 @@ VIDEO_UPDATE( ddayjlc )
 		INT32 yflip = (code&0x80);
 
 		code=(code&0x7f)|((flags&0x30)<<3);
-
 		
 		dgp0.code = code;
 		dgp0.flipx = xflip;
@@ -394,66 +391,53 @@ VIDEO_UPDATE( ddayjlc )
 		dgp0.sy = y;
 		drawgfx(&dgp0);
 	}
-	} // end of patch paragraph
+
+
+
+
+    struct drawgfxParams dgp1={
+        bitmap, 	// dest
+        Machine->gfx[1], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        cliprect, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        0, 	// transparent_color
+        0, 	// scalex
+        0, 	// scaley
+        NULL, 	// pri_buffer
+        0 	// priority_mask
+      };
+
 
 
 	{
 		UINT32 x,y,c;
-		for(y=0;y<32;y++)
-			
-			{ 
-			struct drawgfxParams dgp1={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_PEN, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
-			struct drawgfxParams dgp2={
-				bitmap, 	// dest
-				Machine->gfx[1], 	// gfx
-				0, 	// code
-				0, 	// color
-				0, 	// flipx
-				0, 	// flipy
-				0, 	// sx
-				0, 	// sy
-				cliprect, 	// clip
-				TRANSPARENCY_NONE, 	// transparency
-				0, 	// transparent_color
-				0, 	// scalex
-				0, 	// scaley
-				NULL, 	// pri_buffer
-				0 	// priority_mask
-			  };
+		for(y=0;y<32;y++)			
+        {
 			for(x=0;x<32;x++)
 			{
 				c=videoram[y*32+x];
 				if(x>1&&x<30)
-					
+				{
 					dgp1.code = c+char_bank*0x100;
 					dgp1.sx = x*8;
 					dgp1.sy = y*8;
 					drawgfx(&dgp1);
+                }
 				else
-					
-					dgp2.code = c+char_bank*0x100;
-					dgp2.sx = x*8;
-					dgp2.sy = y*8;
-					drawgfx(&dgp2);
-		}
-			} // end of patch paragraph
-
+				{
+					dgp1.code = c+char_bank*0x100;
+					dgp1.sx = x*8;
+					dgp1.sy = y*8;
+					drawgfx(&dgp1);
+                }
+            }
+        }
 	}
 }
 

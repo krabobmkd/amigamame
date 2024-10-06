@@ -11,7 +11,8 @@
     #define OPTIM68K_USEFAST32INTRF 1
     #ifdef OPTIM68K_USEFAST32INTRF
         #define OPTIM68K_USEFASTMOVEMREAD 1
-        #define OPTIM68K_USEFASTMOVEMWRITE 1
+// makes mslug/mslugx crash the mig after exe relaunch
+//?        #define OPTIM68K_USEFASTMOVEMWRITE 1
     #endif
     #define OPTIM68K_USEDIRECT68KASM_DIVS 1
     #define OPTIM68K_USEDIRECT68KASM 1

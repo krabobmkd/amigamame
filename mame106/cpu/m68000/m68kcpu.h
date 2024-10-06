@@ -1199,6 +1199,9 @@ INLINE uint m68ki_read_imm_16( struct m68k_cpu_instance *p68k COREREG)
     #endif
 }
 
+UINT32 readlong_d16(offs_t address REGM(d0));
+void writelong_d16(offs_t address REGM(d0), UINT32 data REGM(d1));
+
 INLINE uint m68ki_read_imm_32(M68KOPT_PARAMS)
 {
 

@@ -607,7 +607,8 @@ static WRITE16_HANDLER( neogeo_video_w )
 
 	/* If Video RAM changes force a partial update to the previous line */
     // krb: more exact for vertical effects, but slowestness
-//re	force_partial_update(line-24); // tuned by ssideki4 / msyogui
+//re
+    force_partial_update(line-24); // tuned by ssideki4 / msyogui
 
 	offset &=0x7;
 

@@ -71,13 +71,13 @@ static const struct m68k_memory_interface interface_d8 =
  * 16-bit data memory interface
  ****************************************************************************/
 
-static UINT32 readlong_d16(offs_t address REGM(d0))
+UINT32 readlong_d16(offs_t address REGM(d0))
 {
 	UINT32 result = program_read_word_16be(address) << 16;
 	return result | program_read_word_16be(address + 2);
 }
 
-static void writelong_d16(offs_t address REGM(d0), UINT32 data REGM(d1))
+void writelong_d16(offs_t address REGM(d0), UINT32 data REGM(d1))
 {
 	program_write_word_16be(address, data >> 16);
 	program_write_word_16be(address + 2, data);

@@ -816,7 +816,7 @@ int m68k_execute(int num_cycles)
 
 		do
 		{
-#ifndef OPTIM68K_SQUEEZEPPCREG
+#ifndef     OPTIM68K_SQUEEZEPPCREG
 			// Record previous program counter
 			REG_PPC = REG_PC;
 #endif

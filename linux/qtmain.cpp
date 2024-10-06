@@ -81,6 +81,7 @@ QProc *proc=nullptr;
 QThread *qthread = nullptr;
 struct _mame_display *_display=nullptr;
 QMutex m_mutex;
+bool m_bIs15b = false;
 QProc::QProc() : QObject()
 {}
 void QProc::process()
@@ -92,10 +93,12 @@ void QProc::process()
     // test if just "mame romname".
     int itest = getMainConfig().driverIndex().index(
     //"arkretrn"
-    //"wb3"
-    "bublbobl"
+//    "wb3"
+//    "bublbobl"
 //   "dino"
 //    "rastan"
+      "mslug"
+//                "mp_sor2"
     );
     if(itest>0) idriver= itest;
 
@@ -109,7 +112,7 @@ void QProc::process()
 
 QWin::QWin() : QLabel()
 {
-    m_mutex.lock(); // reverse mutex
+ //   m_mutex.lock(); // reverse mutex
 
     qthread = new QThread();
     qthread->start();
@@ -133,14 +136,36 @@ void QWin::updateWin()
     uint16_t *p = (uint16_t *) _display->game_bitmap->base;
     int x1 = _display->game_visible_area.min_x;
     int y1 = _display->game_visible_area.min_y;
+    int realHeight = (_display->game_visible_area.max_y - _display->game_visible_area.min_y)+1;
 
-    if(w != _display->game_bitmap->width || h != _display->game_bitmap->height)
+    if(w != _display->game_bitmap->width || h != realHeight)
     {
         w = _display->game_bitmap->width;
-        h =  _display->game_bitmap->height;
+        h = realHeight;
         bm.resize(w*h*3);
     }
-    for(int y=0;y<_display->game_bitmap->height;y++)
+
+    if(m_bIs15b)
+    {
+
+        for(int y=0;y<realHeight;y++)
+        {
+            uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
+            pline += x1;
+            for(int x=0;x<display->game_bitmap->width;x++)
+            {
+                uint16_t rgb = *pline++;
+
+                int i = (x+y*w)*3;
+                bm[i]= ((rgb>>10)<<3) & 0xf8;
+                bm[i+1]=  ((rgb>>5)<<3) & 0xf8;
+                bm[i+2]=((rgb)<<3) & 0xf8;
+
+            }
+        }
+    } else
+
+    for(int y=0;y<realHeight;y++)
     {
         uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
         pline += x1;
@@ -165,8 +190,8 @@ void QWin::updateWin()
 	this->setPixmap(QPixmap::fromImage(image).scaled(QSize(w*2,h*2)) );
     this->setFixedSize(w*2,h*2);
 	//lbl.show();
-    m_mutex.unlock();
-    m_mutex.lock();
+//    m_mutex.unlock();
+//    m_mutex.lock();
 }
 int main(int argc, char* argv[])
 {
@@ -183,6 +208,18 @@ int osd_init()
 
 int osd_create_display(const osd_create_params *params, UINT32 *rgb_components)
 {
+    if((params->video_attributes & VIDEO_RGB_DIRECT) && (rgb_components))
+    {
+//        rgb_components[0] = 0x00ff0000;
+//        rgb_components[1] = 0x0000ff00;
+//        rgb_components[2] = 0x000000ff;
+        rgb_components[0] = 0x00007c00;
+        rgb_components[1] = 0x000003e0;
+        rgb_components[2] = 0x0000001f;
+        m_bIs15b = true;
+    }
+
+
     return 0;
 }
 void osd_close_display(void)
@@ -196,8 +233,8 @@ int osd_skip_this_frame(void)
 void osd_update_video_and_audio(struct _mame_display *display)
 {
     _display = display;
-    m_mutex.lock();
-    m_mutex.unlock();
+//    m_mutex.lock();
+//    m_mutex.unlock();
 
 }
 mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)

@@ -160,11 +160,10 @@ tilemap_mark_all_tiles_dirty(bgmap);
 	//draw_background(bitmap, cliprect);
 
 	/* draw sprites */
-	
-	{ 
+
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
-		gfx, 	// gfx
+		NULL, 	// gfx
 		0, 	// code
 		0, 	// color
 		0, 	// flipx
@@ -193,8 +192,8 @@ tilemap_mark_all_tiles_dirty(bgmap);
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (sprite_palette * 16);
-				const gfx_element *gfx =  Machine->gfx[1];
-
+		const gfx_element *gfx =  Machine->gfx[1];
+        dgp0.gfx = gfx;
 		if (fcombat_cocktail_flip)
 		{
 			x = 64*8 - gfx->width - x;
@@ -223,10 +222,6 @@ tilemap_mark_all_tiles_dirty(bgmap);
 
 		if(flags&0x10)
 		{
-
-
-
-			
 			dgp0.code = code2+16;
 			dgp0.color = color;
 			dgp0.flipx = xflip;
@@ -253,9 +248,6 @@ tilemap_mark_all_tiles_dirty(bgmap);
 
 		}
 
-
-
-		
 		dgp0.code = code;
 		dgp0.color = color;
 		dgp0.flipx = xflip;
@@ -266,30 +258,27 @@ tilemap_mark_all_tiles_dirty(bgmap);
 
 		if (doubled) i += 4;
 	}
-	} // end of patch paragraph
 
-
+    {
+    struct drawgfxParams dgp5={
+        bitmap, 	// dest
+        Machine->gfx[0], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        cliprect, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        0, 	// transparent_color
+        0, 	// scalex
+        0, 	// scaley
+        NULL, 	// pri_buffer
+        0 	// priority_mask
+      };
 	/* draw the visible text layer */
-	for (sy = VISIBLE_Y_MIN/8; sy < VISIBLE_Y_MAX/8; sy++)
-		
-		{ 
-		struct drawgfxParams dgp5={
-			bitmap, 	// dest
-			Machine->gfx[0], 	// gfx
-			0, 	// code
-			0, 	// color
-			0, 	// flipx
-			0, 	// flipy
-			0, 	// sx
-			0, 	// sy
-			cliprect, 	// clip
-			TRANSPARENCY_PEN, 	// transparency
-			0, 	// transparent_color
-			0, 	// scalex
-			0, 	// scaley
-			NULL, 	// pri_buffer
-			0 	// priority_mask
-		  };
+	for (sy = VISIBLE_Y_MIN/8; sy < VISIBLE_Y_MAX/8; sy++)		
 		for (sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
 		{
 			int x = fcombat_cocktail_flip ? (63*8 - 8*sx) : 8*sx;
@@ -305,6 +294,7 @@ tilemap_mark_all_tiles_dirty(bgmap);
 			dgp5.sy = y;
 			drawgfx(&dgp5);
 		}
-		} // end of patch paragraph
+    }
+
 
 }
