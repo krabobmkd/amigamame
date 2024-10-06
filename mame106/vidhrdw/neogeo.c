@@ -903,7 +903,8 @@ INLINE void neogeo_draw_sprite(
 {
 	int drawn_lines = 0;
 	UINT8 *zoomy_rom;
-	UINT16 tileno,tileatr;
+	UINT32 tileno;
+    UINT16 tileatr;
 	int min_spriteline;
 	int max_spriteline;
 	int tile,yoffs;
