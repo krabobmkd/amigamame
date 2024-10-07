@@ -26,7 +26,8 @@ add_subdirectory(${EXPATPATH} libexpat)
 set(MAME_CORE_SRC
 # chdman.c is an external tool !
 # romcmp.c  is an external tool !
-
+ drivertuning.cpp
+ drivertuning.h
  fileio.cpp
  artwork.c
    cpuint.c    inptport.c  palette.c   streams_krb.c   video.c

@@ -1,54 +1,28 @@
-rastan
-
-cpuexec:0 memory_set_opbase:0003a000
-cpuexec:1 memory_set_opbase:00000000
-cpuexec:0 memory_set_opbase:0003aeb2
-cpuexec:0 memory_set_opbase:0003aec4
-cpuexec:0 memory_set_opbase:0003aec2
-cpuexec:0 memory_set_opbase:0003aebc
-cpuexec:0 memory_set_opbase:0003aeb6
-cpuexec:0 memory_set_opbase:0003aec2
-cpuexec:0 memory_set_opbase:0003aec2
-cpuexec:0 memory_set_opbase:0003aebc
-cpuexec:0 memory_set_opbase:0003aeb6
-cpuexec:0 memory_set_opbase:0003aec2
-cpuexec:0 memory_set_opbase:0003aec2
-cpuexec:0 memory_set_opbase:0003aebc
-cpuexec:0 memory_set_opbase:0003aeb6
-cpuexec:0 memory_set_opbase:0003aec2
 
 
-cpunum_execute(0)
- set_opbase() ->  0003 a000
- cpunum_execute(1)
-  set_opbase() -> 0
-
-cpunum_execute(0)
- set_opbase() ->     3aeb2
- cpunum_execute(1)
-  set_opbase() ->  ---
-
-
-
-bublebobl 83%/86% cpu
-dino 76% cpu
-
-
+todo beta4
+- O drawgfx pack4
+- O tilemap bitfield line optim
+- O optim son bubbob
+- O  neogeo rehash
+- O  neogeo cpu overrwrite optim
+- O  neogeo change to RGB16 index
+- O  neogeo verif slicing
+- O need 100%: rastan,slap fight, bubbob
+- O fastboot neogeo, batrider
 
  Todo for beta3:
- - O Mouse twice faster
+ - X Mouse twice faster
  - X bug when reloading list
 
-
-
-  - O- implement triple buffer at intuition level
+  - X- implement triple buffer at intuition level
   - X mouse as optional input for analog input -> play arkanoid with mouse
      X - idealy could have mouse+joy for same player
      X - could have 2 mouses for 2 players (arkanoid return ?).
-  - try to reactivate 8bit window remap.
+  - O try to reactivate 8bit window remap.
   - X no sound buzing when moving windows
   - O remember windows position and size per resolution.
-  - O try to manage feeze init pass
+  - O try to manage freeze init pass
 
  Done from Beta 1 to Beta 2:
   - Corrected a bug on joystick config SetJoyPortAttrs(): missing the final TAG_DONE.
