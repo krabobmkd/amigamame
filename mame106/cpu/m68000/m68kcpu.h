@@ -2144,6 +2144,18 @@ INLINE void m68ki_check_interrupts(M68KOPT_PARAMS)
 		m68ki_exception_interrupt(M68KOPT_PASSPARAMS, CPU_INT_LEVEL>>8);
 }
 
+// krb
+#ifdef OPTIM68K_SKIPMOVECCRV
+#define DO_MOVED_CLEARV
+#else
+#define DO_MOVED_CLEARV {FLAG_V = VFLAG_CLEAR;}
+#endif
+
+#ifdef OPTIM68K_SKIPMOVECCRC
+#define DO_MOVED_CLEARC
+#else
+#define DO_MOVED_CLEARC {FLAG_C = CFLAG_CLEAR;}
+#endif
 
 
 /* ======================================================================== */

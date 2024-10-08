@@ -240,11 +240,11 @@ protected:
 
 
     // - - - - - scanned roms zip or dir for UI.
-    //std::vector<MameRomFound> _romsFound; // what to save
     // mui like a ptr to ptr list, to insert in one blow.
     // this is meant to be sorted a way or another    
     std::vector<const _game_driver *const*> _romsFound;
     std::vector<UBYTE> _romsFoundReverse;
+    bool            _romsFoundTouched; // should save or not on exit.
     void initDriverIndex();
     int scanDriversRecurse(BPTR lock, FileInfoBlock*fib);
 

@@ -37,6 +37,7 @@ MameConfig::MameConfig()
     : _NumDrivers(0)
     , _activeDriver(-1)
     , _listShowState(0)
+    , _romsFoundTouched(false)
 {
     initDriverIndex();
 }
@@ -95,20 +96,24 @@ int MameConfig::save()
     xml_set_attribute_int(confignode, "version", 1);
 
     // save known rom list
-    if(_romsFound.size()>0)
+    if(_romsFound.size()>0 && _romsFoundTouched)
     {
-        stringstream ssroms;
-        int i=0;
-        for(const _game_driver *const*d : _romsFound)
+        mame_file *romsfoundfile = mame_fopen("romsfound", 0, FILETYPE_CONFIG, 1);
+        // Beta3d: don't use xml for this, it explodes when romset is big.
+        if(romsfoundfile)
         {
-            char sep=' ';
-            if(i==8) {i=0; sep='\n';}
-            ssroms << string((*d)->name) << sep;
-            i++;
-        }
+            int i=0;
+            for(const _game_driver *const*d : _romsFound)
+            {
+                char sep=' ';
+                if(i==8) {i=0; sep='\n';}
+                mame_fputs(romsfoundfile,(*d)->name);
+                mame_fputs(romsfoundfile," ");
+                i++;
+            }
 
-        string romslist = ssroms.str();
-        xml_add_child(confignode,pcf_roms, romslist.c_str());
+            mame_fclose(romsfoundfile);
+        }
     }
 
 
@@ -153,7 +158,7 @@ int MameConfig::load()
 	const char *srcfile;
 	int version, count;
 	mame_file *file=NULL;
-
+    _romsFoundTouched = false;
     // resolve short name to index after load, like scan does.
 
     resettodefault();
@@ -172,6 +177,38 @@ int MameConfig::load()
 		goto error;
 
     {
+        _romsFound.clear();
+        mame_file *romsfoundfile = mame_fopen("romsfound", 0, FILETYPE_CONFIG, 0);
+        if(romsfoundfile)
+        {
+            mame_fseek(romsfoundfile, 0, SEEK_END);
+            ULONG filesize = mame_ftell(romsfoundfile);
+            if(filesize>0)
+            {
+                char *p = (char *)malloc(filesize+1);
+                if(p)
+                {
+                    UINT32 done = mame_fread(romsfoundfile,p,filesize);
+                    p[done]=0;
+                    UINT32 i=0;
+                    string s;
+                    while(i<done)
+                    {
+                        if((p[i]==' ' || i==(done-1) ) && s.length()>0)
+                        {
+                            //_romsFound.push_back(&drivers[idriver]);
+                            int idriver = _driverIndex.index(s.c_str());
+                            if(idriver>=0) _romsFound.push_back(&drivers[idriver]);
+                            s.clear();
+                        } else s+=p[i];
+                        i++;
+                    }
+                    free(p);
+                }
+            }
+            mame_fclose(romsfoundfile);
+        }
+    /* old, ok, but sometimes explode mame xml
         node = xml_get_sibling(confignode->child,pcf_roms);
 
         if(node && node->value)
@@ -191,6 +228,7 @@ int MameConfig::load()
                i = in;
             }
         }
+        */
         initRomsFoundReverse();
     }
 
@@ -360,7 +398,7 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
     serializer("Types P2", (int&)_llPort_Type[1],strLLTypes);
 
 //    _ll = "These two mysterious 3/4 ports was defined for CD32\n"
-//          " and are actually used by some USB stack.";
+//          " and are actually used by some USB stack. (and OS4 lowlevel emu ?)";
 //    serializer(" ", _ll);
 
     serializer("Lowlevel Port 3", (int&)_llPort_Player[2],strPlayers);
@@ -570,6 +608,7 @@ int MameConfig::scanDrivers()
     FreeDosObject(DOS_FIB,fib);
 
     sortDrivers(_romsFound);
+    _romsFoundTouched = true;
 //    printf(" *** ScanDrivers end\n");
     initRomsFoundReverse();
     return (int)_romsFound.size();

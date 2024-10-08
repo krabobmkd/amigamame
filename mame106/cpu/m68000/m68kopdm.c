@@ -5154,18 +5154,85 @@ void m68k_op_lsl_16_al(M68KOPT_PARAMS)
 	FLAG_V = VFLAG_CLEAR;
 }
 
+/* original:
+_m68k_op_move_8_d_d:
+	move.l d2,-(sp)
+	move.l (140,a2),d0 reg ir
 
+	moveq #7,d1
+	and.l d0,d1   DY
+	moveq #0,d2
+	not.b d2
+	and.l (a2,d1.l*4),d2
+
+	bfextu d0{#20:#3},d0  ; d0
+	move.b d2,(3,a2,d0.l*4)
+	move.l d2,(76,a2)
+	move.l d2,(80,a2)
+	clr.l (84,a2)
+	clr.l (88,a2)
+	move.l (sp)+,d2
+	rts
+
+_m68k_op_move_8_d_d:
+	move.l (140,a2),d0 ; regir
+
+     clr.l d1
+	move.b d0,d1
+	andi.b #7,d1
+
+	move.b (a2,d1.w*4),d1
+
+	bfextu d0{#20:#3},d0  ; d0
+	move.b d1,(3,a2,d0.l*4)
+	move.l d1,(76,a2)
+	move.l d1,(80,a2)
+
+	clr.l (84,a2)
+	clr.l (88,a2)
+
+	rts
+
+*/
 void m68k_op_move_8_d_d(M68KOPT_PARAMS)
 {
-	uint res = MASK_OUT_ABOVE_8(DY);
+
+#ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
+
+
+    asm volatile(
+        "move.l %c[n_flag](a2,d0.w*4),d0\n"
+        "\tmove.w ccr,d1"
+        "\tmove.b d1,(3,a2)\n"
+
+
+        :  "a"(r_res), "a" (r_dst), "+d" (src)
+        : "d"(p68k)
+        : "d"(d1)
+        );
+    // correct CCR is in src now.
+    asm volatile(
+        "lsl.l #4,%0\n"
+        "\tmove.l %0,%c[n_flag](%1)\n"
+       :
+       : "d"(src),"a"(p68k), // in
+         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag))
+       :
+       );
+#else
+	uint res = DY;
 	uint* r_dst = &DX;
 
+	uint res = MASK_OUT_ABOVE_8(DY);
+	uint* r_dst = &DX;
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+#endif
+
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5178,8 +5245,8 @@ void m68k_op_move_8_d_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5192,8 +5259,8 @@ void m68k_op_move_8_d_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5206,8 +5273,8 @@ void m68k_op_move_8_d_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5220,8 +5287,8 @@ void m68k_op_move_8_d_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5234,8 +5301,8 @@ void m68k_op_move_8_d_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5248,8 +5315,8 @@ void m68k_op_move_8_d_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5262,8 +5329,8 @@ void m68k_op_move_8_d_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5276,8 +5343,8 @@ void m68k_op_move_8_d_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5290,8 +5357,8 @@ void m68k_op_move_8_d_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5304,8 +5371,8 @@ void m68k_op_move_8_d_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5318,8 +5385,8 @@ void m68k_op_move_8_d_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5332,8 +5399,8 @@ void m68k_op_move_8_d_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5346,8 +5413,8 @@ void m68k_op_move_8_ai_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5360,8 +5427,8 @@ void m68k_op_move_8_ai_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5374,8 +5441,8 @@ void m68k_op_move_8_ai_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5388,8 +5455,8 @@ void m68k_op_move_8_ai_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5402,8 +5469,8 @@ void m68k_op_move_8_ai_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5416,8 +5483,8 @@ void m68k_op_move_8_ai_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5430,8 +5497,8 @@ void m68k_op_move_8_ai_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5444,8 +5511,8 @@ void m68k_op_move_8_ai_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5458,8 +5525,8 @@ void m68k_op_move_8_ai_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5472,8 +5539,8 @@ void m68k_op_move_8_ai_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5486,8 +5553,8 @@ void m68k_op_move_8_ai_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5500,8 +5567,8 @@ void m68k_op_move_8_ai_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5514,8 +5581,8 @@ void m68k_op_move_8_ai_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5528,8 +5595,8 @@ void m68k_op_move_8_pi7_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5542,8 +5609,8 @@ void m68k_op_move_8_pi_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5556,8 +5623,8 @@ void m68k_op_move_8_pi7_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5570,8 +5637,8 @@ void m68k_op_move_8_pi7_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5584,8 +5651,8 @@ void m68k_op_move_8_pi7_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5598,8 +5665,8 @@ void m68k_op_move_8_pi7_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5612,8 +5679,8 @@ void m68k_op_move_8_pi7_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5626,8 +5693,8 @@ void m68k_op_move_8_pi7_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5640,8 +5707,8 @@ void m68k_op_move_8_pi7_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5654,8 +5721,8 @@ void m68k_op_move_8_pi7_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5668,8 +5735,8 @@ void m68k_op_move_8_pi7_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5682,8 +5749,8 @@ void m68k_op_move_8_pi7_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5696,8 +5763,8 @@ void m68k_op_move_8_pi7_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5710,8 +5777,8 @@ void m68k_op_move_8_pi7_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5724,8 +5791,8 @@ void m68k_op_move_8_pi_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5738,8 +5805,8 @@ void m68k_op_move_8_pi_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5752,8 +5819,8 @@ void m68k_op_move_8_pi_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5766,8 +5833,8 @@ void m68k_op_move_8_pi_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5780,8 +5847,8 @@ void m68k_op_move_8_pi_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5794,8 +5861,8 @@ void m68k_op_move_8_pi_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5808,8 +5875,8 @@ void m68k_op_move_8_pi_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5822,8 +5889,8 @@ void m68k_op_move_8_pi_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5836,8 +5903,8 @@ void m68k_op_move_8_pi_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5850,8 +5917,8 @@ void m68k_op_move_8_pi_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5864,8 +5931,8 @@ void m68k_op_move_8_pi_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5878,8 +5945,8 @@ void m68k_op_move_8_pi_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5892,8 +5959,8 @@ void m68k_op_move_8_pd7_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5906,8 +5973,8 @@ void m68k_op_move_8_pd_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5920,8 +5987,8 @@ void m68k_op_move_8_pd7_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5934,8 +6001,8 @@ void m68k_op_move_8_pd7_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5948,8 +6015,8 @@ void m68k_op_move_8_pd7_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5962,8 +6029,8 @@ void m68k_op_move_8_pd7_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5976,8 +6043,8 @@ void m68k_op_move_8_pd7_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -5990,8 +6057,8 @@ void m68k_op_move_8_pd7_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6004,8 +6071,8 @@ void m68k_op_move_8_pd7_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6018,8 +6085,8 @@ void m68k_op_move_8_pd7_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6032,8 +6099,8 @@ void m68k_op_move_8_pd7_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6046,8 +6113,8 @@ void m68k_op_move_8_pd7_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6060,8 +6127,8 @@ void m68k_op_move_8_pd7_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6074,8 +6141,8 @@ void m68k_op_move_8_pd7_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6088,8 +6155,8 @@ void m68k_op_move_8_pd_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6102,8 +6169,8 @@ void m68k_op_move_8_pd_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6116,8 +6183,8 @@ void m68k_op_move_8_pd_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6130,8 +6197,8 @@ void m68k_op_move_8_pd_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6144,8 +6211,8 @@ void m68k_op_move_8_pd_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6158,8 +6225,8 @@ void m68k_op_move_8_pd_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6172,8 +6239,8 @@ void m68k_op_move_8_pd_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6186,8 +6253,8 @@ void m68k_op_move_8_pd_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6200,8 +6267,8 @@ void m68k_op_move_8_pd_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6214,8 +6281,8 @@ void m68k_op_move_8_pd_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6228,8 +6295,8 @@ void m68k_op_move_8_pd_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6242,8 +6309,8 @@ void m68k_op_move_8_pd_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6256,8 +6323,8 @@ void m68k_op_move_8_di_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6270,8 +6337,8 @@ void m68k_op_move_8_di_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6284,8 +6351,8 @@ void m68k_op_move_8_di_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6298,8 +6365,8 @@ void m68k_op_move_8_di_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6312,8 +6379,8 @@ void m68k_op_move_8_di_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6326,8 +6393,8 @@ void m68k_op_move_8_di_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6340,8 +6407,8 @@ void m68k_op_move_8_di_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6354,8 +6421,8 @@ void m68k_op_move_8_di_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6368,8 +6435,8 @@ void m68k_op_move_8_di_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6382,8 +6449,8 @@ void m68k_op_move_8_di_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6396,8 +6463,8 @@ void m68k_op_move_8_di_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6410,8 +6477,8 @@ void m68k_op_move_8_di_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6424,8 +6491,8 @@ void m68k_op_move_8_di_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6438,8 +6505,8 @@ void m68k_op_move_8_ix_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6452,8 +6519,8 @@ void m68k_op_move_8_ix_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6466,8 +6533,8 @@ void m68k_op_move_8_ix_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6480,8 +6547,8 @@ void m68k_op_move_8_ix_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6494,8 +6561,8 @@ void m68k_op_move_8_ix_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6508,8 +6575,8 @@ void m68k_op_move_8_ix_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6522,8 +6589,8 @@ void m68k_op_move_8_ix_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6536,8 +6603,8 @@ void m68k_op_move_8_ix_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6550,8 +6617,8 @@ void m68k_op_move_8_ix_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6564,8 +6631,8 @@ void m68k_op_move_8_ix_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6578,8 +6645,8 @@ void m68k_op_move_8_ix_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6592,8 +6659,8 @@ void m68k_op_move_8_ix_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6606,8 +6673,8 @@ void m68k_op_move_8_ix_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6620,8 +6687,8 @@ void m68k_op_move_8_aw_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6634,8 +6701,8 @@ void m68k_op_move_8_aw_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6648,8 +6715,8 @@ void m68k_op_move_8_aw_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6662,8 +6729,8 @@ void m68k_op_move_8_aw_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6676,8 +6743,8 @@ void m68k_op_move_8_aw_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6690,8 +6757,8 @@ void m68k_op_move_8_aw_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6704,8 +6771,8 @@ void m68k_op_move_8_aw_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6718,8 +6785,8 @@ void m68k_op_move_8_aw_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6732,8 +6799,8 @@ void m68k_op_move_8_aw_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6746,8 +6813,8 @@ void m68k_op_move_8_aw_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6760,8 +6827,8 @@ void m68k_op_move_8_aw_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6774,8 +6841,8 @@ void m68k_op_move_8_aw_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6788,8 +6855,8 @@ void m68k_op_move_8_aw_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6802,8 +6869,8 @@ void m68k_op_move_8_al_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6816,8 +6883,8 @@ void m68k_op_move_8_al_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6830,8 +6897,8 @@ void m68k_op_move_8_al_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6844,8 +6911,8 @@ void m68k_op_move_8_al_pi7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6858,8 +6925,8 @@ void m68k_op_move_8_al_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6872,8 +6939,8 @@ void m68k_op_move_8_al_pd7(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6886,8 +6953,8 @@ void m68k_op_move_8_al_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6900,8 +6967,8 @@ void m68k_op_move_8_al_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6914,8 +6981,8 @@ void m68k_op_move_8_al_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6928,8 +6995,8 @@ void m68k_op_move_8_al_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6942,8 +7009,8 @@ void m68k_op_move_8_al_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6956,8 +7023,8 @@ void m68k_op_move_8_al_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6970,8 +7037,8 @@ void m68k_op_move_8_al_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6984,8 +7051,8 @@ void m68k_op_move_16_d_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -6998,8 +7065,8 @@ void m68k_op_move_16_d_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7012,8 +7079,8 @@ void m68k_op_move_16_d_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7026,8 +7093,8 @@ void m68k_op_move_16_d_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7040,8 +7107,8 @@ void m68k_op_move_16_d_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7054,8 +7121,8 @@ void m68k_op_move_16_d_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7068,8 +7135,8 @@ void m68k_op_move_16_d_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7082,8 +7149,8 @@ void m68k_op_move_16_d_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7096,8 +7163,8 @@ void m68k_op_move_16_d_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7110,8 +7177,8 @@ void m68k_op_move_16_d_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7124,8 +7191,8 @@ void m68k_op_move_16_d_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7138,8 +7205,8 @@ void m68k_op_move_16_d_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7152,8 +7219,8 @@ void m68k_op_move_16_ai_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7166,8 +7233,8 @@ void m68k_op_move_16_ai_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7180,8 +7247,8 @@ void m68k_op_move_16_ai_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7194,8 +7261,8 @@ void m68k_op_move_16_ai_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7208,8 +7275,8 @@ void m68k_op_move_16_ai_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7222,8 +7289,8 @@ void m68k_op_move_16_ai_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7236,8 +7303,8 @@ void m68k_op_move_16_ai_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7250,8 +7317,8 @@ void m68k_op_move_16_ai_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7264,8 +7331,8 @@ void m68k_op_move_16_ai_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7278,8 +7345,8 @@ void m68k_op_move_16_ai_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7292,8 +7359,8 @@ void m68k_op_move_16_ai_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7306,8 +7373,8 @@ void m68k_op_move_16_ai_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7320,8 +7387,8 @@ void m68k_op_move_16_pi_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7334,8 +7401,8 @@ void m68k_op_move_16_pi_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7348,8 +7415,8 @@ void m68k_op_move_16_pi_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7362,8 +7429,8 @@ void m68k_op_move_16_pi_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7376,8 +7443,8 @@ void m68k_op_move_16_pi_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7390,8 +7457,8 @@ void m68k_op_move_16_pi_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7404,8 +7471,8 @@ void m68k_op_move_16_pi_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7418,8 +7485,8 @@ void m68k_op_move_16_pi_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7432,8 +7499,8 @@ void m68k_op_move_16_pi_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7446,8 +7513,8 @@ void m68k_op_move_16_pi_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7460,8 +7527,8 @@ void m68k_op_move_16_pi_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7474,8 +7541,8 @@ void m68k_op_move_16_pi_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7488,8 +7555,8 @@ void m68k_op_move_16_pd_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7502,8 +7569,8 @@ void m68k_op_move_16_pd_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7516,8 +7583,8 @@ void m68k_op_move_16_pd_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7530,8 +7597,8 @@ void m68k_op_move_16_pd_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7544,8 +7611,8 @@ void m68k_op_move_16_pd_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7558,8 +7625,8 @@ void m68k_op_move_16_pd_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7572,8 +7639,8 @@ void m68k_op_move_16_pd_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7586,8 +7653,8 @@ void m68k_op_move_16_pd_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7600,8 +7667,8 @@ void m68k_op_move_16_pd_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7614,8 +7681,8 @@ void m68k_op_move_16_pd_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7628,8 +7695,8 @@ void m68k_op_move_16_pd_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7642,8 +7709,8 @@ void m68k_op_move_16_pd_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7656,8 +7723,8 @@ void m68k_op_move_16_di_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7670,8 +7737,8 @@ void m68k_op_move_16_di_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7684,8 +7751,8 @@ void m68k_op_move_16_di_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7698,8 +7765,8 @@ void m68k_op_move_16_di_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7712,8 +7779,8 @@ void m68k_op_move_16_di_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7726,8 +7793,8 @@ void m68k_op_move_16_di_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7740,8 +7807,8 @@ void m68k_op_move_16_di_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7754,8 +7821,8 @@ void m68k_op_move_16_di_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7768,8 +7835,8 @@ void m68k_op_move_16_di_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7782,8 +7849,8 @@ void m68k_op_move_16_di_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7796,8 +7863,8 @@ void m68k_op_move_16_di_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7810,8 +7877,8 @@ void m68k_op_move_16_di_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7824,8 +7891,8 @@ void m68k_op_move_16_ix_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7838,8 +7905,8 @@ void m68k_op_move_16_ix_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7852,8 +7919,8 @@ void m68k_op_move_16_ix_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7866,8 +7933,8 @@ void m68k_op_move_16_ix_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7880,8 +7947,8 @@ void m68k_op_move_16_ix_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7894,8 +7961,8 @@ void m68k_op_move_16_ix_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7908,8 +7975,8 @@ void m68k_op_move_16_ix_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7922,8 +7989,8 @@ void m68k_op_move_16_ix_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7936,8 +8003,8 @@ void m68k_op_move_16_ix_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7950,8 +8017,8 @@ void m68k_op_move_16_ix_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7964,8 +8031,8 @@ void m68k_op_move_16_ix_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7978,8 +8045,8 @@ void m68k_op_move_16_ix_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -7992,8 +8059,8 @@ void m68k_op_move_16_aw_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8006,8 +8073,8 @@ void m68k_op_move_16_aw_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8020,8 +8087,8 @@ void m68k_op_move_16_aw_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8034,8 +8101,8 @@ void m68k_op_move_16_aw_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8048,8 +8115,8 @@ void m68k_op_move_16_aw_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8062,8 +8129,8 @@ void m68k_op_move_16_aw_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8076,8 +8143,8 @@ void m68k_op_move_16_aw_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8090,8 +8157,8 @@ void m68k_op_move_16_aw_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8104,8 +8171,8 @@ void m68k_op_move_16_aw_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8118,8 +8185,8 @@ void m68k_op_move_16_aw_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8132,8 +8199,8 @@ void m68k_op_move_16_aw_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8146,8 +8213,8 @@ void m68k_op_move_16_aw_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8160,8 +8227,8 @@ void m68k_op_move_16_al_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8174,8 +8241,8 @@ void m68k_op_move_16_al_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8188,8 +8255,8 @@ void m68k_op_move_16_al_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8202,8 +8269,8 @@ void m68k_op_move_16_al_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8216,8 +8283,8 @@ void m68k_op_move_16_al_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8230,8 +8297,8 @@ void m68k_op_move_16_al_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8244,8 +8311,8 @@ void m68k_op_move_16_al_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8258,8 +8325,8 @@ void m68k_op_move_16_al_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8272,8 +8339,8 @@ void m68k_op_move_16_al_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8286,8 +8353,8 @@ void m68k_op_move_16_al_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8300,8 +8367,8 @@ void m68k_op_move_16_al_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8314,8 +8381,8 @@ void m68k_op_move_16_al_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8328,8 +8395,8 @@ void m68k_op_move_32_d_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8342,8 +8409,8 @@ void m68k_op_move_32_d_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8356,8 +8423,8 @@ void m68k_op_move_32_d_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8370,8 +8437,8 @@ void m68k_op_move_32_d_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8384,8 +8451,8 @@ void m68k_op_move_32_d_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8398,8 +8465,8 @@ void m68k_op_move_32_d_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8412,8 +8479,8 @@ void m68k_op_move_32_d_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8426,8 +8493,8 @@ void m68k_op_move_32_d_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8440,8 +8507,8 @@ void m68k_op_move_32_d_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8454,8 +8521,8 @@ void m68k_op_move_32_d_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8468,8 +8535,8 @@ void m68k_op_move_32_d_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8482,8 +8549,8 @@ void m68k_op_move_32_d_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8496,8 +8563,8 @@ void m68k_op_move_32_ai_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8510,8 +8577,8 @@ void m68k_op_move_32_ai_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8524,8 +8591,8 @@ void m68k_op_move_32_ai_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8538,8 +8605,8 @@ void m68k_op_move_32_ai_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8552,8 +8619,8 @@ void m68k_op_move_32_ai_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8566,8 +8633,8 @@ void m68k_op_move_32_ai_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8580,8 +8647,8 @@ void m68k_op_move_32_ai_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8594,8 +8661,8 @@ void m68k_op_move_32_ai_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8608,8 +8675,8 @@ void m68k_op_move_32_ai_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8622,8 +8689,8 @@ void m68k_op_move_32_ai_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8636,8 +8703,8 @@ void m68k_op_move_32_ai_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8650,8 +8717,8 @@ void m68k_op_move_32_ai_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8664,8 +8731,8 @@ void m68k_op_move_32_pi_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8678,8 +8745,8 @@ void m68k_op_move_32_pi_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8692,8 +8759,8 @@ void m68k_op_move_32_pi_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8706,8 +8773,8 @@ void m68k_op_move_32_pi_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8720,8 +8787,8 @@ void m68k_op_move_32_pi_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8734,8 +8801,8 @@ void m68k_op_move_32_pi_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8748,8 +8815,8 @@ void m68k_op_move_32_pi_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8762,8 +8829,8 @@ void m68k_op_move_32_pi_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8776,8 +8843,8 @@ void m68k_op_move_32_pi_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8790,8 +8857,8 @@ void m68k_op_move_32_pi_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8804,8 +8871,8 @@ void m68k_op_move_32_pi_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8818,8 +8885,8 @@ void m68k_op_move_32_pi_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8832,8 +8899,8 @@ void m68k_op_move_32_pd_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8846,8 +8913,8 @@ void m68k_op_move_32_pd_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8860,8 +8927,8 @@ void m68k_op_move_32_pd_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8874,8 +8941,8 @@ void m68k_op_move_32_pd_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8888,8 +8955,8 @@ void m68k_op_move_32_pd_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8902,8 +8969,8 @@ void m68k_op_move_32_pd_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8916,8 +8983,8 @@ void m68k_op_move_32_pd_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8930,8 +8997,8 @@ void m68k_op_move_32_pd_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8944,8 +9011,8 @@ void m68k_op_move_32_pd_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8958,8 +9025,8 @@ void m68k_op_move_32_pd_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8972,8 +9039,8 @@ void m68k_op_move_32_pd_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -8986,8 +9053,8 @@ void m68k_op_move_32_pd_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9000,8 +9067,8 @@ void m68k_op_move_32_di_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9014,8 +9081,8 @@ void m68k_op_move_32_di_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9028,8 +9095,8 @@ void m68k_op_move_32_di_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9042,8 +9109,8 @@ void m68k_op_move_32_di_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9056,8 +9123,8 @@ void m68k_op_move_32_di_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9070,8 +9137,8 @@ void m68k_op_move_32_di_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9084,8 +9151,8 @@ void m68k_op_move_32_di_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9098,8 +9165,8 @@ void m68k_op_move_32_di_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9112,8 +9179,8 @@ void m68k_op_move_32_di_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9126,8 +9193,8 @@ void m68k_op_move_32_di_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9140,8 +9207,8 @@ void m68k_op_move_32_di_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9154,8 +9221,8 @@ void m68k_op_move_32_di_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9168,8 +9235,8 @@ void m68k_op_move_32_ix_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9182,8 +9249,8 @@ void m68k_op_move_32_ix_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9196,8 +9263,8 @@ void m68k_op_move_32_ix_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9210,8 +9277,8 @@ void m68k_op_move_32_ix_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9224,8 +9291,8 @@ void m68k_op_move_32_ix_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9238,8 +9305,8 @@ void m68k_op_move_32_ix_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9252,8 +9319,8 @@ void m68k_op_move_32_ix_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9266,8 +9333,8 @@ void m68k_op_move_32_ix_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9280,8 +9347,8 @@ void m68k_op_move_32_ix_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9294,8 +9361,8 @@ void m68k_op_move_32_ix_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9308,8 +9375,8 @@ void m68k_op_move_32_ix_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9322,8 +9389,8 @@ void m68k_op_move_32_ix_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9336,8 +9403,8 @@ void m68k_op_move_32_aw_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9350,8 +9417,8 @@ void m68k_op_move_32_aw_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9364,8 +9431,8 @@ void m68k_op_move_32_aw_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9378,8 +9445,8 @@ void m68k_op_move_32_aw_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9392,8 +9459,8 @@ void m68k_op_move_32_aw_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9406,8 +9473,8 @@ void m68k_op_move_32_aw_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9420,8 +9487,8 @@ void m68k_op_move_32_aw_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9434,8 +9501,8 @@ void m68k_op_move_32_aw_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9448,8 +9515,8 @@ void m68k_op_move_32_aw_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9462,8 +9529,8 @@ void m68k_op_move_32_aw_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9476,8 +9543,8 @@ void m68k_op_move_32_aw_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9490,8 +9557,8 @@ void m68k_op_move_32_aw_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9504,8 +9571,8 @@ void m68k_op_move_32_al_d(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9518,8 +9585,8 @@ void m68k_op_move_32_al_a(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9532,8 +9599,8 @@ void m68k_op_move_32_al_ai(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9546,8 +9613,8 @@ void m68k_op_move_32_al_pi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9560,8 +9627,8 @@ void m68k_op_move_32_al_pd(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9574,8 +9641,8 @@ void m68k_op_move_32_al_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9588,8 +9655,8 @@ void m68k_op_move_32_al_ix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9602,8 +9669,8 @@ void m68k_op_move_32_al_aw(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9616,8 +9683,8 @@ void m68k_op_move_32_al_al(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9630,8 +9697,8 @@ void m68k_op_move_32_al_pcdi(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9644,8 +9711,8 @@ void m68k_op_move_32_al_pcix(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -9658,8 +9725,8 @@ void m68k_op_move_32_al_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARV();
+	DO_MOVED_CLEARC();
 }
 
 
@@ -11963,7 +12030,7 @@ void m68k_op_moveq_32(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-	FLAG_V = VFLAG_CLEAR;
+	DO_MOVED_CLEARV();
 	FLAG_C = CFLAG_CLEAR;
 }
 
