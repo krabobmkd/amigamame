@@ -17,7 +17,7 @@
 // makes mslug/mslugx crash the mig after exe relaunch
 //?        #define OPTIM68K_USEFASTMOVEMWRITE 1
     #endif
-    #define OPTIM68K_USEDIRECT68KASM_REWRITEMOVES 1
+   #define OPTIM68K_USEDIRECT68KASM_REWRITEMOVES 1
 
     #define OPTIM68K_USEDIRECT68KASM_DIVS 1
     #define OPTIM68K_USEDIRECT68KASM 1
@@ -31,15 +31,15 @@
 #endif
 
 #define COREREG REG68KCORE(a2)
-#define COREIRREG REG68KCORE(d1)
+#define COREIRREG REG68KCORE(d2)
 struct m68k_cpu_instance;
 struct m68ki_cpu_core;
 
 #define OPTIM68K_USEINSTANCE 1
 #if OPTIM68K_USEINSTANCE
 
-    #define M68KOPT_PARAMS struct m68k_cpu_instance *p68k COREREG, uint regir REG68KCORE(d0)
-    #define M68KOPT_PASSPARAMS p68k
+    #define M68KOPT_PARAMS struct m68k_cpu_instance *p68k COREREG, unsigned int regir COREIRREG
+    #define M68KOPT_PASSPARAMS p68k,regir
 
 #else
     #define M68KOPT_PARAMS void

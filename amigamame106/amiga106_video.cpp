@@ -288,7 +288,7 @@ void osd_close_display(void)
 //    extern int tm_nbStatic;
 //}
 //int framestat=0;
-
+extern int dbgtracenbexec;
 void osd_update_video_and_audio(struct _mame_display *display)
 {
 //    framestat++;
@@ -299,6 +299,9 @@ void osd_update_video_and_audio(struct _mame_display *display)
 //        tm_ge_subtable =tm_l_subtable=tm_nbSubStatic=tm_nbStatic=0;
 //        framestat = 0;
 //    }
+
+//    printf("nbcpuexec:%d\n",dbgtracenbexec);
+    dbgtracenbexec=0;
     if(GetStartTime)
     {
         StartTime = osd_cycles();
@@ -310,7 +313,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
     // apply eventual hard beam waiting (if too fast) just before draw.
     int igamefps = (int) display->game_refresh_rate;
-
+//#ifndef __AMIGA__
     {
         // 1000000LL aka osd_cycles_per_second()
         const UINT64 cyclespersec = 1000000LL;
@@ -332,7 +335,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
            framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
         }
     }
-
+//#endif
     g_pMameDisplay->draw(display);
 
     MsgPort *userport = g_pMameDisplay->userPort();

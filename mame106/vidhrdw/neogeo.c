@@ -418,14 +418,17 @@ READ16_HANDLER( neogeo_paletteram16_r )
 
 	return neogeo_paletteram16[offset];
 }
-
-WRITE16_HANDLER( neogeo_paletteram16_w )
+int palettesetcount=0;
+void   neogeo_paletteram16_w(offs_t offset REGM(d0), UINT16 data REGM(d1), UINT16 mem_mask REGM(d2))
 {
 	UINT16 oldword, newword;
 	int r,g,b;
 
 	offset &=0xfff; // mirrored
-
+    if(mem_mask!=0)
+    {
+        palettesetcount++;
+    }
 	oldword = newword = neogeo_paletteram16[offset];
 	COMBINE_DATA(&newword);
 

@@ -14,6 +14,9 @@
 #include "qtmain.h"
 #include <QMainWindow>
 #include <QVBoxLayout>
+
+#include <stdio.h>
+
 extern "C" {
     #include "osdepend.h"
     #include "mamecore.h"
@@ -230,9 +233,15 @@ int osd_skip_this_frame(void)
 {
     return 0;
 }
+extern "C" {
+extern int palettesetcount;
+}
 void osd_update_video_and_audio(struct _mame_display *display)
 {
     _display = display;
+
+if(palettesetcount>0)    printf("palettesetcount:%d\n",palettesetcount);
+    palettesetcount = 0;
 //    m_mutex.lock();
 //    m_mutex.unlock();
 

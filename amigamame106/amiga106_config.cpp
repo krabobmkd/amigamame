@@ -183,6 +183,7 @@ int MameConfig::load()
         {
             mame_fseek(romsfoundfile, 0, SEEK_END);
             ULONG filesize = mame_ftell(romsfoundfile);
+            mame_fseek(romsfoundfile, 0, SEEK_SET);
             if(filesize>0)
             {
                 char *p = (char *)malloc(filesize+1);
@@ -208,7 +209,7 @@ int MameConfig::load()
             }
             mame_fclose(romsfoundfile);
         }
-    /* old, ok, but sometimes explode mame xml
+    /* old, was ok, but sometimes explode mame xml
         node = xml_get_sibling(confignode->child,pcf_roms);
 
         if(node && node->value)

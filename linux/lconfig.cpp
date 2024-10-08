@@ -328,7 +328,7 @@ MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
 void MameConfig::Audio::serialize(ASerializer &serializer)
 {
     serializer("Mode",(int &)_mode,{"  None  ","   AHI   "});
-    serializer("Frequency",_freq,11025,22050); // not more low hz than 11025 it does too little buffers for AHI.
+    serializer("Frequency",_freq,11025,22050,22050); // not more low hz than 11025 it does too little buffers for AHI.
   //hide this for the moment  serializer("Force Mono",_forceMono);
 }
 void MameConfig::Controls::serialize(ASerializer &serializer)
