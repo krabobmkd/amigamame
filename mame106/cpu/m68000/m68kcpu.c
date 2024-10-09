@@ -576,7 +576,7 @@ unsigned int m68k_get_reg(void* context, m68k_register_t regnum)
 //		case M68K_REG_PREF_ADDR:	return cpu->pref_addr;
 //		case M68K_REG_PREF_DATA:	return cpu->pref_data;
 		case M68K_REG_PPC:	return MASK_OUT_ABOVE_32(cpu->ppc);
-		case M68K_REG_IR:	return cpu->ir;
+//		case M68K_REG_IR:	return cpu->ir;
 		case M68K_REG_CPU_TYPE:
 			switch(cpu->cpu_type)
 			{
@@ -638,7 +638,7 @@ void m68k_set_reg(m68k_register_t regnum, unsigned int value)
 		case M68K_REG_CACR:	REG_CACR = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_CAAR:	REG_CAAR = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_PPC:	REG_PPC = MASK_OUT_ABOVE_32(value); return;
-		case M68K_REG_IR:	REG_IRSLOT = MASK_OUT_ABOVE_16(value); return;
+	//	case M68K_REG_IR:	REG_IRSLOT = MASK_OUT_ABOVE_16(value); return;
 	//	case M68K_REG_PREF_ADDR:	CPU_PREF_ADDR = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_CPU_TYPE: m68k_set_cpu_type(p68k,value); return;
 		default:			return;
@@ -797,7 +797,7 @@ void m68k_set_cpu_type(struct m68k_cpu_instance *p68k COREREG, unsigned int cpu_
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(int num_cycles)
 {
-    struct m68k_cpu_instance *p68k = m68k_getActivecpu();
+    register struct m68k_cpu_instance *p68k COREREG = m68k_getActivecpu();
 	/* Make sure we're not stopped */
 	if(!CPU_STOPPED)
 	{
@@ -813,16 +813,37 @@ int m68k_execute(int num_cycles)
 		m68ki_set_address_error_trap(); /* auto-disable (see m68kcpu.h) */
 
 		/* Main loop.  Keep going until we run out of clock cycles */
-static int ret=0,rest2=0;
-        uint ir;
+//static int ret=0,rest2=0;
+
+//#ifdef OPTIM68K_USEDIRECT68KASM_EXELOOP
+//   asm volatile(
+//  ".loop"
+//        "\t\n"
+//        "\t\n"
+//        "\t\n"
+//        "\t\n"
+//        "\t\n"
+//        "\t\n"
+//        "\t\n"
+//        "\t\n"
+//        "\t\n"
+//        "\t\n"
+
+//        :
+//        : "d"(regir), "a"(p68k),
+//         [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
+//         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
+//         [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
+//        :  "d0","d1"
+//        );
+//#else
+        uint16 ir;
 		do
 		{
-#ifndef     OPTIM68K_SQUEEZEPPCREG
-			// Record previous program counter
 			REG_PPC = REG_PC;
-#endif
+
 			// Read an instruction and call its handler
-			REG_IRSLOT = ir = m68ki_read_imm_16(p68k);
+			/*REG_IRSLOT =*/ ir = m68ki_read_imm_16(p68k);
 //            printf("%04x ",(int)ir );
 //                        if(ir == 0x4eba)
 //                        {
@@ -837,7 +858,7 @@ static int ret=0,rest2=0;
 			REG_PPC = REG_PC;
 #endif
             // try a bit of unroll
-            REG_IRSLOT = ir = m68ki_read_imm_16(p68k);
+            /*REG_IRSLOT =*/ ir = m68ki_read_imm_16(p68k);
 //            printf("%04x ",(int)ir );
 
 //            ret++;
@@ -845,10 +866,12 @@ static int ret=0,rest2=0;
 //            if(ret==8) { printf("\n"); ret=0; }
             m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
             m68ki_instruction_jump_table[ir](p68k,ir);
-    if(rest2 == 1000000) exit(1);
+//    if(rest2 == 1000000) exit(1);
 
 
 		} while(m68k_ICount > 0);
+
+//#endif
         /* original:
         do
 		{

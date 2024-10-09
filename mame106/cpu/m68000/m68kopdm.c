@@ -3565,7 +3565,7 @@ void m68k_op_eor_8_d(M68KOPT_PARAMS)
 void m68k_op_eor_8_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_8();
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68k_memory_intf.read8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ p68k->mem.read8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3579,7 +3579,7 @@ void m68k_op_eor_8_ai(M68KOPT_PARAMS)
 void m68k_op_eor_8_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_8();
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68k_memory_intf.read8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ p68k->mem.read8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3593,7 +3593,7 @@ void m68k_op_eor_8_pi(M68KOPT_PARAMS)
 void m68k_op_eor_8_pi7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PI_8();
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68k_memory_intf.read8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ p68k->mem.read8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3607,7 +3607,7 @@ void m68k_op_eor_8_pi7(M68KOPT_PARAMS)
 void m68k_op_eor_8_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_8();
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68k_memory_intf.read8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ p68k->mem.read8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3621,7 +3621,7 @@ void m68k_op_eor_8_pd(M68KOPT_PARAMS)
 void m68k_op_eor_8_pd7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PD_8();
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68k_memory_intf.read8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ p68k->mem.read8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3635,7 +3635,7 @@ void m68k_op_eor_8_pd7(M68KOPT_PARAMS)
 void m68k_op_eor_8_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_8();
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68k_memory_intf.read8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ p68k->mem.read8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3649,7 +3649,7 @@ void m68k_op_eor_8_di(M68KOPT_PARAMS)
 void m68k_op_eor_8_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_8();
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68k_memory_intf.read8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ p68k->mem.read8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3663,7 +3663,7 @@ void m68k_op_eor_8_ix(M68KOPT_PARAMS)
 void m68k_op_eor_8_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_8();
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68k_memory_intf.read8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ p68k->mem.read8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3677,7 +3677,7 @@ void m68k_op_eor_8_aw(M68KOPT_PARAMS)
 void m68k_op_eor_8_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_8();
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68k_memory_intf.read8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ p68k->mem.read8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3702,7 +3702,7 @@ void m68k_op_eor_16_d(M68KOPT_PARAMS)
 void m68k_op_eor_16_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_16();
-	uint res = MASK_OUT_ABOVE_16(DX ^ m68k_memory_intf.read16(ea));
+	uint res = MASK_OUT_ABOVE_16(DX ^ p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -3716,7 +3716,7 @@ void m68k_op_eor_16_ai(M68KOPT_PARAMS)
 void m68k_op_eor_16_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_16();
-	uint res = MASK_OUT_ABOVE_16(DX ^ m68k_memory_intf.read16(ea));
+	uint res = MASK_OUT_ABOVE_16(DX ^ p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -3730,7 +3730,7 @@ void m68k_op_eor_16_pi(M68KOPT_PARAMS)
 void m68k_op_eor_16_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_16();
-	uint res = MASK_OUT_ABOVE_16(DX ^ m68k_memory_intf.read16(ea));
+	uint res = MASK_OUT_ABOVE_16(DX ^ p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -3744,7 +3744,7 @@ void m68k_op_eor_16_pd(M68KOPT_PARAMS)
 void m68k_op_eor_16_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_16();
-	uint res = MASK_OUT_ABOVE_16(DX ^ m68k_memory_intf.read16(ea));
+	uint res = MASK_OUT_ABOVE_16(DX ^ p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -3758,7 +3758,7 @@ void m68k_op_eor_16_di(M68KOPT_PARAMS)
 void m68k_op_eor_16_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_16();
-	uint res = MASK_OUT_ABOVE_16(DX ^ m68k_memory_intf.read16(ea));
+	uint res = MASK_OUT_ABOVE_16(DX ^ p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -3772,7 +3772,7 @@ void m68k_op_eor_16_ix(M68KOPT_PARAMS)
 void m68k_op_eor_16_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_16();
-	uint res = MASK_OUT_ABOVE_16(DX ^ m68k_memory_intf.read16(ea));
+	uint res = MASK_OUT_ABOVE_16(DX ^ p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -3786,7 +3786,7 @@ void m68k_op_eor_16_aw(M68KOPT_PARAMS)
 void m68k_op_eor_16_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_16();
-	uint res = MASK_OUT_ABOVE_16(DX ^ m68k_memory_intf.read16(ea));
+	uint res = MASK_OUT_ABOVE_16(DX ^ p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -3811,7 +3811,7 @@ void m68k_op_eor_32_d(M68KOPT_PARAMS)
 void m68k_op_eor_32_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_32();
-	uint res = DX ^ m68k_memory_intf.read32(ea);
+	uint res = DX ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -3825,7 +3825,7 @@ void m68k_op_eor_32_ai(M68KOPT_PARAMS)
 void m68k_op_eor_32_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_32();
-	uint res = DX ^ m68k_memory_intf.read32(ea);
+	uint res = DX ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -3839,7 +3839,7 @@ void m68k_op_eor_32_pi(M68KOPT_PARAMS)
 void m68k_op_eor_32_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_32();
-	uint res = DX ^ m68k_memory_intf.read32(ea);
+	uint res = DX ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -3853,7 +3853,7 @@ void m68k_op_eor_32_pd(M68KOPT_PARAMS)
 void m68k_op_eor_32_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_32();
-	uint res = DX ^ m68k_memory_intf.read32(ea);
+	uint res = DX ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -3867,7 +3867,7 @@ void m68k_op_eor_32_di(M68KOPT_PARAMS)
 void m68k_op_eor_32_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_32();
-	uint res = DX ^ m68k_memory_intf.read32(ea);
+	uint res = DX ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -3881,7 +3881,7 @@ void m68k_op_eor_32_ix(M68KOPT_PARAMS)
 void m68k_op_eor_32_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_32();
-	uint res = DX ^ m68k_memory_intf.read32(ea);
+	uint res = DX ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -3895,7 +3895,7 @@ void m68k_op_eor_32_aw(M68KOPT_PARAMS)
 void m68k_op_eor_32_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_32();
-	uint res = DX ^ m68k_memory_intf.read32(ea);
+	uint res = DX ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -3921,7 +3921,7 @@ void m68k_op_eori_8_ai(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint ea = EA_AY_AI_8();
-	uint res = src ^ m68k_memory_intf.read8(ea);
+	uint res = src ^ p68k->mem.read8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -3936,7 +3936,7 @@ void m68k_op_eori_8_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint ea = EA_AY_PI_8();
-	uint res = src ^ m68k_memory_intf.read8(ea);
+	uint res = src ^ p68k->mem.read8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -3951,7 +3951,7 @@ void m68k_op_eori_8_pi7(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint ea = EA_A7_PI_8();
-	uint res = src ^ m68k_memory_intf.read8(ea);
+	uint res = src ^ p68k->mem.read8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -3966,7 +3966,7 @@ void m68k_op_eori_8_pd(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint ea = EA_AY_PD_8();
-	uint res = src ^ m68k_memory_intf.read8(ea);
+	uint res = src ^ p68k->mem.read8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -3981,7 +3981,7 @@ void m68k_op_eori_8_pd7(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint ea = EA_A7_PD_8();
-	uint res = src ^ m68k_memory_intf.read8(ea);
+	uint res = src ^ p68k->mem.read8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -3996,7 +3996,7 @@ void m68k_op_eori_8_di(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint ea = EA_AY_DI_8();
-	uint res = src ^ m68k_memory_intf.read8(ea);
+	uint res = src ^ p68k->mem.read8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -4011,7 +4011,7 @@ void m68k_op_eori_8_ix(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint ea = EA_AY_IX_8();
-	uint res = src ^ m68k_memory_intf.read8(ea);
+	uint res = src ^ p68k->mem.read8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -4026,7 +4026,7 @@ void m68k_op_eori_8_aw(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint ea = EA_AW_8();
-	uint res = src ^ m68k_memory_intf.read8(ea);
+	uint res = src ^ p68k->mem.read8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -4041,7 +4041,7 @@ void m68k_op_eori_8_al(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint ea = EA_AL_8();
-	uint res = src ^ m68k_memory_intf.read8(ea);
+	uint res = src ^ p68k->mem.read8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -4067,7 +4067,7 @@ void m68k_op_eori_16_ai(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
 	uint ea = EA_AY_AI_16();
-	uint res = src ^ m68k_memory_intf.read16(ea);
+	uint res = src ^ p68k->mem.read16(ea);
 
 	m68ki_write_16(ea, res);
 
@@ -4082,7 +4082,7 @@ void m68k_op_eori_16_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
 	uint ea = EA_AY_PI_16();
-	uint res = src ^ m68k_memory_intf.read16(ea);
+	uint res = src ^ p68k->mem.read16(ea);
 
 	m68ki_write_16(ea, res);
 
@@ -4097,7 +4097,7 @@ void m68k_op_eori_16_pd(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
 	uint ea = EA_AY_PD_16();
-	uint res = src ^ m68k_memory_intf.read16(ea);
+	uint res = src ^ p68k->mem.read16(ea);
 
 	m68ki_write_16(ea, res);
 
@@ -4112,7 +4112,7 @@ void m68k_op_eori_16_di(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
 	uint ea = EA_AY_DI_16();
-	uint res = src ^ m68k_memory_intf.read16(ea);
+	uint res = src ^ p68k->mem.read16(ea);
 
 	m68ki_write_16(ea, res);
 
@@ -4127,7 +4127,7 @@ void m68k_op_eori_16_ix(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
 	uint ea = EA_AY_IX_16();
-	uint res = src ^ m68k_memory_intf.read16(ea);
+	uint res = src ^ p68k->mem.read16(ea);
 
 	m68ki_write_16(ea, res);
 
@@ -4142,7 +4142,7 @@ void m68k_op_eori_16_aw(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
 	uint ea = EA_AW_16();
-	uint res = src ^ m68k_memory_intf.read16(ea);
+	uint res = src ^ p68k->mem.read16(ea);
 
 	m68ki_write_16(ea, res);
 
@@ -4157,7 +4157,7 @@ void m68k_op_eori_16_al(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
 	uint ea = EA_AL_16();
-	uint res = src ^ m68k_memory_intf.read16(ea);
+	uint res = src ^ p68k->mem.read16(ea);
 
 	m68ki_write_16(ea, res);
 
@@ -4183,7 +4183,7 @@ void m68k_op_eori_32_ai(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_32(p68k);
 	uint ea = EA_AY_AI_32();
-	uint res = src ^ m68k_memory_intf.read32(ea);
+	uint res = src ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -4198,7 +4198,7 @@ void m68k_op_eori_32_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_32(p68k);
 	uint ea = EA_AY_PI_32();
-	uint res = src ^ m68k_memory_intf.read32(ea);
+	uint res = src ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -4213,7 +4213,7 @@ void m68k_op_eori_32_pd(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_32(p68k);
 	uint ea = EA_AY_PD_32();
-	uint res = src ^ m68k_memory_intf.read32(ea);
+	uint res = src ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -4228,7 +4228,7 @@ void m68k_op_eori_32_di(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_32(p68k);
 	uint ea = EA_AY_DI_32();
-	uint res = src ^ m68k_memory_intf.read32(ea);
+	uint res = src ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -4243,7 +4243,7 @@ void m68k_op_eori_32_ix(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_32(p68k);
 	uint ea = EA_AY_IX_32();
-	uint res = src ^ m68k_memory_intf.read32(ea);
+	uint res = src ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -4258,7 +4258,7 @@ void m68k_op_eori_32_aw(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_32(p68k);
 	uint ea = EA_AW_32();
-	uint res = src ^ m68k_memory_intf.read32(ea);
+	uint res = src ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -4273,7 +4273,7 @@ void m68k_op_eori_32_al(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_32(p68k);
 	uint ea = EA_AL_32();
-	uint res = src ^ m68k_memory_intf.read32(ea);
+	uint res = src ^ p68k->mem.read32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -4781,7 +4781,7 @@ void m68k_op_lsr_32_r(M68KOPT_PARAMS)
 void m68k_op_lsr_16_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = src >> 1;
 
 	m68ki_write_16(ea, res);
@@ -4796,7 +4796,7 @@ void m68k_op_lsr_16_ai(M68KOPT_PARAMS)
 void m68k_op_lsr_16_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = src >> 1;
 
 	m68ki_write_16(ea, res);
@@ -4811,7 +4811,7 @@ void m68k_op_lsr_16_pi(M68KOPT_PARAMS)
 void m68k_op_lsr_16_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = src >> 1;
 
 	m68ki_write_16(ea, res);
@@ -4826,7 +4826,7 @@ void m68k_op_lsr_16_pd(M68KOPT_PARAMS)
 void m68k_op_lsr_16_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = src >> 1;
 
 	m68ki_write_16(ea, res);
@@ -4841,7 +4841,7 @@ void m68k_op_lsr_16_di(M68KOPT_PARAMS)
 void m68k_op_lsr_16_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = src >> 1;
 
 	m68ki_write_16(ea, res);
@@ -4856,7 +4856,7 @@ void m68k_op_lsr_16_ix(M68KOPT_PARAMS)
 void m68k_op_lsr_16_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = src >> 1;
 
 	m68ki_write_16(ea, res);
@@ -4871,7 +4871,7 @@ void m68k_op_lsr_16_aw(M68KOPT_PARAMS)
 void m68k_op_lsr_16_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = src >> 1;
 
 	m68ki_write_16(ea, res);
@@ -5053,7 +5053,7 @@ void m68k_op_lsl_32_r(M68KOPT_PARAMS)
 void m68k_op_lsl_16_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
 	m68ki_write_16(ea, res);
@@ -5068,7 +5068,7 @@ void m68k_op_lsl_16_ai(M68KOPT_PARAMS)
 void m68k_op_lsl_16_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
 	m68ki_write_16(ea, res);
@@ -5083,7 +5083,7 @@ void m68k_op_lsl_16_pi(M68KOPT_PARAMS)
 void m68k_op_lsl_16_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
 	m68ki_write_16(ea, res);
@@ -5098,7 +5098,7 @@ void m68k_op_lsl_16_pd(M68KOPT_PARAMS)
 void m68k_op_lsl_16_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
 	m68ki_write_16(ea, res);
@@ -5113,7 +5113,7 @@ void m68k_op_lsl_16_di(M68KOPT_PARAMS)
 void m68k_op_lsl_16_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
 	m68ki_write_16(ea, res);
@@ -5128,7 +5128,7 @@ void m68k_op_lsl_16_ix(M68KOPT_PARAMS)
 void m68k_op_lsl_16_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
 	m68ki_write_16(ea, res);
@@ -5143,7 +5143,7 @@ void m68k_op_lsl_16_aw(M68KOPT_PARAMS)
 void m68k_op_lsl_16_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_16();
-	uint src = m68k_memory_intf.read16(ea);
+	uint src = p68k->mem.read16(ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
 	m68ki_write_16(ea, res);
@@ -5176,13 +5176,12 @@ _m68k_op_move_8_d_d:
 void m68k_op_move_8_d_d(M68KOPT_PARAMS)
 {
 #ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
-
+    // 14 instructions -> 7 instructions :)
     asm volatile(
         "move.w %0,d0\n"
-        "\tmove.w %0,d1\n"
         "\tand.l #7,d0\n"
         "\tmove.b 3+%c[dar](%1,d0.w*4),d0\n"
-        "\tbfextu d1{#20:#3},d1\n"
+        "\tbfextu %0{#20:#3},d1\n"
         "\tmove.b d0,3+%c[dar](%1,d1.w*4)\n"
         "\tmove.l d0,%c[n_flag](%1)\n"
         "\tmove.l d0,%c[not_z_flag](%1)\n"
@@ -7019,10 +7018,9 @@ void m68k_op_move_16_d_d(M68KOPT_PARAMS)
 #ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
     asm volatile(
         "move.w %0,d0\n"
-        "\tmove.w %0,d1\n"
         "\tand.l #7,d0\n"
         "\tmove.w 2+%c[dar](%1,d0.w*4),d0\n"
-        "\tbfextu d1{#20:#3},d1\n"
+        "\tbfextu %0{#20:#3},d1\n"
         "\tmove.w d0,2+%c[dar](%1,d1.w*4)\n"
         "\tmove.l d0,%c[not_z_flag](%1)\n"
         "\tlsr.w #8,d0\n"
@@ -8384,10 +8382,9 @@ void m68k_op_move_32_d_d(M68KOPT_PARAMS)
 #ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
     asm volatile(
         "move.w %0,d0\n"
-        "\tmove.w %0,d1\n"
         "\tand.w #7,d0\n"
         "\tmove.l %c[dar](%1,d0.w*4),d0\n"
-        "\tbfextu d1{#20:#3},d1\n"
+        "\tbfextu %0{#20:#3},d1\n"
         "\tmove.l d0,%c[dar](%1,d1.w*4)\n"
         "\tmove.l d0,%c[not_z_flag](%1)\n"
         "\trol.l #8,d0\n"
@@ -10724,7 +10721,7 @@ void m68k_op_movem_32_re_pd(M68KOPT_PARAMS)
     uint register_list = OPER_I_16(p68k);
 	uint ea = AY;
 
-    uint count = m68k_memory_intf.writemovem32reverse(ea,register_list,&REG_DA[0]);
+    uint count = p68k->mem.writemovem32reverse(ea,register_list,&REG_DA[0]);
     AY = ea - (count<<2);
     USE_CYCLES(count<<CYC_MOVEM_L);
 
@@ -10865,7 +10862,7 @@ void m68k_op_movem_16_er_pi(M68KOPT_PARAMS)
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68k_memory_intf.read16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(p68k->mem.read16(ea)));
 			ea += 2;
 			count++;
 		}
@@ -10923,7 +10920,7 @@ void m68k_op_movem_16_er_ai(M68KOPT_PARAMS)
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68k_memory_intf.read16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(p68k->mem.read16(ea)));
 			ea += 2;
 			count++;
 		}
@@ -10942,7 +10939,7 @@ void m68k_op_movem_16_er_di(M68KOPT_PARAMS)
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68k_memory_intf.read16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(p68k->mem.read16(ea)));
 			ea += 2;
 			count++;
 		}
@@ -10961,7 +10958,7 @@ void m68k_op_movem_16_er_ix(M68KOPT_PARAMS)
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68k_memory_intf.read16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(p68k->mem.read16(ea)));
 			ea += 2;
 			count++;
 		}
@@ -10980,7 +10977,7 @@ void m68k_op_movem_16_er_aw(M68KOPT_PARAMS)
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68k_memory_intf.read16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(p68k->mem.read16(ea)));
 			ea += 2;
 			count++;
 		}
@@ -10999,7 +10996,7 @@ void m68k_op_movem_16_er_al(M68KOPT_PARAMS)
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68k_memory_intf.read16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(p68k->mem.read16(ea)));
 			ea += 2;
 			count++;
 		}
@@ -11020,7 +11017,7 @@ void m68k_op_movem_32_er_pi(M68KOPT_PARAMS)
     {
 		if(register_list & 1)
 		{
-			REG_DA[i] = m68k_memory_intf.read32(ea);
+			REG_DA[i] = p68k->mem.read32(ea);
 			ea += 4;
 			count+=countadd;
 		}
@@ -11030,7 +11027,7 @@ void m68k_op_movem_32_er_pi(M68KOPT_PARAMS)
 
 	USE_CYCLES(count);
 #else
-	// m68ki_read_32 -> (*m68k_memory_intf.read32)(address)
+	// m68ki_read_32 -> (*p68k->mem.read32)(address)
 	// -> program_read_dword_32be
 	// ->    READDWORD32(program_read_dword_32be,
 
@@ -11095,7 +11092,7 @@ void m68k_op_movem_32_er_ai(M68KOPT_PARAMS)
     {
 		if(register_list & 1)
 		{
-			REG_DA[i] = m68k_memory_intf.read32(ea);
+			REG_DA[i] = p68k->mem.read32(ea);
 			ea += 4;
 			count++;
 		}
@@ -11124,7 +11121,7 @@ void m68k_op_movem_32_er_di(M68KOPT_PARAMS)
     {
 		if(register_list & 1)
 		{
-			REG_DA[i] = m68k_memory_intf.read32(ea);
+			REG_DA[i] = p68k->mem.read32(ea);
 			ea += 4;
 			count++;            
 		}
@@ -11153,7 +11150,7 @@ void m68k_op_movem_32_er_ix(M68KOPT_PARAMS)
     {
 		if(register_list & 1)
 		{
-			REG_DA[i] = m68k_memory_intf.read32(ea);
+			REG_DA[i] = p68k->mem.read32(ea);
 			ea += 4;
 			count++;
 		}
@@ -11182,7 +11179,7 @@ void m68k_op_movem_32_er_aw(M68KOPT_PARAMS)
     {
 		if(register_list & 1)
 		{
-			REG_DA[i] = m68k_memory_intf.read32(ea);
+			REG_DA[i] = p68k->mem.read32(ea);
 			ea += 4;
 			count++;
 		}
@@ -11211,7 +11208,7 @@ void m68k_op_movem_32_er_al(M68KOPT_PARAMS)
     {
 		if(register_list & 1)
 		{
-			REG_DA[i] = m68k_memory_intf.read32(ea);
+			REG_DA[i] = p68k->mem.read32(ea);
 			ea += 4;
 			count++;
 		}
@@ -11254,7 +11251,7 @@ void m68k_op_movep_16_er(M68KOPT_PARAMS)
 	uint ea = EA_AY_DI_16();
 	uint* r_dst = &DX;
 
-	*r_dst = MASK_OUT_BELOW_16(*r_dst) | ((m68k_memory_intf.read8(ea) << 8) + m68k_memory_intf.read8(ea + 2));
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | ((p68k->mem.read8(ea) << 8) + p68k->mem.read8(ea + 2));
 }
 
 
@@ -11262,8 +11259,8 @@ void m68k_op_movep_32_er(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_32();
 
-	DX = (m68k_memory_intf.read8(ea) << 24) + (m68k_memory_intf.read8(ea + 2) << 16)
-		+ (m68k_memory_intf.read8(ea + 4) << 8) + m68k_memory_intf.read8(ea + 6);
+	DX = (p68k->mem.read8(ea) << 24) + (p68k->mem.read8(ea + 2) << 16)
+		+ (p68k->mem.read8(ea + 4) << 8) + p68k->mem.read8(ea + 6);
 }
 
 
@@ -12054,13 +12051,13 @@ void m68k_op_move16_32(M68KOPT_PARAMS)
 	int ax = REG_IR & 7;
 	int ay = (w2 >> 12) & 7;
 
-    UINT32 v = m68k_memory_intf.read32(REG_A[ax]);
+    UINT32 v = p68k->mem.read32(REG_A[ax]);
 
     m68ki_write_32(REG_A[ay],    v);
 
-	m68ki_write_32(REG_A[ay]+4,  m68k_memory_intf.read32(REG_A[ax]+4));
-	m68ki_write_32(REG_A[ay]+8,  m68k_memory_intf.read32(REG_A[ax]+8));
-	m68ki_write_32(REG_A[ay]+12, m68k_memory_intf.read32(REG_A[ax]+12));
+	m68ki_write_32(REG_A[ay]+4,  p68k->mem.read32(REG_A[ax]+4));
+	m68ki_write_32(REG_A[ay]+8,  p68k->mem.read32(REG_A[ax]+8));
+	m68ki_write_32(REG_A[ay]+12, p68k->mem.read32(REG_A[ax]+12));
 
 	REG_A[ax] += 16;
 	REG_A[ay] += 16;

@@ -9,7 +9,7 @@
 
 /* global access */
 
-struct m68k_memory_interface m68k_memory_intf;
+//struct m68k_memory_interface m68k_memory_intf;
 offs_t m68k_encrypted_opcode_start[MAX_CPU];
 offs_t m68k_encrypted_opcode_end[MAX_CPU];
 
@@ -241,7 +241,7 @@ static const struct m68k_memory_interface interface_fast32 =
     memory_writemovem32_wr32_reverseSAFE
 */
 /* global access */
-struct m68k_memory_interface m68k_memory_intf;
+//struct m68k_memory_interface m68k_memory_intf;
 
 #endif // A68K2
 
@@ -301,9 +301,9 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68000);
 
 #ifdef OPTIM68K_USEFAST32INTRF
-    m68k_memory_intf = interface_fast16;
+    p68k->mem = interface_fast16;
 #else
-    m68k_memory_intf = interface_d16;
+    p68k->mem = interface_d16;
 #endif
     m68k_state_register(p68k,"m68000", index);
 	m68k_set_int_ack_callback(p68k, irqcallback);
@@ -329,20 +329,20 @@ static void m68000_exit(void)
 //	m68k_get_context(dst);
 //}
 
-static void m68000_set_context(void *src)
-{
-//    printf("m68000_set_context\n");
-#ifdef OPTIM68K_USEFAST32INTRF
-    if (m68k_memory_intf.writemovem32reverse != memory_writemovem32_wr16_reverse)
-		m68k_memory_intf = interface_fast16;
-#else
-    if (m68k_memory_intf.read8 != program_read_byte_16be)
-		m68k_memory_intf = interface_d16;
-#endif
+//static void m68000_set_context(void *src)
+//{
+////    printf("m68000_set_context\n");
+////#ifdef OPTIM68K_USEFAST32INTRF
+////    if (m68k_memory_intf.writemovem32reverse != memory_writemovem32_wr16_reverse)
+////		m68k_memory_intf = interface_fast16;
+////#else
+////    if (m68k_memory_intf.read8 != program_read_byte_16be)
+////		m68k_memory_intf = interface_d16;
+////#endif
 
 
-	m68k_set_context(src);
-}
+//	m68k_set_context(src);
+//}
 
 static offs_t m68000_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, int bytes)
 {
@@ -363,10 +363,14 @@ static offs_t m68000_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, i
 static void m68008_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	m68k_init(index);
-	m68k_set_cpu_type(M68K_CPU_TYPE_68008);
-	m68k_memory_intf = interface_d8;
-	m68k_state_register("m68008", index);
-	m68k_set_int_ack_callback(irqcallback);
+    struct m68k_cpu_instance *p68k = m68k_getcpu(index);
+
+	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68008);
+
+    p68k->mem = interface_d8;
+
+    m68k_state_register(p68k,"m68008", index);
+	m68k_set_int_ack_callback(p68k, irqcallback);
 }
 
 static void m68008_reset(void)
@@ -389,12 +393,12 @@ static void m68008_get_context(void *dst)
 	m68k_get_context(dst);
 }
 
-static void m68008_set_context(void *src)
-{
-	if (m68k_memory_intf.read8 != program_read_byte_8)
-		m68k_memory_intf = interface_d8;
-	m68k_set_context(src);
-}
+//static void m68008_set_context(void *src)
+//{
+////	if (m68k_memory_intf.read8 != program_read_byte_8)
+////		m68k_memory_intf = interface_d8;
+//	m68k_set_context(src);
+//}
 
 static offs_t m68008_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, int bytes)
 {
@@ -431,11 +435,20 @@ static UINT8 m68010_reg_layout[] = {
 
 void m68010_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
+//    printf(" ***** m68000_init\n");
 	m68k_init(index);
-	m68k_set_cpu_type(M68K_CPU_TYPE_68010);
-	m68k_memory_intf = interface_d16;
-	m68k_state_register("m68010", index);
-	m68k_set_int_ack_callback(irqcallback);
+    struct m68k_cpu_instance *p68k = m68k_getcpu(index);
+
+	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68010);
+
+#ifdef OPTIM68K_USEFAST32INTRF
+    p68k->mem = interface_fast16;
+#else
+    p68k->mem = interface_d16;
+#endif
+    m68k_state_register(p68k,"m68010", index);
+	m68k_set_int_ack_callback(p68k, irqcallback);
+
 }
 
 static offs_t m68010_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, int bytes)
@@ -495,9 +508,9 @@ static void m68020_init(int index, int clock, const void *config, int (*irqcallb
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68020);
 
 #ifdef OPTIM68K_USEFAST32INTRF
-    m68k_memory_intf = interface_fast32;
+    p68k->mem = interface_fast32;
 #else
-    m68k_memory_intf = interface_d32;
+    p68k->mem = interface_d32;
 #endif
 
 	m68k_state_register(p68k,"m68020", index);
@@ -524,18 +537,18 @@ static void m68020_get_context(void *dst)
 	m68k_get_context(dst);
 }
 
-static void m68020_set_context(void *src)
-{
-//    printf("m68020_set_context\n");
-#ifdef OPTIM68K_USEFAST32INTRF
-    if (m68k_memory_intf.writemovem32reverse != memory_writemovem32_wr32_reverseSAFE)
-        m68k_memory_intf = interface_fast32;
-#else
-    if (m68k_memory_intf.read8 != program_read_byte_32be)
-		m68k_memory_intf = interface_d32;
-#endif
-	m68k_set_context(src);
-}
+//static void m68020_set_context(void *src)
+//{
+////    printf("m68020_set_context\n");
+////#ifdef OPTIM68K_USEFAST32INTRF
+////    if (m68k_memory_intf.writemovem32reverse != memory_writemovem32_wr32_reverseSAFE)
+////        m68k_memory_intf = interface_fast32;
+////#else
+////    if (m68k_memory_intf.read8 != program_read_byte_32be)
+////		m68k_memory_intf = interface_d32;
+////#endif
+//	m68k_set_context(src);
+//}
 
 static offs_t m68020_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, int bytes)
 {
@@ -562,7 +575,7 @@ static void m68ec020_init(int index, int clock, const void *config, int (*irqcal
     struct m68k_cpu_instance *p68k = m68k_getcpu(index);
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68EC020);
-	m68k_memory_intf = interface_d32;
+	p68k->mem = interface_d32;
 	m68k_state_register(p68k,"m68ec020", index);
 	m68k_set_int_ack_callback(p68k,irqcallback);
 }
@@ -617,7 +630,7 @@ static void m68040_init(int index, int clock, const void *config, int (*irqcallb
     struct m68k_cpu_instance *p68k = m68k_getcpu(index);
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68040);
-	m68k_memory_intf = interface_d32;
+	p68k->mem = interface_d32;
 	m68k_state_register(p68k,"m68040", index);
 	m68k_set_int_ack_callback(p68k,irqcallback);
 }
@@ -642,12 +655,12 @@ static void m68040_get_context(void *dst)
 	m68k_get_context(dst);
 }
 
-static void m68040_set_context(void *src)
-{
-	if (m68k_memory_intf.read8 != program_read_byte_32be)
-		m68k_memory_intf = interface_d32;
-	m68k_set_context(src);
-}
+//static void m68040_set_context(void *src)
+//{
+//	if (m68k_memory_intf.read8 != program_read_byte_32be)
+//		m68k_memory_intf = interface_d32;
+//	m68k_set_context(src);
+//}
 
 static offs_t m68040_dasm(char *buffer, offs_t pc, UINT8 *oprom, UINT8 *opram, int bytes)
 {
@@ -789,7 +802,7 @@ void m68000_get_info(UINT32 state, union cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68000_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68k_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68000_set_context;	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68k_set_context;	break;
 		case CPUINFO_PTR_INIT:							info->init = m68000_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68000_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68000_exit;				break;
@@ -968,7 +981,7 @@ void m68008_get_info(UINT32 state, union cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68008_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68008_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68008_set_context;	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68k_set_context;	break;
 		case CPUINFO_PTR_INIT:							info->init = m68008_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68008_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68008_exit;				break;
@@ -1220,7 +1233,7 @@ void m68020_get_info(UINT32 state, union cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68020_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68020_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68020_set_context;	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68k_set_context;	break;
 		case CPUINFO_PTR_INIT:							info->init = m68020_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68020_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68020_exit;				break;
@@ -1474,7 +1487,7 @@ void m68040_get_info(UINT32 state, union cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68040_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68040_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68040_set_context;	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68k_set_context;	break;
 		case CPUINFO_PTR_INIT:							info->init = m68040_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m68040_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = m68040_exit;				break;

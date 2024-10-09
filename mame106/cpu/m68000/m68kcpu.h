@@ -324,14 +324,10 @@ struct m68k_cpu_instance *m68k_getActivecpu();
 #define REG_CACR         p68k->m_cpu.cacr
 #define REG_CAAR         p68k->m_cpu.caar
 
-#ifdef OPTIM68K_DOUSEREGIRMAGIC
-    #define REG_IR           regir
-    #define REG_IRSLOT       p68k->m_cpu.ir
-#else
+
     #define REG_IR           regir
 //    #define REG_IR           p68k->m_cpu.ir
-    #define REG_IRSLOT       p68k->m_cpu.ir
-#endif
+
 
 #define REG_FP           p68k->m_cpu.fpr
 #define REG_FPCR         p68k->m_cpu.fpcr
@@ -807,9 +803,9 @@ struct m68k_cpu_instance *m68k_getActivecpu();
 
 /* Read from the current address space */
 // krb
-#define m68ki_read_8(A)  m68k_memory_intf.read8(A);
-#define m68ki_read_16(A) m68k_memory_intf.read16(A);
-#define m68ki_read_32(A) m68k_memory_intf.read32(A);
+#define m68ki_read_8(A)  p68k->mem.read8(A);
+#define m68ki_read_16(A) p68k->mem.read16(A);
+#define m68ki_read_32(A) p68k->mem.read32(A);
 
 //#define m68ki_read_8(A)  m68k_memory_intf.read8(A);
 //#define m68ki_read_16(A) m68k_memory_intf.read16(A);
@@ -819,9 +815,9 @@ struct m68k_cpu_instance *m68k_getActivecpu();
 //#define m68ki_write_8(A, V)  m68ki_write_8_fc (A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 //#define m68ki_write_16(A, V) m68ki_write_16_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 //#define m68ki_write_32(A, V) m68ki_write_32_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
-#define m68ki_write_8(A, V)  m68k_memory_intf.write8(A,V);
-#define m68ki_write_16(A, V)  m68k_memory_intf.write16(A,V);
-#define m68ki_write_32(A, V)  m68k_memory_intf.write32(A,V);
+#define m68ki_write_8(A, V)  p68k->mem.write8(A,V);
+#define m68ki_write_16(A, V)  p68k->mem.write16(A,V);
+#define m68ki_write_32(A, V)  p68k->mem.write32(A,V);
 
 #if M68K_SIMULATE_PD_WRITES
 #define m68ki_write_32_pd(A, V) m68ki_write_32_pd_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
@@ -871,7 +867,7 @@ struct m68ki_cpu_core
 	uint dfc;          /* Destination Function Code Register (m68010+) */
 	uint cacr;         /* Cache Control Register (m68020, unemulated) */
 	uint caar;         /* Cache Address Register (m68020, unemulated) */
-	uint ir;           /* Instruction Register */
+//	uint ir;           /* Instruction Register */
     fp_reg fpr[8];     /* FPU Data Register (m68040) */
 	uint fpiar;        /* FPU Instruction Address Register (m68040) */
 	uint fpsr;         /* FPU Status Register (m68040) */
@@ -1016,7 +1012,7 @@ typedef struct m68k_cpu_instance
     // replace active_address_space
 //re    m68k_opcode m_opcode;
 //re    address_space m_address_space[ADDRESS_SPACES];
-
+    struct m68k_memory_interface mem;
 
 } m68k_cpu_instance;
 

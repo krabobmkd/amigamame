@@ -3,6 +3,7 @@
 todo beta4
 - O drawgfx pack4
 - O tilemap bitfield line optim
+- O megatech color correction LE BE
 - O optim son bubbob
 - O  neogeo rehash
 - O  neogeo cpu overrwrite optim

@@ -71,7 +71,7 @@ void m68k_op_abcd_8_mm_ax7(M68KOPT_PARAMS)
 {
 	uint src = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_A7_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -97,7 +97,7 @@ void m68k_op_abcd_8_mm_ay7(M68KOPT_PARAMS)
 {
 	uint src = OPER_A7_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_AX_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -123,7 +123,7 @@ void m68k_op_abcd_8_mm_axy7(M68KOPT_PARAMS)
 {
 	uint src = OPER_A7_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_A7_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -149,7 +149,7 @@ void m68k_op_abcd_8_mm(M68KOPT_PARAMS)
 {
 	uint src = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_AX_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -867,7 +867,7 @@ void m68k_op_add_8_re_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_8();
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -883,7 +883,7 @@ void m68k_op_add_8_re_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_8();
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -899,7 +899,7 @@ void m68k_op_add_8_re_pi7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PI_8();
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -915,7 +915,7 @@ void m68k_op_add_8_re_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_8();
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -931,7 +931,7 @@ void m68k_op_add_8_re_pd7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PD_8();
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -947,7 +947,7 @@ void m68k_op_add_8_re_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_8();
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -963,7 +963,7 @@ void m68k_op_add_8_re_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_8();
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -979,7 +979,7 @@ void m68k_op_add_8_re_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_8();
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -995,7 +995,7 @@ void m68k_op_add_8_re_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_8();
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1443,7 +1443,7 @@ void m68k_op_addi_8_ai(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_AI_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1459,7 +1459,7 @@ void m68k_op_addi_8_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_PI_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1475,7 +1475,7 @@ void m68k_op_addi_8_pi7(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_A7_PI_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1491,7 +1491,7 @@ void m68k_op_addi_8_pd(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1507,7 +1507,7 @@ void m68k_op_addi_8_pd7(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_A7_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1523,7 +1523,7 @@ void m68k_op_addi_8_di(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_DI_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1539,7 +1539,7 @@ void m68k_op_addi_8_ix(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_IX_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1555,7 +1555,7 @@ void m68k_op_addi_8_aw(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AW_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1571,7 +1571,7 @@ void m68k_op_addi_8_al(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AL_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1859,7 +1859,7 @@ void m68k_op_addq_8_ai(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = EA_AY_AI_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1875,7 +1875,7 @@ void m68k_op_addq_8_pi(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = EA_AY_PI_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1891,7 +1891,7 @@ void m68k_op_addq_8_pi7(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = EA_A7_PI_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1907,7 +1907,7 @@ void m68k_op_addq_8_pd(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = EA_AY_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1923,7 +1923,7 @@ void m68k_op_addq_8_pd7(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = EA_A7_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1939,7 +1939,7 @@ void m68k_op_addq_8_di(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = EA_AY_DI_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1955,7 +1955,7 @@ void m68k_op_addq_8_ix(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = EA_AY_IX_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1971,7 +1971,7 @@ void m68k_op_addq_8_aw(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = EA_AW_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1987,7 +1987,7 @@ void m68k_op_addq_8_al(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = EA_AL_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -2336,7 +2336,7 @@ void m68k_op_addx_8_mm_ax7(M68KOPT_PARAMS)
 {
 	uint src = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_A7_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -2354,7 +2354,7 @@ void m68k_op_addx_8_mm_ay7(M68KOPT_PARAMS)
 {
 	uint src = OPER_A7_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_AX_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -2372,7 +2372,7 @@ void m68k_op_addx_8_mm_axy7(M68KOPT_PARAMS)
 {
 	uint src = OPER_A7_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_A7_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -2390,7 +2390,7 @@ void m68k_op_addx_8_mm(M68KOPT_PARAMS)
 {
 	uint src = OPER_AY_PD_8(M68KOPT_PASSPARAMS);
 	uint ea  = EA_AX_PD_8();
-	uint dst = m68k_memory_intf.read8(ea);
+	uint dst = p68k->mem.read8(ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -2793,7 +2793,7 @@ void m68k_op_and_32_er_i(M68KOPT_PARAMS)
 void m68k_op_and_8_re_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_8();
-	uint res = DX & m68k_memory_intf.read8(ea);
+	uint res = DX & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
@@ -2807,7 +2807,7 @@ void m68k_op_and_8_re_ai(M68KOPT_PARAMS)
 void m68k_op_and_8_re_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_8();
-	uint res = DX & m68k_memory_intf.read8(ea);
+	uint res = DX & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
@@ -2821,7 +2821,7 @@ void m68k_op_and_8_re_pi(M68KOPT_PARAMS)
 void m68k_op_and_8_re_pi7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PI_8();
-	uint res = DX & m68k_memory_intf.read8(ea);
+	uint res = DX & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
@@ -2835,7 +2835,7 @@ void m68k_op_and_8_re_pi7(M68KOPT_PARAMS)
 void m68k_op_and_8_re_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_8();
-	uint res = DX & m68k_memory_intf.read8(ea);
+	uint res = DX & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
@@ -2849,7 +2849,7 @@ void m68k_op_and_8_re_pd(M68KOPT_PARAMS)
 void m68k_op_and_8_re_pd7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PD_8();
-	uint res = DX & m68k_memory_intf.read8(ea);
+	uint res = DX & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
@@ -2863,7 +2863,7 @@ void m68k_op_and_8_re_pd7(M68KOPT_PARAMS)
 void m68k_op_and_8_re_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_8();
-	uint res = DX & m68k_memory_intf.read8(ea);
+	uint res = DX & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
@@ -2877,7 +2877,7 @@ void m68k_op_and_8_re_di(M68KOPT_PARAMS)
 void m68k_op_and_8_re_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_8();
-	uint res = DX & m68k_memory_intf.read8(ea);
+	uint res = DX & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
@@ -2891,7 +2891,7 @@ void m68k_op_and_8_re_ix(M68KOPT_PARAMS)
 void m68k_op_and_8_re_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_8();
-	uint res = DX & m68k_memory_intf.read8(ea);
+	uint res = DX & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
@@ -2905,7 +2905,7 @@ void m68k_op_and_8_re_aw(M68KOPT_PARAMS)
 void m68k_op_and_8_re_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_8();
-	uint res = DX & m68k_memory_intf.read8(ea);
+	uint res = DX & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
@@ -3126,7 +3126,7 @@ void m68k_op_andi_8_ai(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_AI_8();
-	uint res = src & m68k_memory_intf.read8(ea);
+	uint res = src & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3141,7 +3141,7 @@ void m68k_op_andi_8_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_PI_8();
-	uint res = src & m68k_memory_intf.read8(ea);
+	uint res = src & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3156,7 +3156,7 @@ void m68k_op_andi_8_pi7(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_A7_PI_8();
-	uint res = src & m68k_memory_intf.read8(ea);
+	uint res = src & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3171,7 +3171,7 @@ void m68k_op_andi_8_pd(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_PD_8();
-	uint res = src & m68k_memory_intf.read8(ea);
+	uint res = src & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3186,7 +3186,7 @@ void m68k_op_andi_8_pd7(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_A7_PD_8();
-	uint res = src & m68k_memory_intf.read8(ea);
+	uint res = src & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3201,7 +3201,7 @@ void m68k_op_andi_8_di(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_DI_8();
-	uint res = src & m68k_memory_intf.read8(ea);
+	uint res = src & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3216,7 +3216,7 @@ void m68k_op_andi_8_ix(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AY_IX_8();
-	uint res = src & m68k_memory_intf.read8(ea);
+	uint res = src & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3231,7 +3231,7 @@ void m68k_op_andi_8_aw(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AW_8();
-	uint res = src & m68k_memory_intf.read8(ea);
+	uint res = src & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3246,7 +3246,7 @@ void m68k_op_andi_8_al(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_8(p68k);
 	uint ea = EA_AL_8();
-	uint res = src & m68k_memory_intf.read8(ea);
+	uint res = src & p68k->mem.read8(ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -4920,7 +4920,7 @@ void m68k_op_bchg_32_r_d(M68KOPT_PARAMS)
 void m68k_op_bchg_8_r_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -4931,7 +4931,7 @@ void m68k_op_bchg_8_r_ai(M68KOPT_PARAMS)
 void m68k_op_bchg_8_r_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -4942,7 +4942,7 @@ void m68k_op_bchg_8_r_pi(M68KOPT_PARAMS)
 void m68k_op_bchg_8_r_pi7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -4953,7 +4953,7 @@ void m68k_op_bchg_8_r_pi7(M68KOPT_PARAMS)
 void m68k_op_bchg_8_r_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -4964,7 +4964,7 @@ void m68k_op_bchg_8_r_pd(M68KOPT_PARAMS)
 void m68k_op_bchg_8_r_pd7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -4975,7 +4975,7 @@ void m68k_op_bchg_8_r_pd7(M68KOPT_PARAMS)
 void m68k_op_bchg_8_r_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -4986,7 +4986,7 @@ void m68k_op_bchg_8_r_di(M68KOPT_PARAMS)
 void m68k_op_bchg_8_r_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -4997,7 +4997,7 @@ void m68k_op_bchg_8_r_ix(M68KOPT_PARAMS)
 void m68k_op_bchg_8_r_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5008,7 +5008,7 @@ void m68k_op_bchg_8_r_aw(M68KOPT_PARAMS)
 void m68k_op_bchg_8_r_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5030,7 +5030,7 @@ void m68k_op_bchg_8_s_ai(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_AI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src ^ mask);
@@ -5041,7 +5041,7 @@ void m68k_op_bchg_8_s_pi(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src ^ mask);
@@ -5052,7 +5052,7 @@ void m68k_op_bchg_8_s_pi7(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_A7_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src ^ mask);
@@ -5063,7 +5063,7 @@ void m68k_op_bchg_8_s_pd(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src ^ mask);
@@ -5074,7 +5074,7 @@ void m68k_op_bchg_8_s_pd7(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_A7_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src ^ mask);
@@ -5085,7 +5085,7 @@ void m68k_op_bchg_8_s_di(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_DI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src ^ mask);
@@ -5096,7 +5096,7 @@ void m68k_op_bchg_8_s_ix(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_IX_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src ^ mask);
@@ -5107,7 +5107,7 @@ void m68k_op_bchg_8_s_aw(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AW_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src ^ mask);
@@ -5118,7 +5118,7 @@ void m68k_op_bchg_8_s_al(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AL_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src ^ mask);
@@ -5138,7 +5138,7 @@ void m68k_op_bclr_32_r_d(M68KOPT_PARAMS)
 void m68k_op_bclr_8_r_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5149,7 +5149,7 @@ void m68k_op_bclr_8_r_ai(M68KOPT_PARAMS)
 void m68k_op_bclr_8_r_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5160,7 +5160,7 @@ void m68k_op_bclr_8_r_pi(M68KOPT_PARAMS)
 void m68k_op_bclr_8_r_pi7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5171,7 +5171,7 @@ void m68k_op_bclr_8_r_pi7(M68KOPT_PARAMS)
 void m68k_op_bclr_8_r_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5182,7 +5182,7 @@ void m68k_op_bclr_8_r_pd(M68KOPT_PARAMS)
 void m68k_op_bclr_8_r_pd7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5193,7 +5193,7 @@ void m68k_op_bclr_8_r_pd7(M68KOPT_PARAMS)
 void m68k_op_bclr_8_r_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5204,7 +5204,7 @@ void m68k_op_bclr_8_r_di(M68KOPT_PARAMS)
 void m68k_op_bclr_8_r_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5215,7 +5215,7 @@ void m68k_op_bclr_8_r_ix(M68KOPT_PARAMS)
 void m68k_op_bclr_8_r_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5226,7 +5226,7 @@ void m68k_op_bclr_8_r_aw(M68KOPT_PARAMS)
 void m68k_op_bclr_8_r_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -5248,7 +5248,7 @@ void m68k_op_bclr_8_s_ai(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_AI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -5259,7 +5259,7 @@ void m68k_op_bclr_8_s_pi(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -5270,7 +5270,7 @@ void m68k_op_bclr_8_s_pi7(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_A7_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -5281,7 +5281,7 @@ void m68k_op_bclr_8_s_pd(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -5292,7 +5292,7 @@ void m68k_op_bclr_8_s_pd7(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_A7_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -5303,7 +5303,7 @@ void m68k_op_bclr_8_s_di(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_DI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -5314,7 +5314,7 @@ void m68k_op_bclr_8_s_ix(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_IX_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -5325,7 +5325,7 @@ void m68k_op_bclr_8_s_aw(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AW_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -5336,7 +5336,7 @@ void m68k_op_bclr_8_s_al(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AL_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -5422,7 +5422,7 @@ void m68k_op_bfchg_32_ai(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte ^ mask_byte);
 		}
@@ -5476,7 +5476,7 @@ void m68k_op_bfchg_32_di(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte ^ mask_byte);
 		}
@@ -5530,7 +5530,7 @@ void m68k_op_bfchg_32_ix(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte ^ mask_byte);
 		}
@@ -5584,7 +5584,7 @@ void m68k_op_bfchg_32_aw(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte ^ mask_byte);
 		}
@@ -5638,7 +5638,7 @@ void m68k_op_bfchg_32_al(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte ^ mask_byte);
 		}
@@ -5729,7 +5729,7 @@ void m68k_op_bfclr_32_ai(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte & ~mask_byte);
 		}
@@ -5783,7 +5783,7 @@ void m68k_op_bfclr_32_di(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte & ~mask_byte);
 		}
@@ -5837,7 +5837,7 @@ void m68k_op_bfclr_32_ix(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte & ~mask_byte);
 		}
@@ -5891,7 +5891,7 @@ void m68k_op_bfclr_32_aw(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte & ~mask_byte);
 		}
@@ -5945,7 +5945,7 @@ void m68k_op_bfclr_32_al(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte & ~mask_byte);
 		}
@@ -6018,9 +6018,9 @@ void m68k_op_bfexts_32_ai(M68KOPT_PARAMS)
 		data = m68ki_read_32(ea);
 
 		data = MASK_OUT_ABOVE_32(data<<offset);
-//  m68k_memory_intf.read8(A)
+//  p68k->mem.read8(A)
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  = MAKE_INT_32(data) >> (32 - width);
@@ -6068,7 +6068,7 @@ void m68k_op_bfexts_32_di(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8((ea+4)) << offset) >> 8;
+			data |= (p68k->mem.read8((ea+4)) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  = MAKE_INT_32(data) >> (32 - width);
@@ -6116,7 +6116,7 @@ void m68k_op_bfexts_32_ix(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  = MAKE_INT_32(data) >> (32 - width);
@@ -6164,7 +6164,7 @@ void m68k_op_bfexts_32_aw(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  = MAKE_INT_32(data) >> (32 - width);
@@ -6212,7 +6212,7 @@ void m68k_op_bfexts_32_al(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  = MAKE_INT_32(data) >> (32 - width);
@@ -6260,7 +6260,7 @@ void m68k_op_bfexts_32_pcdi(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  = MAKE_INT_32(data) >> (32 - width);
@@ -6308,7 +6308,7 @@ void m68k_op_bfexts_32_pcix(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  = MAKE_INT_32(data) >> (32 - width);
@@ -6389,7 +6389,7 @@ void m68k_op_bfextu_32_ai(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6436,7 +6436,7 @@ void m68k_op_bfextu_32_di(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6483,7 +6483,7 @@ void m68k_op_bfextu_32_ix(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6530,7 +6530,7 @@ void m68k_op_bfextu_32_aw(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6577,7 +6577,7 @@ void m68k_op_bfextu_32_al(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6624,7 +6624,7 @@ void m68k_op_bfextu_32_pcdi(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6671,7 +6671,7 @@ void m68k_op_bfextu_32_pcix(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6758,7 +6758,7 @@ void m68k_op_bfffo_32_ai(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 		if((local_offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << local_offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << local_offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6810,7 +6810,7 @@ void m68k_op_bfffo_32_di(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 		if((local_offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << local_offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << local_offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6862,7 +6862,7 @@ void m68k_op_bfffo_32_ix(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 		if((local_offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << local_offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << local_offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6914,7 +6914,7 @@ void m68k_op_bfffo_32_aw(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 		if((local_offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << local_offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << local_offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -6966,7 +6966,7 @@ void m68k_op_bfffo_32_al(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 		if((local_offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << local_offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << local_offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -7018,7 +7018,7 @@ void m68k_op_bfffo_32_pcdi(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 		if((local_offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << local_offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << local_offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -7070,7 +7070,7 @@ void m68k_op_bfffo_32_pcix(M68KOPT_PARAMS)
 		data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 		if((local_offset+width) > 32)
-			data |= (m68k_memory_intf.read8(ea+4) << local_offset) >> 8;
+			data |= (p68k->mem.read8(ea+4) << local_offset) >> 8;
 
 		FLAG_N = NFLAG_32(data);
 		data  >>= (32 - width);
@@ -7183,7 +7183,7 @@ void m68k_op_bfins_32_ai(M68KOPT_PARAMS)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
@@ -7244,7 +7244,7 @@ void m68k_op_bfins_32_di(M68KOPT_PARAMS)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
@@ -7305,7 +7305,7 @@ void m68k_op_bfins_32_ix(M68KOPT_PARAMS)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
@@ -7366,7 +7366,7 @@ void m68k_op_bfins_32_aw(M68KOPT_PARAMS)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
@@ -7427,7 +7427,7 @@ void m68k_op_bfins_32_al(M68KOPT_PARAMS)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
@@ -7519,7 +7519,7 @@ void m68k_op_bfset_32_ai(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte | mask_byte);
 		}
@@ -7574,7 +7574,7 @@ void m68k_op_bfset_32_di(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte | mask_byte);
 		}
@@ -7629,7 +7629,7 @@ void m68k_op_bfset_32_ix(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte | mask_byte);
 		}
@@ -7684,7 +7684,7 @@ void m68k_op_bfset_32_aw(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte | mask_byte);
 		}
@@ -7739,7 +7739,7 @@ void m68k_op_bfset_32_al(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 			m68ki_write_8(ea+4, data_byte | mask_byte);
 		}
@@ -7826,7 +7826,7 @@ void m68k_op_bftst_32_ai(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 		}
 		return;
@@ -7877,7 +7877,7 @@ void m68k_op_bftst_32_di(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 		}
 		return;
@@ -7928,7 +7928,7 @@ void m68k_op_bftst_32_ix(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 		}
 		return;
@@ -7979,7 +7979,7 @@ void m68k_op_bftst_32_aw(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 		}
 		return;
@@ -8030,7 +8030,7 @@ void m68k_op_bftst_32_al(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 		}
 		return;
@@ -8081,7 +8081,7 @@ void m68k_op_bftst_32_pcdi(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 		}
 		return;
@@ -8132,7 +8132,7 @@ void m68k_op_bftst_32_pcix(M68KOPT_PARAMS)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			data_byte = m68k_memory_intf.read8(ea+4);
+			data_byte = p68k->mem.read8(ea+4);
 			FLAG_Z |= (data_byte & mask_byte);
 		}
 		return;
@@ -8212,7 +8212,7 @@ void m68k_op_bset_32_r_d(M68KOPT_PARAMS)
 void m68k_op_bset_8_r_ai(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_AI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -8223,7 +8223,7 @@ void m68k_op_bset_8_r_ai(M68KOPT_PARAMS)
 void m68k_op_bset_8_r_pi(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -8234,7 +8234,7 @@ void m68k_op_bset_8_r_pi(M68KOPT_PARAMS)
 void m68k_op_bset_8_r_pi7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -8245,7 +8245,7 @@ void m68k_op_bset_8_r_pi7(M68KOPT_PARAMS)
 void m68k_op_bset_8_r_pd(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -8256,7 +8256,7 @@ void m68k_op_bset_8_r_pd(M68KOPT_PARAMS)
 void m68k_op_bset_8_r_pd7(M68KOPT_PARAMS)
 {
 	uint ea = EA_A7_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -8267,7 +8267,7 @@ void m68k_op_bset_8_r_pd7(M68KOPT_PARAMS)
 void m68k_op_bset_8_r_di(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_DI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -8278,7 +8278,7 @@ void m68k_op_bset_8_r_di(M68KOPT_PARAMS)
 void m68k_op_bset_8_r_ix(M68KOPT_PARAMS)
 {
 	uint ea = EA_AY_IX_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -8289,7 +8289,7 @@ void m68k_op_bset_8_r_ix(M68KOPT_PARAMS)
 void m68k_op_bset_8_r_aw(M68KOPT_PARAMS)
 {
 	uint ea = EA_AW_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -8300,7 +8300,7 @@ void m68k_op_bset_8_r_aw(M68KOPT_PARAMS)
 void m68k_op_bset_8_r_al(M68KOPT_PARAMS)
 {
 	uint ea = EA_AL_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
@@ -8322,7 +8322,7 @@ void m68k_op_bset_8_s_ai(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_AI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -8333,7 +8333,7 @@ void m68k_op_bset_8_s_pi(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -8344,7 +8344,7 @@ void m68k_op_bset_8_s_pi7(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_A7_PI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -8355,7 +8355,7 @@ void m68k_op_bset_8_s_pd(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -8366,7 +8366,7 @@ void m68k_op_bset_8_s_pd7(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_A7_PD_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -8377,7 +8377,7 @@ void m68k_op_bset_8_s_di(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_DI_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -8388,7 +8388,7 @@ void m68k_op_bset_8_s_ix(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AY_IX_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -8399,7 +8399,7 @@ void m68k_op_bset_8_s_aw(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AW_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -8410,7 +8410,7 @@ void m68k_op_bset_8_s_al(M68KOPT_PARAMS)
 {
 	uint mask = 1 << (OPER_I_8(p68k) & 7);
 	uint ea = EA_AL_8();
-	uint src = m68k_memory_intf.read8(ea);
+	uint src = p68k->mem.read8(ea);
 
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -8766,7 +8766,7 @@ void m68k_op_cas_8_ai(M68KOPT_PARAMS)
 	{
 		uint word2 = OPER_I_16(p68k);
 		uint ea = EA_AY_AI_8();
-		uint dest = m68k_memory_intf.read8(ea);
+		uint dest = p68k->mem.read8(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_8(*compare);
 
@@ -8795,7 +8795,7 @@ void m68k_op_cas_8_pi(M68KOPT_PARAMS)
 	{
 		uint word2 = OPER_I_16(p68k);
 		uint ea = EA_AY_PI_8();
-		uint dest = m68k_memory_intf.read8(ea);
+		uint dest = p68k->mem.read8(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_8(*compare);
 
@@ -8824,7 +8824,7 @@ void m68k_op_cas_8_pi7(M68KOPT_PARAMS)
 	{
 		uint word2 = OPER_I_16(p68k);
 		uint ea = EA_A7_PI_8();
-		uint dest = m68k_memory_intf.read8(ea);
+		uint dest = p68k->mem.read8(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_8(*compare);
 
@@ -8853,7 +8853,7 @@ void m68k_op_cas_8_pd(M68KOPT_PARAMS)
 	{
 		uint word2 = OPER_I_16(p68k);
 		uint ea = EA_AY_PD_8();
-		uint dest = m68k_memory_intf.read8(ea);
+		uint dest = p68k->mem.read8(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_8(*compare);
 
@@ -8882,7 +8882,7 @@ void m68k_op_cas_8_pd7(M68KOPT_PARAMS)
 	{
 		uint word2 = OPER_I_16(p68k);
 		uint ea = EA_A7_PD_8();
-		uint dest = m68k_memory_intf.read8(ea);
+		uint dest = p68k->mem.read8(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_8(*compare);
 
@@ -8911,7 +8911,7 @@ void m68k_op_cas_8_di(M68KOPT_PARAMS)
 	{
 		uint word2 = OPER_I_16(p68k);
 		uint ea = EA_AY_DI_8();
-		uint dest = m68k_memory_intf.read8(ea);
+		uint dest = p68k->mem.read8(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_8(*compare);
 
@@ -8940,7 +8940,7 @@ void m68k_op_cas_8_ix(M68KOPT_PARAMS)
 	{
 		uint word2 = OPER_I_16(p68k);
 		uint ea = EA_AY_IX_8();
-		uint dest = m68k_memory_intf.read8(ea);
+		uint dest = p68k->mem.read8(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_8(*compare);
 
@@ -8969,7 +8969,7 @@ void m68k_op_cas_8_aw(M68KOPT_PARAMS)
 	{
 		uint word2 = OPER_I_16(p68k);
 		uint ea = EA_AW_8();
-		uint dest = m68k_memory_intf.read8(ea);
+		uint dest = p68k->mem.read8(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_8(*compare);
 
@@ -8998,7 +8998,7 @@ void m68k_op_cas_8_al(M68KOPT_PARAMS)
 	{
 		uint word2 = OPER_I_16(p68k);
 		uint ea = EA_AL_8();
-		uint dest = m68k_memory_intf.read8(ea);
+		uint dest = p68k->mem.read8(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_8(*compare);
 
@@ -10037,8 +10037,8 @@ void m68k_op_chk2cmp2_8_ai(M68KOPT_PARAMS)
 		uint word2 = OPER_I_16(p68k);
 		uint compare = REG_DA[(word2 >> 12) & 15]&0xff;
 		uint ea = EA_AY_AI_8();
-		uint lower_bound = m68k_memory_intf.read8(ea);
-		uint upper_bound = m68k_memory_intf.read8(ea + 1);
+		uint lower_bound = p68k->mem.read8(ea);
+		uint upper_bound = p68k->mem.read8(ea + 1);
 
 		if(!BIT_F(word2))
 			FLAG_C = MAKE_INT_8(compare) - MAKE_INT_8(lower_bound);
@@ -10068,8 +10068,8 @@ void m68k_op_chk2cmp2_8_di(M68KOPT_PARAMS)
 		uint word2 = OPER_I_16(p68k);
 		uint compare = REG_DA[(word2 >> 12) & 15]&0xff;
 		uint ea = EA_AY_DI_8();
-		uint lower_bound = m68k_memory_intf.read8(ea);
-		uint upper_bound = m68k_memory_intf.read8(ea + 1);
+		uint lower_bound = p68k->mem.read8(ea);
+		uint upper_bound = p68k->mem.read8(ea + 1);
 
 		if(!BIT_F(word2))
 			FLAG_C = MAKE_INT_8(compare) - MAKE_INT_8(lower_bound);
@@ -10099,8 +10099,8 @@ void m68k_op_chk2cmp2_8_ix(M68KOPT_PARAMS)
 		uint word2 = OPER_I_16(p68k);
 		uint compare = REG_DA[(word2 >> 12) & 15]&0xff;
 		uint ea = EA_AY_IX_8();
-		uint lower_bound = m68k_memory_intf.read8(ea);
-		uint upper_bound = m68k_memory_intf.read8(ea + 1);
+		uint lower_bound = p68k->mem.read8(ea);
+		uint upper_bound = p68k->mem.read8(ea + 1);
 
 		if(!BIT_F(word2))
 			FLAG_C = MAKE_INT_8(compare) - MAKE_INT_8(lower_bound);
@@ -10130,8 +10130,8 @@ void m68k_op_chk2cmp2_8_aw(M68KOPT_PARAMS)
 		uint word2 = OPER_I_16(p68k);
 		uint compare = REG_DA[(word2 >> 12) & 15]&0xff;
 		uint ea = EA_AW_8();
-		uint lower_bound = m68k_memory_intf.read8(ea);
-		uint upper_bound = m68k_memory_intf.read8(ea + 1);
+		uint lower_bound = p68k->mem.read8(ea);
+		uint upper_bound = p68k->mem.read8(ea + 1);
 
 		if(!BIT_F(word2))
 			FLAG_C = MAKE_INT_8(compare) - MAKE_INT_8(lower_bound);
@@ -10161,8 +10161,8 @@ void m68k_op_chk2cmp2_8_al(M68KOPT_PARAMS)
 		uint word2 = OPER_I_16(p68k);
 		uint compare = REG_DA[(word2 >> 12) & 15]&0xff;
 		uint ea = EA_AL_8();
-		uint lower_bound = m68k_memory_intf.read8(ea);
-		uint upper_bound = m68k_memory_intf.read8(ea + 1);
+		uint lower_bound = p68k->mem.read8(ea);
+		uint upper_bound = p68k->mem.read8(ea + 1);
 
 		if(!BIT_F(word2))
 			FLAG_C = MAKE_INT_8(compare) - MAKE_INT_8(lower_bound);

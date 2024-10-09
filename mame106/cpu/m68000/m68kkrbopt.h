@@ -18,6 +18,7 @@
 //?        #define OPTIM68K_USEFASTMOVEMWRITE 1
     #endif
    #define OPTIM68K_USEDIRECT68KASM_REWRITEMOVES 1
+   #define OPTIM68K_USEDIRECT68KASM_EXELOOP 1
 
     #define OPTIM68K_USEDIRECT68KASM_DIVS 1
     #define OPTIM68K_USEDIRECT68KASM 1
@@ -38,7 +39,7 @@ struct m68ki_cpu_core;
 #define OPTIM68K_USEINSTANCE 1
 #if OPTIM68K_USEINSTANCE
 
-    #define M68KOPT_PARAMS struct m68k_cpu_instance *p68k COREREG, unsigned int regir COREIRREG
+    #define M68KOPT_PARAMS struct m68k_cpu_instance *p68k COREREG, unsigned short regir COREIRREG
     #define M68KOPT_PASSPARAMS p68k,regir
 
 #else

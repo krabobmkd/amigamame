@@ -121,7 +121,7 @@ typedef enum
 
 	/* Convenience registers */
 	M68K_REG_PPC,		/* Previous value in the program counter */
-	M68K_REG_IR,		/* Instruction register */
+	//M68K_REG_IR,		/* Instruction register */
 	M68K_REG_CPU_TYPE	/* Type of CPU being run */
 } m68k_register_t;
 
