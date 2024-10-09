@@ -10,7 +10,7 @@
 #include "m68000.h"
 
 #include "m68kkrbopt.h"
-#include "m68kcpu.h"
+//can't be included or define generate collisions: #include "m68kcpu.h"
 
 
 /* Configuration switches (see m68kconf.h for explanation) */
@@ -108,33 +108,6 @@ INLINE unsigned int m68kx_read_immediate_32(unsigned int address REGM(d0))
 #endif
 
 
-}
-
-INLINE unsigned int m68kx_read_pcrelative_8(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0) )
-{
-	if (address >= m68k_encrypted_opcode_start[cpu_getactivecpu()] &&
-			address < m68k_encrypted_opcode_end[cpu_getactivecpu()])
-		return ((m68k_read_immediate_16(address&~1)>>(8*(1-(address & 1))))&0xff);
-	else
-		return m68k_read_memory_8(address);
-}
-
-INLINE unsigned int m68kx_read_pcrelative_16(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0))
-{
-	if (address >= m68k_encrypted_opcode_start[cpu_getactivecpu()] &&
-			address < m68k_encrypted_opcode_end[cpu_getactivecpu()])
-		return m68k_read_immediate_16(address);
-	else
-		return m68k_read_memory_16(address);
-}
-
-INLINE unsigned int m68kx_read_pcrelative_32(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0))
-{
-	if (address >= m68k_encrypted_opcode_start[cpu_getactivecpu()] &&
-			address < m68k_encrypted_opcode_end[cpu_getactivecpu()])
-		return m68k_read_immediate_32(address);
-	else
-		return m68k_read_memory_32(address);
 }
 
 

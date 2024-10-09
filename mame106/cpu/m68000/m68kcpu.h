@@ -819,11 +819,11 @@ struct m68k_cpu_instance *m68k_getActivecpu();
 #define m68ki_write_16(A, V)  p68k->mem.write16(A,V);
 #define m68ki_write_32(A, V)  p68k->mem.write32(A,V);
 
-#if M68K_SIMULATE_PD_WRITES
-#define m68ki_write_32_pd(A, V) m68ki_write_32_pd_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
-#else
-#define m68ki_write_32_pd(A, V) m68ki_write_32_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
-#endif
+//#if M68K_SIMULATE_PD_WRITES
+//#define m68ki_write_32_pd(A, V) m68ki_write_32_pd_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
+//#else
+//#define m68ki_write_32_pd(A, V) m68ki_write_32_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
+//#endif
 
 /* map read immediate 8 to read immediate 16 */
 #define m68ki_read_imm_8() MASK_OUT_ABOVE_8(m68ki_read_imm_16(p68k))
@@ -1046,9 +1046,9 @@ extern uint           m68ki_aerr_fc;
 //INLINE void m68ki_write_8_fc (uint address, uint fc, uint value);
 //INLINE void m68ki_write_16_fc(uint address, uint fc, uint value);
 //INLINE void m68ki_write_32_fc(uint address, uint fc, uint value);
-#if M68K_SIMULATE_PD_WRITES
-INLINE void m68ki_write_32_pd_fc(uint address, uint fc, uint value);
-#endif /* M68K_SIMULATE_PD_WRITES */
+//#if M68K_SIMULATE_PD_WRITES
+//INLINE void m68ki_write_32_pd_fc(uint address, uint fc, uint value);
+//#endif /* M68K_SIMULATE_PD_WRITES */
 
 /* Indexed and PC-relative ea fetching */
 INLINE uint m68ki_get_ea_pcdi( struct m68k_cpu_instance *p68k COREREG);
@@ -1261,14 +1261,14 @@ INLINE uint m68ki_read_imm_32( struct m68k_cpu_instance *p68k COREREG)
 //	m68k_write_memory_32(ADDRESS_68K(address), value);
 //}
 
-#if M68K_SIMULATE_PD_WRITES
-INLINE void m68ki_write_32_pd_fc(uint address, uint fc, uint value)
-{
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
-	m68k_write_memory_32_pd(ADDRESS_68K(address), value);
-}
-#endif
+//#if M68K_SIMULATE_PD_WRITES
+//INLINE void m68ki_write_32_pd_fc(uint address, uint fc, uint value)
+//{
+//	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+//	m68ki_check_address_error_010_less(address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
+//	m68k_write_memory_32_pd(ADDRESS_68K(address), value);
+//}
+//#endif
 
 
 /* --------------------- Effective Address Calculation -------------------- */
@@ -2153,6 +2153,46 @@ INLINE void m68ki_check_interrupts(struct m68k_cpu_instance *p68k COREREG)
 #else
 #define DO_MOVED_CLEARC() {FLAG_C = CFLAG_CLEAR;}
 #endif
+
+
+INLINE unsigned int m68kx_read_pcrelative_8(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0) )
+{
+	if (address >= m68k_encrypted_opcode_start[cpu_getactivecpu()] &&
+			address < m68k_encrypted_opcode_end[cpu_getactivecpu()])
+	{
+		return ((m68k_read_immediate_16(address&~1)>>(8*(1-(address & 1))))&0xff);
+	}
+	else
+	{
+		return m68k_read_memory_8(address);
+	}
+}
+
+INLINE unsigned int m68kx_read_pcrelative_16(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0))
+{
+	if (address >= m68k_encrypted_opcode_start[cpu_getactivecpu()] &&
+			address < m68k_encrypted_opcode_end[cpu_getactivecpu()])
+		{
+           return m68k_read_immediate_16(address);
+		}
+	else
+	{
+		return m68k_read_memory_16(address);
+	}
+}
+
+INLINE unsigned int m68kx_read_pcrelative_32(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0))
+{
+	if (address >= m68k_encrypted_opcode_start[cpu_getactivecpu()] &&
+			address < m68k_encrypted_opcode_end[cpu_getactivecpu()])
+		{
+            return m68k_read_immediate_32(address);
+		}
+	else
+	{
+		return m68k_read_memory_32(address);
+	}
+}
 
 
 /* ======================================================================== */

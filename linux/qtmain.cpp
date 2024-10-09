@@ -99,8 +99,8 @@ void QProc::process()
 //    "wb3"
 //    "bublbobl"
 //   "dino"
-//    "rastan"
-      "mslug"
+    "rastan"
+//      "mslug"
 //                "mp_sor2"
     );
     if(itest>0) idriver= itest;

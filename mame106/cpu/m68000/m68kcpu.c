@@ -1106,6 +1106,25 @@ void m68k_state_register(struct m68k_cpu_instance *p68k COREREG, const char *typ
 
 #endif /* M68K_COMPILE_FOR_MAME */
 
+
+UINT8 CPS2_Read8(offs_t address)
+{
+    struct m68k_cpu_instance *p68k = m68k_getActivecpu();
+	return m68k_read_pcrelative_8(address);
+}
+
+UINT16 CPS2_Read16(offs_t address)
+{
+    struct m68k_cpu_instance *p68k = m68k_getActivecpu();
+	return m68k_read_pcrelative_16(address);
+}
+
+UINT32 CPS2_Read32(offs_t address)
+{
+    struct m68k_cpu_instance *p68k = m68k_getActivecpu();
+	return m68k_read_pcrelative_32(address);
+}
+
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
