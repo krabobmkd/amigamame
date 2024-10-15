@@ -372,7 +372,7 @@ bool Intuition_Window::open()
             ,
         WA_Title,(ULONG)APPNAMEA, /* take title from version string */
         WA_PubScreen, (ULONG)pWbScreen,
-        WA_RptQueue,0, // test
+       WA_RptQueue,0, // test
         TAG_DONE
         );
 //    } // end if sbm ok

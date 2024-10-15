@@ -727,7 +727,7 @@ void ay8910_reset_ym(void *chip)
 void ay8910_set_clock_ym(void *chip, int clock)
 {
 	struct AY8910 *PSG = chip;
-	stream_set_sample_rate(PSG->Channel, /*clock/8*/ Machine->sample_rate);
+	stream_set_sample_rate(PSG->Channel, clock/8 /* Machine->sample_rate*/);
 }
 
 void ay8910_write_ym(void *chip, int addr, int data)

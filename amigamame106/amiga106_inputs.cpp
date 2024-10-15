@@ -17,11 +17,14 @@
 #include <proto/intuition.h>
 #include <proto/lowlevel.h>
 #include <proto/keymap.h>
+#include <proto/alib.h>
 
 #include "intuiuncollide.h"
 
 extern "C" {
     #include <libraries/lowlevel.h>
+    #include <devices/keyboard.h>
+    #include <hardware/intbits.h>
 }
 
 #include <vector>
@@ -50,12 +53,20 @@ using namespace std;
 // extend amiga os code given to mame after "lowlevel rawkey codes".
 #define ANALOG_CODESTART 1024
 
+#ifdef USE_DIRECT_KEYBOARD_DEVICE
 struct KeyboardMatrix {
     union {
         char _k[16];
         ULONG _kl[4];
+    };
+    bool operator==(const KeyboardMatrix &o)
+    {
+        for(int i=0;i<3;i++)
+            if(_kl[i] != o._kl[i]) return false;
+        return true;
     }
 };
+#endif
 
 // we don't even need to publish it:
 struct MameInputs
@@ -74,6 +85,7 @@ struct MameInputs
     };
     LLMouse _mstate[4];
 
+#ifdef USE_DIRECT_KEYBOARD_DEVICE
     // - -  when using direct keyboard device, not intuition idcmp
     // must be allocated in MEMF_PUBLIC
     struct IOStdReq *_KeyIO;
@@ -81,8 +93,9 @@ struct MameInputs
 
     struct Interrupt *_keyboard_interupt;
     struct KeyboardMatrix *_keyboard_data;
+    struct KeyboardMatrix _mainthreadkeys;
     int                 _doUseDirectKeyboard;
-
+#endif
 
 };
 
@@ -149,23 +162,28 @@ int     llPortsTypes[4]={0,0,0,0};
 
 extern "C" {
     struct Library *LowLevelBase = NULL;
-
+#ifdef USE_DIRECT_KEYBOARD_DEVICE
 static void mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1") )
 {
     struct KeyboardMatrix km;
     // hello this is executed at 50Hz or 60Hz, whatever happens . It's a vblank interupt.
     // and it must be all MEMF_PUBLIC.
-    KeyIO->io_Command=KBD_READMATRIX;
-    KeyIO->io_Data= (APTR)&km._kl[0] ;
-    KeyIO->io_Length= 16 ;
-    DoIO((struct IORequest *)KeyIO);
+    if(g_pInputs)
+    {
+
+    g_pInputs->_KeyIO->io_Command=KBD_READMATRIX;
+    g_pInputs->_KeyIO->io_Data= (APTR)&km._kl[0] ;
+    g_pInputs->_KeyIO->io_Length= 16 ;
+    DoIO((struct IORequest *)g_pInputs->_KeyIO);
 
     pkm->_kl[0] |= km._kl[0]; // there is one bit for a key in this, rawkey code order.
     pkm->_kl[1] |= km._kl[1];
     pkm->_kl[2] |= km._kl[2];
     pkm->_kl[3] |= km._kl[3]; // not sure if useful.
+    }
 
 }
+#endif
 
 } // end extern c
 
@@ -296,16 +314,17 @@ void AllocInputs()
     rawkeymap.clear(); // will make the rawkey table again using conf.
 
     // - - - -init direct keyboard
+#ifdef USE_DIRECT_KEYBOARD_DEVICE
     MameConfig::Controls &configControls = getMainConfig().controls();
-    if(configControls._useDirectKeyboard)
+    if(/*configControls._useDirectKeyboard*/true)
     {
         //
 
         struct Interrupt *pi;
-        g_pInputs->_keyboard_interupt = pi = AllocVec(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR);
+        g_pInputs->_keyboard_interupt = pi = (struct Interrupt *) AllocVec(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR);
         if(pi)
         {
-            g_pInputs->_keyboard_data = AllocVec(sizeof(struct KeyboardMatrix), MEMF_PUBLIC|MEMF_CLEAR);
+            g_pInputs->_keyboard_data = (struct KeyboardMatrix *) AllocVec(sizeof(struct KeyboardMatrix), MEMF_PUBLIC|MEMF_CLEAR);
             if(g_pInputs->_keyboard_data)
             {
                 if (g_pInputs->_KeyMP=CreatePort(NULL,NULL))
@@ -317,7 +336,7 @@ void AllocInputs()
                         {
                             pi->is_Node.ln_Name = (char *)"mamekbd";
                             pi->is_Data = (APTR)g_pInputs->_keyboard_data;
-                            pi->is_Code = &mamekbdInteruptfunc;
+                            pi->is_Code = (VOID    (*)()) &mamekbdInteruptfunc;
                             AddIntServer(INTB_VERTB,pi);
                             g_pInputs->_doUseDirectKeyboard = 1;
 
@@ -328,7 +347,7 @@ void AllocInputs()
             } // end if data alloc ok
         } // end if int alloc ok
     } // end if use direct kbd
-
+#endif
 }
 
 void FreeInputs()
@@ -346,6 +365,7 @@ void FreeInputs()
 
     if(g_pInputs)
     {
+#ifdef USE_DIRECT_KEYBOARD_DEVICE
         if(g_pInputs->_keyboard_interupt)
         {
             RemIntServer(INTB_VERTB,g_pInputs->_keyboard_interupt);
@@ -362,6 +382,7 @@ void FreeInputs()
             if(g_pInputs->_keyboard_data) FreeVec(g_pInputs->_keyboard_data);
             FreeVec(g_pInputs->_keyboard_interupt);
          }
+#endif
         free(g_pInputs);
      }
     g_pInputs = NULL;
@@ -409,6 +430,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
 
                 if(imcode & IECODE_UP_PREFIX)
                 {
+                  //  printf("keyup: %04x\n",(int)finalkeycode);
                    // if many down/up happens in one frame, we must see it has pressed, then up next frame.
                    if(g_pInputs->_NbKeysUpStack<256)
                    {
@@ -421,8 +443,6 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 }
                 else
                 {
-                    printf("keydown: %04x\n",(int)finalkeycode);
-
                     UBYTE prev = g_pInputs->_Keys[finalkeycode];
                     if(prev != 0 && prev == fcounter )
                     {   // means down->up->down for same key in the same frame,
@@ -532,16 +552,27 @@ void UpdateInputs(struct MsgPort *pMsgPort)
             }
         } // loop by port
     }
-
+#ifdef USE_DIRECT_KEYBOARD_DEVICE
     if(g_pInputs->_doUseDirectKeyboard)
     {   // this is ored on interuption
-         g_pInputs->_keyboard_data._kl[0]=
-         g_pInputs->_keyboard_data._kl[1]=
-         g_pInputs->_keyboard_data._kl[2]=
-         g_pInputs->_keyboard_data._kl[3]= 0;
+        if(!(*g_pInputs->_keyboard_data == g_pInputs->_mainthreadkeys) )
+        {
+            printf("ks: %08x %08x %08x %08x\n",
+                g_pInputs->_keyboard_data->_kl[0],
+                g_pInputs->_keyboard_data->_kl[1],
+                g_pInputs->_keyboard_data->_kl[2],
+                g_pInputs->_keyboard_data->_kl[3]
+                   );
+        }
+        g_pInputs->_mainthreadkeys = *g_pInputs->_keyboard_data;
+
+         g_pInputs->_keyboard_data->_kl[0]=
+         g_pInputs->_keyboard_data->_kl[1]=
+         g_pInputs->_keyboard_data->_kl[2]=
+         g_pInputs->_keyboard_data->_kl[3]= 0;
 
     }
-
+#endif
     // apply change from parallel pads to player 3 & 4
     if(g_pParallelPads && g_pParallelPads->_ppidata->_last_checked_changes )
     {
@@ -1019,14 +1050,15 @@ INT32 osd_get_code_value(os_code oscode)
 {
     // now , always rawkey.
     if(!g_pInputs) return 0;
+#ifdef USE_DIRECT_KEYBOARD_DEVICE
     if(g_pInputs->_doUseDirectKeyboard)
     {
         if(oscode<0x72)
         {
-            return g_pInputs->_keyboard_data._k[oscode>>3] & ((unsigned char)1)<<(oscode&7);
+            return (g_pInputs->_mainthreadkeys._k[oscode>>3] & (1<<(oscode&7)));
         }
     }
-
+#endif
     if(oscode<(256*4)) // 256*4 is lowlevel extended rawkey range.
     {
        // printf("ASKED :%04x\n",(int)oscode);
