@@ -328,7 +328,10 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                    }
                 }
                 else
-                {   UBYTE prev = g_pInputs->_Keys[finalkeycode];
+                {
+                    printf("keydown: %04x\n",(int)finalkeycode);
+
+                    UBYTE prev = g_pInputs->_Keys[finalkeycode];
                     if(prev != 0 && prev == fcounter )
                     {   // means down->up->down for same key in the same frame,
                         // which is common is just 8fps and player is blasting a key...
@@ -350,9 +353,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 }
             }
             break;
-            case IDCMP_CLOSEWINDOW:
-                mame_schedule_exit();
-            break;
+        case IDCMP_CLOSEWINDOW:
+            mame_schedule_exit();
+        break;
         case IDCMP_MOUSEBUTTONS:
             break;
         case IDCMP_CHANGEWINDOW:
@@ -435,7 +438,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 //#define JP_MVERT_MASK	(255<<8)	/* vertical position	*/
                 //#define JP_MOUSE_MASK	(JP_MHORZ_MASK|JP_MVERT_MASK)
             }
-        } // loop by player
+        } // loop by port
     }
 
 

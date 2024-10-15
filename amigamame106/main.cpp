@@ -177,9 +177,9 @@ void mameExitCleanCtrlC(void);
 void main_close()
 {
    // printf("does main_close\n");
-#ifdef DOMAMELOG
-    printf("mameExitCleanCtrlC\n");
-#endif
+//#ifdef DOMAMELOG
+//    printf("mameExitCleanCtrlC\n");
+//#endif
     mameExitCleanCtrlC(); // flush game allocs, ahcked from mame.c, in case stopped during game.
 #ifdef DOMAMELOG
     printf("osd_close_display\n");
@@ -190,14 +190,14 @@ void main_close()
 #endif
     osd_stop_audio_stream();
 //    printf("after  osd_stop_audio_stream\n");
-#ifdef DOMAMELOG
-    printf("unzip_cache_clear\n");
-#endif
+//#ifdef DOMAMELOG
+//    printf("unzip_cache_clear\n");
+//#endif
     unzip_cache_clear();
 //    printf("after  unzip_cache_clear\n");
-#ifdef DOMAMELOG
-    printf("closeTimers\n");
-#endif
+//#ifdef DOMAMELOG
+//    printf("closeTimers\n");
+//#endif
     closeTimers();
 #ifdef DOMAMELOG
     printf("FreeGUI\n");
@@ -206,40 +206,24 @@ void main_close()
     FreeGUI();
 //    printf("after  FreeGUI\n");
    // FreeConfig(); -> static destructor in _config.
-#ifdef DOMAMELOG
-    printf("gui_gadtools_close\n");
-#endif
+
     gui_gadtools_close();
-#ifdef DOMAMELOG
-    printf("CloseLowLevelLib\n");
-#endif
+
 //    printf("after  gui_gadtools_close\n");
     CloseLowLevelLib();
 //    printf("after  CloseLowLevelLib\n");
-#ifdef DOMAMELOG
-    printf("close Gad\n");
-#endif
+
     if(GadToolsBase) CloseLibrary(GadToolsBase);
 //    if(P96Base) CloseLibrary(P96Base);
-#ifdef DOMAMELOG
-    printf("close cgx\n");
-#endif
+
     if(CyberGfxBase) CloseLibrary(CyberGfxBase);
-#ifdef DOMAMELOG
-    printf("close km\n");
-#endif
+
     if(KeymapBase) CloseLibrary(KeymapBase);
-#ifdef DOMAMELOG
-    printf("close u\n");
-#endif
+
     if(UtilityBase) CloseLibrary(UtilityBase);
-#ifdef DOMAMELOG
-    printf("close i\n");
-#endif
+
     if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
-#ifdef DOMAMELOG
-    printf("close g\n");
-#endif
+
     if(GfxBase) CloseLibrary((struct Library *)GfxBase);
 #ifdef DOMAMELOG
     printf("-end-\n");

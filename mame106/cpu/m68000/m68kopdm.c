@@ -4585,20 +4585,20 @@ void m68k_op_link_16(M68KOPT_PARAMS)
 
 void m68k_op_link_32_a7(M68KOPT_PARAMS)
 {
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+	//if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
 	{
 		REG_A[7] -= 4;
 		m68ki_write_32(REG_A[7], REG_A[7]);
 		REG_A[7] = MASK_OUT_ABOVE_32(REG_A[7] + OPER_I_32(p68k));
 		return;
 	}
-	m68ki_exception_illegal(p68k);
+	//m68ki_exception_illegal(p68k);
 }
 
 
 void m68k_op_link_32(M68KOPT_PARAMS)
 {
-	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+	//if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
 	{
 		uint* r_dst = &AY;
 
@@ -4607,7 +4607,7 @@ void m68k_op_link_32(M68KOPT_PARAMS)
 		REG_A[7] = MASK_OUT_ABOVE_32(REG_A[7] + OPER_I_32(p68k));
 		return;
 	}
-	m68ki_exception_illegal(p68k);
+	//m68ki_exception_illegal(p68k);
 }
 
 
@@ -4618,8 +4618,9 @@ void m68k_op_lsr_8_s(M68KOPT_PARAMS)
 	uint src = MASK_OUT_ABOVE_8(*r_dst);
 	uint res = src >> shift;
 
-	if(shift != 0)
-		USE_CYCLES(shift<<CYC_SHIFT);
+    //	if(shift != 0)
+    //		USE_CYCLES(shift<<CYC_SHIFT);
+        USE_CYCLES(shift);
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -4637,8 +4638,9 @@ void m68k_op_lsr_16_s(M68KOPT_PARAMS)
 	uint src = MASK_OUT_ABOVE_16(*r_dst);
 	uint res = src >> shift;
 
-	if(shift != 0)
-		USE_CYCLES(shift<<CYC_SHIFT);
+    //	if(shift != 0)
+    //		USE_CYCLES(shift<<CYC_SHIFT);
+        USE_CYCLES(shift);
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -4656,8 +4658,9 @@ void m68k_op_lsr_32_s(M68KOPT_PARAMS)
 	uint src = *r_dst;
 	uint res = src >> shift;
 
-	if(shift != 0)
-		USE_CYCLES(shift<<CYC_SHIFT);
+//	if(shift != 0)
+//		USE_CYCLES(shift<<CYC_SHIFT);
+    USE_CYCLES(shift);
 
 	*r_dst = res;
 
@@ -4675,9 +4678,9 @@ void m68k_op_lsr_8_r(M68KOPT_PARAMS)
 	uint src = MASK_OUT_ABOVE_8(*r_dst);
 	uint res = src >> shift;
 
-	if(shift != 0)
+	//if(shift != 0)
 	{
-		USE_CYCLES(shift<<CYC_SHIFT);
+		USE_CYCLES(shift);
 
 		if(shift <= 8)
 		{
@@ -4712,9 +4715,9 @@ void m68k_op_lsr_16_r(M68KOPT_PARAMS)
 	uint src = MASK_OUT_ABOVE_16(*r_dst);
 	uint res = src >> shift;
 
-	if(shift != 0)
+	//if(shift != 0)
 	{
-		USE_CYCLES(shift<<CYC_SHIFT);
+		USE_CYCLES(shift);
 
 		if(shift <= 16)
 		{

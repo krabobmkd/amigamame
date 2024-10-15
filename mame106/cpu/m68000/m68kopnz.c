@@ -7557,6 +7557,40 @@ void m68k_op_subx_32_mm(M68KOPT_PARAMS)
 
 void m68k_op_swap_32(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
+    asm volatile(
+        "\tand.w #7,%0\n"
+        "\tlea %c[dar](%1,%0.w*4),a0\n"
+        "\tmove.l (a0),d0\n"
+        "\tswap d0\n"
+        "\tmove.l d0,(a0)\n"
+        "\tmove.l d0,%c[not_z_flag](%1)\n"
+        "\trol.l #8,d0\n"
+        "\tmove.l d0,%c[n_flag](%1)\n"
+        :
+        : "d"(regir), "a"(p68k),
+         [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
+         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
+         [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
+        :  "d0","a0"
+        );
+    /*
+    move.l d2,-(sp)
+	moveq #7,d0
+	and.l d0,d2
+	lea (a2,d2.l*4),a0
+	move.l (a0),d0
+	swap d0
+	move.l d0,(a0)
+	move.l d0,(80,a2)
+	moveq #24,d1
+	lsr.l d1,d0
+	move.l d0,(76,a2)
+	move.l (sp)+,d2
+*/
+#else
+
+
 	uint* r_dst = &DY;
 
 	FLAG_Z = MASK_OUT_ABOVE_32(*r_dst<<16);
@@ -7564,8 +7598,9 @@ void m68k_op_swap_32(M68KOPT_PARAMS)
 
 	FLAG_Z = *r_dst;
 	FLAG_N = NFLAG_32(*r_dst);
-	FLAG_C = CFLAG_CLEAR;
-	FLAG_V = VFLAG_CLEAR;
+#endif
+//	FLAG_C = CFLAG_CLEAR;
+//	FLAG_V = VFLAG_CLEAR;
 }
 
 

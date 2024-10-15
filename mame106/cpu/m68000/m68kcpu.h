@@ -1033,6 +1033,13 @@ extern uint           m68ki_aerr_address;
 extern uint           m68ki_aerr_write_mode;
 extern uint           m68ki_aerr_fc;
 
+INLINE unsigned int m68kx_read_pcrelative_8(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0) );
+INLINE unsigned int m68kx_read_pcrelative_16(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0));
+INLINE unsigned int m68kx_read_pcrelative_32(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0));
+
+
+
+
 /* Read data immediately after the program counter */
 //INLINE uint m68ki_read_imm_16(M68KOPT_PARAMS);
 //INLINE uint m68ki_read_imm_32(M68KOPT_PARAMS);
