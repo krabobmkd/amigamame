@@ -167,6 +167,7 @@ public:
     };
     struct Audio : public ASerializable
     {
+        Audio();
         void serialize(ASerializer &serializer) override;
         AudioMode _mode = AudioMode::AHI;
         int _freq=0;
@@ -204,6 +205,7 @@ public:
 
     struct Misc : public ASerializable
     {
+        Misc();
         void serialize(ASerializer &serializer) override;        
         std::string _romsPath,_userPath;
         bool    _useCheatCodeFile = false;
@@ -214,6 +216,7 @@ public:
     // just to have a help panel
     struct Help : public ASerializable
     {
+        Help();
         void serialize(ASerializer &serializer) override;
         strText _[10+4];
     };

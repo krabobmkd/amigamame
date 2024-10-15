@@ -33,8 +33,8 @@ MameConfig &getMainConfig()
     return config;
 }
 
-MameConfig::MameConfig()
-    : _NumDrivers(0)
+MameConfig::MameConfig() : ASerializable()
+    , _NumDrivers(0)
     , _activeDriver(-1)
     , _listShowState(0)
     , _romsFoundTouched(false)
@@ -336,7 +336,10 @@ bool MameConfig::Display_PerScreenMode::isDefault()
 }
 
 MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode)
-{}
+{
+    printf("MameConfig::Display::Display()\n");
+
+}
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU Or WPA8",
@@ -363,6 +366,12 @@ MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
     return _perScreenModeS.getActive();
 }
 
+
+MameConfig::Audio::Audio() : ASerializable()
+{
+    printf("MameConfig::Audio::Audio()\n");
+}
+
 void MameConfig::Audio::serialize(ASerializer &serializer)
 {
     serializer("Mode",(int &)_mode,{"  None  ","   AHI   "});
@@ -373,7 +382,7 @@ extern "C" {
      int hasParallelPort();
 }
 MameConfig::Controls::Controls() : ASerializable() {
-
+    printf("MameConfig::Controls::Controls()\n");
 }
 
 void MameConfig::Controls::serialize(ASerializer &serializer)
@@ -457,12 +466,20 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
 //    serializer("Type4", _PlayerPortType[3],controlerTypesLL);
 
 }
+
+MameConfig::Misc::Misc() : ASerializable() {
+    printf("MameConfig::Misc::Misc()\n");
+}
+
 void MameConfig::Misc::serialize(ASerializer &serializer)
 {
     serializer("Roms",_romsPath,SERFLAG_STRING_ISPATH);    
     serializer("Use Cheat Code File",_useCheatCodeFile);
     serializer("Cheat Code File",_cheatFilePath,SERFLAG_STRING_ISFILE);
 
+}
+MameConfig::Help::Help() : ASerializable() {
+    printf("MameConfig::Help::Help()\n");
 }
 
 
@@ -546,6 +563,7 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
 
 void MameConfig::initDriverIndex()
 {
+    printf("initDriverIndex() 1\n");
     // to be done once.
   int NumDrivers;
 
@@ -554,9 +572,8 @@ void MameConfig::initDriverIndex()
     const game_driver *drv  =drivers[NumDrivers];
     if(drv->flags & (/*GAME_NOT_WORKING|*/NOT_A_DRIVER)) continue;
      _driverIndex.insert(drv->name,NumDrivers);
-
-
   }
+    printf("initDriverIndex() 3 . NumDrivers:%d\n",NumDrivers);
   _NumDrivers =NumDrivers;
 
     // also get its screen id:
@@ -567,6 +584,8 @@ void MameConfig::initDriverIndex()
 //    _players.reserve(_NumDrivers);
 //    _players.resize(_NumDrivers);
 
+    printf("initDriverIndex() 4\n");
+
     for(NumDrivers = 0; drivers[NumDrivers]; NumDrivers++)
     {
         const game_driver *drv  =drivers[NumDrivers];
@@ -576,6 +595,7 @@ void MameConfig::initDriverIndex()
       //  _players[NumDrivers] = (UBYTE)nbp;
 
     }
+    printf("initDriverIndex() 5\n");
 }
 void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs/*, int &nbp*/)
 {
