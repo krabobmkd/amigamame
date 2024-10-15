@@ -222,6 +222,7 @@ bool Intuition_Screen::open()
                     WA_DepthGadget,0,
                     WA_CloseGadget,0,
                     WA_DragBar,0,
+                    WA_RptQueue,0, // no rawkey repeat ?
           WA_GimmeZeroZero,FALSE, // test
                     WA_IDCMP,IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY ,
                     0 );
@@ -355,6 +356,7 @@ bool Intuition_Window::open()
         WA_MaxHeight, _machineHeight*_maxzoomfactor,
         WA_MinWidth, _machineWidth,
         WA_MinHeight, _machineHeight,
+        WA_RptQueue,0, // no rawkey repeat ?
         WA_IDCMP,/* IDCMP_GADGETUP | IDCMP_GADGETDOWN |*/
             IDCMP_MOUSEBUTTONS |  IDCMP_RAWKEY | IDCMP_CHANGEWINDOW |
             IDCMP_NEWSIZE /*| IDCMP_INTUITICKS*/ | IDCMP_CLOSEWINDOW,

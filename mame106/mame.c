@@ -298,14 +298,17 @@ int run_game(int game)
 				add_logerror_callback(logfile_callback);
 
 			/* create the Machine structure and driver */
+			printf("create_machine\n");
 			create_machine(game);
-
+			printf("init_machine\n");
 			/* then finish setting up our local machine */
 			init_machine();
-
+			printf("init_machine ok \n");
 			/* load the configuration settings and NVRAM */
 			settingsloaded = config_load_settings();
+			printf("after config_load_settings\n");
 			nvram_load();
+			printf("after nvram_load \n");
 			/* initialize the UI and display the startup screens */
 			if (ui_init(!settingsloaded && !options.skip_disclaimer, !options.skip_warnings, !options.skip_gameinfo) != 0)
 				fatalerror("User cancelled");

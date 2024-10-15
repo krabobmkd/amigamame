@@ -27,7 +27,7 @@ https://github.com/niklasekstrom/amiga-par-to-spi-adapter/blob/master/spi-lib/sp
 #include <hardware/custom.h>
 #include <hardware/intbits.h>
 
-// for some gcc ?
+// -> now is inited or not in main.cpp
 // struct Library *miscbase=NULL;
 //#include "cia_protos.h"
 //#include "misc_protos.h"

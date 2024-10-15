@@ -1,6 +1,7 @@
 
 
 todo beta4
+
 - O drawgfx pack4
 - O tilemap bitfield line optim
 - O optim son bubbob
@@ -10,6 +11,14 @@ todo beta4
 - O  neogeo verif slicing
 - O need 100%: rastan,slap fight, bubbob
 - O fastboot neogeo, batrider
+
+todo beta3c
+- O keyboard blocked keys bug
+- O wrong megatech colors
+- X main.cfg trashed when caching big romset.
+- X 6% to 8% gain of 68k optimisations
+- O manage freeze init pass
+
 
  Todo for beta3:
  - X Mouse twice faster
@@ -22,7 +31,7 @@ todo beta4
   - O try to reactivate 8bit window remap.
   - X no sound buzing when moving windows
   - O remember windows position and size per resolution.
-  - O try to manage freeze init pass
+
 
  Done from Beta 1 to Beta 2:
   - Corrected a bug on joystick config SetJoyPortAttrs(): missing the final TAG_DONE.

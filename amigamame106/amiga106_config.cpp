@@ -38,7 +38,9 @@ MameConfig::MameConfig()
     , _activeDriver(-1)
     , _listShowState(0)
 {
+    printf("MameConfig::MameConfig()\n");
     initDriverIndex();
+    printf("MameConfig::MameConfig() end\n");
 }
 MameConfig::~MameConfig()
 {}
@@ -270,7 +272,9 @@ void MameConfig::toDefault()
     _misc._cheatFilePath = "PROGDIR:cheat.dat";
 
 }
-
+MameConfig::Display_PerScreenMode::Display_PerScreenMode() : ASerializable() {
+ printf("Display_PerScreenMode\n");
+}
 void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
 {
     serializer("Screen Selection",(int &)_ScreenModeChoice,{"Find Best","Select Mode"});
@@ -297,7 +301,10 @@ bool MameConfig::Display_PerScreenMode::isDefault()
 }
 
 MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode)
-{}
+{
+    printf("Display::Display()\n");
+
+}
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU Or WPA8",
@@ -324,6 +331,12 @@ MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
     return _perScreenModeS.getActive();
 }
 
+
+MameConfig::Audio::Audio() : ASerializable()
+{
+    printf("Audio::Audio()\n");
+
+}
 void MameConfig::Audio::serialize(ASerializer &serializer)
 {
     serializer("Mode",(int &)_mode,{"  None  ","   AHI   "});
@@ -333,6 +346,11 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
 extern "C" {
      int hasParallelPort();
 }
+MameConfig::Controls::Controls() : ASerializable() {
+    printf("Controls::Controls()\n");
+
+}
+
 void MameConfig::Controls::serialize(ASerializer &serializer)
 {
     static const vector<string> strPlayers={
@@ -414,6 +432,8 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
 //    serializer("Type4", _PlayerPortType[3],controlerTypesLL);
 
 }
+MameConfig::Misc::Misc() : ASerializable() {}
+
 void MameConfig::Misc::serialize(ASerializer &serializer)
 {
     serializer("Roms",_romsPath,SERFLAG_STRING_ISPATH);    
@@ -422,7 +442,7 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
 
 }
 
-
+MameConfig::Help::Help() : ASerializable() {}
 void MameConfig::Help::serialize(ASerializer &serializer)
 {
     // just use the item capabilities of the gui serializer,

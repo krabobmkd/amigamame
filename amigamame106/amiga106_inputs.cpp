@@ -317,6 +317,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
 
                 if(imcode & IECODE_UP_PREFIX)
                 {
+                    printf("key up:%04x\n",finalkeycode);
                    // if many down/up happens in one frame, we must see it has pressed, then up next frame.
                    if(g_pInputs->_NbKeysUpStack<256)
                    {
@@ -328,7 +329,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                    }
                 }
                 else
-                {   UBYTE prev = g_pInputs->_Keys[finalkeycode];
+                {
+                    printf("key up:%04x\n",finalkeycode);
+                    UBYTE prev = g_pInputs->_Keys[finalkeycode];
                     if(prev != 0 && prev == fcounter )
                     {   // means down->up->down for same key in the same frame,
                         // which is common is just 8fps and player is blasting a key...
@@ -337,7 +340,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                         for(int i=0;i<g_pInputs->_NbKeysUpStack;i++) // just a few there
                         {
                             if(g_pInputs->_NextKeysUpStack[i]==finalkeycode)
-                                g_pInputs->_NextKeysUpStack[i]= 0x80; // a rawkey that can't exist and will not be watched.
+                                g_pInputs->_NextKeysUpStack[i]= 0x0080; // a rawkey that can't exist and will not be watched.
                         }
 
                     }
@@ -348,6 +351,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                         doSwitchFS =1;
                     }
                 }
+            } else
+            {
+                printf("repeat!\n");
             }
             break;
             case IDCMP_CLOSEWINDOW:
@@ -356,7 +362,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
         case IDCMP_MOUSEBUTTONS:
             break;
         case IDCMP_CHANGEWINDOW:
-            // after system bloqued everythi ng for an amount of time,
+            // after system bloqued everyth ng for an amount of time,
             // need to not upset a timer.
             extern void ResetWatchTimer();
             ResetWatchTimer();
@@ -424,7 +430,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                g_pInputs->_mstate[iLLPort]._mousestate = state;
 
 //#define MOUSEBTMASK (JPF_BUTTON_RED|JPF_BUTTON_BLUE|JPF_BUTTON_PLAY)
-               // gt to rdirect mouse buttons in that case, to shot in arkanoid for example.
+               // got to redirect mouse buttons in that case, to shot in arkanoid for example.
                int playershift = (iplayer-1)<<8;
                // not perfect to do here because could jump a slow frame
                g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+playershift] = (int)((state & JPF_BUTTON_RED)!=0);
@@ -445,7 +451,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
         UWORD changed = g_pParallelPads->_ppidata->_last_checked_changes;
         UWORD state = g_pParallelPads->_ppidata->_last_checked;
         static const UWORD rk[]={
-            // it's the order of the bits in parralel registers.
+            // it's the order of the bits in parrallel registers.
             RAWKEY_PORT3_JOY_RIGHT,RAWKEY_PORT3_JOY_LEFT,
             RAWKEY_PORT3_JOY_DOWN,RAWKEY_PORT3_JOY_UP,
             RAWKEY_PORT2_JOY_RIGHT,RAWKEY_PORT2_JOY_LEFT,
