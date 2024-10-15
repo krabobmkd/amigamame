@@ -372,6 +372,10 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
 extern "C" {
      int hasParallelPort();
 }
+MameConfig::Controls::Controls() : ASerializable() {
+
+}
+
 void MameConfig::Controls::serialize(ASerializer &serializer)
 {
     static const vector<string> strPlayers={

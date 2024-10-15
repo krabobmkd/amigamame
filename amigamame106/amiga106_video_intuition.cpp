@@ -222,6 +222,7 @@ bool Intuition_Screen::open()
                     WA_DepthGadget,0,
                     WA_CloseGadget,0,
                     WA_DragBar,0,
+                    WA_RptQueue,0, // test
           WA_GimmeZeroZero,FALSE, // test
                     WA_IDCMP,IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY ,
                     0 );
@@ -371,7 +372,7 @@ bool Intuition_Window::open()
             ,
         WA_Title,(ULONG)APPNAMEA, /* take title from version string */
         WA_PubScreen, (ULONG)pWbScreen,
-
+        WA_RptQueue,0, // test
         TAG_DONE
         );
 //    } // end if sbm ok

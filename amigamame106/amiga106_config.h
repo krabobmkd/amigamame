@@ -186,11 +186,15 @@ public:
 
     struct Controls : public ASerializable
     {
+        Controls();
         void serialize(ASerializer &serializer) override;
         int _llPort_Player[4]; // value 1-4
         int _llPort_Type[4];
         int _parallelPort_Player[2]; // value 1-4
         int _parallel_type[2];
+
+        bool _useDirectKeyboard = true;
+
         strText _ll,_pr;
 
         //ControlPortLL _PlayerPort[4];
