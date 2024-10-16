@@ -3,9 +3,8 @@
 todo beta4
 
 - O drawgfx pack4
-- O tilemap bitfield line optim
+- O tilemap bitfield line optim ->0.5% gain ?
 - O optim son bubbob
-- O  neogeo rehash
 - O  neogeo cpu overrwrite optim
 - O  neogeo change to RGB16 index
 - O  neogeo verif slicing
@@ -14,7 +13,8 @@ todo beta4
 
 todo beta3d
 - O keyboard blocked keys bug
-- O wrong megatech colors
+- O wb3 player 2 start dont work (???)
+- O wrong megaplay colors -> remove all mp_xxx ?
 - X main.cfg trashed when caching big romset.
 - X 6% to 8% gain of 68k optimisations
 - O manage freeze init pass
