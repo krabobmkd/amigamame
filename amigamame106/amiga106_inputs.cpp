@@ -431,7 +431,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
 
                 if(imcode & IECODE_UP_PREFIX)
                 {                   // if many down/up happens in one frame, we must see it has pressed, then up next frame.
-                   // if many down/up happens in one frame, we must see it has pressed, then up next frame.
+                   //printf("Up:%04x\n",finalkeycode);
+
+                    // if many down/up happens in one frame, we must see it has pressed, then up next frame.
                    if(g_pInputs->_NbKeysUpStack<256)
                    {
                         g_pInputs->_NextKeysUpStack[g_pInputs->_NbKeysUpStack] = finalkeycode;
@@ -443,6 +445,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 }
                 else
                 {
+                   //printf("Down:%04x\n",finalkeycode);
                     UBYTE prev = g_pInputs->_Keys[finalkeycode];
                     if(prev != 0 && prev == fcounter )
                     {   // means down->up->down for same key in the same frame,

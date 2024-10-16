@@ -176,7 +176,6 @@ static ULONG shiftRotationBits(ULONG orientation, int rotationShift)
 */
 int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components)
 {
-    printf("osd_create_display\n");
     if(g_pMameDisplay) osd_close_display();
     if(!pparams || !Machine || !Machine->gamedrv) return 1; // fail
 
@@ -292,7 +291,7 @@ void osd_close_display(void)
 extern int dbgtracenbexec;
 void osd_update_video_and_audio(struct _mame_display *display)
 {
-    printf("osd_update_video_and_audio\n");
+
 //    framestat++;
 //    if(framestat>=60)
 //    {
