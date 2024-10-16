@@ -9,10 +9,10 @@ todo beta4
 - O  neogeo cpu overrwrite optim
 - O  neogeo change to RGB16 index
 - O  neogeo verif slicing
-- O need 100%: rastan,slap fight, bubbob
+- O need 100%: rastan (85%),slap fight (90%), bubbob (85%)
 - O fastboot neogeo, batrider
 
-todo beta3c
+todo beta3d
 - O keyboard blocked keys bug
 - O wrong megatech colors
 - X main.cfg trashed when caching big romset.

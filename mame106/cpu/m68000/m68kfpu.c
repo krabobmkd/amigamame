@@ -30,14 +30,14 @@ static UINT8 READ_EA_8( M68KOPT_PARAMS, int ea)
 			{
 				case 1:		// (xxx).L
 				{
-					UINT32 d1 = OPER_I_16(M68KOPT_PASSPARAMS);
-					UINT32 d2 = OPER_I_16(M68KOPT_PASSPARAMS);
+					UINT32 d1 = OPER_I_16(p68k);
+					UINT32 d2 = OPER_I_16(p68k);
 					UINT32 ea = (d1 << 16) | d2;
 					return m68ki_read_8(ea);
 				}
 				case 4:		// #<data>
 				{
-					return  OPER_I_8(M68KOPT_PASSPARAMS);
+					return  OPER_I_8(p68k);
 				}
 				default:	fatalerror("MC68040: READ_EA_8: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
@@ -109,8 +109,8 @@ static UINT32 READ_EA_32(M68KOPT_PARAMS, int ea)
 			{
 				case 1:		// (xxx).L
 				{
-					UINT32 d1 = OPER_I_16(M68KOPT_PASSPARAMS);
-					UINT32 d2 = OPER_I_16(M68KOPT_PASSPARAMS);
+					UINT32 d1 = OPER_I_16(p68k);
+					UINT32 d2 = OPER_I_16(p68k);
 					UINT32 ea = (d1 << 16) | d2;
 					return m68ki_read_32(ea);
 				}
@@ -121,7 +121,7 @@ static UINT32 READ_EA_32(M68KOPT_PARAMS, int ea)
 				}
 				case 4:		// #<data>
 				{
-					return  OPER_I_32(M68KOPT_PASSPARAMS);
+					return  OPER_I_32(p68k);
 				}
 				default:	fatalerror("MC68040: READ_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
@@ -179,8 +179,8 @@ static void WRITE_EA_32(M68KOPT_PARAMS, int ea, UINT32 data)
 			{
 				case 1:		// (xxx).L
 				{
-					UINT32 d1 = OPER_I_16(M68KOPT_PASSPARAMS);
-					UINT32 d2 = OPER_I_16(M68KOPT_PASSPARAMS);
+					UINT32 d1 = OPER_I_16(p68k);
+					UINT32 d2 = OPER_I_16(p68k);
 					UINT32 ea = (d1 << 16) | d2;
 					m68ki_write_32(ea, data);
 					break;
@@ -235,8 +235,8 @@ static UINT64 READ_EA_64( M68KOPT_PARAMS, int ea)
 			{
 				case 4:		// #<data>
 				{
-					h1 = OPER_I_32(M68KOPT_PASSPARAMS);
-					h2 = OPER_I_32(M68KOPT_PASSPARAMS);
+					h1 = OPER_I_32(p68k);
+					h2 = OPER_I_32(p68k);
 					return  (UINT64)(h1) << 32 | (UINT64)(h2);
 				}
 				case 2:		// (d16, PC)
@@ -613,11 +613,11 @@ static void fbcc(M68KOPT_PARAMS)
 
 	if (size)	// 32-bit displacement
 	{
-		disp = OPER_I_32(M68KOPT_PASSPARAMS);
+		disp = OPER_I_32(p68k);
 	}
 	else
 	{
-		disp = (INT16)(OPER_I_16(M68KOPT_PASSPARAMS));
+		disp = (INT16)(OPER_I_16(p68k));
 	}
 
 	// TODO: condition and jump!!!
@@ -632,7 +632,7 @@ void m68040_fpu_op0(M68KOPT_PARAMS)
 	{
 		case 0:
 		{
-			UINT16 w2 = OPER_I_16(M68KOPT_PASSPARAMS);
+			UINT16 w2 = OPER_I_16(p68k);
 			switch ((w2 >> 13) & 0x7)
 			{
 				case 0x0:	// FPU ALU FP, FP

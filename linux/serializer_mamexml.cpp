@@ -59,7 +59,7 @@ void XmlWriter::operator()(const char *sMemberName, std::string &str,int flags)
     xml_data_node *p = xml_add_child(_recursenode.back(),name.c_str(), str.c_str() );
 
 }
-void XmlWriter::operator()(const char *sMemberName, int &v, int min, int max)
+void XmlWriter::operator()(const char *sMemberName, int &v, int min, int max, int defv)
 {
     string name = checkXmlName(sMemberName);
     xml_data_node *p = xml_add_child(_recursenode.back(),name.c_str(),  NULL );
@@ -167,16 +167,19 @@ void XmlReader::operator()(const char *sMemberName, std::string &str, int flags)
     if(p && p->value) str = p->value;
 
 }
-void XmlReader::operator()(const char *sMemberName, int &v, int min, int max)
+void XmlReader::operator()(const char *sMemberName, int &v, int min, int max, int defv)
 {
     string name = checkXmlName(sMemberName);
     xml_data_node *p = xml_get_sibling(_recursenode.back()->child, name.c_str());
     if(p)
     {
-        int vv =  xml_get_attribute_int(p,"v",min);
+        int vv =  xml_get_attribute_int(p,"v",defv);
         if(vv<min) vv=min;
         if(vv>max) vv=max;
         v = vv;
+    } else
+    {
+        v = defv;
     }
 }
 void XmlReader::operator()(const char *sMemberName,  float &v, float min, float max,float step,float defval )
@@ -189,6 +192,8 @@ void XmlReader::operator()(const char *sMemberName,  float &v, float min, float 
         if(vv<min) vv=min;
         if(vv>max) vv=max;
         v = vv;
+    } else {
+        v = defval;
     }
 }
 

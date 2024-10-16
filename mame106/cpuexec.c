@@ -485,6 +485,7 @@ cycles_t dbgcyc_interuptaccum=0;
  *  timeslice
  *
  *************************************/
+int dbgtracenbexec=0;
 
 void cpuexec_timeslice(void)
 {
@@ -533,7 +534,7 @@ void cpuexec_timeslice(void)
 //    cycles_t dbgcyc_startinterupts = 0;
 //    cycles_t dbgcyc_endinterupts = 0;
 #endif
-
+                dbgtracenbexec++;
 	/* loop over CPUs */
 	for (cpunum = 0; Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum++)
 	{
@@ -549,6 +550,7 @@ void cpuexec_timeslice(void)
 			{
 				profiler_mark(PROFILER_CPU1 + cpunum);
 				cycles_stolen = 0;
+
 				ran = cpunum_execute(cpunum, cycles_running);
 
 #ifdef MAME_DEBUG

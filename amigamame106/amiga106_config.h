@@ -194,6 +194,9 @@ public:
         int _llPort_Type[4];
         int _parallelPort_Player[2]; // value 1-4
         int _parallel_type[2];
+
+        //bool _useDirectKeyboard = true;
+
         strText _ll,_pr;
 
         //ControlPortLL _PlayerPort[4];
@@ -245,11 +248,11 @@ protected:
 
 
     // - - - - - scanned roms zip or dir for UI.
-    //std::vector<MameRomFound> _romsFound; // what to save
     // mui like a ptr to ptr list, to insert in one blow.
     // this is meant to be sorted a way or another    
     std::vector<const _game_driver *const*> _romsFound;
     std::vector<UBYTE> _romsFoundReverse;
+    bool            _romsFoundTouched; // should save or not on exit.
     void initDriverIndex();
     int scanDriversRecurse(BPTR lock, FileInfoBlock*fib);
 

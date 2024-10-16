@@ -630,7 +630,9 @@ static void AY8910_init(struct AY8910 *PSG, int streams,
 	/* divided by 8; for the envelope generator of the AY-3-8910, it is half */
 	/* that much (clock/16), but the envelope of the YM2149 goes twice as    */
 	/* fast, therefore again clock/8.                                        */
-	PSG->Channel = stream_create(0,streams,clock/8,PSG,AY8910Update);
+	PSG->Channel = stream_create(0,streams,
+                                  sample_rate , // clock/8
+                                  PSG,AY8910Update);
 
 	ay8910_set_clock_ym(PSG,clock);
 }
@@ -725,7 +727,7 @@ void ay8910_reset_ym(void *chip)
 void ay8910_set_clock_ym(void *chip, int clock)
 {
 	struct AY8910 *PSG = chip;
-	stream_set_sample_rate(PSG->Channel, clock/8);
+	stream_set_sample_rate(PSG->Channel, clock/8 /* Machine->sample_rate*/);
 }
 
 void ay8910_write_ym(void *chip, int addr, int data)
