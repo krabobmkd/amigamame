@@ -60,30 +60,6 @@ AbstractDisplay::~AbstractDisplay(){}
 /* set this to use a direct RGB bitmap rather than a palettized bitmap */
 #define VIDEO_RGB_DIRECT	 			0x0004
 
-/*
-  Create a display screen, or window, of the given dimensions (or larger). It is
-  acceptable to create a smaller display if necessary, in that case the user must
-  have a way to move the visibility window around.
-
-  The params contains all the information the
-  Attributes are the ones defined in driver.h, they can be used to perform
-  optimizations, e.g. dirty rectangle handling if the game supports it, or faster
-  blitting routines with fixed palette if the game doesn't change the palette at
-  run time. The VIDEO_PIXEL_ASPECT_RATIO flags should be honored to produce a
-  display of correct proportions.
-  Orientation is the screen orientation (as defined in driver.h) which will be done
-  by the core. This can be used to select thinner screen modes for vertical games
-  (ORIENTATION_SWAP_XY set), or even to ask the user to rotate the monitor if it's
-  a pivot model. Note that the OS dependent code must NOT perform any rotation,
-  this is done entirely in the core.
-  Depth can be 8 or 16 for palettized modes, meaning that the core will store in the
-  bitmaps logical pens which will have to be remapped through a palette at blit time,
-  and 15 or 32 for direct mapped modes, meaning that the bitmaps will contain RGB
-  triplets (555 or 888). For direct mapped modes, the VIDEO_RGB_DIRECT flag is set
-  in the attributes field.
-
-  Returns 0 on success.
-*/
 //static void waitsec(int s)
 //{
 //    for(int j=0;j<s;j++)
@@ -174,8 +150,33 @@ static ULONG shiftRotationBits(ULONG orientation, int rotationShift)
     return rots[i];
 }
 
+/*
+  Create a display screen, or window, of the given dimensions (or larger). It is
+  acceptable to create a smaller display if necessary, in that case the user must
+  have a way to move the visibility window around.
+
+  The params contains all the information the
+  Attributes are the ones defined in driver.h, they can be used to perform
+  optimizations, e.g. dirty rectangle handling if the game supports it, or faster
+  blitting routines with fixed palette if the game doesn't change the palette at
+  run time. The VIDEO_PIXEL_ASPECT_RATIO flags should be honored to produce a
+  display of correct proportions.
+  Orientation is the screen orientation (as defined in driver.h) which will be done
+  by the core. This can be used to select thinner screen modes for vertical games
+  (ORIENTATION_SWAP_XY set), or even to ask the user to rotate the monitor if it's
+  a pivot model. Note that the OS dependent code must NOT perform any rotation,
+  this is done entirely in the core.
+  Depth can be 8 or 16 for palettized modes, meaning that the core will store in the
+  bitmaps logical pens which will have to be remapped through a palette at blit time,
+  and 15 or 32 for direct mapped modes, meaning that the bitmaps will contain RGB
+  triplets (555 or 888). For direct mapped modes, the VIDEO_RGB_DIRECT flag is set
+  in the attributes field.
+
+  Returns 0 on success.
+*/
 int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components)
 {
+    printf("osd_create_display\n");
     if(g_pMameDisplay) osd_close_display();
     if(!pparams || !Machine || !Machine->gamedrv) return 1; // fail
 
@@ -291,6 +292,7 @@ void osd_close_display(void)
 extern int dbgtracenbexec;
 void osd_update_video_and_audio(struct _mame_display *display)
 {
+    printf("osd_update_video_and_audio\n");
 //    framestat++;
 //    if(framestat>=60)
 //    {

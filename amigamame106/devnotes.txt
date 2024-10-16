@@ -51,8 +51,8 @@ todo beta3d
 
 
   - O optimise memory write/read calls for z80/68k
-  - O Implement CGX/ScalePixelArray() for drawing
-  - O Implement Triple buffer (with ChangeScreen or else ?)
+  - X Implement CGX/ScalePixelArray() for drawing
+  - X Implement Triple buffer (with ChangeScreen or else ?)
   - O implement WriteChunkyPixels instead of WPA8 when os>=3.1
   - O try to optimise sound chips with ridiculously high timing & cpu use (YM2151 ?)
 
@@ -71,7 +71,7 @@ todo beta3d
  - O mui list: have a column for nb players -> where to get that ?
  - O allow sorting by columns
  - O finish drawing leds, test with a driver that lag while booting if it helps
- - O a rom load progress bar somewhere.
+ - X a rom load progress bar somewhere.
 
  -  command line
     - O have most of the regular mame command options to list available roms.

@@ -3860,19 +3860,3 @@ const char *memory_get_handler_string(int read0_or_write1, int cpunum, int space
 	/* 8-bit case: RAM/ROM */
 	return handler_to_string(table, entry);
 }
-
-UINT8 CPS2_Read8(offs_t address)
-{
-	return m68k_read_pcrelative_8(address);
-}
-
-UINT16 CPS2_Read16(offs_t address)
-{
-	return m68k_read_pcrelative_16(address);
-}
-
-UINT32 CPS2_Read32(offs_t address)
-{
-	return m68k_read_pcrelative_32(address);
-}
-

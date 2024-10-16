@@ -99,7 +99,8 @@ void QProc::process()
 //    "wb3"
 //    "bublbobl"
 //   "dino"
-    "rastan"
+"qbert"
+//    "rastan"
 //      "mslug"
 //                "mp_sor2"
     );
