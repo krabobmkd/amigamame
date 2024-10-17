@@ -583,4 +583,4 @@ static DRIVER_INIT(wheelfir)
 	RAM[0xdd3da/2] = 0x4e71; // hack!
 }
 
-GAME( 199?, wheelfir,    0, wheelfir,    wheelfir,    wheelfir, ROT0,  "TCH", "Wheels & Fire", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, wheelfir,    0, wheelfir,    wheelfir,    wheelfir, ROT0,  "TCH", "Wheels & Fire", GAME_NOT_WORKING|GAME_NO_SOUND ,0)

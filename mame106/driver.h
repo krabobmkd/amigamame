@@ -251,6 +251,8 @@ struct _game_driver
 #endif
 
 	UINT32				flags;						/* orientation and other flags; see defines below */
+    // krb minimix
+    INT8                nbplayers;
 };
 
 
@@ -501,7 +503,7 @@ struct _game_driver
 
 ***************************************************************************/
 
-#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)	\
+#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPLAYER)	\
 game_driver driver_##NAME =					\
 {											\
 	__FILE__,								\
@@ -515,10 +517,11 @@ game_driver driver_##NAME =					\
 	construct_ipt_##INPUT,					\
 	init_##INIT,							\
 	rom_##NAME,								\
-	(MONITOR)|(FLAGS)						\
+	(MONITOR)|(FLAGS),						\
+    NBPLAYER \
 };
 
-#define GAMEB(YEAR,NAME,PARENT,BIOS,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)	\
+#define GAMEB(YEAR,NAME,PARENT,BIOS,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPLAYER)	\
 game_driver driver_##NAME =					\
 {											\
 	__FILE__,								\
@@ -532,7 +535,8 @@ game_driver driver_##NAME =					\
 	construct_ipt_##INPUT,					\
 	init_##INIT,							\
 	rom_##NAME,								\
-	(MONITOR)|(FLAGS)						\
+	(MONITOR)|(FLAGS),						\
+    NBPLAYER \
 };
 
 /* this allows to leave the INIT field empty in the GAME() macro call */

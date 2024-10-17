@@ -486,5 +486,5 @@ ROM_START( noahsark )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat,  0, ROT90, "ETM", "Tugboat",    GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, noahsark, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech", "Noah's Ark", GAME_IMPERFECT_GRAPHICS )
+GAME( 1982, tugboat,  0, tugboat, tugboat,  0, ROT90, "ETM", "Tugboat",    GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1983, noahsark, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech", "Noah's Ark", GAME_IMPERFECT_GRAPHICS ,0)

@@ -1225,4 +1225,4 @@ static DRIVER_INIT(changela)
 {
 }
 
-GAME( 1983, changela, 0, changela, changela, changela, ROT180, "Taito Corporation", "Change Lanes", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, changela, 0, changela, changela, changela, ROT180, "Taito Corporation", "Change Lanes", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS ,0)

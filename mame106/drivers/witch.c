@@ -1031,5 +1031,5 @@ DRIVER_INIT(witch)
 	memory_set_bankptr(1,&ROM[UNBANKED_SIZE]);
 }
 
-GAME( 1992, witch,    0,     witch, witch, witch, ROT0, "Sega / Vic Tokai", "Witch", GAME_NOT_WORKING )
-GAME( 1995, pbchmp95, witch, witch, witch, witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95 (bootleg?)", GAME_NOT_WORKING )
+GAME( 1992, witch,    0,     witch, witch, witch, ROT0, "Sega / Vic Tokai", "Witch", GAME_NOT_WORKING ,0)
+GAME( 1995, pbchmp95, witch, witch, witch, witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95 (bootleg?)", GAME_NOT_WORKING ,0)

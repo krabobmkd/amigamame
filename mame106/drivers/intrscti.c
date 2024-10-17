@@ -160,4 +160,4 @@ DRIVER_INIT( intrscti )
 	}
 }
 
-GAME( 19??, intrscti,  0,    intrscti, intrscti, intrscti, ROT0, "Unknown", "Intersecti", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 19??, intrscti,  0,    intrscti, intrscti, intrscti, ROT0, "Unknown", "Intersecti", GAME_NO_SOUND|GAME_NOT_WORKING ,0)

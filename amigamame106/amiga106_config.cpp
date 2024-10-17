@@ -38,6 +38,7 @@ MameConfig::MameConfig() : ASerializable()
     , _NumDrivers(0)
     , _activeDriver(-1)
     , _listShowState(0)
+    , _sortMode(SortMode::Name)
     , _romsFoundTouched(false)
 {
     printf("MameConfig::MameConfig()\n");
@@ -127,6 +128,11 @@ int MameConfig::save()
     if(_activeDriver !=-1)
     {
         xml_add_child(confignode,pcf_last, drivers[_activeDriver]->name );
+    }
+    if(_listShowState !=-1)
+    {
+        xml_data_node *pn = xml_add_child(confignode,pcf_list,NULL);
+        if(pn) xml_set_attribute_int(pn,"show",_listShowState);
     }
     if(_listShowState !=-1)
     {
@@ -696,16 +702,57 @@ static int DriverCompareNames(struct _game_driver ***drv1, struct _game_driver *
 {
   return(stricmp((**drv1)->description, (**drv2)->description));
 }
+static int DriverCompareNbPlayers(struct _game_driver ***drv1, struct _game_driver ***drv2)
+{
+  return((**drv1)->nbplayers < (**drv2)->nbplayers);
+}
+static int DriverCompareYear(struct _game_driver ***drv1, struct _game_driver ***drv2)
+{
+  return(stricmp((**drv1)->year, (**drv2)->year));
+}
+static int DriverCompareArchive(struct _game_driver ***drv1, struct _game_driver ***drv2)
+{
+  return(stricmp((**drv1)->name, (**drv2)->name));
+}
+static int DriverCompareParent(struct _game_driver ***drv1, struct _game_driver ***drv2)
+{
+  return(stricmp((**drv1)->parent, (**drv2)->parent));
+}
 
 
 void MameConfig::sortDrivers( std::vector<const _game_driver *const*> &roms)
 {
     if(roms.size()==0) return;
 
+    int (* comparator)(const void *, const void *) =
+            (int (*)(const void *, const void *))
+            DriverCompareYear;
+            //DriverCompareNames;
+
+    switch(_sortMode)
+    {
+        case SortMode::Name:
+        break;
+        case SortMode::NbPlayers:
+        comparator = (int (*)(const void *, const void *))DriverCompareNbPlayers;
+        break;
+        case SortMode::Year:
+        comparator =(int (*)(const void *, const void *)) DriverCompareYear;
+        break;
+        case SortMode::Archive:
+        comparator = (int (*)(const void *, const void *))DriverCompareArchive;
+        break;
+        case SortMode::Parent:
+        comparator = (int (*)(const void *, const void *))DriverCompareParent;
+        break;
+    default:break;
+
+    }
+
     qsort(roms.data(), //&SortedDrivers[DRIVER_OFFSET],
         (int)roms.size() ,//NumDrivers,
          sizeof(struct _game_driver **),
-          (int (*)(const void *, const void *)) DriverCompareNames);
+           comparator);
 
 }
 void MameConfig::initRomsFoundReverse()

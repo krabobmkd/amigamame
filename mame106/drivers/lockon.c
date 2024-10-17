@@ -790,5 +790,5 @@ ROM_START( lockon )
         ROM_LOAD( "lo2a", 0x000,  0x400, CRC(2bfc6288) SHA1(03d293ddc0c614b606be823826a4375b3d35901f) )
 ROM_END
 
-GAME( 1986, lockon, 0, lockon, lockon, 0, ROT0, "Tatsumi", "Lock-On", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, lockon, 0, lockon, lockon, 0, ROT0, "Tatsumi", "Lock-On", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS ,1)
 

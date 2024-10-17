@@ -285,7 +285,8 @@ static char *String_Driver=(char *)"Driver";
 static char *String_Archive=(char *)"Archive";
 static char *String_Parent=(char *)"Parent";
 static char *String_Screen=(char *)"Screen";
-//static char *String_Players=(char *)"Pl.";
+static char *String_Players=(char *)"Players.";
+static char *String_Year=(char *)"Year";
 static char *String_Comment=(char *)"Comment";
 /*
 
@@ -430,7 +431,7 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
     const struct _game_driver *drv;
 
     struct ColumnsString {
-          char *_driver/*,*_players*/,*_screen,*_archive,*_parent,*_comment;
+          char *_driver,*_players,*_screen,*_year,*_archive,*_parent,*_comment;
     };
     ColumnsString *pColumns = (ColumnsString *)array;
 
@@ -438,7 +439,8 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
   static char screen[32];
   static char archive[16];
   static char parent[16];
- //static char players[16];
+ static char players[12];
+ static char year[12];
 //  static char comment[128];
  static std::string strComment;
   if(!drv_indirect)
@@ -451,15 +453,18 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
     archive[15]=0;
     snprintf(parent,15,  "\033b\033u%s", String_Parent);
     parent[15]=0;
-//    snprintf(players,15,    "\033b\033u%s", String_Players);
-//    players[15]=0;
+    snprintf(players,11,    "\033b\033u%s", String_Players);
+    players[11]=0;
+    snprintf(year,11,    "\033b\033u%s", String_Year);
+    year[11]=0;
    // snprintf(comment,127,  "\033b\033u%s", String_Comment);
    // comment[127]=0;
     strComment =  "\033b\033u";
     strComment += String_Comment;
 
     pColumns->_driver = driver;
-//    pColumns->_players = players;
+    pColumns->_players = players;
+    pColumns->_year = year;
     pColumns->_screen = screen;
     pColumns->_archive = archive;
     pColumns->_parent = parent;
@@ -484,8 +489,8 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
 
  static std::string str_screen;
  int video_attribs;
-// int nbplayers;
- config.getDriverScreenModestring(drv_indirect,str_screen,video_attribs/*,nbplayers*/);
+
+ config.getDriverScreenModestring(drv_indirect,str_screen,video_attribs);
 
  pColumns->_screen = (char*) str_screen.c_str();
 
@@ -495,8 +500,11 @@ static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),c
    else
     pColumns->_parent = (char*)drv->parent;
 
-// snprintf(players,15,"%d", nbplayers);
-//pColumns->_players = players;
+   if(drv->nbplayers == 0) players[0]=0;
+   else snprintf(players,7,"%d", (int) drv->nbplayers);
+pColumns->_players = players;
+
+    pColumns->_year = (char *)drv->year;
 
 //  if(drv->flags & GAME_NOT_WORKING)
 //   pColumns->_comment = NotWorkingString;
@@ -860,7 +868,7 @@ Object *createPanel_Drivers()
           MUIA_Listview_Input,    TRUE,
             MUIA_Listview_List, (ULONG)( LI_Driver = MUINewObject(MUIC_List,
               MUIA_List_Title,    TRUE,
-              MUIA_List_Format,   "BAR,BAR,BAR,BAR,",
+              MUIA_List_Format,   "BAR,BAR,BAR,BAR,BAR,BAR,",
               MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
             InputListFrame,
           TAG_DONE)),

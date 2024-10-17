@@ -570,4 +570,4 @@ ROM_START( mwarr )
 	ROM_COPY( REGION_USER1, 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
-GAME( 199?, mwarr, 0, mwarr, mwarr, 0, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors", 0 )
+GAME( 199?, mwarr, 0, mwarr, mwarr, 0, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors", 0 ,0)

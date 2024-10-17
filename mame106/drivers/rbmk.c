@@ -606,4 +606,4 @@ ROM_START( rbmk )
 ROM_END
 
 
-GAME( 1995, rbmk, 0, rbmk, rbmk,0, ROT0,  "GMS", "Real Battle Mahjong King", GAME_NOT_WORKING )
+GAME( 1995, rbmk, 0, rbmk, rbmk,0, ROT0,  "GMS", "Real Battle Mahjong King", GAME_NOT_WORKING ,0)

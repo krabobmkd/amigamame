@@ -664,4 +664,4 @@ static DRIVER_INIT( dblewing )
 }
 
 
-GAME( 1993, dblewing, 0,        dblewing, dblewing,  dblewing,  ROT90,"Mitchell", "Double Wings", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME( 1993, dblewing, 0,        dblewing, dblewing,  dblewing,  ROT90,"Mitchell", "Double Wings", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND|GAME_NOT_WORKING,0)

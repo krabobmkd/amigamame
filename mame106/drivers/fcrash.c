@@ -406,4 +406,4 @@ ROM_START( fcrash )
 	ROM_RELOAD(          0x10000, 0x20000 )
 ROM_END
 
-GAME( 1990, fcrash,   ffight,  fcrash,     fcrash,   cps1,     ROT0,   "Playmark, bootleg [Capcom]", "Final Crash (World, bootleg)",GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1990, fcrash,   ffight,  fcrash,     fcrash,   cps1,     ROT0,   "Playmark, bootleg [Capcom]", "Final Crash (World, bootleg)",GAME_NOT_WORKING|GAME_NO_SOUND ,2)

@@ -224,6 +224,17 @@ public:
 
     void toDefault();
 
+    enum class SortMode :  int
+    {
+        Name,
+        NbPlayers,
+        Year,
+        Archive,
+        Parent
+    };
+
+    SortMode     sortMode() { return _sortMode; }
+
 protected:
     int _NumDrivers; // in current linker mame driver list. Can be huge.
 
@@ -238,6 +249,8 @@ protected:
 
     int     _listShowState;
 
+
+    SortMode     _sortMode;
 //    ScreenConf _defaultscreenconf;
 //    // TODO video prefs, per video config
 //    // keys are like: "320x224x16"

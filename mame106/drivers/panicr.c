@@ -539,4 +539,4 @@ static DRIVER_INIT( panicr )
 }
 
 
-GAME( 1986, panicr,  0,       panicr,  panicr,  panicr, ROT270, "Seibu", "Panic Road", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1986, panicr,  0,       panicr,  panicr,  panicr, ROT270, "Seibu", "Panic Road", GAME_NO_SOUND|GAME_NOT_WORKING ,0)

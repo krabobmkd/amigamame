@@ -334,4 +334,4 @@ ROM_START( 1945kiii )
 	ROM_LOAD( "m16m-3.u61", 0x00000, 0x200000, CRC(32fc80dd) SHA1(bee32493a250e9f21997114bba26b9535b1b636c) )
 ROM_END
 
-GAME( 2000, 1945kiii, 0, k3, k3, 0, ROT270, "Oriental", "1945k III", 0 )
+GAME( 2000, 1945kiii, 0, k3, k3, 0, ROT270, "Oriental", "1945k III", 0 ,0)

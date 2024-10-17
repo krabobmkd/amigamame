@@ -548,6 +548,6 @@ static DRIVER_INIT( srmp6 )
     Game driver(s)
 ***************************************************************************/
 
-/*GAME( YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)*/
-GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*GAME( YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,0)*/
+GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", GAME_NOT_WORKING | GAME_NO_SOUND,0)
 
