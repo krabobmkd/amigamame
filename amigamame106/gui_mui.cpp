@@ -443,7 +443,10 @@ static int DriverCompareNames(const struct _game_driver **drv1,const  struct _ga
 }
 static int DriverCompareNbPlayers(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
-  return((*drv1)->nbplayers < (*drv2)->nbplayers);
+  int a = (*drv1)->nbplayers;
+  int b = (*drv2)->nbplayers;
+
+    return (b-a);
 }
 static int DriverCompareYear(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
