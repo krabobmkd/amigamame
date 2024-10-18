@@ -18,4 +18,4 @@ add_executable( mamemakToCmake mameMakToCmake.cpp )
 add_executable( musachange musachange.cpp )
 
 
-add_executable( grabcontrols grabcontrols.cpp )
+#add_executable( grabcontrols grabcontrols.cpp )

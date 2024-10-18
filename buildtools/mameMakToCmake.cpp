@@ -467,6 +467,70 @@ int patchMiniMachines(
 
 
     {
+        TMachine  &src=machinetargets["atari"];
+        string mname=string("miniatari");
+        TMachine  &m=machinetargets[mname];
+        m._name = mname;
+
+       m._sources = {
+            "drivers/ccastles.c",
+            "vidhrdw/ccastles.c",
+
+            "drivers/centiped.c",
+            "vidhrdw/centiped.c",
+
+            "drivers/gauntlet.c",
+            "vidhrdw/gauntlet.c",
+
+            "machine/harddriv.c",
+            "drivers/harddriv.c",
+            "sndhrdw/harddriv.c",
+            "vidhrdw/harddriv.c",
+
+            "drivers/rampart.c",
+            "vidhrdw/rampart.c",
+
+            "drivers/klax.c",
+            "vidhrdw/klax.c"
+        };
+        copyDrivers(m,src,{
+        "ccastles","ccastle3","ccastle2",
+        "centiped","centipd2","centtime","milliped","warlords","bullsdrt",
+        "rampart","ramprt2p","rampartj",
+        "gauntlet","gaunts","gauntj","gauntg","gaunt2","gaunt2g","vindctr2",
+        "klax","klaxj","klaxd",
+
+        "harddriv","harddrvc",
+        "stunrun","stunrunp",
+        "racedriv","racedrvc",
+        "steeltal",
+        "strtdriv",
+        "hdrivair"
+    });
+
+        m._cpu_defs["M68010"]=1; // gauntlet + hardwrivin stun runner
+        m._cpu_defs["M6502"]=1;
+        m._cpu_defs["S2650"]=1;
+        m._cpu_defs["M68000"]=1; // rampart
+        m._cpu_defs["TMS34010"]=1; // hardwrivin , ssecond
+        m._cpu_defs["TMS32010"]=1;
+
+        m._cpu_defs["ADSP2100"]=1; // hardwrivin friends
+        m._cpu_defs["ADSP2101"]=1;
+        m._cpu_defs["DSP32C"]=1;
+
+        m._sound_defs["YM2151"]=1;
+        m._sound_defs["TMS5220"]=1;
+        m._sound_defs["POKEY"]=1;
+        m._sound_defs["SN76496"]=1;
+
+        m._sound_defs["YM2413"]=1; // rampart
+        m._sound_defs["OKIM6295"]=1;
+
+        m._sound_defs["DAC"]=1; // hardwrivin
+    }
+
+    {
         TMachine  &src=machinetargets["dataeast"];
         string mname=string("minidtea");
         TMachine  &m=machinetargets[mname];
