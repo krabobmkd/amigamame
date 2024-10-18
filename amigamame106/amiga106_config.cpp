@@ -42,7 +42,13 @@ MameConfig::MameConfig() : ASerializable()
     , _romsFoundTouched(false)
 {
     printf("MameConfig::MameConfig()\n");
-    initDriverIndex();
+    try {
+        initDriverIndex();
+    } catch(const exception &e)
+    {
+        printf("initDriverIndex exception:%s\n",e.what());
+    }
+
     printf("MameConfig::MameConfig() end\n");
 }
 MameConfig::~MameConfig()
@@ -323,7 +329,7 @@ void MameConfig::toDefault()
 
 }
 MameConfig::Display_PerScreenMode::Display_PerScreenMode() : ASerializable() {
- printf("Display_PerScreenMode\n");
+// printf("Display_PerScreenMode\n");
 }
 void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
 {
@@ -645,7 +651,7 @@ int MameConfig::scanDrivers()
 
     FreeDosObject(DOS_FIB,fib);
 
-    sortDrivers(_romsFound);
+    //sortDrivers(_romsFound);
     _romsFoundTouched = true;
 //    printf(" *** ScanDrivers end\n");
     initRomsFoundReverse();
@@ -698,28 +704,8 @@ int MameConfig::scanDriversRecurse(BPTR lock, FileInfoBlock*fib)
     } // end loop per dir file
 
 }
-static int DriverCompareNames(struct _game_driver ***drv1, struct _game_driver ***drv2)
-{
-  return(stricmp((**drv1)->description, (**drv2)->description));
-}
-static int DriverCompareNbPlayers(struct _game_driver ***drv1, struct _game_driver ***drv2)
-{
-  return((**drv1)->nbplayers < (**drv2)->nbplayers);
-}
-static int DriverCompareYear(struct _game_driver ***drv1, struct _game_driver ***drv2)
-{
-  return(stricmp((**drv1)->year, (**drv2)->year));
-}
-static int DriverCompareArchive(struct _game_driver ***drv1, struct _game_driver ***drv2)
-{
-  return(stricmp((**drv1)->name, (**drv2)->name));
-}
-static int DriverCompareParent(struct _game_driver ***drv1, struct _game_driver ***drv2)
-{
-  return(stricmp((**drv1)->parent, (**drv2)->parent));
-}
 
-
+/* now done by mui list
 void MameConfig::sortDrivers( std::vector<const _game_driver *const*> &roms)
 {
     if(roms.size()==0) return;
@@ -755,6 +741,7 @@ void MameConfig::sortDrivers( std::vector<const _game_driver *const*> &roms)
            comparator);
 
 }
+*/
 void MameConfig::initRomsFoundReverse()
 {
     int nbSlots = (_NumDrivers>>3)+1;
@@ -782,7 +769,7 @@ void MameConfig::buildAllRomsVector(std::vector<const _game_driver *const*> &v)
     {
         v[NumDrivers] = &drivers[NumDrivers];
     }
-    sortDrivers(v);
+//    sortDrivers(v);
 }
 // from cheat.c
 extern "C" {

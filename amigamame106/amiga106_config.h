@@ -6,6 +6,7 @@ extern "C"
 }
 #include <string>
 #include <unordered_map>
+//#include <map>
 #include <vector>
 
 #include "serializer.h"
@@ -18,6 +19,7 @@ struct _global_options;
 // driver name list could actually get big, avoid looping it.
 class NameDriverMap {
 public:
+/*old , looks ok but problems with os4 ?
     void insert(const char *n, int mamedriverindex) {
         using namespace std;
         if(!n || *n==0) return;
@@ -36,12 +38,26 @@ public:
     }
 
     std::unordered_map<char,std::unordered_map<std::string,int>> _m;
+    */
+    void insert(const char *n, int mamedriverindex) {
+        using namespace std;
+        if(!n || *n==0) return;
+         string sn(n);
+        _m[sn]=mamedriverindex;
+    }
+    // tell if driver known, and return index on mame driver list.
+    int index(const char *n) const {
+        using namespace std;
+        if(!n || *n==0) return -1;
+        string sn(n);
+        unordered_map<string,int>::const_iterator cit2 = _m.find(sn);
+        if(cit2==_m.end()) return -1;
+        return cit2->second;
+    }
+
+    std::unordered_map<std::string,int> _m;
 };
-/*
-struct ScreenConf {
-     ULONG _modeID;
-};
-*/
+
 
 /** Main configuration.
  *  Mame106 core manage itself default and per driver configuration.
@@ -100,8 +116,7 @@ public:
         CgxDirectCpuOrWPA8,
         CgxScalePixelArray,
        // WritePixelArray8,
-       // GLShader
-        // "CGX Direct CPU","CGX ScalePixelArray","WritePixelArray8","Some GL Shader Would be great"});
+       // GLShader :)
     };
     enum class FSScaleMode :  int
     {
@@ -273,7 +288,7 @@ protected:
     std::vector<int> _videoAttribs;
     //std::vector<UBYTE> _players;
 
-    void sortDrivers( std::vector<const _game_driver *const*> &romsFound);
+    //void sortDrivers( std::vector<const _game_driver *const*> &romsFound);
     void initRomsFoundReverse();
 };
 

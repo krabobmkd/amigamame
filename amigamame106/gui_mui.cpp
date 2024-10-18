@@ -155,12 +155,18 @@ static Object * BU_About_OK=NULL;
 static Object * PU_ScreenMode=NULL;
 
 MUISerializer muiConfigCreator;
+static int columnToSort = 0;
 
+//  MUIM_Notify,  MUIA_List_Active, MUIV_EveryTime,
 static ULONG ASM DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG *par REG(a1))
 {
-    if(!par) return 0;
+    if(!par)
+    {
+        printf("DriverSelect:par 0\n");
+        return 0;
+     }
         MameConfig &config = getMainConfig();
-   // printf("DriverSelect:%d\n",*par);
+    printf("DriverSelect:%d\n",*par);
     // get(LI_Driver, MUIA_List_Active, &v);
     int listindex = *par;
     if(listindex>=0)
@@ -271,12 +277,13 @@ static struct TagItem ScreenModeTags[] =
   { TAG_END }
 };
 
-static struct Hook DirectModeNotifyHook;
-static struct Hook SoundNotifyHook;
-static struct Hook DriverDisplayHook;
-static struct Hook DriverNotifyHook;
+static struct Hook DirectModeNotifyHook={0};
+static struct Hook SoundNotifyHook={0};
+static struct Hook DriverDisplayHook={0};
+static struct Hook DriverSortHook={0};
+static struct Hook DriverNotifyHook={0};
 #ifndef MESS
-static struct Hook ShowNotifyHook;
+static struct Hook ShowNotifyHook={0};
 #endif
 
 #ifndef MESS
@@ -395,7 +402,10 @@ static void ShowFound(void)
     const std::vector<const _game_driver *const*> &roms = config.romsFound();
     //MUIM_List_Insert can insert everything in a blow.
         DoMethod((Object *)LI_Driver, MUIM_List_Insert,
-         (ULONG)roms.data(),(int)roms.size(),  MUIV_List_Insert_Bottom);
+         (ULONG)roms.data(),(int)roms.size(),  /*MUIV_List_Insert_Bottom*/MUIV_List_Insert_Sorted);
+
+// no need because MUIV_List_Insert_Sorted   DoMethod(LI_Driver,MUIM_List_Sort);
+
     // ensure cycle is in correct state
     int cyclestate=0;
     get(CY_Show, MUIA_Cycle_Active, &cyclestate);
@@ -403,6 +413,7 @@ static void ShowFound(void)
     {
         set(CY_Show, MUIA_Cycle_Active,1);
     }
+
 
 }
 static void ShowAll(void)
@@ -413,7 +424,10 @@ static void ShowAll(void)
 
     //MUIM_List_Insert can insert everything in a blow.
         DoMethod((Object *)LI_Driver, MUIM_List_Insert,
-         (ULONG)roms.data(),(int)roms.size(),  MUIV_List_Insert_Bottom);
+         (ULONG)roms.data(),(int)roms.size(),  /*MUIV_List_Insert_Bottom*/MUIV_List_Insert_Sorted);
+
+   // no need because MUIV_List_Insert_Sorted DoMethod(LI_Driver,MUIM_List_Sort);
+
     // ensure cycle is in correct state
     int cyclestate=0;
     get(CY_Show, MUIA_Cycle_Active, &cyclestate);
@@ -423,7 +437,49 @@ static void ShowAll(void)
     }
 }
 
+static int DriverCompareNames(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+  return(stricmp((*drv1)->description, (*drv2)->description));
+}
+static int DriverCompareNbPlayers(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+  return((*drv1)->nbplayers < (*drv2)->nbplayers);
+}
+static int DriverCompareYear(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+  return(strcmp((*drv1)->year, (*drv2)->year));
+}
+static int DriverCompareArchive(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+  return(stricmp((*drv1)->name, (*drv2)->name));
+}
+static int DriverCompareParent(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+  return(stricmp((*drv1)->parent, (*drv2)->parent));
+}
 
+
+// LONG __asm cmpfunc(_a1 char *s1,_a2 char *s2)
+static ULONG ASM DriverSort(
+    const struct _game_driver **drva REG(a1),
+    const struct _game_driver **drvb REG(a2)
+    )
+{   // must return -1 0 1
+    int icolumnToSort = columnToSort;
+    if(icolumnToSort <0) icolumnToSort=0;
+    switch(icolumnToSort)
+    {
+        case 0: return DriverCompareNames(drva,drvb);
+        case 1: return DriverCompareNbPlayers(drva,drvb);
+        case 2: return DriverCompareNames(drva,drvb); // screens TODO ?
+        case 3: return DriverCompareYear(drva,drvb);
+        case 4: return DriverCompareArchive(drva,drvb);
+        case 5: return DriverCompareParent(drva,drvb);
+    }
+
+   return DriverCompareNames(drva,drvb);
+
+}
 static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const struct _game_driver **drv_indirect REG(a1))
 {
 
@@ -557,6 +613,7 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
   ULONG i;
   UBYTE key;
 
+//printf("msg->MethodID:%08x\n",msg->MethodID);
   switch(msg->MethodID)
   {
     case MUIM_Setup:
@@ -588,6 +645,8 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
     case MUIM_HandleEvent:
       data =  (struct DriverData *) INST_DATA(cclass, obj);
       imsg = (struct IntuiMessage *) msg[1].MethodID;
+
+ printf("MUIM_HandleEvent\n");
 
       get(_win(obj), MUIA_Window_ActiveObject, &active_obj);
 
@@ -653,8 +712,56 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
           }
         }
       }
-
       return(0);
+      //break;
+      case MUIM_HandleInput: // krb added
+        {
+	#define _between(a,x,b) ((x)>=(a) && (x)<=(b))
+	#define _isinobject(x,y) (_between(_mleft(obj),(x),_mright(obj)) && _between(_mtop(obj),(y),_mbottom(obj)))
+
+
+            // - - - check clicks on title bar
+            //  struct IntuiMessage *imsg; LONG muikey;
+            struct MUIP_HandleInput *msghi = (struct MUIP_HandleInput *)msg;
+            if(msghi->imsg && msghi->imsg->Class == IDCMP_MOUSEBUTTONS &&
+             msghi->imsg->Code == SELECTDOWN )
+            {
+                // receive all clicks on the window.
+                // we have to check list bounds
+                if(_isinobject( msghi->imsg->MouseX,msghi->imsg->MouseY))
+                {
+                    struct MUI_List_TestPos_Result res;
+                    DoMethod(obj,MUIM_List_TestPos,
+                        msghi->imsg->MouseX,msghi->imsg->MouseY, &res);
+                    if(res.column>=0 && res.entry == -1)
+                    {
+                        // would indicate clicking titles
+                        if(res.column != columnToSort)
+                        {
+                            columnToSort = res.column;
+                            DoMethod(obj,MUIM_List_Sort);
+                        }
+                    }
+                }
+                // Class
+            }
+            if (msghi->muikey!=MUIKEY_NONE)
+            {
+//                switch (msg->muikey)
+//                {
+//                    case MUIKEY_LEFT : data->sx=-1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
+//                    case MUIKEY_RIGHT: data->sx= 1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
+//                    case MUIKEY_UP   : data->sy=-1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
+//                    case MUIKEY_DOWN : data->sy= 1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
+//                }
+            }
+
+            struct MUI_List_TestPos_Result res;
+           // DoMethod(obj,MUIM_List_TestPos,LONG x, LONG y, &res);
+
+            return(DoSuperMethodA(cclass, obj, msg));
+        }
+      break;
   }
 
   return(DoSuperMethodA(cclass, obj, msg));
@@ -727,6 +834,7 @@ void AllocGUI(void)
     DirectModeNotifyHook.h_Entry = (RE_HOOKFUNC) DirectModeNotify;
     SoundNotifyHook.h_Entry      = (RE_HOOKFUNC) SoundNotify;
     DriverDisplayHook.h_Entry    = (RE_HOOKFUNC) DriverDisplay;
+    DriverSortHook.h_Entry    = (RE_HOOKFUNC) DriverSort;
     DriverNotifyHook.h_Entry     = (RE_HOOKFUNC) DriverNotify;
 #ifndef MESS
     ShowNotifyHook.h_Entry        = (RE_HOOKFUNC) ShowNotify;
@@ -870,6 +978,7 @@ Object *createPanel_Drivers()
               MUIA_List_Title,    TRUE,
               MUIA_List_Format,   "BAR,BAR,BAR,BAR,BAR,BAR,",
               MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
+              MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
             InputListFrame,
           TAG_DONE)),
         TAG_END)
@@ -878,8 +987,9 @@ Object *createPanel_Drivers()
           MUIA_Listview_Input, TRUE,
             MUIA_Listview_List, (ULONG)( LI_Driver = MUINewObject(MUIC_List,
               MUIA_List_Title, TRUE,
-              MUIA_List_Format, "BAR,BAR,BAR,BAR,",
+              MUIA_List_Format, "BAR,BAR,BAR,BAR,BAR,BAR,",
               MUIA_List_DisplayHook,  &DriverDisplayHook,
+              MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
             InputListFrame,
           TAG_DONE)),
         TAG_DONE)
