@@ -98,10 +98,10 @@ void QProc::process()
     //"arkretrn"
 //    "wb3"
 //    "bublbobl"
-//   "dino"
+   "dino"
 //"qbert"
 //    "rastan"
-      "mslug"
+//      "mslug"
 //                "mp_sor2"
     );
     if(itest>0) idriver= itest;
@@ -197,11 +197,17 @@ void QWin::updateWin()
 //    m_mutex.unlock();
 //    m_mutex.lock();
 }
+extern "C" {
+void logEntries();
+}
 int main(int argc, char* argv[])
 {
 	QApplication a(argc, argv);
     QWin w;
-	return a.exec();
+    int r =  a.exec();
+    logEntries();
+
+	return r;
 }
 
 

@@ -2,11 +2,13 @@
 extern "C"
 {
     #include "memory.h"
+    #include <stdio.h>
 
     extern UINT8 *bank_ptr[STATIC_COUNT];
     extern address_space active_address_space[ADDRESS_SPACES];/* address space data */
 
 }
+// these are definitions from memory.c , which are meant to be priovate but well...
 
 union _rwhandlers
 {
@@ -24,7 +26,77 @@ struct _handler_data
 	offs_t					mask;					/* mask against the final address */
 	const char *			name;					/* name of the handler */
 };
+#define DO_ENTRY_STATS 1
+#ifdef DO_ENTRY_STATS
 
+UINT32 entriesDirectReadA[256]={0};
+UINT32 entriesDirectReadB[256]={0};
+UINT32 entriesOverread[256]={0};
+
+UINT32 entriesDirectWritesA[256]={0};
+UINT32 entriesDirectWritesB[256]={0};
+UINT32 entriesOverwrites[256]={0};
+
+#define ENTRY_STAT_DirectReadA(a)  entriesDirectReadA[a]++;
+#define ENTRY_STAT_DirectReadB(a)  entriesDirectReadB[a]++;
+#define ENTRY_STAT_Overread(a)  entriesOverread[a]++;
+
+#define ENTRY_STAT_DirectWritesA(a)  entriesDirectWritesA[a]++;
+#define ENTRY_STAT_DirectWritesB(a)  entriesDirectWritesB[a]++;
+#define ENTRY_STAT_Overwrite(a)  entriesOverwrites[a]++;
+
+
+extern "C" {
+    void logEntries();
+}
+
+void logEntries()
+{
+    printf("  **** READ ****\n");
+    for(int ic=0;ic<256;ic++) {
+        if(entriesDirectReadA[ic]>0) {
+            printf("DirectReadA %03d  %08x\n", ic, entriesDirectReadA[ic]);
+        }
+    }
+    for(int ic=0;ic<256;ic++) {
+        if(entriesOverread[ic]>0) {
+            printf("*** overread %03d  %08x\n", ic, entriesOverread[ic]);
+        }
+    }
+    for(int ic=0;ic<256;ic++) {
+        if(entriesDirectReadB[ic]>0) {
+            printf("*** DirectReadB %03d  %08x\n", ic, entriesDirectReadB[ic]);
+        }
+    }
+    printf("  **** WRITE ****\n");
+    for(int ic=0;ic<256;ic++) {
+        if(entriesDirectWritesA[ic]>0) {
+            printf("DirectWriteA %03d  %08x\n", ic, entriesDirectWritesA[ic]);
+        }
+    }
+    for(int ic=0;ic<256;ic++) {
+        if(entriesOverwrites[ic]>0) {
+            printf("*** overwrite %03d  %08x\n", ic, entriesOverwrites[ic]);
+        }
+    }
+    for(int ic=0;ic<256;ic++) {
+        if(entriesDirectWritesB[ic]>0) {
+            printf("*** DirectWriteB %03d  %08x\n", ic, entriesDirectWritesB[ic]);
+        }
+    }
+}
+
+
+#else
+#define ENTRY_STAT_DirectReadA(a)
+#define ENTRY_STAT_DirectReadB(a)
+#define ENTRY_STAT_Overread(a)
+
+#define ENTRY_STAT_DirectWritesA(a)
+#define ENTRY_STAT_DirectWritesB(a)
+#define ENTRY_STAT_Overwrite(a)
+
+#endif
 
 /* fast16 uses:
 	program_read_byte_16be, // program_read_byte_32be,
@@ -45,6 +117,22 @@ UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
     UINT32 entry;
 	address &= active_address_space[0].addrmask;
 	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+    if (entry < STATIC_RAM)
+    {
+        ENTRY_STAT_DirectReadA(entry);
+
+        address = (address - active_address_space[0].readhandlers[entry].offset) &
+                active_address_space[0].readhandlers[entry].mask;
+
+        #ifdef LSB_FIRST
+           UINT16 *p= (UINT16*)&bank_ptr[entry][address];
+           return ((UINT32)p[0]<<16) | ((UINT32)p[1]);
+        #else
+            return *((UINT32 *)&bank_ptr[entry][address]);
+        #endif
+
+    }
+
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
 
@@ -53,6 +141,7 @@ UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
 
 	if (entry < STATIC_RAM)
     {
+        ENTRY_STAT_DirectReadB(entry);
 #ifdef LSB_FIRST
        // mame rewrites memory as a vector of words (possibly to mimic a 16bit bus?)
        // so when mame is intel compiled it would invert bytes by 2,
@@ -66,6 +155,7 @@ UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
         return *((UINT32 *)&bank_ptr[entry][address]);
 #endif
     }
+        ENTRY_STAT_Overread(entry);
     read16_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler16;
     address >>= 1;
 
@@ -80,6 +170,16 @@ UINT16 memory_readword_d16_be(offs_t address REGM(d0))
     UINT32 entry;
 	address &= active_address_space[0].addrmask;
 	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+    if (entry < STATIC_RAM)
+    {
+        ENTRY_STAT_DirectReadA(entry);
+        address = (address - active_address_space[0].readhandlers[entry].offset) &
+                active_address_space[0].readhandlers[entry].mask;
+        // mame already inverts adress bit one in intel mode so for this one,
+         // no inversion and same code if mame if 68k compiled or intel compiled.
+        return *((UINT16*)&bank_ptr[entry][address]);
+    }
+
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
 
@@ -88,10 +188,12 @@ UINT16 memory_readword_d16_be(offs_t address REGM(d0))
 
 	if (entry < STATIC_RAM)
     {
+        ENTRY_STAT_DirectReadB(entry);
        // mame already inverts adress bit one in intel mode so for this one,
         // no inversion and same code if mame if 68k compiled or intel compiled.
        return *((UINT16*)&bank_ptr[entry][address]);
     }
+        ENTRY_STAT_Overread(entry);
     read16_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler16;
     address >>= 1;
 
@@ -105,6 +207,20 @@ UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
     UINT32 entry;
 	address &= active_address_space[0].addrmask;
 	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+    if (entry < STATIC_RAM)
+    {
+        ENTRY_STAT_DirectReadA(entry);
+        address = (address - active_address_space[0].readhandlers[entry].offset) &
+                active_address_space[0].readhandlers[entry].mask;
+        #ifdef LSB_FIRST
+               // LE to BE need a bit inverted.
+               return bank_ptr[entry][address^1];
+        #else
+                //... hopefully BE is original order
+                return bank_ptr[entry][address];
+        #endif
+    }
+
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
 
@@ -113,14 +229,17 @@ UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
 
 	if (entry < STATIC_RAM)
     {
-#ifdef LSB_FIRST
-       // LE to BE need a bit inverted.
-       return bank_ptr[entry][address^1];
-#else
-        //... hopefully BE is original order
-        return bank_ptr[entry][address];
-#endif
+        ENTRY_STAT_DirectReadB(entry);
+
+        #ifdef LSB_FIRST
+               // LE to BE need a bit inverted.
+               return bank_ptr[entry][address^1];
+        #else
+                //... hopefully BE is original order
+                return bank_ptr[entry][address];
+        #endif
     }
+        ENTRY_STAT_Overread(entry);
     read16_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler16;
     int shift = (~address & 1)<<3;
     address >>= 1;
@@ -137,6 +256,23 @@ void memory_writelong_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
     UINT32 entry;
 	address &= active_address_space[0].addrmask;
 	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+    if (entry < STATIC_RAM)
+	{
+        ENTRY_STAT_DirectWritesA(entry);
+        address = (address - active_address_space[0].writehandlers[entry].offset) &
+                active_address_space[0].writehandlers[entry].mask;
+        #ifdef LSB_FIRST
+            // direct write
+            UINT16 *pwrite = (UINT16 *) &bank_ptr[entry][address];
+            pwrite[0] = (UINT16)(data>>16); // already inverted on bit 1, need inversion on bit 2. it's a joke, yes.
+            pwrite[1] = (UINT16)data;
+        #else
+            // direct write
+            UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
+            *pwrite = data;
+        #endif
+        return;
+    }
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
 
@@ -145,12 +281,14 @@ void memory_writelong_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 
 	if (entry >= STATIC_RAM)
 	{
+        ENTRY_STAT_Overwrite(entry);
     	write16_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler16;
         address>>=1;
         writer(address,data>>16,0);
         writer(address+1,data,0);
         return;
 	}
+    ENTRY_STAT_DirectWritesB(entry);
 #ifdef LSB_FIRST
     // direct write
     UINT16 *pwrite = (UINT16 *) &bank_ptr[entry][address];
@@ -168,6 +306,18 @@ void memory_writeword_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
     UINT32 entry;
 	address &= active_address_space[0].addrmask;
 	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+    if(entry<STATIC_RAM)
+    {
+        ENTRY_STAT_DirectWritesA(entry);
+        address = (address - active_address_space[0].writehandlers[entry].offset) &
+                active_address_space[0].writehandlers[entry].mask;
+        // direct write
+        UINT16 *pwrite = (UINT16 *) &bank_ptr[entry][address];
+        *pwrite = (UINT16)data; // LE or BE according to compilation target.
+        return;
+    }
+
+
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
 
@@ -176,12 +326,13 @@ void memory_writeword_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 
 	if (entry >= STATIC_RAM)
 	{
+        ENTRY_STAT_Overwrite(entry);
     	write16_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler16;
         address>>=1;
         writer(address,(UINT16)data,0);
         return;
 	}
-
+    ENTRY_STAT_DirectWritesB(entry);
     // direct write
     UINT16 *pwrite = (UINT16 *) &bank_ptr[entry][address];
     *pwrite = (UINT16)data; // LE or BE according to compilation target.
@@ -193,6 +344,22 @@ void memory_writebyte_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
     UINT32 entry;
 	address &= active_address_space[0].addrmask;
 	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+    if (entry < STATIC_RAM)
+    {
+        ENTRY_STAT_DirectWritesA(entry);
+        address = (address - active_address_space[0].writehandlers[entry].offset) &
+                active_address_space[0].writehandlers[entry].mask;
+        // direct write
+        #ifdef LSB_FIRST
+            UINT8 *pwrite = (UINT8 *) &bank_ptr[entry][address^1];
+        #else
+            UINT8 *pwrite = (UINT8 *) &bank_ptr[entry][address];
+        #endif
+        *pwrite = (UINT8)data; // LE or BE according to compilation target.
+        return;
+    }
+
+
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
 
@@ -201,13 +368,14 @@ void memory_writebyte_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 
 	if (entry >= STATIC_RAM)
 	{
+        ENTRY_STAT_Overwrite(entry);
     	write16_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler16;
         int shift = (~address & 1)<<3;
         address>>=1;
         writer(address,(UINT16)data<<shift,~((UINT16)0xff << shift));
         return;
 	}
-
+    ENTRY_STAT_DirectWritesB(entry);
     // direct write
 #ifdef LSB_FIRST
     UINT8 *pwrite = (UINT8 *) &bank_ptr[entry][address^1];
