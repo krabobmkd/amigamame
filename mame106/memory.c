@@ -312,7 +312,7 @@ UINT8		 				opcode_entry;					/* opcode readmem entry */
 
 address_space				active_address_space[ADDRESS_SPACES];/* address space data */
 
-static UINT8 *				bank_ptr[STATIC_COUNT];			/* array of bank pointers */
+UINT8 *				bank_ptr[STATIC_COUNT];			/* array of bank pointers */
 static UINT8 *				bankd_ptr[STATIC_COUNT];		/* array of decrypted bank pointers */
 static void *				shared_ptr[MAX_SHARED_POINTERS];/* array of shared pointers */
 
@@ -848,76 +848,53 @@ m68k_op_movem_32_er_aw		m68ki_read_32
 m68k_op_movem_32_er_al		m68ki_read_32
 
 */
-UINT32 memory_readlong_d16(offs_t address REGM(d0))
-{
-    UINT32 entry;
-	address &= active_address_space[0].addrmask;
-	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
-	if (entry >= SUBTABLE_BASE)
-		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+//OK, MOVED to other src
+//UINT32 memory_readlong_d16(offs_t address REGM(d0))
+//{
+//    UINT32 entry;
+//	address &= active_address_space[0].addrmask;
+//	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+//	if (entry >= SUBTABLE_BASE)
+//		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
 
-	address = (address - active_address_space[0].readhandlers[entry].offset) &
-            active_address_space[0].readhandlers[entry].mask;
+//	address = (address - active_address_space[0].readhandlers[entry].offset) &
+//            active_address_space[0].readhandlers[entry].mask;
 
-	if (entry < STATIC_RAM)
-    {
-        return *((UINT32 *)&bank_ptr[entry][address]);
-    }
-    read16_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler16;
-    address >>= 1;
+//	if (entry < STATIC_RAM)
+//    {
+//        return *((UINT32 *)&bank_ptr[entry][address]);
+//    }
+//    read16_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler16;
+//    address >>= 1;
 
-    return(
-           (((UINT32)(*reader)(address,0))<<16) |
-           ((UINT32)(*reader)(address+1,0))
-                );
-    /*
-    UINT32 entry;
-	//address &= active_address_space[0].addrmask ;
-	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
-	if (entry >= SUBTABLE_BASE)
-		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+//    return(
+//           (((UINT32)(*reader)(address,0))<<16) |
+//           ((UINT32)(*reader)(address+1,0))
+//                );
+//    /*
+//    UINT32 entry;
+//	//address &= active_address_space[0].addrmask ;
+//	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+//	if (entry >= SUBTABLE_BASE)
+//		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
 
-	address = (address - active_address_space[0].readhandlers[entry].offset)
-            & active_address_space[0].readhandlers[entry].mask;
-	if (entry >= STATIC_RAM)
-	{
-    	read16_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler16;
-        address>>=1;
-        return(
-               (((UINT32)(*reader)(address,0))<<16) |
-               ((UINT32)(*reader)(address+1,0))
-                    );
-	}
+//	address = (address - active_address_space[0].readhandlers[entry].offset)
+//            & active_address_space[0].readhandlers[entry].mask;
+//	if (entry >= STATIC_RAM)
+//	{
+//    	read16_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler16;
+//        address>>=1;
+//        return(
+//               (((UINT32)(*reader)(address,0))<<16) |
+//               ((UINT32)(*reader)(address+1,0))
+//                    );
+//	}
 
-    // - - - - - - - - -
-    UINT32 *pread = (UINT32 *) &bank_ptr[entry][address];
-    return *pread;
-    */
-}
-void memory_writelong_d16(UINT32 address REGM(d0), UINT32 data REGM(d1) )
-{
-    UINT32 entry;
-	address &= active_address_space[0].addrmask;
-	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
-	if (entry >= SUBTABLE_BASE)
-		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
-
-	address = (address - active_address_space[0].writehandlers[entry].offset) &
-            active_address_space[0].writehandlers[entry].mask;
-
-	if (entry >= STATIC_RAM)
-	{
-    	write16_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler16;
-        address>>=1;
-        writer(address,data>>16,0);
-        writer(address+1,data,0);
-        return;
-	}
-
-    // - - - - - - - - -
-    UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
-    *pwrite = data;
-}
+//    // - - - - - - - - -
+//    UINT32 *pread = (UINT32 *) &bank_ptr[entry][address];
+//    return *pread;
+//    */
+//}
 
 
 // return number of bits actually applied

@@ -192,19 +192,32 @@ static const struct m68k_memory_interface interface_d32 =
 };
 
 /* krb */
-static const struct m68k_memory_interface interface_fast16 =
-{ // force 32b bus to 68k, ...
-	WORD_XOR_BE(0),
-	program_read_byte_16be, // program_read_byte_32be,
-	program_read_word_16be, // program_read_word_32be,
-	memory_readlong_d16, // memory_readlong_d16B, // readlong_d16, //program_read_dword_32be, -> if 32b replaced, no more sound in arkretrn.
+//static const struct m68k_memory_interface interface_fast16 =
+//{ // force 32b bus to 68k, ...
+//	WORD_XOR_BE(0),
+//	program_read_byte_16be, // program_read_byte_32be,
+//	program_read_word_16be, // program_read_word_32be,
+//	memory_readlong_d16, // memory_readlong_d16B, // readlong_d16, //program_read_dword_32be, -> if 32b replaced, no more sound in arkretrn.
 
-	program_write_byte_16be, // program_write_byte_32be,
-	program_write_word_16be,//program_write_word_32be,
-	memory_writelong_d16, //writelong_d16, //memory_writelong_d16, // writelong_d16,//program_write_dword_32be,
+//	program_write_byte_16be, // program_write_byte_32be,
+//	program_write_word_16be,//program_write_word_32be,
+//	memory_writelong_d16, //writelong_d16, //memory_writelong_d16, // writelong_d16,//program_write_dword_32be,
+//    NULL,
+//    memory_writemovem32_wr16_reverse,
+//};
+static const struct m68k_memory_interface interface_xfast16 =
+{ // force 32b bus to 68k, ...
+	WORD_XOR_BE(0), // 2 if compilation target is LE, 0 if BE. (xor useless)
+     memory_readbyte_d16_be, //program_read_byte_16be, // memory_readbyte_d16_be,
+	 memory_readword_d16_be, // program_read_word_16be,
+	 memory_readlong_d16_be, // readlong_d16
+	 memory_writebyte_d16_be, // program_write_byte_16be, //memory_writebyte_d16_be,
+	 memory_writeword_d16_be, //program_write_word_16be, //memory_writeword_d16_be,
+	 memory_writelong_d16_be, // writelong_d16, // //memory_writelong_d16_be,
     NULL,
     memory_writemovem32_wr16_reverse,
 };
+
 /*
     0,
 	program_read_byte_16be,
@@ -300,11 +313,13 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68000);
 
-#ifdef OPTIM68K_USEFAST32INTRF
-    p68k->mem = interface_fast16;
-#else
-    p68k->mem = interface_d16;
-#endif
+//#ifdef OPTIM68K_USEFAST32INTRF
+//    p68k->mem = interface_fast16;
+//#else
+//    p68k->mem = interface_d16;
+//#endif
+    p68k->mem = interface_xfast16;
+
     m68k_state_register(p68k,"m68000", index);
 	m68k_set_int_ack_callback(p68k, irqcallback);
 }
@@ -441,11 +456,13 @@ void m68010_init(int index, int clock, const void *config, int (*irqcallback)(in
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68010);
 
-#ifdef OPTIM68K_USEFAST32INTRF
-    p68k->mem = interface_fast16;
-#else
-    p68k->mem = interface_d16;
-#endif
+//#ifdef OPTIM68K_USEFAST32INTRF
+//    p68k->mem = interface_fast16;
+//#else
+//    p68k->mem = interface_d16;
+//#endif
+    p68k->mem = interface_xfast16;
+
     m68k_state_register(p68k,"m68010", index);
 	m68k_set_int_ack_callback(p68k, irqcallback);
 

@@ -775,10 +775,17 @@ void program_read_copy32be(offs_t address REGM(d0),UINT32 l REGM(d1), UINT32 *p 
 UINT32 memory_readmovem32(UINT32 offset REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
 UINT32 memory_writemovem32_wr16_reverse(UINT32 offset REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
 UINT32 memory_writemovem32_wr32_reverse(UINT32 offset REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
-UINT32 memory_readlong_d16(offs_t address REGM(d0));
+
 void memory_writelong_d16(UINT32 address REGM(d0), UINT32 data REGM(d1) );
 
+// the krb new versions for 68k emulation
+UINT32 memory_readlong_d16_be(offs_t address REGM(d0));
+UINT16 memory_readword_d16_be(offs_t address REGM(d0));
+UINT8 memory_readbyte_d16_be(offs_t address REGM(d0));
 
+void memory_writelong_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) );
+void memory_writeword_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) );
+void memory_writebyte_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) );
 /***************************************************************************
 
     Function prototypes for core readmem/writemem routines
