@@ -11036,7 +11036,7 @@ void m68k_op_movem_32_er_pi(M68KOPT_PARAMS)
 
 	uint register_list = OPER_I_16(p68k);
 	uint ea = AY;
-	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+	uint count =  p68k->mem.readmovem32(ea, register_list, &REG_DA[0] );
     AY = ea+(4*count);
     USE_CYCLES(count<<CYC_MOVEM_L);
 #endif
@@ -11107,7 +11107,7 @@ void m68k_op_movem_32_er_ai(M68KOPT_PARAMS)
 
 	uint register_list = OPER_I_16(p68k);
 	uint ea = EA_AY_AI_32();
-	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+	uint count = p68k->mem.readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
 #endif
 }
@@ -11135,7 +11135,7 @@ void m68k_op_movem_32_er_di(M68KOPT_PARAMS)
 #else
 	uint register_list = OPER_I_16(p68k);
 	uint ea = EA_AY_DI_32();
-	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+	uint count = p68k->mem.readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
 #endif
 }
@@ -11164,7 +11164,7 @@ void m68k_op_movem_32_er_ix(M68KOPT_PARAMS)
 
 	uint register_list = OPER_I_16(p68k);
 	uint ea = EA_AY_IX_32();
-	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+	uint count = p68k->mem.readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
 #endif
 }
@@ -11193,7 +11193,7 @@ void m68k_op_movem_32_er_aw(M68KOPT_PARAMS)
 
 	uint register_list = OPER_I_16(p68k);
 	uint ea = EA_AW_32();
-	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+	uint count = p68k->mem.readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
 #endif
 }
@@ -11221,7 +11221,7 @@ void m68k_op_movem_32_er_al(M68KOPT_PARAMS)
 #else
 	uint register_list = OPER_I_16(p68k);
 	uint ea = EA_AL_32();
-	uint count = memory_readmovem32(ea, register_list, &REG_DA[0] );
+	uint count = p68k->mem.readmovem32(ea, register_list, &REG_DA[0] );
     USE_CYCLES(count<<CYC_MOVEM_L);
 #endif
 }

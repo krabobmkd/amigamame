@@ -94,6 +94,7 @@ static const struct m68k_memory_interface interface_d16 =
 	program_write_word_16be,
 	writelong_d16,
     NULL, // changepc
+    memory_readmovem32_wr16,
     memory_writemovem32_wr16_reverse
 };
 
@@ -188,6 +189,7 @@ static const struct m68k_memory_interface interface_d32 =
 	writeword_d32,
 	writelong_d32,
     NULL, // changepc
+    memory_readmovem32_wr16,
     memory_writemovem32_wr32_reverseSAFE
 };
 
@@ -215,6 +217,7 @@ static const struct m68k_memory_interface interface_xfast16 =
 	 memory_writeword_d16_be, //program_write_word_16be, //memory_writeword_d16_be,
 	 memory_writelong_d16_be, // writelong_d16, // //memory_writelong_d16_be,
     NULL,
+    memory_readmovem32_wr16,
     memory_writemovem32_wr16_reverse,
 };
 
@@ -240,6 +243,7 @@ static const struct m68k_memory_interface interface_fast32 =
 	program_write_word_32be, //writeword_d32,
 	writelong_d32,
     NULL,
+    memory_readmovem32_wr16,
     memory_writemovem32_wr32_reverseSAFE,
 };
 /* original:

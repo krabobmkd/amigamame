@@ -26,6 +26,69 @@ struct _handler_data
 	offs_t					mask;					/* mask against the final address */
 	const char *			name;					/* name of the handler */
 };
+
+void analyseAdressSpace(address_space &space)
+{
+    // if game doesnt use useDirectReadB / useDirectWriteB cases,
+    // we can just do one test per call.
+    int useDirectReadB=0;
+    int useDirectWriteB=0;
+
+    // - - - - -reads - - - - -
+    // 0-67: 16k slots where direct memory access spaces, ram or rom.
+    INT16 i;
+    for(i=0;i<STATIC_RAM ; i++)
+    {
+
+    }
+    // 68-191: 16k slots that uses overrides functions because it's some chip, not ram.
+    for(;i<SUBTABLE_BASE ; i++)
+    {
+
+    }
+    // 192-255: when there is a fonction override for just one adress. "Index2" thing.
+    // but then can redirect to previous case.
+    for(;i<256 ; i++)
+    {
+
+    }
+}
+UINT32 adressspace_readmaskuse=0;
+UINT32 readers_readmaskuse=0;
+//#define DO_TESTMASKUSE 1
+#ifdef DO_TESTMASKUSE
+
+ static inline void testMaskUse(UINT32 a, UINT32 b, UINT32 &acc) { acc += (((~a) & b)!=0); }
+#else
+ static inline void testMaskUse(UINT32 a, UINT32 b, UINT32 &acc) { }
+#endif
+
+
+class HOffset {
+public:
+    static inline void applyHandlerOffset(offs_t &address, handler_data &hdata)
+    {
+        address -= hdata.offset;
+        address &= hdata.mask;
+    }
+};
+class HOffsetStat {
+public:
+    static inline void applyHandlerOffset(offs_t &address, handler_data &hdata)
+    {
+        address -= hdata.offset;
+        testMaskUse(hdata.mask,address,readers_readmaskuse);
+        address &= hdata.mask;
+    }
+};
+class HOffsetNoMask {
+public:
+    static inline void applyHandlerOffset(offs_t &address, handler_data &hdata)
+    {
+        address -= hdata.offset;
+    }
+};
+
 #define DO_ENTRY_STATS 1
 #ifdef DO_ENTRY_STATS
 
@@ -111,18 +174,22 @@ void logEntries()
 */
 // - - - - 68k 16b-bus reads
 
+
+
+
 // #define READBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)
-UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
+template<class HOffst=HOffset>
+UINT32 memory_readlong_d16_beT(offs_t address REGM(d0))
 {
     UINT32 entry;
+    testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
 	address &= active_address_space[0].addrmask;
+
 	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
     if (entry < STATIC_RAM)
     {
         ENTRY_STAT_DirectReadA(entry);
-
-        address = (address - active_address_space[0].readhandlers[entry].offset) &
-                active_address_space[0].readhandlers[entry].mask;
+        HOffst::applyHandlerOffset(address,active_address_space[0].readhandlers[entry]);
 
         #ifdef LSB_FIRST
            UINT16 *p= (UINT16*)&bank_ptr[entry][address];
@@ -136,8 +203,7 @@ UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
 
-	address = (address - active_address_space[0].readhandlers[entry].offset) &
-            active_address_space[0].readhandlers[entry].mask;
+    HOffst::applyHandlerOffset(address,active_address_space[0].readhandlers[entry]);
 
 	if (entry < STATIC_RAM)
     {
@@ -165,6 +231,12 @@ UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
                 );
 
 }
+UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
+{
+    return memory_readlong_d16_beT<HOffset>(address);
+}
+
+
 UINT16 memory_readword_d16_be(offs_t address REGM(d0))
 {
     UINT32 entry;
@@ -173,8 +245,9 @@ UINT16 memory_readword_d16_be(offs_t address REGM(d0))
     if (entry < STATIC_RAM)
     {
         ENTRY_STAT_DirectReadA(entry);
-        address = (address - active_address_space[0].readhandlers[entry].offset) &
-                active_address_space[0].readhandlers[entry].mask;
+        handler_data &hdata = active_address_space[0].readhandlers[entry];
+        address -= hdata.offset;
+        address &= hdata.mask;
         // mame already inverts adress bit one in intel mode so for this one,
          // no inversion and same code if mame if 68k compiled or intel compiled.
         return *((UINT16*)&bank_ptr[entry][address]);
@@ -183,8 +256,9 @@ UINT16 memory_readword_d16_be(offs_t address REGM(d0))
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
 
-	address = (address - active_address_space[0].readhandlers[entry].offset) &
-            active_address_space[0].readhandlers[entry].mask;
+    handler_data &hdata = active_address_space[0].readhandlers[entry];
+    address -= hdata.offset;
+    address &= hdata.mask;
 
 	if (entry < STATIC_RAM)
     {
@@ -210,8 +284,9 @@ UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
     if (entry < STATIC_RAM)
     {
         ENTRY_STAT_DirectReadA(entry);
-        address = (address - active_address_space[0].readhandlers[entry].offset) &
-                active_address_space[0].readhandlers[entry].mask;
+        handler_data &hdata = active_address_space[0].readhandlers[entry];
+        address -= hdata.offset;
+        address &= hdata.mask;
         #ifdef LSB_FIRST
                // LE to BE need a bit inverted.
                return bank_ptr[entry][address^1];
@@ -224,8 +299,9 @@ UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
 
-	address = (address - active_address_space[0].readhandlers[entry].offset) &
-            active_address_space[0].readhandlers[entry].mask;
+    handler_data &hdata = active_address_space[0].readhandlers[entry];
+    address -= hdata.offset;
+    address &= hdata.mask;
 
 	if (entry < STATIC_RAM)
     {
@@ -251,6 +327,8 @@ UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
 
 
 // - - - -  68k 16b-bus writes
+
+
 void memory_writelong_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 {
     UINT32 entry;
@@ -259,8 +337,10 @@ void memory_writelong_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
     if (entry < STATIC_RAM)
 	{
         ENTRY_STAT_DirectWritesA(entry);
-        address = (address - active_address_space[0].writehandlers[entry].offset) &
-                active_address_space[0].writehandlers[entry].mask;
+        handler_data &hdata = active_address_space[0].writehandlers[entry];
+        address -= hdata.offset;
+        address &= hdata.mask;
+
         #ifdef LSB_FIRST
             // direct write
             UINT16 *pwrite = (UINT16 *) &bank_ptr[entry][address];
@@ -276,8 +356,9 @@ void memory_writelong_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
 
-	address = (address - active_address_space[0].writehandlers[entry].offset) &
-            active_address_space[0].writehandlers[entry].mask;
+    handler_data &hdata = active_address_space[0].writehandlers[entry];
+    address -= hdata.offset;
+    address &= hdata.mask;
 
 	if (entry >= STATIC_RAM)
 	{
@@ -309,8 +390,9 @@ void memory_writeword_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
     if(entry<STATIC_RAM)
     {
         ENTRY_STAT_DirectWritesA(entry);
-        address = (address - active_address_space[0].writehandlers[entry].offset) &
-                active_address_space[0].writehandlers[entry].mask;
+        handler_data &hdata = active_address_space[0].writehandlers[entry];
+        address -= hdata.offset;
+        address &= hdata.mask;
         // direct write
         UINT16 *pwrite = (UINT16 *) &bank_ptr[entry][address];
         *pwrite = (UINT16)data; // LE or BE according to compilation target.
@@ -321,8 +403,9 @@ void memory_writeword_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
 
-	address = (address - active_address_space[0].writehandlers[entry].offset) &
-            active_address_space[0].writehandlers[entry].mask;
+    handler_data &hdata = active_address_space[0].writehandlers[entry];
+    address -= hdata.offset;
+    address &= hdata.mask;
 
 	if (entry >= STATIC_RAM)
 	{
@@ -347,8 +430,9 @@ void memory_writebyte_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
     if (entry < STATIC_RAM)
     {
         ENTRY_STAT_DirectWritesA(entry);
-        address = (address - active_address_space[0].writehandlers[entry].offset) &
-                active_address_space[0].writehandlers[entry].mask;
+        handler_data &hdata = active_address_space[0].writehandlers[entry];
+        address -= hdata.offset;
+        address &= hdata.mask;
         // direct write
         #ifdef LSB_FIRST
             UINT8 *pwrite = (UINT8 *) &bank_ptr[entry][address^1];
@@ -363,8 +447,9 @@ void memory_writebyte_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
 
-	address = (address - active_address_space[0].writehandlers[entry].offset) &
-            active_address_space[0].writehandlers[entry].mask;
+    handler_data &hdata = active_address_space[0].writehandlers[entry];
+    address -= hdata.offset;
+    address &= hdata.mask;
 
 	if (entry >= STATIC_RAM)
 	{
@@ -384,5 +469,245 @@ void memory_writebyte_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 #endif
     *pwrite = (UINT8)data; // LE or BE according to compilation target.
 
+}
+
+
+// return number of bits actually applied
+// IS USED
+UINT32 memory_readmovem32_wr16(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
+{
+	UINT32 entry;
+	/* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+	/* handle banks inline */
+	address = (address - active_address_space[0].readhandlers[entry].offset)
+            & active_address_space[0].readhandlers[entry].mask;
+	if (entry >= STATIC_RAM)
+	{
+    	read16_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler16;
+        UINT16 i = 0;
+        UINT32 count = 0;
+        address>>=1;
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                preg[i] = ((*reader)(address,0)<<16)| (*reader)(address+1,0);
+                address+=2;
+                count++;
+            }
+            bits>>=1;
+        }
+        return count;
+	}
+
+    // - - - - - - - - -
+#ifdef LSB_FIRST
+    UINT16 *pread = (UINT16 *) &bank_ptr[entry][address];
+#else
+    UINT32 *pread = (UINT32 *) &bank_ptr[entry][address];
+#endif
+
+
+    UINT16 i = 0;
+    UINT32 count = 0;
+	for(; i < 16; i++)
+    {
+		if(bits & 1)
+		{
+        #ifdef LSB_FIRST
+            UINT32 vh= (UINT32)*pread++;
+            UINT32 vl= (UINT32)*pread++;
+            preg[i] = (vh<<16)|vl;
+        #else
+			preg[i] = *pread++;
+        #endif
+			count++;
+		}
+        bits>>=1;
+    }
+    return count;
+
+}
+// needed by 68k interface because video drivers would just patch write16.
+// THE ONE USED
+UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
+{
+    UINT32 entry;
+	/* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
+	/* handle banks inline */
+	address = (address - active_address_space[0].writehandlers[entry].offset)
+            & active_address_space[0].writehandlers[entry].mask;
+	if (entry >= STATIC_RAM)
+	{
+    	//write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
+    	write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
+        UINT16 i = 0;
+        UINT32 count = 0;
+        address>>=1;
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {   // some games minimix, ... need handled 16b writings
+                UINT32 reg = preg[15-i];
+                address--;
+                (*writer16)(address,reg,0);
+                address--;
+                (*writer16)(address,reg>>16,0);
+                //(*writer)(address,preg[15-i],0);
+                count++;
+            }
+            bits>>=1;
+        }
+        return count;
+	}
+
+    // - - - - - - - - -
+    UINT16 i = 0;
+    UINT32 count = 0;
+#ifdef LSB_FIRST
+    UINT16 *pwrite = (UINT16 *) &bank_ptr[entry][address];
+#else
+    UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
+#endif
+	for(; i < 16; i++)
+    {
+		if(bits & 1)
+		{
+            UINT32 v = preg[15-i];
+#ifdef LSB_FIRST
+            pwrite-=2;
+            pwrite[0]=(UINT16)(v<<16);
+            pwrite[1]=(UINT16)v;
+#else
+            pwrite--;
+            *pwrite = v;
+#endif
+			count++;
+		}
+        bits>>=1;
+    }
+
+    return count;
+}
+UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
+{
+    UINT16 i = 0;
+    UINT32 count = 0;
+
+    if (!(address & 3))
+    {
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                address-=4;
+                program_write_dword_32be(address, preg[15-i]);
+                count++;
+            }
+            bits>>=1;
+        }
+
+    } else
+    {
+        for(; i < 16; i++)
+        {
+            if(bits & 1)
+            {
+                address-=4;
+                UINT32 v = preg[15-i];
+                //krb: in the 68k world, pair writing crash, let's economise a test.
+                program_write_word_32be(address, v >> 16);
+                program_write_word_32be(address + 2, v);
+                count++;
+            }
+            bits>>=1;
+        }
+    }
+    return count;
+}
+
+// needed by 68020 interface because video drivers taito_f3 would just patch write32 !!
+UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
+{
+    UINT32 entry;
+	/* perform lookup */
+	address &= active_address_space[0].addrmask ;
+	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
+	/* handle banks inline */
+	address = (address - active_address_space[0].writehandlers[entry].offset)
+            & active_address_space[0].writehandlers[entry].mask;
+	if (entry >= STATIC_RAM)
+	{
+        // arkanoid return has both a 68000 and a 68020 and needs something like that
+       // if (!(address & 3))
+       // {   // 4 bytes aligned
+            //program_write_dword_32be(address, data);
+            write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
+            UINT16 i = 0;
+            UINT32 count = 0;
+            address>>=2;
+            for(; i < 16; i++)
+            {
+                if(bits & 1)
+                {
+                    address--;
+                    (*writer)(address,preg[15-i],0);
+                    count++;
+                }
+                bits>>=1;
+            }
+            return count;
+        /*} else
+        //{
+            // 16bit aligned ? we hope.
+            write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
+            UINT16 i = 0;
+            UINT32 count = 0;
+            address>>=1;
+            for(; i < 16; i++)
+            {
+                if(bits & 1)
+                {   // some games minimix, ... need handled 16b writings
+                    UINT32 reg = preg[15-i];
+                    address--;
+                    (*writer16)(address,reg,0);
+                    address--;
+                    (*writer16)(address,reg>>16,0);
+                    //(*writer)(address,preg[15-i],0);
+                    count++;
+                }
+                bits>>=1;
+            }
+            return count;
+
+        } // end 16b aligned
+        */
+	} // end if need handler.
+
+    // - - - - - - - - -
+    UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
+    UINT16 i = 0;
+    UINT32 count = 0;
+	for(; i < 16; i++)
+    {
+		if(bits & 1)
+		{
+            pwrite--;
+            *pwrite = preg[15-i];
+			count++;
+		}
+        bits>>=1;
+    }
+    return count;
 }
 

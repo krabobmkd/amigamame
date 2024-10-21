@@ -29,8 +29,8 @@ struct m68k_memory_interface
 	UINT8		(*read8)(offs_t a REGM(d0));				// Normal read 8 bit
 	UINT16	(*read16)(offs_t a REGM(d0));				// Normal read 16 bit
 	UINT32	(*read32)(offs_t a REGM(d0));				// Normal read 32 bit
-	void		(*write8)(offs_t a REGM(d0), UINT8 d REGM(d1) );		// Write 8 bit
-	void		(*write16)(offs_t a REGM(d0), UINT16 d REGM(d1) );	// Write 16 bit
+	void		(*write8)(offs_t a REGM(d0), UINT32 d REGM(d1) );		// Write 8 bit
+	void		(*write16)(offs_t a REGM(d0), UINT32 d REGM(d1) );	// Write 16 bit
 	void		(*write32)(offs_t a REGM(d0), UINT32 d REGM(d1) );	// Write 32 bit
 	void		(*changepc)(offs_t);			// Change PC
 
@@ -39,7 +39,7 @@ struct m68k_memory_interface
     // accelerate movems as possible having less entry test hell.
     // note: in the 68k world, movem.w are almost not used.
     // it always return the "count of register treated"
-   // UINT32 (*readmovem32)(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
+    UINT32 (*readmovem32)(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
     // note movem.l dxxx,-(sp) bits order are different than movem.l dxxx,(ax)
     UINT32 (*writemovem32reverse)(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
     //UINT32 (*writemovem32)(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );

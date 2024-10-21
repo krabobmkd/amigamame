@@ -10,10 +10,12 @@
 #define OPTIM68K_SKIPMOVECCRV 1
 #define OPTIM68K_SKIPMOVECCRC 1
 
+#define OPTIM68K_USEFASTMOVEMREAD 1
+
 #ifdef __AMIGA__
     #define OPTIM68K_USEFAST32INTRF 1
     #ifdef OPTIM68K_USEFAST32INTRF
-        #define OPTIM68K_USEFASTMOVEMREAD 1
+
 // makes mslug/mslugx crash the mig after exe relaunch
 //?        #define OPTIM68K_USEFASTMOVEMWRITE 1
     #endif

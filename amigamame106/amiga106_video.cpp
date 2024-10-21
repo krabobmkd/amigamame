@@ -150,6 +150,8 @@ static ULONG shiftRotationBits(ULONG orientation, int rotationShift)
     return rots[i];
 }
 
+
+cycles_t gameCyclePerFrame=-1;
 /*
   Create a display screen, or window, of the given dimensions (or larger). It is
   acceptable to create a smaller display if necessary, in that case the user must
@@ -254,6 +256,11 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     FrameCounter = 0;
     StartTime = 0;
     GetStartTime = 1;
+
+    MameConfig::Misc &configMisc = getMainConfig().misc();
+
+    gameCyclePerFrame =  (cycles_t) (1000000.0 / display->game_refresh_rate );
+
     return 0; // success
 
 }
@@ -313,30 +320,38 @@ void osd_update_video_and_audio(struct _mame_display *display)
     if(!g_pMameDisplay) return;
 
     // apply eventual hard beam waiting (if too fast) just before draw.
-    int igamefps = (int) display->game_refresh_rate;
-//#ifndef __AMIGA__
+
+
+//    int igamefps = (int) (display->game_refresh_rate ); // * configMisc._speedlimit;
+// cycles_t gameCyclePerFrame = (cycles_t) (1000000.0 / display->game_refresh_rate );
+
     {
         // 1000000LL aka osd_cycles_per_second()
-        const UINT64 cyclespersec = 1000000LL;
+        //const UINT64 cyclespersec = 1000000LL;
         //if(inow==0) inow=1;
-        INT64 framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
+//        INT64 framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/(cyclespersec*100);
+        cycles_t cyclethatShouldBeNow = StartTime + (gameCyclePerFrame) * FrameCounter );
+        cycles_t cnow = osd_cycles();
 
         // if OS paused (window moving, menu bt, intuition hogs, reset timer)
-        if(FrameCounter+(igamefps>>1)<framesThatShouldbeNow)
+        //if(FrameCounter+(igamefps>>1)<framesThatShouldbeNow)
+        if(cnow>(cyclethatShouldBeNow+(1000000LL>>1)))
         {
             ResetWatchTimer();
         }
 
-        while(framesThatShouldbeNow<FrameCounter)
+//        while(framesThatShouldbeNow<FrameCounter)
+        while(cnow<cyclethatShouldBeNow)
         {
             // something known to actually does pass priority to system
             // and waits between 1/50 hz or less.
             g_pMameDisplay->WaitFrame();
 
-           framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
+            cnow = osd_cycles();
+//           framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
         }
     }
-//#endif
+
     g_pMameDisplay->draw(display);
 
     MsgPort *userport = g_pMameDisplay->userPort();

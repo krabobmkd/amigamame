@@ -96,9 +96,9 @@ void QProc::process()
     // test if just "mame romname".
     int itest = getMainConfig().driverIndex().index(
     //"arkretrn"
-//    "wb3"
+    "wb3"
 //    "bublbobl"
-   "dino"
+//   "dino"
 //"qbert"
 //    "rastan"
 //      "mslug"

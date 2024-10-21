@@ -226,6 +226,8 @@ public:
         std::string _romsPath,_userPath;
         bool    _useCheatCodeFile = false;
         std::string _cheatFilePath="PROGDIR:cheat.dat";
+        int     _speedlimit = 100;
+
     };
     Misc &misc() { return _misc; }
 
