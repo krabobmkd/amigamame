@@ -1,6 +1,8 @@
 #include "drawgfxn.h"
 #include <stdio.h>
 #include <cstdint>
+
+#include <map>
 using namespace std;
 
 #ifdef LSB_FIRST
@@ -66,24 +68,50 @@ public:
 
 
 */
+// #define SETPIXELCOLOR(dest,n)
+// { if (((1 << (pridata[dest] & 0x1f)) & pmask) == 0)
+//    { if (pridata[dest] & 0x80) { dstdata[dest] = palette_shadow_table[n];} else { dstdata[dest] = (n);} } pridata[dest] = (pridata[dest] & 0x7f) | afterdrawmask; }
 
+// original bitmap prio table goes like: Mask 1f give a bit with 1<<(prio&1f), to be masked by
+// p->priority_mask also 1f
+static UINT8 sillyPrioTable[]={
+    1,2,2,4, // 0
+};
+
+//map<int,int> _k;
+typedef UINT8 pri_t;
 template<typename destPix_t>
 class DestPixPrioContext {
 public:
-    DestPixPrioContext(struct drawgfxParams *p DGREG(a0),UINT16 ofsx, UINT16 ofsy) :
-        _p( ((destPix_t *)p->dest->line[ofsy]) + ofsx),_rowpixels((UINT16)p->dest->rowpixels) {}
+    DestPixPrioContext(struct drawgfxParams *p DGREG(a0),
+                       UINT16 ofsx, UINT16 ofsy) :
+        _p( ((destPix_t *)p->dest->line[ofsy]) + ofsx),
+        _prio(((pri_t *)p->pri_buffer->line[ofsy])+ofsx),
+        _rowpixels((UINT16)p->dest->rowpixels),
+        _np(p->priority_mask & 0x1f){}
     void incrementx(INT16 n) {
         _p += n;
+        _prio += n;
     }
     void incrementy(INT16 n) {
         _p += _rowpixels*n;
+        _prio += _rowpixels*n;
     }
     void setPix(UINT32 n,pen_t color) {
-        _p[n] = color;
+        // for silkworm values goes 0->7 because of the 3 playfields.
+        // 0xf0
+        UINT8 priobef = _prio[n]; // 1 lighted if background, 2 is foregroud, 4 is text.
+
+        if((_np &priobef)==0) // bit lighted in _np means "hidden by"
+        {
+            _p[n] = color;
+        } //TODO DOESNT WORK VALIDATE AGAINST SILKWORM/RYGAR/... first. vidhrw/tecmo.c
     }
 
     destPix_t *_p;
+    pri_t   *_prio;
     UINT16 _rowpixels;
+    const pri_t _np;
 };
 
 
@@ -134,6 +162,7 @@ public:
     krb: redo some of drawgfx.c
     the idea is: more template, less useless switches.
 */
+//
 
 template<class destContext,typename destPix_t,
          class srcContext,class MColor>
@@ -418,21 +447,34 @@ void drawgfx_clut16_Src8(struct drawgfxParams *p DGREG(a0))
 {
     drawgfxT<DestPixContext<UINT16>,UINT16,
         SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+
 }	
-void drawgfx_clut16_Src4(struct drawgfxParams *p DGREG(a0))
-{
-    drawgfxT<DestPixContext<UINT16>,UINT16,
-        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
-}
+//void drawgfx_clut16_Src4(struct drawgfxParams *p DGREG(a0))
+//{
+//    drawgfxT<DestPixContext<UINT16>,UINT16,
+//        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+//}
 
 void drawgfx_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
 {
-    drawgfxT<DestPixContext<UINT16>,UINT16,
-        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+    if(p->priority_mask==0)
+    {
+        drawgfx_clut16_Src8(p);
+    } else
+    {
+        drawgfxT<DestPixPrioContext<UINT16>,UINT16,
+            SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+    }
 }
-void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
-{
-    drawgfxT<DestPixContext<UINT16>,UINT16,
-        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
-}
+//void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
+//{
+//    if(p->priority_mask==0)
+//    {
+//        drawgfx_clut16_Src4(p);
+//    } else
+//    {
+//        drawgfxT<DestPixPrioContext<UINT16>,UINT16,
+//            SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+//    }
+//}
 

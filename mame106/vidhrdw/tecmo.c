@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-
+#include "drawgfxn.h"
 unsigned char *tecmo_txvideoram,*tecmo_fgvideoram,*tecmo_bgvideoram;
 
 int tecmo_video_type = 0;
@@ -247,11 +247,11 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			{
 				default:
 				case 0x0: priority_mask = 0; break;
-				case 0x1: priority_mask = 0xf0; break; /* obscured by text layer */
-				case 0x2: priority_mask = 0xf0|0xcc; break;	/* obscured by foreground */
-				case 0x3: priority_mask = 0xf0|0xcc|0xaa; break; /* obscured by bg and fg */
+				case 0x1: priority_mask = 0xf0| (1<<31); break; /* obscured by text layer */
+				case 0x2: priority_mask = 0xf0|0xcc| (1<<31); break;	/* obscured by foreground */
+				case 0x3: priority_mask = 0xf0|0xcc|0xaa| (1<<31); break; /* obscured by bg and fg */
 			}
-            dgp0.priority_mask = priority_mask | (1<<31);
+            dgp0.priority_mask = priority_mask ;
 			for (y = 0;y < size;y++)
 			{
 				for (x = 0;x < size;x++)
@@ -265,7 +265,10 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					dgp0.flipy = flipy;
 					dgp0.sx = sx;
 					dgp0.sy = sy;
-					drawgfx(&dgp0);
+				//old
+                    drawgfx(&dgp0);
+                  //to be fully validated  drawgfx_clut16_Src8_prio(&dgp0);
+
 				}
 			}
 		}

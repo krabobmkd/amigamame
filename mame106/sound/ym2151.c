@@ -2113,10 +2113,12 @@ INLINE void advance(void)
 		{
 			op = &PSG->oper[0];	/* CH 0 M1 */
 			i = 32;
+            UINT32 opmask = 1;
 			do
 			{
-				KEY_ON(op, 2);
+                KEY_ON(op, 2);
 				op++;
+                opmask<<=1;
 				i--;
 			}while (i);
 			PSG->csm_req = 1;

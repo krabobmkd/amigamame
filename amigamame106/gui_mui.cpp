@@ -724,6 +724,9 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
 	#define _between(a,x,b) ((x)>=(a) && (x)<=(b))
 	#define _isinobject(x,y) (_between(_mleft(obj),(x),_mright(obj)) && _between(_mtop(obj),(y),_mbottom(obj)))
 
+
+             if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
+             {
             // - - - check clicks on title bar
             //  struct IntuiMessage *imsg; LONG muikey;
             struct MUIP_HandleInput *msghi = (struct MUIP_HandleInput *)msg;
@@ -760,9 +763,9 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
 //                    case MUIKEY_DOWN : data->sy= 1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
 //                }
 //            }
+            }
 
-            return(DoSuperMethodA(cclass, obj, msg));
-        }
+        } // end case
       break;
   }
 
@@ -780,6 +783,7 @@ void AllocGUI(void)
         printf(" no MUI interface found\n install MUI or launch a game installed in roms/romname.zip with:\n>Mame106 romname\n\n");
         return;
     }
+    printf("mui lib:%d\n",MUIMasterBase->lib_Version);
     LONG  i;
 
 //  for(NumDrivers = 0; Drivers[NumDrivers]; NumDrivers++);
