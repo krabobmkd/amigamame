@@ -1,3 +1,4 @@
+// memoryn.cpp
 
 extern "C"
 {
@@ -99,6 +100,11 @@ UINT32 entriesOverread[256]={0};
 UINT32 entriesDirectWritesA[256]={0};
 UINT32 entriesDirectWritesB[256]={0};
 UINT32 entriesOverwrites[256]={0};
+
+//handler_data &hdata = active_address_space[0].readhandlers[entry];
+
+//address -= hdata.offset;
+//address &= hdata.mask;
 
 #define ENTRY_STAT_DirectReadA(a)  entriesDirectReadA[a]++;
 #define ENTRY_STAT_DirectReadB(a)  entriesDirectReadB[a]++;
@@ -246,6 +252,7 @@ UINT16 memory_readword_d16_be(offs_t address REGM(d0))
     {
         ENTRY_STAT_DirectReadA(entry);
         handler_data &hdata = active_address_space[0].readhandlers[entry];
+
         address -= hdata.offset;
         address &= hdata.mask;
         // mame already inverts adress bit one in intel mode so for this one,

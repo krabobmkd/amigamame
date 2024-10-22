@@ -259,8 +259,15 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
 
     MameConfig::Misc &configMisc = getMainConfig().misc();
 
-    gameCyclePerFrame =  (cycles_t) (1000000.0 / display->game_refresh_rate );
+ //   printf("osd_create_display fps:%f\n",pparams->fps);
 
+    float speedlimit = configMisc._speedlimit;
+    if(speedlimit<80.0f ) speedlimit = 80.0f;
+    else if(speedlimit>125.0f) speedlimit = 125.0f;
+    speedlimit = 100.0f/speedlimit;
+
+    gameCyclePerFrame =  (cycles_t) (1000000.0 * speedlimit / pparams->fps );
+//    printf("gameCyclePerFrame fps:%d\n",(int)gameCyclePerFrame);
     return 0; // success
 
 }
@@ -320,35 +327,26 @@ void osd_update_video_and_audio(struct _mame_display *display)
     if(!g_pMameDisplay) return;
 
     // apply eventual hard beam waiting (if too fast) just before draw.
-
-
-//    int igamefps = (int) (display->game_refresh_rate ); // * configMisc._speedlimit;
-// cycles_t gameCyclePerFrame = (cycles_t) (1000000.0 / display->game_refresh_rate );
-
     {
-        // 1000000LL aka osd_cycles_per_second()
-        //const UINT64 cyclespersec = 1000000LL;
-        //if(inow==0) inow=1;
-//        INT64 framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/(cyclespersec*100);
-        cycles_t cyclethatShouldBeNow = StartTime + (gameCyclePerFrame) * FrameCounter );
+        // no more 64b division !
+        cycles_t cyclethatShouldBeNow = StartTime + (gameCyclePerFrame * FrameCounter );
         cycles_t cnow = osd_cycles();
 
         // if OS paused (window moving, menu bt, intuition hogs, reset timer)
         //if(FrameCounter+(igamefps>>1)<framesThatShouldbeNow)
-        if(cnow>(cyclethatShouldBeNow+(1000000LL>>1)))
+        if(cnow>(cyclethatShouldBeNow+(1000000LL>>1))) // + half a second.
         {
             ResetWatchTimer();
         }
 
-//        while(framesThatShouldbeNow<FrameCounter)
         while(cnow<cyclethatShouldBeNow)
         {
-            // something known to actually does pass priority to system
-            // and waits between 1/50 hz or less.
+            // some functions that knowns how to actually pass priority to other tasks.
+            // Graphics/WaitTOF() does but is 50 or 60Hz, and will wait a random time on first call.
+            // Graphics/WaitBOVP(vp) should fit exact screen frame but is commonly bad implemented and hogs cpu.
             g_pMameDisplay->WaitFrame();
 
             cnow = osd_cycles();
-//           framesThatShouldbeNow = ((osd_cycles() - StartTime)*igamefps)/cyclespersec;
         }
     }
 

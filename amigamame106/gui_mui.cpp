@@ -649,7 +649,7 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
       data =  (struct DriverData *) INST_DATA(cclass, obj);
       imsg = (struct IntuiMessage *) msg[1].MethodID;
 
- printf("MUIM_HandleEvent\n");
+// printf("MUIM_HandleEvent\n");
 
       get(_win(obj), MUIA_Window_ActiveObject, &active_obj);
 
@@ -722,7 +722,6 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
 	#define _between(a,x,b) ((x)>=(a) && (x)<=(b))
 	#define _isinobject(x,y) (_between(_mleft(obj),(x),_mright(obj)) && _between(_mtop(obj),(y),_mbottom(obj)))
 
-
             // - - - check clicks on title bar
             //  struct IntuiMessage *imsg; LONG muikey;
             struct MUIP_HandleInput *msghi = (struct MUIP_HandleInput *)msg;
@@ -743,13 +742,14 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
                         {
                             columnToSort = res.column;
                             DoMethod(obj,MUIM_List_Sort);
+                           // finnaly, propagate. return(MUI_EventHandlerRC_Eat);
                         }
                     }
                 }
                 // Class
             }
-            if (msghi->muikey!=MUIKEY_NONE)
-            {
+//            if (msghi->muikey!=MUIKEY_NONE)
+//            {
 //                switch (msg->muikey)
 //                {
 //                    case MUIKEY_LEFT : data->sx=-1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
@@ -757,10 +757,7 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
 //                    case MUIKEY_UP   : data->sy=-1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
 //                    case MUIKEY_DOWN : data->sy= 1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
 //                }
-            }
-
-            struct MUI_List_TestPos_Result res;
-           // DoMethod(obj,MUIM_List_TestPos,LONG x, LONG y, &res);
+//            }
 
             return(DoSuperMethodA(cclass, obj, msg));
         }

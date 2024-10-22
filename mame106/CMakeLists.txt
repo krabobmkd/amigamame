@@ -38,7 +38,8 @@ set(MAME_CORE_SRC
 	  harddisk.c  mamecore.c  sha1.c      unzip.c
 	cheat.c    hash.c      mamedriv.c  sndintrf.c  usrintrf.c
 	config.c   hiscore.c   md5.c       sound_krb.c     validity.c
-	cpuexec.c  info.c      memory.c memoryn.cpp memorynasm.s  state.c     version.c
+	cpuexec.c  info.c      memory.c memoryn.cpp   state.c     version.c
+# memorynasm.s
 #  artwork.h
  debugger.h   jedparse.h            png.h        ui_text.h
  audit.h      drawgfx.h drawgfxn.h    mame.h                profiler.h   unzip.h

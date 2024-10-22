@@ -2368,20 +2368,26 @@ void YM2151UpdateOne(void *chip, SAMP **buffers, int length)
 		chanout[6] = 0;
 		chanout[7] = 0;
 
-		chan_calc(0);
-		SAVE_SINGLE_CHANNEL(0)
-		chan_calc(1);
-		SAVE_SINGLE_CHANNEL(1)
-		chan_calc(2);
-		SAVE_SINGLE_CHANNEL(2)
-		chan_calc(3);
-		SAVE_SINGLE_CHANNEL(3)
-		chan_calc(4);
-		SAVE_SINGLE_CHANNEL(4)
-		chan_calc(5);
-		SAVE_SINGLE_CHANNEL(5)
-		chan_calc(6);
-		SAVE_SINGLE_CHANNEL(6)
+        // krb: use loop, better for inst cache
+        for(unsigned short ic=0;ic<7;ic++)
+        {
+            SAVE_SINGLE_CHANNEL(ic)
+            chan_calc(ic);
+        }
+//		chan_calc(0);
+//		SAVE_SINGLE_CHANNEL(0)
+//		chan_calc(1);
+//		SAVE_SINGLE_CHANNEL(1)
+//		chan_calc(2);
+//		SAVE_SINGLE_CHANNEL(2)
+//		chan_calc(3);
+//		SAVE_SINGLE_CHANNEL(3)
+//		chan_calc(4);
+//		SAVE_SINGLE_CHANNEL(4)
+//		chan_calc(5);
+//		SAVE_SINGLE_CHANNEL(5)
+//		chan_calc(6);
+//		SAVE_SINGLE_CHANNEL(6)
 		chan7_calc();
 		SAVE_SINGLE_CHANNEL(7)
 

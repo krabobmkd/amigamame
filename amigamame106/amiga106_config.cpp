@@ -496,7 +496,8 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
     serializer("Use Cheat Code File",_useCheatCodeFile);
     serializer("Cheat Code File",_cheatFilePath,SERFLAG_STRING_ISFILE);
 
-    serializer("Speed Limit",_speedlimit,85,125,100);
+    // min max step default
+    serializer("Speed Limit %",_speedlimit,85.0f,125.0f,5.0f,100.0f);
 }
 MameConfig::Help::Help() : ASerializable() {
     printf("MameConfig::Help::Help()\n");
