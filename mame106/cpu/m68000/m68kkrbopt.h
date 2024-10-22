@@ -1,7 +1,6 @@
 #ifndef M68KKRBOPT_H_
 #define M68KKRBOPT_H_
 
-#define OPTIM68K_NOXOR 1
 #define OPTIM68K_NOMASK_A 1
 
 // batrider no boot, + no sound arkretrn

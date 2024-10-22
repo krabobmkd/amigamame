@@ -55,40 +55,37 @@ void analyseAdressSpace(address_space &space)
     }
 }
 UINT32 adressspace_readmaskuse=0;
-UINT32 readers_readmaskuse=0;
+UINT32 read_maskuse=0;
+UINT32 read_offsetuse=0;
+UINT32 write_maskuse=0;
+UINT32 write_offsetuse=0;
 //#define DO_TESTMASKUSE 1
 #ifdef DO_TESTMASKUSE
 
- static inline void testMaskUse(UINT32 a, UINT32 b, UINT32 &acc) { acc += (((~a) & b)!=0); }
+ static inline void testMaskUse(UINT32 mask, UINT32 adr, UINT32 &acc) { acc += (((~mask) & adr)!=0); }
+
+static inline void testEntryShitMaskUse_directreadA( handler_data &hdata, offs_t a) {
+    if(hdata.offset != 0) read_offsetuse++;
+    testMaskUse(hdata.mask,a,read_maskuse);
+}
+static inline void testEntryShitMaskUse_directwriteA( handler_data &hdata, offs_t a) {
+    if(hdata.offset != 0) write_offsetuse++;
+    testMaskUse(hdata.mask,a,write_maskuse);
+}
+
 #else
  static inline void testMaskUse(UINT32 a, UINT32 b, UINT32 &acc) { }
+
+static inline void testEntryShitMaskUse_directreadA( handler_data &hdata, offs_t a) {
+
+}
+static inline void testEntryShitMaskUse_directwriteA( handler_data &hdata, offs_t a) {
+
+}
+
 #endif
 
 
-class HOffset {
-public:
-    static inline void applyHandlerOffset(offs_t &address, handler_data &hdata)
-    {
-        address -= hdata.offset;
-        address &= hdata.mask;
-    }
-};
-class HOffsetStat {
-public:
-    static inline void applyHandlerOffset(offs_t &address, handler_data &hdata)
-    {
-        address -= hdata.offset;
-        testMaskUse(hdata.mask,address,readers_readmaskuse);
-        address &= hdata.mask;
-    }
-};
-class HOffsetNoMask {
-public:
-    static inline void applyHandlerOffset(offs_t &address, handler_data &hdata)
-    {
-        address -= hdata.offset;
-    }
-};
 
 #define DO_ENTRY_STATS 1
 #ifdef DO_ENTRY_STATS
@@ -121,6 +118,8 @@ extern "C" {
 
 void logEntries()
 {
+    printf("maskuse:%08x offsetuse:%08x adressspace_readmaskuse:%08x\n",read_maskuse,read_offsetuse,adressspace_readmaskuse);
+
     printf("  **** READ ****\n");
     for(int ic=0;ic<256;ic++) {
         if(entriesDirectReadA[ic]>0) {
@@ -167,6 +166,33 @@ void logEntries()
 
 #endif
 
+class HOffset {
+public:
+    static inline void applyHandlerOffset(offs_t &address, handler_data &hdata)
+    {
+        address -= hdata.offset;
+        address &= hdata.mask;
+    }
+};
+class HOffsetStat {
+public:
+    static inline void applyHandlerOffset(offs_t &address, handler_data &hdata)
+    {
+        address -= hdata.offset;
+        testEntryShitMaskUse_directreadA(hdata,address);
+       // testMaskUse(hdata.mask,address,readers_readmaskuse);
+        address &= hdata.mask;
+    }
+};
+class HOffsetNoMask {
+public:
+    static inline void applyHandlerOffset(offs_t &address, handler_data &hdata)
+    {
+        address -= hdata.offset;
+    }
+};
+
+
 /* fast16 uses:
 	program_read_byte_16be, // program_read_byte_32be,
 	program_read_word_16be, // program_read_word_32be,
@@ -195,6 +221,8 @@ UINT32 memory_readlong_d16_beT(offs_t address REGM(d0))
     if (entry < STATIC_RAM)
     {
         ENTRY_STAT_DirectReadA(entry);
+
+
         HOffst::applyHandlerOffset(address,active_address_space[0].readhandlers[entry]);
 
         #ifdef LSB_FIRST
@@ -246,6 +274,7 @@ UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
 UINT16 memory_readword_d16_be(offs_t address REGM(d0))
 {
     UINT32 entry;
+    testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
 	address &= active_address_space[0].addrmask;
 	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
     if (entry < STATIC_RAM)
@@ -286,7 +315,9 @@ UINT16 memory_readword_d16_be(offs_t address REGM(d0))
 UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
 {
     UINT32 entry;
+    testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
 	address &= active_address_space[0].addrmask;
+
 	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
     if (entry < STATIC_RAM)
     {
@@ -295,6 +326,7 @@ UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
         address -= hdata.offset;
         address &= hdata.mask;
         #ifdef LSB_FIRST
+
                // LE to BE need a bit inverted.
                return bank_ptr[entry][address^1];
         #else
@@ -339,7 +371,9 @@ UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
 void memory_writelong_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 {
     UINT32 entry;
+    testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
 	address &= active_address_space[0].addrmask;
+
 	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
     if (entry < STATIC_RAM)
 	{
@@ -392,6 +426,7 @@ void memory_writelong_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 void memory_writeword_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 {
     UINT32 entry;
+    testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
 	address &= active_address_space[0].addrmask;
 	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
     if(entry<STATIC_RAM)
@@ -432,6 +467,7 @@ void memory_writeword_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 void memory_writebyte_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 {
     UINT32 entry;
+    testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
 	address &= active_address_space[0].addrmask;
 	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];
     if (entry < STATIC_RAM)
@@ -544,6 +580,7 @@ UINT32 memory_readmovem32_wr16(UINT32 address REGM(d0), UINT32 bits REGM(d1), UI
 UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
 {
     UINT32 entry;
+    testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
 	/* perform lookup */
 	address &= active_address_space[0].addrmask ;
 	entry = active_address_space[0].writelookup[LEVEL1_INDEX(address)];

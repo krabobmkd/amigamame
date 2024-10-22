@@ -60,6 +60,8 @@ typedef ULONG (*RE_HOOKFUNC)();
 #define MID_About     104
 #define MID_AboutMUI  105
 
+#define MUI5_API_SINCE_VERSION  21
+
 //#define SMT_DISPLAYID 0
 //#define SMT_DEPTH     1
 
@@ -969,6 +971,12 @@ inline Object *OMUINO(char *pclassname,ULONG tag1, ... )
 
 Object *createPanel_Drivers()
 {
+ const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,";
+    if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
+    {
+        ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,BAR,";
+    }
+
   return MUINewObject(MUIC_Group,
         Child, LV_Driver = (Object *)(DriverClass!=NULL)?
 
@@ -976,7 +984,7 @@ Object *createPanel_Drivers()
           MUIA_Listview_Input,    TRUE,
             MUIA_Listview_List, (ULONG)( LI_Driver = MUINewObject(MUIC_List,
               MUIA_List_Title,    TRUE,
-              MUIA_List_Format,   "BAR,BAR,BAR,BAR,BAR,BAR,",
+              MUIA_List_Format,  (ULONG)ListFormat ,
               MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
               MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
             InputListFrame,
@@ -987,7 +995,7 @@ Object *createPanel_Drivers()
           MUIA_Listview_Input, TRUE,
             MUIA_Listview_List, (ULONG)( LI_Driver = MUINewObject(MUIC_List,
               MUIA_List_Title, TRUE,
-              MUIA_List_Format, "BAR,BAR,BAR,BAR,BAR,BAR,",
+              MUIA_List_Format,(ULONG)ListFormat,
               MUIA_List_DisplayHook,  &DriverDisplayHook,
               MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
             InputListFrame,
