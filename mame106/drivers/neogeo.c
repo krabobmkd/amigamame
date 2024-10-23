@@ -1382,7 +1382,7 @@ static MACHINE_DRIVER_START( neogeo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 12000000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(neogeo_readmem,neogeo_writemem)
-//	MDRV_CPU_VBLANK_INT(neogeo_raster_interrupt,RASTER_LINES)
+	MDRV_CPU_VBLANK_INT(neogeo_raster_interrupt,RASTER_LINES)
 
 	MDRV_CPU_ADD(Z80, 4000000) /* verified */
 	/* audio CPU */

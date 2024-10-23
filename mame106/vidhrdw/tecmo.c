@@ -265,8 +265,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					dgp0.flipy = flipy;
 					dgp0.sx = sx;
 					dgp0.sy = sy;
-				//old
-                    drawgfx(&dgp0);
+				  drawgfx(&dgp0);
                   //to be fully validated
                   drawgfx_clut16_Src8_prio(&dgp0);
 
@@ -283,7 +282,7 @@ VIDEO_UPDATE( tecmo )
 {
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,Machine->pens[0x100],cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0/*TILEMAP_IGNORE_TRANSPARENCY*/,1);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,4);
 

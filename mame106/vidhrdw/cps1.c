@@ -179,6 +179,7 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #include "driver.h"
 #include "cpu/m68000/m68kmame.h"
 #include "cps1.h"
+#include "drawgfxn.h"
 
 #include <stdio.h>
 
@@ -1392,7 +1393,8 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
                         dgp0.code = fcode;
                         dgp0.sx = sx;
                         dgp0.sy = sy;
-                        drawgfx(&dgp0);
+                       // drawgfx(&dgp0);
+                        drawgfx_clut16_Src4_prio(&dgp0);
                     }
                 }// end loop y
 
@@ -1407,7 +1409,8 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
                 dgp0.flipy = flipy;
                 dgp0.sx = x & 0x1ff;
                 dgp0.sy = y & 0x1ff;
-                drawgfx(&dgp0);
+               // drawgfx(&dgp0);
+                drawgfx_clut16_Src4_prio(&dgp0);
 			}
 		}
 		base += baseadd;
