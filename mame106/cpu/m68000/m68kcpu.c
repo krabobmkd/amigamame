@@ -841,7 +841,7 @@ int m68k_execute(int num_cycles)
 		do
 		{
 			REG_PPC = REG_PC;
-
+//    printf("68k PC:%08x\n",REG_PC);
 			// Read an instruction and call its handler
 			/*REG_IRSLOT =*/ ir = m68ki_read_imm_16(p68k);
 //            printf("%04x ",(int)ir );
@@ -850,7 +850,8 @@ int m68k_execute(int num_cycles)
 
 //                            printf("%d",ir);
 //                        }
-
+//    printf("68k IR:%08x\n",(int)ir);
+//    exit(0);
 			m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
 			m68ki_instruction_jump_table[ir](p68k,ir);
 #ifndef OPTIM68K_SQUEEZEPPCREG

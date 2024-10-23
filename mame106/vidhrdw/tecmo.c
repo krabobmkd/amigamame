@@ -267,7 +267,8 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					dgp0.sy = sy;
 				//old
                     drawgfx(&dgp0);
-                  //to be fully validated  drawgfx_clut16_Src8_prio(&dgp0);
+                  //to be fully validated
+                  drawgfx_clut16_Src8_prio(&dgp0);
 
 				}
 			}

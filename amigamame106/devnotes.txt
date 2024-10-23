@@ -2,9 +2,12 @@
 
 todo beta4
 
+- O apply super simple memread/write when driver allow.
+- O repair optims YM2151
+- O drawgfx prio -> validate slikworm/rygar/...
 - O drawgfx pack4
 - O tilemap bitfield line optim ->0.5% gain ?
-- O optim son bubbob
+- O optim sound bubbob
 - O  neogeo cpu overrwrite optim
 - O  neogeo change to RGB16 index
 - O  neogeo verif slicing

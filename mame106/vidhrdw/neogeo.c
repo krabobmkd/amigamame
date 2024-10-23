@@ -1183,6 +1183,9 @@ VIDEO_UPDATE( neogeo )
 	void **line=bitmap->line;
 	int scan;
 
+
+// return;
+
 	fillbitmap(bitmap,Machine->pens[4095],cliprect);
 
 	for (scan = cliprect->min_y; scan <= cliprect->max_y ; scan++)

@@ -796,7 +796,7 @@ extern cycles_t dbgcyc_interuptaccum;
 void updatescreen(void)
 {
 	/* update sound */
-	if(Machine->sample_rate>0) sound_frame_update();
+//Re	if(Machine->sample_rate>0) sound_frame_update();
 
 	/* if we're not skipping this frame, draw the screen */
 	if (!osd_skip_this_frame())

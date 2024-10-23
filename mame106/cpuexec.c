@@ -45,6 +45,11 @@
  *  Macros to help verify active CPU
  *
  *************************************/
+#ifdef NDEBUG
+#define VERIFY_ACTIVECPU(name)
+#define VERIFY_EXECUTINGCPU(name)
+#define VERIFY_CPUNUM(name)
+#else
 
 #define VERIFY_ACTIVECPU(name) \
 	int activecpu = cpu_getactivecpu(); \
@@ -57,7 +62,7 @@
 #define VERIFY_CPUNUM(name) \
 	assert_always(cpunum >= 0 && cpunum < cpu_gettotalcpu(), #name "() called for invalid cpu num!")
 
-
+#endif
 
 /*************************************
  *

@@ -1,0 +1,62 @@
+﻿
+mslug
+trace cpuexec.c cpu_getiloops() -> inline calls from neogeo
+
+m68k_op_move_32_d_di
+	OPER_AY_DI_32	 m68ki_read_imm_16-pc)
+	pc=5 b294
+	then m68k_op_move_32_d_ix
+		 m68k_op_move_32_ix_d
+		 m68k_op_subq_16_d
+
+m68k_execute  pc 02002
+		m68k_op_bls_8	-> m68ki_branch_8()
+
+set_cpu_context()		
+memory.c memory_set_context() ************
+
+m68k_op_tst_8_di()
+	OPER_AY_DI_8() m68ki_read_imm_16()
+	
+m68k_op_cmpi_8_al()
+
+bordel dans cpuexec_timesclice 
+	mame_timer_set_global_time
+		cpunum_empty_event_queue()  Empty a CPU's event queue for a specific input line	
+						cpuintrf_push_context -> ICI ?
+		  activecpu_set_input_line
+			activecpu_set_info_int ->ASSERT
+							CPUINFO_INT_INPUT_STATE+ irqline
+				m68000_set_info(35,0) (*cpu[activecpu].intf.set_info)(state, &info);
+						set_irq_line()
+							m68k_set_irq()
+						
+		SLOW:			
+		 cpuintrf.c 
+		#define VERIFY_ACTIVECPU(name) \
+			assert_always(activecpu >= 0, #name "() called with no active cpu!")
+
+look stupid in time slice, 2 big switch	
+cpunum_execute
+	activecpu_get_physical_pc_byte()
+			m68000_get_info(CPUINFO_INT_PC) -> m68k_get_reg(NULL, M68K_REG_PC)&0x00ffffff;
+			
+z80_execute
+	op_fd	program_write_byte_8
+	
+	
+cpuexec_timeslice() again  255 cycles
+	cpunum_execute()
+		memory.c memory_set_opbase()
+						test opbasefunc , test bankd_ptr  
+						loop over banks and find a match */ !!!!!!!!!!!!
+						
+cpuexec_timeslice() super slow.
+		compare_mame_times()
+		
+		
+m68k: 4
+z80: 1
+cpunum_execute/timeslice:  4
+ 						
+						

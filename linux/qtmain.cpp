@@ -101,10 +101,11 @@ void QProc::process()
 //   "dino"
 //"qbert"
 //    "rastan"
- "silkworm"
+
+// "silkworm"
 // "sgemf"
 //                "gforce2"
-//      "mslug"
+      "mslug"
 //                "mp_sor2"
     );
     if(itest>0) idriver= itest;

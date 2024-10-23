@@ -1,4 +1,8 @@
 // memoryn.cpp
+#include <fstream>
+#include <iostream>
+#include <stdio.h>
+using namespace std;
 
 extern "C"
 {
@@ -27,6 +31,41 @@ struct _handler_data
 	offs_t					mask;					/* mask against the final address */
 	const char *			name;					/* name of the handler */
 };
+
+//FILE *pdbg=NULL;
+
+//static int nbt=0, nbtt=0,nbttmax=200000;
+//void startdbg()
+//{
+//    if(!pdbg) {
+//        pdbg = fopen("memlog.txt","wb");
+//    }
+//}
+//void traceMem(UINT32 adr, UINT32 v)
+//{
+//    startdbg();
+//    fprintf(pdbg,"a:%08x %08x ",adr,v);
+//    nbt++; nbtt++;
+//    if(nbt >=8) { nbt=0; fprintf(pdbg,"\n"); }
+//    if(nbtt>=nbttmax) exit(1337);
+//}
+//void traceMem(UINT32 adr, UINT16 v)
+//{
+//    startdbg();
+//    fprintf(pdbg,"a:%08x ____%04x ",adr,(UINT32)v);
+//    nbt++; nbtt++;
+//    if(nbt >=8) { nbt=0; fprintf(pdbg,"\n"); }
+//    if(nbtt>=nbttmax) exit(1337);
+//}
+//void traceMem(UINT32 adr, UINT8 v)
+//{
+//    startdbg();
+//    fprintf(pdbg,"a:%08x ______%02x ",adr,(UINT32)v);
+//    nbt++; nbtt++;
+//    if(nbt >=8) { nbt=0; fprintf(pdbg,"\n"); }
+//    if(nbtt>=nbttmax) exit(1337);
+//}
+
 
 void analyseAdressSpace(address_space &space)
 {
@@ -267,11 +306,13 @@ UINT32 memory_readlong_d16_beT(offs_t address REGM(d0))
 }
 UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
 {
-    return memory_readlong_d16_beT<HOffset>(address);
+    UINT32 v = memory_readlong_d16_beT<HOffset>(address);
+   // traceMem(address,v);
+    return v;
 }
 
 
-UINT16 memory_readword_d16_be(offs_t address REGM(d0))
+UINT16 memory_readword_d16_beT(offs_t address REGM(d0))
 {
     UINT32 entry;
     testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
@@ -311,8 +352,14 @@ UINT16 memory_readword_d16_be(offs_t address REGM(d0))
 
 }
 
+UINT16 memory_readword_d16_be(offs_t address REGM(d0))
+{
+    UINT16 v = memory_readword_d16_beT(address);
+    // traceMem(address,v);
+    return v;
+}
 // this is a read8 that needs to use handler16 instead of handler 8 !! hence the mask/shift horror.
-UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
+UINT8 memory_readbyte_d16_beT(offs_t address REGM(d0))
 {
     UINT32 entry;
     testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
@@ -364,6 +411,12 @@ UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
 
 }
 
+UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
+{
+    UINT8 v = memory_readbyte_d16_beT(address);
+   // traceMem(address,v);
+    return v;
+}
 
 // - - - -  68k 16b-bus writes
 

@@ -88,7 +88,11 @@ public:
         _p( ((destPix_t *)p->dest->line[ofsy]) + ofsx),
         _prio(((pri_t *)p->pri_buffer->line[ofsy])+ofsx),
         _rowpixels((UINT16)p->dest->rowpixels),
-        _np(p->priority_mask & 0x1f){}
+        _np(
+            (((p->priority_mask)>>2) & 4) | // silkw text playfield
+            (((p->priority_mask)>>2) & 2) | // silkw foreg
+            (((p->priority_mask)>>1) & 1)   // silkw backg
+            ){}
     void incrementx(INT16 n) {
         _p += n;
         _prio += n;

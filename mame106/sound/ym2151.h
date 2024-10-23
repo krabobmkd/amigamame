@@ -256,7 +256,7 @@ typedef struct
 } YM2151;
 
 
-INLINE int YM2151ReadStatus( void *_chip REGYM(a0) )
+static inline int YM2151ReadStatus( void *_chip REGYM(a0) )
 {
 	YM2151 *chip = _chip;
 	return chip->status;
