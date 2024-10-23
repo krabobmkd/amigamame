@@ -46,8 +46,8 @@
  *
  *************************************/
 #ifdef NDEBUG
-#define VERIFY_ACTIVECPU(name)
-#define VERIFY_EXECUTINGCPU(name)
+#define VERIFY_ACTIVECPU(name) int activecpu = cpu_getactivecpu();
+#define VERIFY_EXECUTINGCPU(name) int activecpu = cpu_getexecutingcpu();
 #define VERIFY_CPUNUM(name)
 #else
 
