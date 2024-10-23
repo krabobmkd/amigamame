@@ -453,32 +453,33 @@ void drawgfx_clut16_Src8(struct drawgfxParams *p DGREG(a0))
         SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
 
 }	
-//void drawgfx_clut16_Src4(struct drawgfxParams *p DGREG(a0))
-//{
-//    drawgfxT<DestPixContext<UINT16>,UINT16,
-//        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
-//}
+void drawgfx_clut16_Src4(struct drawgfxParams *p DGREG(a0))
+{
+    drawgfxT<DestPixContext<UINT16>,UINT16,
+        SourceContextP4,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+}
 
 void drawgfx_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
 {
     if(p->priority_mask==0)
     {
         drawgfx_clut16_Src8(p);
-    } else
-    {
-        drawgfxT<DestPixPrioContext<UINT16>,UINT16,
-            SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+        return;
     }
+
+    drawgfxT<DestPixPrioContext<UINT16>,UINT16,
+        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+
 }
-//void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
-//{
-//    if(p->priority_mask==0)
-//    {
-//        drawgfx_clut16_Src4(p);
-//    } else
-//    {
-//        drawgfxT<DestPixPrioContext<UINT16>,UINT16,
-//            SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
-//    }
-//}
+void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
+{
+    if(p->priority_mask==0)
+    {
+        drawgfx_clut16_Src4(p);
+        return;
+    }
+    drawgfxT<DestPixPrioContext<UINT16>,UINT16,
+        SourceContextP4,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+
+}
 
