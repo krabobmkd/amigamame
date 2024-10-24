@@ -4,7 +4,8 @@
  * Forked from 1999 Mats Eirik Hansen
  *
  *************************************************************************/
-
+struct Library;
+struct Library *MUIMasterBase = 0L;
 
 // krb:
 /* mui includes generated with:
@@ -29,6 +30,9 @@ extern "C" {
 #include <libraries/iffparse.h>
 #include <libraries/gadtools.h>
 #include <libraries/asl.h>
+
+// we point MUI38 ....
+#include <../../MUI50/include/mui/Guigfx_mcc.h>
 #include <inline/muimaster.h>
 }
 #define CATCOMP_NUMBERS
@@ -102,9 +106,9 @@ struct DriverData
 #define get(obj,attr,store) GetAttr(attr,(Object *)obj,(ULONG *)store)
 #define set(obj,attr,value) SetAttrs(obj,attr,value,TAG_DONE)
 
-struct Library *MUIMasterBase = NULL;
 
-static struct MUI_CustomClass *DriverClass;
+
+static struct MUI_CustomClass *DriverClass=NULL;
 
 static Object *App=NULL;
 static Object *MainWin=NULL;
@@ -122,6 +126,8 @@ static Object * RE_Options=NULL;
 static Object * CY_Show=NULL;
 //static Object *CM_UseDefaults;
 static Object * BU_Scan=NULL;
+
+static Object * IMG_BottomLeft = NULL;
 
 //static Object * CM_Antialiasing;
 //static Object * CM_Translucency;
@@ -152,7 +158,7 @@ static Object * BU_Scan=NULL;
 static Object *LI_Driver=NULL;
 static Object * LV_Driver=NULL;
 static Object * BU_Start=NULL;
-static Object * BU_Quit=NULL;
+//static Object * BU_Quit=NULL;
 static Object * BU_About_OK=NULL;
 static Object * PU_ScreenMode=NULL;
 
@@ -284,6 +290,8 @@ static struct Hook SoundNotifyHook={0};
 static struct Hook DriverDisplayHook={0};
 static struct Hook DriverSortHook={0};
 static struct Hook DriverNotifyHook={0};
+static struct Hook DriverSortColumnNotifyHook={0};
+
 #ifndef MESS
 static struct Hook ShowNotifyHook={0};
 #endif
@@ -322,6 +330,8 @@ static void SetDisplayName(ULONG);
 static ULONG ASM DirectModeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 static ULONG ASM SoundNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 static ULONG ASM DriverNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+static ULONG ASM DriverSortColumnNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+
 #ifndef MESS
 static ULONG ASM ShowNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 #endif
@@ -724,7 +734,8 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
 	#define _between(a,x,b) ((x)>=(a) && (x)<=(b))
 	#define _isinobject(x,y) (_between(_mleft(obj),(x),_mright(obj)) && _between(_mtop(obj),(y),_mbottom(obj)))
 
-
+            // if MUI<5, use this to get selected column.
+            // if MUI>=5 use MUIA_List_SortColumn
              if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
              {
             // - - - check clicks on title bar
@@ -842,6 +853,8 @@ void AllocGUI(void)
     DriverDisplayHook.h_Entry    = (RE_HOOKFUNC) DriverDisplay;
     DriverSortHook.h_Entry    = (RE_HOOKFUNC) DriverSort;
     DriverNotifyHook.h_Entry     = (RE_HOOKFUNC) DriverNotify;
+    DriverSortColumnNotifyHook.h_Entry     = (RE_HOOKFUNC) DriverSortColumnNotify;
+
 #ifndef MESS
     ShowNotifyHook.h_Entry        = (RE_HOOKFUNC) ShowNotify;
 
@@ -863,7 +876,13 @@ void AllocGUI(void)
 #ifdef DOMAMELOG
     printf("before MUI_CreateCustomClass()\n");
 #endif
+  if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
+  {
     DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcher);
+  } else
+  {
+    DriverClass = NULL;
+  }
 #ifdef DOMAMELOG
     printf("after MUI_CreateCustomClass()\n");
 #endif
@@ -978,8 +997,9 @@ Object *createPanel_Drivers()
  const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,";
     if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
     {
-        ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,BAR,";
+        ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,";
     }
+// note: if MUI5, no need to override MUI_List , so DriverClass is NULL.
 
   return MUINewObject(MUIC_Group,
         Child, LV_Driver = (Object *)(DriverClass!=NULL)?
@@ -1187,6 +1207,26 @@ int MainGUI(void)
     {
       if(!MainWin)
       {
+        if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
+        {
+#define SCALEMODEMASK(u, d, p, s)	(((u) ? NISMF_SCALEUP : 0) | ((d) ? NISMF_SCALEDOWN : 0) | ((p) ? NISMF_KEEPASPECT_PICTURE : 0) | ((s) ? NISMF_KEEPASPECT_SCREEN : 0))
+#define TRANSMASK(m, r)				(((m) ? NITRF_MASK : 0 ) | ((r) ? NITRF_RGB : 0))
+
+    printf("do MUIC_Guigfx\n");
+          IMG_BottomLeft =  MUI_NewObject(MUIC_Guigfx,
+							MUIA_Guigfx_FileName, (ULONG) "skin/bl.ilbm",
+							MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Low,
+							// SCALEMODEMASK( scaleup, scaledown  PICASPECT, SCREENASPECT )
+						//	MUIA_Guigfx_ScaleMode, SCALEMODEMASK(FALSE, FALSE, TRUE, FALSE),
+						//	MUIA_Guigfx_Transparency, TRANSMASK(TRUE, TRUE),
+							TAG_DONE);
+    printf("do MUIC_Guigfx:%08x\n",(int)IMG_BottomLeft);
+        }
+        if(IMG_BottomLeft == NULL)
+        {
+            IMG_BottomLeft = MUI_MakeObject(MUIO_HSpace,0);
+        }
+
 //static  std::string appName(APPNAME);
 //  printf("go MUINewObject()\n");
       //  MainWin =  MUINewObject(MUIC_Window,
@@ -1222,7 +1262,8 @@ int MainGUI(void)
 
             Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
               Child, BU_Start   = SimpleButton((ULONG)GetMessage(MSG_START)),
-              Child, BU_Quit    = SimpleButton((ULONG)GetMessage(MSG_QUIT)),
+              Child,IMG_BottomLeft,
+          //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessage(MSG_QUIT)),
             TAG_DONE,0), // end WindowContent Group
           TAG_DONE,0)},
         TAG_DONE,0};
@@ -1243,8 +1284,8 @@ int MainGUI(void)
           DoMethod(BU_Start, MUIM_Notify, MUIA_Pressed, FALSE,
                    App, 2, MUIM_Application_ReturnID, RID_Start);
 
-          DoMethod(BU_Quit, MUIM_Notify, MUIA_Pressed, FALSE,
-                   App, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
+//          DoMethod(BU_Quit, MUIM_Notify, MUIA_Pressed, FALSE,
+//                   App, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
 
           DoMethod(MainWin, MUIM_Notify,  MUIA_Window_CloseRequest, TRUE,
                    App, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
@@ -1270,11 +1311,23 @@ int MainGUI(void)
           DoMethod(LI_Driver, MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
                    LI_Driver, 3, MUIM_CallHook, &DriverNotifyHook, MUIV_TriggerValue);
 
+          if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
+          {
+            #ifndef MUIA_List_SortColumn
+            #define MUIA_List_SortColumn                0x8042cafb /* V21 isg LONG              */
+            #endif
+               // for MUI5 column sorting, listen the selected column attrib:
+               DoMethod(LI_Driver, MUIM_Notify, MUIA_List_SortColumn, MUIV_EveryTime,
+                   LI_Driver, 3, MUIM_CallHook, &DriverSortColumnNotifyHook, MUIV_TriggerValue);
+          }
+
           DoMethod(CY_Show, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
                    CY_Show, 3, MUIM_CallHook, &ShowNotifyHook, MUIV_TriggerValue);
 
           DoMethod(BU_Scan, MUIM_Notify, MUIA_Pressed, FALSE,
                    App, 2, MUIM_Application_ReturnID, RID_Scan);
+
+
 
 
 //re, todo but do that better please.
@@ -1589,5 +1642,10 @@ static ULONG ASM DriverNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG
     MameConfig &config = getMainConfig();
    config.setActiveDriver(GetDriverIndex());
 
+  return(0);
+}
+static ULONG ASM DriverSortColumnNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
+{
+  if(par) columnToSort = *par;
   return(0);
 }

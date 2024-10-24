@@ -248,8 +248,7 @@ void drawgfxT(struct drawgfxParams *p DGREG(a0), int isOpaque)
 		DATA_TYPE *dstdata,int dstwidth,int dstheight,int dstmodulo
 BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
    */
-    // - - - - - - ADJUST_8 or 4, differs when pack4
-
+    // - - - - - - ADJUST
     INT16 ydir;
 	if (flipy)
 	{
@@ -262,21 +261,26 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
     	srcdata.incrementy(topskip);
 		ydir = 1;
 	}
-	if (flipx)
+    /* adjust x moved in other flipx test, one test less.
+    if (flipx)
 	{
     	dstdata.incrementx(dstwidth-1);
     	srcdata.incrementx(srcwidth - dstwidth - leftskip);
-		//srcdata += (srcwidth - dstwidth - leftskip);
 	}
 	else
 	{
         srcdata.incrementx(leftskip);
-		//srcdata += leftskip;
-	}
+	}*/
+    INT16 srcmodulo = gfx->width - leftskip;
+
     if(isOpaque)
     {
         if (flipx)
         {
+            // adjust 
+            dstdata.incrementx(dstwidth - 1);
+            srcdata.incrementx(srcwidth - dstwidth - leftskip);
+
             INT16 destmodulo = ydir*dstdata._rowpixels + dstwidth;
             while (dstheight)
             {
@@ -308,13 +312,16 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
                     dstdata.incrementx(-1);
                 }
 
-                srcdata.incrementy(1);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             }
         }
         else
         {
+            // adjust
+            srcdata.incrementx(leftskip);
+
             INT16 destmodulo = ydir*dstdata._rowpixels - dstwidth;
             while (dstheight)
             {
@@ -344,7 +351,7 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
                     dstdata.setPix(0,pal.color( *scrdatap++ ));
                     dstdata.incrementx(1);
                 }
-                srcdata.incrementy(1);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 // INCREMENT_DST(ydir*VMODULO - dstwidth*HMODULO)
                 dstheight--;
@@ -357,6 +364,10 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
 
         if (flipx)
         {
+            // adjust 
+            dstdata.incrementx(dstwidth - 1);
+            srcdata.incrementx(srcwidth - dstwidth - leftskip);
+
             INT16 destmodulo = ydir*dstdata._rowpixels + dstwidth;
             while (dstheight)
             {
@@ -395,13 +406,16 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
                     if (col != transpen) dstdata.setPix(0,pal.color(col));
                     dstdata.incrementx(-1);
                 }
-                srcdata.incrementy(1);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             }
         }
         else
         {
+            // adjust
+            srcdata.incrementx(leftskip);
+
             INT16 destmodulo = ydir*dstdata._rowpixels - dstwidth;
             while (dstheight)
             {
@@ -440,7 +454,7 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
                     if (col != transpen) dstdata.setPix(0,pal.color(col));
                     dstdata.incrementx(1);
                 }
-                srcdata.incrementy(1);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 // INCREMENT_DST(ydir*VMODULO - dstwidth*HMODULO)
                 dstheight--;
@@ -450,38 +464,22 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
     } // end if transparent
 
 }
-
+// manage access to 2 pixels of 16 colors encoded on one byte 0xf0 0x0f
+// this is used as template param class and is completely asm-inlined.
 class SourceContextP4 {
 public:
     SourceContextP4(const gfx_element *gfx DGREG(a1), unsigned int code )
-        : _linemodulo(gfx->line_modulo),_bleft(0)
-         {
-            _pl = _p = gfx->gfxdata + code * gfx->char_modulo;
-        }
+        : _p(gfx->gfxdata + code * gfx->char_modulo), _linemodulo(gfx->line_modulo),_bleft(0)
+         {}
     // return value and increment, rare use for clipping.
     UINT8 getp() {
-
-        UINT8 v = (*_p);
-
-
-         v = (v>>(_bleft<<2)) & 0x0f;
+        UINT8 v = ((*_p) >>(_bleft<<2)) & 0x0f;
          _p += _bleft;
         _bleft ^=1;
-       //old UINT8 v = ((*_p)>>(_bleft<<2)) & 0x0f; // no test version.
-
-        // --- this
-        //_p += (1+_bleft)>>1;
-        // _bleft  = (1+_bleft) & 1;
-
-        // equivalent to this:
-//        _p += _bleft;
-//        _bleft ^=1;
-
         return v;
     }
     void incrementy(INT32 n) {
-        _pl += n* _linemodulo;
-        _p = _pl;
+        _p += n* _linemodulo;
         _bleft = 0;
     }
 
@@ -490,10 +488,9 @@ public:
         _p += n>>1;
         _bleft  = n & 1;
     }
-    UINT8 *_pl;
     UINT8 *_p;
     UINT16 _linemodulo;
-    UINT16 _bleft;
+    UINT16 _bleft; // 1 or 0, index below byte.
 };
 
 
@@ -538,14 +535,12 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
 
 	ex = sx + gfx->width; // consider end excluded, immense lots of useless -1 removed.
 	if (sx < clip->min_x) sx = clip->min_x;
-	//if (ex > dest->width) ex = dest->width;
 	if (ex > clip->max_x) ex = clip->max_x;
     int dstwidth = ex-sx; /* dest width */
     if(dstwidth<=0) return;
 
 	ey = sy + gfx->height;
 	if ( sy < clip->min_y) sy = clip->min_y;
-	//if (ey > dest->height) ey = dest->height;
 	if ( ey > clip->max_y) ey = clip->max_y;
     int dstheight = ey-sy;	/* dest height */
     if(dstheight<=0) return;
@@ -561,17 +556,6 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
 
         MapColor pal(&gfx->colortable[gfx->color_granularity * p->color]);
 
-//		UINT8 *pribuf = (p->pri_buffer) ? ((UINT8 *)p->pri_buffer->line[sy]) + sx : NULL;
-
- // INCREMENT_DST {dstdata+=(n);pridata += (n);}
-    // - - - - -BLOCKMOVEXXXX
-    /*
-#define COMMON_ARGS
-		const UINT8 *srcdata,int srcwidth,int srcheight,int srcmodulo,
-		int leftskip,int topskip,int flipx,int flipy,
-		DATA_TYPE *dstdata,int dstwidth,int dstheight,int dstmodulo
-BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
-   */
     // - - - - - - ADJUST
 
     INT16 ydir;
@@ -586,60 +570,75 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
     	srcdata.incrementy(topskip);
 		ydir = 1;
 	}
+	/*moved to avoid a test
 	if (flipx)
 	{
     	dstdata.incrementx(dstwidth-1);
     	srcdata.incrementx(srcwidth - dstwidth - leftskip);
-		//srcdata += (srcwidth - dstwidth - leftskip);
 	}
 	else
 	{
         srcdata.incrementx(leftskip);
-		//srcdata += leftskip;
-	}
+	}*/
+
+    INT16 srcmodulo = gfx->width -leftskip;
+
     if(isOpaque)
     {
         if (flipx)
         {
-           /*re INT16 destmodulo = ydir*dstdata._rowpixels + dstwidth;
+            // adjust x
+            dstdata.incrementx(dstwidth - 1);
+            srcdata.incrementx(srcwidth - dstwidth - leftskip);
+            INT16 destmodulo = ydir*dstdata._rowpixels + dstwidth;
             while (dstheight)
             {
-
                 destPix_t *destend = dstdata._p - dstwidth;
-                UINT8 *scrdatap = srcdata._p;
-                while (((uintptr_t)scrdatap & 3) && dstdata._p > destend)
+                //UINT8 *scrdatap = srcdata._p;
+                while (((uintptr_t)srcdata._p & 3) && dstdata._p > destend)
                 {
-                    dstdata.setPix(0,pal.color( *scrdatap++ ));
+                    dstdata.setPix(0,pal.color(srcdata.getp()));
                     dstdata.incrementx(-1);
                 }
-                UINT32 *sd4 = (UINT32 *)scrdatap;
-                while (dstdata._p >= (destend + 4))
+                UINT32 *sd4 = (UINT32 *)dstdata._p;
+                while (dstdata._p >= (destend + 8))
                 {
                     UINT32 col4 = *(sd4++);
-                    dstdata.incrementx(-4);
-                    dstdata.setPix(WRITEORD3,pal.color((UINT8)col4));
-                    col4>>=8;
-                    dstdata.setPix(WRITEORD2,pal.color((UINT8)col4));
-                    col4>>=8;
-                    dstdata.setPix(WRITEORD1,pal.color((UINT8)col4));
-                    col4>>=8;
-                    dstdata.setPix(WRITEORD0,pal.color((UINT8)col4));
+                    dstdata.incrementx(-8);
+
+                    dstdata.setPix(WRITEORDL6, pal.color((UINT8)col4 & 0x0f));
+                    col4 >>= 4;
+                    dstdata.setPix(WRITEORDL7, pal.color((UINT8)col4 & 0x0f));
+                    col4 >>= 4;
+                    dstdata.setPix(WRITEORDL4, pal.color((UINT8)col4 & 0x0f));
+                    col4 >>= 4;
+                    dstdata.setPix(WRITEORDL5, pal.color((UINT8)col4 & 0x0f));
+                    col4 >>= 4;
+                    dstdata.setPix(WRITEORDL2, pal.color((UINT8)col4 & 0x0f));
+                    col4 >>= 4;
+                    dstdata.setPix(WRITEORDL3, pal.color((UINT8)col4 & 0x0f));
+                    col4 >>= 4;
+                    dstdata.setPix(WRITEORDL0, pal.color((UINT8)col4 & 0x0f));
+                    col4 >>= 4;
+                    dstdata.setPix(WRITEORDL1, pal.color((UINT8)col4));
+
                 }
-                scrdatap = (UINT8 *)sd4;
+                srcdata._p = (UINT8 *)sd4;
                 while (dstdata._p > destend)
                 {
-                    dstdata.setPix(0,pal.color( *scrdatap++ ));
+                    dstdata.setPix(0,pal.color( srcdata.getp() ));
                     dstdata.incrementx(-1);
                 }
-
-                srcdata.incrementy(1);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
-            }
-            */
+            }            
         }
         else
         {
+            // adjust x
+            srcdata.incrementx(leftskip);
+
             INT16 destmodulo = ydir*dstdata._rowpixels - dstwidth;
             while (dstheight)
             {
@@ -678,9 +677,9 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
                     dstdata.setPix(0,pal.color( srcdata.getp() ));
                     dstdata.incrementx(1);
                 }
-                srcdata.incrementy(1);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
-                // INCREMENT_DST(ydir*VMODULO - dstwidth*HMODULO)
+
                 dstheight--;
             } // end while h
         } // end if not flipx
@@ -691,53 +690,71 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
 
         if (flipx)
         {
-        /*
+            // adjust x
+            dstdata.incrementx(dstwidth - 1);
+            srcdata.incrementx(srcwidth - dstwidth - leftskip);
+
             INT16 destmodulo = ydir*dstdata._rowpixels + dstwidth;
             while (dstheight)
             {
                 destPix_t *destend = dstdata._p - dstwidth;
-                UINT8 *scrdatap = srcdata._p;
-                while (((uintptr_t)scrdatap & 3) && dstdata._p > destend)	// longword align
+
+                while (((uintptr_t)srcdata._p & 3) && dstdata._p > destend)	// longword align
                 {
-                    UINT8 col = *scrdatap++;
+                    UINT8 col = srcdata.getp();
                     if (col != transpen) dstdata.setPix(0,pal.color(col));
                     dstdata.incrementx(-1);
                 }
-                UINT32 *sd4 = (UINT32 *)scrdatap;
-                while (dstdata._p >= (destend + 4))
+                UINT32 *sd4 = (UINT32 *)srcdata._p;
+                while (dstdata._p >= (destend + 8))
                 {
                     UINT32 col4;
-                    dstdata.incrementx(-4);
-                    if ((col4 = *(sd4++)) != trans4)
+                    dstdata.incrementx(-8);
+                    if ((col4 = *(sd4++)) != trans8)
                     {
-                        UINT8 col = (UINT8)col4;
-                        if(col != transpen) dstdata.setPix(WRITEORD3,pal.color(col));
-                        col4>>=8;
+                        UINT8 col = (UINT8)col4 & 0x0f;
+                        if(col != transpen) dstdata.setPix(WRITEORDL6,pal.color(col));
+                        col4>>=4;
+                        col = (UINT8)col4& 0x0f;
+                        if(col != transpen) dstdata.setPix(WRITEORDL7,pal.color(col));
+                        col4>>=4;
+                        col = (UINT8)col4 & 0x0f;
+                        if(col != transpen) dstdata.setPix(WRITEORDL4,pal.color(col));
+                        col4>>=4;
+                        col = (UINT8)col4 & 0x0f;
+                        if(col != transpen) dstdata.setPix(WRITEORDL5,pal.color(col));
+                        col4>>=4;
+                        col = (UINT8)col4& 0x0f;
+                        if(col != transpen) dstdata.setPix(WRITEORDL2,pal.color(col));
+                        col4>>=4;
+                        col = (UINT8)col4& 0x0f;
+                        if(col != transpen) dstdata.setPix(WRITEORDL3,pal.color(col));
+                        col4>>=4;
+                        col = (UINT8)col4 & 0x0f;
+                        if(col != transpen) dstdata.setPix(WRITEORDL0,pal.color(col));
+                        col4>>=4;
                         col = (UINT8)col4;
-                        if(col != transpen) dstdata.setPix(WRITEORD2,pal.color(col));
-                        col4>>=8;
-                        col = (UINT8)col4;
-                        if(col != transpen) dstdata.setPix(WRITEORD1,pal.color(col));
-                        col4>>=8;
-                        col = (UINT8)col4;
-                        if(col != transpen) dstdata.setPix(WRITEORD0,pal.color(col));
+                        if(col != transpen) dstdata.setPix(WRITEORDL1,pal.color(col));
+
                     }
                 }
-                scrdatap = (UINT8 *)sd4;
+                srcdata._p = (UINT8 *)sd4;
                 while (dstdata._p > destend)
                 {
-                    UINT8 col = *scrdatap++;
+                    UINT8 col =  srcdata.getp();
                     if (col != transpen) dstdata.setPix(0,pal.color(col));
                     dstdata.incrementx(-1);
                 }
-                srcdata.incrementy(1);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             }
-            */
+
         }
         else
         {
+            // adjust x
+            srcdata.incrementx(leftskip);
 
             INT16 destmodulo = ydir*dstdata._rowpixels - dstwidth;
             while (dstheight)
@@ -788,9 +805,8 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
                     if (col != transpen) dstdata.setPix(0,pal.color(col));
                     dstdata.incrementx(1);
                 }
-                srcdata.incrementy(1);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
-                // INCREMENT_DST(ydir*VMODULO - dstwidth*HMODULO)
                 dstheight--;
             } // end while h
 
@@ -801,7 +817,8 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
 
 }
 
-// template parametrization: transp/opaque ,  PIXPACKED4/PIX8 , prio/noprio
+// template parametrization:  PIXPACKED4/PIX8 , prio/noprio
+// function params: opaque/transp.
 
 void drawgfx_clut16_Src8(struct drawgfxParams *p DGREG(a0))
 {
