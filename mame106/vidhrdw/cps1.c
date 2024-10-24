@@ -1614,8 +1614,9 @@ void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
                     dgp2.code = fcode;
                     dgp2.sx = sx;
                     dgp2.sy = sy;
-                    //old drawgfx(&dgp2);
-                    drawgfx_clut16_Src4_prio(&dgp2);
+                    //old
+                    drawgfx(&dgp2);
+                    //drawgfx_clut16_Src4_prio(&dgp2);
                 }
             }// end loop y
 		}
@@ -1625,8 +1626,9 @@ void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
             dgp2.code = code;
             dgp2.sx = (x+xoffs) & 0x3ff;
             dgp2.sy = (y+yoffs) & 0x3ff;
-            //old drawgfx(&dgp2);
-            drawgfx_clut16_Src4_prio(&dgp2);
+            //old
+            drawgfx(&dgp2);
+           // drawgfx_clut16_Src4_prio(&dgp2);
 		}
 	}
 	} // end of patch paragraph
