@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-
+#include "drawgfxn.h"
 unsigned char *slapfight_videoram;
 unsigned char *slapfight_colorram;
 size_t slapfight_videoram_size;
@@ -294,7 +294,8 @@ VIDEO_UPDATE( slapfight )
 			dgp1.sx = (buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) - 13;
 			dgp1.sy = buffered_spriteram[offs+3];			
         }
-        drawgfx(&dgp1);
+        //drawgfx(&dgp1);
+        drawgfx_clut16_Src8(&dgp1);
 	}
 	} // end of patch paragraph
 

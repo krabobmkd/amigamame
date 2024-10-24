@@ -878,6 +878,7 @@ void AllocGUI(void)
 #endif
   if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
   {
+      printf("override! MUI_CreateCustomClass\n");
     DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcher);
   } else
   {

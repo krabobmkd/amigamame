@@ -17,15 +17,6 @@ using namespace std;
 #define SHIFT2 16
 #define SHIFT3 24
 
-#define WRITEORDL0 0
-#define WRITEORDL1 1
-#define WRITEORDL2 2
-#define WRITEORDL3 3
-#define WRITEORDL4 4
-#define WRITEORDL5 5
-#define WRITEORDL6 6
-#define WRITEORDL7 7
-
 #else
 #define WRITEORD0 3
 #define WRITEORD1 2
@@ -36,16 +27,6 @@ using namespace std;
 #define SHIFT2 8
 #define SHIFT1 16
 #define SHIFT0 24
-
-
-#define WRITEORDL0 7
-#define WRITEORDL1 6
-#define WRITEORDL2 5
-#define WRITEORDL3 4
-#define WRITEORDL4 3
-#define WRITEORDL5 2
-#define WRITEORDL6 1
-#define WRITEORDL7 0
 
 
 #endif
@@ -109,6 +90,7 @@ public:
         _prio(((pri_t *)p->pri_buffer->line[ofsy])+ofsx),
         _rowpixels((UINT16)p->dest->rowpixels),
         _np(
+            // works with silworm and cps1
             (((p->priority_mask)>>2) & 4) | // silkw text playfield
             (((p->priority_mask)>>2) & 2) | // silkw foreg
             (((p->priority_mask)>>1) & 1)   // silkw backg
@@ -581,7 +563,6 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
         srcdata.incrementx(leftskip);
 	}*/
 
-    INT16 srcmodulo = gfx->width -leftskip;
 
     if(isOpaque)
     {
@@ -600,27 +581,27 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     dstdata.setPix(0,pal.color(srcdata.getp()));
                     dstdata.incrementx(-1);
                 }
-                UINT32 *sd4 = (UINT32 *)dstdata._p;
+                UINT32 *sd4 = (UINT32 *)srcdata._p;
                 while (dstdata._p >= (destend + 8))
                 {
                     UINT32 col4 = *(sd4++);
                     dstdata.incrementx(-8);
 
-                    dstdata.setPix(WRITEORDL6, pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD3<<1)+1, pal.color((UINT8)col4 & 0x0f));
                     col4 >>= 4;
-                    dstdata.setPix(WRITEORDL7, pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD3<<1), pal.color((UINT8)col4 & 0x0f));
                     col4 >>= 4;
-                    dstdata.setPix(WRITEORDL4, pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD2<<1)+1, pal.color((UINT8)col4 & 0x0f));
                     col4 >>= 4;
-                    dstdata.setPix(WRITEORDL5, pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD2<<1), pal.color((UINT8)col4 & 0x0f));
                     col4 >>= 4;
-                    dstdata.setPix(WRITEORDL2, pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD1<<1)+1, pal.color((UINT8)col4 & 0x0f));
                     col4 >>= 4;
-                    dstdata.setPix(WRITEORDL3, pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD1<<1), pal.color((UINT8)col4 & 0x0f));
                     col4 >>= 4;
-                    dstdata.setPix(WRITEORDL0, pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD0<<1)+1, pal.color((UINT8)col4 & 0x0f));
                     col4 >>= 4;
-                    dstdata.setPix(WRITEORDL1, pal.color((UINT8)col4));
+                    dstdata.setPix((WRITEORD0<<1), pal.color((UINT8)col4));
 
                 }
                 srcdata._p = (UINT8 *)sd4;
@@ -629,7 +610,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     dstdata.setPix(0,pal.color( srcdata.getp() ));
                     dstdata.incrementx(-1);
                 }
-                srcdata.incrementx(srcmodulo);
+                srcdata.incrementx(leftskip);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             }            
@@ -654,21 +635,21 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                 {
                     UINT32 col4= *(sd4++);
 
-                    dstdata.setPix(WRITEORDL1,pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD0<<1),pal.color((UINT8)col4 & 0x0f));
                     col4>>=4;
-                    dstdata.setPix(WRITEORDL0,pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD0<<1)+1,pal.color((UINT8)col4 & 0x0f));
                     col4>>=4;
-                    dstdata.setPix(WRITEORDL3,pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD1<<1),pal.color((UINT8)col4 & 0x0f));
                     col4>>=4;
-                    dstdata.setPix(WRITEORDL2,pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD1<<1)+1,pal.color((UINT8)col4 & 0x0f));
                     col4>>=4;
-                    dstdata.setPix(WRITEORDL5,pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD2<<1),pal.color((UINT8)col4 & 0x0f));
                     col4>>=4;
-                    dstdata.setPix(WRITEORDL4,pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD2<<1)+1,pal.color((UINT8)col4 & 0x0f));
                     col4>>=4;
-                    dstdata.setPix(WRITEORDL7,pal.color((UINT8)col4 & 0x0f));
+                    dstdata.setPix((WRITEORD3<<1),pal.color((UINT8)col4 & 0x0f));
                     col4>>=4;
-                    dstdata.setPix(WRITEORDL6,pal.color((UINT8)col4));
+                    dstdata.setPix((WRITEORD3<<1)+1,pal.color((UINT8)col4));
                     dstdata.incrementx(8);
                 }
                 srcdata._p = (UINT8 *)sd4;
@@ -677,7 +658,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     dstdata.setPix(0,pal.color( srcdata.getp() ));
                     dstdata.incrementx(1);
                 }
-                srcdata.incrementx(srcmodulo);
+                srcdata.incrementx(leftskip);
                 dstdata.incrementx(destmodulo);
 
                 dstheight--;
@@ -713,28 +694,28 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     if ((col4 = *(sd4++)) != trans8)
                     {
                         UINT8 col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL6,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD3<<1)+1,pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4& 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL7,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD3<<1),pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL4,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD2<<1)+1,pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL5,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD2<<1),pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4& 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL2,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD1<<1)+1,pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4& 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL3,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD1<<1),pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL0,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD0<<1)+1,pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4;
-                        if(col != transpen) dstdata.setPix(WRITEORDL1,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD0<<1),pal.color(col));
 
                     }
                 }
@@ -745,7 +726,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     if (col != transpen) dstdata.setPix(0,pal.color(col));
                     dstdata.incrementx(-1);
                 }
-                srcdata.incrementx(srcmodulo);
+                srcdata.incrementx(leftskip);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             }
@@ -773,28 +754,28 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     if ((col4 = *(sd4++)) != trans8)
                     {
                         UINT8 col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL1,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD0<<1),pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL0,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD0<<1)+1,pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL3,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD1<<1),pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL2,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD1<<1)+1,pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL5,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD2<<1),pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL4,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD2<<1)+1,pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL7,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD3<<1),pal.color(col));
                         col4>>=4;
                         col = (UINT8)col4 & 0x0f;
-                        if(col != transpen) dstdata.setPix(WRITEORDL6,pal.color(col));
+                        if(col != transpen) dstdata.setPix((WRITEORD3<<1)+1,pal.color(col));
                     }
                     dstdata.incrementx(8);
                 }
@@ -805,7 +786,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     if (col != transpen) dstdata.setPix(0,pal.color(col));
                     dstdata.incrementx(1);
                 }
-                srcdata.incrementx(srcmodulo);
+                srcdata.incrementx(leftskip);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             } // end while h

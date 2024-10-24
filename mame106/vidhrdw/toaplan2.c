@@ -146,7 +146,7 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-
+#include "drawgfxn.h"
 
 
 #define TOAPLAN2_BG_VRAM_SIZE   0x1000	/* Background RAM size */
@@ -1433,7 +1433,8 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int co
 					dgp0.flipy = flipy;
 					dgp0.sx = sx;
 					dgp0.sy = sy;
-					drawgfx(&dgp0);
+			//re		drawgfx(&dgp0);
+                    drawgfx_clut16_Src8(&dgp0);
 
 					sprite++ ;
 				}

@@ -99,10 +99,11 @@ void QProc::process()
 //    "wb3"
 //    "bublbobl"
 //   "dino"
+                 "batrider"
 //"qbert"
 //    "rastan"
 
- "silkworm"
+// "silkworm"
 // "sgemf"
 //                "gforce2"
 //      "mslug"
