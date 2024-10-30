@@ -348,7 +348,8 @@ Quick review of the system16 hardware:
 #include "driver.h"
 #include "segaic16.h"
 #include "vidhrdw/res_net.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 
 
 /*************************************
@@ -2470,23 +2471,52 @@ static void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *
  *
  *******************************************************************************************/
 
-#define yboard_draw_pixel() 												\
-	/* only draw if onscreen */												\
-	if (x >= minx && x <= maxx && ind < 0x1fe)								\
-		dest[x] = ind | colorpri;											\
+
+static inline void yboard_draw_pixel(int x,int minx, int maxx, int ind, int colorpri,UINT16 *dest )
+{
+    if (x >= minx && x <= maxx && ind < 0x01fe)
+        dest[x] = ind | colorpri;
+}
+
+int nbframe =0;
 
 static void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = memory_region_length(REGION_GFX1) / 0x80000;
+	UINT8 numbanks = (UINT8)(memory_region_length(REGION_GFX1) / 0x80000);
 	const UINT64 *spritebase = (const UINT64 *)memory_region(REGION_GFX1);
 	const UINT16 *rotatebase = rotate[0].buffer ? rotate[0].buffer : rotate[0].rotateram;
-	UINT8 visited[0x1000];
+	static UINT8 visited[0x1000];
 	UINT16 *data;
-	int next = 0;
+	UINT32 next = 0;
 	int y;
 
 	/* reset the visited list */
 	memset(visited, 0, sizeof(visited));
+
+int nbi=0;
+int jj=0;
+FILE *dh= NULL;
+if(nbframe == 1200)
+{
+    dh= fopen("sprb.txt","wb");
+}
+// if(nbframe == 1200)
+// {  int jj=0;
+//    FILE *dh= fopen("spr.txt","wb");
+//    for(int i=0;i<0x8000 ; i+=2)
+//    {
+
+//        fprintf(dh,"%04x%04x ",(int)info->spriteram[i],(int)info->spriteram[i+1]);
+//        jj++;
+//        if(jj==16) {
+//            fprintf(dh,"\n");
+//            jj=0;
+//        }
+//    }
+//    fclose(dh);
+//    exit(1);
+// }
+
 
 	/* clear out any scanlines we might be using */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -2494,28 +2524,38 @@ static void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *
 			memset(&((UINT16 *)bitmap->line[y])[cliprect->min_x], 0xff, (cliprect->max_x - cliprect->min_x + 1) * sizeof(UINT16));
 
 	/* now scan backwards and render the sprites in order */
-	for (data = info->spriteram; !(data[0] & 0x8000) && !visited[next]; data = info->spriteram + next * 8)
+	for (data = info->spriteram; !(data[0] & 0x8000) && !visited[next]; data = info->spriteram + (next<<3))
 	{
 		int hide    = (data[0] & 0x5000);
 		UINT16 *indirect = info->spriteram + ((data[0] & 0x7ff) << 4);
 		int bank    = ((data[1] >> 8) & 0x10) | ((data[2] >> 12) & 0x0f);
-		int xpos    = (data[1] & 0xfff) - 0x600;
-		int top     = (data[2] & 0xfff) - 0x600;
+		int xpos    = (data[1] & 0x0fff) - 0x600;
+		int top     = (data[2] & 0x0fff) - 0x600;
 		UINT16 addr = data[3];
 		int height  = data[4];
 		int ydelta  = (data[5] & 0x4000) ? 1 : -1;
 		int flip    = (~data[5] >> 13) & 1;
 		int xdelta  = (data[5] & 0x1000) ? 1 : -1;
 		int zoom    = data[5] & 0x7ff;
-		int colorpri= (data[6] << 1) & 0xfe00;
+		int colorpri= (data[6] << 1) & 0x0000fe00;
 		int pitch   = (INT8)data[6];
 		int x, y, ytarget, yacc = 0, pix, ind;
 		const UINT64 *spritedata;
 		UINT16 offs;
 
+        if(dh)
+        {
+            fprintf(dh,"%04x ",(int)next);
+            jj++;
+                if(jj==32) {
+                    fprintf(dh,"\n");
+                    jj=0;
+                }
+         }
+
 		/* note that we've visited this entry and get the offset of the next one */
 		visited[next] = 1;
-		next = data[7] & 0xfff;
+		next = data[7] & 0x0fff;
 
 		/* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
 		if (hide || height == 0)
@@ -2570,22 +2610,22 @@ static void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *
 							UINT64 pixels = spritedata[++offs];
 
 							/* draw four pixels */
-							pix = (pixels >> 60) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 56) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 52) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 48) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 44) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 40) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 36) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 32) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 28) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 24) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 20) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 16) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 12) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  8) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  4) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  0) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 60) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 56) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 52) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 48) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 44) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 40) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 36) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 32) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 28) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 24) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 20) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 16) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 12) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >>  8) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >>  4) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >>  0) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
 
 							/* stop if the second-to-last pixel in the group was 0xf */
 							if (pix == 0x0f)
@@ -2603,22 +2643,22 @@ static void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *
 							UINT64 pixels = spritedata[--offs];
 
 							/* draw four pixels */
-							pix = (pixels >>  0) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  4) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  8) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 12) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 16) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 20) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 24) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 28) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 32) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 36) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 40) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 44) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 48) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 52) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 56) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 60) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >>  0) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >>  4) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >>  8) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 12) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 16) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 20) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 24) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 28) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 32) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 36) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 40) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 44) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 48) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 52) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 56) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
+							pix = (pixels >> 60) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
 
 							/* stop if the second-to-last pixel in the group was 0xf */
 							if (pix == 0x0f)
@@ -2633,7 +2673,29 @@ static void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *
 			addr += pitch * (yacc >> 9);
 			yacc &= 0x1ff;
 		}
+		nbi++;
 	}
+	if(nbframe==1200)
+	{
+        printf("nbi:%d\n",nbi);
+	}
+	if(dh)
+	{
+
+        if(dh)
+        {
+            fprintf(dh,"%04x ",(int)next);
+            jj++;
+                if(jj==32) {
+                    fprintf(dh,"\n");
+                    jj=0;
+                }
+         }
+
+	 fclose(dh);
+	 exit(1);
+	 }
+
 }
 
 

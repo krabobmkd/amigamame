@@ -609,13 +609,25 @@ opbase_handler memory_set_opbase_handler(int cpunum, opbase_handler function)
 	return old;
 }
 
-
+//#define DOTRACEMEM 1
 /*-------------------------------------------------
     memory_set_opbase - generic opcode base changer
 -------------------------------------------------*/
 // krb sez: diz the original.
+#if DOTRACEMEM
+extern void openTraceFH();
+extern FILE *traceFH;
+#endif
 void memory_set_opbase(offs_t pc)
 {
+//    printf("\nmsetopbase:%08x\n",pc);
+//Re    if(pc == 0x000330a6) exit(1);
+#if DOTRACEMEM
+    openTraceFH();
+    fprintf(traceFH,"\nmsetopbase:%08x\n",pc);
+    fflush(traceFH);
+
+#endif
 	address_space *space = &active_address_space[ADDRESS_SPACE_PROGRAM];
 
 	UINT8 *base = NULL, *based = NULL;

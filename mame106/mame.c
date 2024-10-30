@@ -1057,6 +1057,7 @@ static void destroy_machine(void)
 /*-------------------------------------------------
     init_machine - initialize the emulated machine
 -------------------------------------------------*/
+mame_time mame_timer_next_fire_time();
 
 static void init_machine(void)
 {
@@ -1097,6 +1098,14 @@ static void init_machine(void)
 	/* this must be done before cpu_init so that CPU's can allocate timers */
 	timer_init();
 	soft_reset_timer = timer_alloc(soft_reset);
+
+printf(" ** init_machine after timer_alloc\n");
+	mame_time target = mame_timer_next_fire_time();
+//	mame_time base = mame_timer_get_time();
+//	int cpunum, ran;
+
+    printf("cpuexec_timeslice target %d %ld \n",target.seconds , target.subseconds);
+
 
 	/* initialize the memory system for this game */
 	/* this must be done before cpu_init so that set_context can look up the opcode base */

@@ -99,13 +99,14 @@ void QProc::process()
 //    "wb3"
 //    "bublbobl"
 //   "dino"
-                 "batrider"
+//                 "batrider"
+//"pdrift"
 //"qbert"
 //    "rastan"
 
 // "silkworm"
 // "sgemf"
-//                "gforce2"
+                "gforce2"
 //      "mslug"
 //                "mp_sor2"
     );
@@ -245,15 +246,15 @@ int osd_skip_this_frame(void)
 {
     return 0;
 }
+// nbframe
 extern "C" {
-extern int palettesetcount;
+extern int nbframe;
 }
 void osd_update_video_and_audio(struct _mame_display *display)
 {
     _display = display;
+nbframe++;
 
-if(palettesetcount>0)    printf("palettesetcount:%d\n",palettesetcount);
-    palettesetcount = 0;
 //    m_mutex.lock();
 //    m_mutex.unlock();
 

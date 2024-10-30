@@ -294,29 +294,10 @@ void osd_close_display(void)
   simulated using the keyboard LEDs, or in other ways e.g. by placing graphics
   on the window title bar.
 */
-//extern "C"
-//{
-//    extern int tm_ge_subtable;
-//    extern int tm_l_subtable;
-//    extern int tm_nbSubStatic;
-//    extern int tm_nbStatic;
-//}
-//int framestat=0;
-extern int dbgtracenbexec;
+
 void osd_update_video_and_audio(struct _mame_display *display)
 {
 
-//    framestat++;
-//    if(framestat>=60)
-//    {
-//        printf("stat: >subt:%d <subt:%d <sstatic:%d stc:%d \n",
-//        tm_ge_subtable,tm_l_subtable,tm_nbSubStatic,tm_nbStatic);
-//        tm_ge_subtable =tm_l_subtable=tm_nbSubStatic=tm_nbStatic=0;
-//        framestat = 0;
-//    }
-
-//    printf("nbcpuexec:%d\n",dbgtracenbexec);
-    dbgtracenbexec=0;
     if(GetStartTime)
     {
         StartTime = osd_cycles();

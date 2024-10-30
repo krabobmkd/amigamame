@@ -101,6 +101,101 @@ static const struct m68k_memory_interface interface_d16 =
 
 #endif // A68K0
 
+
+
+// - - - -override to trace calls
+//#define DOTRACEMEM 1
+#if DOTRACEMEM
+#include <stdio.h>
+#include <stdlib.h>
+FILE *traceFH = NULL;
+UINT32 nbt=0;
+UINT32 nbtt=0;
+void openTraceFH()
+{
+    nbtt++;
+    nbt++;
+ //   if(nbt==131072*16) exit(1);
+    if(traceFH)
+    {
+        if(nbtt==16) {
+        nbtt = 0;
+        fprintf(traceFH,"\n");
+        }
+     return;
+    }
+    traceFH = fopen("memtrace.txt","wb");
+}
+
+UINT32 readlong_d16(offs_t address  REGM(d0));
+void writelong_d16(offs_t address  REGM(d0), UINT32 data  REGM(d1));
+UINT8 m68kmemtrace_read8(offs_t adr)
+{
+    UINT8 v = program_read_byte_16be(adr);
+    openTraceFH();
+    fprintf(traceFH,"r:%08x ______%02x",adr,(int)v);
+    fflush(traceFH);
+    return v;
+}
+
+UINT16 m68kmemtrace_read16(offs_t adr)
+{
+    UINT16 v = program_read_word_16be(adr);
+    openTraceFH();
+    fprintf(traceFH,"r:%08x ____%04x",adr,(int)v);
+    fflush(traceFH);
+    return v;
+}
+
+UINT32 m68kmemtrace_read32(offs_t adr)
+{
+    UINT32 v = readlong_d16(adr);
+    openTraceFH();
+    fprintf(traceFH,"r:%08x %08x",adr,(int)v);
+    fflush(traceFH);
+    return v;
+}
+// - - -
+void m68kmemtrace_write8(offs_t adr,UINT8 data)
+{
+    adr = adr & 0x00ffffff;
+    program_write_byte_16be(adr,data);
+    openTraceFH();
+    fprintf(traceFH,"w:%08x ______%02x",adr,(int)data);
+    fflush(traceFH);
+}
+
+void m68kmemtrace_write16(offs_t adr,UINT16 data)
+{
+    adr = adr & 0x00ffffff;
+    program_write_word_16be(adr,data);
+    openTraceFH();
+    fprintf(traceFH,"w:%08x ____%04x",adr,(int)data);
+    fflush(traceFH);
+}
+
+void m68kmemtrace_write32(offs_t adr,UINT32 data)
+{
+    adr = adr & 0x00ffffff;
+    writelong_d16(adr,data);
+    openTraceFH();
+    fprintf(traceFH,"w:%08x %08x",adr,(int)data);
+    fflush(traceFH);
+}
+struct m68k_memory_interface m68k_memory_tracer_d16 ={
+    0,
+    m68kmemtrace_read8,
+    m68kmemtrace_read16,
+    m68kmemtrace_read32,
+    m68kmemtrace_write8,
+    m68kmemtrace_write16,
+    m68kmemtrace_write32,
+    NULL,
+    memory_readmovem32_wr16,
+    memory_writemovem32_wr16_reverse,
+};
+#endif
+
 /****************************************************************************
  * 32-bit data memory interface
  ****************************************************************************/
@@ -322,8 +417,11 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 //#else
 //    p68k->mem = interface_d16;
 //#endif
-    p68k->mem = interface_xfast16;
-
+#if DOTRACEMEM
+    p68k->mem =   m68k_memory_tracer_d16;
+#else
+    p68k->mem =   interface_xfast16;
+#endif
     m68k_state_register(p68k,"m68000", index);
 	m68k_set_int_ack_callback(p68k, irqcallback);
 }

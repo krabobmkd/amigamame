@@ -837,42 +837,53 @@ int m68k_execute(int num_cycles)
 //        :  "d0","d1"
 //        );
 //#else
-        uint16 ir;
-		do
-		{
-			REG_PPC = REG_PC;
-//    printf("68k PC:%08x\n",REG_PC);
-			// Read an instruction and call its handler
-			/*REG_IRSLOT =*/ ir = m68ki_read_imm_16(p68k);
-//            printf("%04x ",(int)ir );
-//                        if(ir == 0x4eba)
-//                        {
+//        uint16 ir;
+//		do
+//		{
+//			REG_PPC = REG_PC;
+////    printf("68k PC:%08x\n",REG_PC);
+//			// Read an instruction and call its handler
+//			/*REG_IRSLOT =*/ ir = m68ki_read_imm_16(p68k);
+////            printf("%04x ",(int)ir );
+////                        if(ir == 0x4eba)
+////                        {
 
-//                            printf("%d",ir);
-//                        }
-//    printf("68k IR:%08x\n",(int)ir);
-//    exit(0);
-			m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
-			m68ki_instruction_jump_table[ir](p68k,ir);
-#ifndef OPTIM68K_SQUEEZEPPCREG
-			// Record previous program counter
-			REG_PPC = REG_PC;
-#endif
-            // try a bit of unroll
-            /*REG_IRSLOT =*/ ir = m68ki_read_imm_16(p68k);
-//            printf("%04x ",(int)ir );
+////                            printf("%d",ir);
+////                        }
+////    printf("68k IR:%08x\n",(int)ir);
+////    exit(0);
+//			m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
+//			m68ki_instruction_jump_table[ir](p68k,ir);
+//#ifndef OPTIM68K_SQUEEZEPPCREG
+//			// Record previous program counter
+//			REG_PPC = REG_PC;
+//#endif
+//            // try a bit of unroll
+//            /*REG_IRSLOT =*/ ir = m68ki_read_imm_16(p68k);
+////            printf("%04x ",(int)ir );
 
-//            ret++;
-//            rest2++;
-//            if(ret==8) { printf("\n"); ret=0; }
-            m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
-            m68ki_instruction_jump_table[ir](p68k,ir);
-//    if(rest2 == 1000000) exit(1);
+////            ret++;
+////            rest2++;
+////            if(ret==8) { printf("\n"); ret=0; }
+//            m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
+//            m68ki_instruction_jump_table[ir](p68k,ir);
+////    if(rest2 == 1000000) exit(1);
 
 
-		} while(m68k_ICount > 0);
+//		} while(m68k_ICount > 0);
 
 //#endif
+    // NOTE: unrolling can break the "consume cycles" logic by one instr.
+    // which was enough to block "pdrift" very first instructions at boot.
+    // this on has multiple 68k,...
+        do
+		{
+			REG_PPC = REG_PC;
+			uint16 ir = m68ki_read_imm_16(p68k);
+			m68ki_instruction_jump_table[ir](p68k,ir);
+            m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
+		} while(m68k_ICount > 0);
+
         /* original:
         do
 		{

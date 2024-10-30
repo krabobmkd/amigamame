@@ -785,13 +785,6 @@ static void recompute_fps(int skipped_it)
     plus updating the screen during normal
     operations
 -------------------------------------------------*/
-//#define KRB_TRACECPUANDVIDEO 1
-#ifdef KRB_TRACECPUANDVIDEO
-
-extern cycles_t dbgcyc_startinterupts;
-extern cycles_t dbgcyc_endinterupts;
-extern cycles_t dbgcyc_interuptaccum;
-#endif
 
 void updatescreen(void)
 {
@@ -802,15 +795,7 @@ void updatescreen(void)
 	if (!osd_skip_this_frame())
 	{
 		profiler_mark(PROFILER_VIDEO);
-#ifdef KRB_TRACECPUANDVIDEO
-dbgcyc_startinterupts = osd_cycles();
-#endif
 		draw_screen();
-#ifdef KRB_TRACECPUANDVIDEO
-dbgcyc_endinterupts = osd_cycles();
-dbgcyc_interuptaccum += dbgcyc_endinterupts -dbgcyc_startinterupts;
-#endif
-
 		profiler_mark(PROFILER_END);
 	}
 

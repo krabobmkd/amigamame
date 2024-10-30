@@ -469,28 +469,12 @@ void watchdog_enable(int enable)
 #pragma mark CPU SCHEDULING
 #endif
 
-//#define KRB_TRACECPUANDVIDEO 1
-
-#ifdef KRB_TRACECPUANDVIDEO
-cycles_t lastCheckDone=0;
-cycles_t dbgcyc_startcpu[12] = {0}; // osd_cycles(void)
-cycles_t dbgcyc_endcpu = 0;
-
-cycles_t dbgcyc_startinterupts = 0;
-cycles_t dbgcyc_endinterupts = 0;
-
-cycles_t dbgcyc_cpuaccum=0;
-cycles_t dbgcyc_interuptaccum=0;
-
-#endif
-
 /*************************************
  *
  *  Execute all the CPUs for one
  *  timeslice
  *
  *************************************/
-int dbgtracenbexec=0;
 
 void cpuexec_timeslice(void)
 {
@@ -509,37 +493,7 @@ void cpuexec_timeslice(void)
 		cpu[cpunum].suspend = cpu[cpunum].nextsuspend;
 		cpu[cpunum].eatcycles = cpu[cpunum].nexteatcycles;
 	}
-#ifdef KRB_TRACECPUANDVIDEO
-    cycles_t cnow = osd_cycles();
-    if(lastCheckDone==0)
-    {
-        lastCheckDone = cnow;
-    } else
-    {
-        cycles_t delta = cnow - lastCheckDone;
-        if(delta > 2*1000000LL) {
-          cycles_t  dbgcyc_cpuaccuml = dbgcyc_cpuaccum>>14;
-          cycles_t  dbgcyc_interuptaccuml = dbgcyc_interuptaccum>>14;
-          cycles_t total = dbgcyc_cpuaccuml+dbgcyc_interuptaccuml;
-          if(total>0)
-          {
-            int p = (100*dbgcyc_cpuaccuml)/(total);
-            printf("cpu:%d%\n",p);
-          }
 
-            lastCheckDone = cnow;
-        }
-    }
-    cnow = osd_cycles();
-    dbgcyc_startcpu[0] = cnow;
-//    cycles_t lastCheckDone=0;
-//    cycles_t dbgcyc_startcpu[12] = {0}; // osd_cycles(void)
-//    cycles_t dbgcyc_endcpu = 0;
-
-//    cycles_t dbgcyc_startinterupts = 0;
-//    cycles_t dbgcyc_endinterupts = 0;
-#endif
-                dbgtracenbexec++;
 	/* loop over CPUs */
 	for (cpunum = 0; Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum++)
 	{
@@ -582,9 +536,6 @@ void cpuexec_timeslice(void)
 				}
 			}
 		}
-#ifdef KRB_TRACECPUANDVIDEO
-dbgcyc_startcpu[cpunum+1] = osd_cycles();
-#endif
 	}
 
 	/* update the local times of all CPUs */
@@ -608,17 +559,10 @@ dbgcyc_startcpu[cpunum+1] = osd_cycles();
 		cpu[cpunum].suspend = cpu[cpunum].nextsuspend;
 		cpu[cpunum].eatcycles = cpu[cpunum].nexteatcycles;
 	}
-#ifdef KRB_TRACECPUANDVIDEO
-dbgcyc_cpuaccum += dbgcyc_startcpu[cpunum] -dbgcyc_startcpu[0];
-//dbgcyc_startinterupts = osd_cycles();
-#endif
+
 	/* update the global time */
 	mame_timer_set_global_time(target);
-#ifdef KRB_TRACECPUANDVIDEO
-//dbgcyc_endinterupts = osd_cycles();
-//dbgcyc_interuptaccum += dbgcyc_endinterupts -dbgcyc_startinterupts;
 
-#endif
 	/* huh? something for the debugger */
 	#if defined(MAME_DEBUG) && !defined(NEW_DEBUGGER)
 	{

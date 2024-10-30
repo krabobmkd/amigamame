@@ -644,7 +644,6 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
             & active_address_space[0].writehandlers[entry].mask;
 	if (entry >= STATIC_RAM)
 	{
-    	//write32_handler writer = active_address_space[0].writehandlers[entry].handler.write.handler32;
     	write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
         UINT16 i = 0;
         UINT32 count = 0;

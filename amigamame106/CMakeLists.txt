@@ -49,9 +49,9 @@ if(AMIGA)
 	else()
 		list(APPEND AMIGA_COMPILER_OPTIONS -m68020)
 	endif()
-
+#  -fsingle-precision-constant -> dont use that need double precs for timer.h/.c !!
 	if(MAME_USE_HARDFLOAT)
-		list(APPEND AMIGA_COMPILER_OPTIONS -mhard-float -ffast-math -fsingle-precision-constant)
+		list(APPEND AMIGA_COMPILER_OPTIONS -mhard-float -ffast-math)
 	else()
 		list(APPEND AMIGA_COMPILER_OPTIONS -msoft-float)
 	endif()
@@ -67,9 +67,6 @@ if(DOMAMELOG)
 	list(APPEND AMIGA_COMPILER_OPTIONS -DDOMAMELOG=1)
 
 endif()
-# test -fsingle-precision-constant
-# test -mpc32
-#list(APPEND AMIGA_COMPILER_OPTIONS -fsingle-precision-constant )
 
 set(COMMONLIBS "../../amigacommonlibs")
 

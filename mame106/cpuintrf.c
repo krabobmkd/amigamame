@@ -813,7 +813,6 @@ INLINE void set_cpu_context(int cpunum)
 
 void cpuintrf_push_context(int cpunum)
 {
-   //printf("cpuintrf_push_context:\n");
 	/* push the old context onto the stack */
 	cpu_context_stack[cpu_context_stack_ptr++] = activecpu;
 
@@ -828,7 +827,6 @@ void cpuintrf_push_context(int cpunum)
 
 void cpuintrf_pop_context(void)
 {
-   //printf("    cpuintrf_pop_context:%d\n",cpunum);
 	/* push the old context onto the stack */
 	int cpunum = cpu_context_stack[--cpu_context_stack_ptr];
 
@@ -1008,19 +1006,14 @@ void cpuintrf_set_dasm_override(unsigned (*dasm_override)(int cpunum, char *buff
 
 int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, int (*irqcallback)(int))
 {
-//printf("cpuintrf_init_cpu:%d, %d\n",cpunum,cputype);
-//printf("cpu[cpunum].intf.context_size:%d\n",cpu[cpunum].intf.context_size);
 	/* allocate a context buffer for the CPU */
 	cpu[cpunum].context = auto_malloc(cpu[cpunum].intf.context_size);
 	memset(cpu[cpunum].context, 0, cpu[cpunum].intf.context_size);
 
 	/* initialize the CPU and stash the context */
-//    printf("cpuintrf_init_cpu:%d\n",cpunum);
 	activecpu = cpunum;
 	(*cpu[cpunum].intf.init)(cpunum, clock, config, irqcallback);
 	(*cpu[cpunum].intf.get_context)(cpu[cpunum].context);
-
-//    printf("cpuintrf_init_cpu: activecpu -1\n");
 	activecpu = -1;
 
 	/* clear out the registered CPU for this family */
@@ -1038,8 +1031,6 @@ int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, in
 
 void cpuintrf_exit_cpu(int cpunum)
 {
-//    printf("cpuintrf_exit_cpu:%d ->may use exit()\n",cpunum);
-
 	/* if the CPU core defines an exit function, call it now */
 	if (cpu[cpunum].intf.exit)
 	{
