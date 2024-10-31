@@ -2493,13 +2493,13 @@ static void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *
 	/* reset the visited list */
 	memset(visited, 0, sizeof(visited));
 
-int nbi=0;
-int jj=0;
-FILE *dh= NULL;
-if(nbframe == 1200)
-{
-    dh= fopen("sprb.txt","wb");
-}
+//int nbi=0;
+//int jj=0;
+//FILE *dh= NULL;
+//if(nbframe == 1200)
+//{
+//    dh= fopen("sprb.txt","wb");
+//}
 // if(nbframe == 1200)
 // {  int jj=0;
 //    FILE *dh= fopen("spr.txt","wb");
@@ -2543,15 +2543,15 @@ if(nbframe == 1200)
 		const UINT64 *spritedata;
 		UINT16 offs;
 
-        if(dh)
-        {
-            fprintf(dh,"%04x ",(int)next);
-            jj++;
-                if(jj==32) {
-                    fprintf(dh,"\n");
-                    jj=0;
-                }
-         }
+//        if(dh)
+//        {
+//            fprintf(dh,"%04x ",(int)next);
+//            jj++;
+//                if(jj==32) {
+//                    fprintf(dh,"\n");
+//                    jj=0;
+//                }
+//         }
 
 		/* note that we've visited this entry and get the offset of the next one */
 		visited[next] = 1;
@@ -2673,28 +2673,28 @@ if(nbframe == 1200)
 			addr += pitch * (yacc >> 9);
 			yacc &= 0x1ff;
 		}
-		nbi++;
+	//	nbi++;
 	}
-	if(nbframe==1200)
-	{
-        printf("nbi:%d\n",nbi);
-	}
-	if(dh)
-	{
+//	if(nbframe==1200)
+//	{
+//        printf("nbi:%d\n",nbi);
+//	}
+//	if(dh)
+//	{
 
-        if(dh)
-        {
-            fprintf(dh,"%04x ",(int)next);
-            jj++;
-                if(jj==32) {
-                    fprintf(dh,"\n");
-                    jj=0;
-                }
-         }
+//        if(dh)
+//        {
+//            fprintf(dh,"%04x ",(int)next);
+//            jj++;
+//                if(jj==32) {
+//                    fprintf(dh,"\n");
+//                    jj=0;
+//                }
+//         }
 
-	 fclose(dh);
-	 exit(1);
-	 }
+//	 fclose(dh);
+//	 exit(1);
+//	 }
 
 }
 

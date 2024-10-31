@@ -101,18 +101,18 @@ struct m68k_cpu_instance *m68k_getActivecpu();
 
 
 /* Allow for architectures that don't have 16-bit sizes */
-#if USHRT_MAX == 0xffff
-	#define MAKE_INT_16(A) (sint16)(A)
-#else
-	#undef  sint16
-	#define sint16 signed   int
-	#undef  uint16
-	#define uint16 unsigned int
-	INLINE sint MAKE_INT_16(uint value)
-	{
-		return (value & 0x8000) ? value | ~0xffff : value & 0xffff;
-	}
-#endif /* USHRT_MAX == 0xffff */
+//krb test #if USHRT_MAX == 0xffff
+	#define MAKE_INT_16(A) (signed short)(A)
+//#else
+//	#undef  sint16
+//	#define sint16 signed   int
+//	#undef  uint16
+//	#define uint16 unsigned int
+//	INLINE sint MAKE_INT_16(uint value)
+//	{
+//		return (value & 0x8000) ? value | ~0xffff : value & 0xffff;
+//	}
+//#endif /* USHRT_MAX == 0xffff */
 
 
 /* Allow for architectures that don't have 32-bit sizes */
@@ -627,8 +627,12 @@ struct m68k_cpu_instance *m68k_getActivecpu();
 #define EA_AY_AI_16()  EA_AY_AI_8()
 #define EA_AY_AI_32()  EA_AY_AI_8()
 #define EA_AY_PI_8()   (AY++)                                /* postincrement (size = byte) */
-#define EA_AY_PI_16()  ((AY+=2)-2)                           /* postincrement (size = word) */
+
+
+//? #define EA_AY_PI_16()  ((AY+=2)-2)                           /* postincrement (size = word) */
+
 #define EA_AY_PI_32()  ((AY+=4)-4)                           /* postincrement (size = long) */
+
 #define EA_AY_PD_8()   (--AY)                                /* predecrement (size = byte) */
 #define EA_AY_PD_16()  (AY-=2)                               /* predecrement (size = word) */
 #define EA_AY_PD_32()  (AY-=4)                               /* predecrement (size = long) */

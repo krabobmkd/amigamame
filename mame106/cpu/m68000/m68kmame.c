@@ -104,13 +104,32 @@ static const struct m68k_memory_interface interface_d16 =
 
 
 // - - - -override to trace calls
-//#define DOTRACEMEM 1
+#define DOTRACEMEM 1
 #if DOTRACEMEM
 #include <stdio.h>
 #include <stdlib.h>
 FILE *traceFH = NULL;
 UINT32 nbt=0;
+int mintrace=(746265*32)+25;
 UINT32 nbtt=0;
+/*
+
+746265 (*32)
++27
+
+dernier bon:
+r:ffffdf00 ____04bc
+
+r:ffffe3bc ____de88 faux   12
+r:ffffe3be ____deb0 bon    14
+
+
+last bon:
+m68k_op_adda_16_pi
+	prev A value: ffffdf00
+
+
+*/
 void openTraceFH()
 {
     nbtt++;
@@ -118,7 +137,7 @@ void openTraceFH()
  //   if(nbt==131072*16) exit(1);
     if(traceFH)
     {
-        if(nbtt==16) {
+        if(nbtt==32) {
         nbtt = 0;
         fprintf(traceFH,"\n");
         }
@@ -133,17 +152,21 @@ UINT8 m68kmemtrace_read8(offs_t adr)
 {
     UINT8 v = program_read_byte_16be(adr);
     openTraceFH();
-    fprintf(traceFH,"r:%08x ______%02x",adr,(int)v);
-    fflush(traceFH);
+//    fprintf(traceFH,"r:%08x ______%02x",adr,(int)v);
+
     return v;
 }
 
 UINT16 m68kmemtrace_read16(offs_t adr)
 {
     UINT16 v = program_read_word_16be(adr);
+    if(nbt == mintrace)
+    {
+        printf("?");
+    }
     openTraceFH();
-    fprintf(traceFH,"r:%08x ____%04x",adr,(int)v);
-    fflush(traceFH);
+//    fprintf(traceFH,"r:%08x ____%04x",adr,(int)v);
+
     return v;
 }
 
@@ -151,8 +174,8 @@ UINT32 m68kmemtrace_read32(offs_t adr)
 {
     UINT32 v = readlong_d16(adr);
     openTraceFH();
-    fprintf(traceFH,"r:%08x %08x",adr,(int)v);
-    fflush(traceFH);
+//    fprintf(traceFH,"r:%08x %08x",adr,(int)v);
+
     return v;
 }
 // - - -
@@ -161,8 +184,8 @@ void m68kmemtrace_write8(offs_t adr,UINT8 data)
     adr = adr & 0x00ffffff;
     program_write_byte_16be(adr,data);
     openTraceFH();
-    fprintf(traceFH,"w:%08x ______%02x",adr,(int)data);
-    fflush(traceFH);
+//    fprintf(traceFH,"w:%08x ______%02x",adr,(int)data);
+
 }
 
 void m68kmemtrace_write16(offs_t adr,UINT16 data)
@@ -170,8 +193,8 @@ void m68kmemtrace_write16(offs_t adr,UINT16 data)
     adr = adr & 0x00ffffff;
     program_write_word_16be(adr,data);
     openTraceFH();
-    fprintf(traceFH,"w:%08x ____%04x",adr,(int)data);
-    fflush(traceFH);
+//    fprintf(traceFH,"w:%08x ____%04x",adr,(int)data);
+
 }
 
 void m68kmemtrace_write32(offs_t adr,UINT32 data)
@@ -179,8 +202,8 @@ void m68kmemtrace_write32(offs_t adr,UINT32 data)
     adr = adr & 0x00ffffff;
     writelong_d16(adr,data);
     openTraceFH();
-    fprintf(traceFH,"w:%08x %08x",adr,(int)data);
-    fflush(traceFH);
+//    fprintf(traceFH,"w:%08x %08x",adr,(int)data);
+
 }
 struct m68k_memory_interface m68k_memory_tracer_d16 ={
     0,

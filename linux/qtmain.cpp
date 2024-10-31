@@ -254,6 +254,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 {
     _display = display;
 nbframe++;
+// if(nbframe==1200) exit(1);
 
 //    m_mutex.lock();
 //    m_mutex.unlock();

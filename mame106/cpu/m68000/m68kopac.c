@@ -1250,16 +1250,19 @@ void m68k_op_adda_16_a(M68KOPT_PARAMS)
 void m68k_op_adda_16_ai(M68KOPT_PARAMS)
 {
 	uint* r_dst = &AX;
+    uint prev = *r_dst;
 
-	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(OPER_AY_AI_16(M68KOPT_PASSPARAMS)));
+	*r_dst = MASK_OUT_ABOVE_32(prev + MAKE_INT_16(OPER_AY_AI_16(M68KOPT_PASSPARAMS)));
 }
 
 
 void m68k_op_adda_16_pi(M68KOPT_PARAMS)
 {
 	uint* r_dst = &AX;
-
-	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(OPER_AY_PI_16(M68KOPT_PASSPARAMS)));
+    uint prev = *r_dst;
+    sint16 x = MAKE_INT_16(OPER_AY_PI_16(M68KOPT_PASSPARAMS));
+    BLABLA
+	*r_dst = prev + (signed int)x;
 }
 
 
