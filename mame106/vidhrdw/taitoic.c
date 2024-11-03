@@ -534,6 +534,7 @@ Newer version of the I/O chip ?
 
 #include "driver.h"
 #include "taitoic.h"
+#include "drawgfxn.h"
 
 #define TOPSPEED_ROAD_COLORS
 
@@ -1376,7 +1377,8 @@ void PC090OJ_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,int pri
 		dgp0.flipy = flipy;
 		dgp0.sx = x;
 		dgp0.sy = y;
-		drawgfx(&dgp0);
+		//drawgfx(&dgp0);
+        drawgfx_clut16_Src8_prio(&dgp0);
 	}
 	} // end of patch paragraph
 
