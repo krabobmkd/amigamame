@@ -517,7 +517,7 @@ void m68k_op_neg_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_neg_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = p68k->mem.read16(ea);
 	uint res = 0 - src;
 
@@ -928,7 +928,7 @@ void m68k_op_negx_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_negx_16_pi(M68KOPT_PARAMS)
 {
-	uint ea  = EA_AY_PI_16();
+	uint ea  = EA_AY_PI_16(p68k,regir);
 	uint src = p68k->mem.read16(ea);
 	uint res = 0 - MASK_OUT_ABOVE_16(src) - XFLAG_AS_1();
 
@@ -1339,7 +1339,7 @@ void m68k_op_not_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_not_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint res = MASK_OUT_ABOVE_16(~p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
@@ -2058,7 +2058,7 @@ void m68k_op_or_16_re_ai(M68KOPT_PARAMS)
 
 void m68k_op_or_16_re_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint res = MASK_OUT_ABOVE_16(DX | p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
@@ -2413,7 +2413,7 @@ void m68k_op_ori_16_ai(M68KOPT_PARAMS)
 void m68k_op_ori_16_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint res = MASK_OUT_ABOVE_16(src | p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
@@ -2952,7 +2952,7 @@ void m68k_op_ror_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_ror_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = p68k->mem.read16(ea);
 	uint res = ROR_16(src, 1);
 
@@ -3213,7 +3213,7 @@ void m68k_op_rol_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_rol_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = p68k->mem.read16(ea);
 	uint res = MASK_OUT_ABOVE_16(ROL_16(src, 1));
 
@@ -3527,7 +3527,7 @@ void m68k_op_roxr_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_roxr_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = p68k->mem.read16(ea);
 	uint res = ROR_17(src | (XFLAG_AS_1() << 16), 1);
 
@@ -3854,7 +3854,7 @@ void m68k_op_roxl_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_roxl_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = p68k->mem.read16(ea);
 	uint res = ROL_17(src | (XFLAG_AS_1() << 16), 1);
 
@@ -6147,7 +6147,7 @@ void m68k_op_sub_16_re_ai(M68KOPT_PARAMS)
 
 void m68k_op_sub_16_re_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = MASK_OUT_ABOVE_16(DX);
 	uint dst = p68k->mem.read16(ea);
 	uint res = dst - src;
@@ -6740,7 +6740,7 @@ void m68k_op_subi_16_ai(M68KOPT_PARAMS)
 void m68k_op_subi_16_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint dst = p68k->mem.read16(ea);
 	uint res = dst - src;
 
@@ -7164,7 +7164,7 @@ void m68k_op_subq_16_ai(M68KOPT_PARAMS)
 void m68k_op_subq_16_pi(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint dst = p68k->mem.read16(ea);
 	uint res = dst - src;
 

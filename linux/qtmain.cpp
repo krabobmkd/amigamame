@@ -103,10 +103,11 @@ void QProc::process()
 //"pdrift"
 //"qbert"
 //    "rastan"
-
+  "opwolf"
+// "bublbob2"
 // "silkworm"
 // "sgemf"
-                "gforce2"
+//                "gforce2"
 //      "mslug"
 //                "mp_sor2"
     );

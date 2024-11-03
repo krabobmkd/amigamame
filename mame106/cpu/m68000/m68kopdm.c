@@ -3715,7 +3715,7 @@ void m68k_op_eor_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_eor_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint res = MASK_OUT_ABOVE_16(DX ^ p68k->mem.read16(ea));
 
 	m68ki_write_16(ea, res);
@@ -4081,7 +4081,7 @@ void m68k_op_eori_16_ai(M68KOPT_PARAMS)
 void m68k_op_eori_16_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint res = src ^ p68k->mem.read16(ea);
 
 	m68ki_write_16(ea, res);
@@ -4798,7 +4798,7 @@ void m68k_op_lsr_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_lsr_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = p68k->mem.read16(ea);
 	uint res = src >> 1;
 
@@ -5070,7 +5070,7 @@ void m68k_op_lsl_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_lsl_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = p68k->mem.read16(ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
@@ -9913,7 +9913,7 @@ void m68k_op_move_16_frc_pi(M68KOPT_PARAMS)
 {
 	if(CPU_TYPE_IS_010_PLUS(CPU_TYPE))
 	{
-		m68ki_write_16(EA_AY_PI_16(), m68ki_get_ccr());
+		m68ki_write_16(EA_AY_PI_16(p68k,regir), m68ki_get_ccr());
 		return;
 	}
 	m68ki_exception_illegal(p68k);
@@ -10068,7 +10068,7 @@ void m68k_op_move_16_frs_pi(M68KOPT_PARAMS)
 {
 	if(CPU_TYPE_IS_000(CPU_TYPE) || FLAG_S)	/* NS990408 */
 	{
-		uint ea = EA_AY_PI_16();
+		uint ea = EA_AY_PI_16(p68k,regir);
 		m68ki_write_16(ea, m68ki_get_sr());
 		return;
 	}
@@ -11624,7 +11624,7 @@ void m68k_op_moves_16_pi(M68KOPT_PARAMS)
 		if(FLAG_S)
 		{
 			uint word2 = OPER_I_16(p68k);
-			uint ea = EA_AY_PI_16();
+			uint ea = EA_AY_PI_16(p68k,regir);
 
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
 			if(BIT_B(word2))		   /* Register to memory */

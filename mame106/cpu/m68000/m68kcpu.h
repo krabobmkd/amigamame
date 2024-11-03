@@ -629,7 +629,7 @@ struct m68k_cpu_instance *m68k_getActivecpu();
 #define EA_AY_PI_8()   (AY++)                                /* postincrement (size = byte) */
 
 
-//? #define EA_AY_PI_16()  ((AY+=2)-2)                           /* postincrement (size = word) */
+
 
 #define EA_AY_PI_32()  ((AY+=4)-4)                           /* postincrement (size = long) */
 
@@ -992,6 +992,7 @@ struct m68ki_cpu_core
 
 } ;
 #endif
+
 //re
 //typedef struct m68k_opcode {
 //    UINT8 *						m_opcode_base;					/* opcode base */
@@ -1042,7 +1043,12 @@ INLINE unsigned int m68kx_read_pcrelative_16(struct m68k_cpu_instance *p68k CORE
 INLINE unsigned int m68kx_read_pcrelative_32(struct m68k_cpu_instance *p68k COREREG,unsigned int address REGM(d0));
 
 
-
+//? #define EA_AY_PI_16()  ((AY+=2)-2)                           /* postincrement (size = word) */
+    INLINE uint EA_AY_PI_16(M68KOPT_PARAMS) {
+        uint ea = p68k->m_cpu.dar[8+(REG_IR & 7)];
+        p68k->m_cpu.dar[8+(REG_IR & 7)] = ea+2;
+        return ea;
+    }
 
 /* Read data immediately after the program counter */
 //INLINE uint m68ki_read_imm_16(M68KOPT_PARAMS);
@@ -1420,8 +1426,14 @@ INLINE uint OPER_AY_AI_8(M68KOPT_PARAMS)  {uint ea = EA_AY_AI_8();  return m68ki
 INLINE uint OPER_AY_AI_16(M68KOPT_PARAMS) {uint ea = EA_AY_AI_16(); return m68ki_read_16(ea);}
 INLINE uint OPER_AY_AI_32(M68KOPT_PARAMS) {uint ea = EA_AY_AI_32(); return m68ki_read_32(ea);}
 INLINE uint OPER_AY_PI_8(M68KOPT_PARAMS)  {uint ea = EA_AY_PI_8();  return m68ki_read_8(ea); }
-INLINE uint OPER_AY_PI_16(M68KOPT_PARAMS) {uint ea = EA_AY_PI_16(); return m68ki_read_16(ea);}
-INLINE uint OPER_AY_PI_32(M68KOPT_PARAMS) {uint ea = EA_AY_PI_32(); return m68ki_read_32(ea);}
+INLINE uint OPER_AY_PI_16(M68KOPT_PARAMS) {
+     //EA_AY_PI_16();
+    uint ea = p68k->m_cpu.dar[8+(REG_IR & 7)];
+    p68k->m_cpu.dar[8+(REG_IR & 7)] = ea+2;
+    return m68ki_read_16(ea);
+}
+INLINE uint OPER_AY_PI_32(M68KOPT_PARAMS)
+    {uint ea = EA_AY_PI_32(); return m68ki_read_32(ea);}
 INLINE uint OPER_AY_PD_8(M68KOPT_PARAMS)  {uint ea = EA_AY_PD_8();  return m68ki_read_8(ea); }
 INLINE uint OPER_AY_PD_16(M68KOPT_PARAMS) {uint ea = EA_AY_PD_16(); return m68ki_read_16(ea);}
 INLINE uint OPER_AY_PD_32(M68KOPT_PARAMS) {uint ea = EA_AY_PD_32(); return m68ki_read_32(ea);}

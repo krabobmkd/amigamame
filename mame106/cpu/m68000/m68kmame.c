@@ -104,7 +104,7 @@ static const struct m68k_memory_interface interface_d16 =
 
 
 // - - - -override to trace calls
-#define DOTRACEMEM 1
+//#define DOTRACEMEM 1
 #if DOTRACEMEM
 #include <stdio.h>
 #include <stdlib.h>

@@ -3,20 +3,24 @@
 todo beta4
 
 - O apply super simple memread/write when driver allow.
+- X repair gforce2 sprites -> was musashi bug.
 - O repair optims YM2151
-- O drawgfx prio -> validate slikworm/rygar/...
-- O drawgfx pack4
-- O tilemap bitfield line optim ->0.5% gain ?
+- X drawgfx prio -> validate slikworm/rygar/...
+- O drawgfx
+		X pack4
+		O clip X1 bug
+- O tilemap bitfield line optim ->0.5% gain ? 3% ?
 - O optim sound bubbob
 - O  neogeo cpu overrwrite optim
 - O  neogeo change to RGB16 index
 - O  neogeo verif slicing
 - O need 100%: rastan (85%),slap fight (90%), bubbob (85%)
 - O fastboot neogeo, batrider
+- O Mui5 lists with sorting.
+
 
 todo beta3d
 - O keyboard blocked keys bug
-- O wb3 player 2 start dont work (???)
 - O wrong megaplay colors -> remove all mp_xxx ?
 - X main.cfg trashed when caching big romset.
 - X 6% to 8% gain of 68k optimisations

@@ -1025,7 +1025,7 @@ void m68k_op_add_16_re_ai(M68KOPT_PARAMS)
 
 void m68k_op_add_16_re_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = MASK_OUT_ABOVE_16(DX);
 	uint dst = m68ki_read_16(ea);
 	uint res = src + dst;
@@ -1258,10 +1258,12 @@ void m68k_op_adda_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_adda_16_pi(M68KOPT_PARAMS)
 {
+    // krb correction 2024/11/3
+    // adda.w (a2)+,a2 that is done by the sprite configuration routine of gforce2
+    // would fail on gcc because the +2 would be rewritten.
 	uint* r_dst = &AX;
-    uint prev = *r_dst;
     sint16 x = MAKE_INT_16(OPER_AY_PI_16(M68KOPT_PASSPARAMS));
-    BLABLA
+    uint prev = *r_dst;
 	*r_dst = prev + (signed int)x;
 }
 
@@ -1357,8 +1359,10 @@ void m68k_op_adda_32_ai(M68KOPT_PARAMS)
 void m68k_op_adda_32_pi(M68KOPT_PARAMS)
 {
 	uint* r_dst = &AX;
+    // krb same correction as m68k_op_adda_16_pi , peventively, when adda (a2)+,a2
+    uint v = OPER_AY_PI_32(M68KOPT_PASSPARAMS); // can modify *r_dst
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst + v);
 
-	*r_dst = MASK_OUT_ABOVE_32(*r_dst + OPER_AY_PI_32(M68KOPT_PASSPARAMS));
 }
 
 
@@ -1621,7 +1625,7 @@ void m68k_op_addi_16_ai(M68KOPT_PARAMS)
 void m68k_op_addi_16_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint dst = m68ki_read_16(ea);
 	uint res = src + dst;
 
@@ -2045,7 +2049,7 @@ void m68k_op_addq_16_ai(M68KOPT_PARAMS)
 void m68k_op_addq_16_pi(M68KOPT_PARAMS)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint dst = m68ki_read_16(ea);
 	uint res = src + dst;
 
@@ -2935,7 +2939,7 @@ void m68k_op_and_16_re_ai(M68KOPT_PARAMS)
 
 void m68k_op_and_16_re_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint res = DX & m68ki_read_16(ea);
 
 	FLAG_N = NFLAG_16(res);
@@ -3288,7 +3292,7 @@ void m68k_op_andi_16_ai(M68KOPT_PARAMS)
 void m68k_op_andi_16_pi(M68KOPT_PARAMS)
 {
 	uint src = OPER_I_16(p68k);
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint res = src & m68ki_read_16(ea);
 
 	FLAG_N = NFLAG_16(res);
@@ -3751,7 +3755,7 @@ void m68k_op_asr_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_asr_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = m68ki_read_16(ea);
 	uint res = src >> 1;
 
@@ -4046,7 +4050,7 @@ void m68k_op_asl_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_asl_16_pi(M68KOPT_PARAMS)
 {
-	uint ea = EA_AY_PI_16();
+	uint ea = EA_AY_PI_16(p68k,regir);
 	uint src = m68ki_read_16(ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
@@ -9058,7 +9062,7 @@ void m68k_op_cas_16_pi(M68KOPT_PARAMS)
 	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
 	{
 		uint word2 = OPER_I_16(p68k);
-		uint ea = EA_AY_PI_16();
+		uint ea = EA_AY_PI_16(p68k,regir);
 		uint dest = m68ki_read_16(ea);
 		uint* compare = &REG_D[word2 & 7];
 		uint res = dest - MASK_OUT_ABOVE_16(*compare);
@@ -10789,7 +10793,7 @@ void m68k_op_clr_16_ai(M68KOPT_PARAMS)
 
 void m68k_op_clr_16_pi(M68KOPT_PARAMS)
 {
-	m68ki_write_16(EA_AY_PI_16(), 0);
+	m68ki_write_16(EA_AY_PI_16(p68k,regir), 0);
 
 	FLAG_N = NFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
