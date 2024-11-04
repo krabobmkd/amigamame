@@ -196,14 +196,14 @@ void drawgfxT(struct drawgfxParams *p DGREG(a0), int isOpaque)
 
 	ex = sx + gfx->width; // consider end excluded, immense lots of useless -1 removed.
 	if (sx < clip->min_x) sx = clip->min_x;
-	//if (ex > dest->width) ex = dest->width;
+
 	if (ex > clip->max_x) ex = clip->max_x;
     int dstwidth = ex-sx; /* dest width */
     if(dstwidth<=0) return;
 
 	ey = sy + gfx->height;
 	if ( sy < clip->min_y) sy = clip->min_y;
-	//if (ey > dest->height) ey = dest->height;
+
 	if ( ey > clip->max_y) ey = clip->max_y;
     int dstheight = ey-sy;	/* dest height */
     if(dstheight<=0) return;
@@ -253,7 +253,7 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
 	{
         srcdata.incrementx(leftskip);
 	}*/
-    INT16 srcmodulo = gfx->width - leftskip;
+    INT16 srcmodulo = gfx->width; // - leftskip;
 
     if(isOpaque)
     {
@@ -563,6 +563,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
         srcdata.incrementx(leftskip);
 	}*/
 
+    INT16 srcmodulo =  gfx->width - dstwidth; // gfx->width; // - leftskip;
 
     if(isOpaque)
     {
@@ -610,7 +611,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     dstdata.setPix(0,pal.color( srcdata.getp() ));
                     dstdata.incrementx(-1);
                 }
-                srcdata.incrementx(leftskip);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             }            
@@ -658,7 +659,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     dstdata.setPix(0,pal.color( srcdata.getp() ));
                     dstdata.incrementx(1);
                 }
-                srcdata.incrementx(leftskip);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
 
                 dstheight--;
@@ -726,7 +727,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     if (col != transpen) dstdata.setPix(0,pal.color(col));
                     dstdata.incrementx(-1);
                 }
-                srcdata.incrementx(leftskip);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             }
@@ -786,7 +787,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                     if (col != transpen) dstdata.setPix(0,pal.color(col));
                     dstdata.incrementx(1);
                 }
-                srcdata.incrementx(leftskip);
+                srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             } // end while h

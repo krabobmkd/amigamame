@@ -197,6 +197,8 @@ Points to note, known and proven information deleted from this map:
 #include "sound/2610intf.h"
 
 
+#define KRB_SLICEINTDIV 32
+
 /* values probed by Razoola from the real board */
 #define RASTER_LINES 264
 /* VBLANK should fire on line 248 */
@@ -286,7 +288,7 @@ static INT32 neogeo_raster_enable = 1;
 
 static INTERRUPT_GEN( neogeo_raster_interrupt )
 {
-	int line = RASTER_LINES - cpu_getiloops();
+	int line = RASTER_LINES - (cpu_getiloops() *KRB_SLICEINTDIV );
 
 	current_rasterline = line;
 
@@ -1340,7 +1342,7 @@ static MACHINE_DRIVER_START( neogeo_full )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 12000000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(neogeo_readmem,neogeo_writemem)
-	MDRV_CPU_VBLANK_INT(neogeo_raster_interrupt,RASTER_LINES)
+	MDRV_CPU_VBLANK_INT(neogeo_raster_interrupt,RASTER_LINES/KRB_SLICEINTDIV)
 
 	MDRV_CPU_ADD(Z80, 4000000) /* verified */
 	/* audio CPU */
@@ -1382,7 +1384,7 @@ static MACHINE_DRIVER_START( neogeo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 12000000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(neogeo_readmem,neogeo_writemem)
-	MDRV_CPU_VBLANK_INT(neogeo_raster_interrupt,RASTER_LINES)
+	MDRV_CPU_VBLANK_INT(neogeo_raster_interrupt,RASTER_LINES/KRB_SLICEINTDIV)
 
 	MDRV_CPU_ADD(Z80, 4000000) /* verified */
 	/* audio CPU */

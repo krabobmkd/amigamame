@@ -1433,7 +1433,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int co
 					dgp0.flipy = flipy;
 					dgp0.sx = sx;
 					dgp0.sy = sy;
-			//re		drawgfx(&dgp0);
+			//old		drawgfx(&dgp0);
                     drawgfx_clut16_Src8(&dgp0);
 
 					sprite++ ;
