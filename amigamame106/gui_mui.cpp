@@ -175,11 +175,11 @@ static ULONG ASM DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG 
 {
     if(!par)
     {
-        printf("DriverSelect:par 0\n");
+      //  printf("DriverSelect:par 0\n");
         return 0;
      }
         MameConfig &config = getMainConfig();
-    printf("DriverSelect:%d\n",*par);
+//    printf("DriverSelect:%d\n",*par);
     // get(LI_Driver, MUIA_List_Active, &v);
     int listindex = *par;
     if(listindex>=0)
@@ -800,6 +800,125 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
   return(DoSuperMethodA(cclass, obj, msg));
 }
 
+static ULONG ASM DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1))
+{
+  struct DriverData   *data;
+  struct IntuiMessage *imsg;
+  struct _game_driver   **drv_indirect;
+  struct _game_driver   *drv;
+  struct InputEvent   ie;
+
+  Object  *list;
+  APTR  active_obj;
+  ULONG i;
+  UBYTE key;
+
+//printf("msg->MethodID:%08x\n",msg->MethodID);
+  switch(msg->MethodID)
+  {
+    case MUIM_Setup:
+      data = (struct DriverData *)INST_DATA(cclass, obj);
+
+      if(DoSuperMethodA(cclass, obj, msg))
+      {
+        data->Seconds = 0;
+        data->Micros  = 0;
+
+        data->EventHandler.ehn_Priority = 0;
+        data->EventHandler.ehn_Flags    = 0;
+        data->EventHandler.ehn_Object   = obj;
+        data->EventHandler.ehn_Class    = cclass;
+        data->EventHandler.ehn_Events   = IDCMP_RAWKEY;
+        DoMethod(_win(obj), MUIM_Window_AddEventHandler, &data->EventHandler);
+
+        return(TRUE);
+      }
+
+      return(FALSE);
+
+    case MUIM_Cleanup:
+      data = (struct DriverData *)INST_DATA(cclass, obj);
+
+      DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->EventHandler);
+      break;
+
+    case MUIM_HandleEvent:
+      data =  (struct DriverData *) INST_DATA(cclass, obj);
+      imsg = (struct IntuiMessage *) msg[1].MethodID;
+
+// printf("MUIM_HandleEvent\n");
+
+      get(_win(obj), MUIA_Window_ActiveObject, &active_obj);
+
+      if(obj == active_obj)
+      {
+        if(imsg->Class == IDCMP_RAWKEY)
+        {
+          ie.ie_Class   = IECLASS_RAWKEY;
+          ie.ie_SubClass  = 0;
+          ie.ie_Code    = imsg->Code;
+          ie.ie_Qualifier = 0;
+
+//  MapRawKey( CONST struct InputEvent *event, STRPTR buffer, LONG length, CONST struct KeyMap *keyMap );
+          if(MapRawKey(&ie,(STRPTR)&key, 1, NULL) && isalnum(key))
+          {
+            i = imsg->Seconds - data->Seconds;
+
+            if(imsg->Micros < data->Micros)
+              i--;
+
+            if(i < 1)
+            {
+              data->CharIndex++;
+              i = data->CurrentEntry;
+            }
+            else
+            {
+              data->CharIndex = 0;
+              i = 0;
+            }
+
+            data->Seconds = imsg->Seconds;
+            data->Micros  = imsg->Micros;
+
+            get(obj, MUIA_Listview_List, &list);
+
+            do
+            {
+              DoMethod(list, MUIM_List_GetEntry, i, &drv_indirect);
+
+              if(drv_indirect)
+              {
+                drv = *drv_indirect;
+
+                if(data->CharIndex < strlen(drv->description))
+                {
+                  if(key <= tolower(drv->description[data->CharIndex]))
+                  {
+                    data->CurrentEntry = i;
+
+                    set(list, MUIA_List_Active, i);
+
+                    break;
+                  }
+                }
+              }
+
+              i++;
+
+            } while(drv_indirect);
+
+            return(MUI_EventHandlerRC_Eat);
+          }
+        }
+      }
+    //  return(0);
+      break;
+  }
+
+  return(DoSuperMethodA(cclass, obj, msg));
+}
+
 void AllocGUI(void)
 {
 #ifdef DOMAMELOG
@@ -899,7 +1018,8 @@ void AllocGUI(void)
     DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcher);
   } else
   {
-    DriverClass = NULL;
+    DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcherMUI5);
+//    DriverClass = NULL;
   }
 #ifdef DOMAMELOG
     printf("after MUI_CreateCustomClass()\n");
