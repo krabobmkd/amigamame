@@ -51,6 +51,11 @@ extern "C" {
 
 #include "version.h"
 
+
+#ifndef MUIA_List_SortColumn
+#define MUIA_List_SortColumn                0x8042cafb /* V21 isg LONG              */
+#endif
+
 #include <vector>
 #include <string>
 #include <cstdio>
@@ -290,7 +295,7 @@ static struct Hook SoundNotifyHook={0};
 static struct Hook DriverDisplayHook={0};
 static struct Hook DriverSortHook={0};
 static struct Hook DriverNotifyHook={0};
-static struct Hook DriverSortColumnNotifyHook={0};
+//static struct Hook DriverSortColumnNotifyHook={0};
 
 #ifndef MESS
 static struct Hook ShowNotifyHook={0};
@@ -330,7 +335,7 @@ static void SetDisplayName(ULONG);
 static ULONG ASM DirectModeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 static ULONG ASM SoundNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 static ULONG ASM DriverNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
-static ULONG ASM DriverSortColumnNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+//static ULONG ASM DriverSortColumnNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 
 #ifndef MESS
 static ULONG ASM ShowNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
@@ -480,7 +485,17 @@ static ULONG ASM DriverSort(
     const struct _game_driver **drvb REG(a2)
     )
 {   // must return -1 0 1
-    int icolumnToSort = columnToSort;
+
+
+    int icolumnToSort;
+    if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
+    {
+        icolumnToSort = columnToSort;
+    } else
+    {
+        get(LI_Driver, MUIA_List_SortColumn, &icolumnToSort);
+    }
+
     if(icolumnToSort <0) icolumnToSort=0;
     switch(icolumnToSort)
     {
@@ -757,6 +772,8 @@ static ULONG ASM DriverDispatcher(struct IClass *cclass REG(a0), Object * obj RE
                         if(res.column != columnToSort)
                         {
                             columnToSort = res.column;
+    printf("MUIM_HandleInput column:%d\n",columnToSort);
+
                             DoMethod(obj,MUIM_List_Sort);
                            // finnaly, propagate. return(MUI_EventHandlerRC_Eat);
                         }
@@ -853,7 +870,7 @@ void AllocGUI(void)
     DriverDisplayHook.h_Entry    = (RE_HOOKFUNC) DriverDisplay;
     DriverSortHook.h_Entry    = (RE_HOOKFUNC) DriverSort;
     DriverNotifyHook.h_Entry     = (RE_HOOKFUNC) DriverNotify;
-    DriverSortColumnNotifyHook.h_Entry     = (RE_HOOKFUNC) DriverSortColumnNotify;
+//    DriverSortColumnNotifyHook.h_Entry     = (RE_HOOKFUNC) DriverSortColumnNotify;
 
 #ifndef MESS
     ShowNotifyHook.h_Entry        = (RE_HOOKFUNC) ShowNotify;
@@ -1312,15 +1329,13 @@ int MainGUI(void)
           DoMethod(LI_Driver, MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
                    LI_Driver, 3, MUIM_CallHook, &DriverNotifyHook, MUIV_TriggerValue);
 
-          if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
-          {
-            #ifndef MUIA_List_SortColumn
-            #define MUIA_List_SortColumn                0x8042cafb /* V21 isg LONG              */
-            #endif
-               // for MUI5 column sorting, listen the selected column attrib:
-               DoMethod(LI_Driver, MUIM_Notify, MUIA_List_SortColumn, MUIV_EveryTime,
-                   LI_Driver, 3, MUIM_CallHook, &DriverSortColumnNotifyHook, MUIV_TriggerValue);
-          }
+//          if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
+//          {
+
+//               // for MUI5 column sorting, listen the selected column attrib:
+//               DoMethod(LI_Driver, MUIM_Notify, MUIA_List_SortColumn, MUIV_EveryTime,
+//                   LI_Driver, 3, MUIM_CallHook, &DriverSortColumnNotifyHook, MUIV_TriggerValue);
+//          }
 
           DoMethod(CY_Show, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
                    CY_Show, 3, MUIM_CallHook, &ShowNotifyHook, MUIV_TriggerValue);
@@ -1648,5 +1663,6 @@ static ULONG ASM DriverNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG
 static ULONG ASM DriverSortColumnNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
 {
   if(par) columnToSort = *par;
+//    printf("DriverSortColumnNotify:%d\n",columnToSort);
   return(0);
 }
