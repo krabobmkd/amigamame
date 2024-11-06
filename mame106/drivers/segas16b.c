@@ -1029,7 +1029,7 @@ static MACHINE_RESET( system16b )
 	segaic16_memory_mapper_reset();
 	if (i8751_initial_config != NULL)
 		segaic16_memory_mapper_config(i8751_initial_config);
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset();
 
 	fd1094_machine_init();
 
@@ -1095,7 +1095,7 @@ static WRITE16_HANDLER( standard_io_w )
                 D1 : (Output to coin counter 2?)
                 D0 : Output to coin counter 1
             */
-			segaic16_tilemap_set_flip(0, data & 0x40);
+			segaic16_tilemap_set_flip( data & 0x40);
 			segaic16_sprites_set_flip(0, data & 0x40);
 			if (!disable_screen_blanking)
 				segaic16_set_display_enable(data & 0x20);
@@ -1137,7 +1137,7 @@ static WRITE16_HANDLER( misc_io_w )
 static WRITE16_HANDLER( rom_5704_bank_w )
 {
 	if (ACCESSING_LSB)
-		segaic16_tilemap_set_bank(0, offset & 1, data & 7);
+		segaic16_tilemap_set_bank( offset & 1, data & 7);
 }
 
 

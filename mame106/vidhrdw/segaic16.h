@@ -32,13 +32,13 @@ WRITE16_HANDLER( segaic16_paletteram_w );
 #define SEGAIC16_TILEMAP_BACKGROUND	1
 #define SEGAIC16_TILEMAP_TEXT		2
 
-int segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks);
-void segaic16_tilemap_reset(int which);
-void segaic16_tilemap_draw(int which, mame_bitmap *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark);
-void segaic16_tilemap_set_bank(int which, int banknum, int offset);
-void segaic16_tilemap_set_flip(int which, int flip);
-void segaic16_tilemap_set_rowscroll(int which, int enable);
-void segaic16_tilemap_set_colscroll(int which, int enable);
+int segaic16_tilemap_init( int type, int colorbase, int xoffs, int numbanks);
+void segaic16_tilemap_reset();
+void segaic16_tilemap_draw( mame_bitmap *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark);
+void segaic16_tilemap_set_bank( int banknum, int offset);
+void segaic16_tilemap_set_flip( int flip);
+void segaic16_tilemap_set_rowscroll( int enable);
+void segaic16_tilemap_set_colscroll( int enable);
 
 WRITE16_HANDLER( segaic16_tileram_0_w );
 WRITE16_HANDLER( segaic16_textram_0_w );

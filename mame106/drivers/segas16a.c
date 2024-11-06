@@ -321,7 +321,7 @@ static WRITE8_HANDLER( video_control_w )
 	if (((video_control ^ data) & 0x0c) && lamp_changed_w)
 		(*lamp_changed_w)(video_control ^ data, data);
 	video_control = data;
-	segaic16_tilemap_set_flip(0, data & 0x80);
+	segaic16_tilemap_set_flip( data & 0x80);
 	segaic16_sprites_set_flip(0, data & 0x80);
 	segaic16_set_display_enable(data & 0x10);
 	set_led_status(1, data & 0x08);
@@ -361,8 +361,8 @@ static WRITE8_HANDLER( sound_control_w )
              0= Sound is disabled
              1= sound is enabled
     */
-	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
-	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
+	segaic16_tilemap_set_colscroll( ~data & 0x04);
+	segaic16_tilemap_set_rowscroll( ~data & 0x02);
 }
 
 

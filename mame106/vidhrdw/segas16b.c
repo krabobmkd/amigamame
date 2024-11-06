@@ -22,7 +22,7 @@ static int video_start_common(int type)
 	segaic16_palette_init(0x800);
 
 	/* initialize the tile/text layers */
-	if (segaic16_tilemap_init(0, type, 0x000, 0, 2))
+	if (segaic16_tilemap_init( type, 0x000, 0, 2))
 		return 1;
 
 	/* initialize the sprites */
@@ -60,25 +60,35 @@ VIDEO_UPDATE( system16b )
 		fillbitmap(bitmap, get_black_pen(), cliprect);
 		return;
 	}
+/*
+  from segaic16.c :
+    System16b:
+    4-layer tilemap hardware in two pairs, with selection between each
+    members on the pairs on a 8-lines basis.  Slightly better sprites.
+
+    krb:
+    flags 0 -> 1 is "tile priority"
+
+*/
 
 	/* reset priorities */
 	fillbitmap(priority_bitmap, 0, cliprect);
 
 	/* draw background opaquely first, not setting any priorities */
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_IGNORE_TRANSPARENCY, 0x00);
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 1 | TILEMAP_IGNORE_TRANSPARENCY, 0x00);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_IGNORE_TRANSPARENCY, 0x00);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 1 | TILEMAP_IGNORE_TRANSPARENCY, 0x00);
 
 	/* draw background again, just to set the priorities on non-transparent pixels */
-	segaic16_tilemap_draw(0, NULL, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);
-	segaic16_tilemap_draw(0, NULL, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 1, 0x02);
+	segaic16_tilemap_draw( NULL, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);
+	segaic16_tilemap_draw( NULL, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 1, 0x02);
 
 	/* draw foreground */
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 0, 0x02);
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 0, 0x02);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
 
 	/* text layer */
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
 	/* draw the sprites */
 	segaic16_sprites_draw(0, bitmap, cliprect);

@@ -103,7 +103,7 @@ static void hangon_generic_init(void)
 static MACHINE_RESET( hangon )
 {
 	/* reset misc components */
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset();
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
@@ -254,7 +254,7 @@ static WRITE8_HANDLER( video_lamps_w )
 	/* D2 : LAMP1 */
 	/* D1 : COIN2 */
 	/* D0 : COIN1 */
-	segaic16_tilemap_set_flip(0, data & 0x80);
+	segaic16_tilemap_set_flip( data & 0x80);
 	segaic16_sprites_set_flip(0, data & 0x80);
 	segaic16_sprites_set_shadow(0, ~data & 0x40);
 	segaic16_set_display_enable(data & 0x10);
@@ -272,8 +272,8 @@ static WRITE8_HANDLER( tilemap_sound_w )
 	/* D2 : SCONT1 - Tilemap origin bit 1 */
 	/* D1 : SCONT0 - Tilemap origin bit 0 */
 	/* D0 : MUTE (1= audio on, 0= audio off) */
-	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
-	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
+	segaic16_tilemap_set_colscroll( ~data & 0x04);
+	segaic16_tilemap_set_rowscroll( ~data & 0x02);
 }
 
 

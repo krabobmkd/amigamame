@@ -195,7 +195,7 @@ static void xboard_reset(void)
 MACHINE_RESET( xboard )
 {
 	fd1094_machine_init();
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset();
 
 	/* hook the RESET line, which resets CPU #1 */
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)xboard_reset);

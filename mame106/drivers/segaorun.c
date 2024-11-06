@@ -253,7 +253,7 @@ static MACHINE_RESET( outrun )
 	segaic16_memory_mapper_reset();
 	if (custom_map)
 		segaic16_memory_mapper_config(custom_map);
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset();
 
 	/* hook the RESET line, which resets CPU #1 */
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);

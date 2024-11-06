@@ -32,7 +32,7 @@ VIDEO_START( xboard )
 	segaic16_palette_init(0x2000);
 
 	/* initialize the tile/text layers */
-	if (segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2))
+	if (segaic16_tilemap_init( SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2))
 		return 1;
 
 	/* initialize the sprites */
@@ -86,20 +86,20 @@ VIDEO_UPDATE( xboard )
 		segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
 
 	/* draw background */
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 1, 0x02);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 1, 0x02);
 
 	/* draw foreground */
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 0, 0x02);
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 0, 0x02);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
 
 	/* draw the high priority road */
 	if (road_priority == 1)
 		segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
 
 	/* text layer */
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
-	segaic16_tilemap_draw(0, bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
+	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
 	/* draw the sprites */
 	segaic16_sprites_draw(0, bitmap, cliprect);

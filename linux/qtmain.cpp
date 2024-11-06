@@ -53,7 +53,7 @@ void StartGame(int idriver)
 
     // done here
 //    if(drivers[idriver])
-        options.ui_orientation = uiapplied &ORIENTATION_MASK;  // uiorientation;
+options.ui_orientation = uiapplied & ORIENTATION_MASK;  // uiorientation;
 options.skip_disclaimer = 1;
 options.skip_gameinfo = 1;
 options.skip_warnings = 1;
@@ -96,14 +96,14 @@ void QProc::process()
     // test if just "mame romname".
     int itest = getMainConfig().driverIndex().index(
     //"arkretrn"
-//    "wb3"
+    "wb3"
 //    "bublbobl"
 //   "dino"
 //                 "batrider"
 //"pdrift"
 //"qbert"
 //    "rastan"
-  "opwolf"
+//  "opwolf"
 // "bublbob2"
 // "silkworm"
 // "sgemf"

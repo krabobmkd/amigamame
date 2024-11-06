@@ -198,7 +198,7 @@ static void boost_interleave(int param)
 MACHINE_RESET( system18 )
 {
 	segaic16_memory_mapper_reset();
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset();
 	fd1094_machine_init();
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
@@ -283,7 +283,7 @@ static WRITE16_HANDLER( io_chip_w )
 		/* miscellaneous output */
 		case 0x06/2:
 			system18_set_grayscale(~data & 0x40);
-			segaic16_tilemap_set_flip(0, data & 0x20);
+			segaic16_tilemap_set_flip( data & 0x20);
 			segaic16_sprites_set_flip(0, data & 0x20);
 /* These are correct according to cgfm's docs, but mwalker and ddcrew both
    enable the lockout and never turn it off
@@ -300,8 +300,8 @@ static WRITE16_HANDLER( io_chip_w )
 				int i;
 				for (i = 0; i < 4; i++)
 				{
-					segaic16_tilemap_set_bank(0, 0 + i, (data & 0xf) * 4 + i);
-					segaic16_tilemap_set_bank(0, 4 + i, ((data >> 4) & 0xf) * 4 + i);
+					segaic16_tilemap_set_bank( 0 + i, (data & 0xf) * 4 + i);
+					segaic16_tilemap_set_bank( 4 + i, ((data >> 4) & 0xf) * 4 + i);
 				}
 			}
 			break;
