@@ -76,6 +76,10 @@ set(MAME_CORE_SRC
 
 # ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}
 
+if(AMIGA)
+#todo     list(APPEND MAME_CORE_SRC memorynasm.s)
+endif()
+
 set(MAME_INCLUDE_DIRS "src" "../amigamame106" "." "./includes" ${EXPATPATH})
 
 # force specific implementation of drivers like this:

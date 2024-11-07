@@ -32,8 +32,9 @@ extern "C" {
     // just for NM_BARLABEL
     #include <libraries/gadtools.h>
 
-    // we point MUI38 ....
+    // we point MUI50 in almigacommonlibs repository ....
     #include <../../MUI50/include/mui/Guigfx_mcc.h>
+    #include <../../MUI50/include/mui/GIFAnim_mcc.h>
     #include <inline/muimaster.h>
 }
 #define CATCOMP_NUMBERS
@@ -81,18 +82,9 @@ typedef ULONG (*RE_HOOKFUNC)();
 #ifndef GIT_BRANCH
 #define GIT_BRANCH
 #endif
-const char *TextAbout =
-"\33c\n\33b\33uMAME - Multiple Arcade Machine Emulator\33n\n\n"
-"0."REVISION" \n\n"
-"Copyright (C) 1997-2024 by Nicola Salmoria and the MAME team\n"
-"http://mamedev.org\n\n"
-"Amiga port by Vic 'Krb' Ferry (2024) source:\n"
-" https://github.com/krabobmkd/amigamame\n"
-"compiled branch:" GIT_BRANCH " " REVDATE " " REVTIME "\n"
-"Partly based on Mats Eirik Hansen Mame060(1999)\n"
-" http://www.triumph.no/mame\n"
-"This program uses libexpat,zlib,\n"
-" MUI - Magic User Interface\n";
+
+std::string sTextAbout;
+
 
 struct DriverData
 {
@@ -121,14 +113,15 @@ static Object * CY_Show=NULL;
 
 static Object * BU_Scan=NULL;
 
-static Object * IMG_BottomLeft = NULL;
-
 static Object *LI_Driver=NULL;
 static Object * LV_Driver=NULL;
 static Object * BU_Start=NULL;
 //static Object * BU_Quit=NULL;
 static Object * BU_About_OK=NULL;
 static Object * PU_ScreenMode=NULL;
+
+static Object *LA_statusbar=NULL;
+static Object *GIF_cornerlogo=NULL;
 
 MUISerializer muiConfigCreator;
 static int columnToSort = 0;
@@ -975,24 +968,31 @@ int MainGUI(void)
     {
       if(!MainWin)
       {
+      printf("may do image lib ver:%d\n",MUIMasterBase->lib_Version);
         if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
         {
 #define SCALEMODEMASK(u, d, p, s)	(((u) ? NISMF_SCALEUP : 0) | ((d) ? NISMF_SCALEDOWN : 0) | ((p) ? NISMF_KEEPASPECT_PICTURE : 0) | ((s) ? NISMF_KEEPASPECT_SCREEN : 0))
 #define TRANSMASK(m, r)				(((m) ? NITRF_MASK : 0 ) | ((r) ? NITRF_RGB : 0))
 
-    printf("do MUIC_Guigfx\n");
-          IMG_BottomLeft =  MUI_NewObject(MUIC_Guigfx,
-							MUIA_Guigfx_FileName, (ULONG) "skin/bl.ilbm",
-							MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Low,
+    printf("do MUIC_GIFAnim\n");
+          GIF_cornerlogo =
+           MUI_NewObject(MUIC_GIFAnim,MUIA_GIFAnim_File,(ULONG) "PROGDIR:skin/cornerlogo.gif",
+
+                    TAG_DONE);
+          /* following doesnt work ! really there is a problem with guigfx.library.
+           *
+           * MUI_NewObject(MUIC_Guigfx,
+							MUIA_Guigfx_FileName, (ULONG) "PROGDIR:skin/bl.ilbm",
+							MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 							// SCALEMODEMASK( scaleup, scaledown  PICASPECT, SCREENASPECT )
 						//	MUIA_Guigfx_ScaleMode, SCALEMODEMASK(FALSE, FALSE, TRUE, FALSE),
 						//	MUIA_Guigfx_Transparency, TRANSMASK(TRUE, TRUE),
-							TAG_DONE);
-    printf("do MUIC_Guigfx:%08x\n",(int)IMG_BottomLeft);
+							TAG_DONE);*/
+    printf("do MUIC_GIFAnim:%08x\n",(int)GIF_cornerlogo);
         }
-        if(IMG_BottomLeft == NULL)
+        if(GIF_cornerlogo == NULL)
         {
-            IMG_BottomLeft = MUI_MakeObject(MUIO_HSpace,0);
+            GIF_cornerlogo = MUI_MakeObject(MUIO_HSpace,0);
         }
 
 //static  std::string appName(APPNAME);
@@ -1029,15 +1029,23 @@ int MainGUI(void)
             Child,createOptionTabGroup(),
 
             Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-              Child, BU_Start   = SimpleButton((ULONG)GetMessagec("Start")),
-              Child,IMG_BottomLeft,
+                Child, UMUINO(MUIC_Group,
+                      Child, BU_Start   = SimpleButton((ULONG)GetMessagec("Start")),
+                      Child, LA_statusbar = LLabel((ULONG)GetMessagec("Bla bla bla...")),
+                        TAG_DONE,0),
+              Child,GIF_cornerlogo,
           //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessagec("Quit")),
             TAG_DONE,0), // end WindowContent Group
           TAG_DONE,0)},
         TAG_DONE,0};
+
         MainWin =  MUI_NewObjectA(MUIC_Window, (struct TagItem *) &mainwintags[0]);// MUINewObject(MUIC_Window,
 //        printf("after MUINewObject():%08x\n",(int)MainWin);
 // MUIA_Disabled
+// static Object *LA_statusbar=NULL;
+//static Object *GIF_cornerlogo=NULL;
+
+
         if(MainWin)
         {
           DoMethod(App, OM_ADDMEMBER, MainWin);
@@ -1243,6 +1251,29 @@ inline Object *OHCenter(Object *obj)
 
 static void CreateApp(void)
 {
+    if(sTextAbout.length()==0)
+    {
+        sTextAbout =
+            "\33c\n\33b\33uMAME - Multiple Arcade Machine Emulator\33n\n\n"
+            "0."REVISION" \n\n"
+            "Copyright (C) 1997-2024 by Nicola Salmoria and the MAME team\n"
+            "http://mamedev.org\n\n"
+            "Amiga port by Vic 'Krb' Ferry (2024) source:\n"
+            " https://github.com/krabobmkd/amigamame\n"
+            "compiled branch:" GIT_BRANCH " " REVDATE " " REVTIME "\n"
+            "Partly based on Mats Eirik Hansen Mame060(1999)\n"
+            " http://www.triumph.no/mame\n"
+            "This program uses libexpat,zlib,\n"
+            " MUI - Magic User Interface\n";
+        if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
+        {
+            sTextAbout += "Upgrade to MUI5 for a better experience at:\n"
+                        "https://github.com/amiga-mui/muidev/releases\n";
+        }
+    }
+
+
+
   App = MUI_NewObject(MUIC_Application,
     MUIA_Application_Title      , (ULONG)APPNAME,
     //MUIA_Application_Version    , (ULONG)("$VER: " APPNAME " (" REVDATE ")"),
@@ -1260,7 +1291,7 @@ static void CreateApp(void)
             MUIA_Background, MUII_TextBack,
             Child, UMUINO(MUIC_Group,
               Child, UMUINO(MUIC_Text,
-                MUIA_Text_Contents, (ULONG)TextAbout,
+                MUIA_Text_Contents, (ULONG)sTextAbout.c_str(),
               TAG_DONE),
               Child, VSpace(0),
             TAG_DONE),

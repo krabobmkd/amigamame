@@ -191,9 +191,6 @@ void InitLowLevelLib()
 {
     if(!LowLevelBase)
     {
-#ifdef DOMAMELOG
-    printf("Open lowlevel 0\n");
-#endif
         LowLevelBase = OpenLibrary("lowlevel.library", 0);
     }
 }

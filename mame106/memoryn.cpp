@@ -697,7 +697,7 @@ UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits
 {
     UINT16 i = 0;
     UINT32 count = 0;
-
+    address &= active_address_space[0].addrmask ;
     if (!(address & 3))
     {
         for(; i < 16; i++)
