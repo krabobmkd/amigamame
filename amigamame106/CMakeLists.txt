@@ -108,22 +108,11 @@ set(AMIGA_SRC
 		${COMMONLIBS}/libserializer/serializer.h
 		${COMMONLIBS}/libserializer/serializer_mui.h
 		${COMMONLIBS}/libserializer/serializer_mui.cpp
-		gui_gadtools.h
-		gui_gadtools.cpp
-
 
 	mame_ver.h
-	mame_msg.h
 
-#	directdraw.s
 #	parallelporthandler.s
 	devnotes.txt
-#	c2p.s
-#	gfx.s
-#	../../lib/c2p.s.o ../../lib/gfx.s.o
-#	cgxhooks.c
-#	cgxhooks.h
-#	cgxhooks_re.s
 	)
 # - - -have some Amiga code using O0
 	add_library(Mame106AmigaO0 STATIC

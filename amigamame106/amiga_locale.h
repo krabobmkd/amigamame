@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+void initLocale();
+const char *GetMessagec(const char *pEnglishOrKey);
+
 #ifdef __cplusplus
 }
 #endif

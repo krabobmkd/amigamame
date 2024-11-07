@@ -390,7 +390,7 @@ static WRITE16_HANDLER( rom_5987_bank_w )
 		int maxbanks = Machine->gfx[0]->total_elements / 1024;
 		if (data >= maxbanks)
 			data %= maxbanks;
-		segaic16_tilemap_set_bank(0, offset, data);
+		segaic16_tilemap_set_bank( offset, data);
 	}
 
 	/* sprite banking */

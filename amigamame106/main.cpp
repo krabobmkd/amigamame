@@ -24,9 +24,6 @@ extern "C" {
 
 }
 
-#define CATCOMP_NUMBERS
-#include "messages.h"
-
 #include <stdio.h>
 #include <strings.h>
 
@@ -49,7 +46,6 @@ extern "C" {
     #include "asmmacros.h"
 }
 
-
 #include "version.h"
 #include "video.h"
 
@@ -57,9 +53,6 @@ extern "C" {
 #include "amiga106_config.h"
 #include "amiga106_inputs.h"
 #include "gui_mui.h"
-#include "gui_gadtools.h"
-
-//#include "file.h"
 
 #define MIN_STACK (14*1024)
 
@@ -85,7 +78,6 @@ struct DosLibrary   *DOSBase    = NULL;
 #endif
 struct GfxBase      *GfxBase    = NULL;
 struct IntuitionBase  *IntuitionBase  = NULL;
-struct Library      *GadToolsBase = NULL;
 struct Library      *AslBase    = NULL;
 struct Library      *KeymapBase   = NULL;
 struct Library      *UtilityBase  = NULL;
@@ -112,59 +104,30 @@ int libs_init()
     if(!(DOSBase = (struct DosLibrary *) OpenLibrary("dos.library", 36))) return(1);
 #endif
 
-#ifdef DOMAMELOG
-    printf("Open graphics 39\n");
-#endif
     if(!(GfxBase = (struct GfxBase *) OpenLibrary("graphics.library", 39)))
     {
         printf("need at least OS3.0\n");
         return(1);
     }
-#ifdef DOMAMELOG
-    printf("Open intuition 39\n");
-#endif
     if(!(IntuitionBase = (struct IntuitionBase *) OpenLibrary("intuition.library", 39)))
     {
         return(1);
     }
-#ifdef DOMAMELOG
-    printf("Open utility 0\n");
-#endif
     if(!(UtilityBase = OpenLibrary("utility.library",0))) return(1);
-#ifdef DOMAMELOG
-    printf("Open keymap 36\n");
-#endif
     if(!(KeymapBase = OpenLibrary("keymap.library", 36))) return(1);
-#ifdef DOMAMELOG
-    printf("Open asl 36\n");
-#endif
     if(!(AslBase = OpenLibrary("asl.library", 36))) return(1);
 
     InitLowLevelLib();
     // optional:
-#ifdef DOMAMELOG
-    printf("Open cybergraphics 1\n");
-#endif
     CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
 //    P96Base  = OpenLibrary("Picasso96API.library", 0);
-#ifdef DOMAMELOG
-    printf("Open gadtools 1\n");
-#endif
-    GadToolsBase  = OpenLibrary("gadtools.library", 1);
+
     // mui is done elsewhere.
-#ifdef DOMAMELOG
-    printf("gadtools_init\n");
-#endif
-    if(GadToolsBase) gui_gadtools_init();
-#ifdef DOMAMELOG
-    printf("misc resource\n");
-#endif
+
     // also, optional, used for parallel pads:
     // "There is no CloseResource()"
     MiscBase = (struct Library *)OpenResource(MISCNAME);
-#ifdef DOMAMELOG
-    printf("initTimers\n");
-#endif
+
     initTimers();
 
     return(0);
@@ -181,39 +144,19 @@ void main_close()
 //    printf("mameExitCleanCtrlC\n");
 //#endif
     mameExitCleanCtrlC(); // flush game allocs, ahcked from mame.c, in case stopped during game.
-#ifdef DOMAMELOG
-    printf("osd_close_display\n");
-#endif
+
     osd_close_display(); // also useful when ctrl-C
-#ifdef DOMAMELOG
-    printf("osd_stop_audio_stream\n");
-#endif
+
     osd_stop_audio_stream();
-//    printf("after  osd_stop_audio_stream\n");
-//#ifdef DOMAMELOG
-//    printf("unzip_cache_clear\n");
-//#endif
+
     unzip_cache_clear();
-//    printf("after  unzip_cache_clear\n");
-//#ifdef DOMAMELOG
-//    printf("closeTimers\n");
-//#endif
+
     closeTimers();
-#ifdef DOMAMELOG
-    printf("FreeGUI\n");
-#endif
-//    printf("after  closeTimers\n");
+
     FreeGUI();
-//    printf("after  FreeGUI\n");
-   // FreeConfig(); -> static destructor in _config.
 
-    gui_gadtools_close();
-
-//    printf("after  gui_gadtools_close\n");
     CloseLowLevelLib();
-//    printf("after  CloseLowLevelLib\n");
 
-    if(GadToolsBase) CloseLibrary(GadToolsBase);
 //    if(P96Base) CloseLibrary(P96Base);
 
     if(CyberGfxBase) CloseLibrary(CyberGfxBase);
@@ -225,9 +168,7 @@ void main_close()
     if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
 
     if(GfxBase) CloseLibrary((struct Library *)GfxBase);
-#ifdef DOMAMELOG
-    printf("-end-\n");
-#endif
+
 // done in  by compiler runtime or not.
 #ifdef USE_OWN_DOSBASE
    if(DOSBase) CloseLibrary((struct Library *)DOSBase);
@@ -310,11 +251,6 @@ int main(int argc, char **argv)
     if(libs_init()!=0) exit(1);
 
 #ifdef DOMAMELOG
-    printf("gui_gadtools_init()\n");
-#endif
-    if(GadToolsBase) gui_gadtools_init();
-
-#ifdef DOMAMELOG
     printf("getMainConfig().init()\n");
 #endif
     getMainConfig().init(argc,argv);
@@ -383,16 +319,17 @@ int main(int argc, char **argv)
     return(0);
 }
 
-void ErrorRequest(LONG msg_id, ...)
-{
-  // intuition requester
-  struct EasyStruct es;
+// could be insteresting
+//void ErrorRequest(LONG msg_id, ...)
+//{
+//  // intuition requester
+//  struct EasyStruct es;
   
-  es.es_StructSize   = sizeof(struct EasyStruct);
-  es.es_Flags        = 0;
-  es.es_Title        =(CONST_STRPTR)(APPNAMEA);
-  es.es_TextFormat   = (CONST_STRPTR)(GetMessage(msg_id));
-  es.es_GadgetFormat = (CONST_STRPTR)(GetMessage(MSG_OK));
+//  es.es_StructSize   = sizeof(struct EasyStruct);
+//  es.es_Flags        = 0;
+//  es.es_Title        =(CONST_STRPTR)(APPNAMEA);
+//  es.es_TextFormat   = (CONST_STRPTR)(GetMessage(msg_id));
+//  es.es_GadgetFormat = (CONST_STRPTR)(GetMessage(MSG_OK));
 
-  EasyRequestArgs(NULL, &es, NULL, &((&msg_id)[1]));
-}
+//  EasyRequestArgs(NULL, &es, NULL, &((&msg_id)[1]));
+//}
