@@ -527,7 +527,7 @@ static void npdo32(
 #endif
 
 /***********************************************************************************/
-
+//extern int dbg_plane;
 #ifndef pdt16
 static void pdt16(
         UINT16 *dest REGTM(a0),
@@ -541,14 +541,16 @@ static void pdt16(
         )
 {
 	int i;
-
 	for( i=0; i<count; i++ )
 	{
 		if( (pMask[i]&mask)==value )
 		{
 			dest[i] = source[i];
 			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-		}
+		}/* else if(dbg_plane && i&1)
+        {
+            dest[i] = 47;
+        }*/
 	}
 }
 #endif

@@ -52,6 +52,8 @@ VIDEO_START( timscanr )
  *
  *************************************/
 
+int dbg_plane=0;
+
 VIDEO_UPDATE( system16b )
 {
 	/* if no drawing is happening, fill with black and get out */
@@ -71,9 +73,23 @@ VIDEO_UPDATE( system16b )
 
 */
 
-	/* reset priorities */
+	/* reset priorities */    
 	fillbitmap(priority_bitmap, 0, cliprect);
 
+    segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_IGNORE_TRANSPARENCY, 0x01);
+    // second background flag1 never seen in: wb3, gnaxe, shinobi, altbeast.
+
+    segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 0, 0x02);
+    segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
+
+    segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
+
+    // second text used in: altbeast. -> why prio 8 ?
+//dbg_plane=1;
+    segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
+//dbg_plane=0;
+     // original calls
+#if 0
 	/* draw background opaquely first, not setting any priorities */
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_IGNORE_TRANSPARENCY, 0x00);
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 1 | TILEMAP_IGNORE_TRANSPARENCY, 0x00);
@@ -89,7 +105,7 @@ VIDEO_UPDATE( system16b )
 	/* text layer */
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
-
+#endif
 	/* draw the sprites */
 	segaic16_sprites_draw(0, bitmap, cliprect);
 }

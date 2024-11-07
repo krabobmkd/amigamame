@@ -1175,7 +1175,7 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 
 		case 0x2000/2:
 			if (ACCESSING_LSB)
-				segaic16_tilemap_set_bank(0, offset & 1, data & 7);
+				segaic16_tilemap_set_bank( offset & 1, data & 7);
 			break;
 	}
 }

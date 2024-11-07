@@ -58,6 +58,7 @@ options.skip_disclaimer = 1;
 options.skip_gameinfo = 1;
 options.skip_warnings = 1;
 
+options.pause_bright = 1.0f;
     /* Clear the zip filename caches. */
 
     osd_set_mastervolume(0);
@@ -83,6 +84,9 @@ vector<uint8_t> bm(w * h * 3, 128);
 QProc *proc=nullptr;
 QThread *qthread = nullptr;
 struct _mame_display *_display=nullptr;
+QImage _image; //(bm.data(), w, h, QImage::Format_RGB888);
+QMutex _imageMutex;
+bool isinexit=false;
 QMutex m_mutex;
 bool m_bIs15b = false;
 QProc::QProc() : QObject()
@@ -96,7 +100,10 @@ void QProc::process()
     // test if just "mame romname".
     int itest = getMainConfig().driverIndex().index(
     //"arkretrn"
-    "wb3"
+//    "wb3"
+// "shinobi"
+               "goldnaxe"
+//                "altbeast"
 //    "bublbobl"
 //   "dino"
 //                 "batrider"
@@ -142,64 +149,15 @@ void QWin::updateWin()
 {
 
     if(!_display || !_display->game_bitmap ) return;
-    struct _mame_display *display=_display;
+   // struct _mame_display *display=_display;
 
-    uint16_t *p = (uint16_t *) _display->game_bitmap->base;
-    int x1 = _display->game_visible_area.min_x;
-    int y1 = _display->game_visible_area.min_y;
-    int realHeight = (_display->game_visible_area.max_y - _display->game_visible_area.min_y)+1;
+    _imageMutex.lock();
+        int w = _image.width();
+        int h = _image.height();
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
+        this->setFixedSize(w*3,h*3);
+    _imageMutex.unlock();
 
-    if(w != _display->game_bitmap->width || h != realHeight)
-    {
-        w = _display->game_bitmap->width;
-        h = realHeight;
-        bm.resize(w*h*3);
-    }
-
-    if(m_bIs15b)
-    {
-
-        for(int y=0;y<realHeight;y++)
-        {
-            uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
-            pline += x1;
-            for(int x=0;x<display->game_bitmap->width;x++)
-            {
-                uint16_t rgb = *pline++;
-
-                int i = (x+y*w)*3;
-                bm[i]= ((rgb>>10)<<3) & 0xf8;
-                bm[i+1]=  ((rgb>>5)<<3) & 0xf8;
-                bm[i+2]=((rgb)<<3) & 0xf8;
-
-            }
-        }
-    } else
-
-    for(int y=0;y<realHeight;y++)
-    {
-        uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
-        pline += x1;
-        for(int x=0;x<display->game_bitmap->width;x++)
-        {
-            uint16_t c = *pline++;
-            uint32_t rgb=0;
-            if(c<display->game_palette_entries)
-            rgb = display->game_palette[c];
-
-            int i = (x+y*w)*3;
-            bm[i]= rgb>>16;
-            bm[i+1]= rgb>>8;
-            bm[i+2]= rgb;
-
-        }
-    }
-
-
-	const QImage image(bm.data(), w, h, QImage::Format_RGB888);
-
-	this->setPixmap(QPixmap::fromImage(image).scaled(QSize(w*2,h*2)) );
-    this->setFixedSize(w*2,h*2);
 	//lbl.show();
 //    m_mutex.unlock();
 //    m_mutex.lock();
@@ -212,6 +170,7 @@ int main(int argc, char* argv[])
 	QApplication a(argc, argv);
     QWin w;
     int r =  a.exec();
+    isinexit = true;
     logEntries();
 
 	return r;
@@ -253,9 +212,66 @@ extern int nbframe;
 }
 void osd_update_video_and_audio(struct _mame_display *display)
 {
+    if(isinexit) return;
     _display = display;
+    uint16_t *p = (uint16_t *) _display->game_bitmap->base;
+    int x1 = _display->game_visible_area.min_x;
+    int y1 = _display->game_visible_area.min_y;
+    int realHeight = (_display->game_visible_area.max_y - _display->game_visible_area.min_y)+1;
+
+    if(w != _display->game_bitmap->width || h != realHeight)
+    {
+        w = _display->game_bitmap->width;
+        h = realHeight;
+        bm.resize(w*h*3);
+    }
+
+    if(m_bIs15b)
+    {
+
+        for(int y=0;y<realHeight;y++)
+        {
+            uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
+            pline += x1;
+            for(int x=0;x<_display->game_bitmap->width;x++)
+            {
+                uint16_t rgb = *pline++;
+
+                int i = (x+y*w)*3;
+                bm[i]= ((rgb>>10)<<3) & 0xf8;
+                bm[i+1]=  ((rgb>>5)<<3) & 0xf8;
+                bm[i+2]=((rgb)<<3) & 0xf8;
+
+            }
+        }
+    } else
+
+    for(int y=0;y<realHeight;y++)
+    {
+        uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
+        pline += x1;
+        for(int x=0;x<display->game_bitmap->width;x++)
+        {
+            uint16_t c = *pline++;
+            uint32_t rgb=0;
+            if(c<display->game_palette_entries)
+            rgb = display->game_palette[c];
+
+            int i = (x+y*w)*3;
+            bm[i]= rgb>>16;
+            bm[i+1]= rgb>>8;
+            bm[i+2]= rgb;
+
+        }
+    }
+
+	QImage image(bm.data(), w, h, QImage::Format_RGB888);
+        _imageMutex.lock();
+        _image = image;
+    _imageMutex.unlock();
+
 nbframe++;
-if(nbframe == 60*72) mame_pause(1);
+//if(nbframe == 60*28) mame_pause(1);
 // if(nbframe==1200) exit(1);
 
 //    m_mutex.lock();
