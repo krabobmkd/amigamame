@@ -26,17 +26,19 @@ struct Library *MUIMasterBase = 0L;
 #include <proto/timer.h>
 
 extern "C" {
-#include <libraries/mui.h>
-#include <libraries/iffparse.h>
-#include <libraries/gadtools.h>
-#include <libraries/asl.h>
+    #include <libraries/mui.h>
+    #include <libraries/iffparse.h>
+    #include <libraries/asl.h>
+    // just for NM_BARLABEL
+    #include <libraries/gadtools.h>
 
-// we point MUI38 ....
-#include <../../MUI50/include/mui/Guigfx_mcc.h>
-#include <inline/muimaster.h>
+    // we point MUI50 in almigacommonlibs repository ....
+    #include <../../MUI50/include/mui/Guigfx_mcc.h>
+    #include <../../MUI50/include/mui/GIFAnim_mcc.h>
+    #include <inline/muimaster.h>
 }
 #define CATCOMP_NUMBERS
-#include "messages.h"
+#include "amiga_locale.h"
 
 #include "asmmacros.h"
 
@@ -80,23 +82,10 @@ typedef ULONG (*RE_HOOKFUNC)();
 #ifndef GIT_BRANCH
 #define GIT_BRANCH
 #endif
-const char *TextAbout =
-"\33c\n\33b\33uMAME - Multiple Arcade Machine Emulator\33n\n\n"
-"0."REVISION" \n\n"
-"Copyright (C) 1997-2024 by Nicola Salmoria and the MAME team\n"
-"http://mamedev.org\n\n"
-"Amiga port by Vic 'Krb' Ferry (2024) source:\n"
-" https://github.com/krabobmkd/amigamame\n"
-"compiled branch:" GIT_BRANCH " " REVDATE " " REVTIME "\n"
-"Partly based on Mats Eirik Hansen Mame060(1999)\n"
-" http://www.triumph.no/mame\n"
-"This program uses libexpat,zlib,\n"
-" MUI - Magic User Interface\n";
+
+std::string sTextAbout;
 
 
-// https://github.com/krabobmkd
-// "CGXHooks routines by Trond Werner Hansen\n\n"
-// "Chunky to planar routine by Mikael Kalms\n\n"
 struct DriverData
 {
   struct MUI_EventHandlerNode EventHandler;
@@ -111,8 +100,6 @@ struct DriverData
 #define get(obj,attr,store) GetAttr(attr,(Object *)obj,(ULONG *)store)
 #define set(obj,attr,value) SetAttrs(obj,attr,value,TAG_DONE)
 
-
-
 static struct MUI_CustomClass *DriverClass=NULL;
 
 static Object *App=NULL;
@@ -122,50 +109,19 @@ static Object *DisplayName=NULL;
 
 static Object * RE_Options=NULL;
 
-//static Object * CM_Allow16Bit=NULL;
-//static Object * CM_FlipX=NULL;
-//static Object * CM_FlipY=NULL;
-//static Object * CM_DirtyLines=NULL;
-//static Object * CM_AutoFrameSkip=NULL;
-
 static Object * CY_Show=NULL;
-//static Object *CM_UseDefaults;
+
 static Object * BU_Scan=NULL;
 
-static Object * IMG_BottomLeft = NULL;
-
-//static Object * CM_Antialiasing;
-//static Object * CM_Translucency;
-//static Object * SL_BeamWidth;
-//static Object * SL_VectorFlicker;
-
-// audio
-//static Object * SL_AudioChannel[4];
-//static Object * SL_MinFreeChip;
-
-//static Object * SL_FrameSkip;
-
-//static Object * ST_Width;
-//static Object * ST_Height;
-//static Object * ST_RomPath;
-//static Object * ST_SamplePath;
-//static Object * CY_ScreenType;
-//static Object * CY_DirectMode;
-//static Object * CY_Sound;
-//static Object * CY_Buffering;
-//static Object * CY_Rotation;
-
-
-
-//static Object * PA_ScreenMode;
-//static Object * PA_RomPath;
-//static Object * PA_SamplePath;
 static Object *LI_Driver=NULL;
 static Object * LV_Driver=NULL;
 static Object * BU_Start=NULL;
 //static Object * BU_Quit=NULL;
 static Object * BU_About_OK=NULL;
 static Object * PU_ScreenMode=NULL;
+
+static Object *LA_statusbar=NULL;
+static Object *GIF_cornerlogo=NULL;
 
 MUISerializer muiConfigCreator;
 static int columnToSort = 0;
@@ -203,158 +159,41 @@ static ULONG ASM DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG 
   return(0);
 }
 static struct Hook DriverSelectHook;
-
-//static UBYTE           DisplayNameBuffer[256];
 std::string DisplayNameBuffer;
 
 static STRPTR Shows[] =
 {
-  (STRPTR) MSG_ALL,
-  (STRPTR) MSG_FOUND,
+  (STRPTR)"All",
+  (STRPTR)"Found",
   NULL
 };
 
-static STRPTR ScreenTypes[] =
-{
-  (STRPTR) MSG_BEST,
-  (STRPTR) MSG_WORKBENCH,
-  (STRPTR) MSG_CUSTOM,
-  (STRPTR) MSG_USER_SELECT,
-  NULL
-};
-
-static APTR DirectModes[] =
-{
-  (STRPTR) MSG_OFF,
-  (STRPTR) MSG_DRAW,
-  (STRPTR) MSG_COPY,
-  NULL
-};
-
-static STRPTR Sounds[] =
-{
-  (STRPTR) MSG_NONE,
-  (STRPTR) MSG_PAULA,
-  (STRPTR) MSG_AHI,
-  NULL
-};
-
-static STRPTR Joy1Types[] =
-{
-  (STRPTR) MSG_NONE,
-  (STRPTR) MSG_JOYSTICK_PORT_2,
-  (STRPTR) MSG_JOYPAD_PORT_2,
-  (STRPTR) MSG_MOUSE_PORT_1,
-  NULL
-};
-
-static STRPTR Joy2Types[] =
-{
-  (STRPTR) MSG_NONE,
-  (STRPTR) MSG_JOYSTICK_PORT_1,
-  (STRPTR) MSG_JOYPAD_PORT_1,
-  NULL
-};
-
-static STRPTR Rotations[] =
-{
-  (STRPTR) MSG_NO,
-  (STRPTR) MSG_LEFT,
-  (STRPTR) MSG_RIGHT,
-  NULL
-};
-
-//static STRPTR RegisterTitles[] =
-//{
-//  (STRPTR) MSG_DRIVERS,
-//  (STRPTR) MSG_DISPLAY,
-//  (STRPTR) MSG_SOUND,
-//  (STRPTR) MSG_INPUT,
-//  (STRPTR) MSG_PATHS,
-//  NULL
-//};
-
-static STRPTR Bufferings[] =
-{
-  (STRPTR) MSG_SINGLE,
-  (STRPTR) MSG_DOUBLE,
-  (STRPTR) MSG_TRIPLE,
-  NULL
-};
-
-static struct TagItem ScreenModeTags[] =
-{
-  { ASLSM_InitialDisplayID,   0 },
-  { ASLSM_InitialDisplayDepth,  8 },
-  { ASLSM_DoDepth,        TRUE  },
-  { TAG_END }
-};
-
-static struct Hook DirectModeNotifyHook={0};
-static struct Hook SoundNotifyHook={0};
 static struct Hook DriverDisplayHook={0};
 static struct Hook DriverSortHook={0};
 static struct Hook DriverNotifyHook={0};
-//static struct Hook DriverSortColumnNotifyHook={0};
 
-#ifndef MESS
 static struct Hook ShowNotifyHook={0};
-#endif
 
-#ifndef MESS
 // list column names
-static char *String_Driver=(char *)"Driver";
-static char *String_Archive=(char *)"Archive";
-static char *String_Parent=(char *)"Parent";
-static char *String_Screen=(char *)"Screen";
-static char *String_Players=(char *)"Players.";
-static char *String_Year=(char *)"Year";
-static char *String_Comment=(char *)"Comment";
-/*
-
-static char *DirectoryString;
-static char *TypeString;
-static char *WidthString;
-static char *HeightString;
-static char *ColorsString;
-
-*/
-static char *NotWorkingString;
-static char *WrongColorsString;
-static char *ImperfectColorsString;
-//static char *BitmapString;
-//static char *VectorString;
-//static char *BitmapGameDefaultsString;
-//static char *VectorGameDefaultsString;
-#endif
+static const char *String_Driver;
+static const char *String_Archive;
+static const char *String_Parent;
+static const char *String_Screen;
+static const char *String_Players;
+static const char *String_Year;
+static const char *String_Comment;
+static const char *NotWorkingString;
+static const char *WrongColorsString;
+static const char *ImperfectColorsString;
 
 static void CreateApp(void);
-static void SetDisplayName(ULONG);
-//static ULONG ASM ScreenModeStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1));
-//static ULONG ASM ScreenModeStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1));
-static ULONG ASM DirectModeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
-static ULONG ASM SoundNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+//static ULONG ASM DirectModeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+//static ULONG ASM SoundNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 static ULONG ASM DriverNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
-//static ULONG ASM DriverSortColumnNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 
 #ifndef MESS
 static ULONG ASM ShowNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 #endif
-
-/* Convert an index in SortedDrivers into an index for the same
- * driver in Drivers. */
-
-//static inline int GetSortedDriverIndex(int sorted_index)
-//{
-//  int index;
-
-//  if(sorted_index < DRIVER_OFFSET)
-//    index = sorted_index - DRIVER_OFFSET;
-//  else
-//    index = (((ULONG) SortedDrivers[sorted_index]) - ((ULONG) &Drivers[0])) / sizeof(struct _game_driver *);
-
-//  return(index);
-//}
 
 static inline int GetEntryDriverIndex(ULONG entry)
 {
@@ -421,7 +260,7 @@ static void ShowFound(void)
         DoMethod((Object *)LI_Driver, MUIM_List_Insert,
          (ULONG)roms.data(),(int)roms.size(),  /*MUIV_List_Insert_Bottom*/MUIV_List_Insert_Sorted);
 
-// no need because MUIV_List_Insert_Sorted   DoMethod(LI_Driver,MUIM_List_Sort);
+// no need because MUIV_List_Insert_Sorted (would ressort):   DoMethod(LI_Driver,MUIM_List_Sort);
 
     // ensure cycle is in correct state
     int cyclestate=0;
@@ -443,7 +282,7 @@ static void ShowAll(void)
         DoMethod((Object *)LI_Driver, MUIM_List_Insert,
          (ULONG)roms.data(),(int)roms.size(),  /*MUIV_List_Insert_Bottom*/MUIV_List_Insert_Sorted);
 
-   // no need because MUIV_List_Insert_Sorted DoMethod(LI_Driver,MUIM_List_Sort);
+   // no need because MUIV_List_Insert_Sorted does the job: DoMethod(LI_Driver,MUIM_List_Sort);
 
     // ensure cycle is in correct state
     int cyclestate=0;
@@ -512,7 +351,6 @@ static ULONG ASM DriverSort(
 }
 static ULONG ASM DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const struct _game_driver **drv_indirect REG(a1))
 {
-
     MameConfig &config = getMainConfig();
     const struct _game_driver *drv;
 
@@ -933,82 +771,33 @@ void AllocGUI(void)
     printf("mui lib:%d\n",MUIMasterBase->lib_Version);
     LONG  i;
 
-//  for(NumDrivers = 0; Drivers[NumDrivers]; NumDrivers++);
-
-//  SortedDrivers = ( struct _game_driver ***)malloc((NumDrivers + DRIVER_OFFSET) * sizeof(struct _game_driver **));
-
-//  if(SortedDrivers)
-//  {
-//#ifndef MESS
-//    SortedDrivers[0]  = (struct _game_driver **) 1;
-//    SortedDrivers[1]  = (struct _game_driver **) 2;
-//#endif
-//    for(i = 0; i < NumDrivers; i++)
-//      SortedDrivers[i+DRIVER_OFFSET] = const_cast<struct _game_driver **>(&Drivers[i]);
-
-//    qsort(&SortedDrivers[DRIVER_OFFSET], NumDrivers, sizeof(struct _game_driver **), (int (*)(const void *, const void *)) DriverCompare);
-
-#ifdef DOMAMELOG
-    printf("old locale init\n");
-#endif
     App     = NULL;
     MainWin   = NULL;
     AboutWin  = NULL;
 
-    for(i = 0; Shows[i]; i++)
-      Shows[i] = GetMessage((LONG) Shows[i]);
+    for(i = 0; i<(sizeof(Shows)/sizeof(STRPTR)) -1; i++)
+      Shows[i] = (char *) GetMessagec(Shows[i]);
 
-    for(i = 0; ScreenTypes[i]; i++)
-      ScreenTypes[i] = GetMessage((LONG) ScreenTypes[i]);
-
-    for(i = 0; DirectModes[i]; i++)
-      DirectModes[i] = GetMessage((LONG) DirectModes[i]);
-
-    for(i = 0; Sounds[i]; i++)
-      Sounds[i] = GetMessage((LONG) Sounds[i]);
-
-    for(i = 0; Joy1Types[i]; i++)
-      Joy1Types[i] = GetMessage((LONG) Joy1Types[i]);
-
-    for(i = 0; Joy2Types[i]; i++)
-      Joy2Types[i] = GetMessage((LONG) Joy2Types[i]);
-
-    for(i = 0; Rotations[i]; i++)
-      Rotations[i] = GetMessage((LONG) Rotations[i]);
-
-//    for(i = 0; RegisterTitles[i]; i++)
-//      RegisterTitles[i] = GetMessage((LONG) RegisterTitles[i]);
-
-    for(i = 0; Bufferings[i]; i++)
-      Bufferings[i] = GetMessage((LONG) Bufferings[i]);
-
-//    ScreenModeStartHook.h_Entry  = (RE_HOOKFUNC) ScreenModeStart;
-//    ScreenModeStopHook.h_Entry   = (RE_HOOKFUNC) ScreenModeStop;
-    DirectModeNotifyHook.h_Entry = (RE_HOOKFUNC) DirectModeNotify;
-    SoundNotifyHook.h_Entry      = (RE_HOOKFUNC) SoundNotify;
     DriverDisplayHook.h_Entry    = (RE_HOOKFUNC) DriverDisplay;
     DriverSortHook.h_Entry    = (RE_HOOKFUNC) DriverSort;
     DriverNotifyHook.h_Entry     = (RE_HOOKFUNC) DriverNotify;
-//    DriverSortColumnNotifyHook.h_Entry     = (RE_HOOKFUNC) DriverSortColumnNotify;
 
-#ifndef MESS
     ShowNotifyHook.h_Entry        = (RE_HOOKFUNC) ShowNotify;
 
-//    DriverString             = GetMessage(MSG_DRIVER);
-//    DirectoryString          = GetMessage(MSG_DIRECTORY);
-//    TypeString               = GetMessage(MSG_TYPE);
-//    WidthString              = GetMessage(MSG_WIDTH);
-//    HeightString             = GetMessage(MSG_HEIGHT);
-//    ColorsString             = GetMessage(MSG_COLORS);
-//    CommentString            = GetMessage(MSG_COMMENT);
-    NotWorkingString         = GetMessage(MSG_NOT_WORKING);
-    WrongColorsString        = GetMessage(MSG_WRONG_COLORS);
-    ImperfectColorsString    = GetMessage(MSG_IMPERFECT_COLORS);
-//    BitmapString             = GetMessage(MSG_BITMAP);
-//    VectorString             = GetMessage(MSG_VECTOR);
-//    BitmapGameDefaultsString = GetMessage(MSG_BITMAP_GAME_DEFAULTS);
-//    VectorGameDefaultsString = GetMessage(MSG_VECTOR_GAME_DEFAULTS);
-#endif
+    // - - - -possibly locale managed strings for list
+    NotWorkingString         = GetMessagec("Not working");
+    WrongColorsString        = GetMessagec("Wrong colors");
+    ImperfectColorsString    = GetMessagec("Imperfect colors");
+
+    String_Driver=GetMessagec("Driver");
+    String_Archive=GetMessagec("Archive");
+    String_Parent=GetMessagec("Parent");
+    String_Screen=GetMessagec("Screen");
+    String_Players=GetMessagec("Players");
+    String_Year=GetMessagec("Year");
+    String_Comment=GetMessagec("Comment");
+
+
 #ifdef DOMAMELOG
     printf("before MUI_CreateCustomClass()\n");
 #endif
@@ -1040,56 +829,6 @@ void FreeGUI(void)
 
 }
 
-// = = = = = = = objects contructors = = = = = =
-/*ok but
-inline Object *cMenuItem(STRPTR text,STRPTR shortcut,void *userData)
-{
-    vector<struct TagItem> tags;
-    tags.reserve(4);
-
-    if(text) tags.push_back({MUIA_Menuitem_Title,(ULONG)text});
-    if(shortcut) tags.push_back({MUIA_Menuitem_Shortcut,(ULONG)shortcut});
-    if(userData) tags.push_back({MUIA_UserData,(ULONG)userData});
-    tags.push_back({TAG_END,NULL});
-
-    return MUI_NewObjectA(MUIC_Menuitem,tags.data() );
-}
-inline Object *cMenu1()
-{
-    return MUI_NewObject(MUIC_Menu,
-MUIA_Menu_Title,(ULONG)GetMessage(MSG_MENU_GAME),
-MUIA_Family_Child,(ULONG)cMenuItem(GetMessage(MSG_MENU_ABOUT),"?",MID_About),
-MUIA_Family_Child,(ULONG)cMenuItem("About MUI...",NULL,MID_AboutMUI),
-MUIA_Family_Child,(ULONG)MUI_NewObject(MUIC_Menuitem,MUIA_Menuitem_Title,NM_BARLABEL,End),
-MUIA_Family_Child,(ULONG)cMenuItem( GetMessage(MSG_MENU_QUIT),"Q",MUIV_Application_ReturnID_Quit),
-            End
-            );
-
-}
-inline Object *cMainVLayout()
-{
-// #define RegisterGroup(t)    MUI_NewObject(MUIC_Register,MUIA_Register_Titles,(t)
-  return MUI_NewObject(MUIC_Group,
-        Child, RE_Options =MUI_NewObject(MUIC_Register,MUIA_Register_Titles,(RegisterTitles)
-    TODO
-  );
-}
-inline Object *cMainWin()
-{
-    Object *pMenu1 = cMenu1();
-    Object *pMenuStrip = MUI_NewObject(MUIC_Menustrip,MUIA_Family_Child,(ULONG)pMenu1);
-
-    Object *pMainVLayout = cMainVLayout();
-
-    return MUI_NewObject(MUIC_Window,
-          MUIA_Window_Title, APPNAME,
-          MUIA_Window_ID   , MAKE_ID('M','A','I','N'),
-          MUIA_Window_Menustrip, pMenuStrip,
-          WindowContents,(ULONG) pMainVLayout,
-            End
-            );
-}
-*/
 // use less macros
 inline Object *MUINewObject( char *pclassname,ULONG tag1, ... )
 {
@@ -1165,131 +904,15 @@ Object *createPanel_Drivers()
         TAG_DONE)
         ,
         Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,          
-          Child, Label((ULONG)GetMessage(MSG_SHOW)),
+          Child, Label((ULONG)GetMessagec("Show")),
           Child, (ULONG) (CY_Show = OMUINO(MUIC_Cycle,
             MUIA_Cycle_Entries, (ULONG) Shows,
           TAG_DONE)),
-          Child,(ULONG)(BU_Scan = SimpleButton((ULONG)GetMessage(MSG_SCAN))),
+          Child,(ULONG)(BU_Scan = SimpleButton((ULONG)GetMessagec("Scan"))),
         TAG_DONE),
     TAG_DONE);
 
 }
-
-//ULONG createPanel_Display()
-//{
-//    ULONG w= UMUINO(MUIC_Group,
-//    Child, HVSpace,
-//    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-//      Child, HSpace(0),
-
-//      // column group of 4 column, name/checkbox/name/checkbox.
-////      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,4,
-////        MUIA_HorizWeight, 1000,
-////        Child, Label((ULONG)GetMessage(MSG_ALLOW16BIT)),
-////        Child, (ULONG)(CM_Allow16Bit = OCheckMark(/*Config[CFG_ALLOW16BIT]*/1)),
-////        Child, Label((ULONG)GetMessage(MSG_AUTO_FRAMESKIP)),
-////        Child, (ULONG)(CM_AutoFrameSkip = OCheckMark(/*Config[CFG_AUTOFRAMESKIP]*/1)),
-////        Child, Label((ULONG)GetMessage(MSG_FLIPX)),
-////        Child, (ULONG)(CM_FlipX = OCheckMark(/*Config[CFG_FLIPX]*/0)),
-////        Child, Label((ULONG)GetMessage(MSG_ANTIALIAS)),
-////        Child, (ULONG)(CM_Antialiasing = OCheckMark(/*Config[CFG_ANTIALIASING]*/1)),
-////        Child, Label((ULONG)GetMessage(MSG_FLIPY)),
-////        Child, (ULONG)(CM_FlipY = OCheckMark(/*Config[CFG_FLIPY]*/0)),
-////        Child, Label((ULONG)GetMessage(MSG_TRANSLUCENCY)),
-////        Child, (ULONG)(CM_Translucency = OCheckMark(/*Config[CFG_TRANSLUCENCY]*/1)),
-////        Child, Label((ULONG)GetMessage(MSG_DIRTY_LINES)),
-////        Child, (ULONG)(CM_DirtyLines = OCheckMark(/*Config[CFG_DIRTYLINES]*/1)),
-////      TAG_DONE), // end colgroup 4
-
-//      Child, HSpace(0),
-//    TAG_DONE),
-////    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-////      Child, HSpace(0),
-////      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-////        MUIA_HorizWeight, 1000,
-////        Child, Label((ULONG)GetMessage(MSG_BEAM)),
-////        Child,(ULONG)( SL_BeamWidth = OMUINO(MUIC_Slider,
-////          MUIA_Slider_Min, 1,
-////          MUIA_Slider_Max, 16,
-////        TAG_DONE)),
-////        Child, Label((ULONG)GetMessage(MSG_FLICKER)),
-////        Child,(ULONG)( SL_VectorFlicker = OMUINO(MUIC_Slider,
-////          MUIA_Slider_Min, 0,
-////          MUIA_Slider_Max, 100,
-////        TAG_DONE)),
-////        Child, Label((ULONG)GetMessage(MSG_FRAMESKIP)),
-////        Child,(ULONG)( SL_FrameSkip = OMUINO(MUIC_Slider,
-////          MUIA_Slider_Min, 0,
-////          MUIA_Slider_Max, 3,
-////        TAG_DONE)),
-////        Child, Label((ULONG)GetMessage(MSG_WIDTH)),
-////        Child,(ULONG)( ST_Width = MUI_NewObject(MUIC_String,
-////          StringFrame,
-////          MUIA_String_Accept, (ULONG) "0123456789",
-////        TAG_DONE)),
-////        Child, Label((ULONG)GetMessage(MSG_HEIGHT)),
-////        Child,(ULONG)( ST_Height = MUI_NewObject(MUIC_String,
-////          StringFrame,
-////          MUIA_String_Accept, (ULONG) "0123456789",
-////        TAG_DONE)),
-////      TAG_DONE),
-////      Child, HSpace(0),
-////    TAG_DONE),
-
-//    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-//      Child, HSpace(0),
-//      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-//        MUIA_HorizWeight, 1000,
-//        Child, Label((ULONG)GetMessage(MSG_SCREEN_TYPE)),
-//        Child, CY_ScreenType = OMUINO(MUIC_Cycle,
-//          MUIA_Cycle_Entries, (ULONG) ScreenTypes,
-//        TAG_DONE),
-
-
-
-////        Child, Label((ULONG)GetMessage(MSG_DIRECT_MODE)),
-////        Child, CY_DirectMode = OMUINO(MUIC_Cycle,
-////          MUIA_Cycle_Entries, (ULONG) DirectModes,
-////        TAG_DONE),
-////        Child, Label((ULONG)GetMessage(MSG_BUFFERING)),
-////        Child, CY_Buffering = OMUINO(MUIC_Cycle,
-////          MUIA_Cycle_Entries, (ULONG) Bufferings,
-////        TAG_DONE),
-////        Child, Label((ULONG)GetMessage(MSG_ROTATION)),
-////        Child, CY_Rotation = OMUINO(MUIC_Cycle,
-////          MUIA_Cycle_Entries, (ULONG) Rotations,
-////        TAG_DONE),
-//      TAG_DONE),
-//      Child, HSpace(0),
-//    TAG_DONE),
-//    Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-//      Child, HSpace(0),
-//      Child, UMUINO(MUIC_Group,MUIA_Group_Columns,2,
-//        MUIA_HorizWeight, 1000,
-
-//        Child, Label((ULONG)GetMessage(MSG_SCREENMODE)),
-//        Child,(ULONG)( PA_ScreenMode = MUI_NewObject(MUIC_Popasl,
-
-//          MUIA_Popstring_String,(ULONG)( DisplayName = MUI_NewObject(MUIC_Text,
-//            TextFrame,
-//            MUIA_Background, MUII_TextBack,
-//          TAG_DONE)),
-
-//          MUIA_Popstring_Button,(ULONG)(PU_ScreenMode = PopButton(MUII_PopUp)),
-//          MUIA_Popasl_Type,     ASL_ScreenModeRequest,
-//          MUIA_Popasl_StartHook,  (ULONG) &ScreenModeStartHook,
-//          MUIA_Popasl_StopHook, (ULONG) &ScreenModeStopHook,
-//          MUIA_Disabled, (ULONG) (/*Config[CFG_SCREENTYPE] != CFGST_CUSTOM*/1),
-//        TAG_DONE)),
-//      TAG_DONE),
-//      Child, HSpace(0),
-//    TAG_DONE),
-//    Child, HVSpace,
-//  TAG_DONE);
-
-//  return w;
-//}
-
 
 
 ULONG createOptionTabGroup()
@@ -1298,7 +921,7 @@ ULONG createOptionTabGroup()
 
     muiConfigCreator("Main",(ASerializable &)config);
 
-    muiConfigCreator.insertFirstPanel(createPanel_Drivers(),"Drivers");
+    muiConfigCreator.insertFirstPanel(createPanel_Drivers(),GetMessagec("Drivers"));
 
     RE_Options = muiConfigCreator.compile();
 
@@ -1345,24 +968,31 @@ int MainGUI(void)
     {
       if(!MainWin)
       {
+      printf("may do image lib ver:%d\n",MUIMasterBase->lib_Version);
         if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
         {
 #define SCALEMODEMASK(u, d, p, s)	(((u) ? NISMF_SCALEUP : 0) | ((d) ? NISMF_SCALEDOWN : 0) | ((p) ? NISMF_KEEPASPECT_PICTURE : 0) | ((s) ? NISMF_KEEPASPECT_SCREEN : 0))
 #define TRANSMASK(m, r)				(((m) ? NITRF_MASK : 0 ) | ((r) ? NITRF_RGB : 0))
 
-    printf("do MUIC_Guigfx\n");
-          IMG_BottomLeft =  MUI_NewObject(MUIC_Guigfx,
-							MUIA_Guigfx_FileName, (ULONG) "skin/bl.ilbm",
-							MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Low,
+    printf("do MUIC_GIFAnim\n");
+          GIF_cornerlogo =
+           MUI_NewObject(MUIC_GIFAnim,MUIA_GIFAnim_File,(ULONG) "PROGDIR:skin/cornerlogo.gif",
+
+                    TAG_DONE);
+          /* following doesnt work ! really there is a problem with guigfx.library.
+           *
+           * MUI_NewObject(MUIC_Guigfx,
+							MUIA_Guigfx_FileName, (ULONG) "PROGDIR:skin/bl.ilbm",
+							MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 							// SCALEMODEMASK( scaleup, scaledown  PICASPECT, SCREENASPECT )
 						//	MUIA_Guigfx_ScaleMode, SCALEMODEMASK(FALSE, FALSE, TRUE, FALSE),
 						//	MUIA_Guigfx_Transparency, TRANSMASK(TRUE, TRUE),
-							TAG_DONE);
-    printf("do MUIC_Guigfx:%08x\n",(int)IMG_BottomLeft);
+							TAG_DONE);*/
+    printf("do MUIC_GIFAnim:%08x\n",(int)GIF_cornerlogo);
         }
-        if(IMG_BottomLeft == NULL)
+        if(GIF_cornerlogo == NULL)
         {
-            IMG_BottomLeft = MUI_MakeObject(MUIO_HSpace,0);
+            GIF_cornerlogo = MUI_MakeObject(MUIO_HSpace,0);
         }
 
 //static  std::string appName(APPNAME);
@@ -1373,21 +1003,21 @@ int MainGUI(void)
           {MUIA_Window_ID   , MAKE_ID('M','A','I','N')},
 
         {MUIA_Window_Menustrip, UMUINO(MUIC_Menustrip,
-            MUIA_Family_Child,UMUINO(MUIC_Menu,MUIA_Menu_Title,(ULONG)GetMessage(MSG_MENU_GAME),
+            MUIA_Family_Child,UMUINO(MUIC_Menu,MUIA_Menu_Title,(ULONG)GetMessagec("Menu"),
               MUIA_Family_Child, UMUINO(MUIC_Menuitem,
-                MUIA_Menuitem_Title,  (ULONG)GetMessage(MSG_MENU_ABOUT),
+                MUIA_Menuitem_Title,  (ULONG)GetMessagec("About"),
                 MUIA_Menuitem_Shortcut,(ULONG) "?",
                 MUIA_UserData,      MID_About,
               TAG_DONE),
               MUIA_Family_Child, UMUINO(MUIC_Menuitem,
-                MUIA_Menuitem_Title, (ULONG) "About MUI...",
+                MUIA_Menuitem_Title,  (ULONG)GetMessagec("About MUI..."),
                 MUIA_UserData,      MID_AboutMUI,
               TAG_DONE),
               MUIA_Family_Child, UMUINO(MUIC_Menuitem,
                 MUIA_Menuitem_Title,  NM_BARLABEL,
               TAG_DONE),
               MUIA_Family_Child, UMUINO(MUIC_Menuitem,
-                MUIA_Menuitem_Title,  (ULONG)GetMessage(MSG_MENU_QUIT),
+                MUIA_Menuitem_Title,  (ULONG)GetMessagec("Quit"),
                 MUIA_Menuitem_Shortcut,(ULONG) "Q",
                 MUIA_UserData,      MUIV_Application_ReturnID_Quit,
               TAG_DONE),
@@ -1399,15 +1029,23 @@ int MainGUI(void)
             Child,createOptionTabGroup(),
 
             Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-              Child, BU_Start   = SimpleButton((ULONG)GetMessage(MSG_START)),
-              Child,IMG_BottomLeft,
-          //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessage(MSG_QUIT)),
+                Child, UMUINO(MUIC_Group,
+                      Child, BU_Start   = SimpleButton((ULONG)GetMessagec("Start")),
+                      Child, LA_statusbar = LLabel((ULONG)GetMessagec("Bla bla bla...")),
+                        TAG_DONE,0),
+              Child,GIF_cornerlogo,
+          //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessagec("Quit")),
             TAG_DONE,0), // end WindowContent Group
           TAG_DONE,0)},
         TAG_DONE,0};
+
         MainWin =  MUI_NewObjectA(MUIC_Window, (struct TagItem *) &mainwintags[0]);// MUINewObject(MUIC_Window,
 //        printf("after MUINewObject():%08x\n",(int)MainWin);
 // MUIA_Disabled
+// static Object *LA_statusbar=NULL;
+//static Object *GIF_cornerlogo=NULL;
+
+
         if(MainWin)
         {
           DoMethod(App, OM_ADDMEMBER, MainWin);
@@ -1428,23 +1066,9 @@ int MainGUI(void)
           DoMethod(MainWin, MUIM_Notify,  MUIA_Window_CloseRequest, TRUE,
                    App, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
 
-//          DoMethod(CM_AutoFrameSkip, MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
-//                   SL_FrameSkip, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
-
-//          DoMethod(SL_Joy1AutoFireRate, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime,
-//                   SL_Joy1ButtonBTime, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
-
-//          DoMethod(SL_Joy2AutoFireRate, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime,
-//                   SL_Joy2ButtonBTime, 3, MUIM_Set, MUIA_Disabled, MUIV_TriggerValue);
 
           DoMethod(MainWin, MUIM_Notify, MUIA_Window_MenuAction, MUIV_EveryTime,
                    App, 2, MUIM_Application_ReturnID, MUIV_TriggerValue);
-
-//          DoMethod(CY_DirectMode, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
-//                   CY_DirectMode, 3, MUIM_CallHook, &DirectModeNotifyHook, MUIV_TriggerValue);
-
-//          DoMethod(CY_Sound, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
-//                   CY_Sound, 3, MUIM_CallHook, &SoundNotifyHook, MUIV_TriggerValue);
 
           DoMethod(LI_Driver, MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
                    LI_Driver, 3, MUIM_CallHook, &DriverNotifyHook, MUIV_TriggerValue);
@@ -1627,6 +1251,29 @@ inline Object *OHCenter(Object *obj)
 
 static void CreateApp(void)
 {
+    if(sTextAbout.length()==0)
+    {
+        sTextAbout =
+            "\33c\n\33b\33uMAME - Multiple Arcade Machine Emulator\33n\n\n"
+            "0."REVISION" \n\n"
+            "Copyright (C) 1997-2024 by Nicola Salmoria and the MAME team\n"
+            "http://mamedev.org\n\n"
+            "Amiga port by Vic 'Krb' Ferry (2024) source:\n"
+            " https://github.com/krabobmkd/amigamame\n"
+            "compiled branch:" GIT_BRANCH " " REVDATE " " REVTIME "\n"
+            "Partly based on Mats Eirik Hansen Mame060(1999)\n"
+            " http://www.triumph.no/mame\n"
+            "This program uses libexpat,zlib,\n"
+            " MUI - Magic User Interface\n";
+        if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
+        {
+            sTextAbout += "Upgrade to MUI5 for a better experience at:\n"
+                        "https://github.com/amiga-mui/muidev/releases\n";
+        }
+    }
+
+
+
   App = MUI_NewObject(MUIC_Application,
     MUIA_Application_Title      , (ULONG)APPNAME,
     //MUIA_Application_Version    , (ULONG)("$VER: " APPNAME " (" REVDATE ")"),
@@ -1644,7 +1291,7 @@ static void CreateApp(void)
             MUIA_Background, MUII_TextBack,
             Child, UMUINO(MUIC_Group,
               Child, UMUINO(MUIC_Text,
-                MUIA_Text_Contents, (ULONG)TextAbout,
+                MUIA_Text_Contents, (ULONG)sTextAbout.c_str(),
               TAG_DONE),
               Child, VSpace(0),
             TAG_DONE),
@@ -1664,54 +1311,6 @@ static void CreateApp(void)
              App, 2, MUIM_Application_ReturnID, RID_CloseAbout);
   }
 }
-
-static void SetDisplayName(ULONG displayid)
-{
-    if(!DisplayName) return;
-  if(displayid == INVALID_ID)
-    DisplayNameBuffer = GetMessage(MSG_INVALID);
-  else
-  {
-    LONG v;
-    struct NameInfo DisplayNameInfo;
-    v = GetDisplayInfoData(NULL, (UBYTE *) &DisplayNameInfo, sizeof(DisplayNameInfo),
-                         DTAG_NAME, displayid);
-
-    if(v > sizeof(struct QueryHeader))
-    {
-        DisplayNameBuffer = (const char *) DisplayNameInfo.Name;
-    }
-    char temp[16];
-    snprintf(temp,15," (0x%08x)",(int)displayid);
-    DisplayNameBuffer += temp;
-  }
-
-  set(DisplayName, MUIA_Text_Contents, (ULONG) DisplayNameBuffer.c_str());
-}
-
-//static ULONG ASM ScreenModeStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1))
-//{
-//  LONG  i;
-
-//  for(i = 0; taglist[i].ti_Tag != TAG_END; i++);
-
-//  taglist[i].ti_Tag = TAG_MORE;
-//  taglist[i].ti_Data  = (ULONG) ScreenModeTags;
-
-//  return(TRUE);
-//}
-
-//static ULONG ASM ScreenModeStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1))
-//{
-//  ScreenModeTags[SMT_DISPLAYID].ti_Data = smreq->sm_DisplayID;
-//  ScreenModeTags[SMT_DEPTH].ti_Data   = smreq->sm_DisplayDepth;
-
-//  SetDisplayName(smreq->sm_DisplayID);
-
-//  return(0);
-//}
-// when driver just selected, not double clicked
-
 
 #ifndef MESS
 static ULONG ASM ShowNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))

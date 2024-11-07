@@ -1,6 +1,22 @@
 
-	.align	2
-	.globl	_memory_readlong_d16_be
+	include exec/types.i
+
+
+	STRUCTURE directDrawScreen,0
+		APTR	dsc_base
+		ULONG	dsc_bpr
+		WORD	dsc_clipX1
+		WORD	dsc_clipY1
+		WORD	dsc_clipX2
+		WORD	dsc_clipY2
+	LABEL	dsc_sizeof
+
+	XDEF	memory_readlong_d16_be
+	XDEF	_memory_readlong_d16_be
+
+	section	code,code
+
+memory_readlong_d16_be:
 _memory_readlong_d16_be:
 ;	movem.l a2/d3/d2,-(sp)
 .LCFI2:
@@ -13,7 +29,7 @@ _memory_readlong_d16_be:
 ;	move.b d1,d2
 	cmp.l #67,d1
 ;	jls .L244
-	jge .aft
+	bge.b .aft
 ;		addq.l #1,(_entriesDirectReadA,d1.l*4)
 ;		and.w #255,d1
 		mulu.w #20,d1
@@ -24,7 +40,7 @@ _memory_readlong_d16_be:
 	rts
 .aft
 	cmp.l #191,d2
-	jls .L241
+	blt .L241
 	add.l #-192,d2
 	lsl.l #8,d2
 	lsl.l #6,d2

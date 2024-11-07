@@ -1,44 +1,27 @@
 
 #include "amiga_locale.h"
+#include <map>
+#include <string>
+using namespace std;
 
-#include <proto/locale.h>
+static map<string,string> _locale;
 
-// please include that generated horror ony here:
-#define CATCOMP_BLOCK
-#include "messages.h"
+/*
+"Quit","Quitter"
+"About","A propos"
+"About MUI...","A propos de MUI..."
 
-struct LocaleInfo   LocaleInfo ={NULL,NULL};
+*/
 
-
-// do not use the catcomp generated one.
-STRPTR GetString(struct LocaleInfo *li, LONG stringNum)
+void initLocale()
 {
-LONG   *l;
-UWORD  *w;
-STRPTR  builtIn;
-
-    l = (LONG *)CatCompBlock;
-
-    while (*l != stringNum)
-    {
-        w = (UWORD *)((ULONG)l + 4);
-        l = (LONG *)((ULONG)l + (ULONG)*w + 6);
-    }
-    builtIn = (STRPTR)((ULONG)l + 6);
-// STRPTR  __stdargs GetCatalogStr( struct Catalog *catalog, LONG stringNum, STRPTR defaultString );
-//#define XLocaleBase LocaleBase
-//#define LocaleBase li->li_LocaleBase
-// STRPTR  __stdargs GetCatalogStr( struct Catalog *catalog, LONG stringNum, STRPTR defaultString );
-    if (li->li_LocaleBase)
-        return(GetCatalogStr((struct Catalog *)li->li_Catalog,stringNum,builtIn));
-//#define LocaleBase XLocaleBase
-//#undef XLocaleBase
-
-    return(builtIn);
+    // one day or never.
+    //  Note: also could use the lowlevel simple function instead of locale.library.
 }
 
-STRPTR GetMessage(LONG id)
+const char *GetMessagec(const char *pEnglishOrKey)
 {
-    return(GetString(&LocaleInfo, id));
+    map<string,string>::iterator fit = _locale.find(pEnglishOrKey);
+    if(fit == _locale.end()) return pEnglishOrKey;
+    return fit->second.c_str();
 }
-
