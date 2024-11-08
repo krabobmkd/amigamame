@@ -232,7 +232,7 @@ static void undrfire_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 		}
 
 		if (bad_chunks)
-logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != NULL */

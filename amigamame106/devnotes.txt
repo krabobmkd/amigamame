@@ -6,17 +6,20 @@ todo beta4
 - X repair gforce2 sprites -> was musashi bug.
 - O repair optims YM2151
 - X drawgfx prio -> validate slikworm/rygar/...
-- O drawgfx
+- X drawgfx
 		X pack4
-		O clip X1 bug
+		X clip X1 bug
 - O tilemap bitfield line optim ->0.5% gain ? 3% ?
 - O optim sound bubbob
 - O  neogeo cpu overrwrite optim
-- O  neogeo change to RGB16 index
-- O  neogeo verif slicing
+- O  neogeo change RGB15 to 16b index
+- X  neogeo verif slicing
+- O  neogeo rewrite spriter in correct order and with no pixel tests.
 - O need 100%: rastan (85%),slap fight (90%), bubbob (85%)
 - O fastboot neogeo, batrider
-- O Mui5 lists with sorting.
+- X Mui5 lists with sorting.
+- O remove stdout logs, use status line, have output in option.
+- O cheat file accelerate
 
 
 todo beta3d
@@ -37,7 +40,7 @@ todo beta3d
      X - could have 2 mouses for 2 players (arkanoid return ?).
   - O try to reactivate 8bit window remap.
   - X no sound buzing when moving windows
-  - O remember windows position and size per resolution.
+  - O remember windows position and size per resolution. ->no.
 
 
  Done from Beta 1 to Beta 2:
@@ -69,14 +72,13 @@ todo beta3d
   - X all rtypes ? -> am I using wrong roms ? ->OK
 
  - - - - -
- - O ui: want number of players per games so much.
- - O frameskip -> simple ->No
- - O do save screenshot -> who care ?
+ - X ui: want number of players per games so much.
+ - X frameskip -> simple ->No
+ - X do save screenshot -> who care ? -> no.
 
  - O remove S-TV , too much non working drivers.
- - O mui list avoir année et entreprise en colonne
- - O mui list: have a column for nb players -> where to get that ?
- - O allow sorting by columns
+ - X mui list avoir année et entreprise en colonne
+ - X allow sorting by columns
  - O finish drawing leds, test with a driver that lag while booting if it helps
  - X a rom load progress bar somewhere.
 
@@ -85,8 +87,4 @@ todo beta3d
 	- X lancer rom direct avec ligne commande ou tooltip.
 
  - O test memory leaks and hits with muGuardianAngel & else -> muGuardianAngel with UAE & OS3.2 does nothing ????
- - O verif GetCatalogStr , -> REMOVE ugly locale/catcomp engine that looks like leaking (no close calls ?), reintegrate later maybe.
-
-
-
-
+ - X verif GetCatalogStr , -> REMOVE ugly locale/catcomp engine that looks like leaking (no close calls ?), reintegrate later maybe.

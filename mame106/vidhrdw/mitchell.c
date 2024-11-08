@@ -163,7 +163,7 @@ static int paletteram_bank;
 
 WRITE8_HANDLER( pang_gfxctrl_w )
 {
-logerror("PC %04x: pang_gfxctrl_w %02x\n",activecpu_get_pc(),data);
+loginfo(2,"PC %04x: pang_gfxctrl_w %02x\n",activecpu_get_pc(),data);
 {
 	char baf[40];
 	sprintf(baf,"%02x",data);
@@ -198,7 +198,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",activecpu_get_pc(),data);
 
 WRITE8_HANDLER( mstworld_gfxctrl_w )
 {
-logerror("PC %04x: pang_gfxctrl_w %02x\n",activecpu_get_pc(),data);
+loginfo(2,"PC %04x: pang_gfxctrl_w %02x\n",activecpu_get_pc(),data);
 {
 	char baf[40];
 	sprintf(baf,"%02x",data);

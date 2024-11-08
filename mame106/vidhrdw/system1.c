@@ -166,7 +166,7 @@ VIDEO_START( wbml )
 
 WRITE8_HANDLER( system1_videomode_w )
 {
-if (data & 0x6e) logerror("videomode = %02x\n",data);
+if (data & 0x6e) loginfo(2,"videomode = %02x\n",data);
 
 	/* bit 0 is coin counter */
 	coin_counter_w(0, data & 1);

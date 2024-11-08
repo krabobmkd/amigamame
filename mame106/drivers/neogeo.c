@@ -306,7 +306,7 @@ static INTERRUPT_GEN( neogeo_raster_interrupt )
 	{
 		if (line == irq2start)
 		{
-//logerror("trigger IRQ2 at raster line %d (raster counter %d)\n",line,current_rastercounter);
+//loginfo(2,"trigger IRQ2 at raster line %d (raster counter %d)\n",line,current_rastercounter);
 			if (irq2control & IRQ2CTRL_AUTOLOAD_REPEAT)
 				irq2start += (irq2pos_value + 3) / 0x180;	/* ridhero gives 0x17d */
 
@@ -338,7 +338,7 @@ static INTERRUPT_GEN( neogeo_raster_interrupt )
 		}
 
 		/* return a standard vblank interrupt */
-//logerror("trigger IRQ1\n");
+//loginfo(2,"trigger IRQ1\n");
 		vblank_int = 1;	   /* vertical blank */
 	}
 
@@ -355,7 +355,7 @@ static READ16_HANDLER( timer16_r )
 	int coinflip = pd4990a_testbit_r(0);
 	int databit = pd4990a_databit_r(0);
 
-//  logerror("CPU %04x - Read timer\n",activecpu_get_pc());
+//  loginfo(2,"CPU %04x - Read timer\n",activecpu_get_pc());
 
 	res = (readinputport(4) & ~(readinputport(5) & 0x20)) ^ (coinflip << 6) ^ (databit << 7);
 
@@ -488,7 +488,7 @@ static WRITE16_HANDLER( neo_bankswitch_w )
 
 	if (memory_region_length(REGION_CPU1) <= 0x100000)
 	{
-logerror("warning: bankswitch to %02x but no banks available\n",data);
+loginfo(2,"warning: bankswitch to %02x but no banks available\n",data);
 		return;
 	}
 
@@ -496,7 +496,7 @@ logerror("warning: bankswitch to %02x but no banks available\n",data);
 	bankaddress = (data+1)*0x100000;
 	if (bankaddress >= memory_region_length(REGION_CPU1))
 	{
-logerror("PC %06x: warning: bankswitch to empty bank %02x\n",activecpu_get_pc(),data);
+loginfo(2,"PC %06x: warning: bankswitch to empty bank %02x\n",activecpu_get_pc(),data);
 		bankaddress = 0x100000;
 	}
 
@@ -537,7 +537,7 @@ static READ16_HANDLER( neo_control_16_r )
 	res =	((current_rastercounter << 7) & 0xff80) |	/* raster counter */
 			(neogeo_frame_counter & 0x0007);			/* frame counter */
 
-	logerror("PC %06x: neo_control_16_r (%04x)\n",activecpu_get_pc(),res);
+	loginfo(2,"PC %06x: neo_control_16_r (%04x)\n",activecpu_get_pc(),res);
 
 	return res;
 }
@@ -547,7 +547,7 @@ static READ16_HANDLER( neo_control_16_r )
 // moved
 //WRITE16_HANDLER( neo_control_16_w )
 //{
-//	logerror("%06x: neo_control_16_w %04x\n",activecpu_get_pc(),data);
+//	loginfo(2,"%06x: neo_control_16_w %04x\n",activecpu_get_pc(),data);
 
 //	/* Auto-Anim Speed Control */
 //	neogeo_frame_counter_speed = (data >> 8) & 0xff;
@@ -557,7 +557,7 @@ static READ16_HANDLER( neo_control_16_r )
 
 INLINE WRITE16_HANDLER( neo_irq2pos_16_w )
 {
-	logerror("%06x: neo_irq2pos_16_w offset %d %04x\n",activecpu_get_pc(),offset,data);
+	loginfo(2,"%06x: neo_irq2pos_16_w offset %d %04x\n",activecpu_get_pc(),offset,data);
 
 	if (offset)
 		irq2pos_value = (irq2pos_value & 0xffff0000) | (UINT32)data;
@@ -571,7 +571,7 @@ INLINE WRITE16_HANDLER( neo_irq2pos_16_w )
 
 		irq2start = current_rasterline + line;
 
-		logerror("irq2start = %d, current_rasterline = %d, current_rastercounter = %d\n",irq2start,current_rasterline,current_rastercounter);
+		loginfo(2,"irq2start = %d, current_rasterline = %d, current_rastercounter = %d\n",irq2start,current_rasterline,current_rastercounter);
 	}
 }
 
@@ -867,7 +867,7 @@ static READ8_HANDLER( z80_port_r )
 		}
 
 	default:
-logerror("CPU #1 PC %04x: read unmapped port %02x\n",activecpu_get_pc(),offset&0xff);
+loginfo(2,"CPU #1 PC %04x: read unmapped port %02x\n",activecpu_get_pc(),offset&0xff);
 		return 0;
 		break;
 	}
@@ -906,7 +906,7 @@ static WRITE8_HANDLER( z80_port_w )
 		break;
 
 	default:
-logerror("CPU #1 PC %04x: write %02x to unmapped port %02x\n",activecpu_get_pc(),data,offset&0xff);
+loginfo(2,"CPU #1 PC %04x: write %02x to unmapped port %02x\n",activecpu_get_pc(),data,offset&0xff);
 		break;
 	}
 }

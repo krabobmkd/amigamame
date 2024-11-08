@@ -81,7 +81,7 @@ static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 	bankaddr = (data * 0x4000) & (length-1);
 	memory_set_bankptr(1,&RAM[0x10000 + bankaddr]);
 
-	if (data & 0xfe) logerror("%04x: write %02x to f004\n",activecpu_get_pc(),data);
+	if (data & 0xfe) loginfo(2,"%04x: write %02x to f004\n",activecpu_get_pc(),data);
 }
 
 static WRITE16_HANDLER( cps1_sound_fade_w )
@@ -212,7 +212,7 @@ static WRITE8_HANDLER( qsound_banksw_w )
 	int bankaddress=0x10000+((data&0x0f)*0x4000);
 	if (bankaddress >= memory_region_length(REGION_CPU2))
 	{
-		logerror("WARNING: Q sound bank overflow (%02x)\n", data);
+		loginfo(2,"WARNING: Q sound bank overflow (%02x)\n", data);
 		bankaddress=0x10000;
 	}
 	memory_set_bankptr(1, &RAM[bankaddress]);

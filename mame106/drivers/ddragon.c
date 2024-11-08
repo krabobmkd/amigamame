@@ -197,7 +197,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 
 	darktowr_bank=(data & 0xe0) >> 5;
 //  memory_set_bankptr( 1,&RAM[ 0x10000 + ( 0x4000 * ( ( data & 0xe0) >> 5 ) ) ] );
-//  logerror("Bank %05x %02x %02x\n",activecpu_get_pc(),darktowr_bank,data);
+//  loginfo(2,"Bank %05x %02x %02x\n",activecpu_get_pc(),darktowr_bank,data);
 }
 
 static READ8_HANDLER( darktowr_bank_r )
@@ -206,7 +206,7 @@ static READ8_HANDLER( darktowr_bank_r )
 
 	/* MCU is mapped into main cpu memory as a bank */
 	if (darktowr_bank==4) {
-		// logerror("BankRead %05x %08x\n",activecpu_get_pc(),offset);
+		// loginfo(2,"BankRead %05x %08x\n",activecpu_get_pc(),offset);
 
 		/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
         so just hack around the protection here.  (The hacks are 'right' as I have
@@ -228,7 +228,7 @@ static READ8_HANDLER( darktowr_bank_r )
 			return darktowr_mcu_ports[0];
 		}
 
-		logerror("Unmapped mcu bank read %04x\n",offset);
+		loginfo(2,"Unmapped mcu bank read %04x\n",offset);
 		return 0xff;
 	}
 
@@ -238,20 +238,20 @@ static READ8_HANDLER( darktowr_bank_r )
 static WRITE8_HANDLER( darktowr_bank_w )
 {
 	if (darktowr_bank==4) {
-		logerror("BankWrite %05x %08x %08x\n",activecpu_get_pc(),offset,data);
+		loginfo(2,"BankWrite %05x %08x %08x\n",activecpu_get_pc(),offset,data);
 
 		if (offset==0x1400 || offset==0) {
 			int bitSwappedData=BITSWAP8(data,0,1,2,3,4,5,6,7);
 
 			darktowr_mcu_ports[1]=bitSwappedData;
 
-			logerror("MCU PORT 1 -> %04x (from %04x)\n",bitSwappedData,data);
+			loginfo(2,"MCU PORT 1 -> %04x (from %04x)\n",bitSwappedData,data);
 			return;
 		}
 		return;
 	}
 
-	logerror("ROM write! %04x %02x\n",offset,data);
+	loginfo(2,"ROM write! %04x %02x\n",offset,data);
 }
 
 static READ8_HANDLER( darktowr_mcu_r )
@@ -261,7 +261,7 @@ static READ8_HANDLER( darktowr_mcu_r )
 
 static WRITE8_HANDLER( darktowr_mcu_w )
 {
-	logerror("McuWrite %05x %08x %08x\n",activecpu_get_pc(),offset,data);
+	loginfo(2,"McuWrite %05x %08x %08x\n",activecpu_get_pc(),offset,data);
 	darktowr_mcu_ports[offset]=data;
 }
 
@@ -291,7 +291,7 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 
 static READ8_HANDLER( ddragon_hd63701_internal_registers_r )
 {
-	logerror("%04x: read %d\n",activecpu_get_pc(),offset);
+	loginfo(2,"%04x: read %d\n",activecpu_get_pc(),offset);
 	return 0;
 }
 

@@ -2265,7 +2265,7 @@ profiler_mark(PROFILER_INPUT);
 			{
 				portinfo->vblank ^= info->port->mask;
 				if (Machine->drv->vblank_duration == 0)
-					logerror("Warning: you are using IPT_VBLANK with vblank_duration = 0. You need to increase vblank_duration for IPT_VBLANK to work.\n");
+					loginfo(2,"Warning: you are using IPT_VBLANK with vblank_duration = 0. You need to increase vblank_duration for IPT_VBLANK to work.\n");
 			}
 
 		/* now loop back and modify based on the inputs */

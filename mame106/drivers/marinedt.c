@@ -280,8 +280,8 @@ static WRITE8_HANDLER( marinedt_pf_w )
 	marinedt_pf = data;
 
 //if(data&0xf0)
-//  logerror("pf:%02x %d\n",marinedt_pf);
-//logerror("pd:%02x %d\n",marinedt_pd, cpu_getcurrentframe());
+//  loginfo(2,"pf:%02x %d\n",marinedt_pf);
+//loginfo(2,"pd:%02x %d\n",marinedt_pd, cpu_getcurrentframe());
 
 }
 

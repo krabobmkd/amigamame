@@ -1161,7 +1161,7 @@ void activecpu_set_input_line(int irqline, int state)
 	VERIFY_ACTIVECPU(activecpu_set_input_line);
 	if (state != INTERNAL_CLEAR_LINE && state != INTERNAL_ASSERT_LINE)
 	{
-		logerror("activecpu_set_input_line called when cpu_set_input_line should have been used!\n");
+		loginfo(2,"activecpu_set_input_line called when cpu_set_input_line should have been used!\n");
 		return;
 	}
 	activecpu_set_info_int(CPUINFO_INT_INPUT_STATE + irqline, state - INTERNAL_CLEAR_LINE);

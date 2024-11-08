@@ -258,7 +258,7 @@ void state_save_register_memory(const char *module, UINT32 instance, const char 
 	/* check for invalid timing */
 	if (!ss_registration_allowed)
 	{
-		logerror("Attempt to register save state entry after state registration is closed! module %s name %s\n",module,name);
+		loginfo(2,"Attempt to register save state entry after state registration is closed! module %s name %s\n",module,name);
 		ss_illegal_regs++;
 		return;
 	}
@@ -343,7 +343,7 @@ static void register_func_void(ss_func **root, void (*func)(void))
 	/* check for invalid timing */
 	if (!ss_registration_allowed)
 	{
-		logerror("Attempt to register callback function after state registration is closed!");
+		loginfo(2,"Attempt to register callback function after state registration is closed!");
 		ss_illegal_regs++;
 		return;
 	}
@@ -780,17 +780,17 @@ int state_save_save_begin(mame_file *file)
 	if (ss_illegal_regs > 0)
 		return 1;
 
-	TRACE(logerror("Beginning save\n"));
+	TRACE(loginfo(2,"Beginning save\n"));
 	ss_dump_file = file;
 
 	/* compute the total dump size and the offsets of each element */
 	ss_dump_size = compute_size_and_offsets();
-	TRACE(logerror("   total size %u\n", ss_dump_size));
+	TRACE(loginfo(2,"   total size %u\n", ss_dump_size));
 
 	/* allocate memory for the array */
 	ss_dump_array = malloc(ss_dump_size);
 	if (!ss_dump_array)
-		logerror("malloc failed in state_save_save_begin\n");
+		loginfo(2,"malloc failed in state_save_save_begin\n");
 	return 0;
 }
 
@@ -805,22 +805,22 @@ void state_save_save_continue(void)
 	ss_entry *entry;
 	int count;
 
-	TRACE(logerror("Saving tag %d\n", ss_current_tag));
+	TRACE(loginfo(2,"Saving tag %d\n", ss_current_tag));
 
 	/* call the pre-save functions */
-	TRACE(logerror("  calling pre-save functions\n"));
+	TRACE(loginfo(2,"  calling pre-save functions\n"));
 	count = call_hook_functions(ss_prefunc_reg);
-	TRACE(logerror("    %d functions called\n", count));
+	TRACE(loginfo(2,"    %d functions called\n", count));
 
 	/* then copy in all the data */
-	TRACE(logerror("  copying data\n"));
+	TRACE(loginfo(2,"  copying data\n"));
 
 	/* iterate over entries with matching tags */
 	for (entry = ss_registry; entry; entry = entry->next)
 		if (entry->tag == ss_current_tag)
 		{
 			memcpy(ss_dump_array + entry->offset, entry->data, entry->typesize * entry->typecount);
-			TRACE(logerror("    %s: %x..%x\n", entry->name, entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
+			TRACE(loginfo(2,"    %s: %x..%x\n", entry->name, entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
 		}
 }
 
@@ -835,7 +835,7 @@ void state_save_save_finish(void)
 	UINT32 signature;
 	UINT8 flags = 0;
 
-	TRACE(logerror("Finishing save\n"));
+	TRACE(loginfo(2,"Finishing save\n"));
 
 	/* compute the flags */
 #ifndef LSB_FIRST
@@ -878,7 +878,7 @@ void state_save_save_finish(void)
 
 int state_save_load_begin(mame_file *file)
 {
-	TRACE(logerror("Beginning load\n"));
+	TRACE(loginfo(2,"Beginning load\n"));
 
 	/* read the file into memory */
 	ss_dump_size = mame_fsize(file);
@@ -917,8 +917,8 @@ void state_save_load_continue(void)
 	need_convert = (ss_dump_array[9] & SS_MSB_FIRST) == 0;
 #endif
 
-	TRACE(logerror("Loading tag %d\n", ss_current_tag));
-	TRACE(logerror("  copying data\n"));
+	TRACE(loginfo(2,"Loading tag %d\n", ss_current_tag));
+	TRACE(loginfo(2,"  copying data\n"));
 
 	/* iterate over entries with matching tags */
 	for (entry = ss_registry; entry; entry = entry->next)
@@ -927,13 +927,13 @@ void state_save_load_continue(void)
 			memcpy(entry->data, ss_dump_array + entry->offset, entry->typesize * entry->typecount);
 			if (need_convert && ss_conv[entry->typesize])
 				(*ss_conv[entry->typesize])(entry->data, entry->typecount);
-			TRACE(logerror("    %s: %x..%x\n", entry->name, entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
+			TRACE(loginfo(2,"    %s: %x..%x\n", entry->name, entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
 		}
 
 	/* call the post-load functions */
-	TRACE(logerror("  calling post-load functions\n"));
+	TRACE(loginfo(2,"  calling post-load functions\n"));
 	count = call_hook_functions(ss_postfunc_reg);
-	TRACE(logerror("    %d functions called\n", count));
+	TRACE(loginfo(2,"    %d functions called\n", count));
 }
 
 
@@ -944,7 +944,7 @@ void state_save_load_continue(void)
 
 void state_save_load_finish(void)
 {
-	TRACE(logerror("Finishing load\n"));
+	TRACE(loginfo(2,"Finishing load\n"));
 
 	/* free memory and reset the global states */
 	free(ss_dump_array);
@@ -997,7 +997,7 @@ void state_save_dump_registry(void)
 	ss_entry *entry;
 
 	for (entry = ss_registry; entry; entry=entry->next)
-		logerror("%s: %d x %d\n", entry->name, entry->typesize, entry->typecount);
+		loginfo(2,"%s: %d x %d\n", entry->name, entry->typesize, entry->typecount);
 #endif
 }
 

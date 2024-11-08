@@ -106,7 +106,7 @@ PALETTE_INIT( grchamp )
 	{
 		int fog_level;
 		fog_level=250*(1-exp((double)-(FOG_SIZE-j+1)/20));
-		//logerror("fog_level %d\n",fog_level);
+		//loginfo(2,"fog_level %d\n",fog_level);
 		for( i=0; i<0x40; i++ )
 		{
 			palette_get_color(i, &r, &g, &b);

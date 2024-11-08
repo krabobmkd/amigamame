@@ -366,7 +366,7 @@ static READ8_HANDLER( vsgongf_a006_r ){
 	if (!strcmp(Machine->gamedrv->name,"ringfgt"))  return 0x80;
 	if (!strcmp(Machine->gamedrv->name,"ringfgt2")) return 0xc0;
 
-	logerror ("unhandled read from a006\n");
+	loginfo (2, "unhandled read from a006\n");
 	return 0x00;
 }
 
@@ -376,7 +376,7 @@ static READ8_HANDLER( vsgongf_a100_r ){
 	if (!strcmp(Machine->gamedrv->name,"ringfgt"))  return 0x63;
 	if (!strcmp(Machine->gamedrv->name,"ringfgt2")) return 0x6a;
 
-	logerror ("unhandled read from a100\n");
+	loginfo (2, "unhandled read from a100\n");
 	return 0x00;
 }
 

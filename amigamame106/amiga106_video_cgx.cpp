@@ -302,9 +302,8 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
 
     if(_ScreenModeId == INVALID_ID)
     {
-#ifdef DOMAMELOG
-    printf("find best mode...\n");
-#endif
+//    printf("find best mode...\n");
+
         struct TagItem cgxtags[]={
                 CYBRBIDTG_NominalWidth,width,
                 CYBRBIDTG_NominalHeight,height,
@@ -313,7 +312,7 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
         _ScreenModeId = BestCModeIDTagList(cgxtags);
         if(_ScreenModeId == INVALID_ID)
         {
-            logerror("Can't find cyber screen mode for w%d h%d d%d ",width,height,_screenDepthAsked);
+            loginfo(2,"Can't find cyber screen mode for w%d h%d d%d ",width,height,_screenDepthAsked);
             return;
         }
 
@@ -329,17 +328,12 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
 
         _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
 
-#ifdef DOMAMELOG
-        printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d\n",_fullscreenWidth,_fullscreenHeight,
-                    (int)_PixelFmt, (int)_PixelBytes,(int)_screenDepthAsked);
-#endif
-
+//        printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d\n",_fullscreenWidth,_fullscreenHeight,
+//                    (int)_PixelFmt, (int)_PixelBytes,(int)_screenDepthAsked);
 
     } else
     {
-#ifdef DOMAMELOG
-    printf("mode not CGX.\n");
-#endif
+
     }
     if(_PixelFmt == PIXFMT_LUT8)
     {

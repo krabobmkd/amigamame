@@ -429,7 +429,7 @@ static void taitob_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
 #if 0
 /*check the unknown bits*/
     if (color & 0x3fc0){
-      logerror("sprite color (taitob)=%4x ofs=%4x\n",color,offs);
+      loginfo(2,"sprite color (taitob)=%4x ofs=%4x\n",color,offs);
       color = rand()&0x3f;
     }
 #endif

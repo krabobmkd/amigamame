@@ -1262,7 +1262,7 @@ void uPD71054_update_timer( int no )
 	if( duration != 0 ) {
 		timer_adjust( uPD71054.timer[no], TIME_IN_HZ(duration), no, 0 );
 	} else {
-		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
+		loginfo(2, "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
 				activecpu_get_pc(), no );
 	}
 }
@@ -1388,7 +1388,7 @@ READ16_HANDLER( mirror_ram_r )
 WRITE16_HANDLER( mirror_ram_w )
 {
 	COMBINE_DATA(&mirror_ram[offset]);
-//  logerror("PC %06X - Mirror RAM Written: %04X <- %04X\n", activecpu_get_pc(), offset*2, data);
+//  loginfo(2,"PC %06X - Mirror RAM Written: %04X <- %04X\n", activecpu_get_pc(), offset*2, data);
 }
 
 
@@ -1644,7 +1644,7 @@ READ16_HANDLER ( calibr50_ip_r )
 		case 0x16/2:	return (dir2>>8);			// upper 4 bits of p2 rotation
 		case 0x18/2:	return 0xffff;				// ? (value's read but not used)
 		default:
-			logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+			loginfo(2,"PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
 			return 0;
 	}
 }
@@ -2353,7 +2353,7 @@ static READ16_HANDLER( krzybowl_input_r )
 		case 0xc/2:	return dir2y & 0xff;
 		case 0xe/2:	return dir2y >> 8;
 		default:
-			logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+			loginfo(2,"PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
 			return 0;
 	}
 }
@@ -2577,7 +2577,7 @@ READ16_HANDLER( kiwame_input_r )
 		case 0x08/2:	return 0xffff;
 
 		default:
-			logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+			loginfo(2,"PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
 			return 0x0000;
 	}
 }
@@ -2613,12 +2613,12 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( thunderl_protection_r )
 {
-//  logerror("PC %06X - Protection Read\n", activecpu_get_pc());
+//  loginfo(2,"PC %06X - Protection Read\n", activecpu_get_pc());
 	return 0x00dd;
 }
 static WRITE16_HANDLER( thunderl_protection_w )
 {
-//  logerror("PC %06X - Protection Written: %04X <- %04X\n", activecpu_get_pc(), offset*2, data);
+//  loginfo(2,"PC %06X - Protection Written: %04X <- %04X\n", activecpu_get_pc(), offset*2, data);
 }
 
 /* Similar to downtown etc. */
@@ -8853,12 +8853,12 @@ READ16_HANDLER( twineagl_debug_r )
 static UINT8 xram[8];
 READ16_HANDLER( twineagl_200100_r )
 {
-logerror("%04x: twineagl_200100_r %d\n",activecpu_get_pc(),offset);
+loginfo(2,"%04x: twineagl_200100_r %d\n",activecpu_get_pc(),offset);
 	return xram[offset];
 }
 WRITE16_HANDLER( twineagl_200100_w )
 {
-logerror("%04x: twineagl_200100_w %d = %02x\n",activecpu_get_pc(),offset,data);
+loginfo(2,"%04x: twineagl_200100_w %d = %02x\n",activecpu_get_pc(),offset,data);
 	if (ACCESSING_LSB)
 		xram[offset] = data & 0xff;
 }

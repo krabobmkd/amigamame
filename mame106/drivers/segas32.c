@@ -296,7 +296,7 @@ static void int_control_w(int offset, UINT8 data)
 {
 	int duration;
 
-//  logerror("%06X:int_control_w(%X) = %02X\n", activecpu_get_pc(), offset, data);
+//  loginfo(2,"%06X:int_control_w(%X) = %02X\n", activecpu_get_pc(), offset, data);
 	switch (offset)
 	{
 		case 0:
@@ -589,7 +589,7 @@ static READ16_HANDLER( io_expansion_r )
 	if (custom_io_r[0])
 		return (*custom_io_r[0])(offset, mem_mask);
 	else
-		logerror("%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
+		loginfo(2,"%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
 	return 0xffff;
 }
 
@@ -603,7 +603,7 @@ static WRITE16_HANDLER( io_expansion_w )
 	if (custom_io_w[0])
 		(*custom_io_w[0])(offset, data, mem_mask);
 	else
-		logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+		loginfo(2,"%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 }
 
 
@@ -613,7 +613,7 @@ static READ32_HANDLER( io_expansion_0_r )
 		return (*custom_io_r[0])(offset*2+0, mem_mask) |
 			  ((*custom_io_r[0])(offset*2+1, mem_mask >> 16) << 16);
 	else
-		logerror("%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
+		loginfo(2,"%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
 	return 0xffffffff;
 }
 
@@ -626,14 +626,14 @@ static WRITE32_HANDLER( io_expansion_0_w )
 		if (custom_io_w[0])
 			(*custom_io_w[0])(offset*2+0, data, mem_mask);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+			loginfo(2,"%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
 	if ((mem_mask & 0x00ff0000) != 0x00ff0000)
 	{
 		if (custom_io_w[0])
 			(*custom_io_w[0])(offset*2+1, data >> 16, mem_mask >> 16);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+			loginfo(2,"%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
 }
 
@@ -644,7 +644,7 @@ static READ32_HANDLER( io_expansion_1_r )
 		return (*custom_io_r[1])(offset*2+0, mem_mask) |
 			  ((*custom_io_r[1])(offset*2+1, mem_mask >> 16) << 16);
 	else
-		logerror("%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
+		loginfo(2,"%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
 	return 0xffffffff;
 }
 
@@ -657,14 +657,14 @@ static WRITE32_HANDLER( io_expansion_1_w )
 		if (custom_io_w[1])
 			(*custom_io_w[1])(offset*2+0, data, mem_mask);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+			loginfo(2,"%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
 	if ((mem_mask & 0x00ff0000) != 0x00ff0000)
 	{
 		if (custom_io_w[1])
 			(*custom_io_w[1])(offset*2+1, data >> 16, mem_mask >> 16);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+			loginfo(2,"%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
 }
 
@@ -689,7 +689,7 @@ static READ16_HANDLER( analog_custom_io_r )
 			analog_value[offset & 3] <<= 1;
 			return result;
 	}
-	logerror("%06X:unknown analog_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
+	loginfo(2,"%06X:unknown analog_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
 	return 0xffff;
 }
 
@@ -706,7 +706,7 @@ static WRITE16_HANDLER( analog_custom_io_w )
 			analog_value[offset & 3] = readinputportbytag_safe(names[offset & 3], 0);
 			return;
 	}
-	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+	loginfo(2,"%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
 }
 
 
@@ -722,7 +722,7 @@ static READ16_HANDLER( extra_custom_io_r )
 			return readinputportbytag_safe(names[offset & 3], 0xffff);
 	}
 
-	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
+	loginfo(2,"%06X:unknown extra_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
 	return 0xffff;
 }
 
@@ -743,7 +743,7 @@ static WRITE16_HANDLER( orunners_custom_io_w )
 			analog_bank = data & 1;
 			return;
 	}
-	logerror("%06X:unknown orunners_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+	loginfo(2,"%06X:unknown orunners_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
 }
 
 
@@ -762,7 +762,7 @@ static READ16_HANDLER( sonic_custom_io_r )
 			return (UINT8)(readinputportbytag(names[offset/2]) - sonic_last[offset/2]);
 	}
 
-	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
+	loginfo(2,"%06X:unknown sonic_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
 	return 0xffff;
 }
 
@@ -781,7 +781,7 @@ static WRITE16_HANDLER( sonic_custom_io_w )
 			return;
 	}
 
-	logerror("%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+	loginfo(2,"%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
 }
 
 

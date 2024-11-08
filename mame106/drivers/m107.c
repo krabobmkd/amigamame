@@ -97,7 +97,7 @@ static WRITE8_HANDLER( m92_soundlatch_w )
 	{
 		timer_set(TIME_NOW,V30_ASSERT,setvector_callback);
 		soundlatch_w(0,data);
-//      logerror("soundlatch_w %02x\n",data);
+//      loginfo(2,"soundlatch_w %02x\n",data);
 	}
 }
 
@@ -113,7 +113,7 @@ static READ8_HANDLER( m92_soundlatch_r )
 	if (offset == 0)
 	{
 		int res = soundlatch_r(offset);
-//      logerror("soundlatch_r %02x\n",res);
+//      loginfo(2,"soundlatch_r %02x\n",res);
 		return res;
 	}
 	else return 0xff;

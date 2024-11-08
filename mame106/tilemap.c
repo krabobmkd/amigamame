@@ -1898,13 +1898,13 @@ void tilemap_nb_draw( mame_bitmap *dest, UINT32 number, UINT32 scrollx, UINT32 s
 	{																	\
 		clut = &Machine->remapped_colortable[priority >> 16] ;			\
 		*dest = alpha_blend32(*dest, clut[INPUT_VAL]) ;					\
-/*      logerror("PARTIALLY IMPLEMENTED ROZ VIDEO MODE - npbt32\n") ;*/	\
+/*      loginfo(2,"PARTIALLY IMPLEMENTED ROZ VIDEO MODE - npbt32\n") ;*/	\
 	}																	\
 	else if (blit.draw_masked == (blitmask_t)npdt32)					\
 	{																	\
 		clut = &Machine->remapped_colortable[priority >> 16] ;			\
 		*dest = clut[INPUT_VAL] ;										\
-/*      logerror("PARTIALLY IMPLEMENTED ROZ VIDEO MODE - npbt32\n") ;*/	\
+/*      loginfo(2,"PARTIALLY IMPLEMENTED ROZ VIDEO MODE - npbt32\n") ;*/	\
 	}																	\
 	else if (blit.draw_masked == (blitmask_t)pbt15)						\
 	{																	\

@@ -398,7 +398,7 @@ static const gfx_decode gfxdecodeinfo[] =
 // Handler called by the 3526 emulator when the internal timers cause an IRQ
 static void irqhandler(int irq)
 {
-	logerror("YM3526 firing an IRQ\n");
+	loginfo(2,"YM3526 firing an IRQ\n");
 //  cpunum_set_input_line(2,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 

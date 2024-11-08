@@ -111,7 +111,7 @@ static READ32_HANDLER( gunbustr_input_r )
 			return input_port_2_word_r(0,0) | (coin_word << 16);
 		}
  	}
-logerror("CPU #0 PC %06x: read input %06x\n",activecpu_get_pc(),offset);
+loginfo(2,"CPU #0 PC %06x: read input %06x\n",activecpu_get_pc(),offset);
 
 	return 0x0;
 }
@@ -162,7 +162,7 @@ ui_popup(t);
 				coin_counter_w(1, data & 0x04000000);
 				coin_word = (data >> 16) &0xffff;
 			}
-//logerror("CPU #0 PC %06x: write input %06x\n",activecpu_get_pc(),offset);
+//loginfo(2,"CPU #0 PC %06x: write input %06x\n",activecpu_get_pc(),offset);
 		}
 	}
 }

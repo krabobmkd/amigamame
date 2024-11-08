@@ -13,7 +13,7 @@
 #define __MAME_H__
 
 #include "mamecore.h"
-
+#include "mamelog.h"
 #ifdef MESS
 #include "device.h"
 #endif /* MESS */
@@ -205,7 +205,7 @@ struct _global_options
 
 	float	brightness;		/* brightness of the display */
 	float	pause_bright;		/* additional brightness when in pause */
-	float	gamma;			/* gamma correction of the display */
+//removed because pow() has problems	float	gamma;			/* gamma correction of the display */
 	int		vector_width;	/* requested width for vector games; 0 means default (640) */
 	int		vector_height;	/* requested height for vector games; 0 means default (480) */
 	int		ui_orientation;	/* orientation of the UI relative to the video */
@@ -251,7 +251,6 @@ struct _global_options
 extern global_options options;
 extern running_machine *Machine;
 extern const char *mame_disclaimer;
-extern char giant_string_buffer[];
 
 extern char build_version[];
 
@@ -360,12 +359,6 @@ char *auto_strdup(const char *str) ATTR_MALLOC;
 
 
 /* ----- miscellaneous bits & pieces ----- */
-
-/* log to the standard error.log file */
-void CLIB_DECL logerror(const char *text,...) ATTR_PRINTF(1,2);
-
-/* adds a callback to be called on logerror() */
-void add_logerror_callback(void (*callback)(const char *));
 
 /* standardized random number generator */
 UINT32 mame_rand(void);

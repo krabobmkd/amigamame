@@ -152,7 +152,7 @@ struct _rom_load_data
 	UINT8 *			regionbase;			/* base of current region */
 	UINT32			regionlength;		/* length of current region */
 
-	char			errorbuf[4096];		/* accumulated errors */
+	//char			errorbuf[4096];		/* accumulated errors */
 	UINT8			tempbuf[65536];		/* temporary buffer */
 };
 

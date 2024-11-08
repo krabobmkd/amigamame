@@ -811,7 +811,7 @@ WRITE16_HANDLER( kaneko16_sprites_regs_w )
 			break;
 	}
 
-//  logerror("CPU #0 PC %06X : Warning, sprites reg %04X <- %04X\n",activecpu_get_pc(),offset*2,data);
+//  loginfo(2,"CPU #0 PC %06X : Warning, sprites reg %04X <- %04X\n",activecpu_get_pc(),offset*2,data);
 }
 
 

@@ -477,7 +477,7 @@ void m107_screenrefresh(mame_bitmap *bitmap,const rectangle *cliprect)
 WRITE8_HANDLER( m107_spritebuffer_w )
 {
 	if (offset==0) {
-//      logerror("%04x: buffered spriteram\n",activecpu_get_pc());
+//      loginfo(2,"%04x: buffered spriteram\n",activecpu_get_pc());
 		memcpy(m107_spriteram,spriteram,0x1000);
 	}
 }

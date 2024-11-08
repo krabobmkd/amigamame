@@ -469,7 +469,7 @@ static int init_buffered_spriteram(void)
 	/* make sure we have a valid size */
 	if (spriteram_size == 0)
 	{
-		logerror("video_init():  Video buffers spriteram but spriteram_size is 0\n");
+		loginfo(2,"video_init():  Video buffers spriteram but spriteram_size is 0\n");
 		return 0;
 	}
 
@@ -946,7 +946,7 @@ static void save_frame_with(mame_file *fp, mame_bitmap *bitmap, int (*write_hand
 				}
 				break;
 			default:
-				logerror("Unknown color depth\n");
+				loginfo(2,"Unknown color depth\n");
 				break;
 			}
 			write_handler(fp, copy);
@@ -1125,7 +1125,7 @@ mame_bitmap *bitmap_alloc_core(int width,int height,int depth,int use_auto)
 	/* verify it's a depth we can handle */
 	if (depth != 8 && depth != 15 && depth != 16 && depth != 32)
 	{
-		logerror("osd_alloc_bitmap() unknown depth %d\n",depth);
+		loginfo(2,"osd_alloc_bitmap() unknown depth %d\n",depth);
 		return NULL;
 	}
 

@@ -343,7 +343,7 @@ static WRITE8_HANDLER( input_w )
 	{
 		case 0:
 		default:
-logerror("PC %04x: write %02x to port 01\n",activecpu_get_pc(),data);
+loginfo(2,"PC %04x: write %02x to port 01\n",activecpu_get_pc(),data);
 			break;
 		case 1:
 			mahjong_input_select_w(offset,data);

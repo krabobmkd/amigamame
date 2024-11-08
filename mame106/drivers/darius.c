@@ -181,7 +181,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 	parse_control();
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
+	loginfo(2,"CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
 }
 
 static WRITE16_HANDLER( darius_watchdog_w )
@@ -222,7 +222,7 @@ static READ16_HANDLER( darius_ioc_r )
 			return input_port_3_word_r(0,mem_mask);	/* DSW */
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",activecpu_get_pc(),offset);
+loginfo(2,"CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",activecpu_get_pc(),offset);
 
 	return 0xff;
 }
@@ -257,7 +257,7 @@ static WRITE16_HANDLER( darius_ioc_w )
 			return;
 	}
 
-logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",activecpu_get_pc(),offset,data);
+loginfo(2,"CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",activecpu_get_pc(),offset,data);
 }
 
 
@@ -337,7 +337,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static WRITE8_HANDLER( adpcm_command_w )
 {
 	adpcm_command = data;
-	/* logerror("#ADPCM command write =%2x\n",data); */
+	/* loginfo(2,"#ADPCM command write =%2x\n",data); */
 }
 
 #if 0
@@ -553,7 +553,7 @@ static struct MSM5205interface msm5205_interface =
 
 static READ8_HANDLER( adpcm_command_read )
 {
-	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, activecpu_get_pc() ); */
+	/* loginfo(2,"read port 0: %02x  PC=%4x\n",adpcm_command, activecpu_get_pc() ); */
 	return adpcm_command;
 }
 
@@ -570,13 +570,13 @@ static READ8_HANDLER( readport3 )
 static WRITE8_HANDLER ( adpcm_nmi_disable )
 {
 	nmi_enable = 0;
-	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, activecpu_get_pc() ); */
+	/* loginfo(2,"write port 0: NMI DISABLE  PC=%4x\n", data, activecpu_get_pc() ); */
 }
 
 static WRITE8_HANDLER ( adpcm_nmi_enable )
 {
 	nmi_enable = 1;
-	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", activecpu_get_pc() ); */
+	/* loginfo(2,"write port 1: NMI ENABLE   PC=%4x\n", activecpu_get_pc() ); */
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
@@ -1238,7 +1238,7 @@ MACHINE_RESET( darius )
 		darius_pan[i] = 0x80;	/* center */
 	}
 	for( i = 0; i < 0x10; i++ ){
-		//logerror( "calc %d = %d\n", i, (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f)) );
+		//loginfo(2, "calc %d = %d\n", i, (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f)) );
 		darius_def_vol[i] = (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f));
 	}
 }

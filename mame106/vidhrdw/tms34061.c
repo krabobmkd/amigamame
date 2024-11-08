@@ -200,7 +200,7 @@ static WRITE8_HANDLER( register_w )
 		tms34061.regs[regnum] = (tms34061.regs[regnum] & 0xff00) | data;
 
 	/* log it */
-	if (VERBOSE) logerror("%04X:tms34061 %s = %04X\n", activecpu_get_pc(), regnames[regnum], tms34061.regs[regnum]);
+	if (VERBOSE) loginfo(2,"%04X:tms34061 %s = %04X\n", activecpu_get_pc(), regnames[regnum], tms34061.regs[regnum]);
 
 	/* update the state of things */
 	switch (regnum)
@@ -222,7 +222,7 @@ static WRITE8_HANDLER( register_w )
 				case 0x20:	tms34061.yshift = 7;	break;
 				case 0x40:	tms34061.yshift = 8;	break;
 				case 0x80:	tms34061.yshift = 9;	break;
-				default:	logerror("Invalid value for XYOFFSET = %04x\n", tms34061.regs[TMS34061_XYOFFSET]);	break;
+				default:	loginfo(2,"Invalid value for XYOFFSET = %04x\n", tms34061.regs[TMS34061_XYOFFSET]);	break;
 			}
 			tms34061.xmask = (1 << tms34061.yshift) - 1;
 			break;
@@ -270,7 +270,7 @@ static READ8_HANDLER( register_r )
 	}
 
 	/* log it */
-	if (VERBOSE) logerror("%04X:tms34061 %s read = %04X\n", activecpu_get_pc(), regnames[regnum], result);
+	if (VERBOSE) loginfo(2,"%04X:tms34061 %s read = %04X\n", activecpu_get_pc(), regnames[regnum], result);
 	return (offset & 0x02) ? (result >> 8) : result;
 }
 
@@ -462,7 +462,7 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 
 		/* log anything else */
 		default:
-			logerror("Unsupported TMS34061 function %d - PC: %04X\n", func, activecpu_get_pc());
+			loginfo(2,"Unsupported TMS34061 function %d - PC: %04X\n", func, activecpu_get_pc());
 			break;
 	}
 }
@@ -516,7 +516,7 @@ UINT8 tms34061_r(int col, int row, int func)
 
 		/* log anything else */
 		default:
-			logerror("Unsupported TMS34061 function %d - PC: %04X\n",
+			loginfo(2,"Unsupported TMS34061 function %d - PC: %04X\n",
 					func, activecpu_get_pc());
 			break;
 	}
@@ -540,7 +540,7 @@ READ8_HANDLER( tms34061_latch_r )
 
 WRITE8_HANDLER( tms34061_latch_w )
 {
-	if (VERBOSE) logerror("tms34061_latch = %02X\n", data);
+	if (VERBOSE) loginfo(2,"tms34061_latch = %02X\n", data);
 	tms34061.latchdata = data;
 }
 

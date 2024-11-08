@@ -47,17 +47,17 @@ WRITE8_HANDLER( chaknpop_attrram_w );
 
 static WRITE8_HANDLER ( unknown_port_1_w )
 {
-	//logerror("%04x: write to unknow port 1: 0x%02x\n", activecpu_get_pc(), data);
+	//loginfo(2,"%04x: write to unknow port 1: 0x%02x\n", activecpu_get_pc(), data);
 }
 
 static WRITE8_HANDLER ( unknown_port_2_w )
 {
-	//logerror("%04x: write to unknow port 2: 0x%02x\n", activecpu_get_pc(), data);
+	//loginfo(2,"%04x: write to unknow port 2: 0x%02x\n", activecpu_get_pc(), data);
 }
 
 static WRITE8_HANDLER ( coinlock_w )
 {
-	logerror("%04x: coin lock %sable\n", activecpu_get_pc(), data ? "dis" : "en");
+	loginfo(2,"%04x: coin lock %sable\n", activecpu_get_pc(), data ? "dis" : "en");
 }
 
 

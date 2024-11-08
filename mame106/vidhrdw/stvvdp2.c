@@ -2163,16 +2163,16 @@ static void stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter )
 
 #define RP	stv_current_rotation_parameter_table
 
-	if(LOG_ROZ == 1) logerror( "Rotation parameter table (%d)\n", rot_parameter );
-	if(LOG_ROZ == 1) logerror( "xst = %x, yst = %x, zst = %x\n", RP.xst, RP.yst, RP.zst );
-	if(LOG_ROZ == 1) logerror( "dxst = %x, dyst = %x\n", RP.dxst, RP.dyst );
-	if(LOG_ROZ == 1) logerror( "dx = %x, dy = %x\n", RP.dx, RP.dy );
-	if(LOG_ROZ == 1) logerror( "A = %x, B = %x, C = %x, D = %x, E = %x, F = %x\n", RP.A, RP.B, RP.C, RP.D, RP.E, RP.F );
-	if(LOG_ROZ == 1) logerror( "px = %x, py = %x, pz = %x\n", RP.px, RP.py, RP.pz );
-	if(LOG_ROZ == 1) logerror( "cx = %x, cy = %x, cz = %x\n", RP.cx, RP.cy, RP.cz );
-	if(LOG_ROZ == 1) logerror( "mx = %x, my = %x\n", RP.mx, RP.my );
-	if(LOG_ROZ == 1) logerror( "kx = %x, ky = %x\n", RP.kx, RP.ky );
-	if(LOG_ROZ == 1) logerror( "kast = %x, dkast = %x, dkax = %x\n", RP.kast, RP.dkast, RP.dkax );
+	if(LOG_ROZ == 1) loginfo(2, "Rotation parameter table (%d)\n", rot_parameter );
+	if(LOG_ROZ == 1) loginfo(2, "xst = %x, yst = %x, zst = %x\n", RP.xst, RP.yst, RP.zst );
+	if(LOG_ROZ == 1) loginfo(2, "dxst = %x, dyst = %x\n", RP.dxst, RP.dyst );
+	if(LOG_ROZ == 1) loginfo(2, "dx = %x, dy = %x\n", RP.dx, RP.dy );
+	if(LOG_ROZ == 1) loginfo(2, "A = %x, B = %x, C = %x, D = %x, E = %x, F = %x\n", RP.A, RP.B, RP.C, RP.D, RP.E, RP.F );
+	if(LOG_ROZ == 1) loginfo(2, "px = %x, py = %x, pz = %x\n", RP.px, RP.py, RP.pz );
+	if(LOG_ROZ == 1) loginfo(2, "cx = %x, cy = %x, cz = %x\n", RP.cx, RP.cy, RP.cz );
+	if(LOG_ROZ == 1) loginfo(2, "mx = %x, my = %x\n", RP.mx, RP.my );
+	if(LOG_ROZ == 1) loginfo(2, "kx = %x, ky = %x\n", RP.kx, RP.ky );
+	if(LOG_ROZ == 1) loginfo(2, "kast = %x, dkast = %x, dkax = %x\n", RP.kast, RP.dkast, RP.dkax );
 
 	/*Attempt to show on screen the rotation table*/
 	if(LOG_ROZ == 2)
@@ -2755,7 +2755,7 @@ static void stv_vdp2_drawgfx_rgb555( mame_bitmap *dest_bmp, unsigned int code, i
 
 static void stv_vdp2_draw_basic_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 {
-//  if(LOG_VDP2) logerror ("bitmap enable %02x size %08x depth %08x\n", stv2_current_tilemap.layer_name, stv2_current_tilemap.bitmap_size, stv2_current_tilemap.colour_depth);
+//  if(LOG_VDP2) loginfo (2, "bitmap enable %02x size %08x depth %08x\n", stv2_current_tilemap.layer_name, stv2_current_tilemap.bitmap_size, stv2_current_tilemap.colour_depth);
 //  ui_popup ("bitmap enable %02x size %08x depth %08x number %02x", stv2_current_tilemap.layer_name, stv2_current_tilemap.bitmap_size, stv2_current_tilemap.colour_depth,stv2_current_tilemap.bitmap_palette_number);
 	//ui_popup("%04x",STV_VDP2_SCRCTL);
 
@@ -3938,12 +3938,12 @@ struct drawgfxParams dgp7={
 
 		if ( LOG_VDP2 )
 		{
-			logerror( "Layer RBG%d, size %d x %d\n", stv2_current_tilemap.layer_name & 0x7f, cliprect->max_x + 1, cliprect->max_y + 1 );
-			logerror( "Tiles: min %08X, max %08X\n", tilecodemin, tilecodemax );
-			logerror( "MAP size in dwords %08X\n", mpsize_dwords );
+			loginfo(2, "Layer RBG%d, size %d x %d\n", stv2_current_tilemap.layer_name & 0x7f, cliprect->max_x + 1, cliprect->max_y + 1 );
+			loginfo(2, "Tiles: min %08X, max %08X\n", tilecodemin, tilecodemax );
+			loginfo(2, "MAP size in dwords %08X\n", mpsize_dwords );
 			for (i = 0; i < stv2_current_tilemap.map_count; i++)
 			{
-				logerror( "Map register %d: base %08X\n", stv2_current_tilemap.map_offset[i], base[i] );
+				loginfo(2, "Map register %d: base %08X\n", stv2_current_tilemap.map_offset[i], base[i] );
 			}
 		}
 
@@ -4070,12 +4070,12 @@ static void stv_vdp2_copy_roz_bitmap(mame_bitmap *bitmap,
 	coeff_table_val = 0;
 	coeff_table_base = NULL;
 
-	if ( LOG_ROZ == 1 ) logerror( "Rendering RBG with parameter %s\n", iRP == 1 ? "A" : "B" );
-	if ( LOG_ROZ == 1 ) logerror( "RPMD (parameter mode) = %x\n", STV_VDP2_RPMD );
-	if ( LOG_ROZ == 1 ) logerror( "RPRCTL (parameter read control) = %04x\n", STV_VDP2_RPRCTL );
-	if ( LOG_ROZ == 1 ) logerror( "KTCTL (coefficient table control) = %04x\n", STV_VDP2_KTCTL );
-	if ( LOG_ROZ == 1 ) logerror( "KTAOF (coefficient table address offset) = %04x\n", STV_VDP2_KTAOF );
-	if ( LOG_ROZ == 1 ) logerror( "RAOVR (screen-over process) = %x\n", STV_VDP2_RAOVR );
+	if ( LOG_ROZ == 1 ) loginfo(2, "Rendering RBG with parameter %s\n", iRP == 1 ? "A" : "B" );
+	if ( LOG_ROZ == 1 ) loginfo(2, "RPMD (parameter mode) = %x\n", STV_VDP2_RPMD );
+	if ( LOG_ROZ == 1 ) loginfo(2, "RPRCTL (parameter read control) = %04x\n", STV_VDP2_RPRCTL );
+	if ( LOG_ROZ == 1 ) loginfo(2, "KTCTL (coefficient table control) = %04x\n", STV_VDP2_KTCTL );
+	if ( LOG_ROZ == 1 ) loginfo(2, "KTAOF (coefficient table address offset) = %04x\n", STV_VDP2_KTAOF );
+	if ( LOG_ROZ == 1 ) loginfo(2, "RAOVR (screen-over process) = %x\n", STV_VDP2_RAOVR );
 	if ( iRP == 1 )
 	{
 		use_coeff_table = STV_VDP2_RAKTE;
@@ -4871,7 +4871,7 @@ static void stv_vdp2_draw_rotation_screen(mame_bitmap *bitmap, const rectangle *
 		fade_control = stv2_current_tilemap.fade_control;
 		stv2_current_tilemap.fade_control = 0;
 		profiler_mark(PROFILER_USER1);
-		if ( LOG_VDP2 ) logerror( "Checking for cached RBG bitmap, cache_dirty = %d, memcmp() = %d\n", stv_rbg_cache_data.is_cache_dirty, memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)));
+		if ( LOG_VDP2 ) loginfo(2, "Checking for cached RBG bitmap, cache_dirty = %d, memcmp() = %d\n", stv_rbg_cache_data.is_cache_dirty, memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)));
 		if ( (stv_rbg_cache_data.is_cache_dirty & iRP) ||
 			memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)) != 0 )
 		{
@@ -4885,7 +4885,7 @@ static void stv_vdp2_draw_rotation_screen(mame_bitmap *bitmap, const rectangle *
 			stv_rbg_cache_data.map_offset_max[iRP-1] = stv_vdp2_layer_data_placement.map_offset_max;
 			stv_rbg_cache_data.tile_offset_min[iRP-1] = stv_vdp2_layer_data_placement.tile_offset_min;
 			stv_rbg_cache_data.tile_offset_max[iRP-1] = stv_vdp2_layer_data_placement.tile_offset_max;
-			if ( LOG_VDP2 ) logerror( "Cache watch: map = %06X - %06X, tile = %06X - %06X\n", stv_rbg_cache_data.map_offset_min[iRP-1],
+			if ( LOG_VDP2 ) loginfo(2, "Cache watch: map = %06X - %06X, tile = %06X - %06X\n", stv_rbg_cache_data.map_offset_min[iRP-1],
 				stv_rbg_cache_data.map_offset_max[iRP-1], stv_rbg_cache_data.tile_offset_min[iRP-1], stv_rbg_cache_data.tile_offset_max[iRP-1] );
 		}
 
@@ -5082,7 +5082,7 @@ WRITE32_HANDLER ( stv_vdp2_vram_w )
 				 (offset >= stv_rbg_cache_data.tile_offset_min[0] &&
 				 offset < stv_rbg_cache_data.tile_offset_max[0]) )
 			{
-				if ( LOG_VDP2 ) logerror( "RBG Cache: dirtying for RP = 1, write at offset = %06X\n", offset );
+				if ( LOG_VDP2 ) loginfo(2, "RBG Cache: dirtying for RP = 1, write at offset = %06X\n", offset );
 				stv_rbg_cache_data.is_cache_dirty |= STV_VDP2_RBG_ROTATION_PARAMETER_A;
 				stv_rbg_cache_data.watch_vdp2_vram_writes &= ~STV_VDP2_RBG_ROTATION_PARAMETER_A;
 			}
@@ -5094,7 +5094,7 @@ WRITE32_HANDLER ( stv_vdp2_vram_w )
 				 (offset >= stv_rbg_cache_data.tile_offset_min[1] &&
 				 offset < stv_rbg_cache_data.tile_offset_max[1]) )
 			{
-				if ( LOG_VDP2 ) logerror( "RBG Cache: dirtying for RP = 2, write at offset = %06X\n", offset );
+				if ( LOG_VDP2 ) loginfo(2, "RBG Cache: dirtying for RP = 2, write at offset = %06X\n", offset );
 				stv_rbg_cache_data.is_cache_dirty |= STV_VDP2_RBG_ROTATION_PARAMETER_B;
 				stv_rbg_cache_data.watch_vdp2_vram_writes &= ~STV_VDP2_RBG_ROTATION_PARAMETER_B;
 			}
@@ -5258,7 +5258,7 @@ WRITE32_HANDLER ( stv_vdp2_regs_w )
 extern int stv_vblank,stv_hblank;
 READ32_HANDLER ( stv_vdp2_regs_r )
 {
-//  if (offset!=1) if(LOG_VDP2) logerror ("VDP2: Read from Registers, Offset %04x\n",offset);
+//  if (offset!=1) if(LOG_VDP2) loginfo (2, "VDP2: Read from Registers, Offset %04x\n",offset);
 
 	switch(offset)
 	{
@@ -5271,7 +5271,7 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 		/*H/V Counter Register*/
 								     /*H-Counter                               V-Counter                                         */
 			stv_vdp2_regs[offset] = (((Machine->visible_area.max_x - 1)<<16)&0x3ff0000)|(((Machine->visible_area.max_y - 1)<<0)& ((STV_VDP2_LSMD == 3) ? 0x7ff : 0x3ff));
-			if(LOG_VDP2) logerror("CPU #%d PC(%08x) = VDP2: H/V counter read : %08x\n",cpu_getactivecpu(),activecpu_get_pc(),stv_vdp2_regs[offset]);
+			if(LOG_VDP2) loginfo(2,"CPU #%d PC(%08x) = VDP2: H/V counter read : %08x\n",cpu_getactivecpu(),activecpu_get_pc(),stv_vdp2_regs[offset]);
 			stv_vdp2_regs[offset] = 0;
 		break;
 	}
@@ -5325,7 +5325,7 @@ static void stv_vdp2_dynamic_res_change()
 		case 1: vert = 240; break;
 		case 2: vert = 256; break;
 		case 3:
-			if(LOG_VDP2) logerror("WARNING: V Res setting (3) not allowed!\n");
+			if(LOG_VDP2) loginfo(2,"WARNING: V Res setting (3) not allowed!\n");
 			vert = 256;
 			break;
 	}

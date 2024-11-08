@@ -588,7 +588,7 @@ void lans2004_decrypt_68k( void )
 
 static READ16_HANDLER( mslug5_prot_r )
 {
-	logerror("PC %06x: access protected\n",activecpu_get_pc());
+	loginfo(2,"PC %06x: access protected\n",activecpu_get_pc());
 	return 0xa0;
 }
 
@@ -596,13 +596,13 @@ static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 {
 	unsigned char *RAM = memory_region(REGION_CPU1);
 	int bankaddress;
-	logerror("offset: %06x PC %06x: set banking %04x\n",offset,activecpu_get_pc(),data);
+	loginfo(2,"offset: %06x PC %06x: set banking %04x\n",offset,activecpu_get_pc(),data);
 	if ((offset == 0)&&(data == 0xa0))
 	{
 		bankaddress=0xa0;
 		memory_set_bankptr(4,&RAM[bankaddress]);
 		//neogeo_set_cpu1_second_bank(bankaddress);
-		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,activecpu_get_pc(),bankaddress);
+		loginfo(2,"offset: %06x PC %06x: set banking %04x\n\n",offset,activecpu_get_pc(),bankaddress);
 	}
 	else if(offset == 2)
 	{
@@ -611,7 +611,7 @@ static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 		bankaddress=data*0x100000;
 		memory_set_bankptr(4,&RAM[bankaddress]);
 		//neogeo_set_cpu1_second_bank(bankaddress);
-		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,activecpu_get_pc(),bankaddress);
+		loginfo(2,"offset: %06x PC %06x: set banking %04x\n\n",offset,activecpu_get_pc(),bankaddress);
 	}
 }
 

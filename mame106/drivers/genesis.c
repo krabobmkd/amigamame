@@ -168,7 +168,7 @@ MACHINE_RESET( genesis )
 		z80running = 0;
 	}
 
-	logerror("Machine init\n");
+	loginfo(2,"Machine init\n");
 
 	/* set the first scanline 0 timer to go off */
 	scan_timer = timer_alloc(vdp_reload_counter);
@@ -186,14 +186,14 @@ READ16_HANDLER(genesis_ctrl_r)
 {
 /*  int returnval; */
 
-/*  logerror("genesis_ctrl_r %x\n", offset); */
+/*  loginfo(2,"genesis_ctrl_r %x\n", offset); */
 	switch (offset)
 	{
 	case 0:							/* DRAM mode is write only */
 		return 0xffff;
 		break;
 	case 0x80:						/* return Z80 CPU Function Stop Accessible or not */
-		/* logerror("Returning z80 state\n"); */
+		/* loginfo(2,"Returning z80 state\n"); */
 		return (z80running ? 0x0100 : 0x0);
 		break;
 	case 0x100:						/* Z80 CPU Reset - write only */
@@ -209,7 +209,7 @@ WRITE16_HANDLER(genesis_ctrl_w)
 {
 	data &= ~mem_mask;
 
-/*  logerror("genesis_ctrl_w %x, %x\n", offset, data); */
+/*  loginfo(2,"genesis_ctrl_w %x, %x\n", offset, data); */
 
 	switch (offset)
 	{
@@ -221,7 +221,7 @@ WRITE16_HANDLER(genesis_ctrl_w)
 		{
 			z80running = 0;
 			cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
-			/* logerror("z80 stopped by 68k BusReq\n"); */
+			/* loginfo(2,"z80 stopped by 68k BusReq\n"); */
 		}
 		else
 		{
@@ -229,7 +229,7 @@ WRITE16_HANDLER(genesis_ctrl_w)
 //          memory_set_bankptr(1, &genesis_z80_ram[0]);
 
 			cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
-			/* logerror("z80 started, BusReq ends\n"); */
+			/* loginfo(2,"z80 started, BusReq ends\n"); */
 		}
 		return;
 		break;
@@ -240,13 +240,13 @@ WRITE16_HANDLER(genesis_ctrl_w)
 			cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
 
 			cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
-			/* logerror("z80 reset, ram is %p\n", &genesis_z80_ram[0]); */
+			/* loginfo(2,"z80 reset, ram is %p\n", &genesis_z80_ram[0]); */
 			z80running = 0;
 			return;
 		}
 		else
 		{
-			/* logerror("z80 out of reset\n"); */
+			/* loginfo(2,"z80 out of reset\n"); */
 		}
 		return;
 
@@ -263,7 +263,7 @@ READ16_HANDLER ( genesis_68k_to_z80_r )
 	if ((offset >= 0x0000) && (offset <= 0x3fff))
 	{
 		offset &=0x1fff;
-//      logerror("soundram_r returning %x\n",(gen_z80_shared[offset] << 8) + gen_z80_shared[offset+1]);
+//      loginfo(2,"soundram_r returning %x\n",(gen_z80_shared[offset] << 8) + gen_z80_shared[offset+1]);
 		return (genesis_z80_ram[offset] << 8) + genesis_z80_ram[offset+1];
 	}
 
@@ -315,7 +315,7 @@ READ16_HANDLER ( megaplay_68k_to_z80_r )
 	if ((offset >= 0x0000) && (offset <= 0x1fff))
 	{
 		offset &=0x1fff;
-//      logerror("soundram_r returning %x\n",(gen_z80_shared[offset] << 8) + gen_z80_shared[offset+1]);
+//      loginfo(2,"soundram_r returning %x\n",(gen_z80_shared[offset] << 8) + gen_z80_shared[offset+1]);
 		return (genesis_z80_ram[offset] << 8) + genesis_z80_ram[offset+1];
 	}
 
@@ -495,7 +495,7 @@ READ16_HANDLER ( genesis_io_r )
 			}
 
 			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
-//          logerror ("reading joypad 1 , type %02x %02x\n",genesis_io_ram[offset] & 0x80, return_value &0x7f);
+//          loginfo (2, "reading joypad 1 , type %02x %02x\n",genesis_io_ram[offset] & 0x80, return_value &0x7f);
 			if(bios_ctrl_inputs & 0x04) return_value = 0xff;
 			break;
 
@@ -516,7 +516,7 @@ READ16_HANDLER ( genesis_io_r )
 					return_value+=1;
 			}
 			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
-//          logerror ("reading joypad 2 , type %02x %02x\n",genesis_io_ram[offset] & 0x80, return_value &0x7f);
+//          loginfo (2, "reading joypad 2 , type %02x %02x\n",genesis_io_ram[offset] & 0x80, return_value &0x7f);
 			if(bios_ctrl_inputs & 0x04) return_value = 0xff;
 			break;
 
@@ -559,7 +559,7 @@ READ16_HANDLER ( megaplay_genesis_io_r )
 				return_value |= readinputport(1) & 0x03;
 			}
 			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
-//          logerror ("reading joypad 1 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
+//          loginfo (2, "reading joypad 1 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
 			break;
 
 		case 2: /* port B data (joypad 2) */
@@ -572,7 +572,7 @@ READ16_HANDLER ( megaplay_genesis_io_r )
 				return_value |= readinputport(3) & 0x03;
 			}
 			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
-//          logerror ("reading joypad 2 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
+//          loginfo (2, "reading joypad 2 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
 			break;
 
 //      case 3: /* port C data */
@@ -588,7 +588,7 @@ READ16_HANDLER ( megaplay_genesis_io_r )
 
 WRITE16_HANDLER ( genesis_io_w )
 {
-//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,activecpu_get_previouspc());
+//  loginfo (2, "write io offset :%02x data %04x PC: 0x%06x\n",offset,data,activecpu_get_previouspc());
 
 	switch (offset)
 	{
@@ -664,16 +664,16 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER ( genesis_bank_select_w ) /* note value will be meaningless unless all bits are correctly set in */
 {
 	if (offset !=0 ) return;
-//  if (!z80running) logerror("undead Z80 latch write!\n");
+//  if (!z80running) loginfo(2,"undead Z80 latch write!\n");
 	if (z80_latch_bitcount == 0) z80_68000_latch = 0;
 
 	z80_68000_latch = z80_68000_latch | ((( ((unsigned char)data) & 0x01) << (15+z80_latch_bitcount)));
- 	logerror("value %x written to latch\n", data);
+ 	loginfo(2,"value %x written to latch\n", data);
 	z80_latch_bitcount++;
 	if (z80_latch_bitcount == 9)
 	{
 		z80_latch_bitcount = 0;
-		logerror("latch set, value %x\n", z80_68000_latch);
+		loginfo(2,"latch set, value %x\n", z80_68000_latch);
 	}
 }
 
@@ -757,11 +757,11 @@ READ8_HANDLER ( genesis_z80_bank_r )
 {
 	int address = (z80_68000_latch) + (offset & 0x7fff);
 
-	if (!z80running) logerror("undead Z80->68000 read!\n");
+	if (!z80running) loginfo(2,"undead Z80->68000 read!\n");
 
-	if (z80_latch_bitcount != 0) logerror("reading whilst latch being set!\n");
+	if (z80_latch_bitcount != 0) loginfo(2,"reading whilst latch being set!\n");
 
-	logerror("z80 read from address %x\n", address);
+	loginfo(2,"z80 read from address %x\n", address);
 
 	/* Read the data out of the 68k ROM */
 	if (address < 0x400000) return memory_region(REGION_CPU1)[BYTE_XOR(address)];

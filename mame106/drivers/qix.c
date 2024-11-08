@@ -3216,7 +3216,7 @@ static DRIVER_INIT( kram3 )
 	{
 		int a = cpu0_patch[i];
 		if (rom[a] != cpu0_patch[i+1])
-			logerror("error in patch data at address %04x\n",a);
+			loginfo(2,"error in patch data at address %04x\n",a);
 		else
 			decrypted[a-0xa000] = cpu0_patch[i+2];
 
@@ -3234,7 +3234,7 @@ static DRIVER_INIT( kram3 )
 	{
 		int a = cpu1_patch[i];
 		if (rom[a] != cpu1_patch[i+1])
-			logerror("error in patch data at address %04x\n",a);
+			loginfo(2,"error in patch data at address %04x\n",a);
 		else
 			decrypted[a-0xa000] = cpu1_patch[i+2];
 

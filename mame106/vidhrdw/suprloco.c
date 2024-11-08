@@ -153,7 +153,7 @@ WRITE8_HANDLER( suprloco_control_w )
 
 	if ((control & 0x10) != (data & 0x10))
 	{
-		/*logerror("Bit 4 = %d\n", (data >> 4) & 1); */
+		/*loginfo(2,"Bit 4 = %d\n", (data >> 4) & 1); */
 	}
 
 	coin_counter_w(0, data & 0x01);

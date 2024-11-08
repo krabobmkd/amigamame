@@ -154,7 +154,7 @@ WRITE8_HANDLER( ldrun2_bankswitch_w )
 	{
 		if (data < 1 || data > 30)
 		{
-logerror("unknown bank select %02x\n",data);
+loginfo(2,"unknown bank select %02x\n",data);
 			return;
 		}
 		memory_set_bank(1, banks[data-1]);

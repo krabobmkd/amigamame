@@ -120,7 +120,7 @@ VIDEO_UPDATE( changela )
 
 	ls195_latch = 0;
 
-logerror("bank=%4x addr=%4x\n", slopeROM_bank, address);
+loginfo(2,"bank=%4x addr=%4x\n", slopeROM_bank, address);
 
     /* /PRELOAD */
 	/* address = 0xff */
@@ -283,7 +283,7 @@ logerror("bank=%4x addr=%4x\n", slopeROM_bank, address);
 	ROM1 = memory_region(REGION_USER2) + slopeROM_bank + (((address+1)&0x7e)<<2);
 
 
-logerror("addrlow=%4x (addr=%4x)\n", (((address+1)&0x7e)<<2), address );
+loginfo(2,"addrlow=%4x (addr=%4x)\n", (((address+1)&0x7e)<<2), address );
 
 	for (sy = 0; sy < 128; sy++)
 	{

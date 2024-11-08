@@ -26,6 +26,10 @@ extern "C" {
 
 #include <stdio.h>
 #include <strings.h>
+//#include <locale.h>
+//#include <locale>
+//#include <clocale>
+//#include <iostream>
 
 #include <proto/alib.h>
 #include <proto/exec.h>
@@ -140,9 +144,7 @@ void mameExitCleanCtrlC(void);
 void main_close()
 {
    // printf("does main_close\n");
-//#ifdef DOMAMELOG
-//    printf("mameExitCleanCtrlC\n");
-//#endif
+
     mameExitCleanCtrlC(); // flush game allocs, ahcked from mame.c, in case stopped during game.
 
     osd_close_display(); // also useful when ctrl-C
@@ -177,7 +179,7 @@ void main_close()
 
 const char *pVersion="$VER:MAME 0.106 "
         APPVERNUM
-        "68060 68882";
+        " 68060 68882";
 
 // - - - - IF COMPILED WITH FLOAT, AND MACHINE HAS NO FPU, EXIT WITH MESSAGE - - - -
 #if defined(MAME_USE_HARD_FLOAT)
@@ -199,6 +201,7 @@ beforeMainInit _ginit;
 
 int main(int argc, char **argv)
 {
+//  setlocale(LC_NUMERIC, "POSIX"); // for C and C++ where synced with stdio
     {
     Task *task  = FindTask(NULL);
     int stacksize = ((int)task->tc_SPReg - (int)task->tc_SPLower);
@@ -222,9 +225,7 @@ int main(int argc, char **argv)
             return 1;
         }
     }
-#ifdef DOMAMELOG
-    printf("hello\n");
-#endif
+
 /* krb: looks messy to me, original stack should be restored and alloc freed , in an atexit().
   task  = FindTask(NULL);
   if((task->tc_SPReg - task->tc_SPLower) < (MIN_STACK - 1024))
@@ -248,18 +249,15 @@ int main(int argc, char **argv)
   */
     // any exit case will lead to close().
     atexit(&main_close);
+
     if(libs_init()!=0) exit(1);
 
-#ifdef DOMAMELOG
-    printf("getMainConfig().init()\n");
-#endif
     getMainConfig().init(argc,argv);
-#ifdef DOMAMELOG
-    printf("getMainConfig().load()\n");
-#endif
     getMainConfig().load();
 
     int idriver=0; // romToLaunch;
+    STRPTR userdir = NULL;
+    int verbose=0;
     if(argc>1)
     {
         // test if just "mame romname".
@@ -270,8 +268,12 @@ int main(int argc, char **argv)
         STRPTR *args = ArgArrayInit(argc,(const char **)argv);
         STRPTR rom = ArgString((CONST_STRPTR*)args,"ROM","");
         if(rom && *rom != 0)  idriver = getMainConfig().driverIndex().index(rom);
+
+        userdir =  ArgString((CONST_STRPTR*)args,"USERDIR","");
+        verbose = (ArgInt((CONST_STRPTR*)args,"VERBOSE",2)!=2);
         ArgArrayDone();
     }
+    if(verbose) log_enableStdOut(1);
 
     //  if game was explicit, no GUI
     if(idriver>0)
@@ -280,13 +282,9 @@ int main(int argc, char **argv)
         StartGame();
         return 0;
     }
-#ifdef DOMAMELOG
-    printf("before AllocGUI()\n");
-#endif
+
     AllocGUI();
-#ifdef DOMAMELOG
-    printf("after AllocGUI()\n");
-#endif
+
     // go into interface loop
     ULONG quit=FALSE;
 

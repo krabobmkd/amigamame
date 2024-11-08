@@ -389,7 +389,7 @@ static void cottonbm_slave_speedup( UINT32 data )
 		   (stv_workram_h[0x0ffc48/4] != 0x260fbe2c)
 			)
 			{
-				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
+				loginfo(2,"cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
 				cpunum_spinuntil_trigger(1, 1000);
 			}
@@ -426,7 +426,7 @@ static void cotton2_slave_speedup( UINT32 data )
 			(stv_workram_h[0x0ffc48/4] != 0x260fd25c)
 			)
 			{
-				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
+				loginfo(2,"cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
 				cpunum_spinuntil_trigger(1, 1000);
 			}
@@ -538,11 +538,11 @@ static READ32_HANDLER( groovef_hack2_r )
 
 static READ32_HANDLER( groovef_speedup_r )
 {
-//  logerror ("groove speedup \n");
+//  loginfo (2, "groove speedup \n");
 	if (activecpu_get_pc()==0x060a4972)
 	{
 		cpu_spinuntil_int(); // title logos
-//      logerror ("groove speedup skipping\n");
+//      loginfo (2, "groove speedup skipping\n");
 
 	}
 
@@ -608,7 +608,7 @@ and Hanafuda works without hack now (unless the sound ram one)
 
 static READ32_HANDLER( danchih_hack_r )
 {
-	logerror( "DMASt_SCU1: Read at PC=%08x, value = %08x\n", activecpu_get_pc(), stv_workram_h[0x0ffcbc/4] );
+	loginfo(2, "DMASt_SCU1: Read at PC=%08x, value = %08x\n", activecpu_get_pc(), stv_workram_h[0x0ffcbc/4] );
 	if (activecpu_get_pc()==0x06028b2a) return 0x0e0c0000;
 
 	return stv_workram_h[0x0ffcbc/4];
@@ -790,7 +790,7 @@ static void grdforce_slave_speedup( UINT32 data )
 			(stv_workram_h[0x0ffc48/4] != 0x260fd25c)
 			)
 			{
-				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
+				loginfo(2,"cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
 				//cpu_spinuntil_time(TIME_IN_USEC(200));
 				cpunum_spinuntil_trigger(1, 1000);
@@ -843,7 +843,7 @@ static void colmns97_slave_speedup( UINT32 data )
 		if ( (data & 0x00800000) == 0 )
 			if ( (stv_workram_h[0x0ffc48/4] != 0x260ef3fc) )
 			{
-				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
+				loginfo(2,"cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 				cpunum_spinuntil_trigger(1, 1000);
 			}
 
@@ -991,7 +991,7 @@ static void othellos_slave_speedup( UINT32 data )
 		if ( (data & 0x00800000) == 0 )
 			if ( (stv_workram_h[0x0ffc48/4] != 0x260fd25c ) )
 			{
-				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
+				loginfo(2,"cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 				cpunum_spinuntil_trigger(1, 1000);
 			}
 }
@@ -1049,7 +1049,7 @@ DRIVER_INIT(suikoenb)
 
 static void sokyugrt_slave_speedup( UINT32 data )
 {
-	logerror( "SlaveSH2: Idle loop skip, data = %08X\n", data );
+	loginfo(2, "SlaveSH2: Idle loop skip, data = %08X\n", data );
 	if (stv_enable_slave_sh2)
 		if ( activecpu_get_pc() == 0x0605eec2 )
 			if ( (data & 0x00800000) == 0 )
@@ -1087,7 +1087,7 @@ static void znpwfv_slave_speedup( UINT32 data )
 			(stv_workram_h[0x0ffc48/4] != 0x260f359c)
 			)
 			{
-				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
+				loginfo(2,"cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
 				cpunum_spinuntil_trigger(1, 1000);
 			}
@@ -1179,7 +1179,7 @@ static void maruchan_slave_speedup( UINT32 data )
 			(stv_workram_h[0x0ffc48/4] != 0x260ef3c4)
 			)
 			{
-				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
+				loginfo(2,"cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
 				cpunum_spinuntil_trigger(1, 1000);
 			}
@@ -1238,7 +1238,7 @@ static void elandore_slave_speedup(UINT32 data)
 		if ( (data & 0x00800000) == 0 )
 			if ( (stv_workram_h[0x0ffc48/4] != 0x260ee018) )
 			{
-				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
+				loginfo(2,"cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
 				cpunum_spinuntil_trigger(1, 1000);
 			}
@@ -1265,7 +1265,7 @@ static void rsgun_slave_speedup(UINT32 data)
 		if ( (data & 0x00800000) == 0 )
 			if ((stv_workram_h[0x0ffc48/4] != 0x260efc50))
 			{
-				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
+				loginfo(2,"cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
 				cpunum_spinuntil_trigger(1, 1000);
 			}

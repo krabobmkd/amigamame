@@ -198,7 +198,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",activecpu_get_pc(),data);
+//      loginfo(2,"PC %06x: prot = %02x\n",activecpu_get_pc(),data);
 
 		switch (data & 0xf0)
 		{
@@ -213,7 +213,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 				jumpcode |= data & 0x0f;
 				if (jumpcode >= sizeof(jumppoints)/sizeof(jumppoints[0]))
 				{
-					logerror("unknown jumpcode %02x\n",jumpcode);
+					loginfo(2,"unknown jumpcode %02x\n",jumpcode);
 					jumpcode = 0;
 				}
 				prot = 0x20;
@@ -236,7 +236,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 
 static READ16_HANDLER( wildfang_protection_r )
 {
-//  logerror("PC %06x: read prot %02x\n",activecpu_get_pc(),prot);
+//  loginfo(2,"PC %06x: read prot %02x\n",activecpu_get_pc(),prot);
 	return prot;
 }
 
@@ -326,7 +326,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",activecpu_get_pc(),data);
+//      loginfo(2,"PC %06x: prot = %02x\n",activecpu_get_pc(),data);
 
 		switch (data & 0xf0)
 		{
@@ -339,7 +339,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 				break;
 			case 0x20:	/* low 4 bits of jump code */
 				jumpcode |= data & 0x0f;
-				logerror("requested protection jumpcode %02x\n",jumpcode);
+				loginfo(2,"requested protection jumpcode %02x\n",jumpcode);
 //              jumpcode = 0;
 				if (raiga_jumppoints[jumpcode] == -2)
 				{
@@ -348,7 +348,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 
 				if (raiga_jumppoints[jumpcode] == -1)
 				{
-					logerror("unknown jumpcode %02x\n",jumpcode);
+					loginfo(2,"unknown jumpcode %02x\n",jumpcode);
 					ui_popup("unknown jumpcode %02x",jumpcode);
 					jumpcode = 0;
 				}
@@ -372,7 +372,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 
 static READ16_HANDLER( raiga_protection_r )
 {
-//  logerror("PC %06x: read prot %02x\n",activecpu_get_pc(),prot);
+//  loginfo(2,"PC %06x: read prot %02x\n",activecpu_get_pc(),prot);
 	return prot;
 }
 

@@ -414,7 +414,7 @@ static READ16_HANDLER( ssriders_protection_r )
 
 		default:
 			ui_popup("%06x: unknown protection read",activecpu_get_pc());
-			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",activecpu_get_pc(),(UINT32)activecpu_get_reg(M68K_D7),cmd,data);
+			loginfo(2,"%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",activecpu_get_pc(),(UINT32)activecpu_get_reg(M68K_D7),cmd,data);
 			return 0xffff;
     }
 }
@@ -1188,7 +1188,7 @@ WRITE16_HANDLER( tmnt2_1c0800_w )
 			y += sunset_104000[CellVar + 0x08];
 		cpu_writemem24bew_word(dst+0x08,y);
 #if 0
-logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers %08x:%04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x\n",
+loginfo(2,"copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers %08x:%04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x\n",
 	tmnt2_1c0800[0x05],
 	CellDest,CellSrc,
 	src[0], src[1], src[2], src[3],

@@ -139,12 +139,12 @@ DRIVER_INIT( neogeo )
 
 	if (memory_region(REGION_SOUND2))
 	{
-		logerror("using memory region %d for Delta T samples\n",REGION_SOUND2);
+		loginfo(2,"using memory region %d for Delta T samples\n",REGION_SOUND2);
 		neogeo_ym2610_interface.pcmromb = REGION_SOUND2;
 	}
 	else
 	{
-		logerror("using memory region %d for Delta T samples\n",REGION_SOUND1);
+		loginfo(2,"using memory region %d for Delta T samples\n",REGION_SOUND1);
 		neogeo_ym2610_interface.pcmromb = REGION_SOUND1;
 	}
 

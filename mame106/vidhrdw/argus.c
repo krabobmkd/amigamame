@@ -1290,44 +1290,44 @@ static void butasan_log_vram(void)
 	if ( code_pressed(KEYCODE_M) )
 	{
 		int i;
-		logerror("\nSprite RAM\n");
-		logerror("---------------------------------------\n");
-		logerror("       +0 +1 +2 +3 +4 +5 +6 +7  +8 +9 +a +b +c +d +e +f\n");
+		loginfo(2,"\nSprite RAM\n");
+		loginfo(2,"---------------------------------------\n");
+		loginfo(2,"       +0 +1 +2 +3 +4 +5 +6 +7  +8 +9 +a +b +c +d +e +f\n");
 		for (offs = 0 ; offs < spriteram_size ; offs += 16)
 		{
 			for (i = 0 ; i < 16 ; i ++)
 			{
 				if (i == 0)
 				{
-					logerror("%04x : ", offs + 0xf000);
-					logerror("%02x ", spriteram[offs]);
+					loginfo(2,"%04x : ", offs + 0xf000);
+					loginfo(2,"%02x ", spriteram[offs]);
 				}
 				else if (i == 7)
-					logerror("%02x  ", spriteram[offs + 7]);
+					loginfo(2,"%02x  ", spriteram[offs + 7]);
 				else if (i == 15)
-					logerror("%02x\n", spriteram[offs + 15]);
+					loginfo(2,"%02x\n", spriteram[offs + 15]);
 				else
-					logerror("%02x ", spriteram[offs + i]);
+					loginfo(2,"%02x ", spriteram[offs + i]);
 			}
 		}
-		logerror("\nColor RAM\n");
-		logerror("---------------------------------------\n");
-		logerror("       +0 +1 +2 +3 +4 +5 +6 +7  +8 +9 +a +b +c +d +e +f\n");
+		loginfo(2,"\nColor RAM\n");
+		loginfo(2,"---------------------------------------\n");
+		loginfo(2,"       +0 +1 +2 +3 +4 +5 +6 +7  +8 +9 +a +b +c +d +e +f\n");
 		for (offs = 0 ; offs < 0xbf0 ; offs += 16)
 		{
 			for (i = 0 ; i < 16 ; i ++)
 			{
 				if (i == 0)
 				{
-					logerror("%04x : ", offs + 0xc400);
-					logerror("%02x ", argus_paletteram[offs]);
+					loginfo(2,"%04x : ", offs + 0xc400);
+					loginfo(2,"%02x ", argus_paletteram[offs]);
 				}
 				else if (i == 7)
-					logerror("%02x  ", argus_paletteram[offs + 7]);
+					loginfo(2,"%02x  ", argus_paletteram[offs + 7]);
 				else if (i == 15)
-					logerror("%02x\n", argus_paletteram[offs + 15]);
+					loginfo(2,"%02x\n", argus_paletteram[offs + 15]);
 				else
-					logerror("%02x ", argus_paletteram[offs + i]);
+					loginfo(2,"%02x ", argus_paletteram[offs + i]);
 			}
 		}
 	}

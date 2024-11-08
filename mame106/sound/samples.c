@@ -225,12 +225,12 @@ void sample_start(int channel,int samplenum,int loop)
 		return;
 	if (channel >= info->numchannels)
 	{
-		logerror("error: sample_start() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
+		loginfo(2,"error: sample_start() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
 		return;
 	}
 	if (samplenum >= info->samples->total)
 	{
-		logerror("error: sample_start() called with samplenum = %d, but only %d samples available\n",samplenum,info->samples->total);
+		loginfo(2,"error: sample_start() called with samplenum = %d, but only %d samples available\n",samplenum,info->samples->total);
 		return;
 	}
 
@@ -255,7 +255,7 @@ void sample_start_raw(int channel,INT16 *sampledata,int samples,int frequency,in
 
 	if (channel >= info->numchannels)
 	{
-		logerror("error: sample_start() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
+		loginfo(2,"error: sample_start() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
 		return;
 	}
 
@@ -279,7 +279,7 @@ void sample_set_freq(int channel,int freq)
 
 	if (channel >= info->numchannels)
 	{
-		logerror("error: sample_set_freq() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
+		loginfo(2,"error: sample_set_freq() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
 		return;
 	}
 
@@ -296,7 +296,7 @@ void sample_set_volume(int channel,float volume)
 
 	if (channel >= info->numchannels)
 	{
-		logerror("error: sample_set_volume() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
+		loginfo(2,"error: sample_set_volume() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
 		return;
 	}
 
@@ -310,7 +310,7 @@ void sample_set_pause(int channel,int pause)
 
 	if (channel >= info->numchannels)
 	{
-		logerror("error: sample_set_pause() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
+		loginfo(2,"error: sample_set_pause() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
 		return;
 	}
 
@@ -327,7 +327,7 @@ void sample_stop(int channel)
 
 	if (channel >= info->numchannels)
 	{
-		logerror("error: sample_stop() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
+		loginfo(2,"error: sample_stop() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
 		return;
 	}
 
@@ -344,7 +344,7 @@ int sample_playing(int channel)
 
 	if (channel >= info->numchannels)
 	{
-		logerror("error: sample_playing() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
+		loginfo(2,"error: sample_playing() called with channel = %d, but only %d channels allocated\n",channel,info->numchannels);
 		return 0;
 	}
 
@@ -362,7 +362,7 @@ int sample_loaded(int samplenum)
 		return 0;
 	if (samplenum >= info->samples->total)
 	{
-		logerror("error: sample_loaded() called with samplenum = %d, but only %d samples available\n",samplenum,info->samples->total);
+		loginfo(2,"error: sample_loaded() called with samplenum = %d, but only %d samples available\n",samplenum,info->samples->total);
 		return 0;
 	}
 	return (info->samples->sample[samplenum].data != NULL);

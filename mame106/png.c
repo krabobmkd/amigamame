@@ -45,7 +45,7 @@ int png_unfilter(png_info *p)
 
 	if((p->image = (UINT8 *)malloc (p->height*p->rowbytes))==NULL)
 	{
-		logerror("Out of memory\n");
+		loginfo(2,"Out of memory\n");
 		free (p->fimage);
 		return 0;
 	}
@@ -91,7 +91,7 @@ int png_unfilter(png_info *p)
 					else prediction = pC;
 					break;
 				default:
-					logerror("Unknown filter type %i\n",filter);
+					loginfo(2,"Unknown filter type %i\n",filter);
 					prediction = 0;
 				}
 				*dst = 0xff & (*src + prediction);
@@ -109,13 +109,13 @@ int png_verify_signature (mame_file *fp)
 
 	if (mame_fread (fp, signature, 8) != 8)
 	{
-		logerror("Unable to read PNG signature (EOF)\n");
+		loginfo(2,"Unable to read PNG signature (EOF)\n");
 		return 0;
 	}
 
 	if (memcmp(signature, PNG_Signature, 8))
 	{
-		logerror("PNG signature mismatch found: %s expected: %s\n",signature,PNG_Signature);
+		loginfo(2,"PNG signature mismatch found: %s expected: %s\n",signature,PNG_Signature);
 		return 0;
 	}
 	return 1;
@@ -129,14 +129,14 @@ int png_inflate_image (png_info *p)
 
 	if((p->fimage = (UINT8 *)malloc (fbuff_size))==NULL)
 	{
-		logerror("Out of memory\n");
+		loginfo(2,"Out of memory\n");
 		free (p->zimage);
 		return 0;
 	}
 
 	if (uncompress(p->fimage, &fbuff_size, p->zimage, p->zlength) != Z_OK)
 	{
-		logerror("Error while inflating image\n");
+		loginfo(2,"Error while inflating image\n");
 		return 0;
 	}
 
@@ -177,11 +177,11 @@ int png_read_file(mame_file *fp, png_info *p)
 	while (chunk_type != PNG_CN_IEND)
 	{
 		if (mame_fread(fp, v, 4) != 4)
-			logerror("Unexpected EOF in PNG\n");
+			loginfo(2,"Unexpected EOF in PNG\n");
 		chunk_length=convert_from_network_order(v);
 
 		if (mame_fread(fp, str_chunk_type, 4) != 4)
-			logerror("Unexpected EOF in PNG file\n");
+			loginfo(2,"Unexpected EOF in PNG file\n");
 
 		str_chunk_type[4]=0; /* terminate string */
 
@@ -192,12 +192,12 @@ int png_read_file(mame_file *fp, png_info *p)
 		{
 			if ((chunk_data = (UINT8 *)malloc(chunk_length+1))==NULL)
 			{
-				logerror("Out of memory\n");
+				loginfo(2,"Out of memory\n");
 				return 0;
 			}
 			if (mame_fread (fp, chunk_data, chunk_length) != chunk_length)
 			{
-				logerror("Unexpected EOF in PNG file\n");
+				loginfo(2,"Unexpected EOF in PNG file\n");
 				free(chunk_data);
 				return 0;
 			}
@@ -208,17 +208,17 @@ int png_read_file(mame_file *fp, png_info *p)
 			chunk_data = NULL;
 
 		if (mame_fread(fp, v, 4) != 4)
-			logerror("Unexpected EOF in PNG\n");
+			loginfo(2,"Unexpected EOF in PNG\n");
 		chunk_crc=convert_from_network_order(v);
 
 		if (crc != chunk_crc)
 		{
-			logerror("CRC check failed while reading PNG chunk %s\n",str_chunk_type);
-			logerror("Found: %08X  Expected: %08X\n",crc,chunk_crc);
+			loginfo(2,"CRC check failed while reading PNG chunk %s\n",str_chunk_type);
+			loginfo(2,"Found: %08X  Expected: %08X\n",crc,chunk_crc);
 			return 0;
 		}
 
-		logerror("Reading PNG chunk %s\n", str_chunk_type);
+		loginfo(2,"Reading PNG chunk %s\n", str_chunk_type);
 
 		switch (chunk_type)
 		{
@@ -232,23 +232,23 @@ int png_read_file(mame_file *fp, png_info *p)
 			p->interlace_method = *(chunk_data+12);
 			free (chunk_data);
 
-			logerror("PNG IHDR information:\n");
-			logerror("Width: %i, Height: %i\n", p->width, p->height);
-			logerror("Bit depth %i, color type: %i\n", p->bit_depth, p->color_type);
-			logerror("Compression method: %i, filter: %i, interlace: %i\n",
+			loginfo(2,"PNG IHDR information:\n");
+			loginfo(2,"Width: %i, Height: %i\n", p->width, p->height);
+			loginfo(2,"Bit depth %i, color type: %i\n", p->bit_depth, p->color_type);
+			loginfo(2,"Compression method: %i, filter: %i, interlace: %i\n",
 					p->compression_method, p->filter_method, p->interlace_method);
 			break;
 
 		case PNG_CN_PLTE:
 			p->num_palette=chunk_length/3;
 			p->palette=chunk_data;
-			logerror("%i palette entries\n", p->num_palette);
+			loginfo(2,"%i palette entries\n", p->num_palette);
 			break;
 
 		case PNG_CN_tRNS:
 			p->num_trans=chunk_length;
 			p->trans=chunk_data;
-			logerror("%i transparent palette entries\n", p->num_trans);
+			loginfo(2,"%i transparent palette entries\n", p->num_trans);
 			break;
 
 		case PNG_CN_IDAT:
@@ -267,8 +267,8 @@ int png_read_file(mame_file *fp, png_info *p)
 
 				while(*text++) ;
 				chunk_data[chunk_length]=0;
- 				logerror("Keyword: %s\n", chunk_data);
-				logerror("Text: %s\n", text);
+ 				loginfo(2,"Keyword: %s\n", chunk_data);
+				loginfo(2,"Text: %s\n", text);
 			}
 			free(chunk_data);
 			break;
@@ -276,7 +276,7 @@ int png_read_file(mame_file *fp, png_info *p)
 		case PNG_CN_tIME:
 			{
 				UINT8 *t=chunk_data;
-				logerror("Image last-modification time: %i/%i/%i (%i:%i:%i) GMT\n",
+				loginfo(2,"Image last-modification time: %i/%i/%i (%i:%i:%i) GMT\n",
 					((short)(*t) << 8)+ (short)(*(t+1)), *(t+2), *(t+3), *(t+4), *(t+5), *(t+6));
 			}
 
@@ -285,7 +285,7 @@ int png_read_file(mame_file *fp, png_info *p)
 
 		case PNG_CN_gAMA:
 			p->source_gamma	 = convert_from_network_order(chunk_data)/100000.0;
-			logerror( "Source gamma: %f\n",p->source_gamma);
+			loginfo(2, "Source gamma: %f\n",p->source_gamma);
 
 			free(chunk_data);
 			break;
@@ -294,12 +294,12 @@ int png_read_file(mame_file *fp, png_info *p)
 			p->xres = convert_from_network_order(chunk_data);
 			p->yres = convert_from_network_order(chunk_data+4);
 			p->resolution_unit = *(chunk_data+8);
-			logerror("Pixel per unit, X axis: %i\n",p->xres);
-			logerror("Pixel per unit, Y axis: %i\n",p->yres);
+			loginfo(2,"Pixel per unit, X axis: %i\n",p->xres);
+			loginfo(2,"Pixel per unit, Y axis: %i\n",p->yres);
 			if (p->resolution_unit)
-				logerror("Unit is meter\n");
+				loginfo(2,"Unit is meter\n");
 			else
-				logerror("Unit is unknown\n");
+				loginfo(2,"Unit is unknown\n");
 			free(chunk_data);
 			break;
 
@@ -308,9 +308,9 @@ int png_read_file(mame_file *fp, png_info *p)
 
 		default:
 			if (chunk_type & 0x20000000)
-				logerror("Ignoring ancillary chunk %s\n",str_chunk_type);
+				loginfo(2,"Ignoring ancillary chunk %s\n",str_chunk_type);
 			else
-				logerror("Ignoring critical chunk %s!\n",str_chunk_type);
+				loginfo(2,"Ignoring critical chunk %s!\n",str_chunk_type);
 			if (chunk_data)
 				free(chunk_data);
 			break;
@@ -318,7 +318,7 @@ int png_read_file(mame_file *fp, png_info *p)
 	}
 	if ((p->zimage = (UINT8 *)malloc(p->zlength))==NULL)
 	{
-		logerror("Out of memory\n");
+		loginfo(2,"Out of memory\n");
 		return 0;
 	}
 
@@ -359,11 +359,11 @@ int png_read_info(mame_file *fp, png_info *p)
 	while (chunk_type != PNG_CN_IEND)
 	{
 		if (mame_fread(fp, v, 4) != 4)
-			logerror("Unexpected EOF in PNG\n");
+			loginfo(2,"Unexpected EOF in PNG\n");
 		chunk_length=convert_from_network_order(v);
 
 		if (mame_fread(fp, str_chunk_type, 4) != 4)
-			logerror("Unexpected EOF in PNG file\n");
+			loginfo(2,"Unexpected EOF in PNG file\n");
 
 		str_chunk_type[4]=0; /* terminate string */
 
@@ -374,12 +374,12 @@ int png_read_info(mame_file *fp, png_info *p)
 		{
 			if ((chunk_data = (UINT8 *)malloc(chunk_length+1))==NULL)
 			{
-				logerror("Out of memory\n");
+				loginfo(2,"Out of memory\n");
 				return 0;
 			}
 			if (mame_fread (fp, chunk_data, chunk_length) != chunk_length)
 			{
-				logerror("Unexpected EOF in PNG file\n");
+				loginfo(2,"Unexpected EOF in PNG file\n");
 				free(chunk_data);
 				return 0;
 			}
@@ -390,17 +390,17 @@ int png_read_info(mame_file *fp, png_info *p)
 			chunk_data = NULL;
 
 		if (mame_fread(fp, v, 4) != 4)
-			logerror("Unexpected EOF in PNG\n");
+			loginfo(2,"Unexpected EOF in PNG\n");
 		chunk_crc=convert_from_network_order(v);
 
 		if (crc != chunk_crc)
 		{
-			logerror("CRC check failed while reading PNG chunk %s\n",str_chunk_type);
-			logerror("Found: %08X  Expected: %08X\n",crc,chunk_crc);
+			loginfo(2,"CRC check failed while reading PNG chunk %s\n",str_chunk_type);
+			loginfo(2,"Found: %08X  Expected: %08X\n",crc,chunk_crc);
 			return 0;
 		}
 
-		logerror("Reading PNG chunk %s\n", str_chunk_type);
+		loginfo(2,"Reading PNG chunk %s\n", str_chunk_type);
 
 		switch (chunk_type)
 		{
@@ -414,10 +414,10 @@ int png_read_info(mame_file *fp, png_info *p)
 			p->interlace_method = *(chunk_data+12);
 			free (chunk_data);
 
-			logerror("PNG IHDR information:\n");
-			logerror("Width: %i, Height: %i\n", p->width, p->height);
-			logerror("Bit depth %i, color type: %i\n", p->bit_depth, p->color_type);
-			logerror("Compression method: %i, filter: %i, interlace: %i\n",
+			loginfo(2,"PNG IHDR information:\n");
+			loginfo(2,"Width: %i, Height: %i\n", p->width, p->height);
+			loginfo(2,"Bit depth %i, color type: %i\n", p->bit_depth, p->color_type);
+			loginfo(2,"Compression method: %i, filter: %i, interlace: %i\n",
 					p->compression_method, p->filter_method, p->interlace_method);
 			break;
 
@@ -435,12 +435,12 @@ int png_read_info(mame_file *fp, png_info *p)
 					if (c == 4)
 					{
 						res = 1;
-						logerror("Screen location found at %i, %i, %i, %i\n",
+						loginfo(2,"Screen location found at %i, %i, %i, %i\n",
 								 p->screen.min_x, p->screen.max_x,
 								 p->screen.min_y, p->screen.max_y);
 					}
 					else
-						logerror("Invalid %s value %s\n", chunk_data, text);
+						loginfo(2,"Invalid %s value %s\n", chunk_data, text);
 				}
 			}
 			free(chunk_data);
@@ -465,7 +465,7 @@ int png_expand_buffer_8bit (png_info *p)
 	{
 		if ((outbuf = (UINT8 *)malloc(p->width*p->height))==NULL)
 		{
-			logerror("Out of memory\n");
+			loginfo(2,"Out of memory\n");
 			return 0;
 		}
 
@@ -526,7 +526,7 @@ void png_delete_unused_colors (png_info *p)
 		p->image[i]=tab[p->image[i]];
 
 	if (p->num_palette!=pen)
-		logerror("%i unused pen(s) deleted\n", p->num_palette-pen);
+		loginfo(2,"%i unused pen(s) deleted\n", p->num_palette-pen);
 
 	p->num_palette = pen;
 	p->num_trans = trns;
@@ -606,7 +606,7 @@ static int write_chunk(mame_file *fp, UINT32 chunk_type, UINT8 *chunk_data, UINT
 
 	if (written != 3*4+chunk_length)
 	{
-		logerror("Chunk write failed\n");
+		loginfo(2,"Chunk write failed\n");
 		return 0;
 	}
 	return 1;
@@ -617,7 +617,7 @@ int png_write_sig(mame_file *fp)
 	/* PNG Signature */
 	if (mame_fwrite(fp, PNG_Signature, 8) != 8)
 	{
-		logerror("PNG sig write failed\n");
+		loginfo(2,"PNG sig write failed\n");
 		return 0;
 	}
 	return 1;
@@ -636,7 +636,7 @@ int png_write_datastream(mame_file *fp, png_info *p)
 	*(ihdr+10) = p->compression_method;
 	*(ihdr+11) = p->filter_method;
 	*(ihdr+12) = p->interlace_method;
-	logerror("Type(%d) Color Depth(%d)\n", p->color_type,p->bit_depth);
+	loginfo(2,"Type(%d) Color Depth(%d)\n", p->color_type,p->bit_depth);
 	if (write_chunk(fp, PNG_CN_IHDR, ihdr, 13)==0)
 		return 0;
 
@@ -675,7 +675,7 @@ int png_filter(png_info *p)
 
 	if((p->fimage = (UINT8 *)malloc (p->height*(p->rowbytes+1)))==NULL)
 	{
-		logerror("Out of memory\n");
+		loginfo(2,"Out of memory\n");
 		return 0;
 	}
 
@@ -700,13 +700,13 @@ int png_deflate_image(png_info *p)
 
 	if((p->zimage = (UINT8 *)malloc (zbuff_size))==NULL)
 	{
-		logerror("Out of memory\n");
+		loginfo(2,"Out of memory\n");
 		return 0;
 	}
 
 	if (compress(p->zimage, &zbuff_size, p->fimage, p->height*(p->rowbytes+1)) != Z_OK)
 	{
-		logerror("Error while deflating image\n");
+		loginfo(2,"Error while deflating image\n");
 		return 0;
 	}
 	p->zlength = zbuff_size;
@@ -772,7 +772,7 @@ static int png_create_datastream(void *fp, mame_bitmap *bitmap)
 		p.color_type = 3;
 		if((p.palette = (UINT8 *)malloc (3*256))==NULL)
 		{
-			logerror("Out of memory\n");
+			loginfo(2,"Out of memory\n");
 			return 0;
 		}
 		memset (p.palette, 0, 3*256);
@@ -783,7 +783,7 @@ static int png_create_datastream(void *fp, mame_bitmap *bitmap)
 		p.num_palette = 256;
 		if((p.image = (UINT8 *)malloc (p.height*p.width))==NULL)
 		{
-			logerror("Out of memory\n");
+			loginfo(2,"Out of memory\n");
 			return 0;
 		}
 
@@ -805,7 +805,7 @@ static int png_create_datastream(void *fp, mame_bitmap *bitmap)
 		p.bit_depth = 8;
 		if((p.image = (UINT8 *)malloc (p.height * p.rowbytes))==NULL)
 		{
-			logerror("Out of memory\n");
+			loginfo(2,"Out of memory\n");
 			return 0;
 		}
 
@@ -852,7 +852,7 @@ static int png_create_datastream(void *fp, mame_bitmap *bitmap)
 				}
 			break;
 		default:
-			logerror("Unknown color depth\n");
+			loginfo(2,"Unknown color depth\n");
 			break;
 		}
 	}
@@ -910,7 +910,7 @@ int mng_capture_start(mame_file *fp, mame_bitmap *bitmap)
 
 	if (mame_fwrite(fp, MNG_Signature, 8) != 8)
 	{
-		logerror("MNG sig write failed\n");
+		loginfo(2,"MNG sig write failed\n");
 		return 0;
 	}
 

@@ -215,7 +215,7 @@ VIDEO_UPDATE( vb )
 	/*To get linescrolling to work properly, we must ignore the 1st two scroll values, no idea why! -SJE */
 	for (i = 2;i < 32;i++) {
 		tilemap_set_scrollx(bg_tilemap,i,scrollx[i-2]);
-		//logerror("scrollx[%d] = %d\n",i,scrollx[i]);
+		//loginfo(2,"scrollx[%d] = %d\n",i,scrollx[i]);
 	}
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(bitmap,cliprect);

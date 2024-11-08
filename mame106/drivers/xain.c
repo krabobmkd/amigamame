@@ -232,13 +232,13 @@ static WRITE8_HANDLER( xain_irqB_clear_w )
 
 static READ8_HANDLER( xain_68705_r )
 {
-//  logerror("read 68705\n");
+//  loginfo(2,"read 68705\n");
 	return 0x4d;	/* fake P5 checksum test pass */
 }
 
 static WRITE8_HANDLER( xain_68705_w )
 {
-//  logerror("write %02x to 68705\n",data);
+//  loginfo(2,"write %02x to 68705\n",data);
 }
 
 static READ8_HANDLER( xain_input_port_4_r )

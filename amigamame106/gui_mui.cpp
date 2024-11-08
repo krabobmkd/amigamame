@@ -195,6 +195,23 @@ static ULONG ASM DriverNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG
 static ULONG ASM ShowNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 #endif
 
+
+//log_setCallback
+static void muilog(int iwe,const char *pmessage)
+{
+    if(!LA_statusbar || !pmessage) return;
+    // got to treat line by line, here just display last line.
+    int linestart=0;
+    int i=0;
+    while(pmessage[i] != 0)
+    {
+        if(pmessage[i]=='\n' && pmessage[i+1]!=0) linestart = i+1;
+        i++;
+    }
+
+    set(LA_statusbar, MUIA_Text_Contents,(ULONG)(pmessage+linestart));
+}
+
 static inline int GetEntryDriverIndex(ULONG entry)
 {
   int index;
@@ -759,16 +776,13 @@ static ULONG ASM DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * ob
 
 void AllocGUI(void)
 {
-#ifdef DOMAMELOG
-    printf("Open muimaster 16\n");
-#endif
     MUIMasterBase = OpenLibrary("muimaster.library", 16);
     if(!MUIMasterBase)
     {
         printf(" no MUI interface found\n install MUI or launch a game installed in roms/romname.zip with:\n>Mame106 romname\n\n");
         return;
     }
-    printf("mui lib:%d\n",MUIMasterBase->lib_Version);
+   // printf("mui lib:%d\n",MUIMasterBase->lib_Version);
     LONG  i;
 
     App     = NULL;
@@ -798,21 +812,15 @@ void AllocGUI(void)
     String_Comment=GetMessagec("Comment");
 
 
-#ifdef DOMAMELOG
-    printf("before MUI_CreateCustomClass()\n");
-#endif
   if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
   {
-      printf("override! MUI_CreateCustomClass\n");
     DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcher);
   } else
   {
     DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcherMUI5);
 //    DriverClass = NULL;
   }
-#ifdef DOMAMELOG
-    printf("after MUI_CreateCustomClass()\n");
-#endif
+
 }
 
 void FreeGUI(void)
@@ -950,31 +958,23 @@ int MainGUI(void)
 
   MameConfig &config = getMainConfig();
 //  printf("MainGUI: MUIMasterBase:%08x\n",(int)MUIMasterBase);
-//
+
   if(MUIMasterBase)
   {
     if(!App)
     {
-#ifdef DOMAMELOG
-    printf("before CreateApp()\n");
-#endif
       CreateApp();
-#ifdef DOMAMELOG
-    printf("after CreateApp()\n");
-#endif
     }
-//  printf("after CreateApp()\n");
+
     if(App)
     {
       if(!MainWin)
       {
-      printf("may do image lib ver:%d\n",MUIMasterBase->lib_Version);
         if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
         {
 #define SCALEMODEMASK(u, d, p, s)	(((u) ? NISMF_SCALEUP : 0) | ((d) ? NISMF_SCALEDOWN : 0) | ((p) ? NISMF_KEEPASPECT_PICTURE : 0) | ((s) ? NISMF_KEEPASPECT_SCREEN : 0))
 #define TRANSMASK(m, r)				(((m) ? NITRF_MASK : 0 ) | ((r) ? NITRF_RGB : 0))
 
-    printf("do MUIC_GIFAnim\n");
           GIF_cornerlogo =
            MUI_NewObject(MUIC_GIFAnim,MUIA_GIFAnim_File,(ULONG) "PROGDIR:skin/cornerlogo.gif",
 
@@ -988,7 +988,6 @@ int MainGUI(void)
 						//	MUIA_Guigfx_ScaleMode, SCALEMODEMASK(FALSE, FALSE, TRUE, FALSE),
 						//	MUIA_Guigfx_Transparency, TRANSMASK(TRUE, TRUE),
 							TAG_DONE);*/
-    printf("do MUIC_GIFAnim:%08x\n",(int)GIF_cornerlogo);
         }
         if(GIF_cornerlogo == NULL)
         {
@@ -1031,7 +1030,8 @@ int MainGUI(void)
             Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
                 Child, UMUINO(MUIC_Group,
                       Child, BU_Start   = SimpleButton((ULONG)GetMessagec("Start")),
-                      Child, LA_statusbar = LLabel((ULONG)GetMessagec("Bla bla bla...")),
+                      Child, MUI_MakeObject(MUIO_VSpace,0),
+                      Child, LA_statusbar = LLabel((ULONG)GetMessagec("-")),
                         TAG_DONE,0),
               Child,GIF_cornerlogo,
           //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessagec("Quit")),
@@ -1107,6 +1107,9 @@ int MainGUI(void)
 //        printf("before UpdateUIToConfig\n");
 
          UpdateUIToConfig();
+
+         log_setCallback(muilog);
+
 //        printf("after UpdateUIToConfig\n");
 
         }
@@ -1147,7 +1150,7 @@ int MainGUI(void)
               }
             } // end case
               break;
-#ifndef MESS
+
             case RID_Scan:
              // GetOptions(FALSE);
 
@@ -1157,9 +1160,7 @@ int MainGUI(void)
               ShowFound();
 
               break;
-#endif
             case MUIV_Application_ReturnID_Quit:
-             // GetOptions(TRUE);
 
               loop = FALSE;
 
@@ -1385,3 +1386,5 @@ static ULONG ASM DriverSortColumnNotify(struct Hook *hook REG(a0), APTR obj REG(
 //    printf("DriverSortColumnNotify:%d\n",columnToSort);
   return(0);
 }
+
+

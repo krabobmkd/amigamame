@@ -137,7 +137,7 @@ static WRITE8_HANDLER( MC6840_control_port_0_w )
 		MC6809_FLAG = 0;
 	}
 #ifdef MAME_DEBUG
-	logerror("MC6840 Write:(0x%02X)0x%02X\n", MC6840_register0, data);
+	loginfo(2,"MC6840 Write:(0x%02X)0x%02X\n", MC6840_register0, data);
 #endif
 }
 

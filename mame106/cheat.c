@@ -7298,7 +7298,7 @@ static void ResizeCheatList(UINT32 newLength)
 		cheatList = realloc(cheatList, newLength * sizeof(CheatEntry));
 		if(!cheatList && (newLength != 0))
 		{
-			logerror("ResizeCheatList: out of memory resizing cheat list\n");
+			loginfo(2,"ResizeCheatList: out of memory resizing cheat list\n");
 			ui_popup_time(2, "out of memory while loading cheat database");
 
 			cheatListLength = 0;
@@ -7329,7 +7329,7 @@ static void ResizeCheatListNoDispose(UINT32 newLength)
 		cheatList = realloc(cheatList, newLength * sizeof(CheatEntry));
 		if(!cheatList && (newLength != 0))
 		{
-			logerror("ResizeCheatListNoDispose: out of memory resizing cheat list\n");
+			loginfo(2,"ResizeCheatListNoDispose: out of memory resizing cheat list\n");
 			ui_popup_time(2, "out of memory while loading cheat database");
 
 			cheatListLength = 0;
@@ -7428,7 +7428,7 @@ static void ResizeCheatActionList(CheatEntry * entry, UINT32 newLength)
 		entry->actionList = realloc(entry->actionList, newLength * sizeof(CheatAction));
 		if(!entry->actionList && (newLength != 0))
 		{
-			logerror("ResizeCheatActionList: out of memory resizing cheat action list\n");
+			loginfo(2,"ResizeCheatActionList: out of memory resizing cheat action list\n");
 			ui_popup_time(2, "out of memory while loading cheat database");
 
 			entry->actionListLength = 0;
@@ -7452,7 +7452,7 @@ static void ResizeCheatActionListNoDispose(CheatEntry * entry, UINT32 newLength)
 		entry->actionList = realloc(entry->actionList, newLength * sizeof(CheatAction));
 		if(!entry->actionList && (newLength != 0))
 		{
-			logerror("ResizeCheatActionList: out of memory resizing cheat action list\n");
+			loginfo(2,"ResizeCheatActionList: out of memory resizing cheat action list\n");
 			ui_popup_time(2, "out of memory while loading cheat database");
 
 			entry->actionListLength = 0;
@@ -7530,7 +7530,7 @@ static void ResizeWatchList(UINT32 newLength)
 		watchList = realloc(watchList, newLength * sizeof(WatchInfo));
 		if(!watchList && (newLength != 0))
 		{
-			logerror("ResizeWatchList: out of memory resizing watch list\n");
+			loginfo(2,"ResizeWatchList: out of memory resizing watch list\n");
 			ui_popup_time(2, "out of memory while adding watch");
 
 			watchListLength = 0;
@@ -7561,7 +7561,7 @@ static void ResizeWatchListNoDispose(UINT32 newLength)
 		watchList = realloc(watchList, newLength * sizeof(WatchInfo));
 		if(!watchList && (newLength != 0))
 		{
-			logerror("ResizeWatchList: out of memory resizing watch list\n");
+			loginfo(2,"ResizeWatchList: out of memory resizing watch list\n");
 			ui_popup_time(2, "out of memory while adding watch");
 
 			watchListLength = 0;
@@ -7732,7 +7732,7 @@ static void ResizeSearchList(UINT32 newLength)
 		searchList = realloc(searchList, newLength * sizeof(SearchInfo));
 		if(!searchList && (newLength != 0))
 		{
-			logerror("ResizeSearchList: out of memory resizing search list\n");
+			loginfo(2,"ResizeSearchList: out of memory resizing search list\n");
 			ui_popup_time(2, "out of memory while adding search");
 
 			searchListLength = 0;
@@ -7763,7 +7763,7 @@ static void ResizeSearchListNoDispose(UINT32 newLength)
 		searchList = realloc(searchList, newLength * sizeof(SearchInfo));
 		if(!searchList && (newLength != 0))
 		{
-			logerror("ResizeSearchList: out of memory resizing search list\n");
+			loginfo(2,"ResizeSearchList: out of memory resizing search list\n");
 			ui_popup_time(2, "out of memory while adding search");
 
 			searchListLength = 0;
@@ -8358,7 +8358,7 @@ static int ConvertOldCode(int code, int cpu, int * data, int * extendData)
 		traverse++;
 	}
 
-	logerror("ConvertOldCode: %d not found\n", code);
+	loginfo(2,"ConvertOldCode: %d not found\n", code);
 
 	// not found
 	*extendData = 0;
@@ -8586,11 +8586,11 @@ static void LoadCheatFile(char * fileName)
 #endif
 		}
 
-		//logerror("cheat: processing %s\n", buf);
+		//loginfo(2,"cheat: processing %s\n", buf);
 
 		if(TEST_FIELD(type, RemoveFromList))
 		{
-			//logerror("cheat: cheat line removed\n", buf);
+			//loginfo(2,"cheat: cheat line removed\n", buf);
 
 			HandleLocalCommandCheat(type, address, data, extendData, name, description);
 		}
@@ -8600,12 +8600,12 @@ static void LoadCheatFile(char * fileName)
 			{
 				if(cheatListLength == 0)
 				{
-					logerror("LoadCheatFile: first cheat found was link cheat; bailing\n");
+					loginfo(2,"LoadCheatFile: first cheat found was link cheat; bailing\n");
 
 					goto bail;
 				}
 
-				//logerror("cheat: doing link cheat\n");
+				//loginfo(2,"cheat: doing link cheat\n");
 
 				entry = &cheatList[cheatListLength - 1];
 			}
@@ -8614,11 +8614,11 @@ static void LoadCheatFile(char * fileName)
 				// go to the next cheat
 				ResizeCheatList(cheatListLength + 1);
 
-				//logerror("cheat: doing normal cheat\n");
+				//loginfo(2,"cheat: doing normal cheat\n");
 
 				if(cheatListLength == 0)
 				{
-					logerror("LoadCheatFile: cheat list resize failed; bailing\n");
+					loginfo(2,"LoadCheatFile: cheat list resize failed; bailing\n");
 
 					goto bail;
 				}
@@ -8646,7 +8646,7 @@ static void LoadCheatFile(char * fileName)
 
 			if(entry->actionListLength == 0)
 			{
-				logerror("LoadCheatFile: action list resize failed; bailing\n");
+				loginfo(2,"LoadCheatFile: action list resize failed; bailing\n");
 
 				goto bail;
 			}
@@ -9512,7 +9512,7 @@ static void DoCPUWrite(UINT32 data, UINT8 cpu, UINT32 address, UINT8 bytes, UINT
 			break;
 
 		default:
-			logerror("DoCPUWrite: bad size (%d)\n", bytes);
+			loginfo(2,"DoCPUWrite: bad size (%d)\n", bytes);
 			break;
 	}
 }

@@ -38,7 +38,7 @@ static UINT8 rambank;
 static WRITE8_HANDLER( cbasebal_bankswitch_w )
 {
 	/* bits 0-4 select ROM bank */
-//logerror("%04x: bankswitch %02x\n",activecpu_get_pc(),data);
+//loginfo(2,"%04x: bankswitch %02x\n",activecpu_get_pc(),data);
 	memory_set_bank(1, data & 0x1f);
 
 	/* bit 5 used but unknown */

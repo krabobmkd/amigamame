@@ -286,7 +286,7 @@ static void contcirc_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 		}
 
 		if (bad_chunks)
-logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 	} // end of patch paragraph
 
@@ -520,7 +520,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 		}
 
 		if (bad_chunks)
-logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 }
 
@@ -634,7 +634,7 @@ static void bshark_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clipre
 		}
 
 		if (bad_chunks)
-logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 }
@@ -759,7 +759,7 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 		}
 
 		if (bad_chunks)
-logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 	} // end of patch paragraph
 
@@ -875,7 +875,7 @@ static void aquajack_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 		}
 
 		if (bad_chunks)
-logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 	} // end of patch paragraph
 
@@ -992,7 +992,7 @@ static void spacegun_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 		}
 
 		if (bad_chunks)
-logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 	} // end of patch paragraph
 

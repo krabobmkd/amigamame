@@ -185,7 +185,7 @@ mame_file *mame_fopen_error(const char *gamename, const char *filename, int file
 		case FILETYPE_CTRLR:
 			if (openforwrite)
 			{
-				logerror("mame_fopen: type %02x write not supported\n", filetype);
+				loginfo(2,"mame_fopen: type %02x write not supported\n", filetype);
 				return NULL;
 			}
 			break;
@@ -196,7 +196,7 @@ mame_file *mame_fopen_error(const char *gamename, const char *filename, int file
 		case FILETYPE_DEBUGLOG:
 			if (!openforwrite)
 			{
-				logerror("mame_fopen: type %02x read not supported\n", filetype);
+				loginfo(2,"mame_fopen: type %02x read not supported\n", filetype);
 				return NULL;
 			}
 			break;
@@ -306,7 +306,7 @@ mame_file *mame_fopen_error(const char *gamename, const char *filename, int file
 
 		/* anything else */
 		default:
-			logerror("mame_fopen(): unknown filetype %02x\n", filetype);
+			loginfo(2,"mame_fopen(): unknown filetype %02x\n", filetype);
 			return NULL;
 	}
 	return NULL;

@@ -366,12 +366,12 @@ static WRITE16_HANDLER( gain_control_w )
 		if (offset==0)
 		{
 			MB87078_data_w(0, data>>8, 0);
-            //logerror("MB87078 dsel=0 data=%4x\n",data);
+            //loginfo(2,"MB87078 dsel=0 data=%4x\n",data);
 		}
 		else
 		{
 			MB87078_data_w(0, data>>8, 1);
-            //logerror("MB87078 dsel=1 data=%4x\n",data);
+            //loginfo(2,"MB87078 dsel=1 data=%4x\n",data);
 		}
 	}
 }
@@ -2644,7 +2644,7 @@ static MACHINE_RESET( mb87078 )
     {
         int i;
         for (i=0; i<6; i++)
-            logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) );
+            loginfo(2,"SOUND Chan#%i name=%s\n", i, mixer_get_name(i) );
     }
 */
 }

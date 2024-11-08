@@ -125,12 +125,12 @@ READ8_HANDLER( crbaloon_IN2_r )
 	/* the following is needed for the game to boot up */
 	if (val06 & 0x80)
 	{
-logerror("PC %04x: %02x high\n",activecpu_get_pc(),offset);
+loginfo(2,"PC %04x: %02x high\n",activecpu_get_pc(),offset);
 		return (input_port_2_r(0) & 0xf0) | 0x07;
 	}
 	else
 	{
-logerror("PC %04x: %02x low\n",activecpu_get_pc(),offset);
+loginfo(2,"PC %04x: %02x low\n",activecpu_get_pc(),offset);
 		return (input_port_2_r(0) & 0xf0) | 0x07;
 	}
 }
@@ -144,12 +144,12 @@ READ8_HANDLER( crbaloon_IN3_r )
 	/* the following is needed for the game to boot up */
 	if (val0a & 0x01)
 	{
-logerror("PC %04x: 03 high\n",activecpu_get_pc());
+loginfo(2,"PC %04x: 03 high\n",activecpu_get_pc());
 		return (input_port_3_r(0) & 0x0f) | 0x00;
 	}
 	else
 	{
-logerror("PC %04x: 03 low\n",activecpu_get_pc());
+loginfo(2,"PC %04x: 03 low\n",activecpu_get_pc());
 		return (input_port_3_r(0) & 0x0f) | 0x00;
 	}
 }

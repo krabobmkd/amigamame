@@ -255,7 +255,7 @@ static MACHINE_RESET( ta7630 )
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
 		vol_ctrl[ 15-i ] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15-i,vol_ctrl[ 15-i ],db);*/
+		/*loginfo(2,"vol_ctrl[%x] = %i (%f dB)\n",15-i,vol_ctrl[ 15-i ],db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}

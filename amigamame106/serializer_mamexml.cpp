@@ -70,7 +70,8 @@ void XmlWriter::operator()(const char *sMemberName, float &v, float min, float m
 {
     string name = checkXmlName(sMemberName);
     xml_data_node *p = xml_add_child(_recursenode.back(),name.c_str(),  NULL );
-    if(p) xml_set_attribute_float(p,"v",v);
+    // beta4: float read write problematic with gcc bebbo locale mess. -> cast to int.
+    if(p) xml_set_attribute_int(p,"vi",(int)(v*1024.0f));
 }
 
 
@@ -188,7 +189,9 @@ void XmlReader::operator()(const char *sMemberName,  float &v, float min, float 
     xml_data_node *p = xml_get_sibling(_recursenode.back()->child, name.c_str());
     if(p)
     {
-        float vv =  xml_get_attribute_float(p,"v",defval);
+        // now cast int to float because locale are problematics
+        int iv =  xml_get_attribute_int(p,"vi",defval);
+        float vv = (float)iv * (1.0f/1024.0f);
         if(vv<min) vv=min;
         if(vv>max) vv=max;
         v = vv;

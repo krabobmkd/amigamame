@@ -248,13 +248,13 @@ static MACHINE_RESET( ta7630 )
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
 		vol_ctrl[ 15-i ] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15-i,vol_ctrl[ 15-i ],db);*/
+		/*loginfo(2,"vol_ctrl[%x] = %i (%f dB)\n",15-i,vol_ctrl[ 15-i ],db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}
 
 	/* for (i=0; i<8; i++)
-        logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) ); */
+        loginfo(2,"SOUND Chan#%i name=%s\n", i, mixer_get_name(i) ); */
 /*
   channels 0-2 AY#0
   channels 3,4 MSM5232 group1,group2

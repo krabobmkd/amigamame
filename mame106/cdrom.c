@@ -61,7 +61,7 @@ UINT32 cdrom_get_track_phys(cdrom_file *file, UINT32 frame)
 	}
 
 	#if VERBOSE
-	logerror("CDROM: could not find track for frame %d\n", frame);
+	loginfo(2,"CDROM: could not find track for frame %d\n", frame);
 	#endif
 	return 0;
 }
@@ -80,7 +80,7 @@ UINT32 cdrom_get_track_chd(cdrom_file *file, UINT32 frame)
 	}
 
 	#if VERBOSE
-	logerror("CDROM: could not find track for frame %d\n", frame);
+	loginfo(2,"CDROM: could not find track for frame %d\n", frame);
 	#endif
 	return 0;
 }
@@ -202,7 +202,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 	}
 
 	#if VERBOSE
-	logerror("CD has %d tracks\n", file->cdtoc.numtrks);
+	loginfo(2,"CD has %d tracks\n", file->cdtoc.numtrks);
 	#endif
 
 	/* calculate the starting frame for each track, keeping in mind that CHDMAN
@@ -219,7 +219,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 		chdofs  += file->cdtoc.tracks[i].extraframes;
 
 		#if VERBOSE
-		logerror("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d physofs %d chdofs %d\n", i+1,
+		loginfo(2,"Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d physofs %d chdofs %d\n", i+1,
 			file->cdtoc.tracks[i].trktype,
 			file->cdtoc.tracks[i].subtype,
 			file->cdtoc.tracks[i].datasize,
@@ -350,7 +350,7 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, UINT32 numsectors, vo
 		}
 
 		#if VERBOSE
-		logerror("CDROM: Conversion from type %d to type %d not supported!\n", tracktype, datatype);
+		loginfo(2,"CDROM: Conversion from type %d to type %d not supported!\n", tracktype, datatype);
 		#endif
 		return 0;
 	}
@@ -599,13 +599,13 @@ UINT32 cdrom_get_track_start(cdrom_file *file, int track, int msf)
 		s = tstart / 75;
 		f = tstart % 75;
 		#if VERBOSE
-		logerror("CDROM: %d blocks => %d M %d S %d F\n",  cdrom_get_chd_start_of_track(file, track), m, s, f);
+		loginfo(2,"CDROM: %d blocks => %d M %d S %d F\n",  cdrom_get_chd_start_of_track(file, track), m, s, f);
 		#endif
 
 		tstart = make_bcd(m)<<16 | make_bcd(s)<<8 | make_bcd(f);
 
 		#if VERBOSE
-		logerror("CDROM: %08x in BCD\n", tstart);
+		loginfo(2,"CDROM: %08x in BCD\n", tstart);
 		#endif
 
 		return tstart;

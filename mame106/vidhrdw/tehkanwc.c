@@ -185,7 +185,7 @@ static void gridiron_drawled(mame_bitmap *bitmap,UINT8 led,int player)
 			dgp0.color = 0x03;
 			drawgfx(&dgp0);
         }
-	} else logerror("unknown LED %02x for player %d\n",led,player);
+	} else loginfo(2,"unknown LED %02x for player %d\n",led,player);
 	} // end of patch paragraph
 
 

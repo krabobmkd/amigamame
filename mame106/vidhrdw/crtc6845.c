@@ -93,7 +93,7 @@ WRITE8_HANDLER( crtc6845_address_w )
 WRITE8_HANDLER( crtc6845_register_w )
 {
 
-//logerror("CRT #0 PC %04x: WRITE reg 0x%02x data 0x%02x\n",activecpu_get_pc(),crtc6845_address_latch,data);
+//loginfo(2,"CRT #0 PC %04x: WRITE reg 0x%02x data 0x%02x\n",activecpu_get_pc(),crtc6845_address_latch,data);
 
 	switch(crtc6845_address_latch)
 	{

@@ -199,13 +199,13 @@ static UINT8 cpu_sharedram_control_val = 0;
 
 static WRITE8_HANDLER ( cpu_sharedram_sub_w )
 {
-	if (cpu_sharedram_control_val!=0) logerror("sub CPU access to shared RAM when access set for main cpu\n");
+	if (cpu_sharedram_control_val!=0) loginfo(2,"sub CPU access to shared RAM when access set for main cpu\n");
 	cpu_sharedram[offset] = data;
 }
 
 static WRITE8_HANDLER ( cpu_sharedram_main_w )
 {
-	if (cpu_sharedram_control_val!=1) logerror("main CPU access to shared RAM when access set for sub cpu\n");
+	if (cpu_sharedram_control_val!=1) loginfo(2,"main CPU access to shared RAM when access set for sub cpu\n");
 	cpu_sharedram[offset] = data;
 }
 
@@ -219,13 +219,13 @@ static READ8_HANDLER ( cpu_sharedram_r )
 static WRITE8_HANDLER ( cpu_shared_ctrl_sub_w )
 {
 //  cpu_sharedram_control_val = 0;
-//logerror("cpu_sharedram_ctrl=SUB");
+//loginfo(2,"cpu_sharedram_ctrl=SUB");
 }
 
 static WRITE8_HANDLER ( cpu_shared_ctrl_main_w )
 {
 //  cpu_sharedram_control_val = 1;
-//logerror("cpu_sharedram_ctrl=MAIN");
+//loginfo(2,"cpu_sharedram_ctrl=MAIN");
 }
 
 static WRITE8_HANDLER( shougi_watchdog_reset_w )
@@ -235,13 +235,13 @@ static WRITE8_HANDLER( shougi_watchdog_reset_w )
 
 static WRITE8_HANDLER( shougi_mcu_halt_off_w )
 {
-	/* logerror("mcu HALT OFF"); */
+	/* loginfo(2,"mcu HALT OFF"); */
 	cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( shougi_mcu_halt_on_w )
 {
-	/* logerror("mcu HALT ON"); */
+	/* loginfo(2,"mcu HALT ON"); */
 	cpunum_set_input_line(2, INPUT_LINE_HALT,ASSERT_LINE);
 }
 

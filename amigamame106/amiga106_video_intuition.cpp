@@ -178,7 +178,7 @@ bool Intuition_Screen::open()
      if(_pScreenWindow) return true; // already open.
     if(_ScreenModeId == INVALID_ID)
     {
-        logerror("Can't find a screen mode ");
+        loginfo(2,"Can't find a screen mode ");
         return false; // set by inherited class.
      }
 

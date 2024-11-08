@@ -231,7 +231,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
 
         bool screenok = g_pMameDisplay->open(params);
         if(!screenok) {
-            logerror("couldn't open screen.");
+            loginfo(2,"couldn't open screen.");
             return 1; // fail.
         }
     } // end if bitmap
@@ -239,7 +239,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     if(!g_pMameDisplay || !g_pMameDisplay->good())
     {
         //
-        logerror("couldn't find a graphic mode.");
+        loginfo(2,"couldn't find a graphic mode.");
         return 1; // fail.
     }
     // for drivers with RGB modes, we have to describe our pixel format

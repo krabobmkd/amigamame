@@ -105,7 +105,7 @@ double compute_resistor_weights(
 		/* parameters validity check */
 		if (count > MAX_RES_PER_NET)
 		{
-			logerror(" ERROR: res_net.h: compute_resistor_weights(): too many resistors in net #%i. The maximum allowed is %i, the number requested was: %i\n",n, MAX_RES_PER_NET, count);
+			loginfo(2," ERROR: res_net.h: compute_resistor_weights(): too many resistors in net #%i. The maximum allowed is %i, the number requested was: %i\n",n, MAX_RES_PER_NET, count);
 			/* quit */
 			return (0.0);
 		}
@@ -127,7 +127,7 @@ double compute_resistor_weights(
 	if (networks_no < 1)
 	{
 		/* error - no networks to anaylse */
-		logerror(" ERROR: res_net.h: compute_resistor_weights(): no input data\n");
+		loginfo(2," ERROR: res_net.h: compute_resistor_weights(): no input data\n");
 		return (0.0);
 	}
 
@@ -204,25 +204,25 @@ double compute_resistor_weights(
 
 /* debug code */
 #ifdef MAME_DEBUG
-	logerror("compute_resistor_weights():  scaler = %15.10f\n",scale);
-	logerror("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
+	loginfo(2,"compute_resistor_weights():  scaler = %15.10f\n",scale);
+	loginfo(2,"min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
 	for(i = 0; i < networks_no;i++)
 	{
 		double sum = 0.0;
 
-		logerror(" Network no.%i=>  resistances: %i", i, rescount[i] );
+		loginfo(2," Network no.%i=>  resistances: %i", i, rescount[i] );
 		if (r_pu[i] != 0)
-			logerror(", pullup resistor: %i Ohms",r_pu[i]);
+			loginfo(2,", pullup resistor: %i Ohms",r_pu[i]);
 		if (r_pd[i] != 0)
-			logerror(", pulldown resistor: %i Ohms",r_pd[i]);
-		logerror("\n  maximum output of this network:%10.5f (scaled to %15.10f)\n", max_out[i], max_out[i]*scale );
+			loginfo(2,", pulldown resistor: %i Ohms",r_pd[i]);
+		loginfo(2,"\n  maximum output of this network:%10.5f (scaled to %15.10f)\n", max_out[i], max_out[i]*scale );
 		for (n = 0; n < rescount[i]; n++)
 		{
-			logerror("   res %2i:%9.1f Ohms  weight=%10.5f (scaled = %15.10f)\n", n, r[i][n], w[i][n], ws[i][n] );
+			loginfo(2,"   res %2i:%9.1f Ohms  weight=%10.5f (scaled = %15.10f)\n", n, r[i][n], w[i][n], ws[i][n] );
 			sum += ws[i][n];
 		}
-		logerror("                              sum of scaled weights = %15.10f\n", sum  );
+		loginfo(2,"                              sum of scaled weights = %15.10f\n", sum  );
 	}
 #endif
 /* debug end */
@@ -297,7 +297,7 @@ double compute_resistor_net_outputs(
 		/* parameters validity check */
 		if (count > MAX_RES_PER_NET)
 		{
-			logerror(" ERROR: res_net.h: compute_resistor_net_outputs(): too many resistors in net #%i. The maximum allowed is %i, the number requested was: %i\n",n, MAX_RES_PER_NET, count);
+			loginfo(2," ERROR: res_net.h: compute_resistor_net_outputs(): too many resistors in net #%i. The maximum allowed is %i, the number requested was: %i\n",n, MAX_RES_PER_NET, count);
 			/* quit */
 			free(o);
 			free(os);
@@ -321,7 +321,7 @@ double compute_resistor_net_outputs(
 	if (networks_no<1)
 	{
 		/* error - no networks to anaylse */
-		logerror(" ERROR: res_net.h: compute_resistor_net_outputs(): no input data\n");
+		loginfo(2," ERROR: res_net.h: compute_resistor_net_outputs(): no input data\n");
 		free(o);
 		free(os);
 		return (0.0);
@@ -409,25 +409,25 @@ double compute_resistor_net_outputs(
 
 /* debug code */
 #ifdef MAME_DEBUG
-	logerror("compute_resistor_net_outputs():  scaler = %15.10f\n",scale);
-	logerror("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
+	loginfo(2,"compute_resistor_net_outputs():  scaler = %15.10f\n",scale);
+	loginfo(2,"min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
 	for(i = 0; i < networks_no;i++)
 	{
-		logerror(" Network no.%i=>  resistances: %i", i, rescount[i] );
+		loginfo(2," Network no.%i=>  resistances: %i", i, rescount[i] );
 		if (r_pu[i] != 0)
-			logerror(", pullup resistor: %i Ohms",r_pu[i]);
+			loginfo(2,", pullup resistor: %i Ohms",r_pu[i]);
 		if (r_pd[i] != 0)
-			logerror(", pulldown resistor: %i Ohms",r_pd[i]);
-		logerror("\n  maximum output of this network:%10.5f", max_out[i] );
-		logerror("\n  minimum output of this network:%10.5f\n", min_out[i] );
+			loginfo(2,", pulldown resistor: %i Ohms",r_pd[i]);
+		loginfo(2,"\n  maximum output of this network:%10.5f", max_out[i] );
+		loginfo(2,"\n  minimum output of this network:%10.5f\n", min_out[i] );
 		for (n = 0; n < rescount[i]; n++)
 		{
-			logerror("   res %2i:%9.1f Ohms\n", n, r[i][n]);
+			loginfo(2,"   res %2i:%9.1f Ohms\n", n, r[i][n]);
 		}
 		for (n = 0; n < (1<<rescount[i]); n++)
 		{
-			logerror("   combination %2i  out=%10.5f (scaled = %15.10f)\n", n, o[i*(1<<MAX_RES_PER_NET)+n], os[i*(1<<MAX_RES_PER_NET)+n] );
+			loginfo(2,"   combination %2i  out=%10.5f (scaled = %15.10f)\n", n, o[i*(1<<MAX_RES_PER_NET)+n], os[i*(1<<MAX_RES_PER_NET)+n] );
 		}
 	}
 #endif

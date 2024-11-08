@@ -377,7 +377,7 @@ static int dvg_generate_vector_list(void)
 				/* handle stack underflow */
 				if (sp == 0)
 	    		{
-					logerror("\n*** Vector generator stack underflow! ***\n");
+					loginfo(2,"\n*** Vector generator stack underflow! ***\n");
 					done = 1;
 					sp = MAXSTACK - 1;
 				}
@@ -422,7 +422,7 @@ static int dvg_generate_vector_list(void)
 				/* check for stack overflows */
 				if (sp == (MAXSTACK - 1))
 	    		{
-					logerror("\n*** Vector generator stack overflow! ***\n");
+					loginfo(2,"\n*** Vector generator stack overflow! ***\n");
 					done = 1;
 					sp = 0;
 				}
@@ -435,7 +435,7 @@ static int dvg_generate_vector_list(void)
 
 			/* anything else gets caught here */
 			default:
-				logerror("Unknown DVG opcode found\n");
+				loginfo(2,"Unknown DVG opcode found\n");
 				done = 1;
 		}
    		VGLOG(("\n"));
@@ -582,7 +582,7 @@ static int avg_generate_vector_list(void)
 	/* check for zeroed vector RAM */
 	if (vector_word(pc) == 0 && vector_word(pc + 1) == 0)
 	{
-		logerror("VGO with zeroed vector memory\n");
+		loginfo(2,"VGO with zeroed vector memory\n");
 		return total_length;
 	}
 
@@ -747,7 +747,7 @@ static int avg_generate_vector_list(void)
 					if (firstwd & 0x0800)
 					{
 						int newymin = ymin;
-						logerror("CLIP %d\n", firstwd & 0x0800);
+						loginfo(2,"CLIP %d\n", firstwd & 0x0800);
 
 						/* toggle the current state */
 						ywindow = !ywindow;
@@ -787,7 +787,7 @@ static int avg_generate_vector_list(void)
 				/* handle stack underflow */
 				if (sp == 0)
 				{
-					logerror("\n*** Vector generator stack underflow! ***\n");
+					loginfo(2,"\n*** Vector generator stack underflow! ***\n");
 					done = 1;
 					sp = MAXSTACK - 1;
 				}
@@ -839,7 +839,7 @@ static int avg_generate_vector_list(void)
 					/* check for stack overflows */
 					if (sp == (MAXSTACK - 1))
 					{
-						logerror("\n*** Vector generator stack overflow! ***\n");
+						loginfo(2,"\n*** Vector generator stack overflow! ***\n");
 						done = 1;
 						sp = 0;
 					}
@@ -853,7 +853,7 @@ static int avg_generate_vector_list(void)
 
 			/* anything else gets caught here */
 			default:
-				logerror("internal error\n");
+				loginfo(2,"internal error\n");
 		}
 		VGLOG(("\n"));
 	}
@@ -957,7 +957,7 @@ int avgdvg_init(int vector_type)
 	/* 0 vector RAM size is invalid */
 	if (vectorram_size == 0)
 	{
-		logerror("Error: vectorram_size not initialized\n");
+		loginfo(2,"Error: vectorram_size not initialized\n");
 		return 1;
 	}
 
@@ -971,7 +971,7 @@ int avgdvg_init(int vector_type)
 	vector_engine = vector_type;
 	if (vector_engine < AVGDVG_MIN || vector_engine > AVGDVG_MAX)
 	{
-		logerror("Error: unknown Atari Vector Game Type\n");
+		loginfo(2,"Error: unknown Atari Vector Game Type\n");
 		return 1;
 	}
 

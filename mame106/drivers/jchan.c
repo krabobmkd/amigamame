@@ -243,7 +243,7 @@ void jchan_mcu_run(void)
 	UINT16 mcu_offset  = mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */
 	UINT16 mcu_subcmd  = mcu_ram[0x0014/2];		/* sub-command parameter, happens only for command #4 */
 
-	logerror("CPU #0 (PC=%06X) : MCU executed command: %04X %04X %04X ",activecpu_get_pc(),mcu_command,mcu_offset*2,mcu_subcmd);
+	loginfo(2,"CPU #0 (PC=%06X) : MCU executed command: %04X %04X %04X ",activecpu_get_pc(),mcu_command,mcu_offset*2,mcu_subcmd);
 
 /*
     the only MCU commands found in program code are:
@@ -311,16 +311,16 @@ void jchan_mcu_run(void)
 				case 0x2d: /* $209f4 */
 				default:   /* $1b3e0, $1ca40, $20a12, $20b0e, $2140a, $21436, $214cc, $21552 (dynamic) */
 					mcu_ram[mcu_offset] = 0x4e75; // faked with an RTS for now
-					logerror("- UNKNOWN PARAMETER %02X", mcu_subcmd);
+					loginfo(2,"- UNKNOWN PARAMETER %02X", mcu_subcmd);
 			}
-			logerror("\n");
+			loginfo(2,"\n");
 		}
 		break;
 
 		case 0x03: 	// DSW
 		{
 			mcu_ram[mcu_offset] = readinputport(3);
-			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n",activecpu_get_pc(),mcu_command,mcu_offset*2);
+			loginfo(2,"PC=%06X : MCU executed command: %04X %04X (read DSW)\n",activecpu_get_pc(),mcu_command,mcu_offset*2);
 		}
 		break;
 
@@ -363,7 +363,7 @@ are loaded in RAM then saved with cmd 0x42 (see code @ $5196 & $50d4)
 				mame_fread(f,&mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("(load NVRAM settings)\n");
+			loginfo(2,"(load NVRAM settings)\n");
 		}
 		break;
 
@@ -375,12 +375,12 @@ are loaded in RAM then saved with cmd 0x42 (see code @ $5196 & $50d4)
 				mame_fwrite(f,&mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("(save NVRAM settings)\n");
+			loginfo(2,"(save NVRAM settings)\n");
 		}
 		break;
 
 		default:
-			logerror("- UNKNOWN COMMAND!!!\n");
+			loginfo(2,"- UNKNOWN COMMAND!!!\n");
 	}
 }
 
@@ -404,7 +404,7 @@ JCHAN_MCU_COM_W(3)
 
 READ16_HANDLER( jchan_mcu_status_r )
 {
-	logerror("cpu #%d (PC=%06X): read mcu status\n", cpu_getactivecpu(), activecpu_get_previouspc());
+	loginfo(2,"cpu #%d (PC=%06X): read mcu status\n", cpu_getactivecpu(), activecpu_get_previouspc());
 	return 0;
 }
 
@@ -476,7 +476,7 @@ READ16_HANDLER ( jchan_ctrl_r )
 	{
 		case 0/2: return readinputport(0); // Player 1 controls
 		case 2/2: return readinputport(1); // Player 2 controls
-		default: logerror("jchan_ctrl_r unknown!"); break;
+		default: loginfo(2,"jchan_ctrl_r unknown!"); break;
 	}
 	return jchan_ctrl[offset];
 }
@@ -498,7 +498,7 @@ static UINT16 *mainsub_shared_ram;
 WRITE16_HANDLER( main2sub_cmd_w )
 {
 	COMBINE_DATA(&main2sub_cmd);
-	logerror("cpu #%d (PC=%06X): write cmd %04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_cmd);
+	loginfo(2,"cpu #%d (PC=%06X): write cmd %04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_cmd);
 	cpunum_set_input_line(1, 4, HOLD_LINE);
 }
 READ16_HANDLER ( main2sub_status_r )
@@ -508,35 +508,35 @@ READ16_HANDLER ( main2sub_status_r )
 WRITE16_HANDLER( main2sub_status_w )
 {
 	COMBINE_DATA(&main2sub_status);
-	logerror("cpu #%d (PC=%06X): write status (%04x)\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_status);
+	loginfo(2,"cpu #%d (PC=%06X): write status (%04x)\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_status);
 }
 READ16_HANDLER ( main2sub_result_r )
 {
-	logerror("cpu #%d (PC=%06X): read subcpu result (%04x)\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_result);
+	loginfo(2,"cpu #%d (PC=%06X): read subcpu result (%04x)\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_result);
 	return main2sub_result;
 }
 WRITE16_HANDLER( main2sub_unknown )
 {
 #define mainsub_unknown (0x400100+offset/2)
 	COMBINE_DATA(&mainsub_shared_ram[offset]);
-	logerror("cpu #%d (PC=%06X): write unknown (%06X):%04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), mainsub_unknown, main2sub_param(offset));
+	loginfo(2,"cpu #%d (PC=%06X): write unknown (%06X):%04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), mainsub_unknown, main2sub_param(offset));
 }
 
 WRITE16_HANDLER( main2sub_param_w )
 {
 	COMBINE_DATA(&main2sub_param(offset));
-	logerror("cpu #%d (PC=%06X): write param(%d):%04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), offset, main2sub_param(offset));
+	loginfo(2,"cpu #%d (PC=%06X): write param(%d):%04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), offset, main2sub_param(offset));
 }
 
 WRITE16_HANDLER( sub2main_cmd_w )
 {
 	COMBINE_DATA(&sub2main_cmd);
-	logerror("cpu #%d (PC=%06X): write cmd %04x to maincpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), sub2main_cmd);
+	loginfo(2,"cpu #%d (PC=%06X): write cmd %04x to maincpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), sub2main_cmd);
 	cpunum_set_input_line(0, 3, HOLD_LINE);
 }
 READ16_HANDLER ( sub2main_cmd_r )
 {
-	logerror("cpu #%d (PC=%06X): read cmd %04x from subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), sub2main_cmd);
+	loginfo(2,"cpu #%d (PC=%06X): read cmd %04x from subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), sub2main_cmd);
 	return sub2main_cmd;
 }
 

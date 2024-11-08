@@ -159,7 +159,7 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
                 TAG_DONE );
         if(_ScreenModeId == INVALID_ID)
         {
-            logerror(" **** Can't find screen mode for w%d h%d",width,height);
+            loginfo(2," **** Can't find screen mode for w%d h%d",width,height);
             return;
         }
     } // end if no mode decided at first
@@ -183,10 +183,9 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
             {
                 _fullscreenHeight = (int)(dims.MaxOScan.MaxY - dims.MaxOScan.MinY)+1;
             }
-#ifdef DOMAMELOG
-        printf("aga mode $%08x w:%d h:%d\n",
-              (int)_ScreenModeId, _fullscreenWidth,_fullscreenHeight);
-#endif
+
+//        printf("aga mode $%08x w:%d h:%d\n",
+//              (int)_ScreenModeId, _fullscreenWidth,_fullscreenHeight);
 
         } else
         {   // shouldnt happen, fallback

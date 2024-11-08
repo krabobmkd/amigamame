@@ -398,7 +398,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 
 	parse_control();
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
+	loginfo(2,"CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
 }
 
 
@@ -447,7 +447,7 @@ static INTERRUPT_GEN( wgp_cpub_interrupt )
 
 static READ16_HANDLER( lan_status_r )
 {
-	logerror("CPU #2 PC %06x: warning - read lan status\n",activecpu_get_pc());
+	loginfo(2,"CPU #2 PC %06x: warning - read lan status\n",activecpu_get_pc());
 
 	return  (0x4 << 8);	/* CPUB expects this in code at $104d0 (Wgp) */
 }
@@ -474,7 +474,7 @@ static WRITE16_HANDLER( rotate_port_w )
 	{
 		case 0x00:
 		{
-//logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",activecpu_get_pc(),port_sel,data);
+//loginfo(2,"CPU #0 PC %06x: warning - port %04x write %04x\n",activecpu_get_pc(),port_sel,data);
 
 			wgp_rotate_ctrl[port_sel] = data;
 			return;
@@ -544,7 +544,7 @@ static READ16_HANDLER( wgp_adinput_r )
 			return input_port_7_word_r(0,0);	/* unknown */
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",activecpu_get_pc(),offset);
+loginfo(2,"CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",activecpu_get_pc(),offset);
 
 	return 0xff;
 }

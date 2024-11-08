@@ -256,14 +256,14 @@ static MACHINE_START( m92 )
 static READ8_HANDLER( m92_eeprom_r )
 {
 	unsigned char *RAM = memory_region(REGION_USER1);
-//  logerror("%05x: EEPROM RE %04x\n",activecpu_get_pc(),offset);
+//  loginfo(2,"%05x: EEPROM RE %04x\n",activecpu_get_pc(),offset);
 	return RAM[offset/2];
 }
 
 static WRITE8_HANDLER( m92_eeprom_w )
 {
 	unsigned char *RAM = memory_region(REGION_USER1);
-//  logerror("%05x: EEPROM WR %04x\n",activecpu_get_pc(),offset);
+//  loginfo(2,"%05x: EEPROM WR %04x\n",activecpu_get_pc(),offset);
 	RAM[offset/2]=data;
 }
 
@@ -322,13 +322,13 @@ static WRITE8_HANDLER( m92_soundlatch_w )
 	{
 		timer_set(TIME_NOW,V30_ASSERT,setvector_callback);
 		soundlatch_w(0,data);
-//      logerror("soundlatch_w %02x\n",data);
+//      loginfo(2,"soundlatch_w %02x\n",data);
 	}
 }
 
 static READ8_HANDLER( m92_sound_status_r )
 {
-//logerror("%06x: read sound status\n",activecpu_get_pc());
+//loginfo(2,"%06x: read sound status\n",activecpu_get_pc());
 	if (offset == 0)
 		return sound_status&0xff;
 	return sound_status>>8;
@@ -339,7 +339,7 @@ static READ8_HANDLER( m92_soundlatch_r )
 	if (offset == 0)
 	{
 		int res = soundlatch_r(offset);
-//      logerror("soundlatch_r %02x\n",res);
+//      loginfo(2,"soundlatch_r %02x\n",res);
 		return res;
 	}
 	else return 0xff;
@@ -2194,7 +2194,7 @@ static READ8_HANDLER( ssoldier_cycle_r )
 static READ8_HANDLER( psoldier_snd_cycle_r )
 {
 	int a=m92_snd_ram[0xc34];
-//logerror("%08x: %d %d\n",activecpu_get_pc(),a,offset);
+//loginfo(2,"%08x: %d %d\n",activecpu_get_pc(),a,offset);
 	if (activecpu_get_pc()==0x8f0 && (a&0x80)!=0x80 && offset==0) {
 		cpu_spinuntil_int();
 	}

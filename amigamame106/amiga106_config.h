@@ -169,7 +169,7 @@ public:
         std::map<std::string,Display_PerScreenMode> _perScreenMode;
         ASerializer::StringMap<Display_PerScreenMode> _perScreenModeS;
         float _color_brightness=1.0f;
-        float _color_gamma=1.0f;
+       // old useless float _color_gamma=1.0f;
         friend class MameConfig;
     };
     Display &display() { return _display; }

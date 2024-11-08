@@ -395,7 +395,7 @@ static WRITE8_HANDLER( megaplay_bios_banksel_w )
 */
 	bios_bank = data;
 	bios_mode = MP_ROM;
-//  logerror("BIOS: ROM bank %i selected [0x%02x]\n",bios_bank >> 6, data);
+//  loginfo(2,"BIOS: ROM bank %i selected [0x%02x]\n",bios_bank >> 6, data);
 }
 
 static READ8_HANDLER( megaplay_bios_gamesel_r )
@@ -407,7 +407,7 @@ static WRITE8_HANDLER( megaplay_bios_gamesel_w )
 {
 	bios_6403 = data;
 
-//  logerror("BIOS: 0x6403 write: 0x%02x\n",data);
+//  loginfo(2,"BIOS: 0x6403 write: 0x%02x\n",data);
 	bios_mode = data & 0x10;
 }
 
@@ -472,12 +472,12 @@ static WRITE8_HANDLER( megaplay_bios_6402_w )
 {
 	genesis_io_ram[3] = (genesis_io_ram[3] & 0x07) | ((data & 0x70) >> 1);
 //  bios_6402 = (data >> 4) & 0x07;
-//  logerror("BIOS: 0x6402 write: 0x%02x\n",data);
+//  loginfo(2,"BIOS: 0x6402 write: 0x%02x\n",data);
 }
 
 static READ8_HANDLER( megaplay_bios_6404_r )
 {
-//  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
+//  loginfo(2,"BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
 	return (bios_6404 & 0xfe) | ((bios_6403 & 0x10) >> 4);
 //  return bios_6404 | (bios_6403 & 0x10) >> 4;
 }
@@ -488,7 +488,7 @@ static WRITE8_HANDLER( megaplay_bios_6404_w )
 		cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
 	bios_6404 = data;
 
-//  logerror("BIOS: 0x6404 write: 0x%02x\n",data);
+//  loginfo(2,"BIOS: 0x6404 write: 0x%02x\n",data);
 }
 
 static READ8_HANDLER( megaplay_bios_6204_r )
@@ -502,7 +502,7 @@ static WRITE8_HANDLER( megaplay_bios_width_w )
 	bios_width = data;
 	genesis_io_ram[3] = (genesis_io_ram[3] & 0x07) | ((data & 0xf8));
 
-//  logerror("BIOS: 0x6204 - Width write: %02x\n",data);
+//  loginfo(2,"BIOS: 0x6204 - Width write: %02x\n",data);
 }
 
 static READ8_HANDLER( megaplay_bios_6600_r )
@@ -519,7 +519,7 @@ static READ8_HANDLER( megaplay_bios_6600_r )
 static WRITE8_HANDLER( megaplay_bios_6600_w )
 {
 	bios_6600 = data;
-//  logerror("BIOS: 0x6600 write: 0x%02x\n",data);
+//  loginfo(2,"BIOS: 0x6600 write: 0x%02x\n",data);
 }
 
 static WRITE8_HANDLER( megaplay_game_w )
@@ -534,7 +534,7 @@ static WRITE8_HANDLER( megaplay_game_w )
 		bios_mode = MP_GAME;
 		readpos = 1;
 //      ui_popup("Game bank selected: 0x%03x",game_banksel);
-		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n",activecpu_get_previouspc(),game_banksel);
+		loginfo(2,"BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n",activecpu_get_previouspc(),game_banksel);
 	}
 }
 

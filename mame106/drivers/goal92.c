@@ -51,7 +51,7 @@ static READ16_HANDLER( goal92_inputs_r )
 			return readinputport(4);
 
 		default:
-			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n",offset, mem_mask,activecpu_get_pc());
+			loginfo(2,"reading unhandled goal92 inputs %04X %04X @ PC = %04X\n",offset, mem_mask,activecpu_get_pc());
 	}
 
 	return 0;

@@ -319,7 +319,7 @@ static WRITE16_HANDLER(log16_w)
 	int pc = activecpu_get_pc();
 
 	ui_popup("%04x: %04x(w)\n", pc, data);
-	logerror("%04x: %04x(w)\n", pc, data);
+	loginfo(2,"%04x: %04x(w)\n", pc, data);
 }
 #endif
 /******************************************************************************/

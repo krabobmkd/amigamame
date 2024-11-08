@@ -520,7 +520,7 @@ static UINT8 stv_SMPC_r8 (int offset)
 
 	if (activecpu_get_pc()==0x060020E6) return_data = 0x10;//???
 
-	//if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, return_data);
+	//if(LOG_SMPC) loginfo (2, "cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, return_data);
 
 
 	return return_data;
@@ -533,7 +533,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 	time(&ltime);
 	today = localtime(&ltime);
 
-//  if(LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
+//  if(LOG_SMPC) loginfo (2, "8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
 	smpc_ram[offset] = data;
 
 	if(offset == 0x75)
@@ -544,12 +544,12 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 
 
 //      if (data & 0x01)
-//          if(LOG_SMPC) logerror("bit 0 active\n");
+//          if(LOG_SMPC) loginfo(2,"bit 0 active\n");
 //      if (data & 0x02)
-//          if(LOG_SMPC) logerror("bit 1 active\n");
+//          if(LOG_SMPC) loginfo(2,"bit 1 active\n");
 //      if (data & 0x10)
-			//if(LOG_SMPC) logerror("bit 4 active\n");//LOT
-		//if(LOG_SMPC) logerror("SMPC: ram [0x75] = %02x\n",smpc_ram[0x75]);
+			//if(LOG_SMPC) loginfo(2,"bit 4 active\n");//LOT
+		//if(LOG_SMPC) loginfo(2,"SMPC: ram [0x75] = %02x\n",smpc_ram[0x75]);
 		PDR1 = (data & 0x60);
 	}
 
@@ -562,17 +562,17 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 		//ui_popup("PDR2 = %02x",smpc_ram[0x77]);
 		if(!(smpc_ram[0x77] & 0x10))
 		{
-			if(LOG_SMPC) logerror("SMPC: M68k on\n");
+			if(LOG_SMPC) loginfo(2,"SMPC: M68k on\n");
 			cpunum_set_input_line(2, INPUT_LINE_RESET, CLEAR_LINE);
 			en_68k = 1;
 		}
 		else
 		{
-			if(LOG_SMPC) logerror("SMPC: M68k off\n");
+			if(LOG_SMPC) loginfo(2,"SMPC: M68k off\n");
 			cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
 			en_68k = 0;
 		}
-		//if(LOG_SMPC) logerror("SMPC: ram [0x77] = %02x\n",smpc_ram[0x77]);
+		//if(LOG_SMPC) loginfo(2,"SMPC: ram [0x77] = %02x\n",smpc_ram[0x77]);
 		PDR2 = (data & 0x60);
 	}
 
@@ -597,7 +597,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 		if(EXLE1 || EXLE2)
 			if(!(stv_scu[40] & 0x0100)) /*Pad irq*/
 			{
-				if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
+				if(LOG_SMPC) loginfo (2, "Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
 				cpunum_set_input_line_and_vector(0, 8, HOLD_LINE , 0x48);
 			}
 	}
@@ -607,12 +607,12 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 		switch (data)
 		{
 			case 0x00:
-				if(LOG_SMPC) logerror ("SMPC: Master ON\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: Master ON\n");
 				smpc_ram[0x5f]=0x00;
 				break;
 			//in theory 0x01 is for Master OFF,but obviously is not used.
 			case 0x02:
-				if(LOG_SMPC) logerror ("SMPC: Slave ON\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: Slave ON\n");
 				smpc_ram[0x5f]=0x02;
 				#if USE_SLAVE
 				stv_enable_slave_sh2 = 1;
@@ -620,33 +620,33 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				#endif
 				break;
 			case 0x03:
-				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
 				cpu_trigger(1000);
 				cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
-				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: Sound ON\n");
 				/* wrong? */
 				smpc_ram[0x5f]=0x06;
 				cpunum_set_input_line(2, INPUT_LINE_RESET, CLEAR_LINE);
 				break;
 			case 0x07:
-				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: Sound OFF\n");
 				smpc_ram[0x5f]=0x07;
 				break;
 			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
 			//case 0x08:
 			//case 0x09:
 			case 0x0d:
-				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: System Reset\n");
 				smpc_ram[0x5f]=0x0d;
 				cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
 				system_reset();
 				break;
 			case 0x0e:
-				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: Change Clock to 352\n");
 				smpc_ram[0x5f]=0x0e;
 				cpunum_set_clock(0, MASTER_CLOCK_352/2);
 				cpunum_set_clock(1, MASTER_CLOCK_352/2);
@@ -654,7 +654,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			case 0x0f:
-				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: Change Clock to 320\n");
 				smpc_ram[0x5f]=0x0f;
 				cpunum_set_clock(0, MASTER_CLOCK_320/2);
 				cpunum_set_clock(1, MASTER_CLOCK_320/2);
@@ -663,7 +663,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
-				if(LOG_SMPC) logerror ("SMPC: Status Acquire\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: Status Acquire\n");
 				smpc_ram[0x5f]=0x10;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 			  	smpc_ram[0x23] = DectoBCD((today->tm_year + 1900)/100);
@@ -704,13 +704,13 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 			//  /*This is for RTC,cartridge code and similar stuff...*/
 			//  if(!(stv_scu[40] & 0x0080)) /*System Manager(SMPC) irq*/ /* we can't check this .. breaks controls .. probably issues elsewhere? */
 				{
-					if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
+					if(LOG_SMPC) loginfo (2, "Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
 					cpunum_set_input_line_and_vector(0, 8, HOLD_LINE , 0x47);
 				}
 			break;
 			/* RTC write*/
 			case 0x16:
-				if(LOG_SMPC) logerror("SMPC: RTC write\n");
+				if(LOG_SMPC) loginfo(2,"SMPC: RTC write\n");
 				smpc_ram[0x2f] = smpc_ram[0x0d];
 				smpc_ram[0x2d] = smpc_ram[0x0b];
 				smpc_ram[0x2b] = smpc_ram[0x09];
@@ -722,30 +722,30 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 			break;
 			/* SMPC memory setting*/
 			case 0x17:
-				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: memory setting\n");
 				smpc_ram[0x5f]=0x17;
 			break;
 			case 0x18:
-				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: NMI request\n");
 				smpc_ram[0x5f]=0x18;
 				/*NMI is unconditionally requested?*/
 				cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 				break;
 			case 0x19:
-				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: NMI Enable\n");
 				smpc_ram[0x5f]=0x19;
 				NMI_reset = 0;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 				break;
 			case 0x1a:
-				if(LOG_SMPC) logerror ("SMPC: NMI Disable\n");
+				if(LOG_SMPC) loginfo (2, "SMPC: NMI Disable\n");
 				smpc_ram[0x5f]=0x1a;
 				NMI_reset = 1;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 
 				break;
 			default:
-				if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: undocumented Command %02x\n", cpu_getactivecpu(), activecpu_get_pc(), data);
+				if(LOG_SMPC) loginfo (2, "cpu #%d (PC=%08X) SMPC: undocumented Command %02x\n", cpu_getactivecpu(), activecpu_get_pc(), data);
 		}
 
 		// we've processed the command, clear status flag
@@ -823,7 +823,7 @@ static INTERRUPT_GEN( stv_interrupt )
 	{
 		if(!(stv_scu[40] & 2))/*VBLANK-OUT*/
 		{
-			if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT at scanline %04x, Vector 0x41 Level 0x0e\n",scanline);
+			if(LOG_IRQ) loginfo (2, "Interrupt: VBlank-OUT at scanline %04x, Vector 0x41 Level 0x0e\n",scanline);
 			cpunum_set_input_line_and_vector(0, 0xe, HOLD_LINE , 0x41);
 		}
 		stv_vblank = 0;
@@ -845,14 +845,14 @@ static INTERRUPT_GEN( stv_interrupt )
 		{
 			if((!(stv_scu[40] & 0x10)) && (!(stv_scu[38] & 0x80)))
 			{
-				if(LOG_IRQ) logerror ("Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
+				if(LOG_IRQ) loginfo (2, "Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
 				cpunum_set_input_line_and_vector(0, 0xb, HOLD_LINE, 0x44 );
 			}
 			else if((!(stv_scu[40] & 0x10)) && (stv_scu[38] & 0x80))
 			{
 				if(timer_1 == (stv_scu[36] & 0x1ff))
 				{
-					if(LOG_IRQ) logerror ("Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
+					if(LOG_IRQ) loginfo (2, "Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
 					cpunum_set_input_line_and_vector(0, 0xb, HOLD_LINE, 0x44 );
 				}
 			}
@@ -861,7 +861,7 @@ static INTERRUPT_GEN( stv_interrupt )
 		{
 			if(!(stv_scu[40] & 8))/*Timer 0*/
 			{
-				if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
+				if(LOG_IRQ) loginfo (2, "Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
 				cpunum_set_input_line_and_vector(0, 0xc, HOLD_LINE, 0x43 );
 			}
 		}
@@ -869,7 +869,7 @@ static INTERRUPT_GEN( stv_interrupt )
 		/*TODO:use this *at the end* of the draw line.*/
 		if(!(stv_scu[40] & 4))/*HBLANK-IN*/
 		{
-			if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);
+			if(LOG_IRQ) loginfo (2, "Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);
 			cpunum_set_input_line_and_vector(0, 0xd, HOLD_LINE , 0x42);
 		}
 	}
@@ -880,7 +880,7 @@ static INTERRUPT_GEN( stv_interrupt )
 
 		if(!(stv_scu[40] & 1))/*VBLANK-IN*/
 		{
-			if(LOG_IRQ) logerror ("Interrupt: VBlank IN at scanline %04x, Vector 0x40 Level 0x0f\n",scanline);
+			if(LOG_IRQ) loginfo (2, "Interrupt: VBlank IN at scanline %04x, Vector 0x40 Level 0x0f\n",scanline);
 			cpunum_set_input_line_and_vector(0, 0xf, HOLD_LINE , 0x40);
 		}
 		stv_vblank = 1;
@@ -889,7 +889,7 @@ static INTERRUPT_GEN( stv_interrupt )
 		{
 			if(!(stv_scu[40] & 8))/*Timer 0*/
 			{
-				if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
+				if(LOG_IRQ) loginfo (2, "Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
 				cpunum_set_input_line_and_vector(0, 0xc, HOLD_LINE, 0x43 );
 			}
 		}
@@ -941,7 +941,7 @@ static UINT8 port_sel,mux_data;
 READ32_HANDLER ( stv_io_r32 )
 {
 	static int i= -1;
-	//if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", activecpu_get_pc(), offset*4, mem_mask);
+	//if(LOG_IOGA) loginfo(2,"(PC=%08X): I/O r %08X & %08X\n", activecpu_get_pc(), offset*4, mem_mask);
 
 	switch(offset)
 	{
@@ -1018,7 +1018,7 @@ READ32_HANDLER ( stv_io_r32 )
 		}
 		break;
 		case 7:
-		if(LOG_IOGA) logerror("(PC %d=%06x) Warning: READ from PORT_AD\n",cpu_getactivecpu(), activecpu_get_pc());
+		if(LOG_IOGA) loginfo(2,"(PC %d=%06x) Warning: READ from PORT_AD\n",cpu_getactivecpu(), activecpu_get_pc());
 		ui_popup("Read from PORT_AD");
 		i++;
 		return port_ad[i & 7];
@@ -1029,7 +1029,7 @@ READ32_HANDLER ( stv_io_r32 )
 
 WRITE32_HANDLER ( stv_io_w32 )
 {
-	//if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+	//if(LOG_IOGA) loginfo(2,"(PC=%08X): I/O w %08X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 
 	switch(offset)
 	{
@@ -1202,28 +1202,28 @@ READ32_HANDLER( stv_scu_r32 )
 	//}
 	if (offset == 31)
 	{
-		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",activecpu_get_pc());
+		if(LOG_SCU) loginfo(2,"(PC=%08x) DMA status reg read\n",activecpu_get_pc());
 		return stv_scu[offset];
 	}
 	else if ( offset == 35 )
 	{
-        if(LOG_SCU) logerror( "DSP mem read at %08X\n", stv_scu[34]);
+        if(LOG_SCU) loginfo(2, "DSP mem read at %08X\n", stv_scu[34]);
         return dsp_ram_addr_r();
     }
     else if( offset == 41)
     {
-		logerror("(PC=%08x) IRQ status reg read\n",activecpu_get_pc());
+		loginfo(2,"(PC=%08x) IRQ status reg read\n",activecpu_get_pc());
 		/*TODO:for now we're activating everything here,but we need to return the proper active irqs*/
 		return 0xffffffff;
 	}
 	else if( offset == 50 )
 	{
-		logerror("(PC=%08x) SCU version reg read\n",activecpu_get_pc());
+		loginfo(2,"(PC=%08x) SCU version reg read\n",activecpu_get_pc());
 		return 0x00000000;/*SCU Version 0*/
 	}
     else
     {
-    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",activecpu_get_pc(),offset,stv_scu[offset]);
+    	if(LOG_SCU) loginfo(2,"(PC=%08x) SCU reg read at %d = %08x\n",activecpu_get_pc(),offset,stv_scu[offset]);
     	return stv_scu[offset];
    	}
 }
@@ -1279,14 +1279,14 @@ WRITE32_HANDLER( stv_scu_w32 )
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
 				//cpunum_set_input_line_and_vector(0, 9, HOLD_LINE , 0x46);
-				logerror("SCSP: Main CPU interrupt\n");
+				loginfo(2,"SCSP: Main CPU interrupt\n");
 				#if 0
 				if((scu_dst_0 & 0x7ffffff) != 0x05a00000)
 				{
 					if(!(stv_scu[40] & 0x1000))
 					{
 						cpunum_set_input_line_and_vector(0, 3, HOLD_LINE, 0x4c);
-						logerror("SCU: Illegal DMA interrupt\n");
+						loginfo(2,"SCU: Illegal DMA interrupt\n");
 					}
 				}
 				#endif
@@ -1296,13 +1296,13 @@ WRITE32_HANDLER( stv_scu_w32 )
 		case 5:
 		if(INDIRECT_MODE(0))
 		{
-			if(LOG_SCU) logerror("Indirect Mode DMA lv 0 set\n");
+			if(LOG_SCU) loginfo(2,"Indirect Mode DMA lv 0 set\n");
 			if(!DWUP(0)) scu_index_0 = scu_dst_0;
 		}
 
 		/*Start factor enable bits,bit 2,bit 1 and bit 0*/
 		if((stv_scu[5] & 7) != 7)
-			if(LOG_SCU) logerror("Start factor chosen for lv 0 = %d\n",stv_scu[5] & 7);
+			if(LOG_SCU) loginfo(2,"Start factor chosen for lv 0 = %d\n",stv_scu[5] & 7);
 		break;
 		/*LV 1 DMA*/
 		case 8:	 scu_src_1  = ((stv_scu[8] &  0x07ffffff) >> 0);  break;
@@ -1340,19 +1340,19 @@ WRITE32_HANDLER( stv_scu_w32 )
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
 				//cpunum_set_input_line_and_vector(0, 9, HOLD_LINE , 0x46);
-				logerror("SCSP: Main CPU interrupt\n");
+				loginfo(2,"SCSP: Main CPU interrupt\n");
 			}
 		}
 		break;
 		case 13:
 		if(INDIRECT_MODE(1))
 		{
-			if(LOG_SCU) logerror("Indirect Mode DMA lv 1 set\n");
+			if(LOG_SCU) loginfo(2,"Indirect Mode DMA lv 1 set\n");
 			if(!DWUP(1)) scu_index_1 = scu_dst_1;
 		}
 
 		if((stv_scu[13] & 7) != 7)
-			if(LOG_SCU) logerror("Start factor chosen for lv 1 = %d\n",stv_scu[13] & 7);
+			if(LOG_SCU) loginfo(2,"Start factor chosen for lv 1 = %d\n",stv_scu[13] & 7);
 		break;
 		/*LV 2 DMA*/
 		case 16: scu_src_2  = ((stv_scu[16] & 0x07ffffff) >> 0);  break;
@@ -1390,45 +1390,45 @@ WRITE32_HANDLER( stv_scu_w32 )
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
 				//cpunum_set_input_line_and_vector(0, 9, HOLD_LINE , 0x46);
-				logerror("SCSP: Main CPU interrupt\n");
+				loginfo(2,"SCSP: Main CPU interrupt\n");
 			}
 		}
 		break;
 		case 21:
 		if(INDIRECT_MODE(2))
 		{
-			if(LOG_SCU) logerror("Indirect Mode DMA lv 2 set\n");
+			if(LOG_SCU) loginfo(2,"Indirect Mode DMA lv 2 set\n");
 			if(!DWUP(2)) scu_index_2 = scu_dst_2;
 		}
 
 		if((stv_scu[21] & 7) != 7)
-			if(LOG_SCU) logerror("Start factor chosen for lv 2 = %d\n",stv_scu[21] & 7);
+			if(LOG_SCU) loginfo(2,"Start factor chosen for lv 2 = %d\n",stv_scu[21] & 7);
 		break;
 		case 24:
-		if(LOG_SCU) logerror("DMA Forced Stop Register set = %02x\n",stv_scu[24]);
+		if(LOG_SCU) loginfo(2,"DMA Forced Stop Register set = %02x\n",stv_scu[24]);
 		break;
-		case 31: if(LOG_SCU) logerror("Warning: DMA status WRITE! Offset %02x(%d)\n",offset*4,offset); break;
+		case 31: if(LOG_SCU) loginfo(2,"Warning: DMA status WRITE! Offset %02x(%d)\n",offset*4,offset); break;
 		/*DSP section*/
 		/*Use functions so it is easier to work out*/
 		case 32:
 		dsp_prg_ctrl(data);
-		if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
+		if(LOG_SCU) loginfo(2,"SCU DSP: Program Control Port Access %08x\n",data);
 		break;
 		case 33:
 		dsp_prg_data(data);
-		if(LOG_SCU) logerror("SCU DSP: Program RAM Data Port Access %08x\n",data);
+		if(LOG_SCU) loginfo(2,"SCU DSP: Program RAM Data Port Access %08x\n",data);
 		break;
 		case 34:
 		dsp_ram_addr_ctrl(data);
-		if(LOG_SCU) logerror("SCU DSP: Data RAM Address Port Access %08x\n",data);
+		if(LOG_SCU) loginfo(2,"SCU DSP: Data RAM Address Port Access %08x\n",data);
 		break;
 		case 35:
 		dsp_ram_addr_w(data);
-		if(LOG_SCU) logerror("SCU DSP: Data RAM Data Port Access %08x\n",data);
+		if(LOG_SCU) loginfo(2,"SCU DSP: Data RAM Data Port Access %08x\n",data);
 		break;
-		case 36: if(LOG_SCU) logerror("timer 0 compare data = %03x\n",stv_scu[36]);break;
-		case 37: if(LOG_SCU) logerror("timer 1 set data = %08x\n",stv_scu[37]); break;
-		case 38: if(LOG_SCU) logerror("timer 1 mode data = %08x\n",stv_scu[38]); break;
+		case 36: if(LOG_SCU) loginfo(2,"timer 0 compare data = %03x\n",stv_scu[36]);break;
+		case 37: if(LOG_SCU) loginfo(2,"timer 1 set data = %08x\n",stv_scu[37]); break;
+		case 38: if(LOG_SCU) loginfo(2,"timer 1 mode data = %08x\n",stv_scu[38]); break;
 		case 40:
 		/*An interrupt is masked when his specific bit is 1.*/
 		/*Are bit 16-bit 31 for External A-Bus irq mask like the status register?*/
@@ -1439,7 +1439,7 @@ WRITE32_HANDLER( stv_scu_w32 )
 		   stv_scu[40] != 0xfffffffc &&
 		   stv_scu[40] != 0xffffffff)
 		{
-			if(LOG_SCU) logerror("cpu #%d (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
+			if(LOG_SCU) loginfo(2,"cpu #%d (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
 			cpu_getactivecpu(), activecpu_get_pc(),
 			stv_scu[offset],
 			stv_scu[offset] & 0x8000 ? 1 : 0, /*A-Bus irq*/
@@ -1462,20 +1462,20 @@ WRITE32_HANDLER( stv_scu_w32 )
 		break;
 		case 41:
 		/*This is r/w by introdon...*/
-		if(LOG_SCU) logerror("IRQ status reg set:%08x\n",stv_scu[41]);
+		if(LOG_SCU) loginfo(2,"IRQ status reg set:%08x\n",stv_scu[41]);
 		break;
-		case 42: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",stv_scu[42]); break;
-		case 49: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",stv_scu[49]); break;
-		default: if(LOG_SCU) logerror("Warning: unused SCU reg set %d = %08x\n",offset,data);
+		case 42: if(LOG_SCU) loginfo(2,"A-Bus IRQ ACK %08x\n",stv_scu[42]); break;
+		case 49: if(LOG_SCU) loginfo(2,"SCU SDRAM set: %02x\n",stv_scu[49]); break;
+		default: if(LOG_SCU) loginfo(2,"Warning: unused SCU reg set %d = %08x\n",offset,data);
 	}
 }
 
 static void dma_direct_lv0()
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
-	if(LOG_SCU) logerror("DMA lv 0 transfer START\n"
+	if(LOG_SCU) loginfo(2,"DMA lv 0 transfer START\n"
 			             "Start %08x End %08x Size %04x\n",scu_src_0,scu_dst_0,scu_size_0);
-	if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_0,scu_dst_add_0);
+	if(LOG_SCU) loginfo(2,"Start Add %04x Destination Add %04x\n",scu_src_add_0,scu_dst_add_0);
 
 	D0MV_1;
 
@@ -1488,13 +1488,13 @@ static void dma_direct_lv0()
 
 	if(SOUND_RAM(dst_0))
 	{
-		logerror("Sound RAM DMA write\n");
+		loginfo(2,"Sound RAM DMA write\n");
 		scsp_to_main_irq = 1;
 	}
 
 	if((scu_dst_add_0 != scu_src_add_0) && (ABUS(src_0)))
 	{
-		logerror("A-Bus invalid transfer,sets to default\n");
+		loginfo(2,"A-Bus invalid transfer,sets to default\n");
 		scu_add_tmp = (scu_dst_add_0*0x100) | (scu_src_add_0);
 		scu_dst_add_0 = scu_src_add_0 = 4;
 		scu_add_tmp |= 0x80000000;
@@ -1502,29 +1502,29 @@ static void dma_direct_lv0()
 	/*Let me know if you encounter any of these three*/
 	if(ABUS(dst_0))
 	{
-		logerror("A-Bus invalid write\n");
+		loginfo(2,"A-Bus invalid write\n");
 		/*...*/
 	}
 	if(WORK_RAM_L(dst_0))
 	{
-		logerror("WorkRam-L invalid write\n");
+		loginfo(2,"WorkRam-L invalid write\n");
 		/*...*/
 	}
 	if(VDP2(src_0))
 	{
-		logerror("VDP-2 invalid read\n");
+		loginfo(2,"VDP-2 invalid read\n");
 		/*...*/
 	}
 	if(VDP1_REGS(dst_0))
 	{
-		logerror("VDP1 register access,must be in word units\n");
+		loginfo(2,"VDP1 register access,must be in word units\n");
 		scu_add_tmp = (scu_dst_add_0*0x100) | (scu_src_add_0);
 		scu_dst_add_0 = scu_src_add_0 = 2;
 		scu_add_tmp |= 0x80000000;
 	}
 	if(DRUP(0))
 	{
-		logerror("Data read update = 1,read address add value must be 1 too\n");
+		loginfo(2,"Data read update = 1,read address add value must be 1 too\n");
 		scu_add_tmp = (scu_dst_add_0*0x100) | (scu_src_add_0);
 		scu_src_add_0 = 4;
 		scu_add_tmp |= 0x80000000;
@@ -1566,7 +1566,7 @@ static void dma_direct_lv0()
 	if(!(DRUP(0))) scu_src_0 = tmp_src;
 	if(!(DWUP(0))) scu_dst_0 = tmp_dst;
 
-	if(LOG_SCU) logerror("DMA transfer END\n");
+	if(LOG_SCU) loginfo(2,"DMA transfer END\n");
 	if(!(stv_scu[40] & 0x800))/*Lv 0 DMA end irq*/
 		cpunum_set_input_line_and_vector(0, 5, HOLD_LINE , 0x4b);
 
@@ -1583,9 +1583,9 @@ static void dma_direct_lv0()
 static void dma_direct_lv1()
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
-	if(LOG_SCU) logerror("DMA lv 1 transfer START\n"
+	if(LOG_SCU) loginfo(2,"DMA lv 1 transfer START\n"
 			 "Start %08x End %08x Size %04x\n",scu_src_1,scu_dst_1,scu_size_1);
-	if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_1,scu_dst_add_1);
+	if(LOG_SCU) loginfo(2,"Start Add %04x Destination Add %04x\n",scu_src_add_1,scu_dst_add_1);
 
 	D1MV_1;
 
@@ -1598,13 +1598,13 @@ static void dma_direct_lv1()
 
 	if(SOUND_RAM(dst_1))
 	{
-		logerror("Sound RAM DMA write\n");
+		loginfo(2,"Sound RAM DMA write\n");
 		scsp_to_main_irq = 1;
 	}
 
 	if((scu_dst_add_1 != scu_src_add_1) && (ABUS(src_1)))
 	{
-		logerror("A-Bus invalid transfer,sets to default\n");
+		loginfo(2,"A-Bus invalid transfer,sets to default\n");
 		scu_add_tmp = (scu_dst_add_1*0x100) | (scu_src_add_1);
 		scu_dst_add_1 = scu_src_add_1 = 4;
 		scu_add_tmp |= 0x80000000;
@@ -1612,29 +1612,29 @@ static void dma_direct_lv1()
 	/*Let me know if you encounter any of these ones*/
 	if(ABUS(dst_1))
 	{
-		logerror("A-Bus invalid write\n");
+		loginfo(2,"A-Bus invalid write\n");
 		/*...*/
 	}
 	if(WORK_RAM_L(dst_1))
 	{
-		logerror("WorkRam-L invalid write\n");
+		loginfo(2,"WorkRam-L invalid write\n");
 		/*...*/
 	}
 	if(VDP1_REGS(dst_1))
 	{
-		logerror("VDP1 register access,must be in word units\n");
+		loginfo(2,"VDP1 register access,must be in word units\n");
 		scu_add_tmp = (scu_dst_add_1*0x100) | (scu_src_add_1);
 		scu_dst_add_1 = scu_src_add_1 = 2;
 		scu_add_tmp |= 0x80000000;
 	}
 	if(VDP2(src_1))
 	{
-		logerror("VDP-2 invalid read\n");
+		loginfo(2,"VDP-2 invalid read\n");
 		/*...*/
 	}
 	if(DRUP(1))
 	{
-		logerror("Data read update = 1,read address add value must be 1 too\n");
+		loginfo(2,"Data read update = 1,read address add value must be 1 too\n");
 		scu_add_tmp = (scu_dst_add_1*0x100) | (scu_src_add_1);
 		scu_src_add_1 = 4;
 		scu_add_tmp |= 0x80000000;
@@ -1669,7 +1669,7 @@ static void dma_direct_lv1()
 	if(!(DRUP(1))) scu_src_1 = tmp_src;
 	if(!(DWUP(1))) scu_dst_1 = tmp_dst;
 
-	if(LOG_SCU) logerror("DMA transfer END\n");
+	if(LOG_SCU) loginfo(2,"DMA transfer END\n");
 	if(!(stv_scu[40] & 0x400))/*Lv 1 DMA end irq*/
 		cpunum_set_input_line_and_vector(0, 6, HOLD_LINE , 0x4a);
 
@@ -1686,9 +1686,9 @@ static void dma_direct_lv1()
 static void dma_direct_lv2()
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
-	if(LOG_SCU) logerror("DMA lv 2 transfer START\n"
+	if(LOG_SCU) loginfo(2,"DMA lv 2 transfer START\n"
 			 "Start %08x End %08x Size %04x\n",scu_src_2,scu_dst_2,scu_size_2);
-	if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_2,scu_dst_add_2);
+	if(LOG_SCU) loginfo(2,"Start Add %04x Destination Add %04x\n",scu_src_add_2,scu_dst_add_2);
 
 	D2MV_1;
 
@@ -1701,13 +1701,13 @@ static void dma_direct_lv2()
 
 	if(SOUND_RAM(dst_2))
 	{
-		logerror("Sound RAM DMA write\n");
+		loginfo(2,"Sound RAM DMA write\n");
 		scsp_to_main_irq = 1;
 	}
 
 	if((scu_dst_add_2 != scu_src_add_2) && (ABUS(src_2)))
 	{
-		logerror("A-Bus invalid transfer,sets to default\n");
+		loginfo(2,"A-Bus invalid transfer,sets to default\n");
 		scu_add_tmp = (scu_dst_add_2*0x100) | (scu_src_add_2);
 		scu_dst_add_2 = scu_src_add_2 = 4;
 		scu_add_tmp |= 0x80000000;
@@ -1715,29 +1715,29 @@ static void dma_direct_lv2()
 	/*Let me know if you encounter any of these ones*/
 	if(ABUS(dst_2))
 	{
-		logerror("A-Bus invalid write\n");
+		loginfo(2,"A-Bus invalid write\n");
 		/*...*/
 	}
 	if(WORK_RAM_L(dst_2))
 	{
-		logerror("WorkRam-L invalid write\n");
+		loginfo(2,"WorkRam-L invalid write\n");
 		/*...*/
 	}
 	if(VDP1_REGS(dst_2))
 	{
-		logerror("VDP1 register access,must be in word units\n");
+		loginfo(2,"VDP1 register access,must be in word units\n");
 		scu_add_tmp = (scu_dst_add_2*0x100) | (scu_src_add_2);
 		scu_dst_add_2 = scu_src_add_2 = 2;
 		scu_add_tmp |= 0x80000000;
 	}
 	if(VDP2(src_2))
 	{
-		logerror("VDP-2 invalid read\n");
+		loginfo(2,"VDP-2 invalid read\n");
 		/*...*/
 	}
 	if(DRUP(2))
 	{
-		logerror("Data read update = 1,read address add value must be 1 too\n");
+		loginfo(2,"Data read update = 1,read address add value must be 1 too\n");
 		scu_add_tmp = (scu_dst_add_2*0x100) | (scu_src_add_2);
 		scu_src_add_2 = 4;
 		scu_add_tmp |= 0x80000000;
@@ -1772,7 +1772,7 @@ static void dma_direct_lv2()
 	if(!(DRUP(2))) scu_src_2 = tmp_src;
 	if(!(DWUP(2))) scu_dst_2 = tmp_dst;
 
-	if(LOG_SCU) logerror("DMA transfer END\n");
+	if(LOG_SCU) loginfo(2,"DMA transfer END\n");
 	if(!(stv_scu[40] & 0x200))/*Lv 2 DMA end irq*/
 		cpunum_set_input_line_and_vector(0, 6, HOLD_LINE , 0x49);
 
@@ -1813,13 +1813,13 @@ static void dma_indirect_lv0()
 
 		if(SOUND_RAM(dst_0))
 		{
-			logerror("Sound RAM DMA write\n");
+			loginfo(2,"Sound RAM DMA write\n");
 			scsp_to_main_irq = 1;
 		}
 
-		if(LOG_SCU) logerror("DMA lv 0 indirect mode transfer START\n"
+		if(LOG_SCU) loginfo(2,"DMA lv 0 indirect mode transfer START\n"
 			 	 "Start %08x End %08x Size %04x\n",scu_src_0,scu_dst_0,scu_size_0);
-		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_0,scu_dst_add_0);
+		if(LOG_SCU) loginfo(2,"Start Add %04x Destination Add %04x\n",scu_src_add_0,scu_dst_add_0);
 
 		//guess,but I believe it's right.
 		scu_src_0 &=0x07ffffff;
@@ -1883,13 +1883,13 @@ static void dma_indirect_lv1()
 
 		if(SOUND_RAM(dst_1))
 		{
-			logerror("Sound RAM DMA write\n");
+			loginfo(2,"Sound RAM DMA write\n");
 			scsp_to_main_irq = 1;
 		}
 
-		if(LOG_SCU) logerror("DMA lv 1 indirect mode transfer START\n"
+		if(LOG_SCU) loginfo(2,"DMA lv 1 indirect mode transfer START\n"
 			 	 "Start %08x End %08x Size %04x\n",scu_src_1,scu_dst_1,scu_size_1);
-		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_1,scu_dst_add_1);
+		if(LOG_SCU) loginfo(2,"Start Add %04x Destination Add %04x\n",scu_src_add_1,scu_dst_add_1);
 
 		//guess,but I believe it's right.
 		scu_src_1 &=0x07ffffff;
@@ -1955,13 +1955,13 @@ static void dma_indirect_lv2()
 
 		if(SOUND_RAM(dst_2))
 		{
-			logerror("Sound RAM DMA write\n");
+			loginfo(2,"Sound RAM DMA write\n");
 			scsp_to_main_irq = 1;
 		}
 
-		if(LOG_SCU) logerror("DMA lv 2 indirect mode transfer START\n"
+		if(LOG_SCU) loginfo(2,"DMA lv 2 indirect mode transfer START\n"
 			 	 "Start %08x End %08x Size %04x\n",scu_src_2,scu_dst_2,scu_size_2);
-		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_2,scu_dst_add_2);
+		if(LOG_SCU) loginfo(2,"Start Add %04x Destination Add %04x\n",scu_src_add_2,scu_dst_add_2);
 
 		//guess,but I believe it's right.
 		scu_src_2 &=0x07ffffff;
@@ -2033,7 +2033,7 @@ static WRITE32_HANDLER( stv_scsp_regs_w32 )
  * Enter into Radiant Silver Gun specific menu for a test...                       */
 static WRITE32_HANDLER( minit_w )
 {
-	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
+	loginfo(2,"cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
 	cpu_boost_interleave(minit_boost_timeslice, TIME_IN_USEC(minit_boost));
 	cpu_trigger(1000);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
@@ -2041,7 +2041,7 @@ static WRITE32_HANDLER( minit_w )
 
 static WRITE32_HANDLER( sinit_w )
 {
-	logerror("cpu #%d (PC=%08X) SINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
+	loginfo(2,"cpu #%d (PC=%08X) SINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
 	cpu_boost_interleave(sinit_boost_timeslice, TIME_IN_USEC(sinit_boost));
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
@@ -2139,7 +2139,7 @@ static READ32_HANDLER( a_bus_ctrl_r )
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",activecpu_get_pc(),a_bus[3]);
+			loginfo(2,"A-Bus control protection read at %06x with data = %08x\n",activecpu_get_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
 			ui_popup("Prot read at %06x with data = %08x",activecpu_get_pc(),a_bus[3]);
 			#endif
@@ -2265,7 +2265,7 @@ static READ32_HANDLER( a_bus_ctrl_r )
 static WRITE32_HANDLER ( a_bus_ctrl_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",activecpu_get_pc(),offset,data);
+	loginfo(2,"A-Bus control protection write at %06x: [%02x] <- %08x\n",activecpu_get_pc(),offset,data);
 	if(offset == 3)
 	{
 		switch(a_bus[3])
@@ -2788,7 +2788,7 @@ WRITE32_HANDLER ( w60ffc44_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc44/4]);
 
-	logerror("cpu #%d (PC=%08X): 60ffc44_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask ^ 0xffffffff);
+	loginfo(2,"cpu #%d (PC=%08X): 60ffc44_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask ^ 0xffffffff);
 	//sinit_w(offset,data,mem_mask);
 }
 
@@ -2796,7 +2796,7 @@ WRITE32_HANDLER ( w60ffc48_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc48/4]);
 
-	logerror("cpu #%d (PC=%08X): 60ffc48_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask ^ 0xffffffff);
+	loginfo(2,"cpu #%d (PC=%08X): 60ffc48_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask ^ 0xffffffff);
 	//minit_w(offset,data,mem_mask);
 }
 

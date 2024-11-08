@@ -344,8 +344,8 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 		spritebank_buffered[j] = i;
 		spritebank_buffered[j+1] = (i + 0x400);
 
-//logerror("bank %d, set to: %04x\n", j, i);
-//logerror("bank %d, paired so: %04x\n", j + 1, i + 0x400);
+//loginfo(2,"bank %d, set to: %04x\n", j, i);
+//loginfo(2,"bank %d, paired so: %04x\n", j + 1, i + 0x400);
 
 	}
 	else   /* last 4 are individual banks */
@@ -353,7 +353,7 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 		i = data << 10;
 		spritebank_buffered[offset] = i;
 
-//logerror("bank %d, new value: %04x\n", offset, i);
+//loginfo(2,"bank %d, new value: %04x\n", offset, i);
 	}
 
 }

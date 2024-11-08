@@ -249,21 +249,21 @@ static void handle_missing_file(rom_load_data *romdata, const rom_entry *romp)
 	/* optional files are okay */
 	if (ROM_ISOPTIONAL(romp))
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "OPTIONAL %-12s NOT FOUND\n", ROM_GETNAME(romp));
+		loginfo(1, "OPTIONAL %-12s NOT FOUND\n", ROM_GETNAME(romp));
 		romdata->warnings++;
 	}
 
 	/* no good dumps are okay */
 	else if (ROM_NOGOODDUMP(romp))
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s NOT FOUND (NO GOOD DUMP KNOWN)\n", ROM_GETNAME(romp));
+		loginfo(1, "%-12s NOT FOUND (NO GOOD DUMP KNOWN)\n", ROM_GETNAME(romp));
 		romdata->warnings++;
 	}
 
 	/* anything else is bad */
 	else
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s NOT FOUND\n", ROM_GETNAME(romp));
+		loginfo(1, "%-12s NOT FOUND\n", ROM_GETNAME(romp));
 		romdata->errors++;
 	}
 }
@@ -285,13 +285,13 @@ static void dump_wrong_and_correct_checksums(rom_load_data* romdata, const char*
 	found_functions = hash_data_used_functions(hash) & hash_data_used_functions(acthash);
 
 	hash_data_print(hash, found_functions, chksum);
-	sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "    EXPECTED: %s\n", chksum);
+	loginfo(1, "    EXPECTED: %s\n", chksum);
 
 	/* We dump informations only of the functions for which MAME provided
         a correct checksum. Other functions we might have calculated are
         useless here */
 	hash_data_print(acthash, found_functions, chksum);
-	sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "       FOUND: %s\n", chksum);
+	loginfo(1, "       FOUND: %s\n", chksum);
 
 	/* For debugging purposes, we check if the checksums available in the
        driver are correctly specified or not. This can be done by checking
@@ -308,7 +308,7 @@ static void dump_wrong_and_correct_checksums(rom_load_data* romdata, const char*
 		for (i=0;i<HASH_NUM_FUNCTIONS;i++)
 			if (wrong_functions & (1<<i))
 			{
-				sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)],
+				loginfo(1,
 					"\tInvalid %s checksum treated as 0 (check leading zeros)\n",
 					hash_function_name(1<<i));
 
@@ -339,21 +339,21 @@ static void verify_length_and_hash(rom_load_data *romdata, const char *name, UIN
 	/* verify length */
 	if (explength != actlength)
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
+		loginfo(1, "%-12s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
 		romdata->warnings++;
 	}
 
 	/* If there is no good dump known, write it */
 	if (hash_data_has_info(hash, HASH_INFO_NO_DUMP))
 	{
-			sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s NO GOOD DUMP KNOWN\n", name);
+			loginfo(1, "%-12s NO GOOD DUMP KNOWN\n", name);
 		romdata->warnings++;
 	}
 	/* verify checksums */
 	else if (!hash_data_is_equal(hash, acthash, 0))
 	{
 		/* otherwise, it's just bad */
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s WRONG CHECKSUMS:\n", name);
+		loginfo(1, "%-12s WRONG CHECKSUMS:\n", name);
 
 		dump_wrong_and_correct_checksums(romdata, hash, acthash);
 
@@ -362,7 +362,7 @@ static void verify_length_and_hash(rom_load_data *romdata, const char *name, UIN
 	/* If it matches, but it is actually a bad dump, write it */
 	else if (hash_data_has_info(hash, HASH_INFO_BAD_DUMP))
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s ROM NEEDS REDUMP\n",name);
+		loginfo(1, "%-12s ROM NEEDS REDUMP\n",name);
 		romdata->warnings++;
 	}
 }
@@ -383,15 +383,13 @@ static int display_rom_load_results(rom_load_data *romdata)
 	/* if we had errors, they are fatal */
 	if (romdata->errors)
 	{
-		strcat(romdata->errorbuf, "ERROR: required files are missing, the game cannot be run.");
-		fatalerror("%s", romdata->errorbuf);
+		fatalerror( "ERROR: required files are missing, the game cannot be run.");
 	}
 
 	/* if we had warnings, output them, but continue */
 	if (romdata->warnings)
 	{
-		strcat(romdata->errorbuf, "WARNING: the game might not run correctly.");
-		printf("%s\n", romdata->errorbuf);
+		loginfo(1, "WARNING: the game might not run correctly.");
 	}
 
 	/* clean up any regions */
@@ -528,21 +526,21 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 	/* make sure the length was an even multiple of the group size */
 	if (numbytes % groupsize != 0)
 	{
-		printf("Error in RomModule definition: %s length not an even multiple of group size\n", ROM_GETNAME(romp));
+		loginfo(2,"Error in RomModule definition: %s length not an even multiple of group size\n", ROM_GETNAME(romp));
 		return -1;
 	}
 
 	/* make sure we only fill within the region space */
 	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > romdata->regionlength)
 	{
-		printf("Error in RomModule definition: %s out of memory region space\n", ROM_GETNAME(romp));
+		loginfo(2,"Error in RomModule definition: %s out of memory region space\n", ROM_GETNAME(romp));
 		return -1;
 	}
 
 	/* make sure the length was valid */
 	if (numbytes == 0)
 	{
-		printf("Error in RomModule definition: %s has an invalid length\n", ROM_GETNAME(romp));
+		loginfo(2,"Error in RomModule definition: %s has an invalid length\n", ROM_GETNAME(romp));
 		return -1;
 	}
 
@@ -637,14 +635,14 @@ static int fill_rom_data(rom_load_data *romdata, const rom_entry *romp)
 	/* make sure we fill within the region space */
 	if (ROM_GETOFFSET(romp) + numbytes > romdata->regionlength)
 	{
-		printf("Error in RomModule definition: FILL out of memory region space\n");
+		loginfo(2,"Error in RomModule definition: FILL out of memory region space\n");
 		return 0;
 	}
 
 	/* make sure the length was valid */
 	if (numbytes == 0)
 	{
-		printf("Error in RomModule definition: FILL has an invalid length\n");
+		loginfo(2,"Error in RomModule definition: FILL has an invalid length\n");
 		return 0;
 	}
 
@@ -669,14 +667,14 @@ static int copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 	/* make sure we copy within the region space */
 	if (ROM_GETOFFSET(romp) + numbytes > romdata->regionlength)
 	{
-		printf("Error in RomModule definition: COPY out of target memory region space\n");
+		loginfo(2,"Error in RomModule definition: COPY out of target memory region space\n");
 		return 0;
 	}
 
 	/* make sure the length was valid */
 	if (numbytes == 0)
 	{
-		printf("Error in RomModule definition: COPY has an invalid length\n");
+		loginfo(2,"Error in RomModule definition: COPY has an invalid length\n");
 		return 0;
 	}
 
@@ -684,14 +682,14 @@ static int copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 	srcbase = memory_region(srcregion);
 	if (!srcbase)
 	{
-		printf("Error in RomModule definition: COPY from an invalid region\n");
+		loginfo(2,"Error in RomModule definition: COPY from an invalid region\n");
 		return 0;
 	}
 
 	/* make sure we find within the region space */
 	if (srcoffs + numbytes > memory_region_length(srcregion))
 	{
-		printf("Error in RomModule definition: COPY out of source memory region space\n");
+		loginfo(2,"Error in RomModule definition: COPY out of source memory region space\n");
 		return 0;
 	}
 
@@ -716,14 +714,14 @@ static int process_rom_entries(rom_load_data *romdata, const rom_entry *romp)
 		/* if this is a continue entry, it's invalid */
 		if (ROMENTRY_ISCONTINUE(romp))
 		{
-			printf("Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
+			loginfo(2,"Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
 			goto fatalerror;
 		}
 
 		/* if this is a reload entry, it's invalid */
 		if (ROMENTRY_ISRELOAD(romp))
 		{
-			printf("Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
+			loginfo(2,"Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
 			goto fatalerror;
 		}
 
@@ -851,9 +849,9 @@ static int process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 			if (!source)
 			{
 				if (chd_get_last_error() == CHDERR_UNSUPPORTED_VERSION)
-					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s UNSUPPORTED CHD VERSION\n", filename);
+					loginfo(1, "%-12s UNSUPPORTED CHD VERSION\n", filename);
 				else
-					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s NOT FOUND\n", filename);
+					loginfo(1, "%-12s NOT FOUND\n", filename);
 				romdata->errors++;
 				romp++;
 				continue;
@@ -868,7 +866,7 @@ static int process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 			/* verify the MD5 */
 			if (!hash_data_is_equal(ROM_GETHASHDATA(romp), acthash, 0))
 			{
-				sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s WRONG CHECKSUMS:\n", filename);
+				loginfo(1, "%-12s WRONG CHECKSUMS:\n", filename);
 				dump_wrong_and_correct_checksums(romdata, ROM_GETHASHDATA(romp), acthash);
 				romdata->warnings++;
 			}
@@ -890,9 +888,9 @@ static int process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 					if (err != CHDERR_NONE)
 					{
 						if (chd_get_last_error() == CHDERR_UNSUPPORTED_VERSION)
-							sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s UNSUPPORTED CHD VERSION\n", filename);
+							loginfo(1, "%-12s UNSUPPORTED CHD VERSION\n", filename);
 						else
-							sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s: CAN'T CREATE DIFF FILE\n", filename);
+							loginfo(1, "%-12s: CAN'T CREATE DIFF FILE\n", filename);
 						romdata->errors++;
 						romp++;
 						continue;
@@ -904,9 +902,9 @@ static int process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 					if (!diff)
 					{
 						if (chd_get_last_error() == CHDERR_UNSUPPORTED_VERSION)
-							sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s UNSUPPORTED CHD VERSION\n", filename);
+							loginfo(1, "%-12s UNSUPPORTED CHD VERSION\n", filename);
 						else
-							sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%-12s: CAN'T OPEN DIFF FILE\n", filename);
+							loginfo(1, "%-12s: CAN'T OPEN DIFF FILE\n", filename);
 						romdata->errors++;
 						romp++;
 						continue;
@@ -963,14 +961,14 @@ int rom_init(const rom_entry *romp)
 		/* the first entry must be a region */
 		if (!ROMENTRY_ISREGION(region))
 		{
-			printf("Error: missing ROM_REGION header\n");
+			loginfo(2,"Error: missing ROM_REGION header\n");
 			return 1;
 		}
 
 		/* allocate memory for the region */
 		if (new_memory_region(regiontype, ROMREGION_GETLENGTH(region), ROMREGION_GETFLAGS(region)) != 0)
 		{
-			printf("Error: unable to allocate memory for region %d\n", regiontype);
+			loginfo(2,"Error: unable to allocate memory for region %d\n", regiontype);
 			return 1;
 		}
 

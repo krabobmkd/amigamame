@@ -1906,7 +1906,7 @@ static void sprite_render_list(void)
 
 	profiler_mark(PROFILER_USER2);
 
-	logerror("----\n");
+	loginfo(2,"----\n");
 
 	/* compute the outer clip */
 	outerclip.min_x = outerclip.min_y = 0;

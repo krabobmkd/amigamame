@@ -276,7 +276,7 @@ WRITE16_HANDLER( midyunit_control_w )
 		{
 			if (autoerase_enable)
 			{
-				logerror("autoerase off @ %d\n", cpu_getscanline());
+				loginfo(2,"autoerase off @ %d\n", cpu_getscanline());
 				update_partial(cpu_getscanline() - 1, 1);
 			}
 			autoerase_enable = 0;
@@ -287,7 +287,7 @@ WRITE16_HANDLER( midyunit_control_w )
 		{
 			if (!autoerase_enable)
 			{
-				logerror("autoerase on @ %d\n", cpu_getscanline());
+				loginfo(2,"autoerase on @ %d\n", cpu_getscanline());
 				update_partial(cpu_getscanline() - 1, 1);
 			}
 			autoerase_enable = 1;
@@ -592,14 +592,14 @@ WRITE16_HANDLER( midyunit_dma_w )
 #if LOG_DMA
 	if (code_pressed(KEYCODE_L))
 	{
-		logerror("----\n");
-		logerror("DMA command %04X: (xflip=%d yflip=%d)\n",
+		loginfo(2,"----\n");
+		loginfo(2,"DMA command %04X: (xflip=%d yflip=%d)\n",
 				command, (command >> 4) & 1, (command >> 5) & 1);
-		logerror("  offset=%08X pos=(%d,%d) w=%d h=%d rb=%d\n",
+		loginfo(2,"  offset=%08X pos=(%d,%d) w=%d h=%d rb=%d\n",
 				dma_register[DMA_OFFSETLO] | (dma_register[DMA_OFFSETHI] << 16),
 				(INT16)dma_register[DMA_XSTART], (INT16)dma_register[DMA_YSTART],
 				dma_register[DMA_WIDTH], dma_register[DMA_HEIGHT], (INT16)dma_register[DMA_ROWBYTES]);
-		logerror("  palette=%04X color=%04X\n",
+		loginfo(2,"  palette=%04X color=%04X\n",
 				dma_register[DMA_PALETTE], dma_register[DMA_COLOR]);
 	}
 #endif

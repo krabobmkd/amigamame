@@ -304,8 +304,8 @@ WRITE16_HANDLER( twincobr_fgscroll_w )
 
 WRITE16_HANDLER( twincobr_exscroll_w )	/* Extra unused video layer */
 {
-	if (offset == 0) logerror("PC - write %04x to unknown video scroll Y register\n",data);
-	else logerror("PC - write %04x to unknown video scroll X register\n",data);
+	if (offset == 0) loginfo(2,"PC - write %04x to unknown video scroll Y register\n",data);
+	else loginfo(2,"PC - write %04x to unknown video scroll X register\n",data);
 }
 
 /******************** Wardner interface to this hardware ********************/
@@ -350,9 +350,9 @@ WRITE8_HANDLER( wardner_exscroll_w )	/* Extra unused video layer */
 	switch (offset)
 	{
 		case 01:	data <<= 8;
-		case 00:	logerror("PC - write %04x to unknown video scroll X register\n",data); break;
+		case 00:	loginfo(2,"PC - write %04x to unknown video scroll X register\n",data); break;
 		case 03:	data <<= 8;
-		case 02:	logerror("PC - write %04x to unknown video scroll Y register\n",data); break;
+		case 02:	loginfo(2,"PC - write %04x to unknown video scroll Y register\n",data); break;
 	}
 }
 
@@ -441,14 +441,14 @@ void twincobr_log_vram(void)
 		offs_t tile_voffs;
 		int tcode[3];
 		while (code_pressed(KEYCODE_M)) ;
-		logerror("Scrolls             BG-X BG-Y  FG-X FG-Y  TX-X  TX-Y\n");
-		logerror("------>             %04x %04x  %04x %04x  %04x  %04x\n",bgscrollx,bgscrolly,fgscrollx,fgscrolly,txscrollx,txscrolly);
+		loginfo(2,"Scrolls             BG-X BG-Y  FG-X FG-Y  TX-X  TX-Y\n");
+		loginfo(2,"------>             %04x %04x  %04x %04x  %04x  %04x\n",bgscrollx,bgscrolly,fgscrollx,fgscrolly,txscrollx,txscrolly);
 		for ( tile_voffs = 0; tile_voffs < (twincobr_txvideoram_size/2); tile_voffs++ )
 		{
 			tcode[1] = twincobr_bgvideoram16[tile_voffs];
 			tcode[2] = twincobr_fgvideoram16[tile_voffs];
 			tcode[3] = twincobr_txvideoram16[tile_voffs];
-			logerror("$(%04x)  (Col-Tile) BG1:%01x-%03x  FG1:%01x-%03x  TX1:%02x-%03x\n", tile_voffs,
+			loginfo(2,"$(%04x)  (Col-Tile) BG1:%01x-%03x  FG1:%01x-%03x  TX1:%02x-%03x\n", tile_voffs,
 							tcode[1] & 0xf000 >> 12, tcode[1] & 0x0fff,
 							tcode[2] & 0xf000 >> 12, tcode[2] & 0x0fff,
 							tcode[3] & 0xf800 >> 11, tcode[3] & 0x07ff);
@@ -457,14 +457,14 @@ void twincobr_log_vram(void)
 		{
 			tcode[1] = twincobr_bgvideoram16[tile_voffs];
 			tcode[2] = twincobr_fgvideoram16[tile_voffs];
-			logerror("$(%04x)  (Col-Tile) BG1:%01x-%03x  FG1:%01x-%03x\n", tile_voffs,
+			loginfo(2,"$(%04x)  (Col-Tile) BG1:%01x-%03x  FG1:%01x-%03x\n", tile_voffs,
 							tcode[1] & 0xf000 >> 12, tcode[1] & 0x0fff,
 							tcode[2] & 0xf000 >> 12, tcode[2] & 0x0fff);
 		}
 		for ( tile_voffs = (twincobr_fgvideoram_size/2); tile_voffs < (twincobr_bgvideoram_size/2); tile_voffs++ )
 		{
 			tcode[1] = twincobr_bgvideoram16[tile_voffs];
-			logerror("$(%04x)  (Col-Tile) BG1:%01x-%03x\n", tile_voffs,
+			loginfo(2,"$(%04x)  (Col-Tile) BG1:%01x-%03x\n", tile_voffs,
 							tcode[1] & 0xf000 >> 12, tcode[1] & 0x0fff);
 		}
 	}

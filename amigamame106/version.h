@@ -4,7 +4,7 @@
 
 #include "mame_ver.h"
 
-#define APPNAMEA  "Mame 0.106 MiniMix 2024 Beta3d"
-#define APPVERNUM  "a0.3d"
+#define APPNAMEA  "Mame 0.106 MiniMix 2024 Beta4"
+#define APPVERNUM  "a0.4"
 
 #endif

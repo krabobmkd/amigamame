@@ -33,7 +33,7 @@ void errormsg(const char* extmsg, const char* usermsg, const char* zipname) {
 	if (!gUnzipQuiet)
 		printf("Error in zipfile %s\n%s\n", zipname, usermsg);
 	/* Output to log file with all informations */
-	logerror("Error in zipfile %s: %s\n", zipname, extmsg);
+	loginfo(2,"Error in zipfile %s: %s\n", zipname, extmsg);
 }
 
 /* -------------------------------------------------------------------------
@@ -126,7 +126,7 @@ static int ecd_read(zip_file* zip) {
 			/* double buffer */
 			buf_length = 2*buf_length;
 
-			logerror("Retry reading of zip ecd for %d bytes\n",buf_length);
+			loginfo(2,"Retry reading of zip ecd for %d bytes\n",buf_length);
 
 		} else {
 			return -1;
@@ -493,7 +493,7 @@ static int inflate_file(osd_file* in_file, unsigned in_size, unsigned char* out_
      */
     if (err != Z_OK)
 	{
-		logerror("inflateInit error: %d\n", err);
+		loginfo(2,"inflateInit error: %d\n", err);
         return -1;
 	}
 
@@ -505,7 +505,7 @@ static int inflate_file(osd_file* in_file, unsigned in_size, unsigned char* out_
 	{
 		if (in_size <= 0)
 		{
-			logerror("inflate error: compressed size too small\n");
+			loginfo(2,"inflate error: compressed size too small\n");
 			free (in_buffer);
 			return -1;
 		}
@@ -520,7 +520,7 @@ static int inflate_file(osd_file* in_file, unsigned in_size, unsigned char* out_
 			break;
 		if (err != Z_OK)
 		{
-			logerror("inflate error: %d\n", err);
+			loginfo(2,"inflate error: %d\n", err);
 			free (in_buffer);
 			return -1;
 		}
@@ -529,7 +529,7 @@ static int inflate_file(osd_file* in_file, unsigned in_size, unsigned char* out_
     err = inflateEnd(&d_stream);
 	if (err != Z_OK)
 	{
-		logerror("inflateEnd error: %d\n", err);
+		loginfo(2,"inflateEnd error: %d\n", err);
 		free (in_buffer);
 		return -1;
 	}
@@ -538,7 +538,7 @@ static int inflate_file(osd_file* in_file, unsigned in_size, unsigned char* out_
 
 	if ((d_stream.avail_out > 0) || (in_size > 0))
 	{
-		logerror("zip size mismatch. %i\n", in_size);
+		loginfo(2,"zip size mismatch. %i\n", in_size);
 		return -1;
 	}
 
@@ -649,7 +649,7 @@ static zip_file* cache_openzip(int pathtype, int pathindex, const char* zipfile)
 			unsigned j;
 
 /*
-            logerror("Zip cache HIT  for %s\n", zipfile);
+            loginfo(2,"Zip cache HIT  for %s\n", zipfile);
 */
 
 			/* reset the zip directory */
@@ -671,7 +671,7 @@ static zip_file* cache_openzip(int pathtype, int pathindex, const char* zipfile)
 	/* not found */
 
 /*
-    logerror("Zip cache FAIL for %s\n", zipfile);
+    loginfo(2,"Zip cache FAIL for %s\n", zipfile);
 */
 //printf("cache_openzip: not in cache, go openzip\n ");
 	/* open the zip */

@@ -67,7 +67,7 @@ cpu_config *driver_add_cpu(machine_config *machine, const char *tag, int type, i
 			return &machine->cpu[cpunum];
 		}
 
-	logerror("Out of CPU's!\n");
+	loginfo(2,"Out of CPU's!\n");
 	return NULL;
 }
 
@@ -85,7 +85,7 @@ cpu_config *driver_find_cpu(machine_config *machine, const char *tag)
 		if (machine->cpu[cpunum].tag && strcmp(machine->cpu[cpunum].tag, tag) == 0)
 			return &machine->cpu[cpunum];
 
-	logerror("Can't find CPU '%s'!\n", tag);
+	loginfo(2,"Can't find CPU '%s'!\n", tag);
 	return NULL;
 }
 
@@ -107,7 +107,7 @@ void driver_remove_cpu(machine_config *machine, const char *tag)
 			return;
 		}
 
-	logerror("Can't find CPU '%s'!\n", tag);
+	loginfo(2,"Can't find CPU '%s'!\n", tag);
 }
 
 
@@ -130,7 +130,7 @@ speaker_config *driver_add_speaker(machine_config *machine, const char *tag, flo
 			return &machine->speaker[speakernum];
 		}
 
-	logerror("Out of speakers!\n");
+	loginfo(2,"Out of speakers!\n");
 	return NULL;
 }
 
@@ -148,7 +148,7 @@ speaker_config *driver_find_speaker(machine_config *machine, const char *tag)
 		if (machine->speaker[speakernum].tag && strcmp(machine->speaker[speakernum].tag, tag) == 0)
 			return &machine->speaker[speakernum];
 
-	logerror("Can't find speaker '%s'!\n", tag);
+	loginfo(2,"Can't find speaker '%s'!\n", tag);
 	return NULL;
 }
 
@@ -170,7 +170,7 @@ void driver_remove_speaker(machine_config *machine, const char *tag)
 			return;
 		}
 
-	logerror("Can't find speaker '%s'!\n", tag);
+	loginfo(2,"Can't find speaker '%s'!\n", tag);
 }
 
 
@@ -194,7 +194,7 @@ sound_config *driver_add_sound(machine_config *machine, const char *tag, int typ
 			return &machine->sound[soundnum];
 		}
 
-	logerror("Out of sounds!\n");
+	loginfo(2,"Out of sounds!\n");
 	return NULL;
 }
 
@@ -212,7 +212,7 @@ sound_config *driver_find_sound(machine_config *machine, const char *tag)
 		if (machine->sound[soundnum].tag && strcmp(machine->sound[soundnum].tag, tag) == 0)
 			return &machine->sound[soundnum];
 
-	logerror("Can't find sound '%s'!\n", tag);
+	loginfo(2,"Can't find sound '%s'!\n", tag);
 	return NULL;
 }
 
@@ -234,7 +234,7 @@ void driver_remove_sound(machine_config *machine, const char *tag)
 			return;
 		}
 
-	logerror("Can't find sound '%s'!\n", tag);
+	loginfo(2,"Can't find sound '%s'!\n", tag);
 }
 
 

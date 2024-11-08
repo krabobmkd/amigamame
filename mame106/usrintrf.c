@@ -3611,26 +3611,26 @@ static void onscrd_brightness(int increment,int arg)
 	displayosd(buf,brightness*100,100);
 }
 
-static void onscrd_gamma(int increment,int arg)
-{
-	char buf[20];
-	double gamma_correction;
+//static void onscrd_gamma(int increment,int arg)
+//{
+//	char buf[20];
+//	double gamma_correction;
 
-	if (increment)
-	{
-		gamma_correction = palette_get_global_gamma();
+//	if (increment)
+//	{
+//		gamma_correction = palette_get_global_gamma();
 
-		gamma_correction += 0.05 * increment;
-		if (gamma_correction < 0.5) gamma_correction = 0.5;
-		if (gamma_correction > 2.0) gamma_correction = 2.0;
+//		gamma_correction += 0.05 * increment;
+//		if (gamma_correction < 0.5) gamma_correction = 0.5;
+//		if (gamma_correction > 2.0) gamma_correction = 2.0;
 
-		palette_set_global_gamma(gamma_correction);
-	}
-	gamma_correction = palette_get_global_gamma();
+//		palette_set_global_gamma(gamma_correction);
+//	}
+//	gamma_correction = palette_get_global_gamma();
 
-	sprintf(buf,"%s %1.2f", ui_getstring (UI_gamma), gamma_correction);
-	displayosd(buf,100*(gamma_correction-0.5)/(2.0-0.5),100*(1.0-0.5)/(2.0-0.5));
-}
+//	sprintf(buf,"%s %1.2f", ui_getstring (UI_gamma), gamma_correction);
+//	displayosd(buf,100*(gamma_correction-0.5)/(2.0-0.5),100*(1.0-0.5)/(2.0-0.5));
+//}
 
 static void onscrd_vector_flicker(int increment,int arg)
 {
@@ -3787,9 +3787,9 @@ static void onscrd_init(void)
 	onscrd_arg[item] = 0;
 	item++;
 
-	onscrd_fnc[item] = onscrd_gamma;
-	onscrd_arg[item] = 0;
-	item++;
+//	onscrd_fnc[item] = onscrd_gamma;
+//	onscrd_arg[item] = 0;
+//	item++;
 
 	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
 	{

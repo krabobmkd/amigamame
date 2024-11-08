@@ -204,7 +204,7 @@ void galpani3_mcu_run(void)
 	UINT16 mcu_offset  = mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */
 	UINT16 mcu_subcmd  = mcu_ram[0x0014/2];		/* sub-command parameter, happens only for command #4 */
 
-	logerror("(PC=%06X): MCU executed command : %04X %04X\n",activecpu_get_pc(),mcu_command,mcu_offset*2);
+	loginfo(2,"(PC=%06X): MCU executed command : %04X %04X\n",activecpu_get_pc(),mcu_command,mcu_offset*2);
 
 	/* the only MCU commands found in program code are:
          0x04: protection: provide code/data, that's exactly where we are stuck !!!
@@ -217,7 +217,7 @@ void galpani3_mcu_run(void)
 		case 0x03:	// DSW
 		{
 			mcu_ram[mcu_offset] = readinputport(3);
-			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n",activecpu_get_pc(),mcu_command,mcu_offset*2);
+			loginfo(2,"PC=%06X : MCU executed command: %04X %04X (read DSW)\n",activecpu_get_pc(),mcu_command,mcu_offset*2);
 		}
 		break;
 
@@ -264,7 +264,7 @@ void galpani3_mcu_run(void)
 					break;
 
 				default: /* most likely never happen, unless it's done by code provided by MCU itself */
-					logerror("- UNKNOWN PARAMETER %02X", mcu_subcmd);
+					loginfo(2,"- UNKNOWN PARAMETER %02X", mcu_subcmd);
 					break;
 			}
 		}
@@ -277,7 +277,7 @@ void galpani3_mcu_run(void)
 		break;
 
 		default:
-			logerror("UNKNOWN COMMAND\n");
+			loginfo(2,"UNKNOWN COMMAND\n");
 	}
 }
 
@@ -306,7 +306,7 @@ GALPANI3_MCU_COM_W(3)
 
 READ16_HANDLER( galpani3_mcu_status_r )
 {
-	logerror("cpu #%d (PC=%06X): read mcu status\n", cpu_getactivecpu(), activecpu_get_previouspc());
+	loginfo(2,"cpu #%d (PC=%06X): read mcu status\n", cpu_getactivecpu(), activecpu_get_previouspc());
 	return 0;
 }
 

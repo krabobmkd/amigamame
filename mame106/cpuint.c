@@ -250,7 +250,7 @@ static void cpunum_empty_event_queue(int cpu_and_inputline)
 					break;
 
 				default:
-					logerror("cpunum_empty_event_queue cpu #%d, line %d, unknown state %d\n", cpunum, line, state);
+					loginfo(2,"cpunum_empty_event_queue cpu #%d, line %d, unknown state %d\n", cpunum, line, state);
 			}
 
 			/* generate a trigger to unsuspend any CPUs waiting on the interrupt */
@@ -309,7 +309,7 @@ void cpunum_set_input_line_and_vector(int cpunum, int line, int state, int vecto
 			input_event_index[cpunum][line]--;
 			cpunum_empty_event_queue(cpunum | (line << 8));
 			event_index = input_event_index[cpunum][line]++;
-			logerror("Exceeded pending input line event queue on CPU %d!\n", cpunum);
+			loginfo(2,"Exceeded pending input line event queue on CPU %d!\n", cpunum);
 		}
 
 		/* enqueue the event */

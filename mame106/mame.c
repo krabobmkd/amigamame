@@ -173,10 +173,7 @@ static region_info mem_region[MAX_MEMORY_REGIONS];
 static UINT32 rand_seed;
 
 /* logerror calback info */
-static callback_item *logerror_callback_list;
-
-/* a giant string buffer for temporary strings */
-char giant_string_buffer[65536];
+//static callback_item *logerror_callback_list;
 
 /* the "disclaimer" that should be printed when run with no parameters */
 const char *mame_disclaimer =
@@ -247,7 +244,7 @@ static void handle_save(void);
 static void handle_load(void);
 
 
-static void logfile_callback(const char *buffer);
+//static void logfile_callback(const char *buffer);
 
 
 /***************************************************************************
@@ -293,22 +290,22 @@ int run_game(int game)
 			begin_resource_tracking();
 
 			/* if we have a logfile, set up the callback */
-			logerror_callback_list = NULL;
-			if (options.logfile)
-				add_logerror_callback(logfile_callback);
+//			logerror_callback_list = NULL;
+//			if (options.logfile)
+//				add_logerror_callback(logfile_callback);
 
 			/* create the Machine structure and driver */
-			printf("create_machine\n");
+//			printf("create_machine\n");
 			create_machine(game);
-			printf("init_machine\n");
+//			printf("init_machine\n");
 			/* then finish setting up our local machine */
 			init_machine();
-			printf("init_machine ok \n");
+//			printf("init_machine ok \n");
 			/* load the configuration settings and NVRAM */
 			settingsloaded = config_load_settings();
-			printf("after config_load_settings\n");
+//			printf("after config_load_settings\n");
 			nvram_load();
-			printf("after nvram_load \n");
+//			printf("after nvram_load \n");
 			/* initialize the UI and display the startup screens */
 			if (ui_init(!settingsloaded && !options.skip_disclaimer, !options.skip_warnings, !options.skip_gameinfo) != 0)
 				fatalerror("User cancelled");
@@ -858,13 +855,11 @@ void CLIB_DECL fatalerror(const char *text, ...)
 {
 	va_list arg;
 
-	/* dump to the buffer; assume no one writes >2k lines this way */
 	va_start(arg, text);
-	vsnprintf(giant_string_buffer, sizeof(giant_string_buffer), text, arg);
+	vloginfo(2,text, arg);
 	va_end(arg);
 
 	/* output and return */
-	printf("%s\n", giant_string_buffer);
 	if (fatal_error_jmpbuf_valid)
   		longjmp(fatal_error_jmpbuf, 1);
 	else
@@ -873,60 +868,23 @@ void CLIB_DECL fatalerror(const char *text, ...)
 
 
 /*-------------------------------------------------
-    logerror - log to the debugger and any other
-    OSD-defined output streams
--------------------------------------------------*/
-
-void CLIB_DECL logerror(const char *text, ...)
-{
-//    // VF, add error on output
-//    printf("\r"); // rewrite line
-//    va_list arg;
-//	va_start(arg, text);
-//    vprintf(text, arg);
-//    va_end(arg);
-//    printf("                       ");
-	callback_item *cb;
-
-	/* process only if there is a target */
-	if (logerror_callback_list)
-	{
-		va_list arg;
-
-		profiler_mark(PROFILER_LOGERROR);
-
-		/* dump to the buffer */
-		va_start(arg, text);
-		vsnprintf(giant_string_buffer, sizeof(giant_string_buffer), text, arg);
-		va_end(arg);
-
-		/* log to all callbacks */
-		for (cb = logerror_callback_list; cb; cb = cb->next)
-			cb->func.log(giant_string_buffer);
-
-		profiler_mark(PROFILER_END);
-	}
-}
-
-
-/*-------------------------------------------------
     add_logerror_callback - adds a callback to be
-    called on logerror()
+    called on loginfo(2,)
 -------------------------------------------------*/
 
-void add_logerror_callback(void (*callback)(const char *))
-{
-	callback_item *cb, **cur;
+//void add_logerror_callback(void (*callback)(const char *))
+//{
+//	callback_item *cb, **cur;
 
-	assert_always(mame_get_phase() == MAME_PHASE_INIT, "Can only call add_logerror_callback at init time!");
+//	assert_always(mame_get_phase() == MAME_PHASE_INIT, "Can only call add_logerror_callback at init time!");
 
-	cb = auto_malloc(sizeof(*cb));
-	cb->func.log = callback;
-	cb->next = NULL;
+//	cb = auto_malloc(sizeof(*cb));
+//	cb->func.log = callback;
+//	cb->next = NULL;
 
-	for (cur = &logerror_callback_list; *cur; cur = &(*cur)->next) ;
-	*cur = cb;
-}
+//	for (cur = &logerror_callback_list; *cur; cur = &(*cur)->next) ;
+//	*cur = cb;
+//}
 
 
 /*-------------------------------------------------
@@ -934,11 +892,11 @@ void add_logerror_callback(void (*callback)(const char *))
     logfile
 -------------------------------------------------*/
 
-static void logfile_callback(const char *buffer)
-{
-	if (options.logfile)
-		mame_fputs(options.logfile, buffer);
-}
+//static void logfile_callback(const char *buffer)
+//{
+//	if (options.logfile)
+//		mame_fputs(options.logfile, buffer);
+//}
 
 
 /*-------------------------------------------------
@@ -1099,12 +1057,12 @@ static void init_machine(void)
 	timer_init();
 	soft_reset_timer = timer_alloc(soft_reset);
 
-printf(" ** init_machine after timer_alloc\n");
+//printf(" ** init_machine after timer_alloc\n");
 	mame_time target = mame_timer_next_fire_time();
 //	mame_time base = mame_timer_get_time();
 //	int cpunum, ran;
 
-    printf("cpuexec_timeslice target %d %ld \n",target.seconds , target.subseconds);
+//    printf("cpuexec_timeslice target %d %ld \n",target.seconds , target.subseconds);
 
 
 	/* initialize the memory system for this game */
@@ -1184,7 +1142,7 @@ static void soft_reset(int param)
 {
 	callback_item *cb;
 
-	logerror("Soft reset\n");
+	loginfo(2,"Soft reset\n");
 
 	/* temporarily in the reset phase */
 	current_phase = MAME_PHASE_RESET;

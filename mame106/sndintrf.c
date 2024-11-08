@@ -921,7 +921,7 @@ const char *sndtype_get_info_string(int sndtype, UINT32 state)
 
 static void *dummy_sound_start(int index, int clock, const void *config)
 {
-	logerror("Warning: starting a dummy sound core -- you are missing a hookup in sndintrf.c!\n");
+	loginfo(2,"Warning: starting a dummy sound core -- you are missing a hookup in sndintrf.c!\n");
 	return auto_malloc(1);
 }
 

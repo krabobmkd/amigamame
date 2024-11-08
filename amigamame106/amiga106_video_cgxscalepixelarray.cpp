@@ -173,7 +173,7 @@ Intuition_Screen_CGXScale::Intuition_Screen_CGXScale(const AbstractDisplay::para
         if(_ScreenModeId == INVALID_ID)
         {
             printf("Can't find cyber screen mode for w%d h%d d%d\n",width,height,_screenDepthAsked);
-            //logerror("Can't find cyber screen mode for w%d h%d d%d ",width,height,_screenDepthAsked);
+            //loginfo(2,"Can't find cyber screen mode for w%d h%d d%d ",width,height,_screenDepthAsked);
             return;
         }
 

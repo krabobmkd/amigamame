@@ -76,7 +76,7 @@ static WRITE8_HANDLER( exerion_portb_w )
 	porta = memory_region(REGION_CPU1)[0x5f76];
 	portb = data;
 
-	logerror("Port B = %02X\n", data);
+	loginfo(2,"Port B = %02X\n", data);
 }
 
 

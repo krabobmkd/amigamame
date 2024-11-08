@@ -297,7 +297,7 @@ WRITE8_HANDLER( taitosj_colorbank_w )
 {
 	if (taitosj_colorbank[offset] != data)
 	{
-logerror("colorbank %d = %02x\n",offset,data);
+loginfo(2,"colorbank %d = %02x\n",offset,data);
 		memset(dirtybuffer,1,videoram_size);
 		memset(dirtybuffer2,1,videoram_size);
 		memset(dirtybuffer3,1,videoram_size);
@@ -312,7 +312,7 @@ WRITE8_HANDLER( taitosj_videoenable_w )
 {
 	if (taitosj_video_enable != data)
 	{
-logerror("videoenable = %02x\n",data);
+loginfo(2,"videoenable = %02x\n",data);
 
 		if ((taitosj_video_enable & 3) != (data & 3))
 		{
@@ -331,7 +331,7 @@ logerror("videoenable = %02x\n",data);
 			taitosj_spritebank = spriteram;
 
 		if ((taitosj_video_enable & 4) != (data & 4))
-			logerror( "sprite bank[%d]\n", (data & 4) >> 2 );
+			loginfo(2, "sprite bank[%d]\n", (data & 4) >> 2 );
 
 		taitosj_video_enable = data;
 	}

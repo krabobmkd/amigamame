@@ -57,7 +57,7 @@ static UINT8 adjusted_palette_dirty;
 static UINT8 debug_palette_dirty;
 
 static UINT16 shadow_factor, highlight_factor;
-static double global_brightness, global_brightness_adjust, global_gamma;
+static float global_brightness, global_brightness_adjust/*, global_gamma*/;
 
 static UINT8 colormode, highlight_method;
 static pen_t total_colors;
@@ -145,11 +145,11 @@ int palette_start(void)
 	adjusted_palette_dirty = 1;
 	debug_palette_dirty = 1;
 
-	shadow_factor = (int)(PALETTE_DEFAULT_SHADOW_FACTOR * (double)(1 << PEN_BRIGHTNESS_BITS));
-	highlight_factor = (int)(PALETTE_DEFAULT_HIGHLIGHT_FACTOR * (double)(1 << PEN_BRIGHTNESS_BITS));
+	shadow_factor = (int)(PALETTE_DEFAULT_SHADOW_FACTOR * (float)(1 << PEN_BRIGHTNESS_BITS));
+	highlight_factor = (int)(PALETTE_DEFAULT_HIGHLIGHT_FACTOR * (float)(1 << PEN_BRIGHTNESS_BITS));
 	global_brightness = (options.brightness > .001f) ? options.brightness : 1.0f;
 	global_brightness_adjust = 1.0f;
-	global_gamma = (options.gamma > .001f) ? options.gamma : 1.0f;
+//	global_gamma = (options.gamma > .001f) ? options.gamma : 1.0f;
 
 	/* determine the color mode */
 	if (Machine->color_depth == 15)
@@ -165,7 +165,7 @@ int palette_start(void)
 	if ((Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
 			Machine->drv->color_table_len)
 	{
-		logerror("Error: VIDEO_RGB_DIRECT requires color_table_len to be 0.\n");
+		loginfo(2,"Error: VIDEO_RGB_DIRECT requires color_table_len to be 0.\n");
 		return 1;
 	}
 
@@ -180,7 +180,7 @@ int palette_start(void)
 	/* make sure we still fit in 16 bits */
 	if (total_colors > 65536)
 	{
-		logerror("Error: palette has more than 65536 colors.\n");
+		loginfo(2,"Error: palette has more than 65536 colors.\n");
 		return 1;
 	}
 
@@ -981,12 +981,29 @@ static void recompute_adjusted_palette(int brightness_or_gamma_changed)
 
 	/* regenerate the color correction table if needed */
 	if (brightness_or_gamma_changed)
-		for (i = 0; i < sizeof(color_correct_table); i++)
-		{
-			int value = (int)(255.0 * (global_brightness * global_brightness_adjust) * pow((double)i * (1.0 / 255.0), 1.0 / global_gamma) + 0.5);
-			color_correct_table[i] = (value < 0) ? 0 : (value > 255) ? 255 : value;
-		}
+	{
+        float brightns = 255.0f * (global_brightness * global_brightness_adjust);
 
+// krb: thers seems to have problems with pow() and powf() with gcc bebbo -> remove all that.
+ //       if(global_gamma == 1.0f)
+        {
+            for (i = 0; i < sizeof(color_correct_table); i++)
+            {
+                int value = (int)(brightns * (float)i * (1.0f / 255.0f) + 0.5f); // krb: why +0.5 ??
+                color_correct_table[i] = (value < 0) ? 0 : (value > 255) ? 255 : value;
+            }
+        }
+        /*
+        else
+        {
+            float gammafactor =  1.0f / global_gamma;
+            for (i = 0; i < sizeof(color_correct_table); i++)
+            {
+                int value = (int)(brightns * powf((float)i * (1.0f / 255.0f),gammafactor) + 0.5f);
+                color_correct_table[i] = (value < 0) ? 0 : (value > 255) ? 255 : value;
+            }
+		}*/
+    }
 	/* now update all the palette entries */
 	for (i = 0; i < Machine->drv->total_colors; i++)
 		internal_modify_pen(i, game_palette[i], pen_brightness[i]);
@@ -1017,7 +1034,7 @@ void palette_set_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b)
 	/* make sure we're in range */
 	if (pen >= total_colors)
 	{
-		logerror("error: palette_set_color() called with color %d, but only %d allocated.\n", pen, total_colors);
+		loginfo(2,"error: palette_set_color() called with color %d, but only %d allocated.\n", pen, total_colors);
 		return;
 	}
 
@@ -1129,15 +1146,15 @@ void palette_set_highlight_factor(double factor)
     gamma factor
 -------------------------------------------------*/
 
-void palette_set_global_gamma(double _gamma)
-{
-	/* if the gamma changed, recompute */
-	if (global_gamma != _gamma)
-	{
-		global_gamma = _gamma;
-		recompute_adjusted_palette(1);
-	}
-}
+//void palette_set_global_gamma(double _gamma)
+//{
+//	/* if the gamma changed, recompute */
+//	if (global_gamma != _gamma)
+//	{
+//		global_gamma = _gamma;
+//		recompute_adjusted_palette(1);
+//	}
+//}
 
 
 
@@ -1146,10 +1163,10 @@ void palette_set_global_gamma(double _gamma)
     gamma factor
 -------------------------------------------------*/
 
-double palette_get_global_gamma(void)
-{
-	return global_gamma;
-}
+//double palette_get_global_gamma(void)
+//{
+//	return global_gamma;
+//}
 
 
 

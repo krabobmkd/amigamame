@@ -162,7 +162,7 @@ static WRITE8_HANDLER( vb_scrollx_hi_w )
 	vb_scrollx_hi = (data & 0x02) << 7;
 	vb_bgprombank_w((data >> 2)&0x07);
 	vb_spprombank_w((data >> 5)&0x07);
-	//logerror("%04x: vb_scrollx_hi = %d\n",activecpu_get_previouspc(), vb_scrollx_hi);
+	//loginfo(2,"%04x: vb_scrollx_hi = %d\n",activecpu_get_previouspc(), vb_scrollx_hi);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -194,7 +194,7 @@ ADDRESS_MAP_END
 WRITE8_HANDLER(vb_scrollx_lo_w)
 {
 	vb_scrollx_lo = data;
-	//logerror("%04x: vb_scrollx_lo =%d\n",activecpu_get_previouspc(), vb_scrollx_lo);
+	//loginfo(2,"%04x: vb_scrollx_lo =%d\n",activecpu_get_previouspc(), vb_scrollx_lo);
 }
 
 //Cheaters note: Scores are stored in ram @ 0x57-0x58 (though the space is used for other things between matches)

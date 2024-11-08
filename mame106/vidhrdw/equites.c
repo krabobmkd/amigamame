@@ -221,7 +221,7 @@ static void splndrbt_prestep(
 	{
 		ps[i].sy = (unsigned)Dsum;
 		Dsum += (DA * D0) / ((DB * i + DC) * D1);
-		//logerror("dst_y=%3u src_y=%3u\n", i, ps[i].sy);
+		//loginfo(2,"dst_y=%3u src_y=%3u\n", i, ps[i].sy);
 	}
 }
 

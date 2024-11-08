@@ -36,11 +36,11 @@ INLINE void verboselog( int n_level, const char *s_fmt, ... )
 		va_end( v );
 		if( cpu_getactivecpu() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			loginfo(2, "%08x: %s", activecpu_get_pc(), buf );
 		}
 		else
 		{
-			logerror( "(timer) : %s", buf );
+			loginfo(2, "(timer) : %s", buf );
 		}
 	}
 }

@@ -314,7 +314,7 @@ static void sound_exit(void)
 #ifdef WIN32
 			printf("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", spk->speaker->tag, spk->max_sample, 32767.0 / (spk->max_sample ? spk->max_sample : 1), (int)((double)spk->clipped_samples * 100.0 / spk->total_samples));
 #else
-			logerror("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", spk->speaker->tag, spk->max_sample, 32767.0 / (spk->max_sample ? spk->max_sample : 1), (int)((double)spk->clipped_samples * 100.0 / spk->total_samples));
+			loginfo(2,"Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", spk->speaker->tag, spk->max_sample, 32767.0 / (spk->max_sample ? spk->max_sample : 1), (int)((double)spk->clipped_samples * 100.0 / spk->total_samples));
 #endif
 		}
 }
@@ -386,7 +386,7 @@ static int start_sound_chips(void)
 		num_regs = state_save_get_reg_count() - num_regs;
 		if (num_regs == 0)
 		{
-			logerror("Sound chip #%d (%s) did not register any state to save!\n", sndnum, sndnum_name(sndnum));
+			loginfo(2,"Sound chip #%d (%s) did not register any state to save!\n", sndnum, sndnum_name(sndnum));
 			if (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
 				fatalerror("Sound chip #%d (%s) did not register any state to save!", sndnum, sndnum_name(sndnum));
 		}
@@ -522,7 +522,7 @@ static int route_sound(void)
 			info->inputs = 0;
 		}
 		else
-			logerror("Warning: speaker \"%s\" has no inputs\n", info->speaker->tag);
+			loginfo(2,"Warning: speaker \"%s\" has no inputs\n", info->speaker->tag);
 	}
 
 	/* iterate again over all the sound chips */
@@ -998,12 +998,12 @@ void sndti_set_output_gain(int type, int index, int output, float gain)
 
 	if (sndnum < 0)
 	{
-		logerror("sndti_set_output_gain called for invalid sound type %d, index %d\n", type, index);
+		loginfo(2,"sndti_set_output_gain called for invalid sound type %d, index %d\n", type, index);
 		return;
 	}
 	if (output >= sound[sndnum].outputs)
 	{
-		logerror("sndti_set_output_gain called for invalid sound output %d (type %d, index %d)\n", output, type, index);
+		loginfo(2,"sndti_set_output_gain called for invalid sound output %d (type %d, index %d)\n", output, type, index);
 		return;
 	}
 	stream_set_output_gain(sound[sndnum].output[output].stream, sound[sndnum].output[output].output, gain);

@@ -299,7 +299,7 @@ void kageki_init_samples(void)
 		{
 			*dest++ = (INT8)((*scan++) ^ 0x80) * 256;
 		}
-	//  logerror("samples num:%02X ofs:%04X lng:%04X\n", i, start, size);
+	//  loginfo(2,"samples num:%02X ofs:%04X lng:%04X\n", i, start, size);
 	}
 }
 
@@ -328,7 +328,7 @@ static READ8_HANDLER( kageki_csport_r )
 			break;
 		default:
 			dsw = 0x00;
-		//  logerror("kageki_csport_sel error !! (0x%08X)\n", kageki_csport_sel);
+		//  loginfo(2,"kageki_csport_sel error !! (0x%08X)\n", kageki_csport_sel);
 	}
 
 	return (dsw & 0xff);

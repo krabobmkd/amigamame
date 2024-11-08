@@ -101,13 +101,8 @@ void osd_exit()
 int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
 {
     // 9B [N] 46 "\x1b[\x9b\x01m"
-   // if(romdata->romsloaded>1) printf("\r");
-    printf("load rom: %d/%d\r",romdata->romsloaded,romdata->romstotal);
-    fflush(stdout);
-    if(romdata->romsloaded == romdata->romstotal)
-    {
-        printf("\n");
-    }
+   // if(romdata->romsloaded>1) printf("\r");   
+    loginfo(0,"load rom: %d/%d\n",romdata->romsloaded,romdata->romstotal);
    return(0);
 }
 // -  - - - -
@@ -118,7 +113,7 @@ int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
 /* interface is still active while the game is paused. */
 void osd_pause(int paused)
 {
-    printf("osd_pause:%d\n",paused);
+//    printf("osd_pause:%d\n",paused);
 }
 
 

@@ -237,7 +237,7 @@ static READ16_HANDLER( mcu_r )
 			return input_port_3_word_r(0,0);
 
 	}
-logerror("CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
+loginfo(2,"CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
 
 	return mcu_ram[offset];
 }
@@ -303,7 +303,7 @@ static WRITE16_HANDLER( mcu_w )
 			break;
 		}
 		default:
-logerror("CPU0 PC %06x unknown MCU write offset: %04x data: %04x\n",activecpu_get_previouspc(),offset,data);
+loginfo(2,"CPU0 PC %06x unknown MCU write offset: %04x data: %04x\n",activecpu_get_previouspc(),offset,data);
 	}
 }
 
@@ -363,7 +363,7 @@ static READ16_HANDLER( cop2_mcu_r )
 			return input_port_3_word_r(0,0);
 
 	}
-logerror("CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
+loginfo(2,"CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
 
 	return mcu_ram[offset];
 }
@@ -435,7 +435,7 @@ static WRITE16_HANDLER( cop2_mcu_w )
 			break;
 		}
 		default:
-logerror("CPU0 PC %06x unknown MCU write offset: %04x data: %04x\n",activecpu_get_previouspc(),offset,data);
+loginfo(2,"CPU0 PC %06x unknown MCU write offset: %04x data: %04x\n",activecpu_get_previouspc(),offset,data);
 	}
 }
 
@@ -471,7 +471,7 @@ static READ16_HANDLER( godzilla_cop_mcu_r )
 			return input_port_3_word_r(0,0);
 
 	}
-//logerror("CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
+//loginfo(2,"CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
 
 	return mcu_ram[offset];
 }
@@ -503,7 +503,7 @@ static WRITE16_HANDLER( godzilla_cop_mcu_w )
 			break;
 		}
 //      default:
-//      logerror("CPU0 PC %06x MCU write offset: %04x data: %04x\n",activecpu_get_previouspc(),offset*2,data);
+//      loginfo(2,"CPU0 PC %06x MCU write offset: %04x data: %04x\n",activecpu_get_previouspc(),offset*2,data);
 	}
 }
 
@@ -540,7 +540,7 @@ static READ16_HANDLER( sdgndmrb_cop_mcu_r )
 			return input_port_5_word_r(0,0);
 	}
 //  return rand();
-//  logerror("CPU0 PC %06x MCU read offset: %04x\n",activecpu_get_previouspc(),offset*2);
+//  loginfo(2,"CPU0 PC %06x MCU read offset: %04x\n",activecpu_get_previouspc(),offset*2);
 //  ui_popup("CPU0 PC %06x MCU read offset: %04x",activecpu_get_previouspc(),offset*2);
 
 	return mcu_ram[offset];
@@ -635,7 +635,7 @@ static WRITE16_HANDLER( sdgndmrb_cop_mcu_w )
 		}
 
 //      default:
-//      logerror("CPU0 PC %06x MCU write offset: %04x data: %04x\n",activecpu_get_previouspc(),offset*2,data);
+//      loginfo(2,"CPU0 PC %06x MCU write offset: %04x data: %04x\n",activecpu_get_previouspc(),offset*2,data);
 //      ui_popup("CPU0 PC %06x MCU write offset: %04x data: %04x",activecpu_get_previouspc(),offset*2,data);
 	}
 }

@@ -430,10 +430,10 @@ WRITE8_HANDLER( m72_port02_w )
 {
 	if (offset != 0)
 	{
-		if (data) logerror("write %02x to port 03\n",data);
+		if (data) loginfo(2,"write %02x to port 03\n",data);
 		return;
 	}
-	if (data & 0xe0) logerror("write %02x to port 02\n",data);
+	if (data & 0xe0) loginfo(2,"write %02x to port 02\n",data);
 
 	/* bits 0/1 are coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -458,10 +458,10 @@ WRITE8_HANDLER( rtype2_port02_w )
 {
 	if (offset != 0)
 	{
-		if (data) logerror("write %02x to port 03\n",data);
+		if (data) loginfo(2,"write %02x to port 03\n",data);
 		return;
 	}
-	if (data & 0xe0) logerror("write %02x to port 02\n",data);
+	if (data & 0xe0) loginfo(2,"write %02x to port 02\n",data);
 
 	/* bits 0/1 are coin counters */
 	coin_counter_w(0,data & 0x01);

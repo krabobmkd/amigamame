@@ -121,7 +121,7 @@ static unsigned char mcu_val;
 static WRITE8_HANDLER( mcu_data_w )
 {
 #ifdef MAME_DEBUG
-	logerror("mcu_data_w = %x\n",data);
+	loginfo(2,"mcu_data_w = %x\n",data);
 #endif
 	mcu_val = data;
 	/* HW test */
@@ -507,7 +507,7 @@ static const gfx_decode gfxdecodeinfo[] =
 static WRITE8_HANDLER( portb_w )
 {
 	/* don't know what this is... could be a filter */
-	if (data != 0x00) logerror("portB = %02x\n",data);
+	if (data != 0x00) loginfo(2,"portB = %02x\n",data);
 }
 
 static struct AY8910interface ay8910_interface =

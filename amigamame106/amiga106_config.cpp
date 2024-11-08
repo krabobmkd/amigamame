@@ -8,6 +8,7 @@
 // from mame
 extern "C" {
     #include "driver.h"
+    #include "mame.h"
     // use xml from mame
     #include "xmlfile.h"
 
@@ -41,15 +42,12 @@ MameConfig::MameConfig() : ASerializable()
     , _sortMode(SortMode::Name)
     , _romsFoundTouched(false)
 {
-    printf("MameConfig::MameConfig()\n");
     try {
         initDriverIndex();
     } catch(const exception &e)
     {
-        printf("initDriverIndex exception:%s\n",e.what());
+        loginfo(2,"initDriverIndex exception:%s\n",e.what());
     }
-
-    printf("MameConfig::MameConfig() end\n");
 }
 MameConfig::~MameConfig()
 {}
@@ -134,11 +132,6 @@ int MameConfig::save()
     if(_activeDriver !=-1)
     {
         xml_add_child(confignode,pcf_last, drivers[_activeDriver]->name );
-    }
-    if(_listShowState !=-1)
-    {
-        xml_data_node *pn = xml_add_child(confignode,pcf_list,NULL);
-        if(pn) xml_set_attribute_int(pn,"show",_listShowState);
     }
     if(_listShowState !=-1)
     {
@@ -288,7 +281,7 @@ void MameConfig::toDefault()
     _display._drawEngine = DrawEngine::CgxDirectCpuOrWPA8;
     _display._perScreenMode.clear();
     _display._color_brightness = 1.0f;
-    _display._color_gamma = 1.0f;
+    //old_display._color_gamma = 1.0f;
     _display._flags = 0;
     _display._buffering = ScreenBufferMode::Single;
 
@@ -358,8 +351,6 @@ bool MameConfig::Display_PerScreenMode::isDefault()
 
 MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode)
 {
-    printf("MameConfig::Display::Display()\n");
-
 }
 void MameConfig::Display::serialize(ASerializer &serializer)
 {
@@ -377,7 +368,7 @@ void MameConfig::Display::serialize(ASerializer &serializer)
                                             // min,max,step, default
     serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
                                          // min,max,step, default
-    serializer("Gamma",_color_gamma,0.125f,1.0f,0.0625f,1.0f);
+   //old serializer("Gamma",_color_gamma,0.125f,1.0f,0.0625f,1.0f);
 
     serializer("Per Screen Mode",_perScreenModeS);
 
@@ -389,7 +380,6 @@ MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
 
 MameConfig::Audio::Audio() : ASerializable()
 {
-    printf("MameConfig::Audio::Audio()\n");
 }
 
 void MameConfig::Audio::serialize(ASerializer &serializer)
@@ -401,7 +391,6 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
 extern "C" {
      int hasParallelPort();
 }MameConfig::Controls::Controls() : ASerializable() {
-    printf("MameConfig::Controls::Controls()\n");
 }
 
 void MameConfig::Controls::serialize(ASerializer &serializer)
@@ -453,41 +442,9 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         serializer("Types Pr4", (int&)_parallel_type[1],strPrlTypes);
     }
 
-//old
-//    vector<string> ports={
-//        "None",
-//        "Port 1(Mouse)",
-//        "Port 2(Joy)",
-//        "Port 3 Lowlevel.lib",
-//        "Port 4 Lowlevel.lib",
-//        "Parallel Port3(1bt)",
-//        "Parallel Port4(1bt)",
-//        "Parallel Port3(2bt)"
-//    };
-////#define SJA_TYPE_AUTOSENSE 0
-////#define SJA_TYPE_GAMECTLR  1
-////#define SJA_TYPE_MOUSE	   2
-////#define SJA_TYPE_JOYSTK    3
-//    // lowlevel
-//    vector<string> controlerTypesLL={
-//        "Auto Sense",
-//        "CD32 7bt Pad",
-//        "Mouse",
-//        "Joystick(2bt)",
-//    };
-//    serializer("Player1", (int&)_PlayerPort[0],ports);
-//    serializer("Type1", _PlayerPortType[0],controlerTypesLL);
-//    serializer("Player2",  (int&)_PlayerPort[1],ports);
-//    serializer("Type2", _PlayerPortType[1],controlerTypesLL);
-//    serializer("Player3", (int&) _PlayerPort[2],ports);
-//    serializer("Type3", _PlayerPortType[2],controlerTypesLL);
-//    serializer("Player4", (int&) _PlayerPort[3],ports);
-//    serializer("Type4", _PlayerPortType[3],controlerTypesLL);
-
 }
 
 MameConfig::Misc::Misc() : ASerializable() {
-    printf("MameConfig::Misc::Misc()\n");
 }
 
 void MameConfig::Misc::serialize(ASerializer &serializer)
@@ -500,7 +457,6 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
     serializer("Speed Limit %",_speedlimit,85.0f,125.0f,5.0f,100.0f);
 }
 MameConfig::Help::Help() : ASerializable() {
-    printf("MameConfig::Help::Help()\n");
 }
 
 
@@ -563,10 +519,6 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
     drv->drv(&machine);
     video_attribs = machine.video_attributes;
 
-//    if(nbPlayers)
-//    {
-//        *nbPlayers = driverGetNbPlayers(drv);
-//    }
     int width = (machine.default_visible_area.max_x - machine.default_visible_area.min_x)+1;
     int height = (machine.default_visible_area.max_y - machine.default_visible_area.min_y)+1;
     if(drv->flags & ORIENTATION_SWAP_XY) {
@@ -584,7 +536,7 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
 
 void MameConfig::initDriverIndex()
 {
-    printf("initDriverIndex() 1\n");
+   // printf("initDriverIndex() 1\n");
     // to be done once.
   int NumDrivers;
 
@@ -594,7 +546,7 @@ void MameConfig::initDriverIndex()
     if(drv->flags & (/*GAME_NOT_WORKING|*/NOT_A_DRIVER)) continue;
      _driverIndex.insert(drv->name,NumDrivers);
   }
-    printf("initDriverIndex() 3 . NumDrivers:%d\n",NumDrivers);
+  //  printf("initDriverIndex() 3 . NumDrivers:%d\n",NumDrivers);
   _NumDrivers =NumDrivers;
 
     // also get its screen id:
@@ -605,8 +557,6 @@ void MameConfig::initDriverIndex()
 //    _players.reserve(_NumDrivers);
 //    _players.resize(_NumDrivers);
 
-    printf("initDriverIndex() 4\n");
-
     for(NumDrivers = 0; drivers[NumDrivers]; NumDrivers++)
     {
         const game_driver *drv  =drivers[NumDrivers];
@@ -616,7 +566,6 @@ void MameConfig::initDriverIndex()
       //  _players[NumDrivers] = (UBYTE)nbp;
 
     }
-    printf("initDriverIndex() 5\n");
 }
 void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs/*, int &nbp*/)
 {
@@ -762,7 +711,6 @@ int MameConfig::isDriverFound(const _game_driver *const*drv)
     return (int)((_romsFoundReverse[idriver>>3] & (1<<(idriver & 7))) !=0);
 }
 
-
 void MameConfig::buildAllRomsVector(std::vector<const _game_driver *const*> &v)
 {
     v.reserve(_NumDrivers);
@@ -771,7 +719,7 @@ void MameConfig::buildAllRomsVector(std::vector<const _game_driver *const*> &v)
     {
         v[NumDrivers] = &drivers[NumDrivers];
     }
-//    sortDrivers(v);
+// now done by mui list    sortDrivers(v);
 }
 // from cheat.c
 extern "C" {
@@ -794,24 +742,10 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions)
 
     options.pause_bright = _display._color_brightness * 0.5f;
     options.brightness =   _display._color_brightness;
-    options.gamma= _display._color_gamma;
+  //old  options.gamma= _display._color_gamma;
 
     options.samplerate=(_audio._mode == AudioMode::None)?0:_audio._freq;
     options.use_samples = 0;
 
-    // ui_orientation
-
-   //  printf("MameConfig::applyToMameOptions applied samplerate:%d\n",options.samplerate);
-
-//todo/old...
-    //   options.ror        = (Config[CFG_ROTATION] == CFGR_RIGHT);
-    //   options.rol        = (Config[CFG_ROTATION] == CFGR_RIGHT);
-    //   options.flipx      = Config[CFG_FLIPX];
-    //   options.flipy      = Config[CFG_FLIPY];
-
-//    if(Config[CFG_SOUND] == CFGS_NO)
-//      options.samplerate  = 0;
-//    else
-//      options.samplerate  = 22000;
 }
 

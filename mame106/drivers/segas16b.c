@@ -1074,7 +1074,7 @@ static READ16_HANDLER( standard_io_r )
 		case 0x2000/2:
 			return readinputport(4 + (offset & 1));
 	}
-	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	loginfo(2,"%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(0,0);
 }
 
@@ -1105,7 +1105,7 @@ static WRITE16_HANDLER( standard_io_w )
 			coin_counter_w(0, data & 0x01);
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	loginfo(2,"%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
 }
 
 
@@ -1183,14 +1183,14 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 
 static READ16_HANDLER( unknown_rgn2_r )
 {
-	logerror("Region 2: read from %04X\n", offset * 2);
+	loginfo(2,"Region 2: read from %04X\n", offset * 2);
 	return segaic16_compare_timer_1_r(offset & 7, mem_mask);
 }
 
 
 static WRITE16_HANDLER( unknown_rgn2_w )
 {
-	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask ^ 0xffff);
+	loginfo(2,"Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask ^ 0xffff);
 	segaic16_compare_timer_1_w(offset & 7, data, mem_mask);
 }
 

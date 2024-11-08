@@ -248,7 +248,7 @@ static READ16_HANDLER( superman_dsw_input_r )
 		case 0x03:
 			return (readinputport (1) & 0xf0) >> 4;
 		default:
-			logerror("taitox unknown dsw read offset: %04x\n", offset);
+			loginfo(2,"taitox unknown dsw read offset: %04x\n", offset);
 			return 0x00;
 	}
 }
@@ -265,7 +265,7 @@ static READ16_HANDLER( daisenpu_input_r )
 			return readinputport(4);
 
 		default:
-			logerror("taitox unknown input read offset: %04x\n", offset);
+			loginfo(2,"taitox unknown input read offset: %04x\n", offset);
 			return 0x00;
 	}
 }
@@ -279,11 +279,11 @@ static WRITE16_HANDLER( daisenpu_input_w )
 			coin_counter_w(1,data & 0x02);
 			coin_lockout_w(0,~data & 0x04);
 			coin_lockout_w(1,~data & 0x08);
-//logerror("taitox coin control %04x to offset %04x\n",data,offset);
+//loginfo(2,"taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 
 		default:
-			logerror("taitox unknown input write %04x to offset %04x\n",data,offset);
+			loginfo(2,"taitox unknown input write %04x to offset %04x\n",data,offset);
 	}
 }
 
@@ -297,11 +297,11 @@ static WRITE16_HANDLER( kyustrkr_input_w )
 			coin_counter_w(1,data & 0x02);
 			coin_lockout_w(0,data & 0x04);
 			coin_lockout_w(1,data & 0x08);
-//logerror("taitox coin control %04x to offset %04x\n",data,offset);
+//loginfo(2,"taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 
 		default:
-			logerror("taitox unknown input write %04x to offset %04x\n",data,offset);
+			loginfo(2,"taitox unknown input write %04x to offset %04x\n",data,offset);
 	}
 }
 

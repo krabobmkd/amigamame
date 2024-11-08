@@ -37,11 +37,11 @@ INLINE void verboselog( int n_level, const char *s_fmt, ... )
 		va_end( v );
 		if( cpu_getactivecpu() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			loginfo(2, "%08x: %s", activecpu_get_pc(), buf );
 		}
 		else
 		{
-			logerror( "(timer) : %s", buf );
+			loginfo(2, "(timer) : %s", buf );
 		}
 	}
 }
@@ -1789,12 +1789,12 @@ static struct ide_interface atpsx_intf =
 
 static void atpsx_dma_read( UINT32 n_address, INT32 n_size )
 {
-	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
+	loginfo(2,"DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
 	if (n_address < 0xe0000)
 	{
 		// protect kernel+program space (what should we really do here?)
-		logerror( "skip read to low memory\n" );
+		loginfo(2, "skip read to low memory\n" );
 		return;
 	}
 
@@ -1810,7 +1810,7 @@ static void atpsx_dma_read( UINT32 n_address, INT32 n_size )
 
 static void atpsx_dma_write( UINT32 n_address, INT32 n_size )
 {
-	logerror("DMA write from %08x for %d bytes\n", n_address, n_size<<2);
+	loginfo(2,"DMA write from %08x for %d bytes\n", n_address, n_size<<2);
 }
 
 DRIVER_INIT( coh1000w )
@@ -2324,7 +2324,7 @@ static READ32_HANDLER( jdredd_ide_r)
 	{
 		if (reg != 0)
 		{
-			logerror("JDREDD IDE: read 16-bit from non-DATA register %d!\n", reg);
+			loginfo(2,"JDREDD IDE: read 16-bit from non-DATA register %d!\n", reg);
 		}
 
 		return (ide_controller_0_r(0x1f0) | (ide_controller_0_r(0x1f0)<<8));

@@ -521,7 +521,7 @@ static WRITE16_HANDLER( control_w )
 /* protection chip reads */
 static READ16_HANDLER( prot_r )
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", activecpu_get_previouspc(), prot_table ? prot_read_buf : 0xff);
+	if (LOG_PROTECTION) loginfo(2,"%06X:protection r=%02X\n", activecpu_get_previouspc(), prot_table ? prot_read_buf : 0xff);
 	return prot_read_buf | 0xf0;
 }
 
@@ -546,7 +546,7 @@ static WRITE16_HANDLER( prot_w )
 	/* determine the value to return, should a read occur */
 	if (prot_table)
 		prot_read_buf = (prot_table[table_index >> 3] << (4 * (table_index & 7))) >> 28;
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", activecpu_get_previouspc(), data & 0x0f, prot_read_buf);
+	if (LOG_PROTECTION) loginfo(2,"%06X:protection w=%02X, new result=%02X\n", activecpu_get_previouspc(), data & 0x0f, prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != sp_palbase || new_bg_palbase != bg_palbase)
@@ -555,7 +555,7 @@ static WRITE16_HANDLER( prot_w )
 		sp_palbase = new_sp_palbase;
 		bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", bg_palbase, sp_palbase, cpu_getscanline());
+		if (LOG_PALETTE) loginfo(2,"Set palbank: %d/%d (scan=%d)\n", bg_palbase, sp_palbase, cpu_getscanline());
 	}
 }
 

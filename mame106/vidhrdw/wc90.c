@@ -509,7 +509,7 @@ static void drawsprite_64x64(struct drawgfxParams *pdgp,int code,int sx,int sy,i
 }
 
 static void drawsprite_invalid(struct drawgfxParams *pdgp,int code,int sx,int sy,int bank ) {
-	logerror("8 pixel sprite size not supported\n" );
+	loginfo(2,"8 pixel sprite size not supported\n" );
 }
 //  mame_bitmap *, const rectangle *, int, int, int, int, int )
 typedef void (*drawsprites_procdef)(struct drawgfxParams *pdgp,int code,int sx,int sy,int bank);

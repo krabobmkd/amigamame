@@ -486,14 +486,14 @@ int timer_count_anonymous(void)
 	mame_timer *t;
 	int count = 0;
 
-	logerror("timer_count_anonymous:\n");
+	loginfo(2,"timer_count_anonymous:\n");
 	for (t = timer_head; t; t = t->next)
 		if (t->temporary && t != callback_timer)
 		{
 			count++;
-			logerror("  Temp. timer %p, file %s:%d[%s]\n", (void *) t, t->file, t->line, t->func);
+			loginfo(2,"  Temp. timer %p, file %s:%d[%s]\n", (void *) t, t->file, t->line, t->func);
 		}
-	logerror("%d temporary timers found\n", count);
+	loginfo(2,"%d temporary timers found\n", count);
 
 	return count;
 }
@@ -569,7 +569,7 @@ static void mame_timer_remove(mame_timer *which)
 	if (which->tag == -1)
 	{
 		printf("timer_remove: removing an inactive timer! (%s from %s:%d)\n", which->func, which->file, which->line);
-		logerror("timer_remove: removed an inactive timer!\n");
+		loginfo(2,"timer_remove: removed an inactive timer!\n");
 		return;
 	}
 
@@ -614,7 +614,7 @@ static inline void mame_timer_adjust_common(mame_timer *which, mame_time duratio
 	if (which->tag == -1)
 	{
 		printf("mame_timer_adjust: adjusting an inactive timer!\n");
-		logerror("mame_timer_adjust: adjusting an inactive timer!\n");
+		loginfo(2,"mame_timer_adjust: adjusting an inactive timer!\n");
 		return;
 	}
 
@@ -745,7 +745,7 @@ void mame_timer_reset(mame_timer *which, mame_time duration)
 	if (which->tag == -1)
 	{
 		printf("mame_timer_reset: resetting an inactive timer!\n");
-		logerror("mame_timer_reset: resetting an inactive timer!\n");
+		loginfo(2,"mame_timer_reset: resetting an inactive timer!\n");
 		return;
 	}
 
@@ -853,21 +853,21 @@ static void timer_logtimers(void)
 {
 	mame_timer *t;
 
-	logerror("===============\n");
-	logerror("TIMER LOG START\n");
-	logerror("===============\n");
+	loginfo(2,"===============\n");
+	loginfo(2,"TIMER LOG START\n");
+	loginfo(2,"===============\n");
 
-	logerror("Enqueued timers:\n");
+	loginfo(2,"Enqueued timers:\n");
 	for (t = timer_head; t; t = t->next)
-		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
+		loginfo(2,"  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
 			mame_time_to_double(t->start), mame_time_to_double(t->expire), mame_time_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
 
-	logerror("Free timers:\n");
+	loginfo(2,"Free timers:\n");
 	for (t = timer_free_head; t; t = t->next)
-		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
+		loginfo(2,"  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
 			mame_time_to_double(t->start), mame_time_to_double(t->expire), mame_time_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
 
-	logerror("==============\n");
-	logerror("TIMER LOG STOP\n");
-	logerror("==============\n");
+	loginfo(2,"==============\n");
+	loginfo(2,"TIMER LOG STOP\n");
+	loginfo(2,"==============\n");
 }

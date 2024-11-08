@@ -497,7 +497,7 @@ INLINE UINT16 *cps1_base(int offset,int boundary)
 READ16_HANDLER( cps1_output_r )
 {
 #if VERBOSE
-if (offset >= 0x18/2) logerror("PC %06x: read output port %02x\n",activecpu_get_pc(),offset*2);
+if (offset >= 0x18/2) loginfo(2,"PC %06x: read output port %02x\n",activecpu_get_pc(),offset*2);
 #endif
 
 	/* Some games interrogate a couple of registers on bootup. */
@@ -547,7 +547,7 @@ WRITE16_HANDLER( cps1_output_w )
 
 #ifdef MAME_DEBUG
 if (cps1_game_config->control_reg && offset == cps1_game_config->control_reg/2 && data != 0x3f)
-	logerror("control_reg = %04x",data);
+	loginfo(2,"control_reg = %04x",data);
 #endif
 #if VERBOSE
 if (offset > 0x22/2 &&
@@ -557,11 +557,11 @@ if (offset > 0x22/2 &&
 		offset != cps1_game_config->priority[2]/2 &&
 		offset != cps1_game_config->priority[3]/2 &&
 		offset != cps1_game_config->control_reg/2)
-	logerror("PC %06x: write %02x to output port %02x\n",activecpu_get_pc(),data,offset*2);
+	loginfo(2,"PC %06x: write %02x to output port %02x\n",activecpu_get_pc(),data,offset*2);
 
 #ifdef MAME_DEBUG
 if (offset == 0x22/2 && (data & ~0x8001) != 0x0e)
-	logerror("port 22 = %04x",data);
+	loginfo(2,"port 22 = %04x",data);
 if (cps1_game_config->priority[0] && offset == cps1_game_config->priority[0]/2 && data != 0x00)
 	ui_popup("priority0 %04x",data);
 #endif
@@ -1161,7 +1161,7 @@ VIDEO_START( cps )
 
 	if (!cps1_game_config)
 	{
-		logerror("cps1_game_config hasn't been set up yet");
+		loginfo(2,"cps1_game_config hasn't been set up yet");
 		return -1;
 	}
 

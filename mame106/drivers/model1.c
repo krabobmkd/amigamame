@@ -44,7 +44,7 @@ static READ16_HANDLER( io_r )
 		return 0xff;
 	}
 
-	logerror("IOR: %02x\n", offset);
+	loginfo(2,"IOR: %02x\n", offset);
 	return 0xffff;
 }
 
@@ -59,7 +59,7 @@ static WRITE16_HANDLER( bank_w )
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
 			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x1000000 + 0x100000*((data >> 4) & 0xf));
-			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			loginfo(2,"BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
 			break;
@@ -74,7 +74,7 @@ static int last_irq;
 
 static void irq_raise(int level)
 {
-	//  logerror("irq: raising %d\n", level);
+	//  loginfo(2,"irq: raising %d\n", level);
 	//  irq_status |= (1 << level);
 	last_irq = level;
 	cpunum_set_input_line(0, 0, HOLD_LINE);
@@ -162,7 +162,7 @@ static WRITE16_HANDLER(md1_w)
 	if(0 && offset)
 		return;
 	if(1 && model1_dump)
-		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
+		loginfo(2,"TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
 }
 
 static WRITE16_HANDLER(md0_w)
@@ -172,7 +172,7 @@ static WRITE16_HANDLER(md0_w)
 	if(0 && offset)
 		return;
 	if(1 && model1_dump)
-		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
+		loginfo(2,"TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
 }
 
 static WRITE16_HANDLER(p_w)
@@ -180,7 +180,7 @@ static WRITE16_HANDLER(p_w)
 	UINT16 old = paletteram16[offset];
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset, data, mem_mask);
 	if(0 && paletteram16[offset] != old)
-		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
+		loginfo(2,"XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
 }
 
 static UINT16 *mr;
@@ -188,7 +188,7 @@ static WRITE16_HANDLER(mr_w)
 {
 	COMBINE_DATA(mr+offset);
 	if(0 && offset == 0x1138/2)
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, activecpu_get_pc());
+		loginfo(2,"MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, activecpu_get_pc());
 }
 
 static UINT16 *mr2;
@@ -197,23 +197,23 @@ static WRITE16_HANDLER(mr2_w)
 	COMBINE_DATA(mr2+offset);
 #if 0
 	if(0 && offset == 0x6e8/2) {
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, activecpu_get_pc());
+		loginfo(2,"MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, activecpu_get_pc());
 	}
 	if(offset/2 == 0x3680/4)
-		logerror("MW f80[r25], %04x%04x (%x)\n", mr2[0x3680/2+1], mr2[0x3680/2], activecpu_get_pc());
+		loginfo(2,"MW f80[r25], %04x%04x (%x)\n", mr2[0x3680/2+1], mr2[0x3680/2], activecpu_get_pc());
 	if(offset/2 == 0x06ca/4)
-		logerror("MW fca[r19], %04x%04x (%x)\n", mr2[0x06ca/2+1], mr2[0x06ca/2], activecpu_get_pc());
+		loginfo(2,"MW fca[r19], %04x%04x (%x)\n", mr2[0x06ca/2+1], mr2[0x06ca/2], activecpu_get_pc());
 	if(offset/2 == 0x1eca/4)
-		logerror("MW fca[r22], %04x%04x (%x)\n", mr2[0x1eca/2+1], mr2[0x1eca/2], activecpu_get_pc());
+		loginfo(2,"MW fca[r22], %04x%04x (%x)\n", mr2[0x1eca/2+1], mr2[0x1eca/2], activecpu_get_pc());
 #endif
 
 	// wingwar scene position, pc=e1ce -> d735
 	if(offset/2 == 0x1f08/4)
-		logerror("MW  8[r10], %f (%x)\n", *(float *)(mr2+0x1f08/2), activecpu_get_pc());
+		loginfo(2,"MW  8[r10], %f (%x)\n", *(float *)(mr2+0x1f08/2), activecpu_get_pc());
 	if(offset/2 == 0x1f0c/4)
-		logerror("MW  c[r10], %f (%x)\n", *(float *)(mr2+0x1f0c/2), activecpu_get_pc());
+		loginfo(2,"MW  c[r10], %f (%x)\n", *(float *)(mr2+0x1f0c/2), activecpu_get_pc());
 	if(offset/2 == 0x1f10/4)
-		logerror("MW 10[r10], %f (%x)\n", *(float *)(mr2+0x1f10/2), activecpu_get_pc());
+		loginfo(2,"MW 10[r10], %f (%x)\n", *(float *)(mr2+0x1f10/2), activecpu_get_pc());
 }
 
 static READ16_HANDLER( snd_68k_ready_r )

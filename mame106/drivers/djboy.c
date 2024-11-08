@@ -92,7 +92,7 @@ static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
 	unsigned char *RAM = memory_region(REGION_CPU1);
-	logerror( "cpu1_bankswitch( 0x%02x )\n", data );
+	loginfo(2, "cpu1_bankswitch( 0x%02x )\n", data );
 	if( data < 4 )
 	{
 		RAM = &RAM[0x2000 * data];
@@ -160,7 +160,7 @@ ProtectionOut( int i, UINT8 data )
 	}
 	else
 	{
-		logerror( "prot_output_buffer overflow!\n" );
+		loginfo(2, "prot_output_buffer overflow!\n" );
 		exit(1);
 	}
 }
@@ -184,23 +184,23 @@ static WRITE8_HANDLER( prot_data_w )
 {
 	prot_busy_count = 1;
 
-	logerror( "0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
+	loginfo(2, "0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
 
 	if( prot_mode == ePROT_WAIT_DSW1_WRITEBACK )
 	{
-		logerror( "[DSW1_WRITEBACK]\n" );
+		loginfo(2, "[DSW1_WRITEBACK]\n" );
 		ProtectionOut( 0, readinputport(4) ); /* DSW2 */
 		prot_mode = ePROT_WAIT_DSW2_WRITEBACK;
 	}
 	else if( prot_mode == ePROT_WAIT_DSW2_WRITEBACK )
 	{
-		logerror( "[DSW2_WRITEBACK]\n" );
+		loginfo(2, "[DSW2_WRITEBACK]\n" );
 		prot_mode = ePROT_STORE_PARAM;
 		prot_offs = 0;
 	}
 	else if( prot_mode == ePROT_STORE_PARAM )
 	{
-		logerror( "prot param[%d]: 0x%02x\n", prot_offs, data );
+		loginfo(2, "prot param[%d]: 0x%02x\n", prot_offs, data );
 		prot_offs++;
 		if( prot_offs == 8 )
 		{
@@ -227,7 +227,7 @@ static WRITE8_HANDLER( prot_data_w )
 			}
 			else
 			{
-				logerror( "UNEXPECTED PREFIX!\n" );
+				loginfo(2, "UNEXPECTED PREFIX!\n" );
 			}
 			break;
 
@@ -240,7 +240,7 @@ static WRITE8_HANDLER( prot_data_w )
 			break;
 
 		case 0x03: /* prepare for memory write to protection device ram (pc == 0x7987) */ // -> 0x02
-			logerror( "[WRITE BYTES]\n" );
+			loginfo(2, "[WRITE BYTES]\n" );
 			prot_mode = ePROT_WRITE_BYTES;
 			prot_offs = 0;
 			break;
@@ -298,12 +298,12 @@ static WRITE8_HANDLER( prot_data_w )
 			if( prot_mode == ePROT_WRITE_BYTES )
 			{
 				prot_mode = ePROT_READ_BYTES;
-				logerror( "[READ BYTES]\n" );
+				loginfo(2, "[READ BYTES]\n" );
 			}
 			else
 			{
 				prot_mode = ePROT_WRITE_BYTES;
-				logerror( "[WRITE BYTES*]\n" );
+				loginfo(2, "[WRITE BYTES*]\n" );
 			}
 			prot_offs = 0;
 			break;
@@ -327,7 +327,7 @@ static WRITE8_HANDLER( prot_data_w )
 			break;
 
 		default:
-			logerror( "UNKNOWN PROT_W!\n" );
+			loginfo(2, "UNKNOWN PROT_W!\n" );
 			exit(1);
 			break;
 		}
@@ -349,16 +349,16 @@ static READ8_HANDLER( prot_data_r )
 	}
 	else
 	{
-		logerror( "prot_r: data expected!\n" );
+		loginfo(2, "prot_r: data expected!\n" );
 	}
-	logerror( "0x%04x: prot_r() == 0x%02x\n", activecpu_get_pc(), data );
+	loginfo(2, "0x%04x: prot_r() == 0x%02x\n", activecpu_get_pc(), data );
 	return data;
 } /* prot_data_r */
 
 static READ8_HANDLER( prot_status_r )
 { /* port 0xc */
 	UINT8 result = 0;
-//  logerror( "0x%04x: prot_status_r\n", activecpu_get_pc() );
+//  loginfo(2, "0x%04x: prot_status_r\n", activecpu_get_pc() );
 	if( prot_busy_count )
 	{
 		prot_busy_count--;

@@ -47,7 +47,7 @@ static READ8_HANDLER( c1943_protection_r )
     */
 
 	int data = activecpu_get_reg(Z80_BC) >> 8;
-//  logerror("protection read, PC: %04x Result:%02x\n",activecpu_get_pc(),data);
+//  loginfo(2,"protection read, PC: %04x Result:%02x\n",activecpu_get_pc(),data);
 	return data;
 }
 

@@ -194,7 +194,7 @@ static WRITE8_HANDLER( adpcm_play_w )
 		renegade_adpcm.playing = 1;
 	}
 	else
-		logerror("out of range adpcm command: 0x%02x\n", data);
+		loginfo(2,"out of range adpcm command: 0x%02x\n", data);
 }
 
 static WRITE8_HANDLER( sound_w )
@@ -423,7 +423,7 @@ static void mcu_process_command(void)
 				if (health > 0x20)
 					health = 0x20;	/* max 0x20 */
 			}
-			logerror("e_type:0x%02x diff:0x%02x -> 0x%02x\n", enemy_type, difficulty, health);
+			loginfo(2,"e_type:0x%02x diff:0x%02x -> 0x%02x\n", enemy_type, difficulty, health);
 			mcu_buffer[0] = 1;
 			mcu_buffer[1] = health;
 		}
@@ -456,7 +456,7 @@ static void mcu_process_command(void)
 		break;
 
 	default:
-		logerror("unknown MCU command: %02x\n", mcu_buffer[0]);
+		loginfo(2,"unknown MCU command: %02x\n", mcu_buffer[0]);
 		break;
 	}
 }

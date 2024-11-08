@@ -1615,7 +1615,7 @@ READ8_HANDLER( gtstarba_port_0_read )
 	if (activecpu_get_pc()==0x6d2c) return 2;
 	if (activecpu_get_pc()==0x6d34) return 4;
 
-	logerror("Port Read PC=%04x\n",activecpu_get_pc());
+	loginfo(2,"Port Read PC=%04x\n",activecpu_get_pc());
 
 	return 0;
 }
@@ -1657,7 +1657,7 @@ READ8_HANDLER( slapfigh_mcu_r )
 		slapfigh_prot_pos++;
 		return retdat;
 	}
-	logerror("MCU Read PC=%04x\n",activecpu_get_pc());
+	loginfo(2,"MCU Read PC=%04x\n",activecpu_get_pc());
 	return 0;
 }
 

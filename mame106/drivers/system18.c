@@ -225,7 +225,7 @@ static WRITE8_HANDLER( shdancbl_bankctrl_w )
 			break;
 		default:
 			shdancbl_soundbank_ptr = NULL;
-			logerror("Invalid bank setting %02X (%04X)\n", data, activecpu_get_pc());
+			loginfo(2,"Invalid bank setting %02X (%04X)\n", data, activecpu_get_pc());
 			break;
 	}
 }
@@ -413,13 +413,13 @@ static WRITE16_HANDLER( vdp_w )
 				// Check for DMA request
 				if((vdp.reg[1] & 0x20) && (vdp.code & 0x20))
 				{
-					logerror("vdp: DMA disabled in this system.\n");
+					loginfo(2,"vdp: DMA disabled in this system.\n");
 				}
 			}
 			break;
 
 		default: /* Unused */
-			logerror("vdp: write %04X to %08X\n", data, offset);
+			loginfo(2,"vdp: write %04X to %08X\n", data, offset);
 			break;
 	}
 }
@@ -562,11 +562,11 @@ static READ16_HANDLER( sys18_io_r )
 				return -1;
 
 			case 0x2000/2: /* Unused */
-				logerror("read video control latch %06X (%06X)\n", offset, activecpu_get_pc());
+				loginfo(2,"read video control latch %06X (%06X)\n", offset, activecpu_get_pc());
 				return -1;
 
 			case 0x3000/2: /* Expansion connector */
-				logerror("read expansion area %06X (%06X)\n", offset, activecpu_get_pc());
+				loginfo(2,"read expansion area %06X (%06X)\n", offset, activecpu_get_pc());
 				return -1;
 		}
 	}
@@ -634,11 +634,11 @@ static WRITE16_HANDLER( sys18_io_w )
 				break;
 
 			case 0x2000/2: /* Video control latch */
-				logerror("write video control latch %06X = %04X (%06X)\n", offset, data, activecpu_get_pc());
+				loginfo(2,"write video control latch %06X = %04X (%06X)\n", offset, data, activecpu_get_pc());
 				break;
 
 			case 0x3000/2: /* Expansion connector */
-//              logerror("write expansion area %06X = %04X (%06X)\n", offset, data, activecpu_get_pc());
+//              loginfo(2,"write expansion area %06X = %04X (%06X)\n", offset, data, activecpu_get_pc());
 				break;
 		}
 	}

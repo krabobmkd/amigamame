@@ -127,7 +127,7 @@ static void palette_notifier(int addr)
 
 	if(addr > 0x200)
 	{
-logerror("Large palette ? %03x (%04x)\n", addr, activecpu_get_pc());
+loginfo(2,"Large palette ? %03x (%04x)\n", addr, activecpu_get_pc());
 	}
 	else
 	{
@@ -296,7 +296,7 @@ static INTERRUPT_GEN( vbl_interrupt )
 
 static WRITE8_HANDLER( irq_adr_w )
 {
-//logerror("irq_adr_table[%d] = %02x\n",offset,data);
+//loginfo(2,"irq_adr_table[%d] = %02x\n",offset,data);
 	irq_adr_table[offset] = data;
 }
 
@@ -307,7 +307,7 @@ static READ8_HANDLER( irq_adr_r )
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-//logerror("irq_enable = %02x\n",data);
+//loginfo(2,"irq_enable = %02x\n",data);
 	irq_enable = data;
 
 	// fix Plotting test mode
@@ -329,10 +329,10 @@ static WRITE8_HANDLER( rombankswitch_w )
 		if(data>high)
 		{
 			high = data;
-			logerror("New rom size : %x\n", (high+1)*0x2000);
+			loginfo(2,"New rom size : %x\n", (high+1)*0x2000);
 		}
 
-//      logerror("robs %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
+//      loginfo(2,"robs %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
 		cur_rombank = data;
 		memory_set_bankptr(1, memory_region(REGION_CPU1)+0x10000+0x2000*cur_rombank);
 	}
@@ -349,10 +349,10 @@ static WRITE8_HANDLER( rombank2switch_w )
 		if(data>high)
 		{
 			high = data;
-			logerror("New rom2 size : %x\n", (high+1)*0x4000);
+			loginfo(2,"New rom2 size : %x\n", (high+1)*0x4000);
 		}
 
-//      logerror("robs2 %02x (%04x)\n", data, activecpu_get_pc());
+//      loginfo(2,"robs2 %02x (%04x)\n", data, activecpu_get_pc());
 
 		cur_rombank2 = data;
 		memory_set_bankptr(6, memory_region(REGION_CPU3)+0x10000+0x4000*cur_rombank2);
@@ -374,7 +374,7 @@ static WRITE8_HANDLER( rambankswitch_w )
 	if(cur_rambank[offset]!=data)
 	{
 		cur_rambank[offset]=data;
-//logerror("rabs %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
+//loginfo(2,"rabs %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
 		if(data>=0x14 && data<=0x1f)
 		{
 			data -= 0x14;
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( rambankswitch_w )
 		}
 		else
 		{
-logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
+loginfo(2,"unknown rambankswitch %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
 			current_notifier[offset] = 0;
 			current_base[offset] = empty_ram;
 		}
@@ -485,7 +485,7 @@ static WRITE8_HANDLER( mcu_data_w )
 {
 	last_data = data;
 	last_data_adr = activecpu_get_pc();
-//  logerror("mcu write %02x (%04x)\n", data, activecpu_get_pc());
+//  loginfo(2,"mcu write %02x (%04x)\n", data, activecpu_get_pc());
 	switch(data)
 	{
 	case 0x43:
@@ -498,12 +498,12 @@ static WRITE8_HANDLER( mcu_data_w )
 
 static WRITE8_HANDLER( mcu_control_w )
 {
-//  logerror("mcu control %02x (%04x)\n", data, activecpu_get_pc());
+//  loginfo(2,"mcu control %02x (%04x)\n", data, activecpu_get_pc());
 }
 
 static READ8_HANDLER( mcu_data_r )
 {
-//  logerror("mcu read (%04x) [%02x, %04x]\n", activecpu_get_pc(), last_data, last_data_adr);
+//  loginfo(2,"mcu read (%04x) [%02x, %04x]\n", activecpu_get_pc(), last_data, last_data_adr);
 	if(mcu_pos==mcu_reply_len)
 		return 0;
 
@@ -512,14 +512,14 @@ static READ8_HANDLER( mcu_data_r )
 
 static READ8_HANDLER( mcu_control_r )
 {
-//  logerror("mcu control read (%04x)\n", activecpu_get_pc());
+//  loginfo(2,"mcu control read (%04x)\n", activecpu_get_pc());
 	return 0x1;
 }
 
 #if 0
 static WRITE8_HANDLER( sound_w )
 {
-	logerror("Sound_w %02x (%04x)\n", data, activecpu_get_pc());
+	loginfo(2,"Sound_w %02x (%04x)\n", data, activecpu_get_pc());
 }
 #endif
 
@@ -550,7 +550,7 @@ static READ8_HANDLER( mux_r )
 	case 7:
 		return input_port_4_r(0);
 	default:
-		logerror("Mux read from unknown port %d (%04x)\n", mux_ctrl, activecpu_get_pc());
+		loginfo(2,"Mux read from unknown port %d (%04x)\n", mux_ctrl, activecpu_get_pc());
 		return 0xff;
 	}
 }
@@ -563,7 +563,7 @@ static WRITE8_HANDLER( mux_w )
 		control2_w(0, data);
 		break;
 	default:
-		logerror("Mux write to unknown port %d, %02x (%04x)\n", mux_ctrl, data, activecpu_get_pc());
+		loginfo(2,"Mux write to unknown port %d, %02x (%04x)\n", mux_ctrl, data, activecpu_get_pc());
 	}
 }
 
@@ -2250,7 +2250,7 @@ static WRITE8_HANDLER( portA_w )
 		cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (cur_bank-1) * 0x4000;
 		memory_set_bankptr(7,&RAM[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n",cur_bank, activecpu_get_pc() );
+		//loginfo (2, "YM2203 bank change val=%02x  pc=%04x\n",cur_bank, activecpu_get_pc() );
 	}
 }
 

@@ -347,7 +347,7 @@ static WRITE16_HANDLER( iochip_0_w )
 	}
 
 	if (offset <= 4)
-		logerror("I/O chip 0, port %c write = %02X\n", 'A' + offset, data);
+		loginfo(2,"I/O chip 0, port %c write = %02X\n", 'A' + offset, data);
 }
 
 
@@ -396,7 +396,7 @@ static WRITE16_HANDLER( iochip_1_w )
 	iochip_regs[1][offset] = data;
 
 	if (offset <= 4)
-		logerror("I/O chip 1, port %c write = %02X\n", 'A' + offset, data);
+		loginfo(2,"I/O chip 1, port %c write = %02X\n", 'A' + offset, data);
 }
 
 
@@ -404,7 +404,7 @@ static WRITE16_HANDLER( iocontrol_w )
 {
 	if (ACCESSING_LSB)
 	{
-		logerror("I/O chip force input = %d\n", data & 1);
+		loginfo(2,"I/O chip force input = %d\n", data & 1);
 		/* Racing Hero and ABCop set this and fouls up their output ports */
 		/*iochip_force_input = data & 1;*/
 	}
@@ -448,14 +448,14 @@ static VIDEO_UPDATE( loffire )
 
 static READ16_HANDLER( smgp_excs_r )
 {
-	logerror("%06X:smgp_excs_r(%04X)\n", activecpu_get_pc(), offset*2);
+	loginfo(2,"%06X:smgp_excs_r(%04X)\n", activecpu_get_pc(), offset*2);
 	return 0xffff;
 }
 
 
 static WRITE16_HANDLER( smgp_excs_w )
 {
-	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+	loginfo(2,"%06X:smgp_excs_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
 }
 
 

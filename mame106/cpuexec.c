@@ -262,7 +262,7 @@ int cpuexec_init(void)
 		/* if no state registered for saving, we can't save */
 		if (num_regs == 0)
 		{
-			logerror("CPU #%d (%s) did not register any state to save!\n", cpunum, cputype_name(cputype));
+			loginfo(2,"CPU #%d (%s) did not register any state to save!\n", cpunum, cputype_name(cputype));
 			if (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
 				fatalerror("CPU #%d (%s) did not register any state to save!", cpunum, cputype_name(cputype));
 		}
@@ -359,7 +359,7 @@ static void cpuexec_exit(void)
 
 static void watchdog_callback(int param)
 {
-	logerror("reset caused by the (time) watchdog\n");
+	loginfo(2,"reset caused by the (time) watchdog\n");
 	mame_schedule_soft_reset();
 }
 
@@ -430,7 +430,7 @@ void watchdog_reset(void)
 		if (watchdog_counter == WATCHDOG_IS_STARTED_DISABLED)
 		{
 			watchdog_counter = WATCHDOG_IS_BEING_STARTED;
-			logerror("(vblank) watchdog armed by reset\n");
+			loginfo(2,"(vblank) watchdog armed by reset\n");
 		}
 
 		watchdog_setup(FALSE);
@@ -1357,7 +1357,7 @@ static void cpu_vblankreset(void)
 	{
 		if (--watchdog_counter == 0)
 		{
-			logerror("reset caused by the (vblank) watchdog\n");
+			loginfo(2,"reset caused by the (vblank) watchdog\n");
 			mame_schedule_soft_reset();
 		}
 	}

@@ -213,7 +213,7 @@ VIDEO_START( vector )
 		vector_draw_aa_pixel = vector_draw_aa_pixel_32;
 		break;
 	default:
-		logerror ("Vector games have to use direct RGB modes!\n");
+		loginfo (2, "Vector games have to use direct RGB modes!\n");
 		return 1;
 		break;
 	}
@@ -515,7 +515,7 @@ void vector_add_point (int x, int y, rgb_t color, int intensity)
 	if (new_index >= MAX_POINTS)
 	{
 		new_index--;
-		logerror("*** Warning! Vector list overflow!\n");
+		loginfo(2,"*** Warning! Vector list overflow!\n");
 	}
 }
 
@@ -547,7 +547,7 @@ void vector_add_point_callback (int x, int y, rgb_t (*color_callback)(void), int
 	if (new_index >= MAX_POINTS)
 	{
 		new_index--;
-		logerror("*** Warning! Vector list overflow!\n");
+		loginfo(2,"*** Warning! Vector list overflow!\n");
 	}
 }
 
@@ -569,7 +569,7 @@ void vector_add_clip (int x1, int yy1, int x2, int y2)
 	if (new_index >= MAX_POINTS)
 	{
 		new_index--;
-		logerror("*** Warning! Vector list overflow!\n");
+		loginfo(2,"*** Warning! Vector list overflow!\n");
 	}
 }
 
@@ -582,7 +582,7 @@ void vector_set_clip (int x1, int yy1, int x2, int y2)
 	/* failsafe */
 	if ((x1 >= x2) || (yy1 >= y2))
 	{
-		logerror("Error in clipping parameters.\n");
+		loginfo(2,"Error in clipping parameters.\n");
 		xmin = 0;
 		ymin = 0;
 		xmax = vecwidth;

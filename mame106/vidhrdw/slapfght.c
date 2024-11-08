@@ -131,7 +131,7 @@ WRITE8_HANDLER( slapfight_fixcol_w )
 
 WRITE8_HANDLER( slapfight_flipscreen_w )
 {
-	logerror("Writing %02x to flipscreen\n",offset);
+	loginfo(2,"Writing %02x to flipscreen\n",offset);
 	if (offset==0) flipscreen=1; /* Port 0x2 is flipscreen */
 	else flipscreen=0; /* Port 0x3 is normal */
 }
@@ -144,7 +144,7 @@ void slapfght_log_vram(void)
 		int i;
 		for (i=0; i<0x800; i++)
 		{
-			logerror("Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n",i, videoram[i],colorram[i],spriteram[i]);
+			loginfo(2,"Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n",i, videoram[i],colorram[i],spriteram[i]);
 		}
 	}
 }

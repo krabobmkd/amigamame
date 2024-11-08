@@ -433,7 +433,7 @@ static UINT32 read_pixel_shiftreg(offs_t offset)
 	if (state.config->to_shiftreg)
 		state.config->to_shiftreg(offset, &state.shiftreg[0]);
 	else
-		logerror("To ShiftReg function not set. PC = %08X\n", PC);
+		loginfo(2,"To ShiftReg function not set. PC = %08X\n", PC);
 	return state.shiftreg[0];
 }
 
@@ -551,7 +551,7 @@ static void write_pixel_shiftreg(offs_t offset,UINT32 data)
 	if (state.config->from_shiftreg)
 		state.config->from_shiftreg(offset, &state.shiftreg[0]);
 	else
-		logerror("From ShiftReg function not set. PC = %08X\n", PC);
+		loginfo(2,"From ShiftReg function not set. PC = %08X\n", PC);
 }
 
 
@@ -1158,7 +1158,7 @@ static void dpyint_callback(int cpunum)
 {
 	double interval = TIME_IN_HZ(Machine->drv->frames_per_second);
 
-logerror("-- dpyint(%d) @ %d --\n", cpunum, cpu_getscanline());
+loginfo(2,"-- dpyint(%d) @ %d --\n", cpunum, cpu_getscanline());
 
 	/* reset timer for next frame before going into the CPU context */
 	timer_adjust(dpyint_timer[cpunum], interval, cpunum, 0);
@@ -1253,7 +1253,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			break;
 
 		case REG_PMASK:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", activecpu_get_pc());
+			if (data) loginfo(2,"Plane masking not supported. PC=%08X\n", activecpu_get_pc());
 			break;
 
 		case REG_DPYCTL:
@@ -1308,7 +1308,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 				newreg |= data & 0x0008;
 			}
 			IOREG(offset) = newreg;
-logerror("oldreg=%04X newreg=%04X\n", oldreg, newreg);
+loginfo(2,"oldreg=%04X newreg=%04X\n", oldreg, newreg);
 			/* the TMS34010 can set output interrupt? */
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{
@@ -1354,7 +1354,7 @@ logerror("oldreg=%04X newreg=%04X\n", oldreg, newreg);
 	}
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg_name[offset], IOREG(offset), cpu_getscanline());
+		loginfo(2,"CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg_name[offset], IOREG(offset), cpu_getscanline());
 }
 
 
@@ -1391,7 +1391,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	IOREG(offset) = data;
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg020_name[offset], IOREG(offset), cpu_getscanline());
+		loginfo(2,"CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg020_name[offset], IOREG(offset), cpu_getscanline());
 
 	switch (offset)
 	{
@@ -1436,7 +1436,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 		case REG020_PMASKL:
 		case REG020_PMASKH:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", activecpu_get_pc());
+			if (data) loginfo(2,"Plane masking not supported. PC=%08X\n", activecpu_get_pc());
 			break;
 
 		case REG020_DPYCTL:
@@ -1573,7 +1573,7 @@ READ16_HANDLER( tms34010_io_register_r )
 	int result, total;
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: read %s\n", cpunum, activecpu_get_pc(), ioreg_name[offset]);
+		loginfo(2,"CPU#%d@%08X: read %s\n", cpunum, activecpu_get_pc(), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1622,7 +1622,7 @@ READ16_HANDLER( tms34020_io_register_r )
 	int result, total;
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: read %s\n", cpunum, activecpu_get_pc(), ioreg_name[offset]);
+		loginfo(2,"CPU#%d@%08X: read %s\n", cpunum, activecpu_get_pc(), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1812,7 +1812,7 @@ void tms34010_host_w(int cpunum, int reg, int data)
 
 		/* error case */
 		default:
-			logerror("tms34010_host_control_w called on invalid register %d\n", reg);
+			loginfo(2,"tms34010_host_control_w called on invalid register %d\n", reg);
 			break;
 	}
 
@@ -1871,7 +1871,7 @@ int tms34010_host_r(int cpunum, int reg)
 
 		/* error case */
 		default:
-			logerror("tms34010_host_control_r called on invalid register %d\n", reg);
+			loginfo(2,"tms34010_host_control_r called on invalid register %d\n", reg);
 			break;
 	}
 

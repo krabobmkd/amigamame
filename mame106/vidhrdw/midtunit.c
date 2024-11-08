@@ -257,7 +257,7 @@ WRITE16_HANDLER( midtunit_control_w )
         other important bits:
             bit 2 (0x0004) is toggled periodically
     */
-	logerror("T-unit control = %04X\n", data);
+	loginfo(2,"T-unit control = %04X\n", data);
 
 	COMBINE_DATA(&midtunit_control);
 
@@ -278,7 +278,7 @@ WRITE16_HANDLER( midwunit_control_w )
         other important bits:
             bit 2 (0x0004) is toggled periodically
     */
-	logerror("Wolf-unit control = %04X\n", data);
+	loginfo(2,"Wolf-unit control = %04X\n", data);
 
 	COMBINE_DATA(&midtunit_control);
 
@@ -751,18 +751,18 @@ WRITE16_HANDLER( midtunit_dma_w )
 #if LOG_DMA
 	if (code_pressed(KEYCODE_L))
 	{
-		logerror("DMA command %04X: (bpp=%d skip=%d xflip=%d yflip=%d preskip=%d postskip=%d)\n",
+		loginfo(2,"DMA command %04X: (bpp=%d skip=%d xflip=%d yflip=%d preskip=%d postskip=%d)\n",
 				command, (command >> 12) & 7, (command >> 7) & 1, (command >> 4) & 1, (command >> 5) & 1, (command >> 8) & 3, (command >> 10) & 3);
-		logerror("  offset=%08X pos=(%d,%d) w=%d h=%d clip=(%d,%d)-(%d,%d)\n", gfxoffset, dma_register[DMA_XSTART], dma_register[DMA_YSTART],
+		loginfo(2,"  offset=%08X pos=(%d,%d) w=%d h=%d clip=(%d,%d)-(%d,%d)\n", gfxoffset, dma_register[DMA_XSTART], dma_register[DMA_YSTART],
 				dma_register[DMA_WIDTH], dma_register[DMA_HEIGHT], dma_register[DMA_LEFTCLIP], dma_register[DMA_TOPCLIP], dma_register[DMA_RIGHTCLIP], dma_register[DMA_BOTCLIP]);
-		logerror("  offset=%08X pos=(%d,%d) w=%d h=%d clip=(%d,%d)-(%d,%d)\n", gfxoffset, dma_state.xpos, dma_state.ypos,
+		loginfo(2,"  offset=%08X pos=(%d,%d) w=%d h=%d clip=(%d,%d)-(%d,%d)\n", gfxoffset, dma_state.xpos, dma_state.ypos,
 				dma_state.width, dma_state.height, dma_state.leftclip, dma_state.topclip, dma_state.rightclip, dma_state.botclip);
-		logerror("  palette=%04X color=%04X lskip=%02X rskip=%02X xstep=%04X ystep=%04X test=%04X config=%04X\n",
+		loginfo(2,"  palette=%04X color=%04X lskip=%02X rskip=%02X xstep=%04X ystep=%04X test=%04X config=%04X\n",
 				dma_register[DMA_PALETTE], dma_register[DMA_COLOR],
 				dma_register[DMA_LRSKIP] >> 8, dma_register[DMA_LRSKIP] & 0xff,
 				dma_register[DMA_SCALE_X], dma_register[DMA_SCALE_Y], dma_register[DMA_UNKNOWN_E],
 				dma_register[DMA_CONFIG]);
-		logerror("----\n");
+		loginfo(2,"----\n");
 	}
 #endif
 
@@ -779,7 +779,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 		dma_state.offset = gfxoffset;
 	else
 	{
-		logerror("DMA source out of range: %08X\n", gfxoffset);
+		loginfo(2,"DMA source out of range: %08X\n", gfxoffset);
 		goto skipdma;
 	}
 
@@ -863,7 +863,7 @@ VIDEO_UPDATE( midtunit )
 
 #if LOG_DMA
 	if (code_pressed(KEYCODE_L))
-		logerror("---\n");
+		loginfo(2,"---\n");
 #endif
 
 	/* get the current scroll offset */
