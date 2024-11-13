@@ -683,7 +683,7 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions)
 
     options.pause_bright = _display._color_brightness * 0.5f;
     options.brightness =   _display._color_brightness;
-    options.gamma= _display._color_gamma;
+    //options.gamma= _display._color_gamma;
 
     options.samplerate=22050; // (_audio._mode == AudioMode::None)?0:_audio._freq;
     //options.samplerate = 0;

@@ -28,6 +28,8 @@ set(MAME_CORE_SRC
 # romcmp.c  is an external tool !
  mamelog.cpp
  mamelog.h
+ bootlog.h
+ bootlog.c
  drivertuning.cpp
  drivertuning.h
  fileio.cpp

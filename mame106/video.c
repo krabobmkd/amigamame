@@ -104,10 +104,55 @@ static void recompute_fps(int skipped_it);
     video_init - start up the video system
 -------------------------------------------------*/
 
-int video_init(void)
+//krb - open screen before loading roms
+int video_init_earlier()
 {
 	osd_create_params params;
 	artwork_callbacks *artcallbacks;
+
+	int bmwidth = Machine->drv->screen_width;
+	int bmheight = Machine->drv->screen_height;
+
+	/* if we're a vector game, override the screen width and height */
+	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
+		scale_vectorgames(options.vector_width, options.vector_height, &bmwidth, &bmheight);
+
+	// compute the visible area for raster games
+	if (!(Machine->drv->video_attributes & VIDEO_TYPE_VECTOR))
+	{
+		params.width = Machine->drv->default_visible_area.max_x - Machine->drv->default_visible_area.min_x + 1;
+		params.height = Machine->drv->default_visible_area.max_y - Machine->drv->default_visible_area.min_y + 1;
+	}
+	else
+	{
+		params.width = bmwidth;
+		params.height = bmheight;
+	}
+
+	// fill in the rest of the display parameters
+	compute_aspect_ratio(Machine->drv, &params.aspect_x, &params.aspect_y);
+	params.depth = Machine->color_depth;
+	params.colors = palette_get_total_colors_with_ui();
+	params.fps = Machine->drv->frames_per_second;
+	params.video_attributes = Machine->drv->video_attributes;
+
+#ifdef MESS
+	artcallbacks = &mess_artwork_callbacks;
+#else
+	artcallbacks = &mame_artwork_callbacks;
+#endif
+
+	// initialize the display through the artwork (and eventually the OSD) layer
+	if (artwork_create_display(&params, direct_rgb_components, artcallbacks))
+		return 1;
+
+    return 0;
+}
+
+int video_init(void)
+{
+//moved	osd_create_params params;
+//	artwork_callbacks *artcallbacks;
 	int bmwidth = Machine->drv->screen_width;
 	int bmheight = Machine->drv->screen_height;
 
@@ -125,8 +170,8 @@ int video_init(void)
 	/* if we're a vector game, override the screen width and height */
 	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
 		scale_vectorgames(options.vector_width, options.vector_height, &bmwidth, &bmheight);
-
-	/* compute the visible area for raster games */
+/*krb moved earlier
+	// compute the visible area for raster games
 	if (!(Machine->drv->video_attributes & VIDEO_TYPE_VECTOR))
 	{
 		params.width = Machine->drv->default_visible_area.max_x - Machine->drv->default_visible_area.min_x + 1;
@@ -138,7 +183,7 @@ int video_init(void)
 		params.height = bmheight;
 	}
 
-	/* fill in the rest of the display parameters */
+	// fill in the rest of the display parameters
 	compute_aspect_ratio(Machine->drv, &params.aspect_x, &params.aspect_y);
 	params.depth = Machine->color_depth;
 	params.colors = palette_get_total_colors_with_ui();
@@ -151,10 +196,11 @@ int video_init(void)
 	artcallbacks = &mame_artwork_callbacks;
 #endif
 
-	/* initialize the display through the artwork (and eventually the OSD) layer */
+	// initialize the display through the artwork (and eventually the OSD) layer
+
 	if (artwork_create_display(&params, direct_rgb_components, artcallbacks))
 		return 1;
-
+*/
 	/* the create display process may update the vector width/height, so recompute */
 	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
 		scale_vectorgames(options.vector_width, options.vector_height, &bmwidth, &bmheight);

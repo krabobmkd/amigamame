@@ -6,8 +6,6 @@
 // batrider no boot, + no sound arkretrn
 //#define OPTIM68K_SQUEEZEPPCREG 1
 
-#define __AMIGA__ 1
-
 #define OPTIM68K_SKIPMOVECCRV 1
 #define OPTIM68K_SKIPMOVECCRC 1
 

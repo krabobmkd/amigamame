@@ -537,7 +537,7 @@ static READ16_HANDLER( neo_control_16_r )
 	res =	((current_rastercounter << 7) & 0xff80) |	/* raster counter */
 			(neogeo_frame_counter & 0x0007);			/* frame counter */
 
-	loginfo(2,"PC %06x: neo_control_16_r (%04x)\n",activecpu_get_pc(),res);
+//	loginfo(2,"PC %06x: neo_control_16_r (%04x)\n",activecpu_get_pc(),res);
 
 	return res;
 }
@@ -1428,23 +1428,30 @@ MACHINE_DRIVER_END
  ****/
 
 SYSTEM_BIOS_START( neogeo )
-	SYSTEM_BIOS_ADD( 0, "euro",       "Europe MVS (Ver. 2)" )
-	SYSTEM_BIOS_ADD( 1, "euro-s1",    "Europe MVS (Ver. 1)" )
-	SYSTEM_BIOS_ADD( 2, "us",         "US MVS (Ver. 2?)" )
-	SYSTEM_BIOS_ADD( 3, "us-e",       "US MVS (Ver. 1)" )
-	SYSTEM_BIOS_ADD( 4, "asia",       "Asia MVS (Ver. 3)" )
-	SYSTEM_BIOS_ADD( 5, "japan",      "Japan MVS (Ver. 3)" )
-	SYSTEM_BIOS_ADD( 6, "japan-s2",   "Japan MVS (Ver. 2)" )
-	SYSTEM_BIOS_ADD( 7, "japan-s1",   "Japan MVS (Ver. 1)" )
-//VF
-  SYSTEM_BIOS_ADD( 8, "uni-bios.10","Unibios MVS (Hack, Ver. 1.0)" )
-  SYSTEM_BIOS_ADD( 9, "uni-bios.11","Unibios MVS (Hack, Ver. 1.1)" )
-  SYSTEM_BIOS_ADD(10, "debug",      "Debug MVS (Hack?)" )
+	SYSTEM_BIOS_ADD( 0, "euro",       "Europe MVS (v2)" )
+	SYSTEM_BIOS_ADD( 1, "euro-s1",    "Europe MVS (v1)" )
+	SYSTEM_BIOS_ADD( 2, "us",         "US MVS (v2?)" )
+	SYSTEM_BIOS_ADD( 3, "us-e",       "US MVS (v1)" )
+	SYSTEM_BIOS_ADD( 4, "asia",       "Asia MVS (v3)" )
+	SYSTEM_BIOS_ADD( 5, "japan",      "Japan MVS (v3)" )
+	SYSTEM_BIOS_ADD( 6, "japan-s2",   "Japan MVS (v2)" )
+	SYSTEM_BIOS_ADD( 7, "japan-s1",   "Japan MVS (v1)" )
+//krb activated
+  SYSTEM_BIOS_ADD( 8, "uni-bios.10","Unibios MVS (v1.0)" )
+  SYSTEM_BIOS_ADD( 9, "uni-bios.11","Unibios MVS (v1.1)" )
+  SYSTEM_BIOS_ADD(10, "debug",      "Debug MVS" )
   SYSTEM_BIOS_ADD(11, "asia-aes",   "Asia AES" )
+//krb added
+  SYSTEM_BIOS_ADD(12, "uni-bios.40", "Unibios MVS (v4.0)" )
 SYSTEM_BIOS_END
+
+//krb: make this public to feed prefs menu
+const bios_entry *system_bios_neogeo_first = system_bios_neogeo;
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+
+ // krb: redefine list of ng bios.
 
 #define NEOGEO_BIOS \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "sp-s2.sp1",    0x00000, 0x020000, CRC(9036d879) SHA1(4f5ed7105b7128794654ce82b51723e16e389543) ) /* Europe, 1 Slot, has also been found on a 4 Slot (the old hacks were designed for this one) */ \
@@ -1455,11 +1462,11 @@ SYSTEM_BIOS_END
 	ROM_LOAD16_WORD_SWAP_BIOS( 5, "vs-bios.rom",  0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* Japan, Ver 6 VS Bios */ \
 	ROM_LOAD16_WORD_SWAP_BIOS( 6, "sp-j2.rom",    0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* Japan, Older */ \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "sp1.jipan.1024",0x00000, 0x020000,  CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* Japan, Older */ \
-
-//  ROM_LOAD16_WORD_SWAP_BIOS( 8, "uni-bios.10",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */
-//  ROM_LOAD16_WORD_SWAP_BIOS( 9, "uni-bios.11",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */
-//  ROM_LOAD16_WORD_SWAP_BIOS(10, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Debug (Development) Bios */
-//  ROM_LOAD16_WORD_SWAP_BIOS(11, "aes-bios.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
+  ROM_LOAD16_WORD_SWAP_BIOS( 8, "uni-bios.10",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */ \
+  ROM_LOAD16_WORD_SWAP_BIOS( 9, "uni-bios.11",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */ \
+  ROM_LOAD16_WORD_SWAP_BIOS(10, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Debug (Development) Bios */ \
+  ROM_LOAD16_WORD_SWAP_BIOS(11, "aes-bios.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */ \
+  ROM_LOAD16_WORD_SWAP_BIOS(12, "uni-bios.40", 0x00000, 0x020000, CRC(a7aab458) SHA1(938a0bda7d9a357240718c2cec319878d36b8f72) ) /* */
 
 /* note you'll have to modify the last for lines of each block to use the extra bios roms,
    they're hacks / homebrew / console bios roms so Mame doesn't list them by default */

@@ -15,7 +15,8 @@ typedef long BPTR;
 struct FileInfoBlock;
 struct _game_driver;
 struct _global_options;
-
+struct _game_driver;
+typedef struct _game_driver game_driver;
 // driver name list could actually get big, avoid looping it.
 class NameDriverMap {
 public:
@@ -103,7 +104,7 @@ public:
     int isDriverFound(const _game_driver *const*drv);
 
     // apply to mame options
-    void applyToMameOptions(_global_options &mameOptions);
+    void applyToMameOptions(_global_options &mameOptions,const game_driver *drv);
 
     // have an optimized version
     void getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs/*, int &nbp*/);
@@ -227,7 +228,10 @@ public:
         bool    _useCheatCodeFile = false;
         std::string _cheatFilePath="PROGDIR:cheat.dat";
         float     _speedlimit = 100.0f;
+        ULONG_FLAGS  _skipflags = 0;
+        int         _neogeo_bios = 0;
 
+        std::vector<std::string> _neogeoBiosList;
     };
     Misc &misc() { return _misc; }
 

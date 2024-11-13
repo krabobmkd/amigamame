@@ -47,7 +47,7 @@ void StartGame(void)
     }
     if(!drivers[idriver]) return;
 
-    conf.applyToMameOptions(options);
+    conf.applyToMameOptions(options,drivers[idriver]);
 
     // - - games can have has rotation + we add our explicit rotation ,
     // and we must rotate the tab setting interface the other way to compensate.

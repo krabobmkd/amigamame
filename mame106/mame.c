@@ -78,7 +78,7 @@
 #include "hiscore.h"
 #include "debugger.h"
 #include "profiler.h"
-
+#include "bootlog.h"
 #if defined(MAME_DEBUG) && defined(NEW_DEBUGGER)
 #include "debug/debugcon.h"
 #endif
@@ -1032,14 +1032,34 @@ static void init_machine(void)
 	generic_video_init();
 	rand_seed = 0x9d14abd7;
 
+
 	/* init the osd layer */
 	if (osd_init() != 0)
 		fatalerror("osd_init failed");
+
+/*
+        ebStart=0,
+        ebInput,
+        ebRomLoad,
+        ebMemoryAndCpu,
+        ebHighScoreSaveLoad,
+        eDriver, //  decryption is done and memory maps altered
+        eSoundVideo,
+        eCheat,
+
+*/
+
+    // added by krb, would open screen before loading roms.
+	if (video_init_earlier() != 0)
+		fatalerror("screen init failed");
+
+    bootlog_setprogress(ebInput);
 
 	/* initialize the input system */
 	/* this must be done before the input ports are initialized */
 	if (code_init() != 0)
 		fatalerror("code_init failed");
+
 
 	/* initialize the input ports for the game */
 	/* this must be done before memory_init in order to allow specifying */
@@ -1047,6 +1067,7 @@ static void init_machine(void)
 	if (input_port_init(Machine->gamedrv->construct_ipt) != 0)
 		fatalerror("input_port_init failed");
 
+    bootlog_setprogress(ebRomLoad);
 	/* load the ROMs if we have some */
 	/* this must be done before memory_init in order to allocate memory regions */
 	if (rom_init(Machine->gamedrv->rom) != 0)
@@ -1064,7 +1085,7 @@ static void init_machine(void)
 
 //    printf("cpuexec_timeslice target %d %ld \n",target.seconds , target.subseconds);
 
-
+    bootlog_setprogress(ebMemoryAndCpu);
 	/* initialize the memory system for this game */
 	/* this must be done before cpu_init so that set_context can look up the opcode base */
 	if (memory_init() != 0)
@@ -1082,18 +1103,24 @@ static void init_machine(void)
 	if (devices_init(Machine->gamedrv))
 		fatalerror("devices_init failed");
 #endif
+
+    bootlog_setprogress(ebHighScoreSaveLoad);
 	/* start the hiscore system -- remove me */
 	hiscore_init(Machine->gamedrv->name);
 
 	/* start the save/load system */
 	saveload_init();
 
+
+    bootlog_setprogress(eDriver);
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */
 	/* so this location in the init order is important */
 	if (Machine->gamedrv->driver_init != NULL)
 		(*Machine->gamedrv->driver_init)();
 
+
+    bootlog_setprogress(eSoundVideo);
 	/* start the audio system */
 
 	if (sound_init() != 0)
@@ -1104,6 +1131,8 @@ static void init_machine(void)
 	if (video_init() != 0)
 		fatalerror("video_init failed");
 
+
+    bootlog_setprogress(eCheat);
 	/* start the cheat engine */
 
 	if (options.cheat)

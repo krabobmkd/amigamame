@@ -91,7 +91,7 @@ struct _performance_info
 ***************************************************************************/
 
 /* ----- screen rendering and management ----- */
-
+int video_init_earlier(void);
 int video_init(void);
 
 /* set the current visible area of the screen bitmap */

@@ -443,8 +443,18 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
     }
 
 }
-
+ extern const bios_entry *system_bios_neogeo_first;
 MameConfig::Misc::Misc() : ASerializable() {
+// #define SYSTEM_BIOS_START(name)						static const bios_entry system_bios_##name[] = {
+
+    const bios_entry *p = system_bios_neogeo_first;
+    while(p->_name)
+    {
+        _neogeoBiosList.push_back(p->_description);
+        p++;
+    }
+
+//
 }
 
 void MameConfig::Misc::serialize(ASerializer &serializer)
@@ -455,6 +465,10 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
 
     // min max step default
     serializer("Speed Limit %",_speedlimit,85.0f,125.0f,5.0f,100.0f);
+
+    serializer("Skip",_skipflags,0,{"Disclaimer","Game Info"});
+    serializer("NeoGeo Bios",_neogeo_bios,_neogeoBiosList);
+
 }
 MameConfig::Help::Help() : ASerializable() {
 }
@@ -726,7 +740,7 @@ extern "C" {
     extern const char	* cheatfile;
 }
 // apply to mame options
-void MameConfig::applyToMameOptions(_global_options &mameOptions)
+void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driver *drv)
 {
     memset(&mameOptions, 0,sizeof(_global_options));
 
@@ -746,6 +760,24 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions)
 
     options.samplerate=(_audio._mode == AudioMode::None)?0:_audio._freq;
     options.use_samples = 0;
+
+    options.skip_disclaimer = (_misc._skipflags & 1) != 0;
+    options.skip_gameinfo =
+    options.skip_warnings = (_misc._skipflags & 2) != 0;
+
+
+    // if machine points neogeo rom list, then it's neogeo.
+    if(drv->bios == system_bios_neogeo_first &&
+       _misc._neogeo_bios >0 &&  _misc._neogeo_bios<=12)
+    {
+        // stupids want a casted name.
+        static char t[4];
+        snprintf(t,3,"%d",_misc._neogeo_bios);
+        options.bios = t;
+
+        //printf("set bios:%s\n",t);
+    }
+
 
 }
 

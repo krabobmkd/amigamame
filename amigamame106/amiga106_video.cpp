@@ -342,6 +342,12 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
 }
 
+// - -  update screen before boot.
+void osd_update_boot_progress(int percent)
+{
+
+}
+
 extern ULONG _bootframeskip;
 /*
   osd_skip_this_frame() must return 0 if the current frame will be displayed.
