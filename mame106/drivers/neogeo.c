@@ -1442,7 +1442,8 @@ SYSTEM_BIOS_START( neogeo )
   SYSTEM_BIOS_ADD(10, "debug",      "Debug MVS" )
   SYSTEM_BIOS_ADD(11, "asia-aes",   "Asia AES" )
 //krb added
-  SYSTEM_BIOS_ADD(12, "uni-bios.40", "Unibios MVS (v4.0)" )
+  SYSTEM_BIOS_ADD(12, "uni-bios_3_3.rom", "Unibios MVS (v3.3)" )
+//  SYSTEM_BIOS_ADD(12, "uni-bios.40", "Unibios MVS (v4.0)" )
 SYSTEM_BIOS_END
 
 //krb: make this public to feed prefs menu
@@ -1466,7 +1467,7 @@ const bios_entry *system_bios_neogeo_first = system_bios_neogeo;
   ROM_LOAD16_WORD_SWAP_BIOS( 9, "uni-bios.11",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */ \
   ROM_LOAD16_WORD_SWAP_BIOS(10, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Debug (Development) Bios */ \
   ROM_LOAD16_WORD_SWAP_BIOS(11, "aes-bios.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */ \
-  ROM_LOAD16_WORD_SWAP_BIOS(12, "uni-bios.40", 0x00000, 0x020000, CRC(a7aab458) SHA1(938a0bda7d9a357240718c2cec319878d36b8f72) ) /* */
+  ROM_LOAD16_WORD_SWAP_BIOS(12, "uni-bios_3_3.rom", 0x00000, 0x020000, CRC(a7aab458) SHA1(938a0bda7d9a357240718c2cec319878d36b8f72) ) /* */
 
 /* note you'll have to modify the last for lines of each block to use the extra bios roms,
    they're hacks / homebrew / console bios roms so Mame doesn't list them by default */

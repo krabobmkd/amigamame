@@ -1573,7 +1573,7 @@ void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
         dgp2.flipx = fflipx;
         dgp2.flipy = fflipy;
 
-        dgp2.priority_mask =  primasks[priority] ; // |(1<<31) because pdraw ->KRB no more
+        dgp2.priority_mask =  primasks[priority] |(1<<31); // |(1<<31) because pdrawgfx
 
 
 		if(colour & 0x80)
