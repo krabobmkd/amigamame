@@ -98,7 +98,7 @@ int osd_skip_this_frame(void);
 void osd_update_video_and_audio(struct _mame_display *display);
 
 // krb
-void osd_update_boot_progress(int percent);
+void osd_update_boot_progress(int per256, int progenum);
 
 /*
   Provides a hook to allow the OSD system to override processing of a

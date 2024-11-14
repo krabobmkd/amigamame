@@ -95,16 +95,7 @@ void osd_exit()
 {
 }
 
-/* called while loading ROMs. It is called a last time with name == 0 to signal */
-/* that the ROM loading process is finished. */
-/* return non-zero to abort loading */
-int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
-{
-    // 9B [N] 46 "\x1b[\x9b\x01m"
-   // if(romdata->romsloaded>1) printf("\r");   
-    loginfo(0,"load rom: %d/%d\n",romdata->romsloaded,romdata->romstotal);
-   return(0);
-}
+
 // -  - - - -
 
 /* called when the game is paused/unpaused, so the OS dependant code can do special */

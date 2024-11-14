@@ -29,7 +29,8 @@ public:
     virtual bool open() = 0;
     virtual void close() {}
     virtual void draw(_mame_display *display) = 0;
-    virtual MsgPort *userPort() = 0;
+    //virtual MsgPort *userPort() = 0;
+    virtual Window *window() = 0;
     virtual RastPort *rastPort() = 0;
     virtual Screen *screen() { return NULL; }
     virtual BitMap *bitmap() { return NULL; }
@@ -41,7 +42,8 @@ public:
   //  virtual void drawRastPort_CGX(_mame_display *display,Paletted *pRemap);
   //   void drawRastPortWPA8(_mame_display *display,Paletted *pRemap);
 
-
+    inline int width() const { return _width; }
+    inline int height() const { return _height; }
 protected:
     int _width,_height;
     int _useScale;
@@ -59,7 +61,7 @@ public:
     bool open() override;
     void close() override;
     Screen *screen() override;
-    MsgPort *userPort() override;
+    Window *window() override;
     RastPort *rastPort() override;
     BitMap *bitmap() override;
     void waitFrame() override;
@@ -102,7 +104,7 @@ public:
     ~Intuition_Window();
     bool open() override;
     void close() override;
-    MsgPort *userPort() override;
+    Window *window() override;
     RastPort *rastPort() override;
 protected:
     Window *_pWbWindow;
@@ -110,6 +112,7 @@ protected:
     int _machineWidth,_machineHeight;
     int _maxzoomfactor;
 };
+
 
 
 class IntuitionDisplay : public AbstractDisplay
@@ -122,6 +125,7 @@ public:
     void close() override;
     int good() override;
     void draw(_mame_display *pmame_display) override;
+    void drawProgress(int per256, int enm) override;
     MsgPort *userPort() override;
     bool switchFullscreen() override;
     void WaitFrame() override;
@@ -130,7 +134,24 @@ protected:
     IntuitionDrawable   *_drawable; // this manages screen or window opening
  //   IntuitionDrawer     *_drawer; // this manages drawing API.
     params _params; // last params set
- //   void drawRastPort(RastPort *pRPort,_mame_display *pmame_display,int dx,int dy);
+
+
+    // - - - - -  added for direct graphics draw for progbar
+    enum epens {
+        eWhite,
+        eBlack,
+        eGrey,
+        eBlue,
+        eBlue2,
+        eEnd
+    };
+
+    int _pens[eEnd];
+    void obtainPens();
+    void releasePens();
+    struct TextFont *_font;
+
+
 };
 
 

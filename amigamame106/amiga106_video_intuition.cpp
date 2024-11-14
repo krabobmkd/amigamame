@@ -9,13 +9,14 @@
 #include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
-
+#include <proto/diskfont.h>
 #include "version.h"
 // Amiga
 extern "C" {
     #include <intuition/intuition.h>
     #include <intuition/screens.h>
     #include <graphics/modeid.h>
+    #include <graphics/text.h>
 }
 
 extern "C" {
@@ -29,6 +30,7 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 // from driver.h
 #ifndef ORIENTATION_MASK
     #define ORIENTATION_MASK        		0x0007
@@ -183,7 +185,14 @@ bool Intuition_Screen::open()
      }
 
    // note: all this is regular OS intuition, no CGX
-	struct ColorSpec colspec[2]={0,0,0,0,-1,0,0,0};
+	struct ColorSpec colspec[6]={ // let's do it amiga default like
+                0,  8,8,8,  // grey
+                1,  0,0,0, //black
+                2,  15,15,15,
+                3,  1,8,15, // blue 1
+                4,  0,1,8, // blue 2
+                // end
+                -1,0,0,0};
     // that stupid OS function (or driver) want SA_Depth,24 for 32bit depth, or fail.
     if(_screenDepthAsked == 32 )_screenDepthAsked =24;
 
@@ -267,10 +276,9 @@ void Intuition_Screen::close()
     if(_pMouseRaster) FreeRaster( (PLANEPTR) _pMouseRaster ,8,8);
     _pMouseRaster = NULL;
 }
-MsgPort *Intuition_Screen::userPort()
+Window *Intuition_Screen::window()
 {
-    if(!_pScreenWindow) return NULL;
-    return _pScreenWindow->UserPort;
+    return _pScreenWindow;
 }
 RastPort *Intuition_Screen::rastPort()
 {
@@ -389,10 +397,9 @@ void Intuition_Window::close()
 //    if(_sWbWinSBitmap) FreeBitMap(_sWbWinSBitmap);
 //    _sWbWinSBitmap = NULL;
 }
-MsgPort *Intuition_Window::userPort()
+Window *Intuition_Window::window()
 {
-    if(!_pWbWindow) return NULL;
-    return _pWbWindow->UserPort;
+    return _pWbWindow;
 }
 RastPort *Intuition_Window::rastPort()
 {
@@ -405,6 +412,8 @@ IntuitionDisplay::IntuitionDisplay()
 : AbstractDisplay()
 , _drawable(NULL)
 , _params({0})
+, _pens({0})
+, _font(NULL)
 {
 
 }
@@ -456,6 +465,16 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
         close();
         return false;
     }
+    //obtainPens();
+    if(!_font)
+    {
+        struct TextAttr fntatrb={
+            "topaz.font",7,0,0
+        };
+        _font = OpenDiskFont(&fntatrb );
+    }
+
+
 
     return true;
 }
@@ -475,6 +494,49 @@ void IntuitionDisplay::init_rgb_components(unsigned int *rgbcomponents)
         rgbcomponents[2] = 0x0000001f;
     }
 }
+//void IntuitionDisplay::obtainPens()
+//{
+//    // then try alloc pens...
+//    struct pencolor{ UBYTE r,g,b;};
+//    static struct pencolor pencolors[]={
+//        {255,255,255},
+//        {0,0,0},
+//        {128,128,128},
+//        {0,192,255},
+//        {0,24,240},
+//    };
+
+//    Screen *screen = _drawable->screen();
+// printf("colormap:%08x\n",(int) screen->ViewPort.ColorMap);
+//    if(screen && screen->ViewPort.ColorMap)
+//    {
+//        struct ColorMap *pColorMap = screen->ViewPort.ColorMap;
+//        for(int i=0;i<(int)sizeof(pencolors)/sizeof(struct pencolor);i++)
+//        {
+
+//printf("go i:%d\n",(int) i);
+
+//            const struct pencolor &c = pencolors[i];
+//            _pens[i] = ObtainBestPen( pColorMap, ((ULONG)c.r)<<24, ((ULONG)c.g)<<24,
+//                ((ULONG)c.b)<<24, TAG_END);
+//        }
+//    }
+//     printf("obtainPens end\n");
+//}
+//void IntuitionDisplay::releasePens()
+//{
+//    Screen *screen = _drawable->screen();
+
+//    if(screen && screen->ViewPort.ColorMap)
+//    {
+//        struct ColorMap *pColorMap = screen->ViewPort.ColorMap;
+//        for(int i=0;i<(int)sizeof(_pens)/sizeof(int);i++)
+//        {
+//            if(_pens[i] != -1) ReleasePen( pColorMap, _pens[i]);
+//        }
+//    }
+//}
+
 bool IntuitionDisplay::switchFullscreen()
 {
    close();
@@ -483,8 +545,14 @@ bool IntuitionDisplay::switchFullscreen()
 }
 void IntuitionDisplay::close()
 {
+    if(_font)
+    {
+      CloseFont(_font);
+      _font=NULL;
+    }
     if(_drawable)
     {
+        //releasePens();
         _drawable->close();
         delete _drawable;
         _drawable = NULL;
@@ -492,7 +560,7 @@ void IntuitionDisplay::close()
 }
 int IntuitionDisplay::good()
 {
-    if(_drawable && _drawable->userPort()) return 1;
+    if(_drawable && _drawable->window()) return 1;
     return 0;
 }
 void IntuitionDisplay::draw(_mame_display *display)
@@ -501,12 +569,102 @@ void IntuitionDisplay::draw(_mame_display *display)
     _drawable->draw(display);
 
 }
+void IntuitionDisplay::drawProgress(int per256, int enm)
+{
+//     printf("drawProgress\n");
+    if(!_drawable) return;
+    Window *win = _drawable->window();
+    if(!win) return;
+
+    RastPort *rp = win->RPort;
+    if(!rp) return;
+
+    // - -  draw progress screen
+    int w = (int)(win->GZZWidth); // this way manage window border size
+    int h = (int)(win->GZZHeight);
+
+    int blackpen = 1; // _pens[eBlack];
+    int whitepen = 2; // _pens[eWhite];
+    int greypen=0;
+//    if(blackpen == -1) blackpen = GetAPen(rp);
+//    if(whitepen == -1) whitepen = GetBPen(rp);
+
+//     printf("a:%d b:%d\n",blackpen,whitepen);
+// printf("w:%d h:%d\n",w,h);
+    SetAPen(rp,blackpen);
+    RectFill(rp,0,0,w,h);
+    if(per256 >=256) return; // ok, last used to clear.
+
+    int x1 =  (2*w)/256;
+    int x2 = (254*w)/256;
+    int y1 =  (190*h)/256;
+    int y2 =  (208*h)/256;
+    int wless = w;
+    if(h<wless) wless=h;
+    int border =  (2*wless)/256;
+    if(border<1) border=1;
+
+    SetAPen(rp,greypen);
+    RectFill(rp,x1,y1,x2,y1+border);
+    RectFill(rp,x1,y2-border,x2,y2);
+    RectFill(rp,x1,y1+border,x1+border,y2-border);
+    RectFill(rp,x2-border,y1+border,x2,y2-border);
+
+    // bar
+    int xb1 = x1+3*border;
+    int xb2 = x2-3*border;
+    int yb1 = y1+3*border;
+    int yb2 = y2-3*border;
+    RectFill(rp,xb1,yb1,xb1 + ((xb2-xb1)*per256)/256,yb2);
+
+    const char *phases[]={
+        "Temporal convector flux init.",
+        "Initialize input ports.",
+        "Rom load...",
+        "Memory And Cpu inits...",
+        "Hi Score load.",
+        "Rebuild Machine...",
+        "Video Chip inits...",
+        "Load Cheats...",
+        ""
+    };
+    if(_font && enm<sizeof(phases)/sizeof(const char *))
+    {
+        SetFont(rp,_font);
+
+/*
+        ebStart=0,
+        ebInput,
+        ebRomLoad,
+        ebMemoryAndCpu,
+        ebHighScoreSaveLoad,
+        eDriver, //  decryption is done and memory maps altered
+        eSoundVideo,
+        eCheat,
+        eProgressEnd
+*/
+        int xt= 8;
+        const char *p = phases[enm];
+        int l = strlen(p);
+        SetDrMd(rp,  JAM1  );
+        SetAPen(rp,blackpen);
+        Move(rp,xt,yb2+6);
+        Text(rp,p,l);
+        Move(rp,xt+1,yb2+6);
+        Text(rp,p,l);
+
+        SetAPen(rp,whitepen);
+        Move(rp,xt+1,yb2+7);
+        Text(rp,p,l);
+    }
+}
 MsgPort *IntuitionDisplay::userPort()
 {
     if(!_drawable) return NULL;
-    return _drawable->userPort();
+    Window *w = _drawable->window();
+    if(!w) return NULL;
+    return w->UserPort;
 }
-
 void IntuitionDisplay::WaitFrame()
 {
     if(!_drawable) return

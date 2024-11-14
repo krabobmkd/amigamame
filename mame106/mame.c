@@ -1154,6 +1154,8 @@ static void init_machine(void)
 		if (mem_region[num].flags & ROMREGION_DISPOSE)
 			free_memory_region(num);
 
+
+    bootlog_setprogress(eProgressEnd);
 #ifdef MAME_DEBUG
 	/* initialize the debugger */
 	if (Machine->debug_mode)

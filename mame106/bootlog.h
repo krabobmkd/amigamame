@@ -16,7 +16,7 @@ extern "C" {
         eDriver, //  decryption is done and memory maps altered
         eSoundVideo,
         eCheat,
-        eProgressSize
+        eProgressEnd
 
 
     } eProgress;

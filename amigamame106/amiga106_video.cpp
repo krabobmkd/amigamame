@@ -343,9 +343,10 @@ void osd_update_video_and_audio(struct _mame_display *display)
 }
 
 // - -  update screen before boot.
-void osd_update_boot_progress(int percent)
+void osd_update_boot_progress(int per256, int enm)
 {
-
+    if(!g_pMameDisplay) return;
+    g_pMameDisplay->drawProgress(per256,enm);
 }
 
 extern ULONG _bootframeskip;
