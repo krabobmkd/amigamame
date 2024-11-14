@@ -1032,7 +1032,7 @@ static void init_machine(void)
 	generic_video_init();
 	rand_seed = 0x9d14abd7;
 
-
+    bootlog_setprogress(ebStart);
 	/* init the osd layer */
 	if (osd_init() != 0)
 		fatalerror("osd_init failed");

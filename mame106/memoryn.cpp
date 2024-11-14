@@ -129,19 +129,15 @@ static inline void testEntryShitMaskUse_directwriteA( handler_data &hdata, offs_
 #define DO_ENTRY_STATS 1
 #ifdef DO_ENTRY_STATS
 
-UINT32 entriesDirectReadA[256]={0};
-UINT32 entriesDirectReadB[256]={0};
-UINT32 entriesOverread[256]={0};
 
-UINT32 entriesDirectWritesA[256]={0};
-UINT32 entriesDirectWritesB[256]={0};
-UINT32 entriesOverwrites[256]={0};
-
+//#define DO_TESTENTRYTYPE 1
 //handler_data &hdata = active_address_space[0].readhandlers[entry];
 
 //address -= hdata.offset;
 //address &= hdata.mask;
 
+
+#ifdef DO_TESTENTRYTYPE
 #define ENTRY_STAT_DirectReadA(a)  entriesDirectReadA[a]++;
 #define ENTRY_STAT_DirectReadB(a)  entriesDirectReadB[a]++;
 #define ENTRY_STAT_Overread(a)  entriesOverread[a]++;
@@ -149,7 +145,15 @@ UINT32 entriesOverwrites[256]={0};
 #define ENTRY_STAT_DirectWritesA(a)  entriesDirectWritesA[a]++;
 #define ENTRY_STAT_DirectWritesB(a)  entriesDirectWritesB[a]++;
 #define ENTRY_STAT_Overwrite(a)  entriesOverwrites[a]++;
+#else
+#define ENTRY_STAT_DirectReadA(a)
+#define ENTRY_STAT_DirectReadB(a)
+#define ENTRY_STAT_Overread(a)
 
+#define ENTRY_STAT_DirectWritesA(a)
+#define ENTRY_STAT_DirectWritesB(a)
+#define ENTRY_STAT_Overwrite(a)
+#endif
 
 extern "C" {
     void logEntries();
@@ -157,6 +161,7 @@ extern "C" {
 
 void logEntries()
 {
+#ifdef DO_TESTENTRYTYPE
     printf("maskuse:%08x offsetuse:%08x adressspace_readmaskuse:%08x\n",read_maskuse,read_offsetuse,adressspace_readmaskuse);
 
     printf("  **** READ ****\n");
@@ -191,6 +196,7 @@ void logEntries()
             printf("*** DirectWriteB %03d  %08x\n", ic, entriesDirectWritesB[ic]);
         }
     }
+#endif
 }
 
 

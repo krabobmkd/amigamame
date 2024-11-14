@@ -15,7 +15,7 @@
 #include "profiler.h"
 #include "png.h"
 #include "vidhrdw/vector.h"
-
+#include "bootlog.h"
 #if defined(MAME_DEBUG) && !defined(NEW_DEBUGGER)
 #include "mamedbg.h"
 #endif
@@ -167,9 +167,9 @@ int video_init(void)
 		return 1;
 
 #ifndef NEW_RENDER
-	/* if we're a vector game, override the screen width and height */
-	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
-		scale_vectorgames(options.vector_width, options.vector_height, &bmwidth, &bmheight);
+//	/* if we're a vector game, override the screen width and height */
+//	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
+//		scale_vectorgames(options.vector_width, options.vector_height, &bmwidth, &bmheight);
 /*krb moved earlier
 	// compute the visible area for raster games
 	if (!(Machine->drv->video_attributes & VIDEO_TYPE_VECTOR))
@@ -261,6 +261,7 @@ int video_init(void)
 	set_vh_global_attribute(NULL, 0);
 
 	/* actually decode the graphics */
+
 	if (Machine->drv->gfxdecodeinfo)
 		decode_graphics(Machine->drv->gfxdecodeinfo);
 
@@ -278,6 +279,7 @@ int video_init(void)
 	/* initialize tilemaps */
 	if (tilemap_init() != 0)
 		fatalerror("tilemap_init failed");
+
 	return 0;
 }
 
@@ -448,9 +450,10 @@ static void decode_graphics(const gfx_decode *gfxdecodeinfo)
 
 	/* count total graphics elements */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
-		if (Machine->gfx[i])
+		if (Machine->gfx[i] && gfxdecodeinfo[i].memory_region > REGION_INVALID)
+        {
 			totalgfx += Machine->gfx[i]->total_elements;
-
+        }
 	/* loop over all elements */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
 		if (Machine->gfx[i])
@@ -468,6 +471,7 @@ static void decode_graphics(const gfx_decode *gfxdecodeinfo)
 					int num_to_decode = (j + 1024 < gfx->total_elements) ? 1024 : (gfx->total_elements - j);
 					decodegfx(gfx, region_base + gfxdecodeinfo[i].start, j, num_to_decode);
 					curgfx += num_to_decode;
+                    bootlog_setvideodecode(curgfx,totalgfx);
 		/*          ui_display_decoding(artwork_get_ui_bitmap(), curgfx * 100 / totalgfx);*/
 				}
 			}

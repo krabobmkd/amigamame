@@ -597,11 +597,11 @@ void IntuitionDisplay::drawProgress(int per256, int enm)
 
     int x1 =  (2*w)/256;
     int x2 = (254*w)/256;
-    int y1 =  (190*h)/256;
+    int y1 =  (198*h)/256;
     int y2 =  (208*h)/256;
     int wless = w;
     if(h<wless) wless=h;
-    int border =  (2*wless)/256;
+    int border =  (1*wless)/256;
     if(border<1) border=1;
 
     SetAPen(rp,greypen);

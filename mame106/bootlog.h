@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
     void bootlog_setromload(int i, int nbroms);
+    void bootlog_setvideodecode(int i, int nbgfx);
 
     typedef enum {
         ebStart=0,
