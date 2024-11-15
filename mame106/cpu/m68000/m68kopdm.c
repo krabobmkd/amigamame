@@ -12200,12 +12200,31 @@ void m68k_op_moves_32_al(M68KOPT_PARAMS)
 
 void m68k_op_moveq_32(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
+    // 12 instructions -> 6 instructions :)
+    asm volatile(
+        "move.b %0,d0\n"
+        "\textb.l d0\n"
+        "\tbfextu %0{#20:#3},d1\n"
+        "\tmove.l d0,%c[dar](%1,d1.l*4)\n"
+        "\tmove.l d0,%c[not_z_flag](%1)\n"
+        "\tmove.l d0,%c[n_flag](%1)\n"  // bit 7 is neg, no need rol !
+        :
+        : "d"(regir), "a"(p68k),
+         [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
+         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
+         [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
+        :  "d0","d1"
+        );
+#else
 	uint res = DX = MAKE_INT_8(MASK_OUT_ABOVE_8(REG_IR));
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
+#endif
 	DO_MOVED_CLEARV();
-	FLAG_C = CFLAG_CLEAR;
+	DO_MOVED_CLEARC();
+//	FLAG_C = CFLAG_CLEAR;
 }
 
 

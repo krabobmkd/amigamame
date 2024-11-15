@@ -813,3 +813,40 @@ UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REG
     return count;
 }
 
+
+
+UINT8 program_read_byte_8(offs_t address REGM(d0))
+{
+    UINT32 entry;
+    testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
+	address &= active_address_space[0].addrmask;
+
+	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
+
+    if (entry < STATIC_RAM)
+    {
+        ENTRY_STAT_DirectReadA(entry);
+        handler_data &hdata = active_address_space[0].readhandlers[entry];
+        address -= hdata.offset;
+        address &= hdata.mask;
+
+        return bank_ptr[entry][address];
+    }
+	if (entry >= SUBTABLE_BASE)
+		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
+
+    handler_data &hdata = active_address_space[0].readhandlers[entry];
+    address -= hdata.offset;
+    address &= hdata.mask;
+
+	if (entry < STATIC_RAM)
+    {
+        ENTRY_STAT_DirectReadB(entry);
+        return bank_ptr[entry][address];
+    }
+    ENTRY_STAT_Overread(entry);
+    read8_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler8;
+    return reader(address);
+}
+
+//    WRITEBYTE8(program_write_byte_8,     ADDRESS_SPACE_PROGRAM)

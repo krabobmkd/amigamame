@@ -392,10 +392,16 @@ void osd_free_executable(void *ptr)
 {
 
 }
-int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
+//int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
+//{
+//    return 0;
+//}
+void osd_update_boot_progress(int per256, int enm)
 {
-    return 0;
+
 }
+
+
 int osd_is_bad_read_ptr(const void *ptr, size_t size)
 {
     return 0;
