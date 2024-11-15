@@ -409,7 +409,7 @@ VIDEO_UPDATE( centiped )
 		0, 	// sy
 		&spriteclip, 	// clip
 		TRANSPARENCY_PENS, 	// transparency
-		penmask[color & 0x3f], 	// transparent_color
+		0, //penmask[color & 0x3f], 	// transparent_color
 		0, 	// scalex
 		0, 	// scaley
 		NULL, 	// pri_buffer
@@ -424,7 +424,7 @@ VIDEO_UPDATE( centiped )
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		
+		dgp0.transparent_color = penmask[color & 0x3f];
 		dgp0.code = code;
 		dgp0.color = color;
 		dgp0.flipx = flipx;

@@ -341,12 +341,51 @@ void osd_update_video_and_audio(struct _mame_display *display)
     FrameCounter++;
 
 }
+// for progressbar pass
+static void checkExitSimple(MsgPort *userport )
+{
+  struct IntuiMessage *im;
+    int doExit=0;
+    while((im = (struct IntuiMessage *) GetMsg(userport)))
+    {
+        ULONG imclass = im->Class;
+        UWORD imcode  = im->Code;
+        UWORD imqual  = im->Qualifier;
+
+        ReplyMsg((struct Message *) im); // the faster the better.
+
+        switch(imclass)
+        {
+            case IDCMP_RAWKEY:
+            if(!(imqual & IEQUALIFIER_REPEAT) )
+            {
+              if( (imcode & 0x037f)==0x45) doExit = 1; // esc key.
+            }
+            break;
+        case IDCMP_CLOSEWINDOW:
+            doExit = 1;
+        break;
+         default:
+            break;
+        }
+    }
+    if(doExit) fatalerror("abort init"); // setjmp to end of mame loop
+
+}
 
 // - -  update screen before boot.
 void osd_update_boot_progress(int per256, int enm)
 {
     if(!g_pMameDisplay) return;
     g_pMameDisplay->drawProgress(per256,enm);
+
+    // like main thread is under the rungame init ,
+    // galme not started yet,
+    // but test possible exit.
+    MsgPort *userport = g_pMameDisplay->userPort();
+    if(!userport) return ;
+    checkExitSimple(userport);
+
 }
 
 extern ULONG _bootframeskip;

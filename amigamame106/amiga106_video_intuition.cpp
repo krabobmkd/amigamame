@@ -412,7 +412,7 @@ IntuitionDisplay::IntuitionDisplay()
 : AbstractDisplay()
 , _drawable(NULL)
 , _params({0})
-, _pens({0})
+//, _pens(0)
 , _font(NULL)
 {
 
@@ -469,7 +469,7 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
     if(!_font)
     {
         struct TextAttr fntatrb={
-            "topaz.font",7,0,0
+            (STRPTR)"topaz.font",7,0,0
         };
         _font = OpenDiskFont(&fntatrb );
     }

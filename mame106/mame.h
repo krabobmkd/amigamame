@@ -356,8 +356,6 @@ void *_auto_malloc(size_t size, const char *file, int line) ATTR_MALLOC;
 /* allocate memory and duplicate a string that will be freed at the next end_resource_tracking */
 char *auto_strdup(const char *str) ATTR_MALLOC;
 
-
-
 /* ----- miscellaneous bits & pieces ----- */
 
 /* standardized random number generator */

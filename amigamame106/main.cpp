@@ -331,3 +331,10 @@ int main(int argc, char **argv)
 
 //  EasyRequestArgs(NULL, &es, NULL, &((&msg_id)[1]));
 //}
+
+void filtercheat()
+{
+    ifstream ifs("cheat.dat")
+
+
+}

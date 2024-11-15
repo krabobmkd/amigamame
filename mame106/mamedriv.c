@@ -2732,6 +2732,16 @@ const game_driver * const drivers[] =
 	DRIVER( trogpa6 ) /* 1990 "Midway" "Trog (rev PA6-PAC 09/09/90)" */
 #endif
 #ifdef LINK_MINIATARI
+	DRIVER( 720 ) /* 1986 "Atari Games" "720 Degrees (rev 4)" */
+	DRIVER( 720g ) /* 1986 "Atari Games" "720 Degrees (German */
+	DRIVER( 720gr1 ) /* 1986 "Atari Games" "720 Degrees (German */
+	DRIVER( 720r1 ) /* 1986 "Atari Games" "720 Degrees (rev 1)" */
+	DRIVER( 720r2 ) /* 1986 "Atari Games" "720 Degrees (rev 2)" */
+	DRIVER( 720r3 ) /* 1986 "Atari Games" "720 Degrees (rev 3)" */
+	DRIVER( apb ) /* 1987 "Atari Games" "APB - All Points Bulletin (rev 7)" */
+	DRIVER( apb6 ) /* 1987 "Atari Games" "APB - All Points Bulletin (rev 6)" */
+	DRIVER( apbf ) /* 1987 "Atari Games" "APB - All Points Bulletin (French)" */
+	DRIVER( apbg ) /* 1987 "Atari Games" "APB - All Points Bulletin (German)" */
 	DRIVER( bullsdrt ) /* 1985 "Shinkai Inc. (Magic Eletronics Inc. licence)" "Bulls Eye Darts" */
 	DRIVER( ccastle2 ) /* 1983 "Atari" "Crystal Castles (version 2)" */
 	DRIVER( ccastle3 ) /* 1983 "Atari" "Crystal Castles (version 3)" */
@@ -2739,6 +2749,11 @@ const game_driver * const drivers[] =
 	DRIVER( centipd2 ) /* 1980 "Atari" "Centipede (revision 2)" */
 	DRIVER( centiped ) /* 1980 "Atari" "Centipede (revision 3)" */
 	DRIVER( centtime ) /* 1980 "Atari" "Centipede (1 player */
+	DRIVER( csprint ) /* 1986 "Atari Games" "Championship Sprint (rev 3)" */
+	DRIVER( csprint2 ) /* 1986 "Atari Games" "Championship Sprint (rev 2)" */
+	DRIVER( csprintf ) /* 1986 "Atari Games" "Championship Sprint (French)" */
+	DRIVER( csprintg ) /* 1986 "Atari Games" "Championship Sprint (German */
+	DRIVER( csprints ) /* 1986 "Atari Games" "Championship Sprint (Spanish */
 	DRIVER( gaunt2 ) /* 1986 "Atari Games" "Gauntlet II" */
 	DRIVER( gaunt2g ) /* 1986 "Atari Games" "Gauntlet II (German)" */
 	DRIVER( gauntg ) /* 1985 "Atari Games" "Gauntlet (German */
@@ -2748,15 +2763,40 @@ const game_driver * const drivers[] =
 	DRIVER( harddriv ) /* 1988 "Atari Games" "Hard Drivin' (cockpit */
 	DRIVER( harddrvc ) /* 1990 "Atari Games" "Hard Drivin' (compact */
 	DRIVER( hdrivair ) /* 1993 "Atari Games" "Hard Drivin's Airborne (prototype)" */
+	DRIVER( indytem2 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 2)" */
+	DRIVER( indytem3 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 3)" */
+	DRIVER( indytem4 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 4)" */
+	DRIVER( indytemd ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (German)" */
+	DRIVER( indytemp ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 1)" */
 	DRIVER( klax ) /* 1989 "Atari Games" "Klax (set 1)" */
 	DRIVER( klaxd ) /* 1989 "Atari Games" "Klax (Germany)" */
 	DRIVER( klaxj ) /* 1989 "Atari Games" "Klax (Japan)" */
+	DRIVER( marble ) /* 1984 "Atari Games" "Marble Madness (set 1)" */
+	DRIVER( marble2 ) /* 1984 "Atari Games" "Marble Madness (set 2)" */
+	DRIVER( marble3 ) /* 1984 "Atari Games" "Marble Madness (set 3)" */
+	DRIVER( marble4 ) /* 1984 "Atari Games" "Marble Madness (set 4)" */
 	DRIVER( milliped ) /* 1982 "Atari" "Millipede" */
+	DRIVER( paperboy ) /* 1984 "Atari Games" "Paperboy (rev 3)" */
+	DRIVER( paperbr1 ) /* 1984 "Atari Games" "Paperboy (rev 1)" */
+	DRIVER( paperbr2 ) /* 1984 "Atari Games" "Paperboy (rev 2)" */
+	DRIVER( peterpak ) /* 1984 "Atari Games" "Peter Pack-Rat" */
 	DRIVER( racedriv ) /* 1990 "Atari Games" "Race Drivin' (cockpit */
 	DRIVER( racedrvc ) /* 1990 "Atari Games" "Race Drivin' (compact */
 	DRIVER( rampart ) /* 1990 "Atari Games" "Rampart (Trackball)" */
 	DRIVER( rampartj ) /* 1990 "Atari Games" "Rampart (Japan */
 	DRIVER( ramprt2p ) /* 1990 "Atari Games" "Rampart (Joystick)" */
+	DRIVER( roadblc1 ) /* 1987 "Atari Games" "Road Blasters (cockpit */
+	DRIVER( roadblcg ) /* 1987 "Atari Games" "Road Blasters (cockpit */
+	DRIVER( roadblsc ) /* 1987 "Atari Games" "Road Blasters (cockpit */
+	DRIVER( roadblsg ) /* 1987 "Atari Games" "Road Blasters (upright */
+	DRIVER( roadblst ) /* 1987 "Atari Games" "Road Blasters (upright */
+	DRIVER( roadrun1 ) /* 1985 "Atari Games" "Road Runner (rev 1)" */
+	DRIVER( roadrun2 ) /* 1985 "Atari Games" "Road Runner (rev 1+)" */
+	DRIVER( roadrunn ) /* 1985 "Atari Games" "Road Runner (rev 2)" */
+	DRIVER( ssprint ) /* 1986 "Atari Games" "Super Sprint (rev 4)" */
+	DRIVER( ssprint1 ) /* 1986 "Atari Games" "Super Sprint (rev 1)" */
+	DRIVER( ssprint3 ) /* 1986 "Atari Games" "Super Sprint (rev 3)" */
+	DRIVER( ssprintg ) /* 1986 "Atari Games" "Super Sprint (German */
 	DRIVER( steeltal ) /* 1991 "Atari Games" "Steel Talons (rev 2)" */
 	DRIVER( strtdriv ) /* 1993 "Atari Games" "Street Drivin' (prototype)" */
 	DRIVER( stunrun ) /* 1989 "Atari Games" "S.T.U.N. Runner (rev 6)" */

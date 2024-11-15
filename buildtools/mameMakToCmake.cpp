@@ -491,7 +491,13 @@ int patchMiniMachines(
             "vidhrdw/rampart.c",
 
             "drivers/klax.c",
-            "vidhrdw/klax.c"
+            "vidhrdw/klax.c",
+            // marbemadness, paperboy
+            "drivers/atarisy1.c",  // M68010 M6502
+            "drivers/atarisy2.c", // T11 M6502   s:POKEY  YM2151 TMS5220
+            "vidhrdw/atarisy1.c",
+            "vidhrdw/atarisy2.c"
+
         };
         copyDrivers(m,src,{
         "ccastles","ccastle3","ccastle2",
@@ -505,7 +511,19 @@ int patchMiniMachines(
         "racedriv","racedrvc",
         "steeltal",
         "strtdriv",
-        "hdrivair"
+        "hdrivair",
+
+        "marble","marble2","marble3","marble4",
+        "peterpak","indytemp","indytem2","indytem3","indytem4","indytemd",
+        "roadrunn","roadrun2","roadrun1",
+        "roadblst","roadblsg","roadblsc","roadblcg","roadblc1",
+
+        "paperboy","paperbr2","paperbr1",
+        "720","720r3","720r2","720r1","720g","720gr1",
+        "ssprint","ssprint3","ssprint1","ssprintg",
+        "csprint","csprint2","csprintf","csprints","csprintg",
+
+        "apb","apb6","apbg","apbf"
     });
 
         m._cpu_defs["M68010"]=1; // gauntlet + hardwrivin stun runner
@@ -517,7 +535,11 @@ int patchMiniMachines(
 
         m._cpu_defs["ADSP2100"]=1; // hardwrivin friends
         m._cpu_defs["ADSP2101"]=1;
+        m._cpu_defs["ADSP2181"]=1;
+
         m._cpu_defs["DSP32C"]=1;
+
+        m._cpu_defs["T11"]=1;
 
         m._sound_defs["YM2151"]=1;
         m._sound_defs["TMS5220"]=1;
@@ -905,7 +927,7 @@ int createCmake(map<string,TMachine> machinetargets,
         if(upname == "SEGA" ) onShouldBeDefault = true;
          // pacmania,...
          if(upname == "MININAMCOS1") onShouldBeDefault=true;
-
+         if(upname == "MINIATARI") onShouldBeDefault=true;
          if(upname == "JALECO") onShouldBeDefault=true;
 
          if(upname == "CAPCOM" ) onShouldBeDefault = true;

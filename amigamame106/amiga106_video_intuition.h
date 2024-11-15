@@ -146,9 +146,9 @@ protected:
         eEnd
     };
 
-    int _pens[eEnd];
-    void obtainPens();
-    void releasePens();
+//    int _pens[eEnd];
+//    void obtainPens();
+//    void releasePens();
     struct TextFont *_font;
 
 

@@ -51,7 +51,7 @@ Notes:
 
 #include "driver.h"
 #include "neogeo.h"
-
+#include "drawgfxn.h"
 #include <stdio.h>
 
 static UINT16 *neogeo_vidram16;
@@ -519,7 +519,8 @@ INLINE void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 	UINT16 *bm = line[sy]+sx;
 
 	UINT8 *fspr = (UINT32 *)memory_region_gfx3;
-	const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
+//	const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
+    UINT32 colorc =  gfx->color_granularity * color;
 
 	if (sx <= -16) return;
 
@@ -540,41 +541,41 @@ INLINE void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
                 // 10 32
                 UINT8 col;
 
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD7] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD7] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD6] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD6] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD5] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD5] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD4] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD4] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD3] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD3] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD2] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD2] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD1] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD1] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD0] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD0] = (colorc+col);
             }
             v = *fspr4;
             if(v)
             {
                 UINT8 col;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD7] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD7] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD6] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD6] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD5] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD5] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD4] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD4] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD3] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD3] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD2] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD2] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD1] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD1] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD0] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD0] = (colorc+col);
             }
 		}
 		else
@@ -582,30 +583,30 @@ INLINE void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
 			char *zoomx_draw = zoomx_draw_tables[zx];
             fspr+=7;
             UINT8 c = *fspr--;
-            if (zoomx_draw[0]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[1]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[0]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[1]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
             c = *fspr--;
-            if (zoomx_draw[2]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[3]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[2]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[3]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
             c = *fspr--;
-            if (zoomx_draw[4]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[5]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[4]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[5]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
             c = *fspr--;
-            if (zoomx_draw[6]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[7]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[6]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[7]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
 
             c = *fspr--;
-            if (zoomx_draw[8]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[9]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[8]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[9]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
             c = *fspr--;
-            if (zoomx_draw[10]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[11]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[10]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[11]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
             c = *fspr--;
-            if (zoomx_draw[12]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[13]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[12]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[13]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
             c = *fspr--;
-            if (zoomx_draw[14]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[15]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[14]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[15]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
 
 		}
 	}
@@ -623,71 +624,71 @@ INLINE void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
                 // 10 32
                 UINT8 col;
 
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD0] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD0] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD1] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD1] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD2] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD2] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD3] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD3] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD4] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD4] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD5] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD5] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD6] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD6] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD7] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[ WR_ORD7] = (colorc+col);
             }
             v = *fspr4;
             if(v)
             {
                 UINT8 col;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD0] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD0] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD1] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD1] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD2] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD2] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD3] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD3] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD4] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD4] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD5] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD5] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD6] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD6] = (colorc+col);
                 v>>=4;
-                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD7] = paldata[col];
+                col = ((UINT8)v)&msk; if (col) bm[8+ WR_ORD7] = (colorc+col);
             }
 		}
 		else
 		{
 			char *zoomx_draw = zoomx_draw_tables[zx];
             UINT8 c = *fspr++;
-            if (zoomx_draw[0]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[1]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[0]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[1]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
             c = *fspr++;
-            if (zoomx_draw[2]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[3]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[2]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[3]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
             c = *fspr++;
-            if (zoomx_draw[4]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[5]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[4]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[5]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
             c = *fspr++;
-            if (zoomx_draw[6]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[7]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[6]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[7]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
 
             c = *fspr++;
-            if (zoomx_draw[8]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[9]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[8]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[9]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
             c = *fspr++;
-            if (zoomx_draw[10]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[11]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[10]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[11]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
             c = *fspr++;
-            if (zoomx_draw[12]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[13]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[12]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[13]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
             c = *fspr++;
-            if (zoomx_draw[14]) { UINT8 col=c&msk; if (col) *bm = paldata[col]; bm++; }
-            if (zoomx_draw[15]) { UINT8 col=c>>4; if (col) *bm = paldata[col]; bm++; }
+            if (zoomx_draw[14]) { UINT8 col=c&msk; if (col) *bm = (colorc+col); bm++; }
+            if (zoomx_draw[15]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
 
 		}
 	}
@@ -1112,7 +1113,8 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 					dgp0.color = byte2;
 					dgp0.sx = x*8;
 					dgp0.sy = y*8;
-					drawgfx(&dgp0);
+					//drawgfx(&dgp0);
+					drawgfx_clut16_Src8(&dgp0);
 				}
 			}
 			} // end of patch paragraph
@@ -1154,7 +1156,8 @@ static void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cliprect)
 					dgp1.color = byte2;
 					dgp1.sx = x*8;
 					dgp1.sy = y*8;
-					drawgfx(&dgp1);
+					//drawgfx(&dgp1);
+					drawgfx_clut16_Src8(&dgp1);
 							//x = x +8;
 				}
 			}
@@ -1183,7 +1186,8 @@ VIDEO_UPDATE( neogeo )
 
 // return;
 
-	fillbitmap(bitmap,Machine->pens[4095],cliprect);
+//	fillbitmap(bitmap,Machine->pens[4095],cliprect);
+	fillbitmap(bitmap,4095,cliprect);
 
 	for (scan = cliprect->min_y; scan <= cliprect->max_y ; scan++)
 	{

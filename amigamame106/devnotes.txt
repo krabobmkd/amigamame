@@ -2,6 +2,8 @@
 
 todo beta4
 
+- O activate miniatari
+- O cheat file accelerate
 - O apply super simple memread/write when driver allow.
 - X repair gforce2 sprites -> was musashi bug.
 - O repair optims YM2151
@@ -11,15 +13,16 @@ todo beta4
 		X clip X1 bug
 - O tilemap bitfield line optim ->0.5% gain ? 3% ?
 - O optim sound bubbob
-- O  neogeo cpu overrwrite optim
-- O  neogeo change RGB15 to 16b index
+- X  neogeo change RGB15 to 16b index
 - X  neogeo verif slicing
 - O  neogeo rewrite spriter in correct order and with no pixel tests.
+- X  neogeo bios choice
 - O need 100%: rastan (85%),slap fight (90%), bubbob (85%)
 - O fastboot neogeo, batrider
 - X Mui5 lists with sorting.
-- O remove stdout logs, use status line, have output in option.
-- O cheat file accelerate
+- X some icon on UI.
+- X remove stdout logs, use status line, have output in option.
+
 
 
 todo beta3d
@@ -27,7 +30,7 @@ todo beta3d
 - O wrong megaplay colors -> remove all mp_xxx ?
 - X main.cfg trashed when caching big romset.
 - X 6% to 8% gain of 68k optimisations
-- O manage freeze init pass
+- X manage freeze init pass
 
 
  Todo for beta3:
