@@ -5366,6 +5366,32 @@ void m68k_op_move_8_d_pcix(M68KOPT_PARAMS)
 
 void m68k_op_move_8_d_i(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
+ // does move.w #value,dx
+
+// %0 regir d2   %1 p68k a2
+// 12 instr -> 9 instr.
+    asm volatile(
+        "move.l %c[progcount](%1),d1\n" // p68k->pc
+        "\tmove.w ([_opcode_base],d1.l),d0\n"
+        "\taddq.l #2,d1\n" // because 2 alignment
+        "\tmove.l d1,%c[progcount](%1)\n"
+        "\tand.l #255,d0\n" // for ccr c coherency
+
+        "\tbfextu %0{#20:#3},d1\n" // x in dx
+        "\tmove.b d0,%c[dar]+3(%1,d1.l*4)\n"
+
+        "\tmove.l d0,%c[not_z_flag](%1)\n"
+        "\tmove.l d0,%c[n_flag](%1)\n"
+        :
+        : "d"(regir), "a"(p68k),
+         [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
+         [progcount] "n" (offsetof(struct m68ki_cpu_core, pc)),
+         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
+         [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
+        :  "d0","d1"
+        );
+#else
 	uint res = OPER_I_8(M68KOPT_PASSPARAMS);
 	uint* r_dst = &DX;
 
@@ -5373,6 +5399,7 @@ void m68k_op_move_8_d_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
+#endif
 	DO_MOVED_CLEARV();
 	DO_MOVED_CLEARC();
 }
@@ -7122,6 +7149,8 @@ void m68k_op_move_16_d_di(M68KOPT_PARAMS)
 
 void m68k_op_move_16_d_ix(M68KOPT_PARAMS)
 {
+
+
 	uint res = OPER_AY_IX_16(M68KOPT_PASSPARAMS);
 	uint* r_dst = &DX;
 
@@ -7192,6 +7221,33 @@ void m68k_op_move_16_d_pcix(M68KOPT_PARAMS)
 
 void m68k_op_move_16_d_i(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
+ // does move.w #value,dx
+
+// %0 regir d2   %1 p68k a2
+// 13 instr -> 10 instr.
+    asm volatile(
+        "move.l %c[progcount](%1),d1\n" // p68k->pc
+        "\tclr.l d0\n" // for ccr c coherency
+        "\tmove.w ([_opcode_base],d1.l),d0\n"
+        "\taddq.l #2,d1\n"
+        "\tmove.l d1,%c[progcount](%1)\n"
+
+        "\tbfextu %0{#20:#3},d1\n" // x in dx
+        "\tmove.w d0,%c[dar]+2(%1,d1.l*4)\n"
+
+        "\tmove.l d0,%c[not_z_flag](%1)\n"
+        "\tlsr.l #8,d0\n"
+        "\tmove.l d0,%c[n_flag](%1)\n"
+        :
+        : "d"(regir), "a"(p68k),
+         [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
+         [progcount] "n" (offsetof(struct m68ki_cpu_core, pc)),
+         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
+         [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
+        :  "d0","d1"
+        );
+#else
 	uint res = OPER_I_16(p68k);
 	uint* r_dst = &DX;
 
@@ -7199,6 +7255,7 @@ void m68k_op_move_16_d_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
+#endif
 	DO_MOVED_CLEARV();
 	DO_MOVED_CLEARC();
 }
@@ -7212,10 +7269,14 @@ void m68k_op_move_16_ai_d(M68KOPT_PARAMS)
     asm volatile(
         "moveq #7,d0\n"
         "\tand.l %0,d0\n"
+#ifndef OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ
         "\tclr.l    d1\n"  // just for ccr
+#endif
         "\tmove.w %c[dar]+2(%1,d0.l*4),d1\n" // d1 LOW value of dx
-        "\tmove.l d1,%c[not_z_flag](%1)\n" // zero ccr
-        "\tbfextu d2{#20:#3},d0\n" // ax
+#ifndef OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ
+       "\tmove.l d1,%c[not_z_flag](%1)\n" // zero ccr
+#endif
+        "\tbfextu %0{#20:#3},d0\n" // ax
         "\tmove.l (%c[writer16],a2),a0\n" // writer
         "\tmove.l (%c[dar]+(8*4),a2,d0.l*4),d0\n" // (ax) value
         "\tjmp (a0)\n" // d0 adress, d1 value.  jsr -> jmp can replace jsr+rts if last instruction.
@@ -8516,6 +8577,7 @@ void m68k_op_move_32_d_pd(M68KOPT_PARAMS)
 
 void m68k_op_move_32_d_di(M68KOPT_PARAMS)
 {
+
 	uint res = OPER_AY_DI_32(M68KOPT_PASSPARAMS);
 	uint* r_dst = &DX;
 
@@ -8523,6 +8585,7 @@ void m68k_op_move_32_d_di(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
+
 	DO_MOVED_CLEARV();
 	DO_MOVED_CLEARC();
 }
@@ -8600,6 +8663,32 @@ void m68k_op_move_32_d_pcix(M68KOPT_PARAMS)
 
 void m68k_op_move_32_d_i(M68KOPT_PARAMS)
 {
+#ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
+ // does move.l #value,dx
+
+// %0 regir d2   %1 p68k a2
+// 13 instr -> 9 instr.
+    asm volatile(
+        "move.l %c[progcount](%1),d1\n" // p68k->pc
+        "\tmove.l ([_opcode_base],d1.l),d0\n"
+        "\taddq.l #4,d1\n"
+        "\tmove.l d1,%c[progcount](%1)\n"
+
+        "\tbfextu %0{#20:#3},d1\n" // x in dx
+        "\tmove.l d0,%c[dar](%1,d1.l*4)\n"
+
+        "\tmove.l d0,%c[not_z_flag](%1)\n"
+        "\trol.l #8,d0\n"
+        "\tmove.l d0,%c[n_flag](%1)\n"
+        :
+        : "d"(regir), "a"(p68k),
+         [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
+         [progcount] "n" (offsetof(struct m68ki_cpu_core, pc)),
+         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
+         [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
+        :  "d0","d1"
+        );
+#else
 	uint res = OPER_I_32(p68k);
 	uint* r_dst = &DX;
 
@@ -8607,6 +8696,7 @@ void m68k_op_move_32_d_i(M68KOPT_PARAMS)
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
+#endif
 	DO_MOVED_CLEARV();
 	DO_MOVED_CLEARC();
 }
@@ -8622,8 +8712,10 @@ void m68k_op_move_32_ai_d(M68KOPT_PARAMS)
         "moveq #7,d0\n"
         "\tand.l %0,d0\n"
         "\tmove.l %c[dar](%1,d0.l*4),d1\n" // d1 value of dx
+#ifndef OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ
         "\tmove.l d1,%c[not_z_flag](%1)\n" // zero ccr
-        "\tbfextu d2{#20:#3},d0\n" // ax
+#endif
+        "\tbfextu %0{#20:#3},d0\n" // ax
         "\tmove.l (%c[writer32],a2),a0\n" // writer
         "\tmove.l (%c[dar]+(8*4),a2,d0.l*4),d0\n" // (ax) value
         "\tjmp (a0)\n" // d0 adress, d1 value.  ->optim jsr -> jmp if last instruction.
