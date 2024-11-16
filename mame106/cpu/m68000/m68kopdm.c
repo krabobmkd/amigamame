@@ -7264,18 +7264,21 @@ void m68k_op_move_16_d_i(M68KOPT_PARAMS)
 void m68k_op_move_16_ai_d(M68KOPT_PARAMS)
 {
 #ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
+    // note galaxy force 2 test negs after this.
 // %0 regir d2   %1 p68k a2
 // does move.w dx,(ax)
     asm volatile(
         "moveq #7,d0\n"
         "\tand.l %0,d0\n"
-#ifndef OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ
+//#ifndef OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ
         "\tclr.l    d1\n"  // just for ccr
-#endif
+//#endif
         "\tmove.w %c[dar]+2(%1,d0.l*4),d1\n" // d1 LOW value of dx
-#ifndef OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ
+//#ifndef OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ
        "\tmove.l d1,%c[not_z_flag](%1)\n" // zero ccr
-#endif
+       "\tbfextu d1{#16:#8},d0\n\tmove.w d0,%c[n_flag]+2(%1)\n" // ax
+//        "\tmove.w d1,d0\n\tlsr.w #8,d0\n\tmove.w d0,%c[n_flag]+2(%1)\n"
+//#endif
         "\tbfextu %0{#20:#3},d0\n" // ax
         "\tmove.l (%c[writer16],a2),a0\n" // writer
         "\tmove.l (%c[dar]+(8*4),a2,d0.l*4),d0\n" // (ax) value
@@ -12200,31 +12203,31 @@ void m68k_op_moves_32_al(M68KOPT_PARAMS)
 
 void m68k_op_moveq_32(M68KOPT_PARAMS)
 {
-#ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
-    // 12 instructions -> 6 instructions :)
-    asm volatile(
-        "move.b %0,d0\n"
-        "\textb.l d0\n"
-        "\tbfextu %0{#20:#3},d1\n"
-        "\tmove.l d0,%c[dar](%1,d1.l*4)\n"
-        "\tmove.l d0,%c[not_z_flag](%1)\n"
-        "\tmove.l d0,%c[n_flag](%1)\n"  // bit 7 is neg, no need rol !
-        :
-        : "d"(regir), "a"(p68k),
-         [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
-         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
-         [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
-        :  "d0","d1"
-        );
-#else
+// #ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
+//     // 12 instructions -> 6 instructions :)
+//     asm volatile(
+//         "move.b %0,d0\n"
+//         "\textb.l d0\n"
+//         "\tbfextu %0{#20:#3},d1\n"
+//         "\tmove.l d0,%c[dar](%1,d1.l*4)\n"
+//         "\tmove.l d0,%c[not_z_flag](%1)\n"
+//         "\tmove.l d0,%c[n_flag](%1)\n"  // bit 7 is neg, no need rol !
+//         :
+//         : "d"(regir), "a"(p68k),
+//          [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
+//          [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
+//          [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
+//         :  "d0","d1"
+//         );
+// #else
 	uint res = DX = MAKE_INT_8(MASK_OUT_ABOVE_8(REG_IR));
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
-#endif
+//#endif
 	DO_MOVED_CLEARV();
-	DO_MOVED_CLEARC();
-//	FLAG_C = CFLAG_CLEAR;
+//	DO_MOVED_CLEARC();
+	FLAG_C = CFLAG_CLEAR;
 }
 
 
