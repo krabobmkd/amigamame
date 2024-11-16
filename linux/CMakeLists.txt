@@ -124,7 +124,7 @@ if(USE_QT_APP)
         target_link_libraries(${GUI_APPNAME} PRIVATE Qt5::Widgets  )
      endif()
 
-    target_link_libraries(${GUI_APPNAME} PUBLIC mamecore z expat)
+    target_link_libraries(${GUI_APPNAME} PUBLIC mamecore mamecoreUNROLL z expat)
     target_include_directories(${GUI_APPNAME} PUBLIC "../linux" "${COMMONLIBS}/libserializer")
 
     set_property(TARGET ${GUI_APPNAME} PROPERTY C_STANDARD 11)

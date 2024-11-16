@@ -37,8 +37,7 @@ READ16_HANDLER( galpani2_bg8_regs_##_n_##_r ) \
 	switch (offset * 2) \
 	{ \
 		case 0x16:	return rand() & 1; \
-		default: \
-			loginfo(2,"CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",activecpu_get_pc(),_n_,offset*2); \
+		default: break;\
 	} \
 	return galpani2_bg8_regs_##_n_[offset]; \
 }

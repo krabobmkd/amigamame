@@ -1148,7 +1148,7 @@ static WRITE8_HANDLER( batrider_bankswitch_w )
 	if (bank != current_bank)
 	{
 		current_bank = bank;
-		loginfo(2,"Z80 cpu set bank #%d\n", bank);
+		//loginfo(2,"Z80 cpu set bank #%d\n", bank);
 		if (bank > 1)
 			bankaddress = 0x10000 + 0x4000 * (current_bank - 2);
 		else
@@ -1280,8 +1280,8 @@ static READ16_HANDLER( bbakraid_nvram_r )
 
 static WRITE16_HANDLER( bbakraid_nvram_w )
 {
-	if (data & ~0x001f)
-		loginfo(2,"CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",activecpu_get_pc(),data);
+	// if (data & ~0x001f)
+	// 	loginfo(2,"CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",activecpu_get_pc(),data);
 
 	if ( ACCESSING_LSB )
 	{
@@ -1318,14 +1318,14 @@ static READ8_HANDLER ( raizing_command_r )
 {
 	UINT8 *raizing_cpu_comm = (UINT8 *)raizing_cpu_comm16;
 
-	loginfo(2,"Z80 (PC:%04x) reading %02x from $48\n",activecpu_get_pc(),raizing_cpu_comm[BYTE_XOR_BE(1)]);
+//	loginfo(2,"Z80 (PC:%04x) reading %02x from $48\n",activecpu_get_pc(),raizing_cpu_comm[BYTE_XOR_BE(1)]);
 	return raizing_cpu_comm[BYTE_XOR_BE(1)];
 }
 static READ8_HANDLER ( raizing_request_r )
 {
 	UINT8 *raizing_cpu_comm = (UINT8 *)raizing_cpu_comm16;
 
-	loginfo(2,"Z80 (PC:%04x) reading %02x from $4A\n",activecpu_get_pc(),raizing_cpu_comm[BYTE_XOR_BE(3)]);
+//	loginfo(2,"Z80 (PC:%04x) reading %02x from $4A\n",activecpu_get_pc(),raizing_cpu_comm[BYTE_XOR_BE(3)]);
 	return raizing_cpu_comm[BYTE_XOR_BE(3)];
 }
 static WRITE8_HANDLER ( raizing_command_ack_w )
@@ -1357,7 +1357,7 @@ static WRITE16_HANDLER ( bbakraid_trigger_z80_irq )
 static void bbakraid_irqhandler (int state)
 {
 	/* Not used ???  Connected to a test pin (TP082) */
-	loginfo(2,"YMZ280 is generating an interrupt. State=%08x\n",state);
+	//loginfo(2,"YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
 static INTERRUPT_GEN( bbakraid_snd_interrupt )

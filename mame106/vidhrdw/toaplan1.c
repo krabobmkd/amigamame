@@ -623,8 +623,8 @@ READ16_HANDLER( toaplan1_tileram_offs_r )
 
 WRITE16_HANDLER( toaplan1_tileram_offs_w )
 {
-	if (data >= 0x4000)
-		loginfo(2,"Hmmm, unknown video layer being selected (%08x)\n",data);
+	// if (data >= 0x4000)
+	// 	loginfo(2,"Hmmm, unknown video layer being selected (%08x)\n",data);
 	COMBINE_DATA(&pf_voffs);
 }
 
@@ -716,7 +716,7 @@ WRITE16_HANDLER( toaplan1_tileram16_w )
 				}
 				break;
 		default:
-				loginfo(2,"Hmmm, writing %04x to unknown playfield layer address %06x  Offset:%01x\n",data,pf_voffs,offset);
+				//loginfo(2,"Hmmm, writing %04x to unknown playfield layer address %06x  Offset:%01x\n",data,pf_voffs,offset);
 				break;
 	}
 }
@@ -737,7 +737,7 @@ READ16_HANDLER( toaplan1_scroll_regs_r )
 		case 05: scroll = pf3_scrolly; break;
 		case 06: scroll = pf4_scrollx; break;
 		case 07: scroll = pf4_scrolly; break;
-		default: loginfo(2,"Hmmm, reading unknown video scroll register (%08x) !!!\n",offset);
+		default: //loginfo(2,"Hmmm, reading unknown video scroll register (%08x) !!!\n",offset);
 				 break;
 	}
 	return scroll;
@@ -772,7 +772,7 @@ WRITE16_HANDLER( toaplan1_scroll_regs_w )
 		case 07: COMBINE_DATA(&pf4_scrolly);		/* 1EBh */
 				 tilemap_set_scrolly(pf4_tilemap,0,(pf4_scrolly >> 7) - (tiles_offsety - scrolly_offs));
 				 break;
-		default: loginfo(2,"Hmmm, writing %08x to unknown video scroll register (%08x) !!!\n",data ,offset);
+		default: //loginfo(2,"Hmmm, writing %08x to unknown video scroll register (%08x) !!!\n",data ,offset);
 				 break;
 	}
 }

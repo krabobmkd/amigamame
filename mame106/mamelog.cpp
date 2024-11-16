@@ -19,6 +19,7 @@ void log_setCallback(logCallbcack cb)
 
 void vloginfo(int i_w_e, const char * format, va_list args )
 {
+    printf("vloginfo:%d %s\n",i_w_e,format);
     if(doStdOut)
     {
         vprintf(format,args);
@@ -40,7 +41,7 @@ void loginfo(int i_w_e,const char *format, ...)
 }
 void logerror( const char *format, ...)
 {
-    printf("prout\n");
+//    printf("prout\n");
     va_list args;
     va_start(args, format);
         vloginfo(2,format,args);

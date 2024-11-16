@@ -16,7 +16,7 @@ option(MAME_USE_HARDFLOAT "compile using direct 68882 FPU, will not work on econ
 option(AMIGA_USE_68030 " use 68030" OFF)
 option(AMIGA_USE_68040 " use 68040" OFF)
 option(AMIGA_USE_68060 " use 68060" ON)
-option(DOMAMELOG " do output logs" ON)
+# option(DOMAMELOG " do output logs" ON)
 
 option(COMPILE_TESTS " compile extra dev tools/ test units" OFF)
 
@@ -63,10 +63,9 @@ if(AMIGA)
 	# test -msep-data
 	#list(APPEND AMIGA_COMPILER_OPTIONS -mnobitfield)
 endif()
-if(DOMAMELOG)
-	list(APPEND AMIGA_COMPILER_OPTIONS -DDOMAMELOG=1)
-
-endif()
+#if(DOMAMELOG)
+#	list(APPEND AMIGA_COMPILER_OPTIONS -DDOMAMELOG=1)
+#endif()
 
 set(COMMONLIBS "../../amigacommonlibs")
 
@@ -166,7 +165,7 @@ if(MAME_USE_HARDFLOAT)
 	target_compile_definitions(${PROGNAME} PRIVATE MAME_USE_HARD_FLOAT=1 )
 endif()
 # the static libs that are part eof this repo:
-target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO0 Mame106AmigaO3 mamecore z expat)
+target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO0 Mame106AmigaO3 mamecore mamecoreUNROLL z expat)
 
 # target_include_directories(${PROGNAME} PUBLIC "../mame037b/src")
 target_include_directories(${PROGNAME} PUBLIC "../mame106" "${COMMONLIBS}/libserializer")

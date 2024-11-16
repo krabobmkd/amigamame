@@ -659,11 +659,17 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
             if(bits & 1)
             {   // some games minimix, ... need handled 16b writings
                 UINT32 reg = preg[15-i];
+#ifdef LSB_FIRST
+                address--;
+                (*writer16)(address,reg>>16,0);
+                address--;
+                (*writer16)(address,reg,0);
+#else
                 address--;
                 (*writer16)(address,reg,0);
                 address--;
                 (*writer16)(address,reg>>16,0);
-                //(*writer)(address,preg[15-i],0);
+#endif
                 count++;
             }
             bits>>=1;

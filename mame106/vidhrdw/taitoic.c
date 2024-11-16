@@ -4901,7 +4901,7 @@ READ16_HANDLER( TC0110PCR_word_r )
 			return TC0110PCR_ram[0][(TC0110PCR_addr[0])];
 
 		default:
-loginfo(2,"PC %06x: warning - read TC0110PCR address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"PC %06x: warning - read TC0110PCR address %02x\n",activecpu_get_pc(),offset);
 			return 0xff;
 	}
 }
@@ -4914,7 +4914,7 @@ READ16_HANDLER( TC0110PCR_word_1_r )
 			return TC0110PCR_ram[1][(TC0110PCR_addr[1])];
 
 		default:
-loginfo(2,"PC %06x: warning - read second TC0110PCR address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"PC %06x: warning - read second TC0110PCR address %02x\n",activecpu_get_pc(),offset);
 			return 0xff;
 	}
 }
@@ -4927,7 +4927,7 @@ READ16_HANDLER( TC0110PCR_word_2_r )
 			return TC0110PCR_ram[2][(TC0110PCR_addr[2])];
 
 		default:
-loginfo(2,"PC %06x: warning - read third TC0110PCR address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"PC %06x: warning - read third TC0110PCR address %02x\n",activecpu_get_pc(),offset);
 			return 0xff;
 	}
 }
@@ -4961,7 +4961,7 @@ WRITE16_HANDLER( TC0110PCR_word_w )
 		}
 
 		default:
-loginfo(2,"PC %06x: warning - write %04x to TC0110PCR address %02x\n",activecpu_get_pc(),data,offset);
+//loginfo(2,"PC %06x: warning - write %04x to TC0110PCR address %02x\n",activecpu_get_pc(),data,offset);
 			break;
 	}
 }
@@ -4994,7 +4994,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_w )
 		}
 
 		default:
-loginfo(2,"PC %06x: warning - write %04x to TC0110PCR address %02x\n",activecpu_get_pc(),data,offset);
+//loginfo(2,"PC %06x: warning - write %04x to TC0110PCR address %02x\n",activecpu_get_pc(),data,offset);
 			break;
 	}
 }
@@ -5028,7 +5028,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_1_w )
 		}
 
 		default:
-loginfo(2,"PC %06x: warning - write %04x to second TC0110PCR offset %02x\n",activecpu_get_pc(),data,offset);
+//loginfo(2,"PC %06x: warning - write %04x to second TC0110PCR offset %02x\n",activecpu_get_pc(),data,offset);
 			break;
 	}
 }
@@ -5062,7 +5062,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_2_w )
 		}
 
 		default:
-loginfo(2,"PC %06x: warning - write %04x to third TC0110PCR offset %02x\n",activecpu_get_pc(),data,offset);
+//loginfo(2,"PC %06x: warning - write %04x to third TC0110PCR offset %02x\n",activecpu_get_pc(),data,offset);
 			break;
 	}
 }
@@ -5097,7 +5097,7 @@ WRITE16_HANDLER( TC0110PCR_step1_rbswap_word_w )
 		}
 
 		default:
-loginfo(2,"PC %06x: warning - write %04x to TC0110PCR offset %02x\n",activecpu_get_pc(),data,offset);
+//loginfo(2,"PC %06x: warning - write %04x to TC0110PCR offset %02x\n",activecpu_get_pc(),data,offset);
 			break;
 	}
 }
@@ -5132,7 +5132,7 @@ WRITE16_HANDLER( TC0110PCR_step1_4bpg_word_w )
 		}
 
 		default:
-loginfo(2,"PC %06x: warning - write %04x to TC0110PCR address %02x\n",activecpu_get_pc(),data,offset);
+//loginfo(2,"PC %06x: warning - write %04x to TC0110PCR address %02x\n",activecpu_get_pc(),data,offset);
 			break;
 	}
 }
@@ -5166,7 +5166,7 @@ READ8_HANDLER( TC0220IOC_r )
 			return input_port_4_r(0);
 
 		default:
-loginfo(2,"PC %06x: warning - read TC0220IOC address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"PC %06x: warning - read TC0220IOC address %02x\n",activecpu_get_pc(),offset);
 			return 0xff;
 	}
 }
@@ -5193,7 +5193,7 @@ WRITE8_HANDLER( TC0220IOC_w )
 			break;
 
 		default:
-loginfo(2,"PC %06x: warning - write %02x to TC0220IOC address %02x\n",activecpu_get_pc(),data,offset);
+//loginfo(2,"PC %06x: warning - write %02x to TC0220IOC address %02x\n",activecpu_get_pc(),data,offset);
 			break;
 	}
 }
@@ -5276,8 +5276,8 @@ WRITE16_HANDLER( TC0220IOC_halfword_w )
 		/* qtorimon writes here the coin counters - bug? */
 		TC0220IOC_w(offset,(data >> 8) & 0xff);
 
-		if (offset)		/* ainferno writes watchdog in msb */
-loginfo(2,"CPU #0 PC %06x: warning - write to MSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
+//		if (offset)		/* ainferno writes watchdog in msb */
+//loginfo(2,"CPU #0 PC %06x: warning - write to MSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
 	}
 }
 
@@ -5294,7 +5294,7 @@ WRITE16_HANDLER( TC0220IOC_halfword_byteswap_w )
 	{
 		TC0220IOC_w(offset,data & 0xff);
 
-loginfo(2,"CPU #0 PC %06x: warning - write to LSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"CPU #0 PC %06x: warning - write to LSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
 	}
 }
 
@@ -5327,7 +5327,7 @@ READ8_HANDLER( TC0510NIO_r )
 			return input_port_4_r(0);
 
 		default:
-loginfo(2,"PC %06x: warning - read TC0510NIO address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"PC %06x: warning - read TC0510NIO address %02x\n",activecpu_get_pc(),offset);
 			return 0xff;
 	}
 }
@@ -5350,7 +5350,7 @@ WRITE8_HANDLER( TC0510NIO_w )
 			break;
 
 		default:
-loginfo(2,"PC %06x: warning - write %02x to TC0510NIO address %02x\n",activecpu_get_pc(),data,offset);
+//loginfo(2,"PC %06x: warning - write %02x to TC0510NIO address %02x\n",activecpu_get_pc(),data,offset);
 			break;
 	}
 }
@@ -5367,7 +5367,7 @@ WRITE16_HANDLER( TC0510NIO_halfword_w )
 	else
 	{
 		/* driftout writes the coin counters here - bug? */
-loginfo(2,"CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",activecpu_get_pc(),offset);
 		TC0510NIO_w(offset,(data >> 8) & 0xff);
 	}
 }
@@ -5410,7 +5410,7 @@ READ8_HANDLER( TC0640FIO_r )
 			return input_port_4_r(0);
 
 		default:
-loginfo(2,"PC %06x: warning - read TC0640FIO address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"PC %06x: warning - read TC0640FIO address %02x\n",activecpu_get_pc(),offset);
 			return 0xff;
 	}
 }
@@ -5433,7 +5433,7 @@ WRITE8_HANDLER( TC0640FIO_w )
 			break;
 
 		default:
-loginfo(2,"PC %06x: warning - write %02x to TC0640FIO address %02x\n",activecpu_get_pc(),data,offset);
+//loginfo(2,"PC %06x: warning - write %02x to TC0640FIO address %02x\n",activecpu_get_pc(),data,offset);
 			break;
 	}
 }
@@ -5450,7 +5450,7 @@ WRITE16_HANDLER( TC0640FIO_halfword_w )
 	else
 	{
 		TC0640FIO_w(offset,(data >> 8) & 0xff);
-loginfo(2,"CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
 	}
 }
 
@@ -5466,7 +5466,7 @@ WRITE16_HANDLER( TC0640FIO_halfword_byteswap_w )
 	else
 	{
 		TC0640FIO_w(offset,data & 0xff);
-loginfo(2,"CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
+//loginfo(2,"CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
 	}
 }
 

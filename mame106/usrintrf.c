@@ -669,7 +669,7 @@ void CLIB_DECL ui_popup(const char *text,...)
 	va_start(arg,text);
 	vsprintf(popup_text,text,arg);
 	va_end(arg);
-	seconds = strlen(popup_text) / 25 + 2;
+	seconds = strlen(popup_text) / 40 + 2;
 	popup_text_counter = seconds * Machine->refresh_rate;
 }
 

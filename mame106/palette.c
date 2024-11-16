@@ -810,8 +810,19 @@ void palette_update_display(mame_display *display)
 	debug_palette_dirty = 0;
 }
 
+void setpalettefast_neogeo(pen_t pen, rgb_t color)
+{
+    game_palette[pen] = color;
+    /* now update the adjusted color if it's different */
+    // it is always, because already done for neogeo.
+    int r = color_correct_table[RGB_RED(color) ];
+    int g = color_correct_table[RGB_GREEN(color)];
+    int b = color_correct_table[RGB_BLUE(color) ];
+    adjusted_palette[pen] = MAKE_RGB(r,g,b);
 
-
+     adjusted_palette_dirty = 1;
+     mark_pen_dirty(pen);
+}
 /*-------------------------------------------------
     internal_modify_single_pen - change a single
     pen and recompute its adjusted RGB value

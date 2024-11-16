@@ -172,7 +172,7 @@ static WRITE16_HANDLER( hangon_io_w )
 				return;
 		}
 
-	loginfo(2,"%06X:hangon_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+//	loginfo(2,"%06X:hangon_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
 }
 
 
@@ -216,7 +216,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 				return;
 		}
 
-	loginfo(2,"%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+//	loginfo(2,"%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
 }
 
 

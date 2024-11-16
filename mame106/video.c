@@ -447,7 +447,7 @@ static void decode_graphics(const gfx_decode *gfxdecodeinfo)
 {
 	int totalgfx = 0, curgfx = 0;
 	int i;
-
+    int lessmessages=0;
 	/* count total graphics elements */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
 		if (Machine->gfx[i] && gfxdecodeinfo[i].memory_region > REGION_INVALID)
@@ -471,7 +471,8 @@ static void decode_graphics(const gfx_decode *gfxdecodeinfo)
 					int num_to_decode = (j + 1024 < gfx->total_elements) ? 1024 : (gfx->total_elements - j);
 					decodegfx(gfx, region_base + gfxdecodeinfo[i].start, j, num_to_decode);
 					curgfx += num_to_decode;
-                    bootlog_setvideodecode(curgfx,totalgfx);
+                    if(lessmessages & 1) bootlog_setvideodecode(curgfx,totalgfx);
+                    lessmessages++;
 		/*          ui_display_decoding(artwork_get_ui_bitmap(), curgfx * 100 / totalgfx);*/
 				}
 			}

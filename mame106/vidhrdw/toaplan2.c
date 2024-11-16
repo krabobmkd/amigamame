@@ -605,8 +605,8 @@ VIDEO_START( batrider_0 )
 
 void toaplan2_voffs_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
 {
-	if (data >= 0x1c00)
-		loginfo(2,"Hmmm, unknown video controller %01x layer being selected (%08x)\n",controller,data);
+	// if (data >= 0x1c00)
+	// 	loginfo(2,"Hmmm, unknown video controller %01x layer being selected (%08x)\n",controller,data);
 	COMBINE_DATA(&toaplan2_voffs[controller]);
 }
 
@@ -856,7 +856,7 @@ void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT32 mem_mask, int cont
 				break;
 		default:
 				toaplan2_overflow_vram = data;
-				loginfo(2,"Hmmm, writing %04x to unknown VC:%01x layer address %06x  Offset:%01x\n",data,controller,toaplan2_voffs[controller],offset);
+				//loginfo(2,"Hmmm, writing %04x to unknown VC:%01x layer address %06x  Offset:%01x\n",data,controller,toaplan2_voffs[controller],offset);
 				break;
 	}
 	toaplan2_voffs[controller]++;
@@ -1020,7 +1020,7 @@ void toaplan2_scroll_reg_data_w(offs_t offset, UINT16 data, UINT32 mem_mask, int
 						}
 					}
 
-		default:	loginfo(2,"Hmmm, writing %08x to unknown video control register (%08x)  Video controller %01x  !!!\n",data ,toaplan2_scroll_reg[controller],controller);
+		default:	//loginfo(2,"Hmmm, writing %08x to unknown video control register (%08x)  Video controller %01x  !!!\n",data ,toaplan2_scroll_reg[controller],controller);
 					break;
 	}
 
@@ -1119,7 +1119,8 @@ WRITE16_HANDLER( pipibibi_scroll_w )
 			case 0x05:	data += 0x1ef; break;
 			case 0x06:	data += 0x1d4; break;
 			case 0x07:	data += 0x1f7; break;
-			default:	loginfo(2,"PIPIBIBI writing %04x to unknown scroll register %04x",data, offset);
+			default:	//loginfo(2,"PIPIBIBI writing %04x to unknown scroll register %04x",data, offset);
+                break;
 		}
 
 		toaplan2_scroll_reg[0] = offset;

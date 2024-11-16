@@ -129,6 +129,8 @@ void palette_set_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b);
 void palette_get_color(pen_t pen, UINT8 *r, UINT8 *g, UINT8 *b);
 void palette_set_colors(pen_t color_base, const UINT8 *colors, int color_count);
 
+void setpalettefast_neogeo(pen_t pen, rgb_t color);
+
 void palette_set_brightness(pen_t pen, double bright);
 void palette_set_shadow_factor(double factor);
 void palette_set_highlight_factor(double factor);

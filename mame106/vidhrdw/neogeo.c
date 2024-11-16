@@ -300,7 +300,6 @@ static char zoomx_draw_tables[16][16] =
 static void set_palettebank_on_postload(void)
 {
 	int i;
-    printf("set_palettebank_on_postload\n");
 	neogeo_paletteram16 = neogeo_palettebank[neogeo_palette_index];
 
 	for (i = 0; i < 0x2000 >> 1; i++)
@@ -421,13 +420,19 @@ READ16_HANDLER( neogeo_paletteram16_r )
 
 void   neogeo_paletteram16_w(offs_t offset REGM(d0), UINT16 data REGM(d1), UINT16 mem_mask REGM(d2))
 {
-	UINT16 oldword, newword;
+    // krb remove combination...
+	UINT16 oldword , newword=data;
 	int r,g,b;
 
 	offset &=0xfff; // mirrored
 
-	oldword = newword = neogeo_paletteram16[offset];
-	COMBINE_DATA(&newword);
+	oldword /*= newword*/ = neogeo_paletteram16[offset];
+    // krb...
+    // if(mem_mask !=0)
+    // {  never seen here...
+    //     printf("neogeo_paletteram16_w 8bit call\n");
+    // }
+	// so no need ... COMBINE_DATA(&newword);
 
 	if (oldword == newword)
 		return;
@@ -442,7 +447,8 @@ void   neogeo_paletteram16_w(offs_t offset REGM(d0), UINT16 data REGM(d1), UINT1
 	g = (g << 3) | (g >> 2);
 	b = (b << 3) | (b >> 2);
 
-	palette_set_color(offset, r, g, b);
+    setpalettefast_neogeo(offset,(r<<16)|(g<<8)|b);
+//	palette_set_color(offset, r, g, b);
 }
 
 /******************************************************************************/
@@ -1195,6 +1201,10 @@ VIDEO_UPDATE( neogeo )
 		/* Process Sprite List -384 */
 		for (count = 0; count < 0x300 >> 1; count++)
 		{
+
+            //KRB test
+            //if(count>0x40) break;
+
 			t1 = neogeo_vidram16[(0x10400 >> 1) + count];
             t3 = neogeo_vidram16[(0x10000 >> 1) + count];
 			/* If this bit is set this new column is placed next to last one */

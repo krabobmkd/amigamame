@@ -578,6 +578,10 @@ void IntuitionDisplay::draw(_mame_display *display)
 // so this would work on any type of screen.
 void IntuitionDisplay::drawProgress(int per256, int enm)
 {
+    static int lastprog = -1;
+    if(lastprog == per256) return;
+    lastprog = per256;
+
 //     printf("drawProgress\n");
     if(!_drawable) return;
     Window *win = _drawable->window();

@@ -230,13 +230,13 @@ static void create_tilemaps(void);
 
 #else
 
-#define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
-{\
-	loginfo(2,"CPU #0 PC %06X : Warning, ",activecpu_get_pc()); \
-	loginfo(2,_format_,_offset_,_data_); \
-	loginfo(2,"\n");\
-}
-
+// #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
+// {\
+// 	loginfo(2,"CPU #0 PC %06X : Warning, ",activecpu_get_pc()); \
+// 	loginfo(2,_format_,_offset_,_data_); \
+// 	loginfo(2,"\n");\
+// }
+#define SHOW_WRITE_ERROR(_format_,_offset_,_data_)
 #endif
 
 
