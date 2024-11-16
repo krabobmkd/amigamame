@@ -369,7 +369,7 @@ static void checkExitSimple(MsgPort *userport )
             break;
         }
     }
-    if(doExit) fatalerror("abort init"); // setjmp to end of mame loop
+    if(doExit) fatalerror("User cancelled."); // setjmp to end of mame loop
 
 }
 

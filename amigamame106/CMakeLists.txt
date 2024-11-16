@@ -182,6 +182,9 @@ target_compile_options(${PROGNAME} PRIVATE
 
 target_link_options(${PROGNAME} PRIVATE -s ${AMIGA_COMPILER_OPTIONS})
 
+
+install(TARGETS Mame106 DESTINATION "${CMAKE_SOURCE_DIR}/../Mame")
+
 # add_executable(cgxhooktest cgxhookstest.c cgxhooks.c cgxhooks.h )
 # set_property(TARGET cgxhooktest PROPERTY C_STANDARD 11)
 

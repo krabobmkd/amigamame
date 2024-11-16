@@ -35,6 +35,14 @@ static int video_start_common(int type)
 
 VIDEO_START( system16b )
 {
+    if(strcmp(Machine->gamedrv->name,"wb3")==0)
+    {
+        ui_popup("Hello It's your friend Krabob:\nYou are using archive wb3, prefer archive wb32\n which is way faster\n(because it has 8751 CPU less and does the same.).");
+    }
+    if(strcmp(Machine->gamedrv->name,"goldnaxe")==0)
+    {
+        ui_popup("Hello It's your friend Krabob:\nYou are using archive goldnaxe, prefer archive goldnax3\n which is way faster\n(because it has 8751 CPU less and does the same.).");
+    }
 	return video_start_common(SEGAIC16_TILEMAP_16B);
 }
 

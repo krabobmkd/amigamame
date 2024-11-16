@@ -61,6 +61,7 @@ TripleBuffer::TripleBuffer()
 IntuitionDrawable::IntuitionDrawable(int flags)
 : _width(0),_height(0),_useScale(0)
 , _flags(flags), _heightBufferSwitch(0),_heightBufferSwitchApplied(0)
+, _greyPen(0),_blackpen(1) // default on WB screen
 {
 //  _trp._checkw=0;
 //  _trp._rp.BitMap = NULL;
@@ -186,13 +187,17 @@ bool Intuition_Screen::open()
 
    // note: all this is regular OS intuition, no CGX
 	struct ColorSpec colspec[6]={ // let's do it amiga default like
-                0,  8,8,8,  // grey
-                1,  0,0,0, //black
+                0,  0,0,0, //black  inverte black and grey against amiga default.
+                                // this will draw screen black by default.
+                1,  8,8,8,  // grey
                 2,  15,15,15,
                 3,  1,8,15, // blue 1
                 4,  0,1,8, // blue 2
                 // end
                 -1,0,0,0};
+     _greyPen = 1;
+    _blackpen = 0;
+
     // that stupid OS function (or driver) want SA_Depth,24 for 32bit depth, or fail.
     if(_screenDepthAsked == 32 )_screenDepthAsked =24;
 
@@ -569,6 +574,8 @@ void IntuitionDisplay::draw(_mame_display *display)
     _drawable->draw(display);
 
 }
+// draw a progress bar using only graphics.library
+// so this would work on any type of screen.
 void IntuitionDisplay::drawProgress(int per256, int enm)
 {
 //     printf("drawProgress\n");
@@ -583,9 +590,9 @@ void IntuitionDisplay::drawProgress(int per256, int enm)
     int w = (int)(win->GZZWidth); // this way manage window border size
     int h = (int)(win->GZZHeight);
 
-    int blackpen = 1; // _pens[eBlack];
-    int whitepen = 2; // _pens[eWhite];
-    int greypen=0;
+    int blackpen = _drawable->blackPen(); // _pens[eBlack];
+    int whitepen = _drawable->whitePen(); // _pens[eWhite];
+    int greypen= _drawable->greyPen();
 //    if(blackpen == -1) blackpen = GetAPen(rp);
 //    if(whitepen == -1) whitepen = GetBPen(rp);
 
@@ -621,11 +628,11 @@ void IntuitionDisplay::drawProgress(int per256, int enm)
         "Temporal convector flux init.",
         "Initialize input ports.",
         "Rom load...",
-        "Memory And Cpu inits...",
+        "Memory and CPU inits...",
         "Hi Score load.",
-        "Rebuild Machine...",
-        "Video Chip inits...",
-        "Load Cheats...",
+        "Rebuild machine...",
+        "Decode graphics...",
+        "Load cheats...",
         ""
     };
     if(_font && enm<sizeof(phases)/sizeof(const char *))

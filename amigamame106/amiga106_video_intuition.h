@@ -44,12 +44,17 @@ public:
 
     inline int width() const { return _width; }
     inline int height() const { return _height; }
+
+    inline int blackPen() const { return (int)_blackpen; }
+    inline int greyPen() const { return (int)_greyPen; }
+    inline int whitePen() const { return 2; }
 protected:
     int _width,_height;
     int _useScale;
     int _flags;
     int _heightBufferSwitch;
     int _heightBufferSwitchApplied;
+    USHORT _greyPen,_blackpen;
 };
 
 class TripleBuffer;

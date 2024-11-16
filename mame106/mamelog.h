@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include <stdlib.h>
-
+#include <stdarg.h>
 // make it simple....
 void log_enableStdOut(int e);
 typedef void (*logCallbcack)(int i_w_e,const char *);

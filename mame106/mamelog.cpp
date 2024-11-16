@@ -40,6 +40,7 @@ void loginfo(int i_w_e,const char *format, ...)
 }
 void logerror( const char *format, ...)
 {
+//    printf("prout\n");
     va_list args;
     va_start(args, format);
         vloginfo(2,format,args);
