@@ -211,7 +211,7 @@ Points to note, known and proven information deleted from this map:
 
 /******************************************************************************/
 
-unsigned int neogeo_frame_counter;
+unsigned int neogeo_frame_counter=0;
 unsigned int neogeo_frame_counter_speed=4;
 
 /******************************************************************************/
@@ -488,7 +488,7 @@ static WRITE16_HANDLER( neo_bankswitch_w )
 
 	if (memory_region_length(REGION_CPU1) <= 0x100000)
 	{
-loginfo(2,"warning: bankswitch to %02x but no banks available\n",data);
+//loginfo(2,"warning: bankswitch to %02x but no banks available\n",data);
 		return;
 	}
 
@@ -496,7 +496,7 @@ loginfo(2,"warning: bankswitch to %02x but no banks available\n",data);
 	bankaddress = (data+1)*0x100000;
 	if (bankaddress >= memory_region_length(REGION_CPU1))
 	{
-loginfo(2,"PC %06x: warning: bankswitch to empty bank %02x\n",activecpu_get_pc(),data);
+//loginfo(2,"PC %06x: warning: bankswitch to empty bank %02x\n",activecpu_get_pc(),data);
 		bankaddress = 0x100000;
 	}
 
@@ -557,7 +557,7 @@ static READ16_HANDLER( neo_control_16_r )
 
 INLINE WRITE16_HANDLER( neo_irq2pos_16_w )
 {
-	loginfo(2,"%06x: neo_irq2pos_16_w offset %d %04x\n",activecpu_get_pc(),offset,data);
+//	loginfo(2,"%06x: neo_irq2pos_16_w offset %d %04x\n",activecpu_get_pc(),offset,data);
 
 	if (offset)
 		irq2pos_value = (irq2pos_value & 0xffff0000) | (UINT32)data;
@@ -571,7 +571,7 @@ INLINE WRITE16_HANDLER( neo_irq2pos_16_w )
 
 		irq2start = current_rasterline + line;
 
-		loginfo(2,"irq2start = %d, current_rasterline = %d, current_rastercounter = %d\n",irq2start,current_rasterline,current_rastercounter);
+	//	loginfo(2,"irq2start = %d, current_rasterline = %d, current_rastercounter = %d\n",irq2start,current_rasterline,current_rastercounter);
 	}
 }
 
@@ -867,7 +867,7 @@ static READ8_HANDLER( z80_port_r )
 		}
 
 	default:
-loginfo(2,"CPU #1 PC %04x: read unmapped port %02x\n",activecpu_get_pc(),offset&0xff);
+//loginfo(2,"CPU #1 PC %04x: read unmapped port %02x\n",activecpu_get_pc(),offset&0xff);
 		return 0;
 		break;
 	}
@@ -906,7 +906,7 @@ static WRITE8_HANDLER( z80_port_w )
 		break;
 
 	default:
-loginfo(2,"CPU #1 PC %04x: write %02x to unmapped port %02x\n",activecpu_get_pc(),data,offset&0xff);
+//loginfo(2,"CPU #1 PC %04x: write %02x to unmapped port %02x\n",activecpu_get_pc(),data,offset&0xff);
 		break;
 	}
 }

@@ -100,7 +100,7 @@ void QProc::process()
     // test if just "mame romname".
     int itest = getMainConfig().driverIndex().index(
     //"arkretrn"
-    "wb3"
+//    "wb3"
 // "shinobi"
 //               "goldnaxe"
 //                "altbeast"
@@ -115,7 +115,7 @@ void QProc::process()
 // "silkworm"
 // "sgemf"
 //                "gforce2"
-//      "mslug"
+      "mslug"
 //                "mp_sor2"
     );
     if(itest>0) idriver= itest;
@@ -154,7 +154,7 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image)/*.scaled(QSize(w*3,h*3))*/ );
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
         this->setFixedSize(w*3,h*3);
     _imageMutex.unlock();
 
@@ -271,7 +271,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
     _imageMutex.unlock();
 
 nbframe++;
-//if(nbframe == 60*28) mame_pause(1);
+//if(nbframe == 60*10) mame_pause(1);
 // if(nbframe==1200) exit(1);
 
 //    m_mutex.lock();

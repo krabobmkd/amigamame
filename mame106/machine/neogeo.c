@@ -22,14 +22,14 @@ UINT8 *neogeo_game_vectors;
 static void neogeo_custom_memory(void);
 static void neogeo_register_sub_savestate(void);
 
-
+extern unsigned int neogeo_draw_counter;
 /* This function is called on every reset */
 MACHINE_RESET( neogeo )
 {
 	time_t ltime;
 	struct tm *today;
 
-
+    neogeo_draw_counter = 0;
 	/* Reset variables & RAM */
 	memset (neogeo_ram16, 0, 0x10000);
 
