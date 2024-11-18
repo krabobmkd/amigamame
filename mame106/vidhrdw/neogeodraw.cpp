@@ -85,225 +85,225 @@ static UINT32 tileOffsetFilter=0;
 //}
 
 
-static inline void NeoDrawGfx16Opaque(unsigned short **line,const gfx_element *gfx, /* AJP */
-                                     unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-                                     int zx,int zy,const rectangle *clip)
-{
-    int /*ox,*/oy,ey,y,dy;
-    unsigned short *bm;
-    UINT32 col;
+//static inline void NeoDrawGfx16Opaque(unsigned short **line,const gfx_element *gfx, /* AJP */
+//                                     unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//                                     int zx,int zy,const rectangle *clip)
+//{
+//    int /*ox,*/oy,ey,y,dy;
+//    unsigned short *bm;
+//    UINT32 col;
 
-    UINT8 *fspr;
-    char *l_y_skip;
+//    UINT8 *fspr;
+//    char *l_y_skip;
 
-    /* Mish/AJP - Most clipping is done in main loop */
-    oy = sy;
-    ey = sy + zy -1; 	/* Clip for size of zoomed object */
+//    /* Mish/AJP - Most clipping is done in main loop */
+//    oy = sy;
+//    ey = sy + zy -1; 	/* Clip for size of zoomed object */
 
-    if (sy < clip->min_y) sy = clip->min_y;
-    if (ey >= clip->max_y) ey = clip->max_y;
-    //moved -> no because left to right attachment must work
+//    if (sy < clip->min_y) sy = clip->min_y;
+//    if (ey >= clip->max_y) ey = clip->max_y;
+//    //moved -> no because left to right attachment must work
 
-    if(zy==16)
-        l_y_skip=full_y_skip;
-    else
-        l_y_skip=dda_y_skip;
+//    if(zy==16)
+//        l_y_skip=full_y_skip;
+//    else
+//        l_y_skip=dda_y_skip;
 
-    // fspr=get_tile(code);
+//    // fspr=get_tile(code);
 
-    fspr = (UINT8 *)neogeo_memory_region_gfx3;
-    //const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
-    UINT32 colorc =  gfx->color_granularity * color;
+//    fspr = (UINT8 *)neogeo_memory_region_gfx3;
+//    //const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
+//    UINT32 colorc =  gfx->color_granularity * color;
 
-    fspr += code*(128);
+//    fspr += code*(128);
 
-    if (flipy)	/* Y flip */
-    {
-        dy = -8;
-        fspr+=128 - 8 - (sy-oy)*8;
-    }
-    else		/* normal */
-    {
-        dy = 8;
-        fspr+=(sy-oy)*8;
-    }
+//    if (flipy)	/* Y flip */
+//    {
+//        dy = -8;
+//        fspr+=128 - 8 - (sy-oy)*8;
+//    }
+//    else		/* normal */
+//    {
+//        dy = 8;
+//        fspr+=(sy-oy)*8;
+//    }
 
-    {
-        UINT32 colorc =  gfx->color_granularity * color;
-        if (flipx)	/* X flip */
-        {
-            if(zx==15)
-            {
-                for (y = sy;y <= ey;y++)
-                {
-                    bm  = line[y]+sx;
-                    fspr+=(*l_y_skip++)*dy;
+//    {
+//        UINT32 colorc =  gfx->color_granularity * color;
+//        if (flipx)	/* X flip */
+//        {
+//            if(zx==15)
+//            {
+//                for (y = sy;y <= ey;y++)
+//                {
+//                    bm  = line[y]+sx;
+//                    fspr+=(*l_y_skip++)*dy;
 
-                    UINT32 *fspr4 = (UINT32*)fspr;
-                    UINT32 v = *fspr4++;
+//                    UINT32 *fspr4 = (UINT32*)fspr;
+//                    UINT32 v = *fspr4++;
 
-                    UINT8 col;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD7] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD6] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD5] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD4] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD3] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD2] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD1] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v);  bm[8+ WR_ORD0] = (colorc+col);
+//                    UINT8 col;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD7] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD6] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD5] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD4] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD3] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD2] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD1] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v);  bm[8+ WR_ORD0] = (colorc+col);
 
-                    v = *fspr4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD7] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD6] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD5] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD4] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD3] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD2] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD1] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v);  bm[ WR_ORD0] = (colorc+col);
+//                    v = *fspr4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD7] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD6] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD5] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD4] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD3] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD2] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD1] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v);  bm[ WR_ORD0] = (colorc+col);
 
-                }
-            }
-            else
-            {   // zoomx + flipx
-                char *zoomx_draw = zoomx_draw_tables[zx];
-                for (y = sy;y <= ey;y++)
-                {
-                    bm  = ((unsigned short *)line[y])+sx;
-                    fspr+=(*l_y_skip++)*dy;
-                    UINT8 *fsprb = fspr+7;
+//                }
+//            }
+//            else
+//            {   // zoomx + flipx
+//                char *zoomx_draw = zoomx_draw_tables[zx];
+//                for (y = sy;y <= ey;y++)
+//                {
+//                    bm  = ((unsigned short *)line[y])+sx;
+//                    fspr+=(*l_y_skip++)*dy;
+//                    UINT8 *fsprb = fspr+7;
 
-                    UINT8 c = *fsprb--;
-                    if (zoomx_draw[0]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[1]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[2]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[3]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[4]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[5]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[6]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[7]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    UINT8 c = *fsprb--;
+//                    if (zoomx_draw[0]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[1]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[2]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[3]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[4]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[5]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[6]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[7]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
 
-                    c = *fsprb--;
-                    if (zoomx_draw[8]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[9]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[10]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[11]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[12]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[13]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb;
-                    if (zoomx_draw[14]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[15]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[8]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[9]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[10]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[11]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[12]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[13]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb;
+//                    if (zoomx_draw[14]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[15]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
 
-                }
-            }
-        }
-        else		/* normal */
-        {
-            if(zx==15)
-            {
-                for (y = sy ;y <= ey;y++)
-                {
-                    bm  = ((unsigned short *)line[y]) + sx;
-                    fspr+=(*l_y_skip++)*dy;
+//                }
+//            }
+//        }
+//        else		/* normal */
+//        {
+//            if(zx==15)
+//            {
+//                for (y = sy ;y <= ey;y++)
+//                {
+//                    bm  = ((unsigned short *)line[y]) + sx;
+//                    fspr+=(*l_y_skip++)*dy;
 
-                    UINT32 *fspr4 = (UINT32*)fspr;
-                    UINT32 v = fspr4[0];
+//                    UINT32 *fspr4 = (UINT32*)fspr;
+//                    UINT32 v = fspr4[0];
 
-                    UINT8 col;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD0] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD1] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD2] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD3] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD4] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD5] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD6] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v);  bm[ WR_ORD7] = (colorc+col);
+//                    UINT8 col;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD0] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD1] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD2] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD3] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD4] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD5] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD6] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v);  bm[ WR_ORD7] = (colorc+col);
 
-                    v = fspr4[1];
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD0] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD1] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD2] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD3] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD4] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD5] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD6] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v);  bm[8+ WR_ORD7] = (colorc+col);
+//                    v = fspr4[1];
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD0] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD1] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD2] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD3] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD4] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD5] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD6] = (colorc+col);
+//                    v>>=4;
+//                    col = ((UINT8)v);  bm[8+ WR_ORD7] = (colorc+col);
 
-                }
-            }
-            else
-            {
-                char *zoomx_draw = zoomx_draw_tables[zx];
-                for (y = sy ;y <= ey;y++)
-                {
-                    bm  = ((unsigned short *)line[y]) + sx;
-                    fspr+=(*l_y_skip++)*dy;
-                    UINT8 *fsprb = (UINT8 *)fspr;
+//                }
+//            }
+//            else
+//            {
+//                char *zoomx_draw = zoomx_draw_tables[zx];
+//                for (y = sy ;y <= ey;y++)
+//                {
+//                    bm  = ((unsigned short *)line[y]) + sx;
+//                    fspr+=(*l_y_skip++)*dy;
+//                    UINT8 *fsprb = (UINT8 *)fspr;
 
-                    UINT8 c = *fsprb++;
-                    if (zoomx_draw[0]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[1]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[2]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[3]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[4]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[5]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[6]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[7]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    UINT8 c = *fsprb++;
+//                    if (zoomx_draw[0]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[1]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[2]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[3]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[4]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[5]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[6]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[7]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
 
-                    c = *fsprb++;
-                    if (zoomx_draw[8]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[9]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[10]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[11]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[12]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[13]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb;
-                    if (zoomx_draw[14]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[15]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[8]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[9]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[10]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[11]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[12]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[13]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
+//                    c = *fsprb;
+//                    if (zoomx_draw[14]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[15]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
 
-                }
-            }
-        }
-    }
-}
+//                }
+//            }
+//        }
+//    }
+//}
 
 struct neoPixelWriter_Opaque
 {
@@ -339,35 +339,19 @@ void NeoDrawGfx16(
 
     char *l_y_skip;
 
-
     /* Mish/AJP - Most clipping is done in main loop */
     oy = sy;
     ey = sy + zy -1; 	/* Clip for size of zoomed object */
 
     if (sy < clip->min_y) sy = clip->min_y;
     if (ey >= clip->max_y) ey = clip->max_y;
-  //moved -> no because left to right attachment must work
-    if (sx <= -16) return;
-
-    /* Safety feature */
- // code=code%no_of_tiles;
-
-    // if (gfx->pen_usage[code] == 0)	/* decode tile if it hasn't been yet */
-    //     decodetile(code);
-
-    /* Check for total transparency, no need to draw */
-    // if ((gfx->pen_usage[code] & ~1) == 0)
-    //     return;
 
     if(zy==16)
         l_y_skip=full_y_skip;
     else
         l_y_skip=dda_y_skip;
 
-   // fspr=get_tile(code);
-
     fspr = (UINT8 *)neogeo_memory_region_gfx3;
-    //const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
     UINT32 colorc =  gfx->color_granularity * color;
 
     fspr += code*(128);
@@ -461,8 +445,6 @@ zx
                     UINT8 *fsprb = fspr+7;
 
                     UINT8 c = *fsprb--;
-
-
 
                     if (zoomx_draw[0]) { UINT8 col=c>>4;  PixelWriter::setpixel(colorc,col,bm); bm++; }
                     if (zoomx_draw[1]) { UINT8 col=c&0x0f; PixelWriter::setpixel(colorc,col,bm); bm++; }
@@ -705,7 +687,8 @@ void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect)
             if (tileatr & 0x08) tileno=(tileno&~7)|(neogeo_frame_counter&7);	/* fixed */
             else if (tileatr & 0x04) tileno=(tileno&~3)|(neogeo_frame_counter&3);	/* fixed */
 
-            tileno = tileno % no_of_tiles; // safety.
+            //tileno = tileno % no_of_tiles; // safety.
+            if(tileno>=no_of_tiles) continue; // less divs
 
             if (fullmode == 2 || (fullmode == 1 && rzy == 0xff))
             {
@@ -742,7 +725,6 @@ void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect)
                 )
             {
 
-
                 if((penusage & 1)==0)
                 {   // fully opaque
                     NeoDrawGfx16<neoPixelWriter_Opaque>(line,
@@ -755,7 +737,6 @@ void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect)
                       );
                 } else
                 {
-
                     NeoDrawGfx16<neoPixelWriter_Transparent0>(line,
                         gfx,
                         tileno,
