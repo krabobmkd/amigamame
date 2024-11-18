@@ -66,6 +66,8 @@ set(MAME_CORE_SRC
  cpuint.h     inptport.h   osdepend.h            tilemap.h
  cpuintrf.h   input.h      palette.h             timer.h
 
+ vidhrdw/neogeodraw.cpp
+ vidhrdw/neogeodraw.h
   cpu/m68000/m68kkrbopt.h
  sound_krb.h
 	# minimal common driver needs:

@@ -52,23 +52,26 @@ Notes:
 #include "driver.h"
 #include "neogeo.h"
 #include "drawgfxn.h"
+#include "neogeodraw.h"
 #include <stdio.h>
 
-static UINT16 *neogeo_vidram16;
+UINT16 *neogeo_vidram16;
 static UINT16 *neogeo_paletteram16;	/* pointer to 1 of the 2 palette banks */
 static UINT16 *neogeo_palettebank[2]; /* 0x100*16 2 byte palette entries */
 static INT32 neogeo_palette_index;
 static UINT16 neogeo_vidram16_modulo;
 static UINT16 neogeo_vidram16_offset;
+
 static int high_tile;
 static int vhigh_tile;
 static int vvhigh_tile;
+
 static int no_of_tiles;
 static INT32 fix_bank;
 
 
 static UINT8 *memory_region_gfx4;
-static UINT8 *memory_region_gfx3;
+UINT8 *neogeo_memory_region_gfx3;
 
 void neogeo_set_lower_resolution( void )
 {
@@ -275,7 +278,7 @@ int neogeo_fix_bank_type;
     01234 6789abcdef  = E
     0123456789abcdef  = F
 */
-static char zoomx_draw_tables[16][16] =
+char zoomx_draw_tables[16][16] =
 {
 	{ 0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0 },
 	{ 0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0 },
@@ -364,7 +367,7 @@ VIDEO_START( neogeo_mvs )
 	fix_bank = 0;
 
 	memory_region_gfx4  = memory_region(REGION_GFX4);
-	memory_region_gfx3  = memory_region(REGION_GFX3);
+	neogeo_memory_region_gfx3  = memory_region(REGION_GFX3);
 
 	neogeo_set_lower_resolution();
 	register_savestate();
@@ -528,7 +531,7 @@ INLINE void NeoMVSDrawGfxLine(UINT16 **line,const gfx_element *gfx,
     const UINT8 msk=0x0f;
 	UINT16 *bm = line[sy]+sx;
 
-	UINT8 *fspr = (UINT32 *)memory_region_gfx3;
+	UINT8 *fspr = (UINT32 *)neogeo_memory_region_gfx3;
 //	const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
     UINT32 colorc =  gfx->color_granularity * color;
 
@@ -711,7 +714,7 @@ INLINE void NeoMVSDrawGfxLineOpaque(UINT16 **line,const gfx_element *gfx,
     const UINT8 msk=0x0f;
 	UINT16 *bm = line[sy]+sx;
 
-	UINT8 *fspr = (UINT32 *)memory_region_gfx3;
+	UINT8 *fspr = (UINT32 *)neogeo_memory_region_gfx3;
 	//const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
         UINT32 colorc =  gfx->color_granularity * color;
 	if (sx <= -16) return;
@@ -1179,494 +1182,259 @@ static inline void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cli
 
 }
 
-//static char dda_x_skip[16];
-static char dda_y_skip[17];
-static char full_y_skip[16]={0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-
-// int exitbytile=0;
-// int exitbyclipx2=0;
-// from 0.37b !
-
-static inline void NeoMVSDrawGfx16(unsigned short **line,const gfx_element *gfx, /* AJP */
-                     unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-                     int zx,int zy,const rectangle *clip)
-{
-    int /*ox,*/oy,ey,y,dy;
-    unsigned short *bm;
-    UINT32 col;
-    int l; /* Line skipping counter */
-
-    int mydword;
-
-    UINT8 *fspr;
-
-    char *l_y_skip;
 
 
-    /* Mish/AJP - Most clipping is done in main loop */
-    oy = sy;
-    ey = sy + zy -1; 	/* Clip for size of zoomed object */
+//static inline void NeoMVSDrawGfx16(unsigned short **line,const gfx_element *gfx, /* AJP */
+//                     unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+//                     int zx,int zy,const rectangle *clip)
+//{
+//    int /*ox,*/oy,ey,y,dy;
+//    unsigned short *bm;
+//    UINT32 col;
+//    int l; /* Line skipping counter */
 
-    if (sy < clip->min_y) sy = clip->min_y;
-    if (ey >= clip->max_y) ey = clip->max_y;
-  //moved -> no because left to right attachment must work
-    if (sx <= -16) return;
+//    int mydword;
 
-    /* Safety feature */
- // code=code%no_of_tiles;
+//    UINT8 *fspr;
 
-    // if (gfx->pen_usage[code] == 0)	/* decode tile if it hasn't been yet */
-    //     decodetile(code);
-
-    /* Check for total transparency, no need to draw */
-    // if ((gfx->pen_usage[code] & ~1) == 0)
-    //     return;
-
-    if(zy==16)
-        l_y_skip=full_y_skip;
-    else
-        l_y_skip=dda_y_skip;
-
-   // fspr=get_tile(code);
-
-    fspr = (UINT8 *)memory_region_gfx3;
-    //const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
-    UINT32 colorc =  gfx->color_granularity * color;
-
-    fspr += code*(128);
-
-    if (flipy)	/* Y flip */
-    {
-        dy = -8;
-        fspr+=128 - 8 - (sy-oy)*8;
-    }
-    else		/* normal */
-    {
-        dy = 8;
-        fspr+=(sy-oy)*8;
-    }
-
-    {
-       // const unsigned short *paldata;	/* ASG 980209 */
-       // paldata = &gfx->colortable[gfx->color_granularity * color];
-        UINT32 colorc =  gfx->color_granularity * color;
-        if (flipx)	/* X flip */
-        {
-            l=0;
-            if(zx==15)
-            {
-                for (y = sy;y <= ey;y++)
-                {
-                    bm  = line[y]+sx;
-                    fspr+=l_y_skip[l]*dy;
-
-                    UINT32 *fspr4 = (UINT32*)fspr;
-                    UINT32 v = *fspr4++;
-                    if(v)
-                    {
-                        UINT8 col;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD7] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD6] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD5] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD4] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD3] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD2] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD1] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v); if (col) bm[8+ WR_ORD0] = (colorc+col);
-                    }
-                    v = *fspr4;
-                    if(v)
-                    {
-                        UINT8 col;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD7] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD6] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD5] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD4] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD3] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD2] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD1] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v); if (col) bm[ WR_ORD0] = (colorc+col);
-                    }
-                    l++;
-                }
-            }
-            else
-            {   // zoomx + flipx
-                char *zoomx_draw = zoomx_draw_tables[zx];
-                for (y = sy;y <= ey;y++)
-                {
-                    bm  = ((unsigned short *)line[y])+sx;
-                    fspr+=l_y_skip[l]*dy;
-                    UINT8 *fsprb = fspr+7;
-
-                    UINT8 c = *fsprb--;
-                    if (zoomx_draw[0]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[1]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[2]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[3]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[4]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[5]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[6]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[7]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-
-                    c = *fsprb--;
-                    if (zoomx_draw[8]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[9]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[10]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[11]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[12]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[13]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb;
-                    if (zoomx_draw[14]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[15]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-
-                    l++;
-                }
-            }
-        }
-        else		/* normal */
-        {
-            l=0;
-            if(zx==15)
-            {
-                for (y = sy ;y <= ey;y++)
-                {
-                    bm  = ((unsigned short *)line[y]) + sx;
-                    fspr+=l_y_skip[l]*dy;
-
-                    UINT32 *fspr4 = (UINT32*)fspr;
-                    UINT32 v = fspr4[0];
-                    if(v)
-                    {
-                        UINT8 col;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD0] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD1] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD2] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD3] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD4] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD5] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD6] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v); if (col) bm[ WR_ORD7] = (colorc+col);
-                    }
-                    v = fspr4[1];
-                    if(v)
-                    {
-                        UINT8 col;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD0] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD1] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD2] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD3] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD4] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD5] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD6] = (colorc+col);
-                        v>>=4;
-                        col = ((UINT8)v); if (col) bm[8+ WR_ORD7] = (colorc+col);
-                    }
-                    l++;
-                }
-            }
-            else
-            {
-                char *zoomx_draw = zoomx_draw_tables[zx];
-                for (y = sy ;y <= ey;y++)
-                {
-                    bm  = ((unsigned short *)line[y]) + sx;
-                    fspr+=l_y_skip[l]*dy;
-                    UINT8 *fsprb = (UINT8 *)fspr;
-
-                    UINT8 c = *fsprb++;
-                    if (zoomx_draw[0]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[1]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[2]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[3]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[4]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[5]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[6]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[7]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-
-                    c = *fsprb++;
-                    if (zoomx_draw[8]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[9]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[10]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[11]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[12]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[13]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-                    c = *fsprb;
-                    if (zoomx_draw[14]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[15]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
-
-                    l++;
-                }
-            }
-        }
-    }
-}
+//    char *l_y_skip;
 
 
-static inline void NeoMVSDrawGfx16Opaque(unsigned short **line,const gfx_element *gfx, /* AJP */
-                                     unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-                                     int zx,int zy,const rectangle *clip)
-{
-    int /*ox,*/oy,ey,y,dy;
-    unsigned short *bm;
-    UINT32 col;
-    int l; /* Line skipping counter */
+//    /* Mish/AJP - Most clipping is done in main loop */
+//    oy = sy;
+//    ey = sy + zy -1; 	/* Clip for size of zoomed object */
 
-    int mydword;
-    UINT8 *fspr;
-    char *l_y_skip;
+//    if (sy < clip->min_y) sy = clip->min_y;
+//    if (ey >= clip->max_y) ey = clip->max_y;
+//  //moved -> no because left to right attachment must work
+//    if (sx <= -16) return;
 
-    /* Mish/AJP - Most clipping is done in main loop */
-    oy = sy;
-    ey = sy + zy -1; 	/* Clip for size of zoomed object */
+//    /* Safety feature */
+// // code=code%no_of_tiles;
 
-    if (sy < clip->min_y) sy = clip->min_y;
-    if (ey >= clip->max_y) ey = clip->max_y;
-    //moved -> no because left to right attachment must work
+//    // if (gfx->pen_usage[code] == 0)	/* decode tile if it hasn't been yet */
+//    //     decodetile(code);
 
-    if(zy==16)
-        l_y_skip=full_y_skip;
-    else
-        l_y_skip=dda_y_skip;
+//    /* Check for total transparency, no need to draw */
+//    // if ((gfx->pen_usage[code] & ~1) == 0)
+//    //     return;
 
-    // fspr=get_tile(code);
+//    if(zy==16)
+//        l_y_skip=full_y_skip;
+//    else
+//        l_y_skip=dda_y_skip;
 
-    fspr = (UINT8 *)memory_region_gfx3;
-    //const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
-    UINT32 colorc =  gfx->color_granularity * color;
+//   // fspr=get_tile(code);
 
-    fspr += code*(128);
+//    fspr = (UINT8 *)memory_region_gfx3;
+//    //const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
+//    UINT32 colorc =  gfx->color_granularity * color;
 
-    if (flipy)	/* Y flip */
-    {
-        dy = -8;
-        fspr+=128 - 8 - (sy-oy)*8;
-    }
-    else		/* normal */
-    {
-        dy = 8;
-        fspr+=(sy-oy)*8;
-    }
+//    fspr += code*(128);
 
-    {
-        UINT32 colorc =  gfx->color_granularity * color;
-        if (flipx)	/* X flip */
-        {
-            l=0;
-            if(zx==15)
-            {
-                for (y = sy;y <= ey;y++)
-                {
-                    bm  = line[y]+sx;
-                    fspr+=l_y_skip[l]*dy;
+//    if (flipy)	/* Y flip */
+//    {
+//        dy = -8;
+//        fspr+=128 - 8 - (sy-oy)*8;
+//    }
+//    else		/* normal */
+//    {
+//        dy = 8;
+//        fspr+=(sy-oy)*8;
+//    }
 
-                    UINT32 *fspr4 = (UINT32*)fspr;
-                    UINT32 v = *fspr4++;
+//    {
+//       // const unsigned short *paldata;	/* ASG 980209 */
+//       // paldata = &gfx->colortable[gfx->color_granularity * color];
+//        UINT32 colorc =  gfx->color_granularity * color;
+//        if (flipx)	/* X flip */
+//        {
+//            l=0;
+//            if(zx==15)
+//            {
+//                for (y = sy;y <= ey;y++)
+//                {
+//                    bm  = line[y]+sx;
+//                    fspr+=l_y_skip[l]*dy;
 
-                    UINT8 col;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD7] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD6] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD5] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD4] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD3] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD2] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD1] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v);  bm[8+ WR_ORD0] = (colorc+col);
+//                    UINT32 *fspr4 = (UINT32*)fspr;
+//                    UINT32 v = *fspr4++;
+//                    if(v)
+//                    {
+//                        UINT8 col;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD7] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD6] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD5] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD4] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD3] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD2] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD1] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v); if (col) bm[8+ WR_ORD0] = (colorc+col);
+//                    }
+//                    v = *fspr4;
+//                    if(v)
+//                    {
+//                        UINT8 col;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD7] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD6] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD5] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD4] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD3] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD2] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD1] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v); if (col) bm[ WR_ORD0] = (colorc+col);
+//                    }
+//                    l++;
+//                }
+//            }
+//            else
+//            {   // zoomx + flipx
+//                char *zoomx_draw = zoomx_draw_tables[zx];
+//                for (y = sy;y <= ey;y++)
+//                {
+//                    bm  = ((unsigned short *)line[y])+sx;
+//                    fspr+=l_y_skip[l]*dy;
+//                    UINT8 *fsprb = fspr+7;
 
-                    v = *fspr4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD7] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD6] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD5] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD4] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD3] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD2] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD1] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v);  bm[ WR_ORD0] = (colorc+col);
+//                    UINT8 c = *fsprb--;
+//                    if (zoomx_draw[0]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[1]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[2]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[3]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[4]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[5]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[6]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[7]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
 
-                    l++;
-                }
-            }
-            else
-            {   // zoomx + flipx
-                char *zoomx_draw = zoomx_draw_tables[zx];
-                for (y = sy;y <= ey;y++)
-                {
-                    bm  = ((unsigned short *)line[y])+sx;
-                    fspr+=l_y_skip[l]*dy;
-                    UINT8 *fsprb = fspr+7;
+//                    c = *fsprb--;
+//                    if (zoomx_draw[8]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[9]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[10]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[11]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb--;
+//                    if (zoomx_draw[12]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[13]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb;
+//                    if (zoomx_draw[14]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[15]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
 
-                    UINT8 c = *fsprb--;
-                    if (zoomx_draw[0]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[1]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[2]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[3]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[4]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[5]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[6]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[7]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    l++;
+//                }
+//            }
+//        }
+//        else		/* normal */
+//        {
+//            l=0;
+//            if(zx==15)
+//            {
+//                for (y = sy ;y <= ey;y++)
+//                {
+//                    bm  = ((unsigned short *)line[y]) + sx;
+//                    fspr+=l_y_skip[l]*dy;
 
-                    c = *fsprb--;
-                    if (zoomx_draw[8]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[9]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[10]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[11]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb--;
-                    if (zoomx_draw[12]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[13]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    c = *fsprb;
-                    if (zoomx_draw[14]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[15]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
+//                    UINT32 *fspr4 = (UINT32*)fspr;
+//                    UINT32 v = fspr4[0];
+//                    if(v)
+//                    {
+//                        UINT8 col;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD0] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD1] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD2] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD3] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD4] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD5] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[ WR_ORD6] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v); if (col) bm[ WR_ORD7] = (colorc+col);
+//                    }
+//                    v = fspr4[1];
+//                    if(v)
+//                    {
+//                        UINT8 col;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD0] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD1] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD2] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD3] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD4] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD5] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v)&0x0f; if (col) bm[8+ WR_ORD6] = (colorc+col);
+//                        v>>=4;
+//                        col = ((UINT8)v); if (col) bm[8+ WR_ORD7] = (colorc+col);
+//                    }
+//                    l++;
+//                }
+//            }
+//            else
+//            {
+//                char *zoomx_draw = zoomx_draw_tables[zx];
+//                for (y = sy ;y <= ey;y++)
+//                {
+//                    bm  = ((unsigned short *)line[y]) + sx;
+//                    fspr+=l_y_skip[l]*dy;
+//                    UINT8 *fsprb = (UINT8 *)fspr;
 
-                    l++;
-                }
-            }
-        }
-        else		/* normal */
-        {
-            l=0;
-            if(zx==15)
-            {
-                for (y = sy ;y <= ey;y++)
-                {
-                    bm  = ((unsigned short *)line[y]) + sx;
-                    fspr+=l_y_skip[l]*dy;
+//                    UINT8 c = *fsprb++;
+//                    if (zoomx_draw[0]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[1]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[2]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[3]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[4]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[5]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[6]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[7]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
 
-                    UINT32 *fspr4 = (UINT32*)fspr;
-                    UINT32 v = fspr4[0];
+//                    c = *fsprb++;
+//                    if (zoomx_draw[8]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[9]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[10]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[11]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb++;
+//                    if (zoomx_draw[12]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[13]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
+//                    c = *fsprb;
+//                    if (zoomx_draw[14]) { UINT8 col=c&0x0f; if (col) *bm = (colorc+col); bm++; }
+//                    if (zoomx_draw[15]) { UINT8 col=c>>4; if (col) *bm = (colorc+col); bm++; }
 
-                    UINT8 col;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD0] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD1] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD2] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD3] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD4] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD5] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[ WR_ORD6] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v);  bm[ WR_ORD7] = (colorc+col);
-
-                    v = fspr4[1];
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD0] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD1] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD2] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD3] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD4] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD5] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f;  bm[8+ WR_ORD6] = (colorc+col);
-                    v>>=4;
-                    col = ((UINT8)v);  bm[8+ WR_ORD7] = (colorc+col);
-
-                    l++;
-                }
-            }
-            else
-            {
-                char *zoomx_draw = zoomx_draw_tables[zx];
-                for (y = sy ;y <= ey;y++)
-                {
-                    bm  = ((unsigned short *)line[y]) + sx;
-                    fspr+=l_y_skip[l]*dy;
-                    UINT8 *fsprb = (UINT8 *)fspr;
-
-                    UINT8 c = *fsprb++;
-                    if (zoomx_draw[0]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[1]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[2]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[3]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[4]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[5]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[6]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[7]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-
-                    c = *fsprb++;
-                    if (zoomx_draw[8]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[9]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[10]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[11]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb++;
-                    if (zoomx_draw[12]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[13]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-                    c = *fsprb;
-                    if (zoomx_draw[14]) { UINT8 col=c&0x0f;  *bm = (colorc+col); bm++; }
-                    if (zoomx_draw[15]) { UINT8 col=c>>4;  *bm = (colorc+col); bm++; }
-
-                    l++;
-                }
-            }
-        }
-    }
-}
+//                    l++;
+//                }
+//            }
+//        }
+//    }
+//}
 
 void oldUpdate( mame_bitmap *bitmap, const rectangle *cliprect)
 {
@@ -1771,192 +1539,12 @@ VIDEO_UPDATE( neogeo )
 	fillbitmap(bitmap,4095,cliprect);
 
  // todo, bypass when glitching.
- // with neogeo_frame_counter
     if(neogeo_draw_counter<240)
     {
         neogeo_draw_counter++;
         return;
     }
-
-    /* Draw sprites */
-    int sx =0,sy =0,oy =0,my =0,zx = 15, rzy = 1;
-    int offs,i,count,y,x;
-    UINT32 tileno;
-    UINT16 tileatr;
-    int t1,t2,t3;
-
-    char fullmode=0;
-    int ddax=0,dday=0,yskip=0;
-    UINT16 **line=(UINT16 **)bitmap->line;
-    unsigned int *pen_usage;
-    const gfx_element *gfx=Machine->gfx[2]; /* Save constant struct dereference */
-
-    for (INT16 count = 0; count < 0x300 >> 1; count++)
-    {
-
-        t1 = neogeo_vidram16[(0x10400 >> 1) + count];
-        t3 = neogeo_vidram16[(0x10000 >> 1) + count];
-
-        /* If this bit is set this new column is placed next to last one */
-        if (t1 & 0x40) {
-            sx += zx+1;
-            if ( sx >= 0x1F0 )
-                sx -= 0x200;
-
-            /* Get new zoom for this column */
-            zx = (t3 >> 8) & 0x0f;
-            sy = oy;
-        } else {	/* nope it is a new block */
-            t2 = neogeo_vidram16[(0x10800 >> 1) + count];
-
-            /* Sprite scaling */
-            zx = (t3 >> 8) & 0x0f;
-            rzy = t3 & 0xff;
-
-            sx = (t2 >> 7);
-            if ( sx >= 0x1F0 )
-                sx -= 0x200;
-
-            /* Number of tiles in this strip */
-            my = t1 & 0x3f;
-            if (my == 0x20) fullmode = 1;
-            else if (my >= 0x21) fullmode = 2;	/* most games use 0x21, but */
-            /* Alpha Mission II uses 0x3f */
-            else fullmode = 0;
-
-            sy = 0x200 - (t1 >> 7);
-            if (cliprect->max_y - cliprect->min_y > 8 ||	/* kludge to improve the ssideki games */
-                cliprect->min_y == Machine->visible_area.min_y)
-            {
-                if (sy > 0x110) sy -= 0x200;
-                if (fullmode == 2 || (fullmode == 1 && rzy == 0xff))
-                {
-                    while (sy < 0) sy += 2 * (rzy + 1);
-                }
-            }
-            oy = sy;
-
-            if (rzy < 0xff && my < 0x10 && my)
-            {
-                my = (my*256)/(rzy+1);
-                if (my > 0x10) my = 0x10;
-            }
-            if (my > 0x20) my=0x20;
-
-            ddax=0;	/* =16; NS990110 neodrift fix */		/* setup x zoom */
-        }
-
-        /* No point doing anything if tile strip is 0 */
-        if (my==0) continue;
-
-        /* Process x zoom */
-        // if(zx!=15) {
-        //     rzx=0;
-        //     for(i=0;i<16;i++) {
-        //         ddax-=zx+1;
-        //         if(ddax<=0) {
-        //             ddax+=15+1;
-        //             dda_x_skip[i]=1;
-        //             rzx++;
-        //         }
-        //         else dda_x_skip[i]=0;
-        //     }
-        // }
-        // else rzx=16;
-
-        if(sx>=320 /*|| sx <= -16*/) continue;
-
-        /* Setup y zoom */
-        if(rzy==255)
-            yskip=16;
-        else
-            dday=0;	/* =256; NS990105 mslug fix */
-
-        offs = count<<6;
-
-        /* my holds the number of tiles in each vertical multisprite block */
-        for (y=0; y < my ;y++) {
-            tileno	= neogeo_vidram16[offs];
-            offs++;
-            tileatr = neogeo_vidram16[offs];
-            offs++;
-
-            if (high_tile && tileatr&0x10) tileno+=0x10000;
-            if (vhigh_tile && tileatr&0x20) tileno+=0x20000;
-            if (vvhigh_tile && tileatr&0x40) tileno+=0x40000;
-
-            // v037
-            //if (tileatr&0x8) tileno=(tileno&~7)+((tileno+neogeo_frame_counter)&7);
-            //else if (tileatr&0x4) tileno=(tileno&~3)+((tileno+neogeo_frame_counter)&3);
-
-            // v106
-            if (tileatr & 0x08) tileno=(tileno&~7)|(neogeo_frame_counter&7);	/* fixed */
-            else if (tileatr & 0x04) tileno=(tileno&~3)|(neogeo_frame_counter&3);	/* fixed */
-
-            tileno = tileno % no_of_tiles; // safety.
-
-            if (fullmode == 2 || (fullmode == 1 && rzy == 0xff))
-            {
-                if (sy >= 248) sy -= 2 * (rzy + 1);
-            }
-            else if (fullmode == 1)
-            {
-                if (y == 0x10) sy -= 2 * (rzy + 1);
-            }
-            else if (sy > 0x110) sy -= 0x200;	/* NS990105 mslug2 fix */
-
-            if(rzy!=255)
-            {
-                yskip=0;
-                dda_y_skip[0]=0;
-                for(i=0;i<16;i++)
-                {
-                    dda_y_skip[i+1]=0;
-                    dday-=rzy+1;
-                    if(dday<=0)
-                    {
-                        dday+=256;
-                        yskip++;
-                        dda_y_skip[yskip]++;
-                    }
-                    else dda_y_skip[yskip]++;
-                }
-            }
-            UINT32 penusage = gfx->pen_usage[tileno];
-
-            if ( ((gfx->pen_usage[tileno] & ~1) != 0) && // if not fully transparent.
-                (sx > -16) &&
-                (sy+15 >= cliprect->min_y && sy <= cliprect->max_y)
-                )
-            {
-                if((penusage & 1)==0)
-                {   // fully opaque
-                    NeoMVSDrawGfx16Opaque(line,
-                      gfx,
-                      tileno,
-                      tileatr >> 8,
-                      tileatr & 0x01,tileatr & 0x02,
-                      sx,sy,zx,yskip,
-                      cliprect
-                      );
-                } else
-                {
-                    NeoMVSDrawGfx16(line,
-                        gfx,
-                        tileno,
-                        tileatr >> 8,
-                        tileatr & 0x01,tileatr & 0x02,
-                        sx,sy,zx,yskip,
-                        cliprect
-                        );
-                }
-
-
-            }
-
-            sy +=yskip;
-        }  /* for y sprites */
-    }  /* for count */
+    neogeo_drawTilesSprites(bitmap,cliprect);
 
 	neogeo_draw_s_layer(bitmap,cliprect);
 
