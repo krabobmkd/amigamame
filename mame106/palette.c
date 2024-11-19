@@ -988,7 +988,7 @@ static void recompute_adjusted_palette(int brightness_or_gamma_changed)
         {
             for (i = 0; i < sizeof(color_correct_table); i++)
             {
-                int value = (int)(brightns * (float)i * (1.0f / 255.0f) + 0.5f); // krb: why +0.5 ??
+                int value = (int)(brightns * (float)i * (1.0f / 255.0f) ); // krb: why +0.5 ??
                 color_correct_table[i] = (value < 0) ? 0 : (value > 255) ? 255 : value;
             }
         }
@@ -1031,11 +1031,11 @@ static void palette_reset(void)
 void palette_set_color(pen_t pen REGPL(d0), UINT8 r, REGPL(d1) UINT8 g REGPL(d2), UINT8 b REGPL(d3))
 {
 	/* make sure we're in range */
-	if (pen >= total_colors)
-	{
-		//loginfo(2,"error: palette_set_color() called with color %d, but only %d allocated.\n", pen, total_colors);
-		return;
-	}
+//	if (pen >= total_colors)
+//	{
+//		//loginfo(2,"error: palette_set_color() called with color %d, but only %d allocated.\n", pen, total_colors);
+//		return;
+//	}
 
 	/* set the pen value */
 	internal_modify_pen(pen, MAKE_RGB(r, g, b), pen_brightness[pen]);
