@@ -2086,7 +2086,7 @@ READ8_HANDLER( m6803_internal_registers_r )
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			loginfo(2,"CPU #%d PC %04x: warning - read from unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+			//loginfo(2,"CPU #%d PC %04x: warning - read from unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
 			return 0;
 		case 0x08:
 			m6800.pending_tcsr = 0;
@@ -2129,10 +2129,10 @@ READ8_HANDLER( m6803_internal_registers_r )
 		case 0x11:
 		case 0x12:
 		case 0x13:
-			loginfo(2,"CPU #%d PC %04x: warning - read from unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+			//loginfo(2,"CPU #%d PC %04x: warning - read from unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
 			return 0;
 		case 0x14:
-			loginfo(2,"CPU #%d PC %04x: read RAM control register\n",cpu_getactivecpu(),activecpu_get_pc());
+			//loginfo(2,"CPU #%d PC %04x: read RAM control register\n",cpu_getactivecpu(),activecpu_get_pc());
 			return m6800.ram_ctrl;
 		case 0x15:
 		case 0x16:
@@ -2146,7 +2146,7 @@ READ8_HANDLER( m6803_internal_registers_r )
 		case 0x1e:
 		case 0x1f:
 		default:
-			loginfo(2,"CPU #%d PC %04x: warning - read from reserved internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+			//loginfo(2,"CPU #%d PC %04x: warning - read from reserved internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
 			return 0;
 	}
 }
@@ -2203,7 +2203,7 @@ WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			loginfo(2,"CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+			//loginfo(2,"CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 			break;
 		case 0x08:
 			m6800.tcsr = data;
@@ -2240,17 +2240,17 @@ WRITE8_HANDLER( m6803_internal_registers_w )
 			break;
 		case 0x0d:
 		case 0x0e:
-			loginfo(2,"CPU #%d PC %04x: warning - write %02x to read only internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+			//loginfo(2,"CPU #%d PC %04x: warning - write %02x to read only internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 			break;
 		case 0x0f:
 		case 0x10:
 		case 0x11:
 		case 0x12:
 		case 0x13:
-			loginfo(2,"CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+			//loginfo(2,"CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 			break;
 		case 0x14:
-			loginfo(2,"CPU #%d PC %04x: write %02x to RAM control register\n",cpu_getactivecpu(),activecpu_get_pc(),data);
+			//loginfo(2,"CPU #%d PC %04x: write %02x to RAM control register\n",cpu_getactivecpu(),activecpu_get_pc(),data);
 			m6800.ram_ctrl = data;
 			break;
 		case 0x15:
@@ -2265,7 +2265,7 @@ WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x1e:
 		case 0x1f:
 		default:
-			loginfo(2,"CPU #%d PC %04x: warning - write %02x to reserved internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+			//loginfo(2,"CPU #%d PC %04x: warning - write %02x to reserved internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 			break;
 	}
 }

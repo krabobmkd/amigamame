@@ -989,10 +989,19 @@ int MainGUI(void)
 						//	MUIA_Guigfx_Transparency, TRANSMASK(TRUE, TRUE),
 							TAG_DONE);*/
         }
-        if(GIF_cornerlogo == NULL)
+        printf("GIF_cornerlogo:%08x\n",(int)GIF_cornerlogo);
+        if(GIF_cornerlogo)
         {
-            GIF_cornerlogo = MUI_MakeObject(MUIO_HSpace,0);
+            int isok=0;
+             get(GIF_cornerlogo, MUIA_GIFAnim_Decoded, &isok);
+             printf("ok:%d\n",isok);
+
         }
+        // if(GIF_cornerlogo == NULL)
+        // {
+        //     GIF_cornerlogo = MUI_MakeObject(MUIO_HSpace,0);
+        // }
+        ULONG Child_Gif = (GIF_cornerlogo)?Child:TAG_DONE;
 
 //static  std::string appName(APPNAME);
 //  printf("go MUINewObject()\n");
@@ -1033,7 +1042,7 @@ int MainGUI(void)
                       Child, MUI_MakeObject(MUIO_VSpace,0),
                       Child, LA_statusbar = LLabel((ULONG)GetMessagec("-")),
                         TAG_DONE,0),
-              Child,GIF_cornerlogo,
+              Child_Gif,GIF_cornerlogo,
           //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessagec("Quit")),
             TAG_DONE,0), // end WindowContent Group
           TAG_DONE,0)},
@@ -1042,9 +1051,6 @@ int MainGUI(void)
         MainWin =  MUI_NewObjectA(MUIC_Window, (struct TagItem *) &mainwintags[0]);// MUINewObject(MUIC_Window,
 //        printf("after MUINewObject():%08x\n",(int)MainWin);
 // MUIA_Disabled
-// static Object *LA_statusbar=NULL;
-//static Object *GIF_cornerlogo=NULL;
-
 
         if(MainWin)
         {

@@ -163,7 +163,7 @@ static tilemap *pf1_tilemap_8x8,*pf2_tilemap_8x8;
 
 static mame_bitmap *sprite_priority_bitmap;
 
-static UINT8 *dirty_palette;
+static UINT8 *deco16_dirty_palette;
 static int deco16_pf1_bank,deco16_pf2_bank,deco16_pf3_bank,deco16_pf4_bank;
 static int deco16_pf12_16x16_gfx_bank,deco16_pf34_16x16_gfx_bank,deco16_pf12_8x8_gfx_bank;
 static int deco16_pf1_colourmask,deco16_pf2_colourmask,deco16_pf3_colourmask,deco16_pf4_colourmask;
@@ -199,7 +199,7 @@ WRITE16_HANDLER( deco16_nonbuffered_palette_w )
 WRITE16_HANDLER( deco16_buffered_palette_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	dirty_palette[offset/2]=1;
+	deco16_dirty_palette[offset/2]=1;
 }
 
 WRITE16_HANDLER( deco16_palette_dma_w )
@@ -208,8 +208,8 @@ WRITE16_HANDLER( deco16_palette_dma_w )
 	int r,g,b,i;
 
 	for (i=0; i<m; i++) {
-		if (dirty_palette[i]) {
-			dirty_palette[i]=0;
+		if (deco16_dirty_palette[i]) {
+			deco16_dirty_palette[i]=0;
 
 			b = (paletteram16[i*2] >> 0) & 0xff;
 			g = (paletteram16[i*2+1] >> 8) & 0xff;
@@ -538,7 +538,7 @@ static int deco16_video_init(int pf12_only, int split, int full_width)
 		pf2_tilemap_16x16 =	tilemap_create(get_pf2_tile_info,   deco16_scan_rows, TILEMAP_TRANSPARENT,16,16,full_width ? 64 : 32,32);
 	pf2_tilemap_8x8 =	tilemap_create(get_pf2_tile_info_b, tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,full_width ? 64 : 32,32);
 
-	dirty_palette = auto_malloc(4096);
+	deco16_dirty_palette = auto_malloc(4096);
 	deco16_raster_display_list=auto_malloc(20 * 256);
 
 	if (!pf1_tilemap_8x8 || !pf2_tilemap_8x8 || !pf1_tilemap_16x16 || !pf2_tilemap_16x16 || !sprite_priority_bitmap)

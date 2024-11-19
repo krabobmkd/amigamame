@@ -1544,7 +1544,13 @@ VIDEO_UPDATE( neogeo )
         neogeo_draw_counter++;
         return;
     }
-    neogeo_drawTilesSprites(bitmap,cliprect);
+
+
+  //   rectangle rc = *cliprect;
+  // rc.min_y +=10;
+  // rc.max_y -=10;
+
+    neogeo_drawTilesSprites(bitmap,/*&rc*/cliprect);
 
 	neogeo_draw_s_layer(bitmap,cliprect);
 

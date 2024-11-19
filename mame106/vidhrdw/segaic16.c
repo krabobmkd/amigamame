@@ -592,6 +592,34 @@ WRITE16_HANDLER( segaic16_paletteram_w )
 	palette_set_color(offset + 2 * palette.entries, palette.hilight[r], palette.hilight[g], palette.hilight[b]);
 }
 
+// krb: when no shadow pr highlight...
+WRITE16_HANDLER( segaic16_paletteram_fast_w )
+{
+//	UINT16 newval;
+	int r, g, b;
+
+	/* get the new value */
+//	newval = paletteram16[offset];
+//	COMBINE_DATA(&newval);
+	paletteram16[offset] = data;
+
+	/*     byte 0    byte 1 */
+	/*  sBGR BBBB GGGG RRRR */
+	/*  x000 4321 4321 4321 */
+	r = ((data >> 12) & 0x01) | ((data << 1) & 0x1e);
+	g = ((data >> 13) & 0x01) | ((data >> 3) & 0x1e);
+	b = ((data >> 14) & 0x01) | ((data >> 7) & 0x1e);
+
+	r = (r << 3) | (r >> 2);
+	g = (g << 3) | (g >> 2);
+	b = (b << 3) | (b >> 2);
+    setpalettefast_neogeo(offset, (r<<16)|(g<<8)|b );
+
+	/* normal colors */
+//	palette_set_color(offset + 0 * palette.entries, palette.normal[r],  palette.normal[g],  palette.normal[b]);
+//	palette_set_color(offset + 1 * palette.entries, palette.shadow[r],  palette.shadow[g],  palette.shadow[b]);
+//	palette_set_color(offset + 2 * palette.entries, palette.hilight[r], palette.hilight[g], palette.hilight[b]);
+}
 
 
 /*************************************

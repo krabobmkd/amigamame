@@ -6,7 +6,7 @@ extern "C"
 }
 #include <string>
 #include <unordered_map>
-//#include <map>
+#include <map>
 #include <vector>
 
 #include "serializer.h"
@@ -73,6 +73,8 @@ public:
     ~MameConfig();
 
     void init(int argc,char **argv);
+    // list all drivers to output.
+    void listFull();
 
     void resettodefault();
     void setRomPath(const char *rompath);
@@ -90,7 +92,10 @@ public:
     // - -  update detected rom list - - -
     int scanDrivers();
     //int allDrivers();
+    // should be done very soon at start.
+    void setUserDir(const char *pPath) { _misc._userPath = (pPath)?pPath:""; }
     // - - path to main dirs --
+
     const char *getUserDir() const {return _misc._userPath.c_str(); }
     const char *getRomsDir() const {return _misc._romsPath.c_str(); }
 

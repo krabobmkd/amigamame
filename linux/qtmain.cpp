@@ -120,8 +120,10 @@ void QProc::process()
 // "silkworm"
 // "sgemf"
 //                "gforce2"
+
 //        "aof"
       "mslug"
+
 //                "mp_sor2"
     );
     if(itest>0) idriver= itest;
@@ -296,9 +298,10 @@ void osd_update_video_and_audio(struct _mame_display *display)
 nbframe++;
     // logo
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
-if(nbframe == 1176) mame_pause(1);
+//if(nbframe == 1176) mame_pause(1);
+//if(nbframe == 60*28) mame_pause(1);
 // if(nbframe==1200) exit(1);
-
+// if(nbframe==10*60)  mame_pause(1);
 //    m_mutex.lock();
 //    m_mutex.unlock();
 

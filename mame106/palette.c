@@ -49,11 +49,11 @@ UINT16 *palette_shadow_table;
 -------------------------------------------------*/
 
 rgb_t *game_palette;				/* RGB palette as set by the driver */
-static rgb_t *adjusted_palette;		/* actual RGB palette after brightness/gamma adjustments */
-static UINT32 *dirty_palette;
+rgb_t *adjusted_palette;		/* actual RGB palette after brightness/gamma adjustments */
+UINT32 *dirty_palette;
 static UINT16 *pen_brightness;
 
-static UINT8 adjusted_palette_dirty;
+UINT8 adjusted_palette_dirty;
 static UINT8 debug_palette_dirty;
 
 static UINT16 shadow_factor, highlight_factor;
@@ -65,7 +65,7 @@ static pen_t total_colors_with_ui;
 
 static pen_t black_pen, white_pen;
 
-static UINT8 color_correct_table[(MAX_PEN_BRIGHTNESS * MAX_PEN_BRIGHTNESS) >> PEN_BRIGHTNESS_BITS];
+UINT8 color_correct_table[(MAX_PEN_BRIGHTNESS * MAX_PEN_BRIGHTNESS) >> PEN_BRIGHTNESS_BITS];
 
 
 
@@ -810,19 +810,7 @@ void palette_update_display(mame_display *display)
 	debug_palette_dirty = 0;
 }
 
-void setpalettefast_neogeo(pen_t pen, rgb_t color)
-{
-    game_palette[pen] = color;
-    /* now update the adjusted color if it's different */
-    // it is always, because already done for neogeo.
-    int r = color_correct_table[RGB_RED(color) ];
-    int g = color_correct_table[RGB_GREEN(color)];
-    int b = color_correct_table[RGB_BLUE(color) ];
-    adjusted_palette[pen] = MAKE_RGB(r,g,b);
 
-     adjusted_palette_dirty = 1;
-     mark_pen_dirty(pen);
-}
 /*-------------------------------------------------
     internal_modify_single_pen - change a single
     pen and recompute its adjusted RGB value
@@ -874,7 +862,7 @@ static void internal_modify_single_pen(pen_t pen, rgb_t color, int pen_bright)
     its corresponding shadow/highlight
 -------------------------------------------------*/
 
-static void internal_modify_pen(pen_t pen, rgb_t color, int pen_bright) //* new highlight operation
+static inline void internal_modify_pen(pen_t pen, rgb_t color, int pen_bright) //* new highlight operation
 {
 #define FMAX (0xff<<PEN_BRIGHTNESS_BITS)
 
@@ -1000,7 +988,7 @@ static void recompute_adjusted_palette(int brightness_or_gamma_changed)
         {
             for (i = 0; i < sizeof(color_correct_table); i++)
             {
-                int value = (int)(brightns * (float)i * (1.0f / 255.0f) + 0.5f); // krb: why +0.5 ??
+                int value = (int)(brightns * (float)i * (1.0f / 255.0f) ); // krb: why +0.5 ??
                 color_correct_table[i] = (value < 0) ? 0 : (value > 255) ? 255 : value;
             }
         }
@@ -1040,14 +1028,14 @@ static void palette_reset(void)
     entry
 -------------------------------------------------*/
 
-void palette_set_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b)
+void palette_set_color(pen_t pen REGPL(d0), UINT8 r REGPL(d1), UINT8 g REGPL(d2), UINT8 b REGPL(d3))
 {
 	/* make sure we're in range */
-	if (pen >= total_colors)
-	{
-		loginfo(2,"error: palette_set_color() called with color %d, but only %d allocated.\n", pen, total_colors);
-		return;
-	}
+//	if (pen >= total_colors)
+//	{
+//		//loginfo(2,"error: palette_set_color() called with color %d, but only %d allocated.\n", pen, total_colors);
+//		return;
+//	}
 
 	/* set the pen value */
 	internal_modify_pen(pen, MAKE_RGB(r, g, b), pen_brightness[pen]);

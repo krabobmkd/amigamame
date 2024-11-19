@@ -664,8 +664,8 @@ void memory_set_opbase(offs_t pc)
 		/* if nothing was found, leave everything alone */
 		if (entry == STATIC_COUNT)
 		{
-			loginfo(2,"cpu #%d (PC=%08X): warning - op-code execute on mapped I/O\n",
-						cpu_getactivecpu(), activecpu_get_pc());
+//			loginfo(2,"cpu #%d (PC=%08X): warning - op-code execute on mapped I/O\n",
+//						cpu_getactivecpu(), activecpu_get_pc());
 			return;
 		}
 	}
