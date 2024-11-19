@@ -14,7 +14,9 @@
 #include "qtmain.h"
 #include <QMainWindow>
 #include <QVBoxLayout>
-
+#include <QMouseEvent>
+#include <QPaintEvent>
+#include <QPainter>
 #include <stdio.h>
 
 extern "C" {
@@ -28,7 +30,10 @@ extern "C" {
 
 using namespace std;
 
-
+// nbframe
+extern "C" {
+extern int nbframe;
+}
 
 void StartGame(int idriver)
 {
@@ -115,6 +120,7 @@ void QProc::process()
 // "silkworm"
 // "sgemf"
 //                "gforce2"
+//        "aof"
       "mslug"
 //                "mp_sor2"
     );
@@ -144,6 +150,23 @@ QWin::QWin() : QLabel()
     m_timer.setSingleShot(false);
     m_timer.start(1000/60);
     show();
+    setMouseTracking(true);
+
+}
+extern "C" {
+extern int dbg_nbt;
+}
+void QWin::mouseMoveEvent(QMouseEvent* event)
+{
+    dbg_nbt = event->x();
+
+}
+void QWin::paintEvent(QPaintEvent *event)
+{
+    QLabel::paintEvent(event);
+    QPainter p(this);
+
+    p.drawText(60,60,QString("woot:")+QString::number(dbg_nbt));
 }
 void QWin::updateWin()
 {
@@ -206,10 +229,7 @@ int osd_skip_this_frame(void)
 {
     return 0;
 }
-// nbframe
-extern "C" {
-extern int nbframe;
-}
+
 void osd_update_video_and_audio(struct _mame_display *display)
 {
     if(isinexit) return;
@@ -270,8 +290,13 @@ void osd_update_video_and_audio(struct _mame_display *display)
         _image = image;
     _imageMutex.unlock();
 
+         // if(nbframe>1170)
+         // QThread::msleep(1000);
+
 nbframe++;
-//if(nbframe == 60*10) mame_pause(1);
+    // logo
+//if(nbframe == 60*20+60-4-4-4) mame_pause(1);
+if(nbframe == 1176) mame_pause(1);
 // if(nbframe==1200) exit(1);
 
 //    m_mutex.lock();

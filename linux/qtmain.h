@@ -13,6 +13,10 @@ signals:
     void startproc();
 protected:
 	QTimer		m_timer;
+
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
+
 };
 
 class QProc : public QObject
