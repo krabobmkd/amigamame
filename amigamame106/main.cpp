@@ -42,6 +42,7 @@ extern "C" {
 #include <proto/asl.h>
 #include <proto/utility.h>
 #include <proto/keymap.h>
+#include "version.h"
 
 extern "C" {
     // all C amiga stuffs should be included from C++ in extern "C" paragraph
@@ -176,7 +177,7 @@ void main_close()
    if(DOSBase) CloseLibrary((struct Library *)DOSBase);
 #endif
 }
-
+//TODO  68060 68882" against options !! Well doenst work without 060 fpu anyway...
 const char *pVersion="$VER:MAME 0.106 "
         APPVERNUM
         " 68060 68882";
@@ -206,7 +207,11 @@ int main(int argc, char **argv)
     Task *task  = FindTask(NULL);
     int stacksize = ((int)task->tc_SPReg - (int)task->tc_SPLower);
 #ifdef STACK_WATCH
-
+    // the old stack reallocation looks messy,
+    // this part is used to check the actual used stack depth.
+    // by printing a const value on the whole stack alloc and verify what changed at exit.
+    // anyway recursion needs are rare in Mame. some old string operations used 4kb temp
+    //
  // if((task->tc_SPReg - task->tc_SPLower) < (MIN_STACK - 1024))
 
     int a=2;
@@ -226,7 +231,7 @@ int main(int argc, char **argv)
         }
     }
 
-/* krb: looks messy to me, original stack should be restored and alloc freed , in an atexit().
+/* krb: old 1999 stack re-alloc, looks messy to me, original stack should be restored and alloc freed , in an atexit().
   task  = FindTask(NULL);
   if((task->tc_SPReg - task->tc_SPLower) < (MIN_STACK - 1024))
   {
@@ -252,12 +257,14 @@ int main(int argc, char **argv)
 
     if(libs_init()!=0) exit(1);
 
-    getMainConfig().init(argc,argv);
-    getMainConfig().load();
+    getMainConfig().init(argc,argv); // init drivers map.
 
     int idriver=0; // romToLaunch;
     STRPTR userdir = NULL;
     int verbose=0;
+    int romlist=0;
+    int dohelp=0;
+    int version=0;
     if(argc>1)
     {
         // test if just "mame romname".
@@ -269,11 +276,46 @@ int main(int argc, char **argv)
         STRPTR rom = ArgString((CONST_STRPTR*)args,"ROM","");
         if(rom && *rom != 0)  idriver = getMainConfig().driverIndex().index(rom);
 
-        userdir =  ArgString((CONST_STRPTR*)args,"USERDIR","");
+        userdir =  ArgString((CONST_STRPTR*)args,"USERDIR","PROGDIR:user");
         verbose = (ArgInt((CONST_STRPTR*)args,"VERBOSE",2)!=2);
+        romlist = (ArgInt((CONST_STRPTR*)args,"-listfull",2)!=2);
+        if(!romlist) romlist = (ArgInt((CONST_STRPTR*)args,"-ll",2)!=2);
+        dohelp = (ArgInt((CONST_STRPTR*)args,"?",2)!=2);
+        if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"HELP",2)!=2);
+        if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"-h",2)!=2);
+        if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"--help",2)!=2);
+        if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"-v",2)!=2);
         ArgArrayDone();
     }
+    // command line things...
+    if(version)
+    {
+        printf("%s\n",pVersion+5);
+        return 0;
+    }
+    if(dohelp)
+    {
+        printf("%s\n",pVersion+5);
+        printf("Install archive in roms/archive.zip and use with >Mame106 archive\n"
+        " Mame106 uses P96 or Cybergraphics, MUI and AHI optionnals.\n"
+        " commandline options (also can use icon's Tooltips):\n"
+        "    -v version\n"
+        "    -ll or --listfull list all archive names linked in this version.\n"
+        "    VERBOSE   log to standard output.\n");
+        return 0;
+    }
+    if(romlist)
+    {
+        getMainConfig().listFull();
+        return 0;
+    }
+
+
+
     if(verbose) log_enableStdOut(1);
+    if(userdir) getMainConfig().setUserDir(userdir);
+
+    getMainConfig().load();
 
     //  if game was explicit, no GUI
     if(idriver>0)

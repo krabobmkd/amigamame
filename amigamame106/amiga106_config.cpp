@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <proto/exec.h>
 #include <proto/dos.h>
-
+#include <string.h>
 // from mame
 extern "C" {
     #include "driver.h"
@@ -42,12 +42,7 @@ MameConfig::MameConfig() : ASerializable()
     , _sortMode(SortMode::Name)
     , _romsFoundTouched(false)
 {
-    try {
-        initDriverIndex();
-    } catch(const exception &e)
-    {
-        loginfo(2,"initDriverIndex exception:%s\n",e.what());
-    }
+
 }
 MameConfig::~MameConfig()
 {}
@@ -93,6 +88,7 @@ int MameConfig::save()
     if (!root)
         return 0;
 
+    // note: FILETYPE_CONFIG will use getMainConfig().getUserDir()/file
     file = mame_fopen("main", 0, FILETYPE_CONFIG, 1);
     if(!file) {
         xml_file_free(root);
@@ -175,6 +171,7 @@ int MameConfig::load()
 
     resettodefault();
 
+    // note: FILETYPE_CONFIG will use getMainConfig().getUserDir()/file
     file = mame_fopen("main", 0, FILETYPE_CONFIG, 0);
     if(!file)  goto error;
 
@@ -316,7 +313,7 @@ void MameConfig::toDefault()
     _controls._parallel_type[1]=0;
 
     _misc._romsPath = "PROGDIR:roms";
-    _misc._userPath = "PROGDIR:user";
+ //NOT THIS ONE !! decide where configs are written:  _misc._userPath = "PROGDIR:user";
     _misc._useCheatCodeFile = false;
     _misc._cheatFilePath = "PROGDIR:cheat.dat";
 
@@ -512,6 +509,12 @@ _[12] ="- Games with parent archive need their parent,\n   non working games may
 
 void MameConfig::init(int argc,char **argv)
 {
+    try {
+        initDriverIndex();
+    } catch(const exception &e)
+    {
+        loginfo(2,"initDriverIndex exception:%s\n",e.what());
+    }
 
 }
 // from some .h
@@ -581,6 +584,38 @@ void MameConfig::initDriverIndex()
 
     }
 }
+// list all drivers to output.
+void MameConfig::listFull()
+{
+    printf("Archive   Parent    Year Description\n");
+
+    //     std::map<std::string,int> _m;
+    unordered_map<std::string,int>::iterator cit =  _driverIndex._m.begin();
+    while(cit != _driverIndex._m.end())
+    {
+        int idrv = cit->second ; *cit++;
+        const game_driver *drv  =drivers[idrv];
+        if(drv && drv->name && drv->description && drv->year)
+        {
+            char temp[12]={0};
+            int l = strlen(drv->name);
+            strncpy(temp,drv->name,8);
+            while(l<8){ temp[l]=' '; l++;}
+            temp[8]=0;
+
+            char tparent[12]={0};
+            int hasparent = (drv->parent && !(drv->parent[0]=='0' && drv->parent[1]==0) );
+            l = (hasparent)?strlen(drv->parent):0;
+            if(hasparent) strncpy(tparent,drv->parent,8);
+            while(l<8){ tparent[l]=' '; l++;}
+            tparent[8]=0;
+            printf("%s  %s  %s \"%s\"\n",temp,tparent, drv->year, drv->description);
+        }
+    }
+
+
+}
+
 void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs/*, int &nbp*/)
 {
     int idriver = ((int)drv-(int)&drivers[0])/sizeof(const _game_driver *);
