@@ -42,7 +42,7 @@ void segaic16_tilemap_set_colscroll( int enable);
 
 WRITE16_HANDLER( segaic16_tileram_0_w );
 WRITE16_HANDLER( segaic16_textram_0_w );
-
+WRITE16_HANDLER( segaic16_paletteram_fast_w );
 /* sprite systems */
 #define SEGAIC16_MAX_SPRITES		2
 

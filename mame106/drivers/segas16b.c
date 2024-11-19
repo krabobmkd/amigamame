@@ -904,7 +904,7 @@ static WRITE16_HANDLER( atomicp_sound_w );
 static const struct segaic16_memory_map_entry rom_171_5358_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK10,          segaic16_paletteram_fast_w, &paletteram16,         "color RAM" },
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, MRA16_BANK13,          MWA16_BANK13,          &segaic16_spriteram_0, "object RAM" },
@@ -918,7 +918,7 @@ static const struct segaic16_memory_map_entry rom_171_5358_info[] =
 static const struct segaic16_memory_map_entry rom_171_5704_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK10,          segaic16_paletteram_fast_w, &paletteram16,         "color RAM" },
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, MRA16_BANK13,          MWA16_BANK13,          &segaic16_spriteram_0, "object RAM" },
@@ -932,7 +932,7 @@ static const struct segaic16_memory_map_entry rom_171_5704_info[] =
 static const struct segaic16_memory_map_entry rom_atomicp_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK10,          segaic16_paletteram_fast_w, &paletteram16,         "color RAM" },
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, MRA16_BANK13,          MWA16_BANK13,          &segaic16_spriteram_0, "object RAM" },
@@ -946,7 +946,7 @@ static const struct segaic16_memory_map_entry rom_atomicp_info[] =
 static const struct segaic16_memory_map_entry rom_171_5797_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK10,          segaic16_paletteram_fast_w, &paletteram16,         "color RAM" },
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, MRA16_BANK13,          MWA16_BANK13,          &segaic16_spriteram_0, "object RAM" },
@@ -1074,7 +1074,7 @@ static READ16_HANDLER( standard_io_r )
 		case 0x2000/2:
 			return readinputport(4 + (offset & 1));
 	}
-	loginfo(2,"%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	//loginfo(2,"%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(0,0);
 }
 
@@ -1183,14 +1183,14 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 
 static READ16_HANDLER( unknown_rgn2_r )
 {
-	loginfo(2,"Region 2: read from %04X\n", offset * 2);
+	//loginfo(2,"Region 2: read from %04X\n", offset * 2);
 	return segaic16_compare_timer_1_r(offset & 7, mem_mask);
 }
 
 
 static WRITE16_HANDLER( unknown_rgn2_w )
 {
-	loginfo(2,"Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask ^ 0xffff);
+	//loginfo(2,"Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask ^ 0xffff);
 	segaic16_compare_timer_1_w(offset & 7, data, mem_mask);
 }
 

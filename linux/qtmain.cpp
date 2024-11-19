@@ -102,7 +102,7 @@ void QProc::process()
     //"arkretrn"
 //    "wb3"
 // "shinobi"
-//               "goldnaxe"
+               "goldnaxe"
 //                "altbeast"
 //    "bublbobl"
 //   "dino"
@@ -115,7 +115,7 @@ void QProc::process()
 // "silkworm"
 // "sgemf"
 //                "gforce2"
-      "mslug"
+//      "mslug"
 //                "mp_sor2"
     );
     if(itest>0) idriver= itest;

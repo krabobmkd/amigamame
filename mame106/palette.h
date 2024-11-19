@@ -114,6 +114,11 @@ extern UINT32 direct_rgb_components[3];
 extern UINT16 *palette_shadow_table;
 
 
+#if defined(__GNUC__) && defined(__AMIGA__)
+#define REGPL(r) __asm(#r)
+#else
+#define REGPL(r)
+#endif
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -125,11 +130,32 @@ int palette_get_total_colors_with_ui(void);
 
 void palette_update_display(mame_display *display);
 
-void palette_set_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b);
+void palette_set_color(pen_t pen REGPL(d0), UINT8 r, REGPL(d1) UINT8 g REGPL(d2), UINT8 b REGPL(d3));
 void palette_get_color(pen_t pen, UINT8 *r, UINT8 *g, UINT8 *b);
 void palette_set_colors(pen_t color_base, const UINT8 *colors, int color_count);
 
-void setpalettefast_neogeo(pen_t pen, rgb_t color);
+//void setpalettefast_neogeo(pen_t pen REGPL(d0), UINT8 r, REGPL(d1) UINT8 g REGPL(d2), UINT8 b REGPL(d3));
+
+static inline void setpalettefast_neogeo(pen_t pen REGPL(d0), rgb_t color REGPL(d1) )
+{
+    extern rgb_t *game_palette;
+    extern UINT8 color_correct_table[4096];
+    extern UINT8 adjusted_palette_dirty;
+    extern rgb_t *adjusted_palette;
+    extern UINT32 *dirty_palette;
+
+    game_palette[pen] = color;
+    /* now update the adjusted color if it's different */
+    // it is always, because already done for neogeo.
+    int r = color_correct_table[RGB_RED(color) ];
+    int g = color_correct_table[RGB_GREEN(color)];
+    int b = color_correct_table[RGB_BLUE(color) ];
+    adjusted_palette[pen] = MAKE_RGB(r,g,b);
+
+     adjusted_palette_dirty = 1;
+    // mark_pen_dirty(pen);
+   	dirty_palette[pen / 32] |= 1 << (pen % 32);
+}
 
 void palette_set_brightness(pen_t pen, double bright);
 void palette_set_shadow_factor(double factor);
