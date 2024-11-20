@@ -261,10 +261,11 @@ int main(int argc, char **argv)
 
     int idriver=0; // romToLaunch;
     STRPTR userdir = NULL;
+    STRPTR cheatfiletofilter="cheat.dat"; // NULL;
     int verbose=0;
     int romlist=0;
     int dohelp=0;
-    int version=0;
+    int version=0; 
     if(argc>1)
     {
         // test if just "mame romname".
@@ -285,7 +286,13 @@ int main(int argc, char **argv)
         if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"-h",2)!=2);
         if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"--help",2)!=2);
         if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"-v",2)!=2);
+
+        cheatfiletofilter = ArgString((CONST_STRPTR*)args,"FILTERCHEAT",NULL);
         ArgArrayDone();
+    }
+    if(cheatfiletofilter)
+    {
+        getMainConfig().filterCheatFile(cheatfiletofilter);
     }
     // command line things...
     if(version)

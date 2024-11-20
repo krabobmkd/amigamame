@@ -75,6 +75,8 @@ public:
     void init(int argc,char **argv);
     // list all drivers to output.
     void listFull();
+    //create new cheat file with just data for known drivers.
+    void filterCheatFile(const char *pcheatf);
 
     void resettodefault();
     void setRomPath(const char *rompath);

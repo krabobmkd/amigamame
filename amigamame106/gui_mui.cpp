@@ -54,6 +54,16 @@ extern "C" {
 #include "version.h"
 
 
+__inline Object * MUINewObject(CONST_STRPTR cl, Tag tags, ...)
+{
+  return MUI_NewObjectA((char *)cl, (struct TagItem *) &tags);
+}
+__inline Object * MUINewObject(CONST_STRPTR cl, struct TagItem *tags)
+{
+  return MUI_NewObjectA((char *)cl, tags);
+}
+
+
 #ifndef MUIA_List_SortColumn
 #define MUIA_List_SortColumn                0x8042cafb /* V21 isg LONG              */
 #endif
@@ -837,21 +847,8 @@ void FreeGUI(void)
 
 }
 
-// use less macros
-inline Object *MUINewObject( char *pclassname,ULONG tag1, ... )
-{
-   return MUI_NewObjectA(pclassname, (struct TagItem *) &tag1);
-}
-inline ULONG UMUINO(char *pclassname,ULONG tag1, ... )
-{
-   return (ULONG)MUI_NewObjectA(pclassname, (struct TagItem *) &tag1);
-}
-inline Object *OMUINO(char *pclassname,ULONG tag1, ... )
-{
-   return MUI_NewObjectA(pclassname, (struct TagItem *) &tag1);
-}
 #define UCheckMark(selected)\
-	(ULONG)MUI_NewObject(MUIC_Image,\
+	(ULONG)MUINewObject(MUIC_Image,\
 		ImageButtonFrame,\
 		MUIA_InputMode        , MUIV_InputMode_Toggle,\
 		MUIA_Image_Spec       , MUII_CheckMark,\
@@ -861,7 +858,7 @@ inline Object *OMUINO(char *pclassname,ULONG tag1, ... )
 		MUIA_ShowSelState     , FALSE,\
 		TAG_DONE)
 #define OCheckMark(selected)\
-	MUI_NewObject(MUIC_Image,\
+	MUINewObject(MUIC_Image,\
 		ImageButtonFrame,\
 		MUIA_InputMode        , MUIV_InputMode_Toggle,\
 		MUIA_Image_Spec       , MUII_CheckMark,\
@@ -871,7 +868,7 @@ inline Object *OMUINO(char *pclassname,ULONG tag1, ... )
 		MUIA_ShowSelState     , FALSE,\
 		TAG_DONE)
 #define OString(contents,maxlen)\
-	MUI_NewObject(MUIC_String,\
+	MUINewObject(MUIC_String,\
 		StringFrame,\
 		MUIA_String_MaxLen  , maxlen,\
 		MUIA_String_Contents, contents,\
@@ -879,15 +876,14 @@ inline Object *OMUINO(char *pclassname,ULONG tag1, ... )
 
 Object *createPanel_Drivers()
 {
- const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,";
+    const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,";
     if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
     {
         ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,";
     }
-// note: if MUI5, no need to override MUI_List , so DriverClass is NULL.
 
-  return MUINewObject(MUIC_Group,
-        Child, LV_Driver = (Object *)(DriverClass!=NULL)?
+  Object *panel = MUINewObject(MUIC_Group,
+        Child,(ULONG)( LV_Driver = (DriverClass!=NULL)?
 
             ((Object *)NewObject(DriverClass->mcc_Class, NULL,
           MUIA_Listview_Input,    TRUE,
@@ -898,28 +894,32 @@ Object *createPanel_Drivers()
               MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
             InputListFrame,
           TAG_DONE)),
-        TAG_END)
-             )
-        :(Object *) OMUINO(MUIC_Listview,
+        TAG_END))
+
+        :((Object *)MUINewObject(MUIC_Listview,
           MUIA_Listview_Input, TRUE,
             MUIA_Listview_List, (ULONG)( LI_Driver = MUINewObject(MUIC_List,
               MUIA_List_Title, TRUE,
+              InputListFrame,
               MUIA_List_Format,(ULONG)ListFormat,
-              MUIA_List_DisplayHook,  &DriverDisplayHook,
+              MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
               MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
-            InputListFrame,
+
           TAG_DONE)),
-        TAG_DONE)
+        TAG_DONE))
+
+        )
         ,
-        Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,          
-          Child, Label((ULONG)GetMessagec("Show")),
-          Child, (ULONG) (CY_Show = OMUINO(MUIC_Cycle,
+        Child, (ULONG)MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+          Child,(ULONG) Label((ULONG)GetMessagec("Show")),
+          Child, (ULONG) (CY_Show = MUINewObject(MUIC_Cycle,
             MUIA_Cycle_Entries, (ULONG) Shows,
           TAG_DONE)),
           Child,(ULONG)(BU_Scan = SimpleButton((ULONG)GetMessagec("Scan"))),
         TAG_DONE),
     TAG_DONE);
 
+    return panel;
 }
 
 
@@ -956,6 +956,7 @@ int MainGUI(void)
   ULONG signals = 0;
   BOOL  loop  = TRUE;
 
+
   MameConfig &config = getMainConfig();
 //  printf("MainGUI: MUIMasterBase:%08x\n",(int)MUIMasterBase);
 
@@ -975,13 +976,22 @@ int MainGUI(void)
 #define SCALEMODEMASK(u, d, p, s)	(((u) ? NISMF_SCALEUP : 0) | ((d) ? NISMF_SCALEDOWN : 0) | ((p) ? NISMF_KEEPASPECT_PICTURE : 0) | ((s) ? NISMF_KEEPASPECT_SCREEN : 0))
 #define TRANSMASK(m, r)				(((m) ? NITRF_MASK : 0 ) | ((r) ? NITRF_RGB : 0))
 
-          GIF_cornerlogo =
-           MUI_NewObject(MUIC_GIFAnim,MUIA_GIFAnim_File,(ULONG) "PROGDIR:skin/cornerlogo.gif",
-
+        // will be NULL if MUI<5, but just invalid if file not found.
+            GIF_cornerlogo =
+            MUINewObject(MUIC_GIFAnim,MUIA_GIFAnim_File,(ULONG) "PROGDIR:skin/cornerlogo.gif",
                     TAG_DONE);
+            if(GIF_cornerlogo)
+            {
+                int isinvalid=0;
+                get(GIF_cornerlogo, MUIA_GIFAnim_Invalid, &isinvalid);
+                if(isinvalid) {
+                    MUI_DisposeObject(GIF_cornerlogo);
+                    GIF_cornerlogo = NULL;
+                }
+            }
           /* following doesnt work ! really there is a problem with guigfx.library.
            *
-           * MUI_NewObject(MUIC_Guigfx,
+           * MUINewObject(MUIC_Guigfx,
 							MUIA_Guigfx_FileName, (ULONG) "PROGDIR:skin/bl.ilbm",
 							MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 							// SCALEMODEMASK( scaleup, scaledown  PICASPECT, SCREENASPECT )
@@ -989,14 +999,7 @@ int MainGUI(void)
 						//	MUIA_Guigfx_Transparency, TRANSMASK(TRUE, TRUE),
 							TAG_DONE);*/
         }
-        printf("GIF_cornerlogo:%08x\n",(int)GIF_cornerlogo);
-        if(GIF_cornerlogo)
-        {
-            int isok=0;
-             get(GIF_cornerlogo, MUIA_GIFAnim_Decoded, &isok);
-             printf("ok:%d\n",isok);
 
-        }
         // if(GIF_cornerlogo == NULL)
         // {
         //     GIF_cornerlogo = MUI_MakeObject(MUIO_HSpace,0);
@@ -1010,21 +1013,21 @@ int MainGUI(void)
           {MUIA_Window_Title,(ULONG)APPNAMEA},
           {MUIA_Window_ID   , MAKE_ID('M','A','I','N')},
 
-        {MUIA_Window_Menustrip, UMUINO(MUIC_Menustrip,
-            MUIA_Family_Child,UMUINO(MUIC_Menu,MUIA_Menu_Title,(ULONG)GetMessagec("Menu"),
-              MUIA_Family_Child, UMUINO(MUIC_Menuitem,
+        {MUIA_Window_Menustrip, (ULONG)MUINewObject(MUIC_Menustrip,
+            MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menu,MUIA_Menu_Title,(ULONG)GetMessagec("Menu"),
+              MUIA_Family_Child, (ULONG)MUINewObject(MUIC_Menuitem,
                 MUIA_Menuitem_Title,  (ULONG)GetMessagec("About"),
                 MUIA_Menuitem_Shortcut,(ULONG) "?",
                 MUIA_UserData,      MID_About,
               TAG_DONE),
-              MUIA_Family_Child, UMUINO(MUIC_Menuitem,
+              MUIA_Family_Child, (ULONG)MUINewObject(MUIC_Menuitem,
                 MUIA_Menuitem_Title,  (ULONG)GetMessagec("About MUI..."),
                 MUIA_UserData,      MID_AboutMUI,
               TAG_DONE),
-              MUIA_Family_Child, UMUINO(MUIC_Menuitem,
+              MUIA_Family_Child, (ULONG)MUINewObject(MUIC_Menuitem,
                 MUIA_Menuitem_Title,  NM_BARLABEL,
               TAG_DONE),
-              MUIA_Family_Child, UMUINO(MUIC_Menuitem,
+              MUIA_Family_Child, (ULONG)MUINewObject(MUIC_Menuitem,
                 MUIA_Menuitem_Title,  (ULONG)GetMessagec("Quit"),
                 MUIA_Menuitem_Shortcut,(ULONG) "Q",
                 MUIA_UserData,      MUIV_Application_ReturnID_Quit,
@@ -1032,17 +1035,19 @@ int MainGUI(void)
             TAG_DONE),
           TAG_DONE)},
 
-        {WindowContents, UMUINO(MUIC_Group, // vertical group because no horiz. specified.
+        {WindowContents, (ULONG)MUINewObject(MUIC_Group, // vertical group because no horiz. specified.
 
             Child,createOptionTabGroup(),
 
-            Child, UMUINO(MUIC_Group,MUIA_Group_Horiz,TRUE,
-                Child, UMUINO(MUIC_Group,
+            Child, (ULONG)MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+                Child,(ULONG)(LA_statusbar = LLabel((ULONG)GetMessagec("-"))),
+                Child,(ULONG)(BU_Start   = SimpleButton((ULONG)GetMessagec("Start"))),
+                /*Child, (ULONG)MUINewObject(MUIC_Group,
                       Child, BU_Start   = SimpleButton((ULONG)GetMessagec("Start")),
                       Child, MUI_MakeObject(MUIO_VSpace,0),
                       Child, LA_statusbar = LLabel((ULONG)GetMessagec("-")),
-                        TAG_DONE,0),
-              Child_Gif,GIF_cornerlogo,
+                        TAG_DONE,0),*/
+              Child_Gif,(ULONG)GIF_cornerlogo,
           //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessagec("Quit")),
             TAG_DONE,0), // end WindowContent Group
           TAG_DONE,0)},
@@ -1246,7 +1251,7 @@ void AboutGUI(void)
 
 inline Object *OHCenter(Object *obj)
 {
-  return MUI_NewObject(MUIC_Group,
+  return MUINewObject(MUIC_Group,
                        MUIA_Group_Horiz,TRUE,
                        MUIA_Group_Spacing,0,
                        Child,(ULONG) MUI_MakeObject(MUIO_HSpace,0),
@@ -1258,6 +1263,8 @@ inline Object *OHCenter(Object *obj)
 
 static void CreateApp(void)
 {
+    if(App) return; // already ok
+
     if(sTextAbout.length()==0)
     {
         sTextAbout =
@@ -1280,24 +1287,23 @@ static void CreateApp(void)
     }
 
 
-
-  App = MUI_NewObject(MUIC_Application,
+  App = MUINewObject(MUIC_Application,
     MUIA_Application_Title      , (ULONG)APPNAME,
     //MUIA_Application_Version    , (ULONG)("$VER: " APPNAME " (" REVDATE ")"),
     MUIA_Application_Author     , (ULONG)AUTHOR,
     MUIA_Application_Base       , (ULONG)"MAME",
-    SubWindow, (ULONG)(AboutWin = MUI_NewObject(MUIC_Window,
+    SubWindow, (ULONG)(AboutWin = MUINewObject(MUIC_Window,
       MUIA_Window_Title, (ULONG)APPNAME,
       MUIA_Window_ID   , MAKE_ID('A','B','O','U'),
-      WindowContents, UMUINO(MUIC_Group,
-        Child, UMUINO(MUIC_Scrollgroup,
+      WindowContents, (ULONG)MUINewObject(MUIC_Group,
+        Child, (ULONG)MUINewObject(MUIC_Scrollgroup,
           MUIA_Scrollgroup_FreeHoriz, FALSE,
           MUIA_Scrollgroup_FreeVert, TRUE,
-          MUIA_Scrollgroup_Contents, UMUINO(MUIC_Virtgroup,
+          MUIA_Scrollgroup_Contents, (ULONG)MUINewObject(MUIC_Virtgroup,
             VirtualFrame,
             MUIA_Background, MUII_TextBack,
-            Child, UMUINO(MUIC_Group,
-              Child, UMUINO(MUIC_Text,
+            Child, (ULONG)MUINewObject(MUIC_Group,
+              Child, (ULONG)MUINewObject(MUIC_Text,
                 MUIA_Text_Contents, (ULONG)sTextAbout.c_str(),
               TAG_DONE),
               Child, VSpace(0),
@@ -1308,6 +1314,7 @@ static void CreateApp(void)
       TAG_DONE), // end group
     TAG_DONE)),
   TAG_DONE);
+
 
   if(App)
   {

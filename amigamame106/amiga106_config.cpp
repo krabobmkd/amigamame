@@ -5,6 +5,7 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <string.h>
+#include <fstream>
 // from mame
 extern "C" {
     #include "driver.h"
@@ -620,6 +621,33 @@ void MameConfig::listFull()
 
 }
 
+//create new cheat file with just data for known drivers.
+void MameConfig::filterCheatFile(const char *pcheatf)
+{
+    ifstream ifs(pcheatf);
+    if(!ifs.good()) return;
+
+    ofstream ofs(string(pcheatf)+".new");
+
+    string l;
+    while(getline(ifs,l))
+    {
+        if(l.size()==0) continue;
+        char temp[1024];
+        size_t i = l.find(":");
+        if(i == string::npos) continue;
+        size_t j = l.find(":",i+1);
+        if(j == string::npos) continue;
+        string n=l.substr(i+1,j-i-1);
+        if(_driverIndex.index(n.c_str()) != -1)
+        {
+            ofs << l << "\n";
+        }
+
+    }
+    ofs << endl;
+
+}
 void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs/*, int &nbp*/)
 {
     int idriver = ((int)drv-(int)&drivers[0])/sizeof(const _game_driver *);
