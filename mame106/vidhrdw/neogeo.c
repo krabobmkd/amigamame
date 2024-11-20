@@ -70,7 +70,7 @@ static int no_of_tiles;
 static INT32 fix_bank;
 
 
-static UINT8 *memory_region_gfx4;
+UINT8 *neogeo_memory_region_gfx4;
 UINT8 *neogeo_memory_region_gfx3;
 
 void neogeo_set_lower_resolution( void )
@@ -366,7 +366,7 @@ VIDEO_START( neogeo_mvs )
 	neogeo_vidram16_offset = 0;
 	fix_bank = 0;
 
-	memory_region_gfx4  = memory_region(REGION_GFX4);
+	neogeo_memory_region_gfx4  = memory_region(REGION_GFX4);
 	neogeo_memory_region_gfx3  = memory_region(REGION_GFX3);
 
 	neogeo_set_lower_resolution();
@@ -925,7 +925,7 @@ INLINE void neogeo_draw_sprite(
 	int zoom_line;
 	int invert=0;
 	gfx_element *gfx=Machine->gfx[2]; /* Save constant struct dereference */
-	zoomy_rom = memory_region_gfx4 + (zy << 8);
+	zoomy_rom = neogeo_memory_region_gfx4 + (zy << 8);
 
 	/* the maximum value for my is 0x200 */
 	min_spriteline = sy & 0x1ff;
@@ -1459,7 +1459,10 @@ void oldUpdate( mame_bitmap *bitmap, const rectangle *cliprect)
         /* Process Sprite List -384 */
         for (count = 0; count < 0x300 >> 1; count++)
         {
-
+            if(count==177){
+                static int ggg=0;
+                ggg++;
+            }
             //KRB test
             //if(count>0x40) break;
 
@@ -1531,7 +1534,7 @@ void oldUpdate( mame_bitmap *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( neogeo )
 {
- // if(nbframe < 60*10)
+ //if(nbframe < 60*10)
  // {
  //   oldUpdate(bitmap,cliprect);
  //   return;
