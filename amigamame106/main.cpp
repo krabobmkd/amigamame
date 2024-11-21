@@ -261,7 +261,7 @@ int main(int argc, char **argv)
 
     int idriver=0; // romToLaunch;
     STRPTR userdir = NULL;
-    STRPTR cheatfiletofilter="cheat.dat"; // NULL;
+    STRPTR cheatfiletofilter= NULL;
     int verbose=0;
     int romlist=0;
     int dohelp=0;

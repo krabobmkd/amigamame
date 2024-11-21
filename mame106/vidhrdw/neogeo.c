@@ -1539,19 +1539,19 @@ VIDEO_UPDATE( neogeo )
  //   oldUpdate(bitmap,cliprect);
  //   return;
  // }
-	fillbitmap(bitmap,4095,cliprect);
-
+    // let a few glitch drawn during glitch startup, but basically draw nothing. does fast boot.
+    if(neogeo_draw_counter==0) fillbitmap(bitmap,4095,cliprect);
  // todo, bypass when glitching.
     if(neogeo_draw_counter<240)
     {
         neogeo_draw_counter++;
-        return;
+        if(neogeo_draw_counter != 80)  return;
     }
+    fillbitmap(bitmap,4095,cliprect);
 
-
-  //   rectangle rc = *cliprect;
-  // rc.min_y +=10;
-  // rc.max_y -=10;
+    rectangle rc = *cliprect;
+  rc.min_y +=7;
+  rc.max_y -=7;
 
     neogeo_drawTilesSprites(bitmap,/*&rc*/cliprect);
 

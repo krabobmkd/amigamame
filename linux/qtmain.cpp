@@ -121,8 +121,8 @@ void QProc::process()
 // "sgemf"
 //                "gforce2"
 
-//        "aof"
-      "mslug2"
+        "aof"
+//      "mslug"
 
 //                "mp_sor2"
     );
@@ -169,6 +169,8 @@ void QWin::paintEvent(QPaintEvent *event)
     QPainter p(this);
 
     p.drawText(60,60,QString("woot:")+QString::number(dbg_nbt));
+
+//    p.drawText(60,60,QString("woot:")+QString::number(nbframe));
 }
 void QWin::updateWin()
 {
@@ -179,8 +181,8 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w,h)) );
-        this->setFixedSize(w,h);
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
+        this->setFixedSize(w*3,h*3);
     _imageMutex.unlock();
 
 	//lbl.show();
@@ -292,16 +294,16 @@ void osd_update_video_and_audio(struct _mame_display *display)
         _image = image;
     _imageMutex.unlock();
 
-         // if(nbframe>1170)
-         // QThread::msleep(1000);
+          // if(nbframe>300)
+           QThread::msleep(1000/60);
 
 nbframe++;
     // logo
-if(nbframe == 60*20+60-4-4-4) mame_pause(1);
+//if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 //if(nbframe == 3350) mame_pause(1);
 //if(nbframe == 60*28) mame_pause(1);
 // if(nbframe==1200) exit(1);
-// if(nbframe==28*60)  mame_pause(1);
+// if(nbframe==3500)  mame_pause(1);
 //    m_mutex.lock();
 //    m_mutex.unlock();
 
