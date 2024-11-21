@@ -122,7 +122,7 @@ void QProc::process()
 //                "gforce2"
 
 //        "aof"
-      "mslug"
+      "mslug2"
 
 //                "mp_sor2"
     );
@@ -179,8 +179,8 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
-        this->setFixedSize(w*3,h*3);
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w,h)) );
+        this->setFixedSize(w,h);
     _imageMutex.unlock();
 
 	//lbl.show();
@@ -297,11 +297,11 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
 nbframe++;
     // logo
-//if(nbframe == 60*20+60-4-4-4) mame_pause(1);
+if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 //if(nbframe == 3350) mame_pause(1);
 //if(nbframe == 60*28) mame_pause(1);
 // if(nbframe==1200) exit(1);
-// if(nbframe==10*60)  mame_pause(1);
+// if(nbframe==28*60)  mame_pause(1);
 //    m_mutex.lock();
 //    m_mutex.unlock();
 
