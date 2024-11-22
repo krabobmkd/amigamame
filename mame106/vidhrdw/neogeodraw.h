@@ -7,6 +7,8 @@
     #include "mamecore.h"
     #include "mame.h"
 
+    // would allocate an escape table for transparent tiles in Yzoom mode.
+    void neogeo_initDrawTilesSprites();
     void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect);
 
 #ifdef __cplusplus

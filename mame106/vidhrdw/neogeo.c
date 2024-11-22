@@ -372,6 +372,9 @@ VIDEO_START( neogeo_mvs )
 	neogeo_set_lower_resolution();
 	register_savestate();
 
+	//krb
+    neogeo_initDrawTilesSprites();
+
 	return 0;
 }
 

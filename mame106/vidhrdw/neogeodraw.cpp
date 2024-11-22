@@ -1,4 +1,20 @@
-﻿#include "neogeodraw.h"
+﻿//   _____   ____  __.________
+//  /     \ |    |/ _|\______ \
+// /  \ /  \|      <   |    |  \
+///    Y    \    |  \  |    `   \
+//\____|__  /____|__ \/_______  /
+// ==rlz==\/ =======\/========\/
+// krb presents...
+// the Hardcore sped up-neogeo vidhrdw, originally for Mame MiniMix 2024.
+// o No test per pixels in x loops, twice less tests in y loops.
+// o dreadfull inlining algorithm.
+// o Wiseful use of C++ template inlining in coordination with assembler.
+// o Wiseful use of C++ lambda !! Take this, nineties.
+// o mame2003 level of support (no line interupt management but no old glitch prior to v78. Yet, it's not the v78 version at all).
+// o Amiga68k will benefit assembler pixel tracer.
+// o Still support LE64 or BE32 cpus.
+
+#include "neogeodraw.h"
 extern "C" {
     #include "drawgfx.h"
     extern UINT16 *neogeo_vidram16;
@@ -8,9 +24,10 @@ extern "C" {
     extern unsigned int neogeo_frame_counter;
     extern UINT8 *neogeo_memory_region_gfx3;
     extern UINT8 *neogeo_memory_region_gfx4;
-    extern char zoomx_draw_tables[16][16];
 }
+static UINT8 *neogeo_Yjumps=NULL;
 
+// Amiga uses register parameter instead of stack on tracer.
 #if defined(__GNUC__) && defined(__AMIGA__)
 #define REGNG(r) __asm(#r)
     //#define REGM(r)
@@ -18,8 +35,13 @@ extern "C" {
 #define REGNG(r)
 #endif
 
+//#ifdef __AMIGA__
+//#define USENEOGEO_ASM68K_PIXELWRITERS 1
+//#endif
 
 //    int tutute= 0;
+
+// Endianness affair: LSB Least Significant bit.
 // note: could be inverted in tile decoding.
 #ifdef LSB_FIRST
         // little endian: intel arm
@@ -50,10 +72,14 @@ extern "C"
     int dbg_nbt=0;
 }
 
-static int no_of_tiles=0;
+// - -  values that are static to a game driver.
+static UINT32 no_of_tiles=0;
 static UINT32 tileOffsetFilter=0;
 
 
+typedef void (*neoLineWriter)( UINT16 *bm REGNG(a0), UINT8 *fspr REGNG(a1),UINT16 ipalette REGNG(d0));
+
+/**  used for template inlining */
 struct neoPixelWriter_Opaque
 {
     static bool isOpaque() { return true; }
@@ -62,7 +88,7 @@ struct neoPixelWriter_Opaque
         *bm = palette+col;
     }
 };
-
+/**  used for template inlining */
 struct neoPixelWriter_Transparent0
 {
     static bool isOpaque() { return false; }
@@ -71,7 +97,6 @@ struct neoPixelWriter_Transparent0
         if(col) *bm = palette+col;
     }
 };
-
 
 typedef struct _NeoDrawGfxParams {
     UINT8 *fspr;
@@ -85,17 +110,12 @@ typedef struct _NeoDrawGfxParams {
     int flipx;
 } sNeoDrawGfxParams;
 
+#ifndef USENEOGEO_ASM68K_PIXELWRITERS
 
-
-
-
-
-
-
-// when Y zoom is applied, we have to draw line by lines.
-// this would write a 16 pixel sprite line, applying X zoom and flipx
-// template are used to avoid x-zoom-related tests-per-pixels.
-// everything is inlined by compiler.
+/** when Y zoom is applied, we have to draw line by lines.
+ this would write a 16 pixel sprite line, applying X zoom and flipx
+ every template variables tests are inlined by compiler by implementations
+  so tests-per-pixels are actually removed. */
 template<class PixelWriter,bool flipx,
          char j0,char j1,char j2,char j3,char j4,char j5,char j6,char j7,
          char j8,char j9,char j10,char j11,char j12,char j13,char j14,char j15>
@@ -166,6 +186,8 @@ void NeoDrawGfx16line(
     }
 }
 
+/** Still template level, but specifies the 16 possible values of x zoom.
+*/
 template<class PixelWriter,bool flipx>
 void NeoDrawGfx16line0( UINT16 *bm REGNG(a0), UINT8 *fspr REGNG(a1),UINT16 ipalette REGNG(d0))
 { NeoDrawGfx16line<PixelWriter,flipx,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0 >(bm,fspr,ipalette); }
@@ -220,14 +242,15 @@ template<class PixelWriter,bool flipx>
 void NeoDrawGfx16line15( UINT16 *bm REGNG(a0), UINT8 *fspr REGNG(a1),UINT16 ipalette REGNG(d0))
 { NeoDrawGfx16line<PixelWriter,flipx,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1>(bm,fspr,ipalette); }
 
-typedef void (*neoLineWriter)( UINT16 *bm REGNG(a0), UINT8 *fspr REGNG(a1),UINT16 ipalette REGNG(d0));
 
-// - - - this table is indexed like this:
-// (p->zx) +   // 0->15   zoomx cases
-// ((penusage & 1)<<4) + // 0 or 16,  , 0 means opaque
-// ((tileatr & 0x01)<<5) // 0 or 32, flip x
-
-static neoLineWriter lineWriters[64]={
+/** This 64 sized lambda table implements real functions.
+ * The assembler generated uses very short code with no stack use for params.
+ * table is indexed like this:
+ *  0->15   zoomx cases
+ *  +0 or 16,  0 means opaque
+ *  +0 or 32, flip x
+*/
+static neoLineWriter neogeo_lineWriters[64]={
 
     // - - - -- - - - -- - - - - no flipx, Opaque
     [](UINT16 *bm REGNG(a0), UINT8 *fspr REGNG(a1),UINT16 ipalette REGNG(d0)){
@@ -369,15 +392,19 @@ static neoLineWriter lineWriters[64]={
             NeoDrawGfx16line15<neoPixelWriter_Transparent0,true>(bm,fspr,ipalette);},
 
 };
-
-
-
-// This version is used when no Y Zoom, so we can do a classic fast y loop.
-// template are used to avoid x-zoom-related tests-per-pixels.
-// everything is inlined by compiler.
-// there is technically 15*2 assembled version of this.
-// PixelWriter tells if opaque or transparent.
-// if opaque: ... no test at all per pixels.
+#else
+    // if asm 68k
+    extern "C" {
+        extern neoLineWriter neogeo_lineWriters[64];
+    };
+#endif
+/** This tracer is used when there is no Y zoom.
+ * So it includes a fast Y loop and the X 16 pixels line tracer.
+ * there is technically 15*2 assembled version of this.
+ * every templates vars tests is removd by the compiler at implementations.
+ *  PixelWriter tells if opaque or transparent.
+ * if tile opaque, there is no test at all per pixels.
+ */
 template<class PixelWriter,
          char j0,char j1,char j2,char j3,char j4,char j5,char j6,char j7,
          char j8,char j9,char j10,char j11,char j12,char j13,char j14,char j15>
@@ -485,12 +512,12 @@ void NeoDrawGfx16(sNeoDrawGfxParams *p REGNG(a0))
     if (p->flipx)	/* X flip */
     {
         UINT8 *fspr = p->fspr;
-        UINT16 **line = p->line;
+ //       UINT16 **line = p->line;
         UINT16 ipalette = p->ipalette;
         INT32 dy = p->dy;
         INT16 sy = (INT16)p->sy;
         INT16 ey = (INT16)p->ey;
-        INT32 sx = p->sx;
+//        INT32 sx = p->sx;
         //if(p->zx==15)
         switch(p->zx)
         {
@@ -639,27 +666,7 @@ void NeoDrawGfx16(sNeoDrawGfxParams *p REGNG(a0))
                 fspr+=dy;
             }
         } break; //15
-            /*
-	{ 0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0 },
-	{ 0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0 },
-	{ 0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0 },
-	{ 0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0 },
 
-	{ 0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0 },
-	{ 0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0 },
-	{ 0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0 },
-	{ 1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0 },
-
-	{ 1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0 },
-	{ 1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0 },
-	{ 1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1 },
-	{ 1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1 },
-
-	{ 1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1 },
-	{ 1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1 },
-	{ 1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1 },
-	{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
-*/
         case 0:NeoDrawGfx16zx<PixelWriter,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0>(p);
             break;
         case 1:NeoDrawGfx16zx<PixelWriter,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0>(p);
@@ -698,6 +705,12 @@ void NeoDrawGfx16(sNeoDrawGfxParams *p REGNG(a0))
 
 }
 
+/** The Y loop used when zoomY is actually involved.
+ *  This have only 3 tests per line, when original 2003 code had of 6 or 7 and 3 times the code size.
+ * Yet same functionnality. "fullmode or not" is completely template-inlined, which is great
+ * because it would slow down big ass, when this feature is only used is 2 of the 40 games.
+ * Also, does NOT scan stupidly the whole vertical blank for no reason. Come on kids !
+ */
 template<int fullmode>
 static inline void tileYLoopZoomY(
     sNeoDrawGfxParams *p REGNG(a0),
@@ -710,6 +723,7 @@ static inline void tileYLoopZoomY(
     UINT8 *fspr = (UINT8 *)neogeo_memory_region_gfx3;
     /* get pointer to table in zoom ROM (thanks to Miguel Angel Horna for the info) */
     UINT8 *zoomy_rom = neogeo_memory_region_gfx4 + (zy << 8);
+    UINT8 *zoomy_jumps = neogeo_Yjumps + (zy << 8);
     UINT16 **line = p->line;
 
     const INT16 miny = (INT16)cliprect->min_y;
@@ -817,14 +831,20 @@ static inline void tileYLoopZoomY(
                 else if (tileatr & 0x04) tileno=(tileno&~3)|(neogeo_frame_counter&3);	/* fixed */
 
                 penusage = gfx->pen_usage[tileno];            // escape whole tile here ?
-/*todo
+
                 if(penusage == 1) // only color 0 on whole tile.
                 {
                     // escape to line that is next tile...
-                    drawn_lines += escapeToNextTile_table[zoom_line];
+                    if (drawn_lines & 0x100) // if second batch of 16 tiles !
+                    {
+                        drawn_lines += 16-zoomy_jumps[zoom_line];
+                    } else
+                    {
+                        drawn_lines += zoomy_jumps[zoom_line];
+                    }
                     continue;
                 }
-                */
+
                 yXorFlipper = (tileatr>>1 & 0x01) * 0x0f;
 
                 ipalette = (tileatr >> 4 & 0x0ff0);
@@ -832,14 +852,14 @@ static inline void tileYLoopZoomY(
 
                 // there is a function pointer table with 16 xzoomcase *(2flipx) * (2opaque/tr)
                 // = 64 functions , NO TESTS !!
-                linewriter = lineWriters[
+                linewriter = neogeo_lineWriters[
                                     (p->zx) +   // 0->15
                                     ((penusage & 1)<<4) + // 0 or 16,  , 0 means opaque
                                     ((tileatr & 0x01)<<5) // 0 or 32, flip x
                                     ];
 
             }
-            if(penusage == 1) { drawn_lines++; continue; }
+            //if(penusage == 1) { drawn_lines++; continue; }
 
             // todo, this test could be escaped in tile change with a jump table.
             //if(penusage == 1) continue; // only color 0 on whole tile.
@@ -851,9 +871,9 @@ static inline void tileYLoopZoomY(
         }  /* for y */
 
         if(drawn_lines < mysize)
-        {   // means previous stop for ymax, so now
-            // jump down to up, and continue up if very long strip.
-            int delta = ( 0x200 - (sy+drawn_lines)) + miny; // jump blank, actually.
+        {   // means previous stop was for ymax, so now:
+            // jump down to up, and continue up to max size, if very long strip. (0x20= 512 pix height)
+            int delta = ( 0x200 - (sy+drawn_lines)) + miny; // jump screen vblank, actually.
             drawn_lines += delta;
             next_stop = mysize;
         }
@@ -861,10 +881,12 @@ static inline void tileYLoopZoomY(
     }
 } // end Yzoom version
 
-// still manage x zoom, x flip, y flip.
-// we can treat 16pix height tile with a fast y loop.
-// no need for "yzoom table"
 
+/**
+ * No-Yzoom Yloop that traces 16x16 tiles one by one.
+ * so there is basically nothing done per Y line.
+ *  still manage x zoom, x flip, y flip.
+ */
 static inline void tileYLoopNozoomY(
     sNeoDrawGfxParams *p REGNG(a0),
     UINT32 offs REGNG(d0),INT16 sy REGNG(d1),INT32 my REGNG(d2),
@@ -905,7 +927,7 @@ static inline void tileYLoopNozoomY(
 
         UINT32 penusage = gfx->pen_usage[tileno];
 
-        if ((penusage & ~1) != 0)  // if not fully transparent.
+        if ((penusage & ~1) != 0)  // if not fully transparent. happens a lot.
         {
             // = = = = prepare y things = = = =
             INT16 syy=sy;
@@ -932,25 +954,16 @@ static inline void tileYLoopNozoomY(
 //             p->zx = zx;
              p->flipx = tileatr & 0x01;
 
-
-            if((penusage & 1)==0)
-            {   // fully opaque
-                NeoDrawGfx16<neoPixelWriter_Opaque>(p);
-
-            } else
-            {
-                NeoDrawGfx16<neoPixelWriter_Transparent0>(p);
-            }
+            if((penusage & 1)==0)  NeoDrawGfx16<neoPixelWriter_Opaque>(p);
+            else NeoDrawGfx16<neoPixelWriter_Transparent0>(p);
 
         } // end if draw ok.
 
         sy +=16;        
         if( sy > cliprect->max_y)
         {
-            // if my 32, will round to up !
+            // if my 32, will round down to up !
             INT32 d= ((512 -sy)+cliprect->min_y)>>4;
-
-//                ((512-sy)>>4) +1; // +1 because miny at 16 !!
 
             ofsb += d*2;
             my -= d;
@@ -961,43 +974,68 @@ static inline void tileYLoopNozoomY(
     }  /* for y sprites */
 }
 
+// would allocate an escape table for transparent tiles in Yzoom mode.
+// must be done after rom load and memory_region_gfx4 set.
+void neogeo_initDrawTilesSprites()
+{
+    UINT8 *zoomy_rom = neogeo_memory_region_gfx4; // + (zy << 8);
+    if(!zoomy_rom) return;
+
+    // of a given zoom rate [0,255] and tile line index [0,255],
+    // gives the number of lines to jump to reach next tile.
+    // it allow to jump fully transparent tiles.
+    // we read the zoom rom to build this.
+    neogeo_Yjumps = (UINT8 *) auto_malloc(256*256); // malloc_or_die(256*256);
+
+    for(INT16 yz=0;yz<256;yz++)
+    {
+        UINT8 itile=16;
+        UINT8 iCountToNextTile=0;
+        UINT8 *zoomyb =  zoomy_rom + (yz<<8);
+        for(INT16 y=255;y>=0;y--)
+        {
+            UINT8 t = zoomyb[y]>>4;
+            if(itile != t)
+            {
+                itile = t;
+                iCountToNextTile = 1;
+            } else iCountToNextTile++;
+            neogeo_Yjumps[(yz<<8)+y] = iCountToNextTile;
+        }
+    }
+}
+
 void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect)
 {
     /* Draw sprites */
     int sx =0,my =0,zx = 15,zy=0x00ff;
-    INT16 sy; // [0,511] , wrap around Y
-    int offs,i,count,y,x;
-
-    int t2;
+    INT16 sy;
 
     char fullmode=0;
-    int ddax=0,dday=0,yskip=0;
     UINT16 **line=(UINT16 **)bitmap->line;
-    unsigned int *pen_usage;
     const gfx_element *gfx=Machine->gfx[2]; /* Save constant struct dereference */
 
     // - - - - get tile rom length configuration...
     // should be done per game launch .
     no_of_tiles=gfx->total_elements;
-    UINT32 ltileOffsetFilter = 0;
-    if (no_of_tiles>0x40000)  ltileOffsetFilter = 0x70;
-	else if (no_of_tiles>0x20000)  ltileOffsetFilter = 0x30;
-	else if (no_of_tiles>0x10000) ltileOffsetFilter = 0x10;
-    tileOffsetFilter = ltileOffsetFilter;
 
-
+    if (no_of_tiles>0x40000)  tileOffsetFilter = 0x70;
+	else if (no_of_tiles>0x20000)  tileOffsetFilter = 0x30;
+	else if (no_of_tiles>0x10000) tileOffsetFilter = 0x10;
+	else tileOffsetFilter = 0;
 
     sNeoDrawGfxParams sParams;
     sParams.line = line;
 
    // int nbt = 0;
-    // 384 zoomable 16x16 sprites
+    // 384 zoomable 16x(16*my) sprites
     for (INT16 count = 0; count < 0x300 >> 1; count++)
     {
         UINT16 t1 = neogeo_vidram16[(0x10400 >> 1) + count];
         UINT16 t3 = neogeo_vidram16[(0x10000 >> 1) + count];
 
-        // watch out, a sprite can draw nothing but just be its geometry used for shifting next sprtes.
+        // watch out, a sprite can draw nothing but have its geometry used for shifting next sprtes.
+
         /* If this bit is set this new column is placed next to last one */
         if (t1 & 0x40) {
             sx += zx+1;
@@ -1009,18 +1047,17 @@ void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect)
 
             zx = (t3 >> 8) & 0x0f;
             zy = t3 & 0xff;
-            t2 = neogeo_vidram16[(0x10800 >> 1) + count];
+            UINT16 t2 = neogeo_vidram16[(0x10800 >> 1) + count];
             sx = (t2 >> 7);
             sy = 0x200 - (t1 >> 7);
             // krb: make Y space much clearer with negative values.
+            // this is the secret ingredient that makes it all fast, that was missing.
             if( sy > (INT16)cliprect->max_y ) sy -=512; // sy [-300,   0, miny , maxy ]
 
-            //if (my==0) continue; // fast exit when sprite not used.
-
-            if (my > 0x20)
+            if (my > 0x20) // my==0x20 stands for 0x20 * 16 = 512 pixel height, which means filling the whole screen height + vblank whatever sy is.
             {
                 my = 0x20;
-                fullmode = 1;
+                fullmode = 1; // this special sprite mode is actually used in very few games.
             }
             else
                 fullmode = 0;
@@ -1033,54 +1070,43 @@ void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect)
 
         if(sx>=320 || sx<=-16) continue;
 
-        offs = count<<6;
+        int offs = count<<6;
 
         sParams.sx = sx;
         sParams.zx = zx;
 
-        if(!fullmode) // 99% of the cases.
+        if(!fullmode) // 99.9% of the cases.
         {
             if(zy == 0x00ff)
-            { // no-fullstrip, no-yzoom
+            {   // no-yzoom
                 tileYLoopNozoomY(&sParams,offs,sy,my,cliprect);
-            //    tileYLoopZoomY<0>(&sParams,offs,sy,my,zy,cliprect);
             } else
-            { // no-fullstrip, yzoom
+            {   //  yzoom
                 tileYLoopZoomY<0>(&sParams,offs,sy,my,zy,cliprect);
             }
         } // end non-full mode vstrip
         else
-        {  // fullmode vstrip (RARE)
-             if(zy == 0x00ff)
-            { //fullstrip, no-yzoom
-                tileYLoopNozoomY(&sParams,offs,sy,my,cliprect);
-              //
-             //   tileYLoopNozoomY(&sParams,offs,sy,my,cliprect);
-            } else
-            { // fullstrip, yzoom
-                tileYLoopZoomY<1>(&sParams,offs,sy,my,zy,cliprect);
-  // tileYLoopNozoomY(&sParams,offs,sy,my,cliprect);
-            }
-
+        {  // fullmode vstrip (RARE)           
+            tileYLoopZoomY<1>(&sParams,offs,sy,my,zy,cliprect);
         } // end full mode vstrip
 
 
-
-                // if(nbt == dbg_nbt)
-                // {
-                //     int by = sy& 0x1ff;
-                //     if(by<cliprect->min_y) by = cliprect->min_y;
-                //     if(by>cliprect->max_y-5 ) by=cliprect->max_y-5;
-                //     {
-                //     // for(int hy=sy;hy<sy+16;hy++)
-                //     //     for(int hx=sx;hx<sx+16;hx++)
-                //     //         line[hy+2][hx+2]=4095;
-                //     for(int hy=by;hy<by+5;hy++)
-                //     for(int hx=sx;hx<sx+5;hx++)
-                //             line[hy][hx]=1;
-                //     }
-                // }
-                //  nbt++;
+        // debug tool: draw a cursor over a given sprite.
+        // if(nbt == dbg_nbt)
+        // {
+        //     int by = sy& 0x1ff;
+        //     if(by<cliprect->min_y) by = cliprect->min_y;
+        //     if(by>cliprect->max_y-5 ) by=cliprect->max_y-5;
+        //     {
+        //     // for(int hy=sy;hy<sy+16;hy++)
+        //     //     for(int hx=sx;hx<sx+16;hx++)
+        //     //         line[hy+2][hx+2]=4095;
+        //     for(int hy=by;hy<by+5;hy++)
+        //     for(int hx=sx;hx<sx+5;hx++)
+        //             line[hy][hx]=1;
+        //     }
+        // }
+        //  nbt++;
 
 
     }  /* for count */
