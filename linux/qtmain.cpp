@@ -37,55 +37,55 @@ extern "C" {
 extern int nbframe;
 }
 
-// conv tool here because fine.
-void imageToMigabm()
-{
-    QImage imgb;
-     imgb.load("mamelogo128.gif");
-    QImage img = imgb.convertToFormat(QImage::Format_Indexed8);
- QImage::Format f =img.format();
- cout << "f:"<< (int)f;
-    int fwidth = img.width()>>3;
-    vector<uint8_t> planar(fwidth *img.height() );
+// // conv tool here because fine.
+// void imageToMigabm()
+// {
+//     QImage imgb;
+//      imgb.load("mamelogo128.gif");
+//     QImage img = imgb.convertToFormat(QImage::Format_Indexed8);
+//  QImage::Format f =img.format();
+//  cout << "f:"<< (int)f;
+//     int fwidth = img.width()>>3;
+//     vector<uint8_t> planar(fwidth *img.height() );
 
-    for (int y = 0; y < img.height(); y++) {
-        const uchar* scanLine = img.constScanLine(y);
-        for(int w=0;w<fwidth ;w++)
-        {
-            uint8_t c=0;
-            c|= (*scanLine++ !=0)<<7;
-            c|= (*scanLine++!=0)<<6;
-            c|= (*scanLine++!=0)<<5;
-            c|= (*scanLine++!=0)<<4;
-            c|= (*scanLine++!=0)<<3;
-            c|= (*scanLine++!=0)<<2;
-            c|= (*scanLine++!=0)<<1;
-            c|= (*scanLine++!=0);
-            planar[y*fwidth + w]=c;
-        }
+//     for (int y = 0; y < img.height(); y++) {
+//         const uchar* scanLine = img.constScanLine(y);
+//         for(int w=0;w<fwidth ;w++)
+//         {
+//             uint8_t c=0;
+//             c|= (*scanLine++ >10)<<7;
+//             c|= (*scanLine++>10)<<6;
+//             c|= (*scanLine++>10)<<5;
+//             c|= (*scanLine++>10)<<4;
+//             c|= (*scanLine++>10)<<3;
+//             c|= (*scanLine++>10)<<2;
+//             c|= (*scanLine++>10)<<1;
+//             c|= (*scanLine++>10);
+//             planar[y*fwidth + w]=c;
+//         }
 
-        //memcpy(pixelData + (img.width() * y), scanLine, img.width());
-    }
-//    stringstream ss;
-    ofstream fileimgd("imgdata.c");
-    int nbc=0;
-    for(size_t i=0 ; i<planar.size()  ; i++)
-    {
-        uint8_t c = planar[i];
-        fileimgd << (uint32_t) c;
-        if(i<planar.size()-1) fileimgd << ",";
-        nbc++;
-        if(nbc>= 32) {
-            fileimgd << "\n";
-            nbc=0;
-        }
+//         //memcpy(pixelData + (img.width() * y), scanLine, img.width());
+//     }
+// //    stringstream ss;
+//     ofstream fileimgd("imgdata.c");
+//     int nbc=0;
+//     for(size_t i=0 ; i<planar.size()  ; i++)
+//     {
+//         uint8_t c = planar[i];
+//         fileimgd << (uint32_t) c;
+//         if(i<planar.size()-1) fileimgd << ",";
+//         nbc++;
+//         if(nbc>= 32) {
+//             fileimgd << "\n";
+//             nbc=0;
+//         }
 
-    }
+//     }
 
 
 
-   // Format_Indexed8 QImage convertedImage = image.convertToFormat(QImage::Format_RGB32);
-}
+//    // Format_Indexed8 QImage convertedImage = image.convertToFormat(QImage::Format_RGB32);
+// }
 
 void StartGame(int idriver)
 {
@@ -170,7 +170,7 @@ void QProc::process()
 //  "opwolf"
 // "bublbob2"
 // "silkworm"
-// "sgemf"
+// "mslugx"
 //                "gforce2"
 
 //        "aof"
@@ -233,8 +233,8 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w,h)) );
-        this->setFixedSize(w,h);
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
+        this->setFixedSize(w*3,h*3);
     _imageMutex.unlock();
 
 	//lbl.show();
@@ -246,8 +246,8 @@ void logEntries();
 }
 int main(int argc, char* argv[])
 {
-    imageToMigabm();
-    return 0;
+    // imageToMigabm();
+    // return 0;
 
 	QApplication a(argc, argv);
     QWin w;
@@ -358,7 +358,7 @@ nbframe++;
 //if(nbframe == 3350) mame_pause(1);
 //if(nbframe == 240 + 76) mame_pause(1);
 // if(nbframe==1200) exit(1);
-// if(nbframe==3500)  mame_pause(1);
+// if(nbframe==60*10)  mame_schedule_exit();
 //    m_mutex.lock();
 //    m_mutex.unlock();
 

@@ -420,6 +420,9 @@ int scanline1;
 int scanline2;
 int scancalls;
 
+//krb
+static UINT32 *cps_colorIndex;
+
 void cps_setversion(int v)
 {
     cps_version=v;
@@ -936,6 +939,10 @@ void cps1_get_video_base(void )
 
 WRITE16_HANDLER( cps1_gfxram_w )
 {
+    if(offset>0x02ffff || cps1_gfxram==NULL)
+    {
+        printf("wtf?\n");
+    }
 	int oldword = cps1_gfxram[offset];
 	COMBINE_DATA(&cps1_gfxram[offset]);
 	if (oldword != cps1_gfxram[offset])
@@ -1178,6 +1185,34 @@ VIDEO_START( cps )
 	palette_basecolor[4] = 4*32;	/* stars1 */
 	palette_basecolor[5] = 5*32;	/* stars2 */
 
+    /* krb: this should optimize big time */
+    cps_colorIndex = auto_malloc(65536*sizeof(UINT32));
+    if(cps_version ==2)
+    {
+        for(UINT32 i=0;i<65536;i++)
+        {
+            int red, green, blue, bright;
+            bright = 0x10 + (i>>12);
+            red   = ((i>>8)&0x0f) * bright * 0x11 / 0x1f;
+            green = ((i>>4)&0x0f) * bright * 0x11 / 0x1f;
+            blue  = ((i>>0)&0x0f) * bright * 0x11 / 0x1f;
+            cps_colorIndex[i] = (red<<16)|(green<<8)|blue;
+        }
+    } else
+    {
+        // cps1 palette
+        for(UINT32 i=0;i<65536;i++)
+        {
+            int red, green, blue, bright;
+            bright = (i>>12);
+            if (bright) bright += 2;
+
+            red   = ((i>>8)&0x0f) * bright;
+            green = ((i>>4)&0x0f) * bright;
+            blue  = ((i>>0)&0x0f) * bright;
+            cps_colorIndex[i] = (red<<16)|(green<<8)|blue;
+        }
+    }
 	return 0;
 }
 
@@ -1208,48 +1243,24 @@ void cps1_build_palette(void)
 {
 	int offset;
 
-    if (cps_version == 2)
+    //krb
+    // treat colors 2 by 2, does 2048 tests instead of 4096.
+    for (offset = 0; offset < cps1_palette_entries*16/2; offset++)
     {
-        for (offset = 0; offset < cps1_palette_entries*16; offset++)
+        UINT32 palette2 = ((UINT32 *)cps1_palette)[offset];
+
+        if (palette2 !=  ((UINT32 *)cps1_old_palette)[offset])
         {
-            int palette = cps1_palette[offset];
+            ((UINT32 *)cps1_old_palette)[offset] = palette2;
 
-            if (palette != cps1_old_palette[offset])
-            {
-                int red, green, blue, bright;
-				bright = 0x10 + (palette>>12);
-
-				red   = ((palette>>8)&0x0f) * bright * 0x11 / 0x1f;
-				green = ((palette>>4)&0x0f) * bright * 0x11 / 0x1f;
-				blue  = ((palette>>0)&0x0f) * bright * 0x11 / 0x1f;
-
-                //palette_set_color (offset, red, green, blue);
-
-                cps1_old_palette[offset] = palette;
-                setpalettefast_neogeo(offset,(red<<16)|(green<<8)|blue);
-            }
-        }
-    }
-    else    // cps1
-    {
-        for (offset = 0; offset < cps1_palette_entries*16; offset++)
-        {
-            int palette = cps1_palette[offset];
-
-            if (palette != cps1_old_palette[offset])
-            {
-                int red, green, blue, bright;
-				bright = (palette>>12);
-				if (bright) bright += 2;
-
-				red   = ((palette>>8)&0x0f) * bright;
-				green = ((palette>>4)&0x0f) * bright;
-				blue  = ((palette>>0)&0x0f) * bright;
-
-               // palette_set_color (offset, red, green, blue);
-                cps1_old_palette[offset] = palette;
-                setpalettefast_neogeo(offset,(red<<16)|(green<<8)|blue);
-            }
+            // note cps_colorIndex is set according to cps1 por cps2 palette system.
+#ifdef LSB_FIRST
+            setpalettefast_neogeo((offset<<1), cps_colorIndex[(UINT16)palette2] );
+            setpalettefast_neogeo((offset<<1)+1,cps_colorIndex[palette2>>16]);
+#else
+            setpalettefast_neogeo((offset<<1)+1, cps_colorIndex[(UINT16)palette2] );
+            setpalettefast_neogeo((offset<<1),cps_colorIndex[palette2>>16]);
+#endif
         }
     }
 

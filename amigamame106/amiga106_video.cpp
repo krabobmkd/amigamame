@@ -340,6 +340,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
     FrameCounterUpdate++;
     FrameCounter++;
 
+
 }
 // for progressbar pass
 static void checkExitSimple(MsgPort *userport )

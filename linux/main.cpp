@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     // test if just "mame romname".
     int itest = getMainConfig().driverIndex().index(
     //"arkretrn"
-    "wb3"
+    "mslug"
     );
     if(itest>0) idriver= itest;
 
@@ -106,7 +106,9 @@ int osd_skip_this_frame(void)
 }
 void osd_update_video_and_audio(struct _mame_display *display)
 {
-
+    static int nbframe = 0;
+    nbframe++;
+    if(nbframe==60*12) mame_schedule_exit();
 }
 mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)
 {
@@ -215,13 +217,17 @@ void osd_free_executable(void *ptr)
 {
 
 }
-int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
-{
-    return 0;
-}
+// int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
+// {
+//     return 0;
+// }
 int osd_is_bad_read_ptr(const void *ptr, size_t size)
 {
     return 0;
 }
 
 
+void osd_update_boot_progress(int per256, int enm)
+{
+
+}

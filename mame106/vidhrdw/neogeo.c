@@ -56,7 +56,7 @@ Notes:
 #include <stdio.h>
 
 UINT16 *neogeo_vidram16;
-static UINT16 *neogeo_paletteram16;	/* pointer to 1 of the 2 palette banks */
+static UINT16 *neogeo_paletteram16=NULL;	/* pointer to 1 of the 2 palette banks */
 static UINT16 *neogeo_palettebank[2]; /* 0x100*16 2 byte palette entries */
 static INT32 neogeo_palette_index;
 static UINT16 neogeo_vidram16_modulo;
@@ -373,7 +373,7 @@ VIDEO_START( neogeo_mvs )
 	register_savestate();
 
 	//krb
-    neogeo_initDrawTilesSprites();
+    //re neogeo_initDrawTilesSprites();
 
 	return 0;
 }
@@ -397,7 +397,8 @@ static void swap_palettes(void)
 		g = (g << 3) | (g >> 2);
 		b = (b << 3) | (b >> 2);
 
-		palette_set_color(i, r, g, b);
+        setpalettefast_neogeo(i,(r<<16)|(g<<8)|b);
+		//palette_set_color(i, r, g, b);
 	}
 }
 
@@ -1551,12 +1552,12 @@ VIDEO_UPDATE( neogeo )
         if(neogeo_draw_counter != 80)  return;
     }
     fillbitmap(bitmap,4095,cliprect);
-
+/*
     rectangle rc = *cliprect;
   rc.min_y +=7;
   rc.max_y -=7;
-
-    neogeo_drawTilesSprites(bitmap,/*&rc*/cliprect);
+*/
+    neogeo_drawTilesSprites(bitmap,/*&rc*/ cliprect);
 
 	neogeo_draw_s_layer(bitmap,cliprect);
 

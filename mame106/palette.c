@@ -115,6 +115,7 @@ static inline UINT32 rgb_to_direct32(rgb_t rgb)
 
 static inline rgb_t adjust_palette_entry(rgb_t entry, int pen_bright)
 {
+    // valgrind: "Use of uninitialised value of size 8" for the 3 lines.
 	int r = color_correct_table[(RGB_RED(entry) * pen_bright) >> PEN_BRIGHTNESS_BITS];
 	int g = color_correct_table[(RGB_GREEN(entry) * pen_bright) >> PEN_BRIGHTNESS_BITS];
 	int b = color_correct_table[(RGB_BLUE(entry) * pen_bright) >> PEN_BRIGHTNESS_BITS];

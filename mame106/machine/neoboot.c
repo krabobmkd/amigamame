@@ -14,7 +14,7 @@
 
 #include "driver.h"
 #include "neogeo.h"
-
+#include "stdlib.h"
 /* General Bootleg Functions - used by more than 1 game */
 
 void neogeo_bootleg_cx_decrypt( void )

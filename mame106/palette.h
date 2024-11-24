@@ -136,14 +136,14 @@ void palette_set_colors(pen_t color_base, const UINT8 *colors, int color_count);
 
 //void setpalettefast_neogeo(pen_t pen REGPL(d0), UINT8 r, REGPL(d1) UINT8 g REGPL(d2), UINT8 b REGPL(d3));
 
+extern rgb_t *game_palette;
+extern UINT8 color_correct_table[4096];
+extern UINT8 adjusted_palette_dirty;
+extern rgb_t *adjusted_palette;
+extern UINT32 *dirty_palette;
+
 static inline void setpalettefast_neogeo(pen_t pen REGPL(d0), rgb_t color REGPL(d1) )
 {
-    extern rgb_t *game_palette;
-    extern UINT8 color_correct_table[4096];
-    extern UINT8 adjusted_palette_dirty;
-    extern rgb_t *adjusted_palette;
-    extern UINT32 *dirty_palette;
-
     game_palette[pen] = color;
     /* now update the adjusted color if it's different */
     // it is always, because already done for neogeo.

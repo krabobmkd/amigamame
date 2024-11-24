@@ -646,30 +646,30 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
 	if (entry >= SUBTABLE_BASE)
 		entry = active_address_space[0].writelookup[LEVEL2_INDEX(entry,address)];
 	/* handle banks inline */
-	address = (address - active_address_space[0].writehandlers[entry].offset)
-            & active_address_space[0].writehandlers[entry].mask;
+    address = (address - active_address_space[0].writehandlers[entry].offset);
+
+    UINT32 entrymask = active_address_space[0].writehandlers[entry].mask ;
+
 	if (entry >= STATIC_RAM)
 	{
     	write16_handler writer16 = active_address_space[0].writehandlers[entry].handler.write.handler16;
         UINT16 i = 0;
         UINT32 count = 0;
-        address>>=1;
+        address>>=1; // writer16() funcs use adr/2 because adress words.
+        entrymask>>=1;
         for(; i < 16; i++)
         {
             if(bits & 1)
             {   // some games minimix, ... need handled 16b writings
                 UINT32 reg = preg[15-i];
-#ifdef LSB_FIRST
+                 //no lsb case needed here because we explicitly separate 16+16 for32.
                 address--;
-                (*writer16)(address,reg>>16,0);
-                address--;
-                (*writer16)(address,reg,0);
-#else
-                address--;
+                address &=entrymask;
                 (*writer16)(address,reg,0);
                 address--;
+                address &=entrymask;
                 (*writer16)(address,reg>>16,0);
-#endif
+
                 count++;
             }
             bits>>=1;
@@ -680,23 +680,24 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
     // - - - - - - - - -
     UINT16 i = 0;
     UINT32 count = 0;
-#ifdef LSB_FIRST
-    UINT16 *pwrite = (UINT16 *) &bank_ptr[entry][address];
-#else
-    UINT32 *pwrite = (UINT32 *) &bank_ptr[entry][address];
-#endif
+
+    // address
+    UINT8 *pwrite = bank_ptr[entry];
+
 	for(; i < 16; i++)
     {
 		if(bits & 1)
 		{
             UINT32 v = preg[15-i];
+            address -= 4;
+            address &= entrymask;
 #ifdef LSB_FIRST
-            pwrite-=2;
-            pwrite[0]=(UINT16)(v<<16);
-            pwrite[1]=(UINT16)v;
+            UINT16 *pwr16 =  (UINT16*)(pwrite+address);
+            pwr16[0]=(UINT16)(v>>16);
+            pwr16[1]=(UINT16)(v);
 #else
-            pwrite--;
-            *pwrite = v;
+
+            *((UINT32*)(pwrite+address)) = v;
 #endif
 			count++;
 		}

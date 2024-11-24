@@ -312,6 +312,8 @@ int run_game(int game)
 			/* ensure we don't show the opening screens on a reset */
 			options.skip_disclaimer = options.skip_warnings = options.skip_gameinfo = TRUE;
 
+// no leak here
+
 			/* start resource tracking; note that soft_reset assumes it can */
 			/* call end_resource_tracking followed by begin_resource_tracking */
 			/* to clear out resources allocated between resets */
@@ -1037,6 +1039,7 @@ static void init_machine(void)
 	if (osd_init() != 0)
 		fatalerror("osd_init failed");
 
+
 /*
         ebStart=0,
         ebInput,
@@ -1053,6 +1056,7 @@ static void init_machine(void)
 	if (video_init_earlier() != 0)
 		fatalerror("screen init failed");
 
+
     bootlog_setprogress(ebInput);
 
 	/* initialize the input system */
@@ -1067,11 +1071,14 @@ static void init_machine(void)
 	if (input_port_init(Machine->gamedrv->construct_ipt) != 0)
 		fatalerror("input_port_init failed");
 
+
     bootlog_setprogress(ebRomLoad);
 	/* load the ROMs if we have some */
 	/* this must be done before memory_init in order to allocate memory regions */
 	if (rom_init(Machine->gamedrv->rom) != 0)
 		fatalerror("rom_init failed");
+
+
 
 	/* initialize the timers and allocate a soft_reset timer */
 	/* this must be done before cpu_init so that CPU's can allocate timers */
@@ -1091,12 +1098,17 @@ static void init_machine(void)
 	if (memory_init() != 0)
 		fatalerror("memory_init failed");
 
+
+
+
 	/* now set up all the CPUs */
 	if (cpuexec_init() != 0)
 		fatalerror("cpuexec_init failed");
 
 	if (cpuint_init() != 0)
 		fatalerror("cpuint_init failed");
+
+
 
 #ifdef MESS
 	/* initialize the devices */
@@ -1108,8 +1120,10 @@ static void init_machine(void)
 	/* start the hiscore system -- remove me */
 	hiscore_init(Machine->gamedrv->name);
 
+
 	/* start the save/load system */
 	saveload_init();
+
 
 
     bootlog_setprogress(eDriver);
@@ -1118,6 +1132,7 @@ static void init_machine(void)
 	/* so this location in the init order is important */
 	if (Machine->gamedrv->driver_init != NULL)
 		(*Machine->gamedrv->driver_init)();
+
 
 
     bootlog_setprogress(eSoundVideo);
@@ -1173,8 +1188,8 @@ static void soft_reset(int param)
 {
 	callback_item *cb;
 
-	loginfo(2,"Soft reset\n");
-
+//	loginfo(2,"Soft reset\n");
+	loginfo(2,"Start machine\n"); //krb: more interesting message for UI.
 	/* temporarily in the reset phase */
 	current_phase = MAME_PHASE_RESET;
 
@@ -1250,7 +1265,8 @@ static void saveload_init(void)
 
 		if (strlen(options.savegame) == 1)
 		{
-			sprintf(name, "%s-%c", Machine->gamedrv->name, options.savegame[0]);
+			snprintf(name,19, "%s-%c", Machine->gamedrv->name, options.savegame[0]);
+            name[19]=0;
 			mame_schedule_load(name);
 		}
 		else

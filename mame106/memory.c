@@ -507,9 +507,13 @@ void memory_exit(void)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			if (cpudata[cpunum].space[spacenum].read.table)
+            {
 				free(cpudata[cpunum].space[spacenum].read.table);
+            }
 			if (cpudata[cpunum].space[spacenum].write.table)
+            {
 				free(cpudata[cpunum].space[spacenum].write.table);
+            }
 		}
 }
 
@@ -2316,8 +2320,14 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t start, offs_
 	/* if we weren't passed a memory block, allocate one and clear it to zero */
 	if (allocatemem)
 	{
-		memory = auto_malloc(end - start + 1);
-		memset(memory, 0, end - start + 1);
+        // krb: valgrind said: Address 0x85f3040 is 0 bytes after a block of size 196,608 alloc'd
+        // changed +1 with +8
+        // it basically seems some ddrv (cps1) does move.l with low .w written outside of gfx ram.
+        // which look like just a silly memset code.
+        // let's use +8 instead of +1, as 8 is the 64b size. And it's more aligned.
+        // corrected lots of valgrind cases
+		memory = auto_malloc(end - start + 8);
+		memset(memory, 0, end - start + 8);
 	}
 
 	/* register for saving, but only if we're not part of a memory region */

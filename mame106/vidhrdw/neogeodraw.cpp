@@ -732,7 +732,7 @@ static inline void tileYLoopZoomY(
 
     // - - - - - - - -
     // tile-related data that are persistent if next line is same tile.
-    UINT16 tile=16; // can only be 0,15, so it will be changed at first iteration.
+    UINT16 tile=32; // can only be 0,15 -> no in full mode its 0->31, so it will be changed at first iteration.
     UINT32 penusage; // = gfx->pen_usage[tileno];
     UINT8 *fspr_tile;
     UINT16 ipalette; // =  p->ipalette = (tileatr >> 4 & 0x0ff0); ;
@@ -830,20 +830,23 @@ static inline void tileYLoopZoomY(
                 if (tileatr & 0x08) tileno=(tileno&~7)|(neogeo_frame_counter&7);	/* fixed */
                 else if (tileatr & 0x04) tileno=(tileno&~3)|(neogeo_frame_counter&3);	/* fixed */
 
+                if(tileno>=no_of_tiles) return; // less divs, souldnt happen anyway.
+
+
                 penusage = gfx->pen_usage[tileno];            // escape whole tile here ?
 
-                if(penusage == 1) // only color 0 on whole tile.
-                {
-                    // escape to line that is next tile...
-                    if (drawn_lines & 0x100) // if second batch of 16 tiles !
-                    {
-                        drawn_lines += 16-zoomy_jumps[zoom_line];
-                    } else
-                    {
-                        drawn_lines += zoomy_jumps[zoom_line];
-                    }
-                    continue;
-                }
+                // if(penusage == 1) // only color 0 on whole tile.
+                // {
+                //     // escape to line that is next tile...
+                //     if (drawn_lines & 0x100) // if second batch of 16 tiles !
+                //     {
+                //         drawn_lines += 16-zoomy_jumps[zoom_line];
+                //     } else
+                //     {
+                //         drawn_lines += zoomy_jumps[zoom_line];
+                //     }
+                //     continue;
+                // }
 
                 yXorFlipper = (tileatr>>1 & 0x01) * 0x0f;
 
@@ -859,7 +862,7 @@ static inline void tileYLoopZoomY(
                                     ];
 
             }
-            //if(penusage == 1) { drawn_lines++; continue; }
+            if(penusage == 1) { drawn_lines++; continue; }
 
             // todo, this test could be escaped in tile change with a jump table.
             //if(penusage == 1) continue; // only color 0 on whole tile.
@@ -987,6 +990,7 @@ void neogeo_initDrawTilesSprites()
     // we read the zoom rom to build this.
     neogeo_Yjumps = (UINT8 *) auto_malloc(256*256); // malloc_or_die(256*256);
 
+     //TODO doesnt work
     for(INT16 yz=0;yz<256;yz++)
     {
         UINT8 itile=16;
