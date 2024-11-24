@@ -668,12 +668,12 @@ static WRITE8_HANDLER ( genesis_bank_select_w ) /* note value will be meaningles
 	if (z80_latch_bitcount == 0) z80_68000_latch = 0;
 
 	z80_68000_latch = z80_68000_latch | ((( ((unsigned char)data) & 0x01) << (15+z80_latch_bitcount)));
- 	loginfo(2,"value %x written to latch\n", data);
+ //	loginfo(2,"value %x written to latch\n", data);
 	z80_latch_bitcount++;
 	if (z80_latch_bitcount == 9)
 	{
 		z80_latch_bitcount = 0;
-		loginfo(2,"latch set, value %x\n", z80_68000_latch);
+	//	loginfo(2,"latch set, value %x\n", z80_68000_latch);
 	}
 }
 

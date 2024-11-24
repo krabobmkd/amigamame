@@ -25,7 +25,7 @@ extern "C" {
     extern UINT8 *neogeo_memory_region_gfx3;
     extern UINT8 *neogeo_memory_region_gfx4;
 }
-static UINT8 *neogeo_Yjumps=NULL;
+static UINT16 *neogeo_Yjumps=NULL;
 
 // Amiga uses register parameter instead of stack on tracer.
 #if defined(__GNUC__) && defined(__AMIGA__)
@@ -35,9 +35,9 @@ static UINT8 *neogeo_Yjumps=NULL;
 #define REGNG(r)
 #endif
 
-//#ifdef __AMIGA__
-//#define USENEOGEO_ASM68K_PIXELWRITERS 1
-//#endif
+#ifdef __AMIGA__
+#define USENEOGEO_ASM68K_PIXELWRITERS 1
+#endif
 
 //    int tutute= 0;
 
@@ -76,7 +76,11 @@ extern "C"
 static UINT32 no_of_tiles=0;
 static UINT32 tileOffsetFilter=0;
 
+// used by Yloop that treat one tile of 16x16 pix.
+typedef void (*neoTileWriter)(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                        UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) );
 
+// used by Yloop that treat one line of 16 pix.
 typedef void (*neoLineWriter)( UINT16 *bm REGNG(a0), UINT8 *fspr REGNG(a1),UINT16 ipalette REGNG(d0));
 
 /**  used for template inlining */
@@ -101,6 +105,7 @@ struct neoPixelWriter_Transparent0
 typedef struct _NeoDrawGfxParams {
     UINT8 *fspr;
     UINT16 **line;
+    UINT32 rowbytes;
     INT32 dy;
     INT32 sy;
     INT32 ey;
@@ -110,7 +115,6 @@ typedef struct _NeoDrawGfxParams {
     int flipx;
 } sNeoDrawGfxParams;
 
-#ifndef USENEOGEO_ASM68K_PIXELWRITERS
 
 /** when Y zoom is applied, we have to draw line by lines.
  this would write a 16 pixel sprite line, applying X zoom and flipx
@@ -254,7 +258,9 @@ static neoLineWriter neogeo_lineWriters[64]={
 
     // - - - -- - - - -- - - - - no flipx, Opaque
     [](UINT16 *bm REGNG(a0), UINT8 *fspr REGNG(a1),UINT16 ipalette REGNG(d0)){
-            NeoDrawGfx16line0<neoPixelWriter_Opaque,false>(bm,fspr,ipalette);},
+            NeoDrawGfx16line0<neoPixelWriter_Opaque,false>(bm,fspr,ipalette);
+
+    },
    [](UINT16 *bm REGNG(a0), UINT8 *fspr REGNG(a1),UINT16 ipalette REGNG(d0)){
             NeoDrawGfx16line1<neoPixelWriter_Opaque,false>(bm,fspr,ipalette);},
     [](UINT16 *bm REGNG(a0), UINT8 *fspr REGNG(a1),UINT16 ipalette REGNG(d0)){
@@ -392,12 +398,7 @@ static neoLineWriter neogeo_lineWriters[64]={
             NeoDrawGfx16line15<neoPixelWriter_Transparent0,true>(bm,fspr,ipalette);},
 
 };
-#else
-    // if asm 68k
-    extern "C" {
-        extern neoLineWriter neogeo_lineWriters[64];
-    };
-#endif
+
 /** This tracer is used when there is no Y zoom.
  * So it includes a fast Y loop and the X 16 pixels line tracer.
  * there is technically 15*2 assembled version of this.
@@ -408,21 +409,17 @@ static neoLineWriter neogeo_lineWriters[64]={
 template<class PixelWriter,
          char j0,char j1,char j2,char j3,char j4,char j5,char j6,char j7,
          char j8,char j9,char j10,char j11,char j12,char j13,char j14,char j15>
-void NeoDrawGfx16zx(sNeoDrawGfxParams *p REGNG(a0))
+void NeoDrawTile16zx(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                     UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2))
 {
-    UINT8 *fspr = p->fspr;
-    UINT16 **line = p->line;
-    UINT16 ipalette = p->ipalette;
-    INT32 dy = p->dy;
-    INT32 sy = p->sy;
-    INT32 ey = p->ey;
-    INT32 sx = p->sx;
-    for (INT16 y = sy ;y <= ey;y++)
+    while(bmy<=bmyend)
     {
-        UINT16 *bm  = line[y] + sx;
+        UINT16 *bm = bmy;
+        bmy += screenmodx>>1;
+
         UINT8 *fsprb = fspr;
 
-        UINT32 c = *fsprb++;
+        UINT8 c = *fsprb++;
 
         if (j0) { PixelWriter::setpixel(ipalette,c&0x0f,bm); bm++; }
         if (j1) { PixelWriter::setpixel(ipalette,c>>4,bm); bm++; }
@@ -461,21 +458,18 @@ void NeoDrawGfx16zx(sNeoDrawGfxParams *p REGNG(a0))
 template<class PixelWriter,
          char j0,char j1,char j2,char j3,char j4,char j5,char j6,char j7,
          char j8,char j9,char j10,char j11,char j12,char j13,char j14,char j15>
-void NeoDrawGfx16flipxZx(sNeoDrawGfxParams *p REGNG(a0))
+void NeoDrawTile16flipxzx(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                          UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2))
 {
-    UINT8 *fspr = p->fspr + 7; // +7 because flipx start end of x line.
-    UINT16 **line = p->line;
-    UINT16 ipalette = p->ipalette;
-    INT32 dy = p->dy;
-    INT32 sy = p->sy;
-    INT32 ey = p->ey;
-    INT32 sx = p->sx;
-    for (INT16 y = sy ;y <= ey;y++)
+    fspr+= 7;
+    while(bmy<=bmyend)
     {
-        UINT16 *bm  = line[y] + sx;
+        UINT16 *bm = bmy;
+        bmy += screenmodx>>1;
+
         UINT8 *fsprb = fspr;
 
-        UINT32 c = *fsprb--;
+        UINT8 c = *fsprb--;
 
         if (j0) { UINT8 col=c>>4;  PixelWriter::setpixel(ipalette,col,bm); bm++; }
         if (j1) { UINT8 col=c&0x0f; PixelWriter::setpixel(ipalette,col,bm); bm++; }
@@ -506,204 +500,533 @@ void NeoDrawGfx16flipxZx(sNeoDrawGfxParams *p REGNG(a0))
     }
 }
 
+
 template<class PixelWriter>
-void NeoDrawGfx16(sNeoDrawGfxParams *p REGNG(a0))
+void NeoDrawTile16(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+           UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) )
 {
-    if (p->flipx)	/* X flip */
+    while(bmy<=bmyend)
     {
-        UINT8 *fspr = p->fspr;
- //       UINT16 **line = p->line;
-        UINT16 ipalette = p->ipalette;
-        INT32 dy = p->dy;
-        INT16 sy = (INT16)p->sy;
-        INT16 ey = (INT16)p->ey;
-//        INT32 sx = p->sx;
-        //if(p->zx==15)
-        switch(p->zx)
+        UINT16 *bm = bmy;
+        bmy += screenmodx>>1;
+        UINT32 *fspr4 = (UINT32*)fspr;
+        UINT32 v = fspr4[0];
+        if(PixelWriter::isOpaque() || v )
         {
-            case 15:
-            for (INT16 y = sy;y <= ey;y++)
-            {
-                UINT16 *bm  = p->line[y]+p->sx;
-                UINT32 *fspr4 = (UINT32*)fspr;
-                UINT32 v = *fspr4++;
-                 // test totally removed by compiler when PixelWriter::isOpaque(). template magic.
-                if(PixelWriter::isOpaque() || v)
-                {
-                    UINT8 col;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD7);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD6);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD5);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD4);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD3);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD2);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD1);
-                    v>>=4;
-                    col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD0);
-                }
-                v = *fspr4;
-                 // test totally removed by compiler when PixelWriter::isOpaque(). template magic.
-                if(PixelWriter::isOpaque() || v)
-                {
-                    UINT8 col;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD7);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD6);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD5);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD4);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD3);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD2);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD1);
-                    v>>=4;
-                    col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+WR_ORD0);
-                }
-                fspr+=dy;
-            }
-            break;
-            case 0:NeoDrawGfx16flipxZx<PixelWriter,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0>(p);
-                break;
-            case 1:NeoDrawGfx16flipxZx<PixelWriter,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0>(p);
-                break;
-            case 2:NeoDrawGfx16flipxZx<PixelWriter,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0>(p);
-                break;
-            case 3:NeoDrawGfx16flipxZx<PixelWriter,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0>(p);
-                break;
-            case 4:NeoDrawGfx16flipxZx<PixelWriter,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0>(p);
-                break;
-            case 5:NeoDrawGfx16flipxZx<PixelWriter,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0>(p);
-                break;
-            case 6:NeoDrawGfx16flipxZx<PixelWriter,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(p);
-                break;
-            case 7:NeoDrawGfx16flipxZx<PixelWriter,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(p);
-                break;
-            case 8:
-                NeoDrawGfx16flipxZx<PixelWriter,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0>(p);
-                break;
-            case 9:NeoDrawGfx16flipxZx<PixelWriter,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0>(p);
-                break;
-            case 10:NeoDrawGfx16flipxZx<PixelWriter,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1>(p);
-                break;
-            case 11:NeoDrawGfx16flipxZx<PixelWriter,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1>(p);
-                break;
-            case 12:NeoDrawGfx16flipxZx<PixelWriter,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1> (p);
-                break;
-            case 13:NeoDrawGfx16flipxZx<PixelWriter,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(p);
-                break;
-            case 14:NeoDrawGfx16flipxZx<PixelWriter,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1>(p);
-                break;
-
-        } // end flipx zx switch
+            UINT8 col;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD0);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD1);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD2);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD3);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD4);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD5);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD6);
+            v>>=4;
+            col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+WR_ORD7);
+        }
+        v = fspr4[1];
+        if( PixelWriter::isOpaque() || v )
+        {
+            UINT8 col;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD0);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD1);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD2);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD3);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD4);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD5);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD6);
+            v>>=4;
+            col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD7);
+        }
+        fspr+=dy;
     }
-    else		/* normal no flipx */
-    {
-        switch(p->zx)
-        {
-        case 15:
-        {
-            UINT8 *fspr = p->fspr;
-            UINT16 **line = p->line;
-            UINT16 ipalette = p->ipalette;
-            INT32 dy = p->dy;
-            INT32 sy = p->sy;
-            INT32 ey = p->ey;
-            INT32 sx = p->sx;
-            for (INT16 y = sy ;y <= ey;y++)
-            {
-                UINT16 *bm  = ((unsigned short *)line[y]) + sx;
-
-                UINT32 *fspr4 = (UINT32*)fspr;
-                UINT32 v = fspr4[0];
-                if(PixelWriter::isOpaque() || v )
-                {
-                    UINT8 col;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD0);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD1);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD2);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD3);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD4);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD5);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD6);
-                    v>>=4;
-                    col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+WR_ORD7);
-                }
-                v = fspr4[1];
-                if( PixelWriter::isOpaque() || v )
-                {
-                    UINT8 col;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD0);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD1);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD2);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD3);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD4);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD5);
-                    v>>=4;
-                    col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD6);
-                    v>>=4;
-                    col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD7);
-                }
-                fspr+=dy;
-            }
-        } break; //15
-
-        case 0:NeoDrawGfx16zx<PixelWriter,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0>(p);
-            break;
-        case 1:NeoDrawGfx16zx<PixelWriter,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0>(p);
-            break;
-        case 2:NeoDrawGfx16zx<PixelWriter,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0>(p);
-            break;
-        case 3:NeoDrawGfx16zx<PixelWriter,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0>(p);
-            break;
-        case 4:NeoDrawGfx16zx<PixelWriter,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0>(p);
-            break;
-        case 5:NeoDrawGfx16zx<PixelWriter,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0>(p);
-            break;
-        case 6:NeoDrawGfx16zx<PixelWriter,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(p);
-            break;
-        case 7:NeoDrawGfx16zx<PixelWriter,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(p);
-            break;
-        case 8:
-            NeoDrawGfx16zx<PixelWriter,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0>(p);
-            break;
-        case 9:NeoDrawGfx16zx<PixelWriter,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0>(p);
-            break;
-        case 10:NeoDrawGfx16zx<PixelWriter,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1>(p);
-            break;
-        case 11:NeoDrawGfx16zx<PixelWriter,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1>(p);
-            break;
-        case 12:NeoDrawGfx16zx<PixelWriter,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1> (p);
-            break;
-        case 13:NeoDrawGfx16zx<PixelWriter,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(p);
-            break;
-        case 14:NeoDrawGfx16zx<PixelWriter,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1>(p);
-            break;
-
-        }// end zoom switch normal x
-
-    } // end no flip x
 
 }
+
+
+template<class PixelWriter>
+void NeoDrawTile16flipx(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                   UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) )
+{
+    while(bmy<=bmyend)
+    {
+        UINT16 *bm = bmy;
+        bmy += screenmodx>>1;
+        UINT32 *fspr4 = (UINT32*)fspr;
+        UINT32 v = *fspr4++;
+        // test totally removed by compiler when PixelWriter::isOpaque(). template magic.
+        if(PixelWriter::isOpaque() || v)
+        {
+            UINT8 col;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD7);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD6);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD5);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD4);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD3);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD2);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD1);
+            v>>=4;
+            col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD0);
+        }
+        v = *fspr4;
+        // test totally removed by compiler when PixelWriter::isOpaque(). template magic.
+        if(PixelWriter::isOpaque() || v)
+        {
+            UINT8 col;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD7);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD6);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD5);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD4);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD3);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD2);
+            v>>=4;
+            col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD1);
+            v>>=4;
+            col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+WR_ORD0);
+        }
+        fspr+=dy;
+    }
+
+}
+
+extern "C" {
+    void NeoDrawTile16_Opaque_z15(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                        UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) );
+
+    void NeoDrawTile16_Transp0_z15(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                              UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) );
+
+    void NeoDrawTile16_Opaque_flipx_z15(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                              UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) );
+
+    void NeoDrawTile16_Transp0_flipx_z15(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                               UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) );
+}
+
+
+#ifdef USENEOGEO_ASM68K_PIXELWRITERS
+    //
+#else
+
+    // explicit implementations easily switchable to asm withC signatures.
+    void NeoDrawTile16_Opaque_z15(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                                  UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) )
+    {
+        NeoDrawTile16<neoPixelWriter_Opaque>(ipalette,dy,screenmodx,bmy,bmyend,fspr);
+    }
+
+    void NeoDrawTile16_Transp0_z15(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                                   UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) )
+    {
+        NeoDrawTile16<neoPixelWriter_Transparent0>(ipalette,dy,screenmodx,bmy,bmyend,fspr);
+    }
+
+    void NeoDrawTile16_Opaque_flipx_z15(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                                        UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) )
+    {
+        NeoDrawTile16flipx<neoPixelWriter_Opaque>(ipalette,dy,screenmodx,bmy,bmyend,fspr);
+    }
+
+    void NeoDrawTile16_Transp0_flipx_z15(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                                         UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) )
+    {
+        NeoDrawTile16flipx<neoPixelWriter_Transparent0>(ipalette,dy,screenmodx,bmy,bmyend,fspr);
+    }
+
+#endif
+
+/** This 64 sized lambda table implements real functions.
+ * The assembler generated uses very short code with no stack use for params.
+ * table is indexed like this:
+ *  0->15   zoomx cases
+ *  +0 or 16,  0 means opaque
+ *  +0 or 32, flip x
+*/
+
+static neoTileWriter neogeo_tileWriters[64]={
+
+// - - - - - - - - - - - - - - no flipx, Opaque
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+     NeoDrawTile16zx<neoPixelWriter_Opaque,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Opaque,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    NeoDrawTile16_Opaque_z15,
+    // [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+    //     NeoDrawTile16<neoPixelWriter_Opaque>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+
+    // - - - -- - - - -- - - - - no flipx, Transparent0
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16zx<neoPixelWriter_Transparent0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    // [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+    //     NeoDrawTile16<neoPixelWriter_Transparent0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    NeoDrawTile16_Transp0_z15,
+
+    // - - - -- - - - -- - - - - flipx, Opaque
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Opaque,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+//    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+//        NeoDrawTile16flipx<neoPixelWriter_Opaque>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    NeoDrawTile16_Opaque_flipx_z15,
+
+
+    // - - - -- - - - -- - - - - flipx, Transparent0
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+        NeoDrawTile16flipxzx<neoPixelWriter_Transparent0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1>(ipalette,dy,screenmodx,bmy,bmyend,fspr); },
+
+    NeoDrawTile16_Transp0_flipx_z15
+//    [](UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2) ){
+//        NeoDrawTile16flipx<neoPixelWriter_Transparent0>(ipalette,dy,screenmodx,bmy,bmyend,fspr); }
+
+
+};
+
+// template<class PixelWriter>
+// void NeoDrawGfxOLD16(sNeoDrawGfxParams *p REGNG(a0))
+// {
+//     if (p->flipx)	/* X flip */
+//     {
+//         UINT8 *fspr = p->fspr;
+//  //       UINT16 **line = p->line;
+//         UINT16 ipalette = p->ipalette;
+//         INT32 dy = p->dy;
+//         INT16 sy = (INT16)p->sy;
+//         INT16 ey = (INT16)p->ey;
+// //        INT32 sx = p->sx;
+//         //if(p->zx==15)
+//         switch(p->zx)
+//         {
+//             case 15:
+//             for (INT16 y = sy;y <= ey;y++)
+//             {
+//                 UINT16 *bm  = p->line[y]+p->sx;
+//                 UINT32 *fspr4 = (UINT32*)fspr;
+//                 UINT32 v = *fspr4++;
+//                  // test totally removed by compiler when PixelWriter::isOpaque(). template magic.
+//                 if(PixelWriter::isOpaque() || v)
+//                 {
+//                     UINT8 col;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD7);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD6);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD5);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD4);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD3);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD2);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD1);
+//                     v>>=4;
+//                     col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD0);
+//                 }
+//                 v = *fspr4;
+//                  // test totally removed by compiler when PixelWriter::isOpaque(). template magic.
+//                 if(PixelWriter::isOpaque() || v)
+//                 {
+//                     UINT8 col;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD7);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD6);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD5);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD4);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD3);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD2);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD1);
+//                     v>>=4;
+//                     col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+WR_ORD0);
+//                 }
+//                 fspr+=dy;
+//             }
+//             break;
+//             case 0:NeoDrawLine16flipxZx<PixelWriter,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0>(p);
+//                 break;
+//             case 1:NeoDrawLine16flipxZx<PixelWriter,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0>(p);
+//                 break;
+//             case 2:NeoDrawLine16flipxZx<PixelWriter,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0>(p);
+//                 break;
+//             case 3:NeoDrawLine16flipxZx<PixelWriter,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0>(p);
+//                 break;
+//             case 4:NeoDrawLine16flipxZx<PixelWriter,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0>(p);
+//                 break;
+//             case 5:NeoDrawLine16flipxZx<PixelWriter,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0>(p);
+//                 break;
+//             case 6:NeoDrawLine16flipxZx<PixelWriter,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(p);
+//                 break;
+//             case 7:NeoDrawLine16flipxZx<PixelWriter,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(p);
+//                 break;
+//             case 8:
+//                 NeoDrawLine16flipxZx<PixelWriter,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0>(p);
+//                 break;
+//             case 9:NeoDrawLine16flipxZx<PixelWriter,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0>(p);
+//                 break;
+//             case 10:NeoDrawLine16flipxZx<PixelWriter,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1>(p);
+//                 break;
+//             case 11:NeoDrawLine16flipxZx<PixelWriter,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1>(p);
+//                 break;
+//             case 12:NeoDrawLine16flipxZx<PixelWriter,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1> (p);
+//                 break;
+//             case 13:NeoDrawLine16flipxZx<PixelWriter,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(p);
+//                 break;
+//             case 14:NeoDrawLine16flipxZx<PixelWriter,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1>(p);
+//                 break;
+
+//         } // end flipx zx switch
+//     }
+//     else		/* normal no flipx */
+//     {
+//         switch(p->zx)
+//         {
+//         case 15:
+//         {
+//             UINT8 *fspr = p->fspr;
+//             UINT16 **line = p->line;
+//             UINT16 ipalette = p->ipalette;
+//             INT32 dy = p->dy;
+//             INT32 sy = p->sy;
+//             INT32 ey = p->ey;
+//             INT32 sx = p->sx;
+//             for (INT16 y = sy ;y <= ey;y++)
+//             {
+//                 UINT16 *bm  = ((unsigned short *)line[y]) + sx;
+
+//                 UINT32 *fspr4 = (UINT32*)fspr;
+//                 UINT32 v = fspr4[0];
+//                 if(PixelWriter::isOpaque() || v )
+//                 {
+//                     UINT8 col;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD0);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD1);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD2);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD3);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD4);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD5);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+WR_ORD6);
+//                     v>>=4;
+//                     col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+WR_ORD7);
+//                 }
+//                 v = fspr4[1];
+//                 if( PixelWriter::isOpaque() || v )
+//                 {
+//                     UINT8 col;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD0);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD1);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD2);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD3);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD4);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD5);
+//                     v>>=4;
+//                     col = ((UINT8)v)&0x0f; PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD6);
+//                     v>>=4;
+//                     col = ((UINT8)v); PixelWriter::setpixel(ipalette,col,bm+8+WR_ORD7);
+//                 }
+//                 fspr+=dy;
+//             }
+//         } break; //15
+
+//         case 0:NeoDrawLine16zx<PixelWriter,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0>(p);
+//             break;
+//         case 1:NeoDrawLine16zx<PixelWriter,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0>(p);
+//             break;
+//         case 2:NeoDrawLine16zx<PixelWriter,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0>(p);
+//             break;
+//         case 3:NeoDrawLine16zx<PixelWriter,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0>(p);
+//             break;
+//         case 4:NeoDrawLine16zx<PixelWriter,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0>(p);
+//             break;
+//         case 5:NeoDrawLine16zx<PixelWriter,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0>(p);
+//             break;
+//         case 6:NeoDrawLine16zx<PixelWriter,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(p);
+//             break;
+//         case 7:NeoDrawLine16zx<PixelWriter,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0>(p);
+//             break;
+//         case 8:
+//             NeoDrawLine16zx<PixelWriter,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0>(p);
+//             break;
+//         case 9:NeoDrawLine16zx<PixelWriter,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0>(p);
+//             break;
+//         case 10:NeoDrawLine16zx<PixelWriter,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1>(p);
+//             break;
+//         case 11:NeoDrawLine16zx<PixelWriter,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1>(p);
+//             break;
+//         case 12:NeoDrawLine16zx<PixelWriter,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1> (p);
+//             break;
+//         case 13:NeoDrawLine16zx<PixelWriter,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1>(p);
+//             break;
+//         case 14:NeoDrawLine16zx<PixelWriter,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1>(p);
+//             break;
+
+//         }// end zoom switch normal x
+
+//     } // end no flip x
+
+// }
 
 /** The Y loop used when zoomY is actually involved.
  *  This have only 3 tests per line, when original 2003 code had of 6 or 7 and 3 times the code size.
@@ -723,7 +1046,7 @@ static inline void tileYLoopZoomY(
     UINT8 *fspr = (UINT8 *)neogeo_memory_region_gfx3;
     /* get pointer to table in zoom ROM (thanks to Miguel Angel Horna for the info) */
     UINT8 *zoomy_rom = neogeo_memory_region_gfx4 + (zy << 8);
-    UINT8 *zoomy_jumps = neogeo_Yjumps + (zy << 8);
+    UINT16 *zoomy_jumps = neogeo_Yjumps + (zy << 8);
     UINT16 **line = p->line;
 
     const INT16 miny = (INT16)cliprect->min_y;
@@ -782,8 +1105,8 @@ static inline void tileYLoopZoomY(
                     invert = 1;
                 }
 
-                    if (zy) // fullmode special things applied here
-                    {
+                    if (zy) // fullmode special things applied here. was (fullmode && zy).
+                    {   // these are a very sad expressions, actually use divisions.
                         zoom_line %= 2*zy;
                         if (zoom_line >= zy)
                         {
@@ -835,18 +1158,24 @@ static inline void tileYLoopZoomY(
 
                 penusage = gfx->pen_usage[tileno];            // escape whole tile here ?
 
-                // if(penusage == 1) // only color 0 on whole tile.
-                // {
-                //     // escape to line that is next tile...
-                //     if (drawn_lines & 0x100) // if second batch of 16 tiles !
-                //     {
-                //         drawn_lines += 16-zoomy_jumps[zoom_line];
-                //     } else
-                //     {
-                //         drawn_lines += zoomy_jumps[zoom_line];
-                //     }
-                //     continue;
-                // }
+                if(penusage == 1) // only color 0 on whole tile.
+                {
+                    tile = 32; // force tile update after line jump.
+                    // UINT8 jump = zoomy_jumps[zoom_line];
+                    // drawn_lines += jump;
+                    // escape to line that is next tile...
+                    if (drawn_lines & 0x100) // if second batch of 16 tiles !
+                    {
+                        UINT16 jump = zoomy_jumps[zoom_line]>>8;
+                        drawn_lines += jump;
+                    } else
+                    {
+                        UINT16 jump = zoomy_jumps[zoom_line] & 0x00ff;
+                      //  UINT8 jump = zoomy_jumps[zoom_line];
+                        drawn_lines += jump;
+                    }
+                    continue;
+                }
 
                 yXorFlipper = (tileatr>>1 & 0x01) * 0x0f;
 
@@ -862,7 +1191,7 @@ static inline void tileYLoopZoomY(
                                     ];
 
             }
-            if(penusage == 1) { drawn_lines++; continue; }
+// moved in tile change, using a table.           if(penusage == 1) { drawn_lines++; continue; }
 
             // todo, this test could be escaped in tile change with a jump table.
             //if(penusage == 1) continue; // only color 0 on whole tile.
@@ -909,7 +1238,7 @@ static inline void tileYLoopNozoomY(
         sy += d<<4;
     }
     UINT16 *pvidram = &neogeo_vidram16[offs];
-
+    const UINT32 rowbytes = p->rowbytes;
 
     UINT8 *fspr = (UINT8 *)neogeo_memory_region_gfx3;
     /* my holds the number of tiles in each vertical multisprite block */
@@ -935,30 +1264,59 @@ static inline void tileYLoopNozoomY(
             // = = = = prepare y things = = = =
             INT16 syy=sy;
             INT16 ey = sy + 15; 	/* Clip for size of zoomed object */
-
+            INT32 dy;
+            UINT8 *fpsr;
             if (syy < cliprect->min_y) syy = cliprect->min_y;
             if (ey > cliprect->max_y) ey = cliprect->max_y;
 
             if (/*flipy*/tileatr & 0x02)
             {
-                p->dy = -8;
-                p->fspr = fspr + (tileno*128) + 128 - 8 - (syy-sy)*8;
+                dy = -8;
+                fpsr = fspr + (tileno*128) + 128 - 8 - (syy-sy)*8;
             }
             else		/* normal */
-            {
-                p->dy = 8;
-                p->fspr = fspr + (tileno*128) + (syy-sy)*8;
+            {                
+                dy = 8;
+                fpsr = fspr + (tileno*128) + (syy-sy)*8;
             }
-            p->ipalette = (tileatr >> 4 & 0x0ff0); // (tileatr >> 8) * gfx->color_granularity
+ //           p->ipalette = (tileatr >> 4 & 0x0ff0); // (tileatr >> 8) * gfx->color_granularity
 
-             p->sy = syy;
-             p->ey = ey;
+             //p->sy = syy;
+             //p->ey = ey;
 //             p->sx = sx; done outside.
 //             p->zx = zx;
-             p->flipx = tileatr & 0x01;
+//             p->flipx = tileatr & 0x01;
 
-            if((penusage & 1)==0)  NeoDrawGfx16<neoPixelWriter_Opaque>(p);
-            else NeoDrawGfx16<neoPixelWriter_Transparent0>(p);
+            UINT16 *bmy = p->line[syy]+ p->sx;
+            UINT16 *bmyend = p->line[ey]+ p->sx;
+
+
+             neoTileWriter tilewriter = neogeo_tileWriters[
+                 (p->zx) +   // 0->15
+                 ((penusage & 1)<<4) + // 0 or 16,  , 0 means opaque
+                 ((tileatr & 0x01)<<5) // 0 or 32, flip x
+             ];
+             tilewriter(
+                (tileatr >> 4 & 0x0ff0), // ipalette
+                dy, // sprite mem modulo
+                 rowbytes, // screen modulo
+                bmy,
+                bmyend,
+                fpsr
+                 );
+             /*
+UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+                        UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1),UINT8 *fspr REGNG(a2)
+*/
+
+                 /*
+template<class PixelWriter>
+void NeoDrawTile16(UINT16 ipalette REGNG(d0),INT32 dy REGNG(d1),INT32 screenmodx REGNG(d2),
+           UINT16 *bmy REGNG(a0),UINT16 *bmyend REGNG(a1), UINT8 *fspr REGNG(a2) )
+*/
+
+            // if((penusage & 1)==0)  NeoDrawGfx16<neoPixelWriter_Opaque>(p);
+            // else NeoDrawGfx16<neoPixelWriter_Transparent0>(p);
 
         } // end if draw ok.
 
@@ -988,13 +1346,13 @@ void neogeo_initDrawTilesSprites()
     // gives the number of lines to jump to reach next tile.
     // it allow to jump fully transparent tiles.
     // we read the zoom rom to build this.
-    neogeo_Yjumps = (UINT8 *) auto_malloc(256*256); // malloc_or_die(256*256);
+    neogeo_Yjumps = (UINT16 *) auto_malloc(256*256*2); // malloc_or_die(256*256);
 
-     //TODO doesnt work
+     //TODO
     for(INT16 yz=0;yz<256;yz++)
     {
-        UINT8 itile=16;
-        UINT8 iCountToNextTile=0;
+        UINT8 itile=16; // impossible value.
+        UINT16 iCountToNextTile=0;
         UINT8 *zoomyb =  zoomy_rom + (yz<<8);
         for(INT16 y=255;y>=0;y--)
         {
@@ -1005,6 +1363,18 @@ void neogeo_initDrawTilesSprites()
                 iCountToNextTile = 1;
             } else iCountToNextTile++;
             neogeo_Yjumps[(yz<<8)+y] = iCountToNextTile;
+        }
+        // - - - -
+        itile=16;
+        for(INT16 y=0;y<256;y++)
+        {
+            UINT8 t = zoomyb[y]>>4;
+            if(itile != t)
+            {
+                itile = t;
+                iCountToNextTile = 1;
+            } else iCountToNextTile++;
+            neogeo_Yjumps[(yz<<8)+y] |= iCountToNextTile<<8;
         }
     }
 }
@@ -1030,6 +1400,7 @@ void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect)
 
     sNeoDrawGfxParams sParams;
     sParams.line = line;
+    sParams.rowbytes = bitmap->rowbytes;
 
    // int nbt = 0;
     // 384 zoomable 16x(16*my) sprites

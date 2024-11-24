@@ -619,6 +619,9 @@ void IntuitionDisplay::drawProgress(int per256, int enm)
     RastPort *rp = win->RPort;
     if(!rp) return;
 
+    // avoid glitches (very slow because usually just loop but well, ... avoid glitches)
+    WaitBOVP(&(win->WScreen->ViewPort));
+
     // - -  draw progress screen
     int w = (int)(win->GZZWidth); // this way manage window border size
     int h = (int)(win->GZZHeight);
@@ -697,6 +700,11 @@ void IntuitionDisplay::drawProgress(int per256, int enm)
         Move(rp,xt+1,yb2+7);
         Text(rp,p,l);
     }
+    // totally need a glowing point at the corner
+    // finnaly not
+    // SetAPen(rp,whitepen);
+    // WritePixel(rp,x2,y1);
+    // WritePixel(rp,x2-1,y1);
     // - - - logo !
     BitMap bm;
     InitBitMap(&bm, 2, 128, 36 );

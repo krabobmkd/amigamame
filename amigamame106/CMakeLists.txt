@@ -109,6 +109,8 @@ set(AMIGA_SRC
 		${COMMONLIBS}/libserializer/serializer_mui.cpp
 
 	mame_ver.h
+	../mame106/vidhrdw/neogeodrawasm.s
+
 
 #	parallelporthandler.s
 	devnotes.txt

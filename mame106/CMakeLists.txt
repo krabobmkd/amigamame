@@ -1,6 +1,9 @@
 #  done in 2024 to adapt Mame4Allv0.37 to old triumph Amiga Mame.
 
 cmake_minimum_required (VERSION 3.1)
+if(AMIGA)
+enable_language( VASM )
+endif()
 
 set(C_STANDARD 11)
 set(CXX_STANDARD 11)
@@ -102,6 +105,8 @@ set(MAME_UNROLL_SRC  drawgfx.c  drawgfxn.cpp
 
 if(AMIGA)
 #todo     list(APPEND MAME_CORE_SRC memorynasm.s)
+#todo
+#	list(APPEND MAME_CORE_SRC vidhrdw/neogeodrawasm.s)
 endif()
 
 set(MAME_INCLUDE_DIRS "src" "../amigamame106" "." "./includes" ${EXPATPATH})

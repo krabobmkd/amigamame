@@ -173,8 +173,8 @@ void QProc::process()
 // "mslugx"
 //                "gforce2"
 
-//        "aof"
-      "mslug"
+        "aof"
+//      "mslug"
 
 //                "mp_sor2"
     );
@@ -356,7 +356,7 @@ nbframe++;
     // logo
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 //if(nbframe == 3350) mame_pause(1);
-//if(nbframe == 240 + 76) mame_pause(1);
+//if(nbframe == 60*12) mame_pause(1);
 // if(nbframe==1200) exit(1);
 // if(nbframe==60*10)  mame_schedule_exit();
 //    m_mutex.lock();
