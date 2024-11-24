@@ -116,6 +116,11 @@ typedef struct _NeoDrawGfxParams {
 } sNeoDrawGfxParams;
 
 
+#ifdef USENEOGEO_ASM68K_PIXELWRITERS
+extern "C" {
+    extern neoLineWriter neogeo_lineWriters[64];
+}
+#else
 /** when Y zoom is applied, we have to draw line by lines.
  this would write a 16 pixel sprite line, applying X zoom and flipx
  every template variables tests are inlined by compiler by implementations
@@ -398,7 +403,7 @@ static neoLineWriter neogeo_lineWriters[64]={
             NeoDrawGfx16line15<neoPixelWriter_Transparent0,true>(bm,fspr,ipalette);},
 
 };
-
+#endif
 /** This tracer is used when there is no Y zoom.
  * So it includes a fast Y loop and the X 16 pixels line tracer.
  * there is technically 15*2 assembled version of this.
