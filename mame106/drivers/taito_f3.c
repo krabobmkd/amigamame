@@ -76,7 +76,7 @@ static READ32_HANDLER( f3_control_r )
 			return (coin_word[1]<<16) | readinputport(6);
 	}
 
-	loginfo(2,"CPU #0 PC %06x: warning - read unmapped control address %06x\n",activecpu_get_pc(),offset);
+//	loginfo(2,"CPU #0 PC %06x: warning - read unmapped control address %06x\n",activecpu_get_pc(),offset);
 	return 0xffffffff;
 }
 
@@ -113,7 +113,7 @@ static WRITE32_HANDLER( f3_control_w )
 			}
 			return;
 	}
-	loginfo(2,"CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",activecpu_get_pc(),offset,data);
+//	loginfo(2,"CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",activecpu_get_pc(),offset,data);
 }
 
 static WRITE32_HANDLER( f3_sound_reset_0_w )

@@ -15,7 +15,7 @@ todo beta4
 - O optim sound bubbob
 - X  neogeo change RGB15 to 16b index
 - X  neogeo verif slicing
-- O  neogeo rewrite spriter in correct order and with no pixel tests.
+- X  neogeo rewrite spriter in correct order and with no pixel tests.
 - X  neogeo bios choice
 - O need 100%: rastan (85%),slap fight (90%), bubbob (85%)
 - O fastboot neogeo, batrider

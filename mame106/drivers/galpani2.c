@@ -138,7 +138,7 @@ static void galpani2_mcu_nmi(void)
 			mcu_size	=	(cpunum_read_byte(0, mcu_address + 8)<<8) +
 							(cpunum_read_byte(0, mcu_address + 9)<<0) ;
 
-			loginfo(2,"CPU #0 PC %06X : MCU executes command $A, %04X %02X-> %04x\n",activecpu_get_pc(),mcu_src,mcu_size,mcu_dst);
+//			loginfo(2,"CPU #0 PC %06X : MCU executes command $A, %04X %02X-> %04x\n",activecpu_get_pc(),mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
@@ -158,7 +158,7 @@ static void galpani2_mcu_nmi(void)
 			cpunum_write_byte(0,mcu_address+0,0xff);
 			cpunum_write_byte(0,mcu_address+1,0xff);
 
-			loginfo(2,"CPU #0 PC %06X : MCU ERROR, unknown command %02X\n",activecpu_get_pc(),mcu_command);
+//			loginfo(2,"CPU #0 PC %06X : MCU ERROR, unknown command %02X\n",activecpu_get_pc(),mcu_command);
 		}
 
 		/* Erase command? */
@@ -202,7 +202,7 @@ WRITE16_HANDLER( galpani2_oki_0_bank_w )
 	if (ACCESSING_LSB)
 	{
 		UINT8 *ROM = memory_region(REGION_SOUND1);
-		loginfo(2,"CPU #0 PC %06X : OKI 0 bank %08X\n",activecpu_get_pc(),data);
+//		loginfo(2,"CPU #0 PC %06X : OKI 0 bank %08X\n",activecpu_get_pc(),data);
 		memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 	}
 }
@@ -212,7 +212,7 @@ WRITE16_HANDLER( galpani2_oki_1_bank_w )
 	if (ACCESSING_LSB)
 	{
 		OKIM6295_set_bank_base(1, 0x40000 * (data & 0xf) );
-		loginfo(2,"CPU #0 PC %06X : OKI 1 bank %08X\n",activecpu_get_pc(),data);
+//		loginfo(2,"CPU #0 PC %06X : OKI 1 bank %08X\n",activecpu_get_pc(),data);
 	}
 }
 

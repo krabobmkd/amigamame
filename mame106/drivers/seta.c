@@ -1262,8 +1262,8 @@ void uPD71054_update_timer( int no )
 	if( duration != 0 ) {
 		timer_adjust( uPD71054.timer[no], TIME_IN_HZ(duration), no, 0 );
 	} else {
-		loginfo(2, "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
-				activecpu_get_pc(), no );
+//		loginfo(2, "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
+//				activecpu_get_pc(), no );
 	}
 }
 

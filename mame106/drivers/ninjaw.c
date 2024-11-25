@@ -190,7 +190,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 	parse_control();
 
-	loginfo(2,"CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
+//	loginfo(2,"CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
 }
 
 

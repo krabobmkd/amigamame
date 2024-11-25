@@ -136,98 +136,6 @@ static Object *GIF_cornerlogo=NULL;
 MUISerializer muiConfigCreator;
 static int columnToSort = 0;
 
-#define USE_CLAYOUT 1
-#ifdef USE_CLAYOUT
-// - - - experiment custom layout
-
-HOOKPROTONHNO(MagicLayoutFunc, LONG, struct MUI_LayoutMsg *lm)
-{
-	switch (lm->lm_Type)
-	{
-		case MUILM_MINMAX:
-		{
-			/*
-			** MinMax calculation function. When this is called,
-			** the children of your group have already been asked
-			** about their min/max dimension so you can use their
-			** dimensions to calculate yours.
-			*/
-
-			Object *cstate = (Object *)lm->lm_Children->mlh_Head;
-			Object *child;
-
-			WORD minw  = 32;
-			WORD minh  = 32;
-			WORD maxw  = 256;
-			WORD maxh  = 128;
-			// we map to first child which is classic layout.
-			child = NextObject(&cstate);
-			if(child) {
-				minw  = _minwidth (child);				
-				minh =  _minheight(child);
-				maxw  = _maxwidth (child);				
-				maxh =  _maxheight(child);				
-			}
-			/* set the result fields in the message */
-			lm->lm_MinMax.MinWidth  = minw;
-			lm->lm_MinMax.MinHeight = minh;
-			lm->lm_MinMax.DefWidth  = minw;
-			lm->lm_MinMax.DefHeight = minh;
-			lm->lm_MinMax.MaxWidth  = maxw;
-			lm->lm_MinMax.MaxHeight = maxh;
-			return 0;
-		}
-
-		case MUILM_LAYOUT:
-		{
-			/*
-			** Layout function. Here, we have to call MUI_Layout() for each
-			** our children. MUI wants us to place them in a rectangle
-			** defined by (0,0,lm->lm_Layout.Width-1,lm->lm_Layout.Height-1)
-			** You are free to put the children anywhere in this rectangle.
-			*/
-			Object *cstate = (Object *)lm->lm_Children->mlh_Head;
-			Object *child;
-
-			// first object is set to the whole layout
-			child = NextObject(&cstate);
-			if(child) {
-				if (!MUI_Layout(child,0,0,
-					lm->lm_Layout.Width-1,
-					lm->lm_Layout.Height-1,
-					0)) return FALSE;							
-			}
-			// following objects at corners, "above"
-			child = NextObject(&cstate);
-			if(child)
-			{
-				LONG mw = _minwidth (child);
-				LONG mh = _minheight(child);
-				LONG x = lm->lm_Layout.Width-mw;
-				LONG y = lm->lm_Layout.Height-mh;				
-				if (!MUI_Layout(child,x,y,mw,mh,0))
-					return FALSE;				
-			}
-			// just to be conform...
-			while ((child = NextObject(&cstate)))
-			{
-				LONG mw = _minwidth (child);
-				LONG mh = _minheight(child);
-				LONG 
-				if (!MUI_Layout(child,l,t,mw,mh,0))
-					return FALSE;	
-			}
-
-			return TRUE;
-		}
-	}
-	return(MUILM_UNKNOWN);
-}
-MakeStaticHook(LayoutHook, LayoutFunc);
-
-
-// 
-#endif
 //  MUIM_Notify,  MUIA_List_Active, MUIV_EveryTime,
 static ULONG ASM DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG *par REG(a1))
 {
@@ -1067,90 +975,37 @@ int MainGUI(void)
         {
 #define SCALEMODEMASK(u, d, p, s)	(((u) ? NISMF_SCALEUP : 0) | ((d) ? NISMF_SCALEDOWN : 0) | ((p) ? NISMF_KEEPASPECT_PICTURE : 0) | ((s) ? NISMF_KEEPASPECT_SCREEN : 0))
 #define TRANSMASK(m, r)				(((m) ? NITRF_MASK : 0 ) | ((r) ? NITRF_RGB : 0))
-
-        // will be NULL if MUI<5, but just invalid if file not found.
-            GIF_cornerlogo =
-            MUINewObject(MUIC_GIFAnim,MUIA_GIFAnim_File,(ULONG) "PROGDIR:skin/cornerlogo.gif",
-                    TAG_DONE);
-            if(GIF_cornerlogo)
+            // will be NULL if MUI<5, but just invalid if file not found.
+            const char *giffilepath = "PROGDIR:skin/cornerlogo.gif";
+            int exists=0;
+            BPTR hdl = Open(giffilepath, MODE_OLDFILE);
+            exists = (hdl!=NULL);
+            if(hdl) Close(hdl);
+            if(exists)
             {
-                int isinvalid=0;
-                get(GIF_cornerlogo, MUIA_GIFAnim_Invalid, &isinvalid);
-                if(isinvalid) {
-                    MUI_DisposeObject(GIF_cornerlogo);
-                    GIF_cornerlogo = NULL;
-                }
+                GIF_cornerlogo =
+                    MUINewObject(MUIC_GIFAnim,MUIA_GIFAnim_File,(ULONG) giffilepath, TAG_DONE);
             }
-          /* following doesnt work ! really there is a problem with guigfx.library.
-           *
-           * MUINewObject(MUIC_Guigfx,
-							MUIA_Guigfx_FileName, (ULONG) "PROGDIR:skin/bl.ilbm",
-							MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-							// SCALEMODEMASK( scaleup, scaledown  PICASPECT, SCREENASPECT )
-						//	MUIA_Guigfx_ScaleMode, SCALEMODEMASK(FALSE, FALSE, TRUE, FALSE),
-						//	MUIA_Guigfx_Transparency, TRANSMASK(TRUE, TRUE),
-							TAG_DONE);*/
         }
-
-        // if(GIF_cornerlogo == NULL)
-        // {
-        //     GIF_cornerlogo = MUI_MakeObject(MUIO_HSpace,0);
-        // }
         ULONG Child_Gif = (GIF_cornerlogo)?Child:TAG_DONE;
 
-/* example for special layout:
-Child, VGroup,
-	GroupFrame,
-	MUIA_Group_LayoutHook, &LayoutHook,
-	Child, b[0] = SimpleButton("Click"),
-	Child, b[1] = SimpleButton("me"),
-	Child, b[2] = SimpleButton("in"),
-	Child, b[3] = SimpleButton("correct"),
-	Child, b[4] = SimpleButton("sequence"),
-	Child, b[5] = SimpleButton("to"),
-*/
-#ifdef USE_CLAYOUT
- Object *windowContent =
-				MUINewObject(MUIC_Group,
-				MUIA_Group_LayoutHook, &LayoutHook,
-				
-				Child,(ULONG)MUINewObject(MUIC_Group, // vertical group because no horiz. specified.
 
-            Child,createOptionTabGroup(),
-
-            Child, (ULONG)MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
-                Child,(ULONG)(LA_statusbar = LLabel((ULONG)GetMessagec("-"))),
-                Child,(ULONG)(BU_Start   = SimpleButton((ULONG)GetMessagec("Start"))),
-                /*Child, (ULONG)MUINewObject(MUIC_Group,
-                      Child, BU_Start   = SimpleButton((ULONG)GetMessagec("Start")),
-                      Child, MUI_MakeObject(MUIO_VSpace,0),
-                      Child, LA_statusbar = LLabel((ULONG)GetMessagec("-")),
-                        TAG_DONE,0),*/
-//moved              Child_Gif,(ULONG)GIF_cornerlogo,
-          //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessagec("Quit")),
-            TAG_DONE,0), // end WindowContent Group
-          TAG_DONE,0),
-// overlayout		  
-	Child_Gif,(ULONG)GIF_cornerlogo,	  
-	  TAG_DONE,0);
-#else
  Object *windowContent = MUINewObject(MUIC_Group, // vertical group because no horiz. specified.
 
             Child,createOptionTabGroup(),
 
             Child, (ULONG)MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
-                Child,(ULONG)(LA_statusbar = LLabel((ULONG)GetMessagec("-"))),
-                Child,(ULONG)(BU_Start   = SimpleButton((ULONG)GetMessagec("Start"))),
-                /*Child, (ULONG)MUINewObject(MUIC_Group,
+                //Child,(ULONG)(LA_statusbar = LLabel((ULONG)GetMessagec("-"))),
+                //Child,(ULONG)(BU_Start   = SimpleButton((ULONG)GetMessagec("Start"))),
+                Child, (ULONG)MUINewObject(MUIC_Group,
                       Child, BU_Start   = SimpleButton((ULONG)GetMessagec("Start")),
-                      Child, MUI_MakeObject(MUIO_VSpace,0),
+                    //  Child, MUI_MakeObject(MUIO_VSpace,0),
                       Child, LA_statusbar = LLabel((ULONG)GetMessagec("-")),
-                        TAG_DONE,0),*/
+                        TAG_DONE,0),
               Child_Gif,(ULONG)GIF_cornerlogo,
           //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessagec("Quit")),
             TAG_DONE,0), // end WindowContent Group
           TAG_DONE,0);
-#endif
 
 //static  std::string appName(APPNAME);
 //  printf("go MUINewObject()\n");

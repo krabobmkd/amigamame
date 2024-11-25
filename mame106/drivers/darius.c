@@ -181,7 +181,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 	parse_control();
 
-	loginfo(2,"CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
+//	loginfo(2,"CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
 }
 
 static WRITE16_HANDLER( darius_watchdog_w )
@@ -222,7 +222,7 @@ static READ16_HANDLER( darius_ioc_r )
 			return input_port_3_word_r(0,mem_mask);	/* DSW */
 	}
 
-loginfo(2,"CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",activecpu_get_pc(),offset);
+//loginfo(2,"CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",activecpu_get_pc(),offset);
 
 	return 0xff;
 }
@@ -257,7 +257,7 @@ static WRITE16_HANDLER( darius_ioc_w )
 			return;
 	}
 
-loginfo(2,"CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",activecpu_get_pc(),offset,data);
+//loginfo(2,"CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",activecpu_get_pc(),offset,data);
 }
 
 
