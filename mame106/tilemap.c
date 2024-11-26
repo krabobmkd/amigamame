@@ -37,6 +37,8 @@
 
 #define TILE_FLAG_DIRTY	(0x80)
 
+int tutute=0;
+
 typedef enum { eWHOLLY_TRANSPARENT, eWHOLLY_OPAQUE, eMASKED } trans_t;
 
 typedef void (*tilemap_draw_func)( tilemap *tmap, int xpos, int ypos, int mask, int value );
@@ -113,23 +115,32 @@ static tilemap *	first_tilemap; /* resource tracking */
 static UINT32			screen_width, screen_height;
 tile_data				tile_info;
 
-typedef void (*blitmask_t)(
-        void *dest REGTM(a0),
-        const void *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        );
-typedef void (*blitopaque_t)(
-        void *dest REGTM(a0),
-        const void *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        );
+typedef struct {
+    // yloop things
+	INT16 y; /* current screen line to render */
+	INT16 y_next;
+	INT16 count,dummy ;
+
+	UINT32 destmodx;
+	UINT32 sourcemodx;
+//this is global...	UINT32 priomodx;
+    //
+        void *dest ;
+        const void *source;
+
+        UINT8 *pri ;
+        UINT32 pcode;
+
+        const UINT8 *pMask;
+        UINT32 sourcemaskmodx;
+        int mask ;
+        int value ;
+
+
+} sBlitMaskParams;
+
+typedef void (*blitmask_t)(sBlitMaskParams *p REGTM(a0) );
+typedef void (*blitopaque_t)(sBlitMaskParams *p REGTM(a0) );
 
 /* the following parameters are constant across tilemap_draw calls */
 static struct
@@ -347,487 +358,799 @@ static void mappings_update( tilemap *tmap )
 
 /***********************************************************************************/
 
-static void pio(
-        void *dest REGTM(a0),
-        const void *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pio( sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
+	INT16 i,y,y_next,count;
+    UINT8 *pri0 = p->pri;
+    UINT32 pcode = p->pcode;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
 
-	if (pcode)
+    for(;;)
+    {
+        UINT8 *pri = pri0;
+
 		for( i=0; i<count; i++ )
 		{
 			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
 		}
+
+        if( ++y == y_next ) break;
+        pri0 += priority_bitmap_pitch_line;
+
+    }
+
 }
 
-static void pit(
-        void *dest REGTM(a0),
-        const void *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3))
+static void pit(sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
 
-	if (pcode)
-		for( i=0; i<count; i++ )
-		{
-			if( (pMask[i]&mask)==value )
-			{
-				pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-			}
-		}
+	INT16 i,y,y_next,count;
+    UINT8 *pri0 = p->pri;
+    UINT32 pcode = p->pcode;
+    const UINT8 *pMask0 = p->pMask;
+    if (!pcode) return;
+
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
+    for(;;)
+    {
+        UINT8 *pri = pri0;
+        const UINT8 *pMask = pMask0;
+        for( i=0; i<count; i++ )
+        {
+            if( (pMask[i]&mask)==value )
+            {
+                pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+            }
+        }
+        if( ++y == y_next ) break;
+        pri0 += priority_bitmap_pitch_line;
+        pMask0 += p->sourcemaskmodx;
+    }
 }
 
 /***********************************************************************************/
 
 #ifndef pdo16
-static void pdo16(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdo16( sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
-	memcpy( dest,source,count*sizeof(UINT16) );
-	for( i=0; i<count; i++ )
-	{
-		pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-	}
+	INT16 i,y,y_next,count;
+    UINT8 *pri0 = p->pri;
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    UINT32 pcode = p->pcode;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    for(;;)
+    {
+        UINT8 *pri = pri0;
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        memcpy( dest,source,count*sizeof(UINT16) );
+        for( i=0; i<count; i++ )
+        {
+            pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+        }
+
+        if( ++y == y_next ) break;
+        pri0 += priority_bitmap_pitch_line;
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+    }
 }
 #endif
-static void pdo16First(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdo16First( sBlitMaskParams *p REGTM(a0) )
 {
     // if here means mask is zero, reset prio layer.
-	int i;
-	memcpy( dest,source,count*sizeof(UINT16) );
-    memset( pri,(UINT8)pcode,count);
+	INT16 i,y,y_next,count;
+    UINT8 *pri0 = p->pri;
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    UINT32 pcode = p->pcode;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    for(;;)
+    {
+        UINT8 *pri = pri0;
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        memcpy( dest,source,count*sizeof(UINT16) );
+        memset( pri,(UINT8)pcode,count);
+
+        if( ++y == y_next ) break;
+        pri0 += priority_bitmap_pitch_line;
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+    }
 
 }
 
 
 #ifndef pdo16pal
-static void pdo16pal(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdo16pal(sBlitMaskParams *p REGTM(a0) )
 {
-	int pal = pcode >> 16;
-	int i;
-	for( i=0; i<count; i++ )
-	{
-		dest[i] = source[i] + pal;
-		pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-	}
+    INT16 i,y,y_next,count;
+    UINT32 pcode = p->pcode;
+	UINT16 pal = (pcode >> 16);
+    UINT8 *pri0 = p->pri;
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    for(;;)
+    {
+        UINT8 *pri = pri0;
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+
+        for( i=0; i<count; i++ )
+        {
+            dest[i] = source[i] + pal;
+            pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+        }
+        if( ++y == y_next ) break;
+
+        pri0 += priority_bitmap_pitch_line;
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+    }
 }
 #endif
 
 #ifndef pdo16np
-static void pdo16np(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdo16np(sBlitMaskParams *p REGTM(a0) )
 {
-	memcpy( dest,source,count*sizeof(UINT16) );
+    INT16 y,y_next,count;
+
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+
+    	memcpy( dest,source,count*sizeof(UINT16) );
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+    }
 }
 #endif
 
-static void pdo15(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdo15(sBlitMaskParams *p REGTM(a0))
 {
-	int i;
+    INT16 i,y,y_next,count;
+
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    UINT8 *pri0 = p->pri;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+        UINT32 pcode = p->pcode;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<count; i++ )
-	{
-		dest[i] = clut[source[i]];
-		pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        UINT8 *pri = pri0;
+
+        for( i=0; i<count; i++ )
+        {
+            dest[i] = clut[source[i]];
+            pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+        }
+        if( ++y == y_next ) break;
+
+        pri0 += priority_bitmap_pitch_line;
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
 	}
 }
 
 #ifndef pdo32
-static void pdo32(
-        UINT32 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdo32(sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
+    INT16 i,y,y_next,count;
+
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    UINT8 *pri0 = p->pri;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+        UINT32 pcode = p->pcode;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<count; i++ )
-	{
-		dest[i] = clut[source[i]];
-		pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        UINT8 *pri = pri0;
+        for( i=0; i<count; i++ )
+        {
+            dest[i] = clut[source[i]];
+            pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+        }
+
+        if( ++y == y_next ) break;
+
+        pri0 += priority_bitmap_pitch_line;
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
 	}
 }
 #endif
 
 #ifndef npdo32
-static void npdo32(
-        UINT32 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void npdo32(sBlitMaskParams *p REGTM(a0) )
 {
+    INT16 i,y,y_next,count;
+
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+        UINT32 pcode = p->pcode;
+	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
+
 	int oddcount = count & 3;
 	int unrcount = count & ~3;
-	int i;
-	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<oddcount; i++ )
-	{
-		dest[i] = clut[source[i]];
-	}
-	source += count; dest += count;
-	for( i=-unrcount; i; i+=4 )
-	{
-		UINT32 eax, ebx;
-		eax = source[i  ];
-		ebx = source[i+1];
-		eax = clut[eax];
-		ebx = clut[ebx];
-		dest[i  ] = eax;
-		eax = source[i+2];
-		dest[i+1] = ebx;
-		ebx = source[i+3];
-		eax = clut[eax];
-		ebx = clut[ebx];
-		dest[i+2] = eax;
-		dest[i+3] = ebx;
-	}
+
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        for( i=0; i<oddcount; i++ )
+        {
+            dest[i] = clut[source[i]];
+        }
+        source += count; dest += count;
+        for( i=-unrcount; i; i+=4 )
+        {
+            UINT32 eax, ebx;
+            eax = source[i  ];
+            ebx = source[i+1];
+            eax = clut[eax];
+            ebx = clut[ebx];
+            dest[i  ] = eax;
+            eax = source[i+2];
+            dest[i+1] = ebx;
+            ebx = source[i+3];
+            eax = clut[eax];
+            ebx = clut[ebx];
+            dest[i+2] = eax;
+            dest[i+3] = ebx;
+        }
+
+        if( ++y == y_next ) break;
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+    }
 }
 #endif
 
 /***********************************************************************************/
 //extern int dbg_plane;
 #ifndef pdt16
-static void pdt16(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdt16(sBlitMaskParams *p REGTM(a0)  )
 {
-	int i;
-	for( i=0; i<count; i++ )
-	{
-		if( (pMask[i]&mask)==value )
-		{
-			dest[i] = source[i];
-			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-		}/* else if(dbg_plane && i&1)
+    INT16 i,y,y_next,count;
+
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    UINT8 *pri0 = p->pri;
+    const UINT8 *pMask0 = p->pMask;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+        UINT32 pcode = p->pcode;
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        UINT8 *pri = pri0;
+        const UINT8 *pMask = pMask0;
+        for( i=0; i<count; i++ )
         {
-            dest[i] = 47;
-        }*/
-	}
+            if( (pMask[i]&mask)==value )
+            {
+                dest[i] = source[i];
+                pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+            }/* else if(dbg_plane && i&1)
+            {
+                dest[i] = 47;
+            }*/
+        }
+
+        if( ++y == y_next ) break;
+
+        pri0 += priority_bitmap_pitch_line;
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pMask0 += p->sourcemaskmodx;
+    }
 }
 #endif
 
 #ifndef pdt16pal
-static void pdt16pal(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdt16pal(sBlitMaskParams *p REGTM(a0) )
 {
-	int pal = pcode >> 16;
-	int i;
+	UINT16 pal = (p->pcode >> 16);
+    INT16 i,y,y_next,count;
 
-	for( i=0; i<count; i++ )
-	{
-		if( (pMask[i]&mask)==value )
-		{
-			dest[i] = source[i] + pal;
-			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-		}
-	}
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    UINT8 *pri0 = p->pri;
+    const UINT8 *pMask0 = p->pMask;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+        UINT32 pcode = p->pcode;
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        UINT8 *pri = pri0;
+        const UINT8 *pMask = pMask0;
+
+        for( i=0; i<count; i++ )
+        {
+            if( (pMask[i]&mask)==value )
+            {
+                dest[i] = source[i] + pal;
+                pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+            }
+        }
+        if( ++y == y_next ) break;
+
+        pri0 += priority_bitmap_pitch_line;
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pMask0 += p->sourcemaskmodx;
+    }
+
 }
 #endif
 
 #ifndef pdt16np
-static void pdt16np(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdt16np(sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
+    INT16 i,y,y_next,count;
 
-	for( i=0; i<count; i++ )
-	{
-		if( (pMask[i]&mask)==value )
-			dest[i] = source[i];
-	}
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    const UINT8 *pMask0 = p->pMask;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        const UINT8 *pMask = pMask0;
+
+        for( i=0; i<count; i++ )
+        {
+            if( (pMask[i]&mask)==value )
+                dest[i] = source[i];
+        }
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pMask0 += p->sourcemaskmodx;
+    }
 }
 #endif
 
-static void pdt15(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdt15(sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
+ UINT32 pcode = p->pcode;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<count; i++ )
-	{
-		if( (pMask[i]&mask)==value )
-		{
-			dest[i] = clut[source[i]];
-			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-		}
-	}
+
+    INT16 i,y,y_next,count;
+
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    const UINT8 *pMask0 = p->pMask;
+    UINT8 *pri0 = p->pri;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        const UINT8 *pMask = pMask0;
+        UINT8 *pri = pri0;
+
+        for( i=0; i<count; i++ )
+        {
+            if( (pMask[i]&mask)==value )
+            {
+                dest[i] = clut[source[i]];
+                pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+            }
+        }
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pMask0 += p->sourcemaskmodx;
+        pri0 += priority_bitmap_pitch_line;
+    }
 }
 
 #ifndef pdt32
-static void pdt32(
-        UINT32 *dest REGTM(a0),
-        const UINT32 *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pdt32(sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
+        UINT32 pcode = p->pcode;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<count; i++ )
-	{
-		if( (pMask[i]&mask)==value )
-		{
-			dest[i] = clut[source[i]];
-			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-		}
-	}
+
+    INT16 i,y,y_next,count;
+
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    const UINT8 *pMask0 = p->pMask;
+    UINT8 *pri0 = p->pri;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        const UINT8 *pMask = pMask0;
+        UINT8 *pri = pri0;
+
+        for( i=0; i<count; i++ )
+        {
+            if( (pMask[i]&mask)==value )
+            {
+                dest[i] = clut[source[i]];
+                pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+            }
+        }
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pMask0 += p->sourcemaskmodx;
+        pri0 += priority_bitmap_pitch_line;
+    }
 }
 #endif
 
 #ifndef npdt32
-static void npdt32(
-        UINT32 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void npdt32(sBlitMaskParams *p REGTM(a0) )
 {
-	int oddcount = count & 3;
-	int unrcount = count & ~3;
-	int i;
+        UINT32 pcode = p->pcode;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
 
-	for( i=0; i<oddcount; i++ )
-	{
-		if( (pMask[i]&mask)==value ) dest[i] = clut[source[i]];
-	}
-	pMask += count, source += count; dest += count;
-	for( i=-unrcount; i; i+=4 )
-	{
-		if( (pMask[i  ]&mask)==value ) dest[i  ] = clut[source[i  ]];
-		if( (pMask[i+1]&mask)==value ) dest[i+1] = clut[source[i+1]];
-		if( (pMask[i+2]&mask)==value ) dest[i+2] = clut[source[i+2]];
-		if( (pMask[i+3]&mask)==value ) dest[i+3] = clut[source[i+3]];
-	}
+    INT16 i,y,y_next,count;
+
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    const UINT8 *pMask0 = p->pMask;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+	INT16 oddcount = count & 3;
+	INT16 unrcount = count & ~3;
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        const UINT8 *pMask = pMask0;
+
+
+        for( i=0; i<oddcount; i++ )
+        {
+            if( (pMask[i]&mask)==value ) dest[i] = clut[source[i]];
+        }
+        pMask += count, source += count; dest += count;
+        for( i=-unrcount; i; i+=4 )
+        {
+            if( (pMask[i  ]&mask)==value ) dest[i  ] = clut[source[i  ]];
+            if( (pMask[i+1]&mask)==value ) dest[i+1] = clut[source[i+1]];
+            if( (pMask[i+2]&mask)==value ) dest[i+2] = clut[source[i+2]];
+            if( (pMask[i+3]&mask)==value ) dest[i+3] = clut[source[i+3]];
+        }
+
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pMask0 += p->sourcemaskmodx;
+    }
 }
 #endif
 
 /***********************************************************************************/
 
-static void pbo15(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pbo15(sBlitMaskParams *p REGTM(a0))
 {
-	int i;
+        UINT32 pcode = p->pcode;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<count; i++ )
-	{
-		dest[i] = alpha_blend16(dest[i], clut[source[i]]);
-		pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-	}
+
+    INT16 i,y,y_next,count;
+    UINT8 *pri0 = p->pri;
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        UINT8 *pri = pri0;
+
+        for( i=0; i<count; i++ )
+        {
+            dest[i] = alpha_blend16(dest[i], clut[source[i]]);
+            pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+        }
+
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pri0 += priority_bitmap_pitch_line;
+    }
 }
 
 #ifndef pbo32
-static void pbo32(
-        UINT32 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pbo32(sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
+        UINT32 pcode = p->pcode;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<count; i++ )
-	{
-		dest[i] = alpha_blend32(dest[i], clut[source[i]]);
-		pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-	}
+
+    INT16 i,y,y_next,count;
+    UINT8 *pri0 = p->pri;
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        UINT8 *pri = pri0;
+
+        for( i=0; i<count; i++ )
+        {
+            dest[i] = alpha_blend32(dest[i], clut[source[i]]);
+            pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+        }
+
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pri0 += priority_bitmap_pitch_line;
+    }
 }
 #endif
 
 #ifndef npbo32
-static void npbo32(
-        UINT32 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void npbo32(sBlitMaskParams *p REGTM(a0)  )
 {
-	int oddcount = count & 3;
-	int unrcount = count & ~3;
-	int i;
+    INT16 i,y,y_next,count;
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+        UINT32 pcode = p->pcode;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+
+	INT16 oddcount = count & 3;
+	INT16 unrcount = count & ~3;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<oddcount; i++ )
-	{
-		dest[i] = alpha_blend32(dest[i], clut[source[i]]);
-	}
-	source += count; dest += count;
-	for( i=-unrcount; i; i+=4 )
-	{
-		dest[i  ] = alpha_blend32(dest[i  ], clut[source[i  ]]);
-		dest[i+1] = alpha_blend32(dest[i+1], clut[source[i+1]]);
-		dest[i+2] = alpha_blend32(dest[i+2], clut[source[i+2]]);
-		dest[i+3] = alpha_blend32(dest[i+3], clut[source[i+3]]);
-	}
+
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+
+
+        for( i=0; i<oddcount; i++ )
+        {
+            dest[i] = alpha_blend32(dest[i], clut[source[i]]);
+        }
+        source += count; dest += count;
+        for( i=-unrcount; i; i+=4 )
+        {
+            dest[i  ] = alpha_blend32(dest[i  ], clut[source[i  ]]);
+            dest[i+1] = alpha_blend32(dest[i+1], clut[source[i+1]]);
+            dest[i+2] = alpha_blend32(dest[i+2], clut[source[i+2]]);
+            dest[i+3] = alpha_blend32(dest[i+3], clut[source[i+3]]);
+        }
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+    }
 }
 #endif
 
 /***********************************************************************************/
 
-static void pbt15(
-        UINT16 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pbt15(sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
+    INT16 i,y,y_next,count;
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    const UINT8 *pMask0 = p->pMask;
+        UINT32 pcode = p->pcode;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+    UINT8 *pri0 = p->pri;
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<count; i++ )
-	{
-		if( (pMask[i]&mask)==value )
-		{
-			dest[i] = alpha_blend16(dest[i], clut[source[i]]);
-			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-		}
-	}
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        const UINT8 *pMask = pMask0;
+        UINT8 *pri = pri0;
+        for( i=0; i<count; i++ )
+        {
+            if( (pMask[i]&mask)==value )
+            {
+                dest[i] = alpha_blend16(dest[i], clut[source[i]]);
+                pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+            }
+        }
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pMask0 += p->sourcemaskmodx;
+        pri0 += priority_bitmap_pitch_line;
+    }
 }
 
 #ifndef pbt32
-static void pbt32(
-        UINT32 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void pbt32(sBlitMaskParams *p REGTM(a0) )
 {
-	int i;
+    INT16 i,y,y_next,count;
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    const UINT8 *pMask0 = p->pMask;
+        UINT32 pcode = p->pcode;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+    UINT8 *pri0 = p->pri;
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
-	for( i=0; i<count; i++ )
-	{
-		if( (pMask[i]&mask)==value )
-		{
-			dest[i] = alpha_blend32(dest[i], clut[source[i]]);
-			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
-		}
-	}
+
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        const UINT8 *pMask = pMask0;
+        UINT8 *pri = pri0;
+
+        for( i=0; i<count; i++ )
+        {
+            if( (pMask[i]&mask)==value )
+            {
+                dest[i] = alpha_blend32(dest[i], clut[source[i]]);
+                pri[i] = (pri[i] & (pcode >> 8)) | pcode;
+            }
+        }
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pMask0 += p->sourcemaskmodx;
+        pri0 += priority_bitmap_pitch_line;
+    }
 }
 #endif
 
 #ifndef npbt32
-static void npbt32(
-        UINT32 *dest REGTM(a0),
-        const UINT16 *source REGTM(a1),
-        const UINT8 *pMask REGTM(a2),
-        int mask REGTM(d1),
-        int value REGTM(d2),
-        int count REGTM(d0),
-        UINT8 *pri REGTM(a3),
-        UINT32 pcode REGTM(d3)
-        )
+static void npbt32(sBlitMaskParams *p REGTM(a0) )
 {
-	int oddcount = count & 3;
-	int unrcount = count & ~3;
-	int i;
+    INT16 i,y,y_next,count;
+    const UINT16 *source0 = p->source;
+    UINT16 *dest0 = p->dest;
+    const UINT8 *pMask0 = p->pMask;
+        UINT32 pcode = p->pcode;
+    y = p->y;
+    y_next = p->y_next;
+    count = p->count;
+    UINT8 *pri0 = p->pri;
+    UINT8 mask = p->mask;
+    UINT8 value = p->value;
+
+
+	INT16 oddcount = count & 3;
+	INT16 unrcount = count & ~3;
 	pen_t *clut = &Machine->remapped_colortable[pcode >> 16];
 
-	for( i=0; i<oddcount; i++ )
-	{
-		if( (pMask[i]&mask)==value ) dest[i] = alpha_blend32(dest[i], clut[source[i]]);
-	}
-	pMask += count, source += count; dest += count;
-	for( i=-unrcount; i; i+=4 )
-	{
-		if( (pMask[i  ]&mask)==value ) dest[i  ] = alpha_blend32(dest[i  ], clut[source[i  ]]);
-		if( (pMask[i+1]&mask)==value ) dest[i+1] = alpha_blend32(dest[i+1], clut[source[i+1]]);
-		if( (pMask[i+2]&mask)==value ) dest[i+2] = alpha_blend32(dest[i+2], clut[source[i+2]]);
-		if( (pMask[i+3]&mask)==value ) dest[i+3] = alpha_blend32(dest[i+3], clut[source[i+3]]);
-	}
+    for(;;)
+    {
+        const UINT16 *source = source0;
+        UINT16 *dest = dest0;
+        const UINT8 *pMask = pMask0;
+        UINT8 *pri = pri0;
+
+        for( i=0; i<oddcount; i++ )
+        {
+            if( (pMask[i]&mask)==value ) dest[i] = alpha_blend32(dest[i], clut[source[i]]);
+        }
+        pMask += count, source += count; dest += count;
+        for( i=-unrcount; i; i+=4 )
+        {
+            if( (pMask[i  ]&mask)==value ) dest[i  ] = alpha_blend32(dest[i  ], clut[source[i  ]]);
+            if( (pMask[i+1]&mask)==value ) dest[i+1] = alpha_blend32(dest[i+1], clut[source[i+1]]);
+            if( (pMask[i+2]&mask)==value ) dest[i+2] = alpha_blend32(dest[i+2], clut[source[i+2]]);
+            if( (pMask[i+3]&mask)==value ) dest[i+3] = alpha_blend32(dest[i+3], clut[source[i+3]]);
+        }
+        if( ++y == y_next ) break;
+
+        dest0 += p->destmodx;
+        source0 += p->sourcemodx;
+        pMask0 += p->sourcemaskmodx;
+        pri0 += priority_bitmap_pitch_line;
+    }
 }
 #endif
 
@@ -2206,6 +2529,20 @@ DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
 		priority_bitmap_next = priority_bitmap_baseaddr + dy*priority_bitmap_pitch_line;
 		source_next = source_baseaddr + dy*tmap->pixmap_pitch_line;
 		mask_next = mask_baseaddr + dy*tmap->transparency_bitmap_pitch_line;
+
+		//krb
+
+		// structure params for drawing pointers.
+		// values that are constant can be set early.
+        sBlitMaskParams blitparams;
+        blitparams.destmodx = blit.screen_bitmap_pitch_line;
+        blitparams.sourcemodx = tmap->pixmap_pitch_line;
+        blitparams.sourcemaskmodx = tmap->transparency_bitmap_pitch_line;
+        blitparams.mask = mask;
+        blitparams.value = value;
+        blitparams.pcode = blit.tilemap_priority_code;
+
+
 		for(;;)
 		{
 			row = y/tmap->cached_tile_height;
@@ -2215,6 +2552,7 @@ DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
 			pTrans = mask_baseaddr + x_start;
 
 			cached_indx = row*tmap->num_cached_cols + c1;
+
 			for( column=c1; column<=c2; column++ )
 			{
 				if( column == c2 )
@@ -2246,14 +2584,26 @@ DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
 					if( x_end>x2 ) x_end = x2;
 
 					if( transPrev != eWHOLLY_TRANSPARENT )
-					{
+					{/*wasok
 						count = x_end - x_start;
 						source0 = source_baseaddr + x_start;
 						dest0 = dest_baseaddr + x_start;
 						pmap0 = priority_bitmap_baseaddr + x_start;
+						*/
+						blitparams.y = y;
+						blitparams.y_next = y_next;
+
+                        blitparams.count = x_end - x_start;
+                        blitparams.dest = dest_baseaddr + x_start;
+                        blitparams.source = source_baseaddr + x_start;
+                        blitparams.pri = priority_bitmap_baseaddr + x_start;
+
 
 						if( transPrev == eWHOLLY_OPAQUE )
 						{
+
+    						blit.draw_opaque(&blitparams);
+						/*
 							i = y;
 							for(;;)
 							{
@@ -2264,11 +2614,14 @@ DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
 								source0 += tmap->pixmap_pitch_line;
 								pmap0 += priority_bitmap_pitch_line;
 							}
+							*/
 						} /* transPrev == eWHOLLY_OPAQUE */
 						else /* transPrev == eMASKED */
 						{
-							mask0 = mask_baseaddr + x_start;
-							i = y;
+                            tutute++;
+                            blitparams.pMask = mask_baseaddr + x_start;
+    						blit.draw_masked(&blitparams);
+/*							i = y;
 							for(;;)
 							{
 								blit.draw_masked( dest0, source0, mask0, mask, value, count, pmap0, tilemap_priority_code );
@@ -2278,7 +2631,7 @@ DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
 								source0 += tmap->pixmap_pitch_line;
 								mask0 += tmap->transparency_bitmap_pitch_line;
 								pmap0 += priority_bitmap_pitch_line;
-							}
+							}*/
 						} /* transPrev == eMASKED */
 					} /* transPrev != eWHOLLY_TRANSPARENT */
 					x_start = x_end;

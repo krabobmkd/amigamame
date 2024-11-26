@@ -163,7 +163,7 @@ void QProc::process()
 //                "altbeast"
 //    "bublbobl"
 //   "dino"
-//                 "batrider"
+                 "arkretrn"
 //"pdrift"
 //"qbert"
  //   "rastsaga"
@@ -173,7 +173,8 @@ void QProc::process()
 // "mslugx"
 //                "gforce2"
 
-        "aof"
+//        "aof"
+//"chasehq"
 //      "mslug"
 
 //                "mp_sor2"

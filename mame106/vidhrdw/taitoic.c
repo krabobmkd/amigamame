@@ -4977,9 +4977,9 @@ WRITE16_HANDLER( TC0110PCR_step1_word_w )
 
 		case 1:
 		{
-			int r,g,b;   /* data = palette BGR value */
+			UINT32 r,g,b;   /* data = palette BGR value */
 
-			TC0110PCR_ram[0][(TC0110PCR_addr[0])] = data & 0xffff;
+			TC0110PCR_ram[0][(TC0110PCR_addr[0])] = data /*very funny & 0xffff*/;
 
 			r = (data >>  0) & 0x1f;
 			g = (data >>  5) & 0x1f;
@@ -4989,7 +4989,8 @@ WRITE16_HANDLER( TC0110PCR_step1_word_w )
 			g = (g << 3) | (g >> 2);
 			b = (b << 3) | (b >> 2);
 
-			palette_set_color(TC0110PCR_addr[0],r,g,b);
+			//palette_set_color(TC0110PCR_addr[0],r,g,b);
+			setpalettefast_neogeo(TC0110PCR_addr[0], (r<<16)|(g<<8)|b );
 			break;
 		}
 
