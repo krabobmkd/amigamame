@@ -42,9 +42,9 @@ enum
 
 
 /* graphics-related variables */
-       UINT8	midtunit_gfx_rom_large;
-static UINT16	midtunit_control;
-static UINT8	midtunit_using_34020;
+       UINT8	midtunit_gfx_rom_large=0;
+static UINT16	midtunit_control=0;
+static UINT8	midtunit_using_34020=0;
 
 /* palette-related variables */
 static pen_t *	pen_map;
@@ -52,7 +52,7 @@ static pen_t *	pen_map;
 /* videoram-related variables */
 static UINT32 	gfxbank_offset[2];
 static UINT16 *	local_videoram;
-static UINT8	videobank_select;
+static UINT8	videobank_select=0;
 
 /* DMA-related variables */
 static UINT16	dma_register[18];
@@ -257,7 +257,7 @@ WRITE16_HANDLER( midtunit_control_w )
         other important bits:
             bit 2 (0x0004) is toggled periodically
     */
-	loginfo(2,"T-unit control = %04X\n", data);
+// mortal kombat does this:	loginfo(2,"T-unit control = %04X\n", data);
 
 	COMBINE_DATA(&midtunit_control);
 

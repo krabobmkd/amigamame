@@ -272,7 +272,7 @@ void MameConfig::serialize(ASerializer &serializer)
     serializer("Audio",     (ASerializable&)_audio,0);
     serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS);
     serializer("Misc",     (ASerializable&)_misc,0);
-    serializer("Help",     (ASerializable&)_help,0);
+    serializer("Help",     (ASerializable&)_help,SERFLAG_GROUP_SCROLLER);
 }
 void MameConfig::toDefault()
 {

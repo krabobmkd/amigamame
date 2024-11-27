@@ -11,7 +11,7 @@ todo beta4
 - X drawgfx
 		X pack4
 		X clip X1 bug
-- O tilemap bitfield line optim ->0.5% gain ? 3% ?
+- X tilemap bitfield line optim ->0.5% gain ? 3% ?
 - O optim sound bubbob
 - X  neogeo change RGB15 to 16b index
 - X  neogeo verif slicing

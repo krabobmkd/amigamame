@@ -41,6 +41,7 @@ Sprite layout.
 ***************************************************************************/
 
 #include "driver.h"
+#include "drawgfxn.h"
 #include <stdio.h>
 
 unsigned char *ddragon_bgvideoram,*ddragon_fgvideoram;
@@ -232,35 +233,35 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
             dgp.sx = sx;
             dgp.sy = sy;
-            drawgfx(&dgp);
+            drawgfx_clut16_Src8(&dgp);
 
 			switch ( size ) {
 				case 1: /* double y */
                     dgp.code = which;
                     dgp.sy = sy+dy;
-                    drawgfx(&dgp);
+                    drawgfx_clut16_Src8(&dgp);
 				break;
 				case 2: /* double x */
                     dgp.code = which;
                     dgp.sx = sx+dx;
-                    drawgfx(&dgp);
+                    drawgfx_clut16_Src8(&dgp);
 				break;
 
 				case 3:
                     dgp.code = which;
                     dgp.sx = sx+dx;
                     dgp.sy = sy+dy;
-                    drawgfx(&dgp);
+                    drawgfx_clut16_Src8(&dgp);
 
                     dgp.code = which+1;
                     dgp.sx = sx+dx;
                     dgp.sy = sy;
-                    drawgfx(&dgp);
+                    drawgfx_clut16_Src8(&dgp);
 
                     dgp.code = which+2;
                     dgp.sx = sx;
                     dgp.sy = sy+dy;
-                    drawgfx(&dgp);
+                    drawgfx_clut16_Src8(&dgp);
 				break;
 			}
 		}

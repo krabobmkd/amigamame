@@ -3070,7 +3070,7 @@ void program_rcopy_to_io(UINT8 port,UINT16 readAddress, UINT8 n)
     Program memory handlers
 -------------------------------------------------*/
 
-//     READBYTE8(program_read_byte_8,      ADDRESS_SPACE_PROGRAM)
+     READBYTE8(program_read_byte_8,      ADDRESS_SPACE_PROGRAM)
     WRITEBYTE8(program_write_byte_8,     ADDRESS_SPACE_PROGRAM)
 
   READBYTE16BE(program_read_byte_16be,   ADDRESS_SPACE_PROGRAM)

@@ -487,6 +487,8 @@ void mame_schedule_exit(void)
 {
 	exit_pending = TRUE;
 
+    loginfo(0,"Exit game."); // just for UI
+
 	/* if we're autosaving on exit, schedule a save as well */
 	if (options.auto_save && (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
 		mame_schedule_save(Machine->gamedrv->name);
@@ -1189,7 +1191,7 @@ static void soft_reset(int param)
 	callback_item *cb;
 
 //	loginfo(2,"Soft reset\n");
-	loginfo(2,"Start machine\n"); //krb: more interesting message for UI.
+	loginfo(0,"Start machine\n"); //krb: more interesting message for UI.
 	/* temporarily in the reset phase */
 	current_phase = MAME_PHASE_RESET;
 

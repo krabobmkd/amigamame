@@ -5,11 +5,12 @@
 
 static int doStdOut = 0;
 static logCallbcack logcb = NULL;
-
+static int max_iwe=1;
 // make it simple....
 void log_enableStdOut(int e)
 {
     doStdOut = e;
+    max_iwe = 2;
 }
 
 void log_setCallback(logCallbcack cb)
@@ -19,7 +20,8 @@ void log_setCallback(logCallbcack cb)
 
 void vloginfo(int i_w_e, const char * format, va_list args )
 {
-    printf("vloginfo:%d %s\n",i_w_e,format);
+    if(i_w_e>max_iwe) return;
+
     if(doStdOut)
     {
         vprintf(format,args);
@@ -34,6 +36,8 @@ void vloginfo(int i_w_e, const char * format, va_list args )
 }
 void loginfo(int i_w_e,const char *format, ...)
 {
+        if(i_w_e>max_iwe) return;
+
     va_list args;
     va_start(args, format);
         vloginfo(i_w_e,format,args);
@@ -41,6 +45,8 @@ void loginfo(int i_w_e,const char *format, ...)
 }
 void logerror( const char *format, ...)
 {
+    printf("vloginfo: %s\n",format);
+    if(2>max_iwe) return;
 //    printf("prout\n");
     va_list args;
     va_start(args, format);

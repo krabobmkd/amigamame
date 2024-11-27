@@ -118,7 +118,7 @@ class Agdoc {
 public:
     void treatmdfile( string &mdpath);
 
-    void exportag(ofstream &ofs);
+    void export_ag(ofstream &ofs);
     vector< shared_ptr<paragr> > _prgs;
 
 };
@@ -203,7 +203,7 @@ string titleToMdId(string t)
  return trimt;
 }
 
-void Agdoc::exportag(ofstream &ofs)
+void Agdoc::export_ag(ofstream &ofs)
 {
     ofs << "@DATABASE\n";
  bool nodeison=false;
@@ -252,7 +252,8 @@ int main(int argc, char **argv)
     string ppth(argv[1]);
     d.treatmdfile(ppth);
 
-
+    ofstream ofsag("Mame106Minimix.guide");
+    if(ofsag.good()) d.export_ag(ofsag);
 
     return 0;
 }

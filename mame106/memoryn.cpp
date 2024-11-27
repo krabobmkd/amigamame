@@ -1,18 +1,31 @@
 // memoryn.cpp
+
+extern "C"
+{
+#include "memory.h"
+#include <stdio.h>
+
+extern UINT8 *bank_ptr[STATIC_COUNT];
+extern address_space active_address_space[ADDRESS_SPACES];/* address space data */
+
+UINT32 memory_readlong_d16_be(offs_t address REGM(d0));
+UINT16 memory_readword_d16_be(offs_t address REGM(d0));
+UINT8 memory_readbyte_d16_be(offs_t address REGM(d0));
+void memory_writelong_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) );
+void memory_writeword_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) );
+void memory_writebyte_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) );
+
+UINT32 memory_readmovem32_wr16(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
+UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
+
+}
+
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
 using namespace std;
 
-extern "C"
-{
-    #include "memory.h"
-    #include <stdio.h>
 
-    extern UINT8 *bank_ptr[STATIC_COUNT];
-    extern address_space active_address_space[ADDRESS_SPACES];/* address space data */
-
-}
 // these are definitions from memory.c , which are meant to be priovate but well...
 
 union _rwhandlers
@@ -318,7 +331,7 @@ UINT32 memory_readlong_d16_be(offs_t address REGM(d0))
 }
 
 
-UINT16 memory_readword_d16_beT(offs_t address REGM(d0))
+UINT16 memory_readword_d16_be(offs_t address REGM(d0))
 {
     UINT32 entry;
     testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
@@ -358,14 +371,8 @@ UINT16 memory_readword_d16_beT(offs_t address REGM(d0))
 
 }
 
-UINT16 memory_readword_d16_be(offs_t address REGM(d0))
-{
-    UINT16 v = memory_readword_d16_beT(address);
-    // traceMem(address,v);
-    return v;
-}
 // this is a read8 that needs to use handler16 instead of handler 8 !! hence the mask/shift horror.
-UINT8 memory_readbyte_d16_beT(offs_t address REGM(d0))
+UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
 {
     UINT32 entry;
     testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
@@ -417,12 +424,12 @@ UINT8 memory_readbyte_d16_beT(offs_t address REGM(d0))
 
 }
 
-UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
-{
-    UINT8 v = memory_readbyte_d16_beT(address);
-   // traceMem(address,v);
-    return v;
-}
+// UINT8 memory_readbyte_d16_be(offs_t address REGM(d0))
+// {
+//     UINT8 v = memory_readbyte_d16_beT(address);
+//    // traceMem(address,v);
+//     return v;
+// }
 
 // - - - -  68k 16b-bus writes
 
@@ -820,40 +827,3 @@ UINT32 memory_writemovem32_wr32_reverse(UINT32 address REGM(d0), UINT32 bits REG
     return count;
 }
 
-
-
-UINT8 program_read_byte_8(offs_t address REGM(d0))
-{
-    UINT32 entry;
-    testMaskUse(active_address_space[0].addrmask,address,adressspace_readmaskuse);
-	address &= active_address_space[0].addrmask;
-
-	entry = active_address_space[0].readlookup[LEVEL1_INDEX(address)];
-
-    if (entry < STATIC_RAM)
-    {
-        ENTRY_STAT_DirectReadA(entry);
-        handler_data &hdata = active_address_space[0].readhandlers[entry];
-        address -= hdata.offset;
-        address &= hdata.mask;
-
-        return bank_ptr[entry][address];
-    }
-	if (entry >= SUBTABLE_BASE)
-		entry = active_address_space[0].readlookup[LEVEL2_INDEX(entry,address)];
-
-    handler_data &hdata = active_address_space[0].readhandlers[entry];
-    address -= hdata.offset;
-    address &= hdata.mask;
-
-	if (entry < STATIC_RAM)
-    {
-        ENTRY_STAT_DirectReadB(entry);
-        return bank_ptr[entry][address];
-    }
-    ENTRY_STAT_Overread(entry);
-    read8_handler reader = active_address_space[0].readhandlers[entry].handler.read.handler8;
-    return reader(address);
-}
-
-//    WRITEBYTE8(program_write_byte_8,     ADDRESS_SPACE_PROGRAM)

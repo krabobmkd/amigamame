@@ -8494,7 +8494,50 @@ static void HandleLocalCommandCheat(UINT32 type, UINT32 address, UINT32 data, UI
 			break;
 	}
 }
+//krb
+static void LoadCheatFileAlternative(char * fileName)
+{
+    FILE *fh = fopen(fileName,"rb");
+    if(!fh) return;
+    fseek(fh, 0, SEEK_END);
+    int size = ftell(fh);
+    fseek(fh, 0, SEEK_SET);
 
+    char *p=malloc(size);
+    if(!p) {
+        fclose(fh);
+        return;
+    }
+    fread(p,1,size+1,fh);
+    p[size]=0;
+
+    int i=0;
+    int ilinestart=0;
+    while(i<size)
+    {
+        char c =*i++;
+        if(c==':')
+        {
+            if(c=='\n')
+            {
+                //TODO
+
+                ilinestart = i+1;
+            }
+        }
+    }
+
+    free(p);
+    fclose(fh);
+
+    int size, offs;
+    offs = osd_ftell(file->file);
+    osd_fseek(file->file, 0, SEEK_END);
+    size = osd_ftell(file->file);
+    osd_fseek(file->file, offs, SEEK_SET);
+
+    fseek(fh, 0, SEEK_END);
+}
 static void LoadCheatFile(char * fileName)
 {
 	mame_file	* theFile;

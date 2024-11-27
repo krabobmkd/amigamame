@@ -1158,7 +1158,7 @@ static void dpyint_callback(int cpunum)
 {
 	double interval = TIME_IN_HZ(Machine->drv->frames_per_second);
 
-loginfo(2,"-- dpyint(%d) @ %d --\n", cpunum, cpu_getscanline());
+// mortal kombat does this: loginfo(2,"-- dpyint(%d) @ %d --\n", cpunum, cpu_getscanline());
 
 	/* reset timer for next frame before going into the CPU context */
 	timer_adjust(dpyint_timer[cpunum], interval, cpunum, 0);
@@ -1308,7 +1308,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 				newreg |= data & 0x0008;
 			}
 			IOREG(offset) = newreg;
-loginfo(2,"oldreg=%04X newreg=%04X\n", oldreg, newreg);
+//loginfo(2,"oldreg=%04X newreg=%04X\n", oldreg, newreg);
 			/* the TMS34010 can set output interrupt? */
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{

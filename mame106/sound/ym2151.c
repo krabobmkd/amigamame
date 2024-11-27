@@ -1062,7 +1062,7 @@ void YM2151WriteReg(void *_chip REGYM(a0), UINT8 r REGYM(d0), UINT8 v  REGYM(d1)
 			break;
 
 		default:
-			loginfo(2,"YM2151 Write %02x to undocumented register #%02x\n",v,r);
+		//mortal kombat	loginfo(2,"YM2151 Write %02x to undocumented register #%02x\n",v,r);
 			break;
 		}
 		break;

@@ -71,6 +71,10 @@ conversion kit which could be applied to a bootleg double dragon :-p?
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
+#include <stdio.h>
+
+#define KRB_SCANLINE_DIVFACTOR 16
+//16
 
 /* from vidhrdw */
 extern unsigned char *ddragon_bgvideoram,*ddragon_fgvideoram;
@@ -92,7 +96,7 @@ static int dd_sub_cpu_busy;
 static int sprite_irq, sound_irq, ym_irq, snd_cpu;
 static int adpcm_pos[2],adpcm_end[2],adpcm_idle[2];
 static UINT8* darktowr_mcu_ports, *darktowr_ram;
-static int VBLK;
+static int VBLK=0;
 static UINT8 bank_data;
 /* end of private globals */
 
@@ -952,16 +956,48 @@ static struct MSM5205interface msm5205_interface =
 
 static INTERRUPT_GEN( ddragon_interrupt )
 {
-	int scanline=271 - cpu_getiloops();
+#define KRBOPTIM 1
 
-	/* VBLK is lowered on scanline 0 */
-	if (scanline==0) {
-		VBLK=0;
-	}
+
+// #define KRBOPTIM 1
+ #ifdef KRBOPTIM
+    // KRB_SCANLINE_DIVFACTOR
+    int iloop = ((cpu_getiloops()+1)*16)-1;// * KRB_SCANLINE_DIVFACTOR;
+    int scanline=(271 - iloop) ;
+
+
+    /* VBLK is lowered on scanline 0 */
+    if (scanline==0) {
+        VBLK=0;
+    }
+
+    /* VBLK is raised on scanline 240 and NMI line is pulled high */
+    if (scanline==240) {
+        //force_partial_update(scanline);
+        cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
+        VBLK=0x8;
+    }
+
+    /* IMS is triggered every time VPOS line 3 is raised, as VPOS counter starts at 16, effectively every 16 scanlines */
+    //	if ((scanline%16)==7)
+    {
+        //force_partial_update(scanline);
+        cpunum_set_input_line(0,M6809_FIRQ_LINE,ASSERT_LINE);
+    }
+ #else
+// KRB_SCANLINE_DIVFACTOR
+    int iloop = cpu_getiloops();// * KRB_SCANLINE_DIVFACTOR;
+    int scanline=(271 - iloop) ;
+
+
+    /* VBLK is lowered on scanline 0 */
+    if (scanline==0) {
+        VBLK=0;
+    }
 
 	/* VBLK is raised on scanline 240 and NMI line is pulled high */
 	if (scanline==240) {
-		force_partial_update(scanline);
+		//force_partial_update(scanline);
 		cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
 		VBLK=0x8;
 	}
@@ -969,17 +1005,22 @@ static INTERRUPT_GEN( ddragon_interrupt )
 	/* IMS is triggered every time VPOS line 3 is raised, as VPOS counter starts at 16, effectively every 16 scanlines */
 	if ((scanline%16)==7)
 	{
-		force_partial_update(scanline);
+		//force_partial_update(scanline);
 		cpunum_set_input_line(0,M6809_FIRQ_LINE,ASSERT_LINE);
 	}
-}
 
+#endif
+}
+//krb  1000
+#define dDragonInterleave 1
+// 272
+#define ddragon_nblineinterrupt 272/KRB_SCANLINE_DIVFACTOR
 static MACHINE_DRIVER_START( ddragon )
 
 	/* basic machine hardware */
  	MDRV_CPU_ADD(HD6309, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(ddragon_interrupt,272)
+	MDRV_CPU_VBLANK_INT(ddragon_interrupt,ddragon_nblineinterrupt)
 
 	MDRV_CPU_ADD(HD63701, 3579545 / 3) /* This divider seems correct by comparison to real board */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
@@ -990,7 +1031,7 @@ static MACHINE_DRIVER_START( ddragon )
 
 	MDRV_FRAMES_PER_SECOND(((12000000.0 / 256.0) / 3.0) / 272.0)
 	MDRV_VBLANK_DURATION(0)
-	MDRV_INTERLEAVE(1000) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_INTERLEAVE(dDragonInterleave /*1000*/) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_START(ddragon)
 	MDRV_MACHINE_RESET(ddragon)
@@ -1077,7 +1118,7 @@ static MACHINE_DRIVER_START( ddragonb )
 	/* basic machine hardware */
  	MDRV_CPU_ADD(HD6309, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(ddragon_interrupt,272)
+	MDRV_CPU_VBLANK_INT(ddragon_interrupt,ddragon_nblineinterrupt)
 
  	MDRV_CPU_ADD(HD6309, 12000000 / 3) /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
@@ -1088,7 +1129,7 @@ static MACHINE_DRIVER_START( ddragonb )
 
 	MDRV_FRAMES_PER_SECOND(((12000000.0 / 256.0) / 3.0) / 272.0)
 	MDRV_VBLANK_DURATION(0)
-	MDRV_INTERLEAVE(100) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_INTERLEAVE(dDragonInterleave) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_START(ddragon)
 	MDRV_MACHINE_RESET(ddragonb)
@@ -1125,7 +1166,7 @@ static MACHINE_DRIVER_START( ddragon2 )
 	/* basic machine hardware */
  	MDRV_CPU_ADD(HD6309, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(dd2_readmem,dd2_writemem)
-	MDRV_CPU_VBLANK_INT(ddragon_interrupt,272)
+	MDRV_CPU_VBLANK_INT(ddragon_interrupt,ddragon_nblineinterrupt)
 
 	MDRV_CPU_ADD(Z80,12000000 / 3) /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(dd2_sub_readmem,dd2_sub_writemem)
@@ -1136,7 +1177,7 @@ static MACHINE_DRIVER_START( ddragon2 )
 
 	MDRV_FRAMES_PER_SECOND(((12000000.0 / 256.0) / 3.0) / 272.0)
 	MDRV_VBLANK_DURATION(0)
-	MDRV_INTERLEAVE(100) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_INTERLEAVE(dDragonInterleave) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_RESET(ddragon2)
 

@@ -71,6 +71,7 @@ static const unsigned char tlogomamebm[(128/8)*36]={
     0,0,0,127,224,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,192,0,0,0,0,0,0,0,0,0,0,0,
     0,0,1,255,128,0,0,0,0,0,0,0,0,0,0,0,0,0,3,255,0,0,0,0,0,0,0,0,0,0,0,0
 };
+
 BitMap *g_res_BitmapLogo=NULL;
 
 }
@@ -712,11 +713,14 @@ void IntuitionDisplay::drawProgress(int per256, int enm)
     bm.Planes[1] = (PLANEPTR)&tlogomamebm[0];
 
     // mask erase shadow
-    BltMaskBitMapRastPort
-        (&bm,0,0,rp,w-128-16-2  ,y1-37+11,128,36,
-         0x0022, /*0x00c0*/
-         (PLANEPTR)&tlogomamebm[0]
-         );
+    if(blackpen==0)
+    {
+        BltMaskBitMapRastPort
+            (&bm,0,0,rp,w-128-16-2  ,y1-37+11,128,36,
+             0x0022, /*0x00c0*/
+             (PLANEPTR)&tlogomamebm[0]
+             );
+    }
 
     // mask write logo
    BltMaskBitMapRastPort

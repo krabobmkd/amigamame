@@ -119,7 +119,7 @@ replace_list_item(MAME_CPU_SRC "cpu/tms32010/tms32010.c" "cpu/tms32010/tms32010.
 #replace_list_item(MAME_CORE_SRC "palette.c" "palette_krb.c")
 #replace_list_item(MAME_CORE_SRC "mame.c" "mame_krb.c")
 
-add_library( mamecore STATIC  ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} )
+add_library( mamecore STATIC  ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_CPU_SRC} )
 set_property(TARGET mamecore PROPERTY C_STANDARD 11)
 set_property(TARGET mamecore PROPERTY CXX_STANDARD 11)
 target_include_directories(mamecore PUBLIC ${MAME_INCLUDE_DIRS} ${ZLIBPATH} )
@@ -137,7 +137,7 @@ endif()
 
 
 
-add_library( mamecoreUNROLL STATIC  ${MAME_UNROLL_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC})
+add_library( mamecoreUNROLL STATIC  ${MAME_UNROLL_SRC} ${MAME_SOUND_SRC} )
 set_property(TARGET mamecoreUNROLL PROPERTY C_STANDARD 11)
 set_property(TARGET mamecoreUNROLL PROPERTY CXX_STANDARD 11)
 target_include_directories(mamecoreUNROLL PUBLIC ${MAME_INCLUDE_DIRS} ${ZLIBPATH} )

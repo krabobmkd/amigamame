@@ -2178,8 +2178,8 @@ WRITE8_HANDLER( m6803_internal_registers_w )
 					io_write_byte_8(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
 						| (io_read_byte_8(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
 
-				if (m6800.port2_ddr & 2)
-					loginfo(2,"CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpu_getactivecpu(),activecpu_get_pc());
+				// if (m6800.port2_ddr & 2)
+				// 	loginfo(2,"CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpu_getactivecpu(),activecpu_get_pc());
 			}
 			break;
 		case 0x02:
