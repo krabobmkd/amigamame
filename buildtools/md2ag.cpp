@@ -9,21 +9,20 @@
 #include <memory>
 #include <algorithm>
 
-
 #include <filesystem>
 namespace fs = std::filesystem;
 
 using namespace std;
 
 
-std::string trim(std::string& str) {
+std::string trim(const std::string& str) {
     const std::string whitespace = " \t\r";
     auto begin = str.find_first_not_of(whitespace);
     if (begin == std::string::npos) begin=0;
 
     auto end = str.find_last_not_of(whitespace);
     string nstr =str.substr(begin, end - begin + 1);
-    str = nstr;
+  //  str = nstr;
     return nstr;
 }
 inline void sepline(const string &line,const string sep,string &partA, string &partB)
@@ -106,27 +105,152 @@ string rgetline(istream &ifs)
 
 
 
-class Agdoc {
-public:
+struct paragr {
+    int _level;
+    bool _isdot=false;
+    string _tit;
+    vector<string> _t;
 
-
+    vector<paragr> _prgs;
 };
 
+class Agdoc {
+public:
+    void treatmdfile( string &mdpath);
 
-void treatmdfile( Agdoc &agd, string &mdpath)
+    void exportag(ofstream &ofs);
+    vector< shared_ptr<paragr> > _prgs;
+
+};
+bool startWith(const string &s,const string &t)
 {
-
+    return(s.find(t) != 0);
 }
 
+void Agdoc::treatmdfile(  string &mdpath)
+{
+    ifstream ifsmd(mdpath);
+    if(!ifsmd.good()) return;
+
+    shared_ptr<paragr> curprg = make_shared<paragr>();
+    _prgs.push_back(curprg);
+
+    string l;
+    getline(ifsmd,l);
+    while(!ifsmd.eof())
+    {
+       l = trim(l);
+       if(l.length()==0 )
+       {
+        getline(ifsmd,l);
+        continue;
+       }
+       if(startWith(l,"###"))
+       {
+           curprg = make_shared<paragr>();
+            _prgs.push_back(curprg);
+
+            curprg->_tit = trim(l.substr(3));
+            curprg->_level = 3;
+       } else if(startWith(l,"##"))
+       {
+           curprg = make_shared<paragr>();
+            _prgs.push_back(curprg);
+
+            curprg->_tit = trim(l.substr(2));
+            curprg->_level = 2;
+       } else if(startWith(l,"#"))
+       {
+           curprg = make_shared<paragr>();
+            _prgs.push_back(curprg);
+
+            curprg->_tit = trim(l.substr(1));
+            curprg->_level = 1;
+       } else if(startWith(l,"**"))
+       {
+            curprg->_t.push_back(l);
+       }else if(startWith(l,"*"))
+       {
+           curprg = make_shared<paragr>();
+            _prgs.push_back(curprg);
+            curprg->_isdot = true;
+            curprg->_t.push_back( l);
+
+       }else if(startWith(l,"-"))
+       {
+           curprg = make_shared<paragr>();
+            _prgs.push_back(curprg);
+            curprg->_isdot = true;
+            curprg->_t.push_back(l);
+       } else
+       {
+            curprg->_t.push_back(l);
+       }
+
+        getline(ifsmd,l);
+    }
+}
+void toLower(string &s) {
+    transform(s.begin(), s.end(), s.begin(),
+              ::tolower);
+}
+
+string titleToMdId(string t)
+{
+    string trimt = trim(t);
+ trimt = replace(trimt," ","-");
+ toLower(trimt);
+ return trimt;
+}
+
+void Agdoc::exportag(ofstream &ofs)
+{
+    ofs << "@DATABASE\n";
+ bool nodeison=false;
+ bool isFirstNode=true;
+ vector<shared_ptr<paragr>>::iterator it = _prgs.begin();
+
+ while(it != _prgs.end() )
+ {
+    shared_ptr<paragr> p = *it++;
+    if(p->_level>0) {
+        nodeison = true;
+        if(nodeison) ofs << "@ENDNODE\n";
+         string nodename= titleToMdId(p->_tit);
+         if(isFirstNode) nodename = "MAIN";
+
+         ofs << "@NODE "<<nodename<<" \""<< p->_tit <<"\"\n";
+
+    }
+
+// titleToMdId
+
+    it++;
+ }
+ if(nodeison) ofs << "@ENDNODE\n";
+/*
+  @DATABASE
+  @NODE MAIN "Intuition Table of Contents"
+  @{"Introduction" LINK Intro}
+  @{"Screens" LINK Screen}
+  @{"Windows" LINK Window}
+  @{"Gadgets" LINK Gadget}
+  @{"Menus" LINK Menu}
+  @ENDNODE
+*/
+
+}
 
 int main(int argc, char **argv)
 {
     if(argc <2) return 0;
 
 
-    ifstream ifs(argv[1]);
-    if(!ifs.good()) return 1;
+      //  curprg = make_shared<paragr>();
 
+    Agdoc d;
+    string ppth(argv[1]);
+    d.treatmdfile(ppth);
 
 
 
