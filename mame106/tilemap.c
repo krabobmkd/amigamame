@@ -37,7 +37,6 @@
 
 #define TILE_FLAG_DIRTY	(0x80)
 
-int tutute=0;
 
 typedef enum { eWHOLLY_TRANSPARENT, eWHOLLY_OPAQUE, eMASKED } trans_t;
 
@@ -2618,7 +2617,7 @@ DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
 						} /* transPrev == eWHOLLY_OPAQUE */
 						else /* transPrev == eMASKED */
 						{
-                            tutute++;
+                           // tutute++;
                             blitparams.pMask = mask_baseaddr + x_start;
     						blit.draw_masked(&blitparams);
 /*							i = y;

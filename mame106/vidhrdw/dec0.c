@@ -96,7 +96,8 @@ Todo:
 
 #include "driver.h"
 #include "includes/dec0.h"
-
+#include "drawgfxn.h"
+#include <stdio.h>
 static tilemap *pf1_tilemap_0,*pf1_tilemap_1,*pf1_tilemap_2;
 static tilemap *pf2_tilemap_0,*pf2_tilemap_1,*pf2_tilemap_2;
 static tilemap *pf3_tilemap_0,*pf3_tilemap_1,*pf3_tilemap_2;
@@ -227,7 +228,7 @@ static void dec0_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int p
 			dgp0.flipy = fy;
 			dgp0.sx = x;
 			dgp0.sy = y + mult * multi;
-			drawgfx(&dgp0);
+			drawgfx_clut16_Src8(&dgp0);
 
 			multi--;
 		}
@@ -373,6 +374,7 @@ static void dec0_pf3_draw(mame_bitmap *bitmap,const rectangle *cliprect,int flag
 			custom_tilemap_draw(bitmap,cliprect,pf3_tilemap_2,dec0_pf3_rowscroll,dec0_pf3_colscroll,dec0_pf3_control_0,dec0_pf3_control_1,flags);
 			break;
 	};
+
 }
 
 /******************************************************************************/
@@ -401,28 +403,41 @@ VIDEO_UPDATE( baddudes )
 	if ((dec0_pri & 0x01) == 0)
 	{
 		dec0_pf2_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY);
+
 		dec0_pf3_draw(bitmap,cliprect,0);
 
 		if (dec0_pri & 2)
-			dec0_pf2_draw(bitmap,cliprect,TILEMAP_FRONT); /* Foreground pens only */
+        {
+			dec0_pf2_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY| TILEMAP_FRONT); // Foreground pens only
+        }
 
 		dec0_drawsprites(bitmap,cliprect,0x00,0x00);
 
+/*krb
 		if (dec0_pri & 4)
-			dec0_pf3_draw(bitmap,cliprect,TILEMAP_FRONT); /* Foreground pens only */
+        {
+			dec0_pf3_draw(bitmap,cliprect,TILEMAP_FRONT); // Foreground pens only
+        }
+*/
 	}
 	else
 	{
 		dec0_pf3_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY);
+
 		dec0_pf2_draw(bitmap,cliprect,0);
 
 		if (dec0_pri & 2)
-			dec0_pf3_draw(bitmap,cliprect,TILEMAP_FRONT); /* Foreground pens only */
-
+        {
+			dec0_pf3_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY | TILEMAP_FRONT); // Foreground pens only
+        }
 		dec0_drawsprites(bitmap,cliprect,0x00,0x00);
 
+/*krb
 		if (dec0_pri & 4)
-			dec0_pf2_draw(bitmap,cliprect,TILEMAP_FRONT); /* Foreground pens only */
+        {
+			dec0_pf2_draw(bitmap,cliprect,TILEMAP_FRONT); // Foreground pens only
+        }
+*/
 	}
 
 	dec0_pf1_draw(bitmap,cliprect,0);

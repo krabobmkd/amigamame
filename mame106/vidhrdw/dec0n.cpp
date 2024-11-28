@@ -1,4 +1,4 @@
-
+// dec0n.cpp
 extern "C" {
     #include "mame.h"
     #include "driver.h"
@@ -21,7 +21,7 @@ typedef struct {
     const UINT16 *rowscroll_ptr;
     const UINT16 *colscroll_ptr;
     const UINT16 *control1;
-
+    const UINT16 columnOffsetConstant;
 } custileparams;
 
 template<int flipscreen, int ignoretransp,int mapfront,int row_scroll_enabled,int col_scroll_enabled>
@@ -55,18 +55,21 @@ void custom_tilemap_drawT( custileparams *params)
     int yscrollf = params->control1[3]&0xf;
     int xscrollf = params->control1[2]&0xf;
 
+    UINT16 xscrollfmask =   (0x003f>>xscrollf);
+    xscrollf +=3; // because does ((src_x >> 3) >> xscrollf)
+
     const UINT16 *rowscroll_ptr = params->rowscroll_ptr;
     const UINT16 *colscroll_ptr = params->colscroll_ptr;
 
     const UINT16 **srclines = (const UINT16 **)params->src_bitmap->line;
 
-    UINT32 **destlines = (UINT32 **)params->bitmap->line;
+    UINT16 **destlines = (UINT16 **)params->bitmap->line;
 
-    INT16 y,x,maxx= (INT16)params->cliprect->max_x, maxy = (INT16)params->cliprect->max_y;
+    INT16 y,maxx= (INT16)params->cliprect->max_x, maxy = (INT16)params->cliprect->max_y;
     INT16 srcbmwidth = params->src_bitmap->width;
 
 	if (flipscreen)
-		src_y = (params->src_bitmap->height - 256) - scrolly;
+		src_y = (params->src_bitmap->height - 256) - scrolly  ;
 	else
 		src_y = scrolly;
 
@@ -80,30 +83,35 @@ void custom_tilemap_drawT( custileparams *params)
 		if (flipscreen)
 			src_x=(srcbmwidth - 256) - src_x;
 
-        UINT32 *pline = destlines[y];
+        UINT16 *pline = destlines[y];
 
-		for (x=0; x<=maxx; x++) {
+        INT16 x=0;
+        //int srcy2 = (src_y + params->columnOffsetConstant) & height_mask;
+        const UINT16 *line2 = srclines[(src_y + params->columnOffsetConstant) & height_mask];
+
+		for (x=0; x<=maxx; x++ , src_x++ ) {
+
             UINT16  p;
 			if (col_scroll_enabled)
 			{
-				int column_offset=colscroll_ptr[((src_x >> 3) >> xscrollf)&(0x3f>>xscrollf)];
+				int column_offset=colscroll_ptr[(src_x >> xscrollf) & xscrollfmask ];
 				p = (srclines[(src_y + column_offset)&height_mask])[src_x&width_mask];
             } else
             {
-                p = (srclines[src_y&height_mask])[src_x&width_mask];
+                p = line2[src_x&width_mask];
             }
 
-			src_x++;
 			if (ignoretransp || (p&0xf))
 			{
 				if(mapfront)
 				{
 					/* Top 8 pens of top 8 palettes only */
-					if ((p&0x88)==0x88) pline[x] = Machine->pens[p];
+                    if ((p&0x88)==0x88) pline[x] = p; // Machine->pens[p];
 				}
 				else
 				{
-    				pline[x] = Machine->pens[p];
+
+                    pline[x] = p; // Machine->pens[p];
 				}
 			}
 		}
@@ -130,16 +138,40 @@ void custom_tilemap_draw(mame_bitmap *bitmap,
 //	int ignoretransp = (flags&TILEMAP_IGNORE_TRANSPARENCY);
 //	int mapfront = (flags&TILEMAP_FRONT);
 
+    // test column offset per column, in most case we can use a constant and do less tiling.
+    int doColumnOffset = ((colscroll_ptr && (control0[0]&0x8))!=0);
+    int columnOffsetConstant=0;
+    if(doColumnOffset)
+    {
+        int columnOffsetIsConstant=1;
+        // we bet just a single y constant would be ok...
+        int xscrollf = control1[2]&0xf;
+        UINT16 xscrollfmask = (0x003f>>xscrollf);
+        columnOffsetConstant=colscroll_ptr[0 ];
+        for(UINT16 x=1;x<xscrollfmask;x++)
+        {
+            int next_column_offset=colscroll_ptr[x];
+            if(next_column_offset != columnOffsetConstant)
+            {
+                columnOffsetIsConstant=0;
+                break;
+            }
+
+        }
+        if(columnOffsetIsConstant) doColumnOffset=0;
+    }
+
+
     // 5 booleans will gives 32 possible routines
     int rendertypeid = (flip_screen !=0) |
                     ((flags&TILEMAP_IGNORE_TRANSPARENCY)>>3) |
                      ( (flags&TILEMAP_FRONT)>>4) |
                      (((rowscroll_ptr && (control0[0]&0x4)) !=0)<<3) |
-                    (((colscroll_ptr && (control0[0]&0x8)) !=0)<<4);
+                    ((doColumnOffset)<<4);
 
 
     custileparams params = {
-        bitmap,cliprect,src_bitmap,rowscroll_ptr,colscroll_ptr,control1
+        bitmap,cliprect,src_bitmap,rowscroll_ptr,colscroll_ptr,control1,columnOffsetConstant
     };
 
     switch(rendertypeid)
