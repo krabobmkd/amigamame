@@ -17,8 +17,8 @@ class Drawable_CGX {
 public:
   Drawable_CGX(IntuitionDrawable &drawable);
   virtual ~Drawable_CGX();
-  void drawCGX_DirectCPU16(_mame_display *display);
-  void drawCGX_DirectCPU32(_mame_display *display);
+  void drawCGX_DirectCPU16(  RastPort *pRPort, BitMap *pBitmap,_mame_display *display);
+  void drawCGX_DirectCPU32( BitMap *pBitmap,_mame_display *display);
 
   inline bool isSourceRGBA32() {
       const ULONG fritata = (VIDEO_RGB_DIRECT|VIDEO_NEEDS_6BITS_PER_GUN);

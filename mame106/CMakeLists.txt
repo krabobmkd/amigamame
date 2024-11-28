@@ -99,6 +99,9 @@ set(MAME_UNROLL_SRC  drawgfx.c  drawgfxn.cpp
 				 sound/wavwrite.c
 				 sound/wavwrite.h
 					)
+#if(OPT_DATAEAST)
+	list(APPEND MAME_UNROLL_SRC vidhrdw/dec0n.cpp)
+#endif()
 # move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/neogeo.c")
 
 # ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}

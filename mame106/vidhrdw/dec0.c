@@ -237,85 +237,93 @@ static void dec0_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int p
 }
 
 /******************************************************************************/
+// moved to c++
+extern void custom_tilemap_draw(mame_bitmap *bitmap,
+                const rectangle *cliprect,
+                tilemap *tilemap_ptr,
+                const UINT16 *rowscroll_ptr,
+                const UINT16 *colscroll_ptr,
+                const UINT16 *control0,
+                const UINT16 *control1,
+                int flags);
+//static void custom_tilemap_draw(mame_bitmap *bitmap,
+//								const rectangle *cliprect,
+//								tilemap *tilemap_ptr,
+//								const UINT16 *rowscroll_ptr,
+//								const UINT16 *colscroll_ptr,
+//								const UINT16 *control0,
+//								const UINT16 *control1,
+//								int flags)
+//{
+//	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tilemap_ptr);
+//	int x, y, p;
+//	int column_offset=0, src_x=0, src_y=0;
+//	unsigned int scrollx=control1[0];
+//	unsigned int scrolly=control1[1];
+//	int width_mask = src_bitmap->width - 1;
+//	int height_mask = src_bitmap->height - 1;
+//	int row_scroll_enabled = (rowscroll_ptr && (control0[0]&0x4));
+//	int col_scroll_enabled = (colscroll_ptr && (control0[0]&0x8));
 
-static void custom_tilemap_draw(mame_bitmap *bitmap,
-								const rectangle *cliprect,
-								tilemap *tilemap_ptr,
-								const UINT16 *rowscroll_ptr,
-								const UINT16 *colscroll_ptr,
-								const UINT16 *control0,
-								const UINT16 *control1,
-								int flags)
-{
-	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tilemap_ptr);
-	int x, y, p;
-	int column_offset=0, src_x=0, src_y=0;
-	unsigned int scrollx=control1[0];
-	unsigned int scrolly=control1[1];
-	int width_mask = src_bitmap->width - 1;
-	int height_mask = src_bitmap->height - 1;
-	int row_scroll_enabled = (rowscroll_ptr && (control0[0]&0x4));
-	int col_scroll_enabled = (colscroll_ptr && (control0[0]&0x8));
+//	if (!src_bitmap)
+//		return;
 
-	if (!src_bitmap)
-		return;
+//	/* Column scroll & row scroll may per applied per pixel, there are
+//    shift registers for each which control the granularity of the row/col
+//    offset (down to per line level for row, and per 8 lines for column).
 
-	/* Column scroll & row scroll may per applied per pixel, there are
-    shift registers for each which control the granularity of the row/col
-    offset (down to per line level for row, and per 8 lines for column).
+//    Nb:  The row & col selectors are _not_ affected by the shape of the
+//    playfield (ie, 256*1024, 512*512 or 1024*256).  So even if the tilemap
+//    width is only 256, 'src_x' should not wrap at 256 in the code below (to
+//    do so would mean the top half of row RAM would never be accessed which
+//    is incorrect).
 
-    Nb:  The row & col selectors are _not_ affected by the shape of the
-    playfield (ie, 256*1024, 512*512 or 1024*256).  So even if the tilemap
-    width is only 256, 'src_x' should not wrap at 256 in the code below (to
-    do so would mean the top half of row RAM would never be accessed which
-    is incorrect).
+//    Nb2:  Real hardware exhibits a strange bug with column scroll on 'mode 2'
+//    (256*1024) - the first column has a strange additional offset, but
+//    curiously the first 'wrap' (at scroll offset 256) does not have this offset,
+//    it is displayed as expected.  The bug is confimed to only affect this mode,
+//    the other two modes work as expected.  This bug is not emulated, as it
+//    doesn't affect any games.
+//    */
 
-    Nb2:  Real hardware exhibits a strange bug with column scroll on 'mode 2'
-    (256*1024) - the first column has a strange additional offset, but
-    curiously the first 'wrap' (at scroll offset 256) does not have this offset,
-    it is displayed as expected.  The bug is confimed to only affect this mode,
-    the other two modes work as expected.  This bug is not emulated, as it
-    doesn't affect any games.
-    */
+//	if (flip_screen)
+//		src_y = (src_bitmap->height - 256) - scrolly;
+//	else
+//		src_y = scrolly;
 
-	if (flip_screen)
-		src_y = (src_bitmap->height - 256) - scrolly;
-	else
-		src_y = scrolly;
+//	for (y=0; y<=cliprect->max_y; y++) {
+//		if (row_scroll_enabled)
+//			src_x=scrollx + rowscroll_ptr[(src_y >> (control1[3]&0xf))&(0x1ff>>(control1[3]&0xf))];
+//		else
+//			src_x=scrollx;
 
-	for (y=0; y<=cliprect->max_y; y++) {
-		if (row_scroll_enabled)
-			src_x=scrollx + rowscroll_ptr[(src_y >> (control1[3]&0xf))&(0x1ff>>(control1[3]&0xf))];
-		else
-			src_x=scrollx;
+//		if (flip_screen)
+//			src_x=(src_bitmap->width - 256) - src_x;
 
-		if (flip_screen)
-			src_x=(src_bitmap->width - 256) - src_x;
+//		for (x=0; x<=cliprect->max_x; x++) {
+//			if (col_scroll_enabled)
+//				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2]&0xf))&(0x3f>>(control1[2]&0xf))];
 
-		for (x=0; x<=cliprect->max_x; x++) {
-			if (col_scroll_enabled)
-				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2]&0xf))&(0x3f>>(control1[2]&0xf))];
+//			p = (((UINT16*)src_bitmap->line[(src_y + column_offset)&height_mask])[src_x&width_mask]);
 
-			p = (((UINT16*)src_bitmap->line[(src_y + column_offset)&height_mask])[src_x&width_mask]);
-
-			src_x++;
-			if ((flags&TILEMAP_IGNORE_TRANSPARENCY) || (p&0xf))
-			{
-				if( flags & TILEMAP_FRONT )
-				{
-					/* Top 8 pens of top 8 palettes only */
-					if ((p&0x88)==0x88)
-						plot_pixel(bitmap, x, y, Machine->pens[p]);
-				}
-				else
-				{
-					plot_pixel(bitmap, x, y, Machine->pens[p]);
-				}
-			}
-		}
-		src_y++;
-	}
-}
+//			src_x++;
+//			if ((flags&TILEMAP_IGNORE_TRANSPARENCY) || (p&0xf))
+//			{
+//				if( flags & TILEMAP_FRONT )
+//				{
+//					/* Top 8 pens of top 8 palettes only */
+//					if ((p&0x88)==0x88)
+//						plot_pixel(bitmap, x, y, Machine->pens[p]);
+//				}
+//				else
+//				{
+//					plot_pixel(bitmap, x, y, Machine->pens[p]);
+//				}
+//			}
+//		}
+//		src_y++;
+//	}
+//}
 
 /******************************************************************************/
 

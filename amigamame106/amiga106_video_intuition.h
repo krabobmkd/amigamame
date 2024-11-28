@@ -50,6 +50,7 @@ public:
     inline int whitePen() const { return 2; }
 protected:
     int _width,_height;
+    int _screenshiftx,_screenshifty; // when direct WB bitmap rendering trick.
     int _useScale;
     int _flags;
     int _heightBufferSwitch;
@@ -111,11 +112,15 @@ public:
     void close() override;
     Window *window() override;
     RastPort *rastPort() override;
+
+    bool isOnTop();
 protected:
     Window *_pWbWindow;
 
     int _machineWidth,_machineHeight;
     int _maxzoomfactor;
+
+
 };
 
 

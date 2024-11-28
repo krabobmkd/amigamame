@@ -8495,49 +8495,50 @@ static void HandleLocalCommandCheat(UINT32 type, UINT32 address, UINT32 data, UI
 	}
 }
 //krb
-static void LoadCheatFileAlternative(char * fileName)
-{
-    FILE *fh = fopen(fileName,"rb");
-    if(!fh) return;
-    fseek(fh, 0, SEEK_END);
-    int size = ftell(fh);
-    fseek(fh, 0, SEEK_SET);
+//static void LoadCheatFileAlternative(char * fileName)
+//{
+//    FILE *fh = fopen(fileName,"rb");
+//    if(!fh) return;
+//    fseek(fh, 0, SEEK_END);
+//    int size = ftell(fh);
+//    fseek(fh, 0, SEEK_SET);
 
-    char *p=malloc(size);
-    if(!p) {
-        fclose(fh);
-        return;
-    }
-    fread(p,1,size+1,fh);
-    p[size]=0;
+//    char *p=malloc(size);
+//    if(!p) {
+//        fclose(fh);
+//        return;
+//    }
+//    fread(p,1,size+1,fh);
+//    p[size]=0;
 
-    int i=0;
-    int ilinestart=0;
-    while(i<size)
-    {
-        char c =*i++;
-        if(c==':')
-        {
-            if(c=='\n')
-            {
-                //TODO
+//    int i=0;
+//    int ilinestart=0;
+//    while(i<size)
+//    {
+//        char c =p[i++];
 
-                ilinestart = i+1;
-            }
-        }
-    }
+//        if(c==':')
+//        {
+//            if(c=='\n')
+//            {
+//                //TODO
 
-    free(p);
-    fclose(fh);
+//                ilinestart = i+1;
+//            }
+//        }
+//    }
 
-    int size, offs;
-    offs = osd_ftell(file->file);
-    osd_fseek(file->file, 0, SEEK_END);
-    size = osd_ftell(file->file);
-    osd_fseek(file->file, offs, SEEK_SET);
+//    free(p);
+//    fclose(fh);
 
-    fseek(fh, 0, SEEK_END);
-}
+////    int size, offs;
+////    offs = osd_ftell(file->file);
+////    osd_fseek(file->file, 0, SEEK_END);
+////    size = osd_ftell(file->file);
+////    osd_fseek(file->file, offs, SEEK_SET);
+
+////    fseek(fh, 0, SEEK_END);
+//}
 static void LoadCheatFile(char * fileName)
 {
 	mame_file	* theFile;

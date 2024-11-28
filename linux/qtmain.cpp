@@ -164,7 +164,7 @@ void QProc::process()
 //    "bublbobl"
 //   "dino"
 //                 "arkretrn"
-        "ddragon"
+        "baddudes"
 //"pdrift"
 //"qbert"
  //   "rastsaga"

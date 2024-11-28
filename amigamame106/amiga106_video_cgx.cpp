@@ -99,10 +99,13 @@ void Drawable_CGX::close()
 
 }
 
-void Drawable_CGX::drawCGX_DirectCPU16(_mame_display *display)
+void Drawable_CGX::drawCGX_DirectCPU16(
+        RastPort *pRPort,
+        BitMap *pBitmap,
+        _mame_display *display)
 {
-    RastPort *pRPort = _drawable.rastPort();
-    BitMap *pBitmap = _drawable.bitmap();
+//    RastPort *pRPort = _drawable.rastPort();
+//    BitMap *pBitmap = _drawable.bitmap();
     if(!pRPort || !pBitmap) return;
 
     // - - update palette if exist and is needed.
@@ -205,10 +208,13 @@ void Drawable_CGX::drawCGX_DirectCPU16(_mame_display *display)
 }
 
 
-void Drawable_CGX::drawCGX_DirectCPU32(_mame_display *display)
+void Drawable_CGX::drawCGX_DirectCPU32(
+     //   RastPort *pRPort,
+        BitMap *pBitmap,
+    _mame_display *display)
 {
     //RastPort *pRPort = _drawable.rastPort();
-    BitMap *pBitmap = _drawable.bitmap();
+  //  BitMap *pBitmap = _drawable.bitmap();
     if(/*!pRPort ||*/ !pBitmap || !directDrawARGB32) return;
 
     // applied width height if using scale or not, and centering.
@@ -370,12 +376,14 @@ void Intuition_Screen_CGX::draw(_mame_display *display)
 //    if(_pTripleBufferImpl && !_pTripleBufferImpl->beforeBufferDrawn()) return;
     if(isSourceRGBA32() )
     {
-        drawCGX_DirectCPU32(display);
+        drawCGX_DirectCPU32(bitmap(),display);
     }
     else
     {
-        drawCGX_DirectCPU16(display);
+        drawCGX_DirectCPU16(rastPort(),bitmap(), display);
     }
+
+
    if(_pTripleBufferImpl) _pTripleBufferImpl->afterBufferDrawn();
    if(_flags & DISPFLAG_USEHEIGHTBUFFER) {
         if(_pScreen)
@@ -401,23 +409,48 @@ void Intuition_Window_CGX::draw(_mame_display *display)
 {
      if(!_pWbWindow || !_sWbWinSBitmap) return;
 
-    // will draw on friend bitmap _sWbWinSBitmap to the current size.
+    // will draw to the current size.
     _width = (int)(_pWbWindow->GZZWidth);
     _height = (int)(_pWbWindow->GZZHeight);
-    // use cpu direct copy
-    if(isSourceRGBA32())
-        drawCGX_DirectCPU32(display);
-    else
-        drawCGX_DirectCPU16(display);
 
-    // then use os copy to window, it manages layers, slow because 2 pass but easy way.
-    BltBitMapRastPort( _sWbWinSBitmap,//CONST struct BitMap *srcBitMap,
-           0,0, //LONG xSrc, LONG ySrc,
-           _pWbWindow->RPort,//struct RastPort *destRP,
-           0,0,//LONG xDest, LONG yDest,
-           _width, _height,
-           0x00c0//ULONG minterm  -> copy minterm.
-           );
+     if(isOnTop())
+     {
+         // window is on top, we don't need layer library,
+         // and can draw directly to wb rastport.
+         // avoid a bitmap copy.
+// WORD LeftEdge, TopEdge
+        _screenshiftx = _pWbWindow->LeftEdge; // because rastport is inside window
+        _screenshifty = _pWbWindow->TopEdge;
+
+        RastPort *pScreenRp = &(_pWbWindow->WScreen->RastPort);
+        BitMap *pScreenBM = _pWbWindow->WScreen->RastPort.BitMap;
+
+        // use cpu direct copy
+        if(isSourceRGBA32())
+            drawCGX_DirectCPU32(pScreenBM,display);
+        else
+            drawCGX_DirectCPU16(pScreenRp,pScreenBM,display);
+
+     } else
+     {
+        _screenshiftx = 0; // because rastport is inside window
+        _screenshifty = 0;
+        // will draw on friend bitmap _sWbWinSBitmap.
+        // use cpu direct copy
+        if(isSourceRGBA32())
+            drawCGX_DirectCPU32(bitmap(),display);
+        else
+            drawCGX_DirectCPU16(rastPort(),bitmap(),display);
+
+        // then use os copy to window, it manages layers, slow because 2 pass but easy way.
+        BltBitMapRastPort( _sWbWinSBitmap,//CONST struct BitMap *srcBitMap,
+               0,0, //LONG xSrc, LONG ySrc,
+               _pWbWindow->RPort,//struct RastPort *destRP,
+               0,0,//LONG xDest, LONG yDest,
+               _width, _height,
+               0x00c0//ULONG minterm  -> copy minterm.
+               );
+     }
 
 }
 bool Intuition_Window_CGX::open()

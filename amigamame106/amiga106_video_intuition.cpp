@@ -89,7 +89,9 @@ TripleBuffer::TripleBuffer()
 
 
 IntuitionDrawable::IntuitionDrawable(int flags)
-: _width(0),_height(0),_useScale(0)
+: _width(0),_height(0)
+, _screenshiftx(0),_screenshifty(0)
+, _useScale(0)
 , _flags(flags), _heightBufferSwitch(0),_heightBufferSwitchApplied(0)
 , _greyPen(0),_blackpen(1) // default on WB screen
 {
@@ -118,8 +120,8 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
         hh = _height;
         // let's consider scale always take all available screen,
         // which is the case for window mode.
-        cenx = 0;
-        ceny = 0;
+        cenx = _screenshiftx; // 0 all the time except WB screen direct rendering
+        ceny = _screenshifty; // 0 ...
     } else
     {   // screen mode: it's better keep pixel per pixel resolution and create adapted picasso modes.
         MameConfig::Display_PerScreenMode &config = getMainConfig().display().getActiveMode();
@@ -432,6 +434,12 @@ void Intuition_Window::close()
 //    if(_sWbWinSBitmap) FreeBitMap(_sWbWinSBitmap);
 //    _sWbWinSBitmap = NULL;
 }
+bool Intuition_Window::isOnTop()
+{
+    if(!_pWbWindow || !_pWbWindow->WScreen) return false;
+    return (_pWbWindow->WScreen->FirstWindow == _pWbWindow);
+}
+
 Window *Intuition_Window::window()
 {
     return _pWbWindow;
