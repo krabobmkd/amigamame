@@ -118,12 +118,13 @@ static UINT16 dec0_pri;
 
 WRITE16_HANDLER( dec0_update_sprites_w )
 {
+    //krb what the fuck 2kb
 	memcpy(dec0_spriteram,spriteram16,0x800);
 }
 
 /******************************************************************************/
 
-static void update_24bitcol(int offset)
+static inline void update_24bitcol(int offset)
 {
 	int r,g,b;
 
@@ -131,13 +132,14 @@ static void update_24bitcol(int offset)
 	g = (paletteram16[offset] >> 8) & 0xff;
 	b = (paletteram16_2[offset] >> 0) & 0xff;
 
-	palette_set_color(offset,r,g,b);
+    setpalettefast_neogeo(offset,(r<<16)|(g<<8)|b);
+	//palette_set_color(offset,r,g,b);
 }
 
 WRITE16_HANDLER( dec0_paletteram_rg_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	update_24bitcol(offset);
+//test, let's bet it's always set as RG the b.	update_24bitcol(offset);
 }
 
 WRITE16_HANDLER( dec0_paletteram_b_w )

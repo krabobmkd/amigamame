@@ -1455,13 +1455,13 @@ void tilemap_set_flip( tilemap *tmap, int attributes )
 
 /***********************************************************************************/
 
-void tilemap_set_scroll_cols( tilemap *tmap, int n )
+void tilemap_set_scroll_cols( tilemap *tmap REGTM(a0), int n  REGTM(d0))
 {
 	tmap->logical_scroll_cols = n;
 	tmap->cached_scroll_cols = n;
 }
 
-void tilemap_set_scroll_rows( tilemap *tmap, int n )
+void tilemap_set_scroll_rows( tilemap *tmap REGTM(a0), int n  REGTM(d0))
 {
 	tmap->logical_scroll_rows = n;
 	tmap->cached_scroll_rows = n;
@@ -1469,7 +1469,7 @@ void tilemap_set_scroll_rows( tilemap *tmap, int n )
 
 /***********************************************************************************/
 
-void tilemap_mark_tile_dirty( tilemap *tmap, int memory_offset )
+void tilemap_mark_tile_dirty( tilemap *tmap REGTM(a0), int memory_offset REGTM(d0))
 {
 	if( memory_offset<tmap->max_memory_offset )
 	{
@@ -1482,7 +1482,7 @@ void tilemap_mark_tile_dirty( tilemap *tmap, int memory_offset )
 	}
 }
 
-void tilemap_mark_all_tiles_dirty( tilemap *tmap )
+void tilemap_mark_all_tiles_dirty( tilemap *tmap REGTM(a0))
 {
 	if( tmap==ALL_TILEMAPS )
 	{
@@ -1502,7 +1502,7 @@ void tilemap_mark_all_tiles_dirty( tilemap *tmap )
 
 /***********************************************************************************/
 
-static void update_tile_info( tilemap *tmap, UINT32 cached_indx, UINT32 col, UINT32 row )
+static void update_tile_info( tilemap *tmap REGTM(a0), UINT32 cached_indx REGTM(d0), UINT32 col REGTM(d1), UINT32 row REGTM(d2) )
 {
 	UINT32 x0;
 	UINT32 y0;
@@ -1574,6 +1574,14 @@ mame_bitmap *tilemap_get_transparency_bitmap( tilemap * tmap )
 UINT8 *tilemap_get_transparency_data( tilemap * tmap ) //*
 {
 	return tmap->transparency_data;
+}
+void tilemap_get_tile_size(  tilemap * tmap, UINT16 *width, UINT16 *height, UINT16*nbtx,UINT16 *nbty )
+{
+    if(width) *width = (UINT16) tmap->logical_tile_width;
+    if(height) *height = (UINT16) tmap->logical_tile_height;
+    if(nbtx) *nbtx = (UINT16) tmap->num_logical_cols;
+    if(nbty) *nbty = (UINT16) tmap->num_logical_rows;
+
 }
 
 /***********************************************************************************/

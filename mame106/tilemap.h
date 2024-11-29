@@ -131,15 +131,15 @@ void tilemap_set_transparent_pen( tilemap *tmap, int pen );
 void tilemap_set_transmask( tilemap *tmap, int which, UINT32 fgmask, UINT32 bgmask );
 void tilemap_set_depth( tilemap *tmap, int tile_depth, int tile_granularity );
 
-void tilemap_mark_tile_dirty( tilemap *tmap, int memory_offset );
-void tilemap_mark_all_tiles_dirty( tilemap *tmap );
+void tilemap_mark_tile_dirty( tilemap *tmap REGTM(a0), int memory_offset REGTM(d0));
+void tilemap_mark_all_tiles_dirty( tilemap *tmap REGTM(a0));
 
-void tilemap_set_scroll_rows( tilemap *tmap, int scroll_rows ); /* default: 1 */
+void tilemap_set_scroll_rows( tilemap *tmap REGTM(a0), int scroll_rows REGTM(d0)); /* default: 1 */
 void tilemap_set_scrolldx( tilemap *tmap, int dx, int dx_if_flipped );
 void tilemap_set_scrollx( tilemap *tmap, int row, int value );
 int tilemap_get_scrolldx( tilemap *tmap );
 
-void tilemap_set_scroll_cols( tilemap *tmap, int scroll_cols ); /* default: 1 */
+void tilemap_set_scroll_cols( tilemap *tmap REGTM(a0), int scroll_cols REGTM(d0)); /* default: 1 */
 void tilemap_set_scrolldy( tilemap *tmap, int dy, int dy_if_flipped );
 void tilemap_set_scrolly( tilemap *tmap, int col, int value );
 int tilemap_get_scrolldy( tilemap *tmap );
@@ -182,7 +182,7 @@ void tilemap_draw_roz_primask(mame_bitmap *dest,const rectangle *cliprect,tilema
 mame_bitmap *tilemap_get_pixmap( tilemap * tmap );
 mame_bitmap *tilemap_get_transparency_bitmap( tilemap * tmap );
 UINT8 *tilemap_get_transparency_data( tilemap * tmap );  //*
-
+void tilemap_get_tile_size(  tilemap * tmap, UINT16 *width, UINT16 *height, UINT16*nbtx,UINT16 *nbty  );
 /*********************************************************************/
 
 UINT32 tilemap_scan_cols( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows );
@@ -198,6 +198,7 @@ UINT32 tilemap_scan_rows_flip_xy( UINT32 col, UINT32 row, UINT32 num_cols, UINT3
 /* For showcharset()'s sake */
 UINT32 tilemap_count( void );
 void tilemap_nb_size( UINT32 number, UINT32 *width, UINT32 *height );
+
 void tilemap_nb_draw( mame_bitmap *dest, UINT32 number, UINT32 scrollx, UINT32 scrolly );
 
 #endif	/* __TILEMAP_H__ */

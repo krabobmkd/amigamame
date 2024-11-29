@@ -15,6 +15,7 @@ extern "C" {
 }
 
 typedef struct {
+    tilemap *tilemap_ptr;
     mame_bitmap *bitmap;
 	const rectangle *cliprect;
     const mame_bitmap *src_bitmap;
@@ -22,6 +23,7 @@ typedef struct {
     const UINT16 *colscroll_ptr;
     const UINT16 *control1;
     const UINT16 columnOffsetConstant;
+    const UINT16 rowOffsetConstant;
 } custileparams;
 
 template<int flipscreen, int ignoretransp,int mapfront,int row_scroll_enabled,int col_scroll_enabled>
@@ -69,9 +71,9 @@ void custom_tilemap_drawT( custileparams *params)
     INT16 srcbmwidth = params->src_bitmap->width;
 
 	if (flipscreen)
-		src_y = (params->src_bitmap->height - 256) - scrolly  ;
+		src_y = ((params->src_bitmap->height - 256) - scrolly) + params->columnOffsetConstant ; //krb: not sure this one
 	else
-		src_y = scrolly;
+		src_y = scrolly+ params->columnOffsetConstant;
 
 	for (y=0; y<=maxy; y++) {
     	INT16 src_x;
@@ -85,11 +87,9 @@ void custom_tilemap_drawT( custileparams *params)
 
         UINT16 *pline = destlines[y];
 
-        INT16 x=0;
-        //int srcy2 = (src_y + params->columnOffsetConstant) & height_mask;
-        const UINT16 *line2 = srclines[(src_y + params->columnOffsetConstant) & height_mask];
+        const UINT16 *line2 = srclines[(src_y ) & height_mask];
 
-		for (x=0; x<=maxx; x++ , src_x++ ) {
+		for (INT16 x=0; x<=maxx; x++ , src_x++ ) {
 
             UINT16  p;
 			if (col_scroll_enabled)
@@ -119,6 +119,162 @@ void custom_tilemap_drawT( custileparams *params)
 	}
 }
 
+// when simple x/y scroll offsets are applied with same values everywhere,
+// we can go further in tile optimisation.
+// note this is the case of 100% rendering cases for baddudes.
+template<int flipscreen, int ignoretransp,int mapfront>
+void custom_tilemap_draw_noscrambleT( custileparams *params)
+{
+	int src_y=0;
+	UINT16 scrollx=params->control1[0];
+	UINT16 scrolly=params->control1[1];
+	int width_mask = params->src_bitmap->width - 1;
+	int height_mask = params->src_bitmap->height - 1;
+
+    int yscrollf = params->control1[3]&0xf;
+    int xscrollf = params->control1[2]&0xf;
+
+    xscrollf +=3; // because does ((src_x >> 3) >> xscrollf)
+
+    const UINT16 *rowscroll_ptr = params->rowscroll_ptr;
+    const UINT16 *colscroll_ptr = params->colscroll_ptr;
+
+    const UINT16 **srclines = (const UINT16 **)params->src_bitmap->line;
+
+    UINT16 **destlines = (UINT16 **)params->bitmap->line;
+
+    INT16 maxx= (INT16)params->cliprect->max_x, maxy = (INT16)params->cliprect->max_y +1;
+    INT16 srcbmwidth = params->src_bitmap->width;
+
+	if (flipscreen)
+		src_y = ((params->src_bitmap->height - 256) - scrolly) + params->columnOffsetConstant ; //krb: not sure this one
+	else
+		src_y = scrolly+ params->columnOffsetConstant;
+
+
+    INT16 src_x=scrollx;
+
+    if (flipscreen)
+        src_x=(srcbmwidth - 256) - src_x;
+
+
+    UINT16 tilew,nbtilesw,nbtilesh;
+    tilemap_get_tile_size(params->tilemap_ptr,&tilew,NULL,&nbtilesw,&nbtilesh);
+
+    // come on, it's either 8x8 for pf1 or 16x16 for pf2 pf3.
+    const UINT8 tiledivbits = (tilew == 16)?4:3; // it's 8 or 16.
+    const UINT8 tilemask = tilew-1; // it's 8 or 16.
+    const UINT16 tilelxmask = (nbtilesw-1)<<tiledivbits; // 31 or 63.
+    const UINT16 tilelymask = (nbtilesh-1)<<tiledivbits; // 31 or 63.
+
+    // tiles in the tilemap index
+    UINT16 ytile =( src_y & tilelymask);
+    UINT16 ylasttile =( (src_y+maxy) & tilelymask);
+
+    UINT16 xfirsttile = src_x & tilelxmask ;
+    UINT16 xlasttile = (src_x+256) & tilelxmask;
+
+    INT16 yscreen = -(src_y & tilemask);
+    INT16 xscreenstartx1 = -(src_x & tilemask);
+    INT16 xscreenstartx2 = xscreenstartx1 + tilew ;
+    if(xscreenstartx1<0 ) xscreenstartx1=0;
+
+     // - - - -  y  loop
+    while(ytile!=ylasttile) // different because <> wont work with rounding.
+    {
+        // general Y clip for this row
+        INT16 ys1=yscreen;
+        INT16 ys2=ys1+tilew;
+        INT16 yt1=ytile;
+        INT16 yt2=ytile+tilew;
+        if(ys1<0) {
+            yt1 += -ys1;
+            ys1=0;
+        }
+        if(ys2>maxy) {
+            yt2 -= ys2-maxy;
+            ys2=maxy;
+        }
+
+        // - - - -  x row loop
+        UINT16 *plinedest_t = destlines[ys1];
+
+        INT16 xtile  = xfirsttile;
+        while(xtile!=xlasttile)
+        {
+            const UINT16 *plinesrc_t = srclines[yt1 & height_mask]+ (src_x & );
+
+            // todo test if tile transparent, opaque , or per pixel
+
+            //
+            INT16 innerx1=;
+            INT16 innerx2=innerx1+16;
+            // - - - - - y tile loop
+            for(INT16 y=ys1;y<ys2;y++)
+            {
+                UINT16 *plinedest_tt = plinedest_tt ;
+                const UINT16 *plinesrc_tt = plinesrc_tt;
+
+                INT16 x1 = innerx1;
+                while(x1<innerx2)
+                {
+
+                    x1++;
+                } // end loop inside tile x
+                plinedest_tt += 256;
+                plinedest_tt += 256;
+                //x1 = x2;
+            } // end loop inside tile y
+
+            // - - - -  x row loop
+            xtile +=tilew;
+            xtile &= tilelxmask;
+            plinedest_t += tilew;
+
+        }// end xloop by tile
+        yscreen += tilew;
+
+        ytile += tilew;
+        ytile &= tilelymask;
+
+    } // end yloop by tile
+/*olde ok
+	for (y=0; y<=maxy; y++) {
+    	INT16 src_x;
+
+        src_x=scrollx;
+
+		if (flipscreen)
+			src_x=(srcbmwidth - 256) - src_x;
+
+        UINT16 *pline = destlines[y];
+
+        const UINT16 *line2 = srclines[(src_y ) & height_mask];
+
+		for (INT16 x=0; x<=maxx; x++ , src_x++ ) {
+
+            UINT16  p = line2[src_x&width_mask];
+
+			if (ignoretransp || (p&0xf))
+			{
+				if(mapfront)
+				{
+					// Top 8 pens of top 8 palettes only
+                    if ((p&0x88)==0x88) pline[x] = p; // Machine->pens[p];
+				}
+				else
+				{
+
+                    pline[x] = p; // Machine->pens[p];
+				}
+			}
+		}
+		src_y++;
+	}
+	*/
+}
+
+
 
 void custom_tilemap_draw(mame_bitmap *bitmap,
 								const rectangle *cliprect,
@@ -132,33 +288,38 @@ void custom_tilemap_draw(mame_bitmap *bitmap,
 	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tilemap_ptr);
 	if (!src_bitmap)
 		return;
-// <int flip_screen, int ignoretransp,int mapfront,int row_scroll_enabled,int col_scroll_enabled>
-//	int row_scroll_enabled = (rowscroll_ptr && (control0[0]&0x4));
-//	int col_scroll_enabled = (colscroll_ptr && (control0[0]&0x8));
-//	int ignoretransp = (flags&TILEMAP_IGNORE_TRANSPARENCY);
-//	int mapfront = (flags&TILEMAP_FRONT);
 
     // test column offset per column, in most case we can use a constant and do less tiling.
     int doColumnOffset = ((colscroll_ptr && (control0[0]&0x8))!=0);
-    int columnOffsetConstant=0;
+    UINT16 columnOffsetConstant=0;
     if(doColumnOffset)
-    {
-        int columnOffsetIsConstant=1;
-        // we bet just a single y constant would be ok...
+    {   // we bet just a single y constant would be ok...
+        int columnOffsetIsConstant=1;        
         int xscrollf = control1[2]&0xf;
         UINT16 xscrollfmask = (0x003f>>xscrollf);
-        columnOffsetConstant=colscroll_ptr[0 ];
+        columnOffsetConstant=colscroll_ptr[0];
         for(UINT16 x=1;x<xscrollfmask;x++)
         {
             int next_column_offset=colscroll_ptr[x];
-            if(next_column_offset != columnOffsetConstant)
-            {
-                columnOffsetIsConstant=0;
-                break;
-            }
-
+            if(next_column_offset != columnOffsetConstant) {columnOffsetIsConstant=0;break;}
         }
-        if(columnOffsetIsConstant) doColumnOffset=0;
+        if(columnOffsetIsConstant) doColumnOffset=0; // finnaly, just apply constant
+    }
+
+    int doRowOffset = ((rowscroll_ptr && (control0[0]&0x4)) !=0);
+    UINT16 rowOffsetConstant=0;
+    if(doRowOffset)
+    {    // we bet just a single y constant would be ok...
+        int rowOffsetIsConstant=1;
+        int  yscrollf = control1[3]&0xf;
+        UINT16 yscrollfmask = (0x1ff>>yscrollf);
+        rowOffsetConstant=rowscroll_ptr[0];
+        for(UINT16 y=1;y<yscrollfmask;y++)
+        {
+            int next_column_offset=rowscroll_ptr[y];
+            if(next_column_offset != columnOffsetConstant) { rowOffsetIsConstant=0; break; }
+        }
+        if(rowOffsetIsConstant) doRowOffset=0; // finnaly, just apply constant
     }
 
 
@@ -166,24 +327,26 @@ void custom_tilemap_draw(mame_bitmap *bitmap,
     int rendertypeid = (flip_screen !=0) |
                     ((flags&TILEMAP_IGNORE_TRANSPARENCY)>>3) |
                      ( (flags&TILEMAP_FRONT)>>4) |
-                     (((rowscroll_ptr && (control0[0]&0x4)) !=0)<<3) |
+                     ((doRowOffset)<<3) |
                     ((doColumnOffset)<<4);
 
-
     custileparams params = {
-        bitmap,cliprect,src_bitmap,rowscroll_ptr,colscroll_ptr,control1,columnOffsetConstant
+        tilemap_ptr,
+        bitmap,cliprect,src_bitmap,rowscroll_ptr,colscroll_ptr,control1,
+        columnOffsetConstant,rowOffsetConstant
     };
 
     switch(rendertypeid)
     {
-        case 0:  custom_tilemap_drawT<0,0,0,0,0>(&params); break;
-        case 1:  custom_tilemap_drawT<1,0,0,0,0>(&params); break;
-        case 2:  custom_tilemap_drawT<0,1,0,0,0>(&params); break;
-        case 3:  custom_tilemap_drawT<1,1,0,0,0>(&params); break;
-        case 4:  custom_tilemap_drawT<0,0,1,0,0>(&params); break;
-        case 5:  custom_tilemap_drawT<1,0,1,0,0>(&params); break;
-        case 6:  custom_tilemap_drawT<0,1,1,0,0>(&params); break;
-        case 7:  custom_tilemap_drawT<1,1,1,0,0>(&params); break;
+        // no vert or horiz parallax means we can apply tile optimisations.
+        case 0:  custom_tilemap_draw_noscrambleT<0,0,0>(&params); break;
+        case 1:  custom_tilemap_draw_noscrambleT<1,0,0>(&params); break;
+        case 2:  custom_tilemap_draw_noscrambleT<0,1,0>(&params); break;
+        case 3:  custom_tilemap_draw_noscrambleT<1,1,0>(&params); break;
+        case 4:  custom_tilemap_draw_noscrambleT<0,0,1>(&params); break;
+        case 5:  custom_tilemap_draw_noscrambleT<1,0,1>(&params); break;
+        case 6:  custom_tilemap_draw_noscrambleT<0,1,1>(&params); break;
+        case 7:  custom_tilemap_draw_noscrambleT<1,1,1>(&params); break;
 
         case 8:  custom_tilemap_drawT<0,0,0,1,0>(&params); break;
         case 9:  custom_tilemap_drawT<1,0,0,1,0>(&params); break;
