@@ -1,6 +1,6 @@
 # amigamame
 
- Hello, It's Beta2 now, binaries will be soon on aminet.
+ Hello, It's Beta4 now, binaries will be soon on aminet.
 
  This is a Port of Mame106 (2006) to Amiga classic 68060, using bebbo gcc6.5 crosscompiler and cmake.
  would only work on very fast Amigas with more than 64Mo. For the moment it also needs Cybergraphics or Picasso, and >=OS3.1. This is hugely based on Mame060 from triumph for the MUI part. All these are under GPL licences.
