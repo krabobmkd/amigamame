@@ -197,14 +197,14 @@ void drawgfxT(struct drawgfxParams *p DGREG(a0), int isOpaque)
 	ex = sx + gfx->width; // consider end excluded, immense lots of useless -1 removed.
 	if (sx < clip->min_x) sx = clip->min_x;
 
-	if (ex > clip->max_x) ex = clip->max_x;
+	if (ex > clip->max_x+1) ex = clip->max_x+1;
     int dstwidth = ex-sx; /* dest width */
     if(dstwidth<=0) return;
 
 	ey = sy + gfx->height;
 	if ( sy < clip->min_y) sy = clip->min_y;
 
-	if ( ey > clip->max_y) ey = clip->max_y;
+	if ( ey > clip->max_y+1) ey = clip->max_y+1;
     int dstheight = ey-sy;	/* dest height */
     if(dstheight<=0) return;
 

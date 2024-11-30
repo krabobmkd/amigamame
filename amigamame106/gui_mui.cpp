@@ -991,13 +991,17 @@ int MainGUI(void)
 
 
  Object *windowContent = MUINewObject(MUIC_Group, // vertical group because no horiz. specified.
-
+            // MUIA_Group_HorizSpacing,0,
+            // MUIA_Group_VertSpacing,0,
             Child,createOptionTabGroup(),
 
             Child, (ULONG)MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+                MUIA_Group_HorizSpacing,0,
+                MUIA_Group_VertSpacing,0,
                 //Child,(ULONG)(LA_statusbar = LLabel((ULONG)GetMessagec("-"))),
                 //Child,(ULONG)(BU_Start   = SimpleButton((ULONG)GetMessagec("Start"))),
                 Child, (ULONG)MUINewObject(MUIC_Group,
+                       MUIA_Group_HorizSpacing,0,
                       Child, BU_Start   = SimpleButton((ULONG)GetMessagec("Start")),
                     //  Child, MUI_MakeObject(MUIO_VSpace,0),
                       Child, LA_statusbar = LLabel((ULONG)GetMessagec("-")),

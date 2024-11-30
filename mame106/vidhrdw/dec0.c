@@ -115,12 +115,16 @@ static UINT16 *dec0_spriteram;
 static UINT16 dec0_pri;
 
 /******************************************************************************/
-
-WRITE16_HANDLER( dec0_update_sprites_w )
-{
-    //krb what the fuck 2kb
-	memcpy(dec0_spriteram,spriteram16,0x800);
-}
+//krb
+int dec0_wouldYouUpdateSprites=0;
+//WRITE16_HANDLER( dec0_update_sprites_w )
+// static void dec0_update_sprites_w()
+// {
+//     if(dec0_spriteram != spriteram16)
+//     {
+//         memcpy(dec0_spriteram,spriteram16,0x800);
+//     }
+// }
 
 /******************************************************************************/
 
@@ -154,7 +158,7 @@ static void dec0_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int p
 {
 	int offs;
 
-	
+    const UINT16 *lspriteram = dec0_spriteram;
 	{ 
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
@@ -177,10 +181,10 @@ static void dec0_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int p
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 
-		y = dec0_spriteram[offs];
+		y = lspriteram[offs];
 		if ((y&0x8000) == 0) continue;
 
-		x = dec0_spriteram[offs+2];
+		x = lspriteram[offs+2];
 		colour = x >> 12;
 		if ((colour & pri_mask) != pri_val) continue;
 
@@ -192,7 +196,7 @@ static void dec0_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int p
 		multi = (1 << ((y & 0x1800) >> 11)) - 1;	/* 1x, 2x, 4x, 8x height */
 											/* multi = 0   1   3   7 */
 
-		sprite = dec0_spriteram[offs+1] & 0x0fff;
+		sprite = lspriteram[offs+1] & 0x0fff;
 
 		x = x & 0x01ff;
 		y = y & 0x01ff;
@@ -410,7 +414,7 @@ VIDEO_UPDATE( baddudes )
 
 		if (dec0_pri & 2)
         {
-			dec0_pf2_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY| TILEMAP_FRONT); // Foreground pens only
+			dec0_pf2_draw(bitmap,cliprect,TILEMAP_FRONT); // Foreground pens only
         }
 
 		dec0_drawsprites(bitmap,cliprect,0x00,0x00);
@@ -430,8 +434,9 @@ VIDEO_UPDATE( baddudes )
 
 		if (dec0_pri & 2)
         {
-			dec0_pf3_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY | TILEMAP_FRONT); // Foreground pens only
+			dec0_pf3_draw(bitmap,cliprect, TILEMAP_FRONT); // Foreground pens only
         }
+
 		dec0_drawsprites(bitmap,cliprect,0x00,0x00);
 
 /*krb
@@ -755,6 +760,18 @@ VIDEO_START( dec0_nodma )
 	pf3_tilemap_1 = tilemap_create(get_pf3_tile_info,tile_shape1_scan,    TILEMAP_TRANSPARENT,16,16, 32, 32);
 	pf3_tilemap_2 = tilemap_create(get_pf3_tile_info,tile_shape2_scan,    TILEMAP_TRANSPARENT,16,16, 16, 64);
 
+    //krb
+    tilemap_set_transparent_pen(pf1_tilemap_0,0);
+    tilemap_set_transparent_pen(pf1_tilemap_1,0);
+    tilemap_set_transparent_pen(pf1_tilemap_2,0);
+    tilemap_set_transparent_pen(pf2_tilemap_0,0);
+    tilemap_set_transparent_pen(pf2_tilemap_1,0);
+    tilemap_set_transparent_pen(pf2_tilemap_2,0);
+    tilemap_set_transparent_pen(pf3_tilemap_0,0);
+    tilemap_set_transparent_pen(pf3_tilemap_1,0);
+    tilemap_set_transparent_pen(pf3_tilemap_2,0);
+
+
 	if (!pf1_tilemap_0 || !pf1_tilemap_1 || !pf1_tilemap_2
 		|| !pf2_tilemap_0 || !pf2_tilemap_1 || !pf2_tilemap_2
 		|| !pf3_tilemap_0 || !pf3_tilemap_1 || !pf3_tilemap_2)
@@ -768,7 +785,7 @@ VIDEO_START( dec0_nodma )
 VIDEO_START( dec0 )
 {
 	video_start_dec0_nodma();
-	dec0_spriteram=auto_malloc(0x800);
+//krb, not sure	dec0_spriteram=auto_malloc(0x800);
 
 	return 0;
 }

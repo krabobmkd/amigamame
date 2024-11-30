@@ -114,7 +114,7 @@ READ16_HANDLER( slyspy_protection_r )
 		case 6:		return 0x2;
 	}
 
-	logerror("%04x, Unknown protection read at 30c000 %d\n",activecpu_get_pc(),offset);
+//	logerror("%04x, Unknown protection read at 30c000 %d\n",activecpu_get_pc(),offset);
 	return 0;
 }
 
@@ -494,7 +494,7 @@ See the code about 0xb60 (USA version)
 
 */
 
-logerror("CPU #0 PC %06x: warning - write %02x to i8751\n",activecpu_get_pc(),data);
+//logerror("CPU #0 PC %06x: warning - write %02x to i8751\n",activecpu_get_pc(),data);
 
 }
 

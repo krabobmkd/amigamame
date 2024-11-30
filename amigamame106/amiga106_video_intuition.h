@@ -42,14 +42,15 @@ public:
   //  virtual void drawRastPort_CGX(_mame_display *display,Paletted *pRemap);
   //   void drawRastPortWPA8(_mame_display *display,Paletted *pRemap);
 
-    inline int width() const { return _width; }
-    inline int height() const { return _height; }
+    inline int width() const { return _widthtarget; }
+    inline int height() const { return _heighttarget; }
 
     inline int blackPen() const { return (int)_blackpen; }
     inline int greyPen() const { return (int)_greyPen; }
     inline int whitePen() const { return 2; }
 protected:
-    int _width,_height;
+    int _widthtarget,_heighttarget;
+    int _widthphys,_heightphys;
     int _screenshiftx,_screenshifty; // when direct WB bitmap rendering trick.
     int _useScale;
     int _flags;
@@ -112,8 +113,9 @@ public:
     void close() override;
     Window *window() override;
     RastPort *rastPort() override;
-
+#ifdef USE_DIRECT_WB_RENDERING
     bool isOnTop();
+#endif
 protected:
     Window *_pWbWindow;
 

@@ -47,7 +47,7 @@ UINT16 *dec0_ram;
 UINT8 *robocop_shared_ram;
 
 /******************************************************************************/
-
+extern int dec0_wouldYouUpdateSprites;
 static WRITE16_HANDLER( dec0_control_w )
 {
 	switch (offset<<1)
@@ -57,7 +57,8 @@ static WRITE16_HANDLER( dec0_control_w )
 			break;
 
 		case 2: /* DMA flag */
-			dec0_update_sprites_w(0,0,mem_mask);
+            dec0_wouldYouUpdateSprites = 1;
+//			dec0_update_sprites_w(0,0,mem_mask);
 			break;
 
 		case 4: /* 6502 sound cpu */

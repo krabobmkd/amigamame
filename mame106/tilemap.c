@@ -165,7 +165,10 @@ static void recalculate_scroll( tilemap *tmap );
 
 static void install_draw_handlers( tilemap *tmap );
 
-static void update_tile_info( tilemap *tmap, UINT32 cached_indx, UINT32 cached_col, UINT32 cached_row );
+static void update_tile_info
+    ( tilemap *tmap REGTM(a0), UINT32 cached_indx REGTM(d0), UINT32 col REGTM(d1), UINT32 row REGTM(d2) );
+
+//    tilemap *tmap, UINT32 cached_indx, UINT32 cached_col, UINT32 cached_row );
 
 /***********************************************************************************/
 
@@ -1577,10 +1580,10 @@ UINT8 *tilemap_get_transparency_data( tilemap * tmap ) //*
 }
 void tilemap_get_tile_size(  tilemap * tmap, UINT16 *width, UINT16 *height, UINT16*nbtx,UINT16 *nbty )
 {
-    if(width) *width = (UINT16) tmap->logical_tile_width;
-    if(height) *height = (UINT16) tmap->logical_tile_height;
-    if(nbtx) *nbtx = (UINT16) tmap->num_logical_cols;
-    if(nbty) *nbty = (UINT16) tmap->num_logical_rows;
+    if(width) *width = (UINT16) tmap->cached_tile_width;
+    if(height) *height = (UINT16) tmap->cached_tile_height;
+    if(nbtx) *nbtx = (UINT16) tmap->num_cached_cols;
+    if(nbty) *nbty = (UINT16) tmap->num_cached_rows;
 
 }
 

@@ -131,14 +131,6 @@ void custom_tilemap_draw_noscrambleT( custileparams *params)
 	int width_mask = params->src_bitmap->width - 1;
 	int height_mask = params->src_bitmap->height - 1;
 
-    int yscrollf = params->control1[3]&0xf;
-    int xscrollf = params->control1[2]&0xf;
-
-    xscrollf +=3; // because does ((src_x >> 3) >> xscrollf)
-
-    const UINT16 *rowscroll_ptr = params->rowscroll_ptr;
-    const UINT16 *colscroll_ptr = params->colscroll_ptr;
-
     const UINT16 **srclines = (const UINT16 **)params->src_bitmap->line;
 
     UINT16 **destlines = (UINT16 **)params->bitmap->line;
@@ -171,16 +163,28 @@ void custom_tilemap_draw_noscrambleT( custileparams *params)
     UINT16 ytile =( src_y & tilelymask);
     UINT16 ylasttile =( (src_y+maxy) & tilelymask);
 
-    UINT16 xfirsttile = src_x & tilelxmask ;
-    UINT16 xlasttile = (src_x+256) & tilelxmask;
+    src_x &=width_mask;
+
+    UINT16 xfirsttile = src_x /*& tilelxmask*/ ;
+    UINT16 xlasttile = (src_x+256) & tilelxmask ;
 
     INT16 yscreen = -(src_y & tilemask);
-    INT16 xscreenstartx1 = -(src_x & tilemask);
-    INT16 xscreenstartx2 = xscreenstartx1 + tilew ;
-    if(xscreenstartx1<0 ) xscreenstartx1=0;
+   // INT16 xscreenstartx1 = -(src_x & tilemask); always 0 after clip
+    const INT16 xscreenstartx2 = (-(src_x & tilemask) + tilew) ;// [1,16]
+
+    const INT16 destmodulo = params->bitmap->rowpixels;
+    const INT16 srcmodulo = params->src_bitmap->rowpixels;
+
+    mame_bitmap *ptransbm = tilemap_get_transparency_bitmap( params->tilemap_ptr );
+
+    UINT8 *ptranspdata =  tilemap_get_transparency_data(  params->tilemap_ptr  );
+
+    // 1024 + 32
+    // cached_indx = row*tmap->num_cached_cols + c1;
+    // if( (tmap->transparency_data[cached_indx]&mask)!=0 )
 
      // - - - -  y  loop
-    while(ytile!=ylasttile) // different because <> wont work with rounding.
+    while(1) // different because <> wont work with rounding.
     {
         // general Y clip for this row
         INT16 ys1=yscreen;
@@ -199,79 +203,106 @@ void custom_tilemap_draw_noscrambleT( custileparams *params)
         // - - - -  x row loop
         UINT16 *plinedest_t = destlines[ys1];
 
+        INT16 inx1 = 0;
+        INT16 inx2 = xscreenstartx2;
+
         INT16 xtile  = xfirsttile;
-        while(xtile!=xlasttile)
-        {
-            const UINT16 *plinesrc_t = srclines[yt1 & height_mask]+ (src_x & );
 
-            // todo test if tile transparent, opaque , or per pixel
+        UINT32 nbdec = (((yt1 & height_mask)>>tiledivbits)*nbtilesw);
+//                           (((src_x+inx1) & width_mask)>>tiledivbits);
 
-            //
-            INT16 innerx1=;
-            INT16 innerx2=innerx1+16;
+        UINT8 *ptranspdata_row = ptranspdata +nbdec;
+
+        // let's say 0 fully trans
+        // 1 transp , 2 opaque
+        //UINT8 transprev=0,transcur; // strange ways of tilemap.c
+        while(1)
+        {          
+            UINT16 *plinedest_tt = plinedest_t + inx1;
+            const UINT16 *plinesrc_tt = srclines[yt1 & height_mask]+ ((src_x+inx1) & width_mask);
+            INT16 x2 = inx2;
+            if(x2>256) x2=256;
             // - - - - - y tile loop
-            for(INT16 y=ys1;y<ys2;y++)
+            // todo test if tile transparent, opaque , or per pixel
+            UINT8 transdata = ptranspdata_row[
+                        (((src_x+inx1) & width_mask)>>tiledivbits)
+                        ] & 16; // 0 or 16, low bits are prio tile mask, sometimes.
+            if(!transdata )
             {
-                UINT16 *plinedest_tt = plinedest_tt ;
-                const UINT16 *plinesrc_tt = plinesrc_tt;
-
-                INT16 x1 = innerx1;
-                while(x1<innerx2)
+                // actually means either wholly trans or wholly opaque
+                // horribly, that information is in the transparency bitmap :(
+                // or is it because it allows to switch render type by line ? ->no.
+                // this is meat to be an tilemap.c internal problem.
+                // may have been a choice over what bit left to use.
+                const UINT8 *ptrbm = ((const UINT8 *)
+                        ptransbm->line[yt1 & height_mask])+ ((src_x+inx1) & width_mask);
+                transdata = (*ptrbm & 16)<<1; // would do 0,16,32
+            }
+            if(ignoretransp || transdata ==32)
+            {
+                // fully opaque case ->copy
+                for(INT16 y=ys1;y<ys2;y++)
                 {
+                    UINT16 *plinedest_ttt = plinedest_tt ;
+                    const UINT16 *plinesrc_ttt = plinesrc_tt;
+                    INT16 x1 = inx1;
+                    while(x1<x2)
+                    {
+                        *plinedest_ttt++ = *plinesrc_ttt++;
+                        x1++;
+                    } // end loop inside tile x
 
-                    x1++;
-                } // end loop inside tile x
-                plinedest_tt += 256;
-                plinedest_tt += 256;
-                //x1 = x2;
-            } // end loop inside tile y
+                    plinesrc_tt += srcmodulo; // NO
+                    plinedest_tt += destmodulo;
 
-            // - - - -  x row loop
+                } // end loop inside tile y
+            } else if(transdata)
+            {
+                // some pixels -> tests
+                for(INT16 y=ys1;y<ys2;y++)
+                {
+                    UINT16 *plinedest_ttt = plinedest_tt ;
+                    const UINT16 *plinesrc_ttt = plinesrc_tt;
+                    INT16 x1 = inx1;
+                    while(x1<x2)
+                    {
+                        UINT16 p = *plinesrc_ttt++;
+                        if(mapfront) // template escaped test
+                        {
+                            /* Top 8 pens of top 8 palettes only */
+                            if ((p&0x88)==0x88) *plinedest_ttt = p; // Machine->pens[p];
+                        }
+                        else
+                        {
+                            if(p & 0x0f)
+                                *plinedest_ttt = p;
+                        }
+                        plinedest_ttt++;
+                        x1++;
+                    } // end loop inside tile x
+
+                    plinesrc_tt += srcmodulo; // NO
+                    plinedest_tt += destmodulo;
+                } // end loop inside tile y
+            }
+
+            if(xtile==xlasttile) break;
+            // - - - -  x row loop adds
             xtile +=tilew;
             xtile &= tilelxmask;
-            plinedest_t += tilew;
 
+            inx1 = inx2;
+            inx2 += tilew;
         }// end xloop by tile
+
+        if(ytile==ylasttile) break;
         yscreen += tilew;
 
         ytile += tilew;
         ytile &= tilelymask;
 
     } // end yloop by tile
-/*olde ok
-	for (y=0; y<=maxy; y++) {
-    	INT16 src_x;
 
-        src_x=scrollx;
-
-		if (flipscreen)
-			src_x=(srcbmwidth - 256) - src_x;
-
-        UINT16 *pline = destlines[y];
-
-        const UINT16 *line2 = srclines[(src_y ) & height_mask];
-
-		for (INT16 x=0; x<=maxx; x++ , src_x++ ) {
-
-            UINT16  p = line2[src_x&width_mask];
-
-			if (ignoretransp || (p&0xf))
-			{
-				if(mapfront)
-				{
-					// Top 8 pens of top 8 palettes only
-                    if ((p&0x88)==0x88) pline[x] = p; // Machine->pens[p];
-				}
-				else
-				{
-
-                    pline[x] = p; // Machine->pens[p];
-				}
-			}
-		}
-		src_y++;
-	}
-	*/
 }
 
 
@@ -285,6 +316,7 @@ void custom_tilemap_draw(mame_bitmap *bitmap,
 								const UINT16 *control1,
 								int flags)
 {
+    // note: tilemap_get_pixmap() actually DOES the tilemap rendering or update.
 	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tilemap_ptr);
 	if (!src_bitmap)
 		return;
@@ -341,8 +373,8 @@ void custom_tilemap_draw(mame_bitmap *bitmap,
         // no vert or horiz parallax means we can apply tile optimisations.
         case 0:  custom_tilemap_draw_noscrambleT<0,0,0>(&params); break;
         case 1:  custom_tilemap_draw_noscrambleT<1,0,0>(&params); break;
-        case 2:  custom_tilemap_draw_noscrambleT<0,1,0>(&params); break;
-        case 3:  custom_tilemap_draw_noscrambleT<1,1,0>(&params); break;
+        case 2:  custom_tilemap_drawT<0,1,0,0,0>(&params); break; // ignore transp does speedcopy
+        case 3:  custom_tilemap_drawT<1,1,0,0,0>(&params); break;
         case 4:  custom_tilemap_draw_noscrambleT<0,0,1>(&params); break;
         case 5:  custom_tilemap_draw_noscrambleT<1,0,1>(&params); break;
         case 6:  custom_tilemap_draw_noscrambleT<0,1,1>(&params); break;

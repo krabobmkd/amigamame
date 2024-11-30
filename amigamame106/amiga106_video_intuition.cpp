@@ -89,7 +89,8 @@ TripleBuffer::TripleBuffer()
 
 
 IntuitionDrawable::IntuitionDrawable(int flags)
-: _width(0),_height(0)
+: _widthtarget(0),_heighttarget(0)
+, _widthphys(0),_heightphys(0) // target screen may be WB or private
 , _screenshiftx(0),_screenshifty(0)
 , _useScale(0)
 , _flags(flags), _heightBufferSwitch(0),_heightBufferSwitchApplied(0)
@@ -114,12 +115,14 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
         doSwap(sourcewidth,sourceheight);
     }
 
-    if((_width>sourcewidth || _height>sourceheight) && _useScale)
+    if((_widthtarget>sourcewidth || _heighttarget>sourceheight) && _useScale)
     {   // like window mode or perfect screen fit.
-        ww = _width;
-        hh = _height;
+        ww = _widthtarget;
+        hh = _heighttarget;
         // let's consider scale always take all available screen,
         // which is the case for window mode.
+
+        // when wb zoom
         cenx = _screenshiftx; // 0 all the time except WB screen direct rendering
         ceny = _screenshifty; // 0 ...
     } else
@@ -129,40 +132,40 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
         if(config._FSscaleMode == MameConfig::FSScaleMode::ScaleToBorder)
         {
             int sourceratio = (sourcewidth<<16)/sourceheight;
-            int screenratio = (_width<<16)/_height;
+            int screenratio = (_widthtarget<<16)/_heighttarget;
             if(sourceratio==screenratio)
             {   // like scaletostretch
-                ww = _width;
-                hh = _height;
-                cenx = 0;
-                ceny = 0;
+                ww = _widthtarget;
+                hh = _heighttarget;
+                cenx = _screenshiftx;
+                ceny = _screenshifty;
             }else if(sourceratio<screenratio)
             {
 //                printf("vertical border touch: sourcewidth:%d  sourceheight:%d _width:%d _height:%d\n"
 //                       ,sourcewidth,sourceheight,_width,_height);
                 // vertical border touch
                 ceny = 0;
-                hh = _height;
-                ww = sourcewidth*_height/sourceheight;
-                cenx = _width-ww;
+                hh = _heighttarget;
+                ww = sourcewidth*_heighttarget/sourceheight;
+                cenx = _widthtarget-ww;
                 cenx>>=1;
 //                printf("ww:%d  hh:%d cenx:%d ceny:%d\n"
 //                       ,ww,hh,cenx,ceny);
             } else
             {
                 // horizontal border touch
-                ww = _width;
+                ww = _widthtarget;
                 cenx = 0;
-                hh = sourceheight*_width/sourcewidth;
-                ceny = _height-hh;
+                hh = sourceheight*_widthtarget/sourcewidth;
+                ceny = _heighttarget-hh;
                 ceny>>=1;
             }
         } else if(config._FSscaleMode == MameConfig::FSScaleMode::ScaleToStretch)
         {
-            ww = _width;
-            hh = _height;
-            cenx = 0;
-            ceny = 0;
+            ww = _widthtarget;
+            hh = _heighttarget;
+            cenx = _screenshiftx;
+            ceny = _screenshifty;
         } else
             // that, or default.
        // if(config._FSscaleMode == MameConfig::FSScaleMode::CenterWithNoScale)
@@ -170,10 +173,12 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
             ww = sourcewidth;
             hh = sourceheight;
 
-            cenx = _width-sourcewidth;
-            ceny = _height-sourceheight;
+            cenx = _widthtarget-sourcewidth;
+            ceny = _heighttarget-sourceheight;
             cenx>>=1;
             ceny>>=1;
+            cenx += _screenshiftx;
+            ceny += _screenshifty;
         }
 
     }
@@ -181,8 +186,8 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
     // could happen if screen more little than source.
     if(cenx<0) cenx=0;
     if(ceny<0) ceny=0;
-    if(hh+ceny>_height){ hh=_height; ceny=0; }// fast cheap clipping
-    if(ww+cenx>_width) { ww=_width; cenx=0; }
+    if(hh+ceny>_heightphys){ hh=_heightphys-ceny; }// fast cheap clipping
+    if(ww+cenx>_widthphys) { ww=_widthphys-cenx; }
 
     if(_heightBufferSwitch) ceny+= _heightBufferSwitchApplied;
 }
@@ -283,8 +288,8 @@ bool Intuition_Screen::open()
 	{
         SetPointer( _pScreenWindow ,(UWORD *) _pMouseRaster, 0,1,0,0);
     }
-    _width = _fullscreenWidth;
-    _height = _fullscreenHeight;
+    _widthtarget = _widthphys = _fullscreenWidth;
+    _heighttarget = _heightphys = _fullscreenHeight;
 
     if(_flags & DISPFLAG_USETRIPLEBUFFER)
     {
@@ -373,6 +378,8 @@ bool Intuition_Window::open()
     Screen *pWbScreen;
     if (!(pWbScreen = LockPubScreen(NULL))
             ) return false;
+    _widthphys = pWbScreen->Width;
+    _heightphys = pWbScreen->Height;
 
     // open window in center of workbench
     int xcen = (pWbScreen->Width - _machineWidth);
@@ -434,12 +441,21 @@ void Intuition_Window::close()
 //    if(_sWbWinSBitmap) FreeBitMap(_sWbWinSBitmap);
 //    _sWbWinSBitmap = NULL;
 }
+#ifdef USE_DIRECT_WB_RENDERING
+//doesnt work at all! how to check that ? Layer.library ?
 bool Intuition_Window::isOnTop()
 {
     if(!_pWbWindow || !_pWbWindow->WScreen) return false;
-    return (_pWbWindow->WScreen->FirstWindow == _pWbWindow);
-}
 
+    Screen *pWbScreen;
+    if (!(pWbScreen = LockPubScreen(NULL))
+        ) return false;
+    bool isontop =  (pWbScreen->FirstWindow == _pWbWindow);
+    UnlockPubScreen(NULL,pWbScreen);
+
+    return isontop;
+}
+#endif
 Window *Intuition_Window::window()
 {
     return _pWbWindow;

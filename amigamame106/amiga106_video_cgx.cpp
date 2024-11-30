@@ -410,17 +410,24 @@ void Intuition_Window_CGX::draw(_mame_display *display)
      if(!_pWbWindow || !_sWbWinSBitmap) return;
 
     // will draw to the current size.
-    _width = (int)(_pWbWindow->GZZWidth);
-    _height = (int)(_pWbWindow->GZZHeight);
+    _widthtarget = (int)(_pWbWindow->GZZWidth);
+    _heighttarget = (int)(_pWbWindow->GZZHeight);
+#ifdef USE_DIRECT_WB_RENDERING
+    // isOnTop doesnt work and this doesnt accelerate much.
+     if(isOnTop() &&
+        _pWbWindow->LeftEdge+_pWbWindow->BorderLeft>0 &&
+        _pWbWindow->TopEdge+_pWbWindow->BorderTop > 0 &&
+        (_pWbWindow->LeftEdge+_pWbWindow->BorderLeft+_widthtarget)<_widthphys &&
+        (_pWbWindow->TopEdge+_pWbWindow->BorderTop+_heighttarget)<_heightphys
 
-     if(isOnTop())
+        )
      {
          // window is on top, we don't need layer library,
          // and can draw directly to wb rastport.
          // avoid a bitmap copy.
-// WORD LeftEdge, TopEdge
-        _screenshiftx = _pWbWindow->LeftEdge; // because rastport is inside window
-        _screenshifty = _pWbWindow->TopEdge;
+
+        _screenshiftx = _pWbWindow->LeftEdge+_pWbWindow->BorderLeft; // because rastport is inside window
+        _screenshifty = _pWbWindow->TopEdge+_pWbWindow->BorderTop;
 
         RastPort *pScreenRp = &(_pWbWindow->WScreen->RastPort);
         BitMap *pScreenBM = _pWbWindow->WScreen->RastPort.BitMap;
@@ -432,6 +439,7 @@ void Intuition_Window_CGX::draw(_mame_display *display)
             drawCGX_DirectCPU16(pScreenRp,pScreenBM,display);
 
      } else
+#endif
      {
         _screenshiftx = 0; // because rastport is inside window
         _screenshifty = 0;
@@ -447,7 +455,7 @@ void Intuition_Window_CGX::draw(_mame_display *display)
                0,0, //LONG xSrc, LONG ySrc,
                _pWbWindow->RPort,//struct RastPort *destRP,
                0,0,//LONG xDest, LONG yDest,
-               _width, _height,
+               _widthtarget, _heighttarget,
                0x00c0//ULONG minterm  -> copy minterm.
                );
      }

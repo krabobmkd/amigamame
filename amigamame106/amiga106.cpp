@@ -74,10 +74,11 @@ void StartGame(void)
     run_game(idriver);
 //    printf("after run_game\n");
 
+
     unzip_cache_clear();
     mame_pause(0);// remove pause that could be set while quiting previous game.
-
-
+    // when fatal error need that
+    osd_close_display();
 //todo ?
 //  if(options.playback)
 //    osd_fclose(options.playback);

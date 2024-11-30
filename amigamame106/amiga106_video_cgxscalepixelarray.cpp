@@ -235,8 +235,8 @@ void Intuition_Window_CGXScale::draw(_mame_display *display)
      if(!_pWbWindow) return;
 
     // will draw on friend bitmap _sWbWinSBitmap to the current size.
-    _width = (int)(_pWbWindow->GZZWidth);
-    _height = (int)(_pWbWindow->GZZHeight);
+    _widthtarget = (int)(_pWbWindow->GZZWidth);
+    _heighttarget = (int)(_pWbWindow->GZZHeight);
 
      drawCGX_scale(display);
 }
