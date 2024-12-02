@@ -458,10 +458,65 @@ int patchMiniMachines(
             "machine/namcoio.c",
             "machine/xevious.c","vidhrdw/xevious.c","vidhrdw/digdug.c",
             "machine/atari_vg.c",
-            "sound/namco52.c","sound/namco54.c",
-            "sound/namco.c",
-            "sound/filter.c"
+//            "sound/namco52.c","sound/namco54.c",
+//             "sound/namco.c",
+
+           "machine/atarigen.c",  "machine/atarigen.h",
+           "machine/atari_vg.c",
+        "sndhrdw/atarijsa.c","sndhrdw/atarijsa.h"
         };
+        m._sound_defs["NAMCO"]=1;
+        m._sound_defs["NAMCO_52XX"]=1;
+        m._sound_defs["NAMCO_54XX"]=1;
+        m._sound_defs["FILTER"]=1;
+        m._sound_defs["SAMPLES"]=1;
+
+        m._cpu_defs["Z80"]=1;
+/*
+	MDRV_SOUND_ADD(NAMCO, 18432000/6/32)
+	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
+
+	MDRV_SOUND_ADD(NAMCO_52XX, 18432000/12)
+        MDRV_SOUND_CONFIG(namco_52xx_interface)
+        MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+
+        MDRV_SOUND_ADD(NAMCO_54XX, 18432000/12)
+        MDRV_SOUND_CONFIG(namco_54xx_interface)
+        MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+
+        MDRV_SOUND_ADD(SAMPLES, 0)
+        MDRV_SOUND_CONFIG(samples_interface_bosco)
+        MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.95)
+*/
+    }
+
+    {
+        TMachine  &src=machinetargets["nintendo"];
+        string mname=string("justdkong");
+        TMachine  &m=machinetargets[mname];
+        m._name = mname;
+
+        m._sources = {
+            "drivers/dkong_short.c","sndhrdw/dkong.c","vidhrdw/dkong.c",
+            // "machine/scramble.c", // this one  used by konami also
+            // "machine/strtheat.c",
+            // "machine/drakton.c"
+        };
+
+        m._cpu_defs["Z80"]=1;
+        m._cpu_defs["I8035"]=1;
+        m._cpu_defs["S2650"]=1;
+        m._cpu_defs["N2A03"]=1;
+        m._sound_defs["DAC"]=1;
+        m._sound_defs["SAMPLES"]=1;
+        m._sound_defs["NES"]=1;
+// HAS_N2A03
+        copyDrivers(m,src,{
+                            "dkong","dkongo","dkongjp","dkongjr","dkongjrj",
+                            "dkong3","dkong3j"
+                            });
+
 
     }
 
@@ -482,13 +537,16 @@ int patchMiniMachines(
             "drivers/gauntlet.c",
             "vidhrdw/gauntlet.c",
 
-            "machine/harddriv.c",
-            "drivers/harddriv.c",
-            "sndhrdw/harddriv.c",
-            "vidhrdw/harddriv.c",
+            // "machine/harddriv.c",
+            // "drivers/harddriv.c",
+            // "sndhrdw/harddriv.c",
+            // "vidhrdw/harddriv.c",
 
             "drivers/rampart.c",
             "vidhrdw/rampart.c",
+
+            "vidhrdw/atarimo.c",
+            "machine/slapstic.c",
 
             "drivers/klax.c",
             "vidhrdw/klax.c",
@@ -496,7 +554,13 @@ int patchMiniMachines(
             "drivers/atarisy1.c",  // M68010 M6502
             "drivers/atarisy2.c", // T11 M6502   s:POKEY  YM2151 TMS5220
             "vidhrdw/atarisy1.c",
-            "vidhrdw/atarisy2.c"
+            "vidhrdw/atarisy2.c",
+
+            "machine/asic65.c",
+            "machine/atari_vg.c",
+            "machine/atarigen.c",  "machine/atarigen.h",
+            "machine/atari_vg.c",
+            "sndhrdw/atarijsa.c","sndhrdw/atarijsa.h"
 
         };
         copyDrivers(m,src,{
@@ -506,12 +570,12 @@ int patchMiniMachines(
         "gauntlet","gaunts","gauntj","gauntg","gaunt2","gaunt2g","vindctr2",
         "klax","klaxj","klaxd",
 
-        "harddriv","harddrvc",
-        "stunrun","stunrunp",
-        "racedriv","racedrvc",
-        "steeltal",
-        "strtdriv",
-        "hdrivair",
+//        "harddriv","harddrvc",
+//        "stunrun","stunrunp",
+        // "racedriv","racedrvc",
+        // "steeltal",
+        // "strtdriv",
+        // "hdrivair",
 
         "marble","marble2","marble3","marble4",
         "peterpak","indytemp","indytem2","indytem3","indytem4","indytemd",
@@ -535,12 +599,14 @@ int patchMiniMachines(
 
         m._cpu_defs["ADSP2100"]=1; // hardwrivin friends
         m._cpu_defs["ADSP2101"]=1;
+        m._cpu_defs["ADSP2104"]=1;
         m._cpu_defs["ADSP2181"]=1;
 
         m._cpu_defs["DSP32C"]=1;
 
         m._cpu_defs["T11"]=1;
 
+        m._sound_defs["AY8910"]=1;
         m._sound_defs["YM2151"]=1;
         m._sound_defs["TMS5220"]=1;
         m._sound_defs["POKEY"]=1;
@@ -551,9 +617,17 @@ int patchMiniMachines(
 
         m._sound_defs["DAC"]=1; // hardwrivin
     }
+    {
+        TMachine  &src=machinetargets["neogeo"];
+        src._sources.push_back("vidhrdw/neogeodraw.cpp");
+        src._sources.push_back("vidhrdw/neogeodraw.h");
+
+    }
 
     {
         TMachine  &src=machinetargets["dataeast"];
+        src._sources.push_back("vidhrdw/dec0n.cpp");
+
         string mname=string("minidtea");
         TMachine  &m=machinetargets[mname];
         m._name = mname;
@@ -599,7 +673,7 @@ int patchMiniMachines(
         m._sources = {
             "drivers/supbtime.c","vidhrdw/supbtime.c","vidhrdw/deco16ic.c",
             "drivers/karnov.c","vidhrdw/karnov.c",
-            "drivers/dec0.c","machine/dec0.c","vidhrdw/dec0.c"
+            "drivers/dec0.c","machine/dec0.c","vidhrdw/dec0.c","vidhrdw/dec0n.cpp"
         };
         m._cpu_defs["M68000"]=1;
         m._cpu_defs["M6502"]=1;
@@ -928,6 +1002,7 @@ int createCmake(map<string,TMachine> machinetargets,
          // pacmania,...
          if(upname == "MININAMCOS1") onShouldBeDefault=true;
          if(upname == "MINIATARI") onShouldBeDefault=true;
+         if(upname == "JUSTDKONG") onShouldBeDefault=true;
          if(upname == "JALECO") onShouldBeDefault=true;
 
          if(upname == "CAPCOM" ) onShouldBeDefault = true;
@@ -935,14 +1010,16 @@ int createCmake(map<string,TMachine> machinetargets,
  //       if(upname == "NAMCO" ) onShouldBeDefault = true; -> too horizontaly dependent.
  //       if(upname == "PACMAN" ) onShouldBeDefault = true;
         if(upname == "IREM" ) onShouldBeDefault = true;
- // problem with filter       if(upname == "JUSTGALAGA" ) onShouldBeDefault = true;
+ // problem with filter
+        if(upname == "JUSTGALAGA" ) onShouldBeDefault = true;
+        if(upname == "PACMAN" ) onShouldBeDefault = true;
         // just for rtype, rtypeleo -> THEY DONT WORK !!
 //        if(upname == "IREM" ) onShouldBeDefault = true;
 //        if(upname == "DATAEAST" ) onShouldBeDefault = true; -> too big/shitty
         if(upname == "MINIDTEA" ) onShouldBeDefault = true;
 
         // because Q*BERT ! ->doesnt work
-        //if(upname == "GOTTLIEB" ) onShouldBeDefault = true;
+        if(upname == "GOTTLIEB" ) onShouldBeDefault = true;
         // just for buggy boy :) ->DOESNT WORK On 0.106 :(
 //        if(upname == "TATSUMI" ) onShouldBeDefault = true; // tested ok
 
@@ -1123,6 +1200,10 @@ int createCmake(map<string,TMachine> machinetargets,
     }
 #ifndef ADDCPUANDSOUNDINMACHINE
     // add cpu & soundchip sources
+
+    soundeverused["FILTER"] = 1;
+
+    soundsources["FILTER"]._vars["SOUNDOBJS"] = {"sound/filter.c","sound/filter.h"};
 
     for(const auto &p : soundeverused )
     {

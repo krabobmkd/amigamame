@@ -172,6 +172,59 @@ static void redclash_draw_sprites( mame_bitmap *bitmap )
 {
 	int i, offs;
 
+    struct drawgfxParams dgp4={
+        bitmap, 	// dest
+        Machine->gfx[1], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        0, 	// clip
+        &Machine->visible_area, 	// transparency
+        TRANSPARENCY_PEN, 	// transparent_color
+        0, 	// scalex
+        0, 	// scaley
+        NULL, 	// pri_buffer
+        0 	// priority_mask
+    };
+
+    struct drawgfxParams dgp0={
+        bitmap, 	// dest
+        Machine->gfx[3], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        &Machine->visible_area, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        0, 	// transparent_color
+        0, 	// scalex
+        0, 	// scaley
+        NULL, 	// pri_buffer
+        0 	// priority_mask
+    };
+    struct drawgfxParams dgp2={
+        bitmap, 	// dest
+        NULL, 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        &Machine->visible_area, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        0, 	// transparent_color
+        0, 	// scalex
+        0, 	// scaley
+        NULL, 	// pri_buffer
+        0 	// priority_mask
+    };
+
 	for (offs = spriteram_size - 0x20;offs >= 0;offs -= 0x20)
 	{
 		i = 0;
@@ -188,151 +241,60 @@ static void redclash_draw_sprites( mame_bitmap *bitmap )
 				int sx = spriteram[offs + i + 3];
 				int sy = offs / 4 + (spriteram[offs + i] & 0x07);
 
-
-				switch ((spriteram[offs + i] & 0x18) >> 3)
-				
-{ 
-struct drawgfxParams dgp4={
-	bitmap, 	// dest
-	Machine->gfx[1], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	sy - 16, 	// clip
-	&Machine->visible_area, 	// transparency
-	TRANSPARENCY_PEN, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+				switch ((spriteram[offs + i] & 0x18) >> 3)				
+                {
 					case 3:	/* 24x24 */
-					
-{ 
-struct drawgfxParams dgp0={
-	bitmap, 	// dest
-	Machine->gfx[3], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
+                    {
 						int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((gfxbank & 1) << 4);
-
 						
 						dgp0.code = code;
 						dgp0.color = color;
 						dgp0.sx = sx;
 						dgp0.sy = sy - 16;
 						drawgfx(&dgp0);
+
 						/* wraparound */
-						
-						dgp0.code = code;
-						dgp0.color = color;
 						dgp0.sx = sx - 256;
 						dgp0.sy = sy - 16;
 						drawgfx(&dgp0);
 						break;
 					}
-} // end of patch paragraph
-
-
 					case 2:	/* 16x16 */
+                    {
+                        int code;
 						if (spriteram[offs + i] & 0x20)	/* zero hour spaceships */
-						
-{ 
-struct drawgfxParams dgp2={
-	bitmap, 	// dest
-	Machine->gfx[4+bank], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-{
-							int code = ((spriteram[offs + i + 1] & 0xf8) >> 3) + ((gfxbank & 1) << 5);
+                        {
+							code = ((spriteram[offs + i + 1] & 0xf8) >> 3) + ((gfxbank & 1) << 5);
 							int bank = (spriteram[offs + i + 1] & 0x02) >> 1;
+                            dgp2.gfx = Machine->gfx[4+bank];
 
-							
-							dgp2.code = code;
-							dgp2.color = color;
-							dgp2.sx = sx;
-							dgp2.sy = sy - 16;
-							drawgfx(&dgp2);
-						}
-} // end of patch paragraph
-
-						
-{ 
-struct drawgfxParams dgp3={
-	bitmap, 	// dest
-	Machine->gfx[2], 	// gfx
-	0, 	// code
-	0, 	// color
-	0, 	// flipx
-	0, 	// flipy
-	0, 	// sx
-	0, 	// sy
-	&Machine->visible_area, 	// clip
-	TRANSPARENCY_PEN, 	// transparency
-	0, 	// transparent_color
-	0, 	// scalex
-	0, 	// scaley
-	NULL, 	// pri_buffer
-	0 	// priority_mask
-  };
-else
+						} else
 						{
-							int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((gfxbank & 1) << 4);
-
-							
-							dgp3.code = code;
-							dgp3.color = color;
-							dgp3.sx = sx;
-							dgp3.sy = sy - 16;
-							drawgfx(&dgp3);
+							code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((gfxbank & 1) << 4);
+                            dgp2.gfx = Machine->gfx[2];
 						}
-} // end of patch paragraph
-
-						break;
+                        dgp2.code = code;
+                        dgp2.color = color;
+                        dgp2.sx = sx;
+                        dgp2.sy = sy - 16;
+                        drawgfx(&dgp2);
+                    }
+                    break;
 
 					case 1:	/* 8x8 */
 						
 						dgp4.code = spriteram[offs + i + 1];
-						dgp4.color = // + 4 * (spriteram[offs + i + 2] & 0x10);
-						dgp4.flipx = color;
-						dgp4.sy = sx;
+						dgp4.color =color;// + 4 * (spriteram[offs + i + 2] & 0x10);
+                        dgp4.sx = sx;
+                        dgp4.sy = sy - 16;
 						drawgfx(&dgp4);
 						break;
 
 					case 0:
-ui_popup("unknown sprite size 0");
+                //ui_popup("unknown sprite size 0");
 						break;
 				}
-} // end of patch paragraph
+
 
 			}
 		}

@@ -21,13 +21,14 @@ option(OPT_FUUKI "" OFF)
 option(OPT_GAELCO "" OFF)
 option(OPT_GAMEPLAN "" OFF)
 option(OPT_GAMETRON "" OFF)
-option(OPT_GOTTLIEB "" OFF)
+option(OPT_GOTTLIEB "" ON)
 option(OPT_GREYHND "" OFF)
 option(OPT_IGS "" OFF)
 option(OPT_IREM "" ON)
 option(OPT_ITECH "" OFF)
 option(OPT_JALECO "" ON)
-option(OPT_JUSTGALAGA "" OFF)
+option(OPT_JUSTDKONG "" ON)
+option(OPT_JUSTGALAGA "" ON)
 option(OPT_KANEKO "" ON)
 option(OPT_KONAMI "" OFF)
 option(OPT_MEADOWS "" OFF)
@@ -37,7 +38,7 @@ option(OPT_MIDCOIN "" OFF)
 option(OPT_MIDW8080 "" OFF)
 option(OPT_MIDWAY "" OFF)
 option(OPT_MIDWAYTUNIT "" ON)
-option(OPT_MINIATARI "" OFF)
+option(OPT_MINIATARI "" ON)
 option(OPT_MINIDTEA "" ON)
 option(OPT_MINIKONAMI "" ON)
 option(OPT_MININAMCOS1 "" ON)
@@ -54,7 +55,7 @@ option(OPT_OLYMPIA "" OFF)
 option(OPT_OMORI "" OFF)
 option(OPT_ORCA "" OFF)
 option(OPT_PACIFIC "" OFF)
-option(OPT_PACMAN "" OFF)
+option(OPT_PACMAN "" ON)
 option(OPT_PHOENIX "" OFF)
 option(OPT_PLAYMARK "" OFF)
 option(OPT_PSIKYO "" OFF)
@@ -405,7 +406,7 @@ if(OPT_DATAEAST)
 		drivers/tryout.c vidhrdw/tryout.c drivers/tumbleb.c vidhrdw/tumbleb.c 
 		drivers/tumbleb.c vidhrdw/tumbleb.c drivers/tumblep.c vidhrdw/tumblep.c 
 		drivers/vaportra.c vidhrdw/vaportra.c machine/deco102.c machine/decocrpt.c 
-		machine/decoprot.c vidhrdw/deco16ic.c 	)
+		machine/decoprot.c vidhrdw/deco16ic.c vidhrdw/dec0n.cpp 	)
 	set(MSND_AY8910 ON)
 	set(MSND_BSMT2000 ON)
 	set(MSND_C6280 ON)
@@ -798,13 +799,41 @@ if(OPT_JALECO)
 		HAS_M68000=1 HAS_M6809=1 HAS_V70=1 HAS_Z80=1 
 	)
 endif()
+if(OPT_JUSTDKONG)
+	add_compile_definitions(LINK_JUSTDKONG=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/dkong_short.c sndhrdw/dkong.c vidhrdw/dkong.c 	)
+	set(MSND_DAC ON)
+	set(MSND_NES ON)
+	set(MSND_SAMPLES ON)
+	set(MCPU_I8035 ON)
+	set(MCPU_N2A03 ON)
+	set(MCPU_S2650 ON)
+	set(MCPU_Z80 ON)
+	list(APPEND CPU_DEFS
+		HAS_DAC=1 HAS_NES=1 HAS_SAMPLES=1 	)
+	list(APPEND CPU_DEFS
+		HAS_I8035=1 HAS_N2A03=1 HAS_S2650=1 HAS_Z80=1 
+	)
+endif()
 if(OPT_JUSTGALAGA)
 	add_compile_definitions(LINK_JUSTGALAGA=1)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/galaga.c vidhrdw/galaga.c vidhrdw/bosco.c machine/namcoio.c 
 		machine/xevious.c vidhrdw/xevious.c vidhrdw/digdug.c machine/atari_vg.c 
-		sound/namco52.c sound/namco54.c sound/namco.c sound/filter.c 
-	)
+		machine/atarigen.c machine/atarigen.h machine/atari_vg.c sndhrdw/atarijsa.c 
+		sndhrdw/atarijsa.h 	)
+	set(MSND_FILTER ON)
+	set(MSND_NAMCO ON)
+	set(MSND_NAMCO_52XX ON)
+	set(MSND_NAMCO_54XX ON)
+	set(MSND_SAMPLES ON)
+	set(MCPU_Z80 ON)
+	list(APPEND CPU_DEFS
+		HAS_FILTER=1 HAS_NAMCO=1 HAS_NAMCO_52XX=1 HAS_NAMCO_54XX=1 
+		HAS_SAMPLES=1 	)
+	list(APPEND CPU_DEFS
+		HAS_Z80=1 	)
 endif()
 if(OPT_KANEKO)
 	add_compile_definitions(LINK_KANEKO=1)
@@ -1076,13 +1105,12 @@ if(OPT_MINIATARI)
 	add_compile_definitions(LINK_MINIATARI=1)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/ccastles.c vidhrdw/ccastles.c drivers/centiped.c vidhrdw/centiped.c 
-		drivers/gauntlet.c vidhrdw/gauntlet.c machine/harddriv.c drivers/harddriv.c 
-		sndhrdw/harddriv.c vidhrdw/harddriv.c drivers/rampart.c vidhrdw/rampart.c 
-		drivers/klax.c vidhrdw/klax.c drivers/atarisy1.c drivers/atarisy2.c 
-		vidhrdw/atarisy1.c vidhrdw/atarisy2.c machine/atari_vg.h machine/atari_vg.c 
-		machine/atarigen.h machine/atarigen.c vidhrdw/atarimo.c vidhrdw/atarimo.h 
-		machine/asic65.c machine/asic65.h sndhrdw/atarijsa.c machine/slapstic.c 
-	)
+		drivers/gauntlet.c vidhrdw/gauntlet.c drivers/rampart.c vidhrdw/rampart.c 
+		vidhrdw/atarimo.c machine/slapstic.c drivers/klax.c vidhrdw/klax.c 
+		drivers/atarisy1.c drivers/atarisy2.c vidhrdw/atarisy1.c vidhrdw/atarisy2.c 
+		machine/asic65.c machine/atari_vg.c machine/atarigen.c machine/atarigen.h 
+		machine/atari_vg.c sndhrdw/atarijsa.c sndhrdw/atarijsa.h 	)
+	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
 	set(MSND_OKIM6295 ON)
 	set(MSND_POKEY ON)
@@ -1092,6 +1120,7 @@ if(OPT_MINIATARI)
 	set(MSND_YM2413 ON)
 	set(MCPU_ADSP2100 ON)
 	set(MCPU_ADSP2101 ON)
+	set(MCPU_ADSP2104 ON)
 	set(MCPU_ADSP2181 ON)
 	set(MCPU_DSP32C ON)
 	set(MCPU_M6502 ON)
@@ -1102,19 +1131,21 @@ if(OPT_MINIATARI)
 	set(MCPU_TMS32010 ON)
 	set(MCPU_TMS34010 ON)
 	list(APPEND CPU_DEFS
-		HAS_DAC=1 HAS_OKIM6295=1 HAS_POKEY=1 HAS_SN76496=1 
-		HAS_TMS5220=1 HAS_YM2151=1 HAS_YM2413=1 	)
+		HAS_AY8910=1 HAS_DAC=1 HAS_OKIM6295=1 HAS_POKEY=1 
+		HAS_SN76496=1 HAS_TMS5220=1 HAS_YM2151=1 HAS_YM2413=1 
+	)
 	list(APPEND CPU_DEFS
-		HAS_ADSP2100=1 HAS_ADSP2101=1 HAS_ADSP2181=1 HAS_DSP32C=1 
-		HAS_M6502=1 HAS_M68000=1 HAS_M68010=1 HAS_S2650=1 
-		HAS_T11=1 HAS_TMS32010=1 HAS_TMS34010=1 	)
+		HAS_ADSP2100=1 HAS_ADSP2101=1 HAS_ADSP2104=1 HAS_ADSP2181=1 
+		HAS_DSP32C=1 HAS_M6502=1 HAS_M68000=1 HAS_M68010=1 
+		HAS_S2650=1 HAS_T11=1 HAS_TMS32010=1 HAS_TMS34010=1 
+	)
 endif()
 if(OPT_MINIDTEA)
 	add_compile_definitions(LINK_MINIDTEA=1)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/supbtime.c vidhrdw/supbtime.c vidhrdw/deco16ic.c drivers/karnov.c 
 		vidhrdw/karnov.c drivers/dec0.c machine/dec0.c vidhrdw/dec0.c 
-	)
+		vidhrdw/dec0n.cpp 	)
 	set(MSND_OKIM6295 ON)
 	set(MSND_YM2203 ON)
 	set(MSND_YM3526 ON)
@@ -1361,7 +1392,8 @@ if(OPT_NEOGEO)
 	add_compile_definitions(LINK_NEOGEO=1)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/neogeo.c machine/neogeo.c vidhrdw/neogeo.c machine/neoboot.c 
-		machine/neocrypt.c machine/neoprot.c 	)
+		machine/neocrypt.c machine/neoprot.c vidhrdw/neogeodraw.cpp vidhrdw/neogeodraw.h 
+	)
 	set(MSND_YM2610 ON)
 	set(MSND_YM2610B ON)
 	set(MCPU_M68000 ON)
@@ -2406,6 +2438,9 @@ if(MSND_ES5506)
 endif()
 if(MSND_ES8712)
 	list(APPEND MAME_SOUND_SRC sound/es8712.c sound/es8712.h )
+endif()
+if(MSND_FILTER)
+	list(APPEND MAME_SOUND_SRC sound/filter.c sound/filter.h )
 endif()
 if(MSND_GAELCO_CG1V)
 	list(APPEND MAME_SOUND_SRC sound/gaelco.c sound/gaelco.h )

@@ -1848,6 +1848,15 @@ const game_driver * const drivers[] =
 	DRIVER( valtric ) /* 1986 "[NMK] (Jaleco license)" "Valtric" */
 	DRIVER( wildplt ) /* 1992 "Jaleco" "Wild Pilot" */
 #endif
+#ifdef LINK_JUSTDKONG
+	DRIVER( dkong ) /* 1981 "Nintendo of America" "Donkey Kong (US set 1)" */
+	DRIVER( dkong3 ) /* 1983 "Nintendo of America" "Donkey Kong 3 (US)" */
+	DRIVER( dkong3j ) /* 1983 "Nintendo" "Donkey Kong 3 (Japan)" */
+	DRIVER( dkongjp ) /* 1981 "Nintendo" "Donkey Kong (Japan set 1)" */
+	DRIVER( dkongjr ) /* 1982 "Nintendo of America" "Donkey Kong Junior (US)" */
+	DRIVER( dkongjrj ) /* 1982 "Nintendo" "Donkey Kong Jr. (Japan)" */
+	DRIVER( dkongo ) /* 1981 "Nintendo" "Donkey Kong (US set 2)" */
+#endif
 #ifdef LINK_JUSTGALAGA
 	DRIVER( battles ) /* 1982 "bootleg" "Battles" */
 	DRIVER( bosco ) /* 1981 "Namco" "Bosconian (new version)" */
@@ -2760,9 +2769,6 @@ const game_driver * const drivers[] =
 	DRIVER( gauntj ) /* 1985 "Atari Games" "Gauntlet (Japanese */
 	DRIVER( gauntlet ) /* 1985 "Atari Games" "Gauntlet (rev 14)" */
 	DRIVER( gaunts ) /* 1985 "Atari Games" "Gauntlet (Spanish */
-	DRIVER( harddriv ) /* 1988 "Atari Games" "Hard Drivin' (cockpit */
-	DRIVER( harddrvc ) /* 1990 "Atari Games" "Hard Drivin' (compact */
-	DRIVER( hdrivair ) /* 1993 "Atari Games" "Hard Drivin's Airborne (prototype)" */
 	DRIVER( indytem2 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 2)" */
 	DRIVER( indytem3 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 3)" */
 	DRIVER( indytem4 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 4)" */
@@ -2780,8 +2786,6 @@ const game_driver * const drivers[] =
 	DRIVER( paperbr1 ) /* 1984 "Atari Games" "Paperboy (rev 1)" */
 	DRIVER( paperbr2 ) /* 1984 "Atari Games" "Paperboy (rev 2)" */
 	DRIVER( peterpak ) /* 1984 "Atari Games" "Peter Pack-Rat" */
-	DRIVER( racedriv ) /* 1990 "Atari Games" "Race Drivin' (cockpit */
-	DRIVER( racedrvc ) /* 1990 "Atari Games" "Race Drivin' (compact */
 	DRIVER( rampart ) /* 1990 "Atari Games" "Rampart (Trackball)" */
 	DRIVER( rampartj ) /* 1990 "Atari Games" "Rampart (Japan */
 	DRIVER( ramprt2p ) /* 1990 "Atari Games" "Rampart (Joystick)" */
@@ -2797,10 +2801,6 @@ const game_driver * const drivers[] =
 	DRIVER( ssprint1 ) /* 1986 "Atari Games" "Super Sprint (rev 1)" */
 	DRIVER( ssprint3 ) /* 1986 "Atari Games" "Super Sprint (rev 3)" */
 	DRIVER( ssprintg ) /* 1986 "Atari Games" "Super Sprint (German */
-	DRIVER( steeltal ) /* 1991 "Atari Games" "Steel Talons (rev 2)" */
-	DRIVER( strtdriv ) /* 1993 "Atari Games" "Street Drivin' (prototype)" */
-	DRIVER( stunrun ) /* 1989 "Atari Games" "S.T.U.N. Runner (rev 6)" */
-	DRIVER( stunrunp ) /* 1989 "Atari Games" "S.T.U.N. Runner (upright prototype)" */
 	DRIVER( vindctr2 ) /* 1988 "Atari Games" "Vindicators Part II (rev 3)" */
 	DRIVER( warlords ) /* 1980 "Atari" "Warlords" */
 #endif

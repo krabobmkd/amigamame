@@ -441,20 +441,21 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
     }
 
 }
+#ifdef LINK_NEOGEO
  extern const bios_entry *system_bios_neogeo_first;
+#endif
 MameConfig::Misc::Misc() : ASerializable()
      , _userPath("PROGDIR:user") // this can be chanegd at init by args, not by load/save/todefault.
  {
 // #define SYSTEM_BIOS_START(name)						static const bios_entry system_bios_##name[] = {
-
-    "PROGDIR:cheat.dat";
-
+#ifdef LINK_NEOGEO
     const bios_entry *p = system_bios_neogeo_first;
     while(p->_name)
     {
         _neogeoBiosList.push_back(p->_description);
         p++;
     }
+#endif
 
 //
 }
@@ -832,8 +833,9 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     options.skip_gameinfo =
     options.skip_warnings = (_misc._skipflags & 2) != 0;
 
-
+#ifdef LINK_NEOGEO
     // if machine points neogeo rom list, then it's neogeo.
+
     if(drv->bios == system_bios_neogeo_first &&
        _misc._neogeo_bios >0 &&  _misc._neogeo_bios<=12)
     {
@@ -844,7 +846,7 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
 
         //printf("set bios:%s\n",t);
     }
-
+#endif
 
 }
 

@@ -69,8 +69,7 @@ set(MAME_CORE_SRC
  cpuint.h     inptport.h   osdepend.h            tilemap.h
  cpuintrf.h   input.h      palette.h             timer.h
 
- vidhrdw/neogeodraw.cpp
- vidhrdw/neogeodraw.h
+
   cpu/m68000/m68kkrbopt.h
  sound_krb.h
 	# minimal common driver needs:
@@ -99,9 +98,7 @@ set(MAME_UNROLL_SRC  drawgfx.c  drawgfxn.cpp
 				 sound/wavwrite.c
 				 sound/wavwrite.h
 					)
-#if(OPT_DATAEAST)
-	list(APPEND MAME_UNROLL_SRC vidhrdw/dec0n.cpp)
-#endif()
+
 # move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/neogeo.c")
 
 # ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}

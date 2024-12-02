@@ -175,7 +175,10 @@ target_include_directories(${PROGNAME} PUBLIC "../mame106" "${COMMONLIBS}/libser
 # MUI is not provided by gccbebbo6.5 ndk by default, we have it there:
 target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/MUI38/include")
 # target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/P96/include")
-
+if(OPT_NEOGEO)
+	#because we search neogeo bios list explicitly from config to mamelib
+	target_compile_definitions(${PROGNAME} PRIVATE LINK_NEOGEO=1 )
+endif()
 # sources that doesn't support -O2 are moved to MameXAmigaO0 lib
 target_compile_options(${PROGNAME} PRIVATE
 		$<$<CONFIG:RELEASE>:-O2 -Wno-narrowing -DNDEBUG>

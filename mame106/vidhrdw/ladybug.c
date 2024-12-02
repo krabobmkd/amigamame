@@ -372,7 +372,6 @@ static void ladybug_draw_sprites( mame_bitmap *bitmap )
 	int offs;
 
 	
-	{ 
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
 		Machine->gfx[1], 	// gfx
@@ -434,7 +433,7 @@ static void ladybug_draw_sprites( mame_bitmap *bitmap )
 			if (spriteram[offs + i] & 0x80)
 			{
 				if (spriteram[offs + i] & 0x40)	/* 16x16 */
-					
+                {
 					dgp0.code = (spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10);
 					dgp0.color = spriteram[offs + i + 2] & 0x0f;
 					dgp0.flipx = spriteram[offs + i] & 0x20;
@@ -442,8 +441,9 @@ static void ladybug_draw_sprites( mame_bitmap *bitmap )
 					dgp0.sx = spriteram[offs + i + 3];
 					dgp0.sy = offs / 4 - 8 + (spriteram[offs + i] & 0x0f);
 					drawgfx(&dgp0);
+                }
 				else	/* 8x8 */
-					
+                {
 					dgp1.code = spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10);
 					dgp1.color = spriteram[offs + i + 2] & 0x0f;
 					dgp1.flipx = spriteram[offs + i] & 0x20;
@@ -451,10 +451,10 @@ static void ladybug_draw_sprites( mame_bitmap *bitmap )
 					dgp1.sx = spriteram[offs + i + 3];
 					dgp1.sy = offs / 4 + (spriteram[offs + i] & 0x0f);
 					drawgfx(&dgp1);
+                }
 			}
 		}
 	}
-	} // end of patch paragraph
 
 }
 

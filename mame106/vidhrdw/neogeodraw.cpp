@@ -67,10 +67,10 @@ static UINT16 *neogeo_Yjumps=NULL;
 #define WR_ORD7  1
 #endif
 
-extern "C"
-    {
-    int dbg_nbt=0;
-}
+// extern "C"
+//     {
+//     int dbg_nbt=0;
+// }
 
 // - -  values that are static to a game driver.
 static UINT32 no_of_tiles=0;

@@ -32,10 +32,6 @@ extern "C" {
 
 using namespace std;
 
-// nbframe
-extern "C" {
-extern int nbframe;
-}
 
 // // conv tool here because fine.
 // void imageToMigabm()
@@ -164,7 +160,7 @@ void QProc::process()
 //    "bublbobl"
 //   "dino"
 //                 "arkretrn"
-        "baddudes"
+        "qbert"
 //"pdrift"
 //"qbert"
  //   "rastsaga"
@@ -209,12 +205,12 @@ QWin::QWin() : QLabel()
     setMouseTracking(true);
 
 }
-extern "C" {
-extern int dbg_nbt;
-}
+// extern "C" {
+// extern int dbg_nbt;
+// }
 void QWin::mouseMoveEvent(QMouseEvent* event)
 {
-    dbg_nbt = event->x();
+  //  dbg_nbt = event->x();
 
 }
 void QWin::paintEvent(QPaintEvent *event)
@@ -222,7 +218,7 @@ void QWin::paintEvent(QPaintEvent *event)
     QLabel::paintEvent(event);
     QPainter p(this);
 
-    p.drawText(60,60,QString("woot:")+QString::number(dbg_nbt));
+    p.drawText(60,60,QString("woot:")+QString::number(0));
 
 //    p.drawText(60,60,QString("woot:")+QString::number(nbframe));
 }
@@ -354,11 +350,11 @@ void osd_update_video_and_audio(struct _mame_display *display)
           // if(nbframe>300)
      //      QThread::msleep(1000/60);
 
-nbframe++;
+//nbframe++;
     // logo
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 //if(nbframe == 3350) mame_pause(1);
-if(nbframe == 60*25) mame_pause(1);
+//if(nbframe == 60*25) mame_pause(1);
 // if(nbframe==1200) exit(1);
 // if(nbframe==60*10)  mame_schedule_exit();
 //    m_mutex.lock();
