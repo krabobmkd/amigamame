@@ -1,9 +1,9 @@
 
 todo R1
 
- - O bug galaga white bg when window to fullscreen
+ - X bug galaga white bg when window to fullscreen
  - O optimize gauntlet
- - O no sound mix if no audio
+ - X no sound mix if no audio
 - O fastboot neogeo, batrider -> no mix
  - O amigaguide with md2ag
      - controllers image

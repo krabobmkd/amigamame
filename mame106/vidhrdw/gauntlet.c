@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "machine/atarigen.h"
 #include "gauntlet.h"
-
+#include "palette.h"
 
 
 /*************************************
@@ -30,6 +30,34 @@ static UINT8 playfield_tile_bank;
 static UINT8 playfield_color_bank;
 
 
+//krb
+WRITE16_HANDLER( paletteram16_IIIIRRRRGGGGBBBB_gauntlet_word_w )
+{
+//    COMBINE_DATA(&paletteram16[offset]);
+    paletteram16[offset] = data;
+
+//    set_color_4444(offset, 12, 8, 4, 0, paletteram16[offset]);
+
+
+    static const UINT8 ztable[16] =
+        { 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
+    int i, r, g, b;
+
+    i = ztable[(data >> 12) & 15];
+    UINT32 val=((data <<8) & 0x000f0000) |
+                 ((data <<4) & 0x00000f00)
+                | (data & 0x0f);
+    val *= i;
+
+    /*
+    r = ((data >> rshift) & 15) * i;
+    g = ((data >> gshift) & 15) * i;
+    b = ((data >> bshift) & 15) * i;
+*/
+    //palette_set_color(color, r, g, b);
+    setpalettefast_neogeo(offset, val );
+
+}
 
 /*************************************
  *

@@ -82,6 +82,12 @@ struct Library *AHIBase=NULL;
 sAHISoundServer *_pThreadAHI = NULL;
 int m_ahi_error=0;
 
+
+int soundMixerIsOn()
+{
+    return (_pThreadAHI!=NULL);
+}
+
 void AHIS_Delete()
 {
 //    printf(" AHIS_Delete:%08x\n",(int)_pThreadAHI);

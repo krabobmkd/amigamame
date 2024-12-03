@@ -33,6 +33,13 @@ extern "C" {
 using namespace std;
 
 
+extern "C" {
+int soundMixerIsOn() {
+    return 0;
+}
+
+}
+
 // // conv tool here because fine.
 // void imageToMigabm()
 // {
@@ -160,7 +167,7 @@ void QProc::process()
 //    "bublbobl"
 //   "dino"
 //                 "arkretrn"
-        "qbert"
+        "demonwld"
 //"pdrift"
 //"qbert"
  //   "rastsaga"

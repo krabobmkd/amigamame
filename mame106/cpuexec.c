@@ -505,7 +505,7 @@ void cpuexec_timeslice(void)
 			LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
 
 			/* run for the requested number of cycles */
-			if (cycles_running > 0)
+			if (cycles_running > 16) // krb serioulsy ? 1 cycle seen ?
 			{
 				profiler_mark(PROFILER_CPU1 + cpunum);
 				cycles_stolen = 0;

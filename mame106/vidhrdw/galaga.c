@@ -384,6 +384,8 @@ PALETTE_INIT( galaga )
 
 		palette_set_color(i + 32,r,g,b);
 	}
+
+    ui_popup("Galaga uses color 0 as white on 8Bit screens.\nForce 16bit screen to correct this.\n");
 }
 
 

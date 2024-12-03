@@ -1256,18 +1256,18 @@ VIDEO_UPDATE( demonwld )
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,Machine->pens[0x120],cliprect);
 
-	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY | 0,0);
-	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY | 1,0);
+	// tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY | 0,0);
+	// tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY | 1,0);
 
 	for (priority = 1; priority < 16; priority++)
 	{
-		tilemap_draw_primask(bitmap,cliprect,pf4_tilemap,priority,priority,0);
-		tilemap_draw_primask(bitmap,cliprect,pf3_tilemap,priority,priority,0);
-		tilemap_draw_primask(bitmap,cliprect,pf2_tilemap,priority,priority,0);
-		tilemap_draw_primask(bitmap,cliprect,pf1_tilemap,priority,priority,0);
+		 tilemap_draw_primask(bitmap,cliprect,pf4_tilemap,priority,priority,0);
+		// tilemap_draw_primask(bitmap,cliprect,pf3_tilemap,priority,priority,0);
+		// tilemap_draw_primask(bitmap,cliprect,pf2_tilemap,priority,priority,0);
+		//tilemap_draw_primask(bitmap,cliprect,pf1_tilemap,priority,priority,0);
 	}
 
-	draw_sprites(bitmap,cliprect);
+	//draw_sprites(bitmap,cliprect);
 }
 
 

@@ -4,6 +4,8 @@
 extern "C"
 {
     #include <exec/types.h>
+
+extern int soundMixerIsOn();
 }
 
 // describe a sound buffer to write
@@ -27,6 +29,8 @@ struct sSoundToWrite
 
 // return how much done.
 ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite);
+
+
 
 
 #endif

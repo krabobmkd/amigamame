@@ -306,9 +306,11 @@ READ16_HANDLER( midwunit_control_r )
 WRITE16_HANDLER( midtunit_paletteram_w )
 {
 	int newword, r, g, b;
+//krb
+//	COMBINE_DATA(&paletteram16[offset]);
+    paletteram16[offset] = data;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+    newword = data; // paletteram16[offset];
 
 	r = (newword >> 10) & 0x1f;
 	g = (newword >>  5) & 0x1f;
@@ -318,7 +320,8 @@ WRITE16_HANDLER( midtunit_paletteram_w )
 	g = (g << 3) | (g >> 2);
 	b = (b << 3) | (b >> 2);
 
-	palette_set_color(offset, r, g, b);
+    setpalettefast_neogeo(offset,(r<<16) | (g<<8)|b);
+//	palette_set_color(offset, r, g, b);
 }
 
 
