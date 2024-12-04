@@ -15,7 +15,7 @@ add_executable( mamemakToCmake mameMakToCmake.cpp )
 #set_property(TARGET apichanger PROPERTY CXX_STANDARD 14)
 #add_executable( m68kmake ../src/mame106/cpu/m68000/m68kmake.c )
 
-add_executable( musachange musachange.cpp )
+#add_executable( musachange musachange.cpp )
 add_executable( md2ag md2ag.cpp )
 
 #add_executable( grabcontrols grabcontrols.cpp )

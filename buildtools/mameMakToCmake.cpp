@@ -537,7 +537,7 @@ int patchMiniMachines(
             "drivers/gauntlet.c",
             "vidhrdw/gauntlet.c",
 
-            // "machine/harddriv.c",
+            // "machine/harddriv.c",  dontwork
             // "drivers/harddriv.c",
             // "sndhrdw/harddriv.c",
             // "vidhrdw/harddriv.c",
@@ -570,6 +570,7 @@ int patchMiniMachines(
         "gauntlet","gaunts","gauntj","gauntg","gaunt2","gaunt2g","vindctr2",
         "klax","klaxj","klaxd",
 
+// they don't work
 //        "harddriv","harddrvc",
 //        "stunrun","stunrunp",
         // "racedriv","racedrvc",
@@ -577,6 +578,7 @@ int patchMiniMachines(
         // "strtdriv",
         // "hdrivair",
 
+        // atarisy1
         "marble","marble2","marble3","marble4",
         "peterpak","indytemp","indytem2","indytem3","indytem4","indytemd",
         "roadrunn","roadrun2","roadrun1",

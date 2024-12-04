@@ -142,6 +142,7 @@ void Agdoc::treatmdfile(  string &mdpath)
        l = trim(l);
        if(l.length()==0 )
        {
+        curprg->_t.push_back("");
         getline(ifsmd,l);
         continue;
        }
@@ -238,6 +239,43 @@ string replaceLinks(const string s)
     final += s.substr(iprev,(i== string::npos)?i:(i-iprev));
     return final;
 }
+
+
+string replaceImage(const string s)
+{
+    //  ![Game driver list interface](guideimg/mmdriverlist.gif)
+    bool inpa=false,inpb=false;
+    size_t l = s.length() ;
+    size_t i=0,iprev=0;
+    string final;
+    while(i<l)
+    {
+       i = s.find("![",iprev);
+       if(i== string::npos) break;
+       size_t ib = s.find("]",i+2);
+        if(ib== string::npos) break;
+
+        size_t ic = s.find("(",ib+1);
+        if(ic== string::npos) break;
+        size_t id = s.find(")",ic+1);
+        if(id== string::npos) break;
+
+         string visible = s.substr(i+2,ib-(i+2));
+         string link = s.substr(ic+1,id-(ic+1));
+        // link = rreplace(link,"#","");
+
+        final += s.substr(iprev,(i== string::npos)?i:(i-iprev));
+        final += "@{\" Display: ";
+        final += visible;
+        final += " \" SYSTEM \"multiview ";
+        final +=link;
+        final += "\"}";
+        iprev = id+1;
+        i=iprev;
+    }
+    final += s.substr(iprev,(i== string::npos)?i:(i-iprev));
+    return final;
+}
 //  ![Game driver list interface](guideimg/mmcontrols)
 string replaceImg(const string s)
 {
@@ -293,6 +331,23 @@ string replaceBolds(const string s)
     } while(i != string::npos);
     return ss.str();
 }
+
+std::vector<std::string> findSubParag(vector<shared_ptr<paragr>>::iterator it ,
+vector<shared_ptr<paragr>>::iterator itend )
+{
+    std::vector<std::string> vsubprg;
+    if(it == itend) return vsubprg;
+
+    while(it != itend)
+    {
+        shared_ptr<paragr> p = *it++;
+        if(p->_level ==1 ||  p->_level == 2 ) break;
+        if(p->_level == 3) vsubprg.push_back(p->_tit);
+    }
+    return vsubprg;
+}
+
+
 void Agdoc::export_ag(ofstream &ofs)
 {
     ofs << "@DATABASE\n";
@@ -301,10 +356,13 @@ void Agdoc::export_ag(ofstream &ofs)
  vector<shared_ptr<paragr>>::iterator it = _prgs.begin();
 
     int dotindex=0; // dots are paragraphs
+    int currentIndent=1;
+    // treat body
+    bool firstdot=true;
  while(it != _prgs.end() )
  {
     shared_ptr<paragr> p = *it++;
-    if(p->_level>0) {
+    if(p->_level ==1 ||  p->_level == 2 ||  p->_level == 3 ) {
 
         if(nodeison) ofs << "\n@ENDNODE\n";
          string nodename= titleToMdId(p->_tit);
@@ -312,9 +370,125 @@ void Agdoc::export_ag(ofstream &ofs)
          isFirstNode = false;
 
          ofs << "@NODE "<<nodename<<" \""<< p->_tit <<"\"\n";
+           ofs << "@SMARTWRAP\n@{TAB 2}\n";
 
-//         ofs << "@WORDWRAP\n@Width 74\n@TAB 2\n";
-            ofs << "@SMARTWRAP\n@TAB 3\n";
+         // now need to write  title name in text also
+         ofs << "\n@{FG Shine} @{b}" << p->_tit << "@{ub}@{FG Text}@{PAR}\n\n" ;
+         ofs << "@{BODY} @{LINDENT 1 }\n";
+
+        nodeison = true;
+        currentIndent = 1;
+        firstdot=true;
+
+        //  - -  --
+        if(p->_level ==2)
+        {
+            std::vector<std::string> vsubp = findSubParag(it, _prgs.end());
+            for(string st : vsubp)
+            {
+                string linkst = rreplace(titleToMdId(st),"#","");
+                linkst = rreplace(linkst," ","-");
+                 ofs << "@{\" "<<st<<" \" LINK "<< linkst  <<   "}@{LINE}";
+            }
+        }
+
+    } else if(p->_level ==3 )
+    {
+        // just use title, keep same parag.
+         ofs << "\n@{FG Shine} @{b}" << p->_tit << "@{ub}@{FG Text}@{PAR}\n\n" ;
+         ofs << "@{BODY} @{LINDENT 1 }\n";
+        nodeison = true;
+        currentIndent = 1;
+        firstdot=true;
+    }
+
+
+    for(string s : p->_t)
+    {
+        if(s.length() ==0) { ofs << "@{LINE}";
+         continue;
+        }
+        int nbindent=0;
+        while(nbindent<s.length() && (s[nbindent] == ' ' || s[nbindent] == '\t' ) ) nbindent++;
+        if(nbindent<1) nbindent=1;
+
+        string ttrim = trim(s);
+//        if(ttrim.length() ==0) { ofs << "\n";
+//         continue;
+//        }
+        if(ttrim == "***")
+        {
+           ofs << "\n@{LINE}";
+            continue;
+        }
+       // no slachn here ttrim = rreplace(ttrim,"\n","\n@{LINE}@{LINE}");
+        ttrim = replaceImage(ttrim);
+        ttrim = replaceLinks(ttrim);
+        ttrim = replaceBolds(ttrim);
+        if(startWith(ttrim,"* ") || startWith(ttrim,"- "))
+        {
+            // dot
+            //if(dotindex==0) ofs << "\n";
+            dotindex++;
+
+            char dotch = '-';// (char)149;
+
+             if(startWith(ttrim,"- "))  {
+                //if(firstdot)
+                nbindent +=4;
+
+                dotch = '-';
+             }else // if "* "
+             {
+                //if(firstdot)
+                 nbindent +=2;
+
+             }
+            if(currentIndent != nbindent)
+            {
+                ofs << "@{LINDENT "<< nbindent<<"}@{LINE}";
+               currentIndent=nbindent;
+            }
+            // 149 = dot in ansi
+            ofs << dotch << ttrim.substr(1) << "@{LINE}\n";
+
+            firstdot = false;
+            continue;
+        } else {
+            firstdot = true;
+        }
+        // normal line to parag in smartmode
+        if(currentIndent != nbindent)
+        {
+            ofs << "\n@{LINDENT "<< nbindent<<"}@{LINE}";
+            currentIndent=nbindent;
+        }
+        ofs <<  ttrim << "@{LINE}";
+
+    }
+
+ }
+ if(nodeison) ofs << "\n@ENDNODE\n";
+
+}
+
+int main(int argc, char **argv)
+{
+//    if(argc <2) return 0;
+
+
+      //  curprg = make_shared<paragr>();
+
+    Agdoc d;
+    string ppth(/*argv[1]*/"MAME106-MiniMix-1.x-User-Documentation.md");
+    d.treatmdfile(ppth);
+
+    ofstream ofsag("Mame106Minimix.guide",ios::binary);
+    if(ofsag.good()) d.export_ag(ofsag);
+
+    return 0;
+}
+
 
 //@SMARTWRAP
 //@TAB 3
@@ -460,134 +634,3 @@ Attribute Commands
      Turn off underlining.  V39.
 https://www.lysator.liu.se/amiga/code/guide/amigaguide.guide
 */
-         // now need to write  title name in text also
-         ofs << "\n  @{b}" << p->_tit << "@{ub}\n\n" ;
-
-        nodeison = true;
-    }
-    // treat body
-    bool firstdot=false;
-    for(string s : p->_t)
-    {
-        if(s.length() ==0) { ofs << "\n";
-         continue;
-        }
-        int nbindent=1;
-        while(nbindent<s.length() && (s[nbindent] == ' ' || s[nbindent] == '\t' ) ) nbindent++;
-           string sindent;
-        for(int i=0;i<nbindent ; i++) sindent +=" ";
-        string ttrim = trim(s);
-        if(ttrim.length() ==0) { ofs << "\n";
-         continue;
-        }
-        if(ttrim == "***")
-        {
-            ofs << "\n- - - - - - - - - - - - - - - - - - - - -\n";
-            continue;
-        }
-        ttrim = replaceLinks(ttrim);
-        ttrim = replaceBolds(ttrim);
-        if(startWith(ttrim,"* ") || startWith(ttrim,"- "))
-        {
-            // dot
-            if(dotindex==0) ofs << "\n";
-            dotindex++;
-
-            string otherindex = sindent;
-            char dotch = (char)149;
-        //    if(startWith(ttrim,"* ") ) otherindex +=
-             if(startWith(ttrim,"- "))  {
-              if(firstdot) ofs << "@LINDENT "<< (sindent.length()+2);
-                otherindex += "   ";
-                dotch = '-';
-             }else
-             {
-                if(firstdot) ofs << "@LINDENT "<< (sindent.length());
-
-             }
-            // 149 = dot in ansi
-            ofs << otherindex << dotch << ttrim.substr(1) << "\n";
-
-            firstdot = false;
-            continue;
-        } else {
-        firstdot = true;
-        }
-       // [Prerequesite and installation](#prerequesite-and-installation])
-       // replace links
-      //  if(ttrim)
-
-        vector<string> words = splitt(ttrim," ");
-//        if(words.size()>0 && (words[0]=="*" || words[0]=="-"))
-//        {
-//            // this is a dot
-
-//        }
-
-
-        bool startline=true;
-        int nbwline = 0;
-        int ic = 0;
-        const int maxcol=68;
-        size_t iw;
-        for(iw=0; iw<words.size() ; iw++ )
-        {
-            string w = words[iw];
-            if(startline)
-            {
-                ofs << sindent;
-                ic+=sindent.length();
-                startline = false;
-            }
-            ofs << w << ((iw<words.size()-1)?" ":"");
-            ic += w.length()+1;
-
-            if(ic>=maxcol)
-            {
-                ic=0;
-                startline = true;
-                ofs << "\n";
-            }
-            nbwline++;
-        }
-         ofs << "\n";
-    dotindex = 0;
-
-//        ttrim, rreplace (ttrim,"**", "");
-//        if(ttrim[0]=='-' || (ttrim[0]=='*')
-
-
-
-    }
-
- }
- if(nodeison) ofs << "\n@ENDNODE\n";
-/*
-  @DATABASE
-  @NODE MAIN "Intuition Table of Contents"
-  @{"Introduction" LINK Intro}
-  @{"Screens" LINK Screen}
-  @{"Windows" LINK Window}
-  @{"Gadgets" LINK Gadget}
-  @{"Menus" LINK Menu}
-  @ENDNODE
-*/
-
-}
-
-int main(int argc, char **argv)
-{
-//    if(argc <2) return 0;
-
-
-      //  curprg = make_shared<paragr>();
-
-    Agdoc d;
-    string ppth(/*argv[1]*/"MAME106-MiniMix-1.x-User-Documentation.md");
-    d.treatmdfile(ppth);
-
-    ofstream ofsag("Mame106Minimix.guide");
-    if(ofsag.good()) d.export_ag(ofsag);
-
-    return 0;
-}
