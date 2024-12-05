@@ -347,6 +347,23 @@ vector<shared_ptr<paragr>>::iterator itend )
     return vsubprg;
 }
 
+void formatTitle(string tit,ostream &ofs)
+{
+//  +------------
+// /
+//+------------
+    int l = tit.length();
+    ofs << "@{CODE}@{FG Shine}@{b}";
+    ofs << "  +";
+    for(int i=0;i<(l+4);i++)  ofs << "-";
+    ofs <<"+\n";
+    ofs << " /  "<< tit << "  /\n";
+    ofs << "+";
+    for(int i=0;i<(l+4);i++)  ofs << "-";
+    ofs <<"+\n";
+
+    ofs << "@{ub}@{FG Text}@{PAR}";
+}
 
 void Agdoc::export_ag(ofstream &ofs)
 {
@@ -370,11 +387,11 @@ void Agdoc::export_ag(ofstream &ofs)
          isFirstNode = false;
 
          ofs << "@NODE "<<nodename<<" \""<< p->_tit <<"\"\n";
-           ofs << "@SMARTWRAP\n@{TAB 2}\n";
-
+        ofs << "@SMARTWRAP\n";
          // now need to write  title name in text also
-         ofs << "\n@{FG Shine} @{b}" << p->_tit << "@{ub}@{FG Text}@{PAR}\n\n" ;
-         ofs << "@{BODY} @{LINDENT 1 }\n";
+         formatTitle(p->_tit,ofs);
+         ofs << "@{BODY}@{LINDENT 1 }\n";
+//ofs << "@SMARTWRAP\n@{TAB 2}\n";
 
         nodeison = true;
         currentIndent = 1;
