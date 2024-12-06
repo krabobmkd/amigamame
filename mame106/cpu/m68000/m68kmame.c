@@ -7,7 +7,7 @@
 #include "state.h"
 #include "m68kkrbopt.h"
 #include "m68kcpu.h"
-
+#include "drivertuning.h"
 /* global access */
 
 //struct m68k_memory_interface m68k_memory_intf;
@@ -313,19 +313,6 @@ static const struct m68k_memory_interface interface_d32 =
 };
 
 /* krb */
-//static const struct m68k_memory_interface interface_fast16 =
-//{ // force 32b bus to 68k, ...
-//	WORD_XOR_BE(0),
-//	program_read_byte_16be, // program_read_byte_32be,
-//	program_read_word_16be, // program_read_word_32be,
-//	memory_readlong_d16, // memory_readlong_d16B, // readlong_d16, //program_read_dword_32be, -> if 32b replaced, no more sound in arkretrn.
-
-//	program_write_byte_16be, // program_write_byte_32be,
-//	program_write_word_16be,//program_write_word_32be,
-//	memory_writelong_d16, //writelong_d16, //memory_writelong_d16, // writelong_d16,//program_write_dword_32be,
-//    NULL,
-//    memory_writemovem32_wr16_reverse,
-//};
 static const struct m68k_memory_interface interface_xfast16 =
 { // force 32b bus to 68k, ...
 	WORD_XOR_BE(0), // 2 if compilation target is LE, 0 if BE. (xor useless)
@@ -337,7 +324,7 @@ static const struct m68k_memory_interface interface_xfast16 =
 	 memory_writelong_d16_be, // writelong_d16, // //memory_writelong_d16_be,
     NULL,
     memory_readmovem32_wr16,
-    memory_writemovem32_wr16_reverse,
+    memory_writemovem32_wr16_reverse, // this one can fail when used between 2 incompatible "memory entries", yet memory space is anded, but should use the other entries. Affect neogeo and demonwld
 };
 
 /*
@@ -428,6 +415,19 @@ static UINT8 m68000_win_layout[] = {
 	 0,23,80, 1 	/* command line window (bottom rows) */
 };
 
+static void check_xfast16(struct m68k_memory_interface *pmem)
+{
+    pmem->writemovem32reverse = &memory_writemovem32_wr16_reverse; // default, fast.
+    if(!Machine) return;
+
+    sDriverTuning *ptuning =getDriverTuning(Machine->gamedrv);
+    if(ptuning && (ptuning->_flags & MDTF_M68K_SAFE_MOVEMWRITE)!=0)
+    {
+        pmem->writemovem32reverse = &memory_writemovem32_wr16_reverseSAFE;
+    }
+
+}
+
 static void m68000_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 //    printf(" ***** m68000_init\n");
@@ -445,7 +445,11 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
     p68k->mem =   m68k_memory_tracer_d16;
 #else
     p68k->mem =   interface_xfast16;
+    check_xfast16(&p68k->mem);
 #endif
+
+
+
     m68k_state_register(p68k,"m68000", index);
 	m68k_set_int_ack_callback(p68k, irqcallback);
 }
@@ -588,6 +592,7 @@ void m68010_init(int index, int clock, const void *config, int (*irqcallback)(in
 //    p68k->mem = interface_d16;
 //#endif
     p68k->mem = interface_xfast16;
+    check_xfast16(&p68k->mem);
 
     m68k_state_register(p68k,"m68010", index);
 	m68k_set_int_ack_callback(p68k, irqcallback);

@@ -6,9 +6,14 @@ extern "C" {
 #endif
 #include "driver.h"
 
+// this is all a krb invention...
+
+// Mame Driver Tuning Flags
+#define MDTF_M68K_SAFE_MOVEMWRITE 1
+#define MDTF_LONGBOOT 2
 typedef struct _DriverTuning {
-	int _bootframeskip; // also no brake
-	
+	UINT32 _bootframeskip;
+	UINT32 _flags;
 } sDriverTuning;
 
 sDriverTuning *getDriverTuningByName(const char *drivername);

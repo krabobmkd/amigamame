@@ -83,11 +83,12 @@ void Drawable_OS3::draw_WPA8(_mame_display *display)
         directDraw_UBYTE_UBYTE(&p);
     } else
     {   // remap to shared screen colors, need a clut.
-    //TODO
-//        if(pRemap && pRemap->_clut8.size()>0)
-//        {
-//           directDrawClutT_UBYTE_UBYTE(&ddscreen,&ddsource,0,0,ww,hh,pRemap->_clut8.data());
-//        }
+        // 8bit but with WB palette, remap to shared screen colors, need a clut.
+        if(_pRemap->_clut8.size()>0)
+        {
+            directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
+            directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
+        }
     }
     //WritePixelArray8(rp,xstart,ystart,xstop,ystop,array,temprp)
 
@@ -116,6 +117,53 @@ void Drawable_OS3::checkWpa8TmpRp(RastPort *rp,int linewidth)
     _trp._checkw=pixelwidth;
 
 }
+void Drawable_OS3::draw_WriteChunkyPixels(_mame_display *display)
+{
+    RastPort *pRPort = _drawable.rastPort();
+    if(!pRPort) return;
+    mame_bitmap *bitmap = display->game_bitmap;
+
+    // - - update palette if exist and is needed.
+    if(_pRemap && ((display->changed_flags & GAME_PALETTE_CHANGED) !=0 || _pRemap->needRemap()))
+    {
+        _pRemap->updatePaletteRemap(display);
+    }
+    int sourcewidth,sourceheight;
+    int cenx,ceny,ww,hh;
+    _drawable.getGeometry(display,cenx,ceny,ww,hh,sourcewidth,sourceheight);
+
+    // - - get a 8bit bitmap from the 16b one, we know there's only 256 color max. - -
+    const int bmsize = ww*(hh);
+    if(bmsize != _wpatempbm.size()) _wpatempbm.resize(bmsize);
+
+    directDrawScreen ddscreen={
+        _wpatempbm.data(),
+        ww, // bpr
+        0,0,ww,hh // clip rect
+    };
+
+    directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
+        display->game_visible_area.min_x,display->game_visible_area.min_y,
+        display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
+        _drawable.flags()
+    };
+    directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
+    if(_useIntuitionPalette)
+    {   // no clut table and use intuition LoadRGB32 to change screen colors
+        // actually does WORD to BYTE conversion with no lut.
+        directDraw_UBYTE_UBYTE(&p);
+    } else
+    {   // 8bit but with WB palette, remap to shared screen colors, need a clut.
+        if(_pRemap->_clut8.size()>0)
+        {
+            directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
+        }
+    }
+//	WriteChunkyPixels(rp,xstart,ystart,xstop,ystop,array,bytesperrow)
+//	                  A0 D0     D1     D2    D3    A2     D4
+
+    WriteChunkyPixels(pRPort,cenx,ceny,cenx+ww-1,ceny+hh-1,_wpatempbm.data(),ww );
+}
 
 
 void Drawable_OS3::initRemapTable()
@@ -126,7 +174,7 @@ void Drawable_OS3::initRemapTable()
         _pRemap = new Paletted_Screen8(_drawable.screen());
     } else
     {
-
+        _pRemap = new Paletted_Pens8(_drawable.screen());
     }
 }
 void Drawable_OS3::close()
@@ -216,7 +264,17 @@ void Intuition_Screen_OS3::draw(_mame_display *display)
 {
 //    if(_pTripleBufferImpl && !_pTripleBufferImpl->beforeBufferDrawn()) return;
     // WritePixelArrays is OS3.0, We could use WriteChunkyPixels which is OS3.1.
-    Drawable_OS3::draw_WPA8(display);
+    if(GfxBase->LibNode.lib_Version>=40)
+    {
+        Drawable_OS3::draw_WriteChunkyPixels(display);
+    } else
+    if(GfxBase->LibNode.lib_Version>=36)
+    {
+        Drawable_OS3::draw_WPA8(display);
+    } else {
+        return;
+    }
+
    if(_pTripleBufferImpl) _pTripleBufferImpl->afterBufferDrawn();
 
    if(_flags & DISPFLAG_USEHEIGHTBUFFER) {
@@ -235,13 +293,24 @@ void Intuition_Screen_OS3::draw(_mame_display *display)
 Intuition_Window_OS3::Intuition_Window_OS3(const AbstractDisplay::params &params)
     : Intuition_Window(params), Drawable_OS3((IntuitionDrawable&)*this)
 {
-
+    printf("Intuition_Window_OS3\n");
 }
 Intuition_Window_OS3::~Intuition_Window_OS3()
 {
 
 }
 // open() is  Intuition_Window::open()
+bool Intuition_Window_OS3::open()
+{
+    if(_pWbWindow) return true; // already ok
+    bool ok = Intuition_Window::open();
+    if(!ok) return false;
+
+    // if any clut or RGB15 only:
+    initRemapTable();
+
+    return true;
+}
 
 void Intuition_Window_OS3::close()
 {
@@ -250,7 +319,35 @@ void Intuition_Window_OS3::close()
 }
 void Intuition_Window_OS3::draw(_mame_display *display)
 {
-    // would draw a OS3 window on workbench possibly AGA.
-    //TODO, with the ObtainPen() ans special remap thing.
-    // Drawable_OS3::draw_WPA8(display);
+   // printf("Intuition_Window_OS3::draw:\n");
+     if(!_pWbWindow || !_sWbWinSBitmap) return;
+    // would draw a OS3 window on workbench possibly AGA or CGX 8Bit.
+    // will draw to the current size.
+    _widthtarget = (int)(_pWbWindow->GZZWidth);
+    _heighttarget = (int)(_pWbWindow->GZZHeight);
+
+    _screenshiftx = 0; // because rastport is inside window
+    _screenshifty = 0;
+    // will draw on friend bitmap _sWbWinSBitmap.
+    //printf("GfxBase->LibNode.lib_Version %d\n",GfxBase->LibNode.lib_Version);
+    if(GfxBase->LibNode.lib_Version>=40)
+    {
+        Drawable_OS3::draw_WriteChunkyPixels(display);
+    } else
+    if(GfxBase->LibNode.lib_Version>=36)
+    {
+        Drawable_OS3::draw_WPA8(display);
+    } else {
+        return;
+    }
+
+    // then use os copy to window, it manages layers, slow because 2 pass but easy way.
+    BltBitMapRastPort( _sWbWinSBitmap,//CONST struct BitMap *srcBitMap,
+           0,0, //LONG xSrc, LONG ySrc,
+           _pWbWindow->RPort,//struct RastPort *destRP,
+           0,0,//LONG xDest, LONG yDest,
+           _widthtarget, _heighttarget,
+           0x00c0//ULONG minterm  -> copy minterm.
+           );
+
 }

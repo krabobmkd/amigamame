@@ -15,6 +15,7 @@ public:
     virtual ~Paletted(){}
     int needRemap() const { return _needFirstRemap; }
      virtual void updatePaletteRemap(_mame_display *display) = 0;
+     // color lookup table to final screen pixel format. Use either table.
     std::vector<UBYTE> _clut8;
     std::vector<USHORT> _clut16;
     std::vector<ULONG> _clut32;
@@ -34,7 +35,7 @@ protected:
 
     int _pixFmt,_bytesPerPix;
 };
-
+/* When target is a 8Bit screen and game 8bit, use LoadRGB32() and no clut.  */
 class Paletted_Screen8 : public Paletted
 {
  public:
@@ -45,6 +46,9 @@ protected:
     ULONG _palette[3*32+2]; // LOADRGB32 format.
 };
 
+/* Whe target screen pixels is 8bit but palette is imposed by OS.
+* then Use CLUT
+*/
 // beta experimental
 class Paletted_Pens8 : public Paletted
 {
@@ -54,6 +58,8 @@ class Paletted_Pens8 : public Paletted
     void updatePaletteRemap(_mame_display *display) override;
 protected:
     struct Screen *_pScreen;
+    std::vector<UBYTE> _rgb4cube;
+    void initRemapCube();
 };
 
 #endif

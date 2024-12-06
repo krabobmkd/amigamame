@@ -774,6 +774,7 @@ void program_read_copy32be(offs_t address REGM(d0),UINT32 l REGM(d1), UINT32 *p 
 
 UINT32 memory_readmovem32_wr16(UINT32 offset REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
 UINT32 memory_writemovem32_wr16_reverse(UINT32 offset REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
+UINT32 memory_writemovem32_wr16_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
 UINT32 memory_writemovem32_wr32_reverse(UINT32 offset REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
 UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
 

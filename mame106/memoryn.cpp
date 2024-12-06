@@ -713,6 +713,28 @@ UINT32 memory_writemovem32_wr16_reverse(UINT32 address REGM(d0), UINT32 bits REG
 
     return count;
 }
+// needed by 68k interface because video drivers would just patch write16.
+// THE ONE also USED
+UINT32 memory_writemovem32_wr16_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
+{
+    UINT16 i = 0;
+    UINT32 count = 0;
+
+    for(; i < 16; i++)
+    {
+        if(bits & 1)
+        {
+            address-=4;
+            UINT32 v = preg[15-i];
+            memory_writelong_d16_be(address, v );
+            count++;
+        }
+        bits>>=1;
+    }
+
+    return count;
+}
+
 UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
 {
     UINT16 i = 0;

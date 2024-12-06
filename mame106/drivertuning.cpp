@@ -4,8 +4,8 @@
 #include <string>
 
 extern "C" {
-	#include <mamecore.h>	
-	unsigned int _bootframeskip=0;
+	#include "mamecore.h"
+	UINT32 _bootframeskip=0;
 }
 
 using namespace std;
@@ -13,8 +13,13 @@ using namespace std;
 
 
 static map<string,sDriverTuning> _tunings={
-	{"neogeo",{4*60}},
-	{"batrider",{4*60}}
+	{"neogeo",{240,0}},
+	{"batrider",{4*60,0}},
+	{"sgemf",{8*60,0}},
+	//toaplan1
+	{"demonwld",{0,MDTF_M68K_SAFE_MOVEMWRITE}},
+	{"truxton",{12*60,MDTF_LONGBOOT}}, // boot after the end of the world.
+	{"hellfire",{12*60,MDTF_LONGBOOT}},
 };
 
 sDriverTuning *getDriverTuning(const char *drivername)
@@ -42,9 +47,13 @@ sDriverTuning *getDriverTuning(const struct _game_driver *pdriver)
 void applyDriverTuning(const struct _game_driver *pd)
 {
     if(!pd) return;
-    _bootframeskip = 30; // default ?
+    _bootframeskip = 0;
     sDriverTuning *ptuning = getDriverTuning(pd);
     if(!ptuning) return;
     _bootframeskip = ptuning->_bootframeskip;
 
+    if(ptuning->_flags & MDTF_M68K_SAFE_MOVEMWRITE)
+    {
+        ui_popup("Long boot, must wait...");
+    }
 }

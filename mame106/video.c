@@ -832,7 +832,8 @@ static void recompute_fps(int skipped_it)
 
 //krb
 extern int soundMixerIsOn();
-
+extern UINT32 _bootframeskip;
+UINT32 _frame=0;
 /*-------------------------------------------------
     updatescreen - handle frameskipping and UI,
     plus updating the screen during normal
@@ -842,7 +843,8 @@ extern int soundMixerIsOn();
 void updatescreen(void)
 {
     /* update sound */
-	if(Machine->sample_rate>0 && soundMixerIsOn())  sound_frame_update();
+	if(Machine->sample_rate>0 && soundMixerIsOn() && _frame<_bootframeskip)  sound_frame_update();
+
 
 	/* if we're not skipping this frame, draw the screen */
 	if (!osd_skip_this_frame())
@@ -871,6 +873,8 @@ void updatescreen(void)
 		(*Machine->drv->video_eof)();
 		profiler_mark(PROFILER_END);
 	}
+    // krb
+    _frame++;
 }
 
 

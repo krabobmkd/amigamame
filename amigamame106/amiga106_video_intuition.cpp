@@ -356,6 +356,7 @@ void Intuition_Screen::waitFrame()
 
 Intuition_Window::Intuition_Window(const AbstractDisplay::params &params) : IntuitionDrawable(params._flags)
     , _pWbWindow(NULL)
+    , _sWbWinSBitmap(NULL)
     , _machineWidth(params._width),_machineHeight(params._height)
     , _maxzoomfactor(1)
 {
@@ -390,12 +391,6 @@ bool Intuition_Window::open()
     ycen>>=1;
 //    printf("openWindow:_machineWidth:%d _machineHeight:%d xcen:%d ycen:%d \n",_machineWidth,_machineHeight,xcen,ycen);
 
-// struct BitMap * __stdargs AllocBitMap( ULONG sizex, ULONG sizey, ULONG depth, ULONG flags, CONST struct BitMap *friend_bitmap );
-
-//    _sWbWinSBitmap = AllocBitMap(_machineWidth*_maxzoomfactor,_machineHeight*_maxzoomfactor,
-//            pWbScreen->RastPort.BitMap->Depth,BMF_CLEAR|BMF_DISPLAYABLE,pWbScreen->RastPort.BitMap);
-//    if(_sWbWinSBitmap) {
-
     _pWbWindow = (Window *)OpenWindowTags(NULL,
         WA_Left,xcen,
         WA_Top,ycen,
@@ -428,18 +423,33 @@ bool Intuition_Window::open()
         );
 //    } // end if sbm ok
     UnlockPubScreen(NULL,pWbScreen);
+    if(_pWbWindow == NULL) return false;
 
-    return ( _pWbWindow != NULL );
+    if(!_sWbWinSBitmap)
+    {
+        _sWbWinSBitmap = AllocBitMap(
+                    _machineWidth*_maxzoomfactor,_machineHeight*_maxzoomfactor,
+                _pWbWindow->WScreen->RastPort.BitMap->Depth,
+                    BMF_CLEAR|BMF_DISPLAYABLE, _pWbWindow->WScreen->RastPort.BitMap);
+        if(!_sWbWinSBitmap) {
+            close();
+            return false;
+        }
+    }
+
+    return true;
 
 }
 void Intuition_Window::close()
 {
     IntuitionDrawable::close();
+
+    if(_sWbWinSBitmap) FreeBitMap(_sWbWinSBitmap);
+    _sWbWinSBitmap = NULL;
+
     if(_pWbWindow) CloseWindow(_pWbWindow);
     _pWbWindow = NULL;
 
-//    if(_sWbWinSBitmap) FreeBitMap(_sWbWinSBitmap);
-//    _sWbWinSBitmap = NULL;
 }
 #ifdef USE_DIRECT_WB_RENDERING
 //doesnt work at all! how to check that ? Layer.library ?
@@ -456,6 +466,11 @@ bool Intuition_Window::isOnTop()
     return isontop;
 }
 #endif
+Screen *Intuition_Window::screen()
+{
+    if(!_pWbWindow) return NULL;
+    return _pWbWindow->WScreen;
+}
 Window *Intuition_Window::window()
 {
     return _pWbWindow;
@@ -464,6 +479,10 @@ RastPort *Intuition_Window::rastPort()
 {
     if(!_pWbWindow) return NULL;
     return _pWbWindow->RPort;
+}
+BitMap *Intuition_Window::bitmap()
+{
+    return _sWbWinSBitmap;
 }
 
 // - - - - - --  -

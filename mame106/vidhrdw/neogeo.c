@@ -1290,26 +1290,22 @@ void oldUpdate( mame_bitmap *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( neogeo )
 {
- //if(nbframe < 60*10)
- // {
- //   oldUpdate(bitmap,cliprect);
- //   return;
- // }
-    // let a few glitch drawn during glitch startup, but basically draw nothing. does fast boot.
+
     if(neogeo_draw_counter==0) fillbitmap(bitmap,4095,cliprect);
- // todo, bypass when glitching.
+    //  bypass when glitching at boot.
+    // let a few glitch drawn during glitch startup, but basically draw nothing. does fast boot.
+    // note: during boot all 384 sprites are stretched so it's like we draw 100 screens...
     if(neogeo_draw_counter<240)
     {
         neogeo_draw_counter++;
-        if(neogeo_draw_counter != 80)  return;
+        if(neogeo_draw_counter != 80)  return; // yet let a single glitch frame so we know it's going on.
     }
     fillbitmap(bitmap,4095,cliprect);
-/*
-    rectangle rc = *cliprect;
-  rc.min_y +=7;
-  rc.max_y -=7;
-*/
-    neogeo_drawTilesSprites(bitmap,/*&rc*/ cliprect);
+
+    // this engine was rewritten in 2004. Sort of 2003 version completely rewritten/optimized
+    // with 3 tests by sprite lines instead of 7 and just the transparent pixel test. No test for zoomx,
+    // more escape for totally transparent tiles and lines.
+    neogeo_drawTilesSprites(bitmap,cliprect);
 
 	neogeo_draw_s_layer(bitmap,cliprect);
 

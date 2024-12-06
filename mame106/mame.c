@@ -79,6 +79,7 @@
 #include "debugger.h"
 #include "profiler.h"
 #include "bootlog.h"
+#include "drivertuning.h"
 #if defined(MAME_DEBUG) && defined(NEW_DEBUGGER)
 #include "debug/debugcon.h"
 #endif
@@ -1002,6 +1003,9 @@ static void create_machine(int game)
 
 	/* add an exit callback to clear out the Machine on the way out */
 	add_exit_callback(destroy_machine);
+
+	// krb
+    applyDriverTuning(Machine->gamedrv);
 }
 
 
@@ -1185,7 +1189,7 @@ static void init_machine(void)
     soft_reset - actually perform a soft-reset
     of the system
 -------------------------------------------------*/
-
+extern UINT32 _frame;
 static void soft_reset(int param)
 {
 	callback_item *cb;
@@ -1229,6 +1233,9 @@ static void soft_reset(int param)
 	/* set the global time to the current time */
 	/* this allows 0-time queued callbacks to run before any CPUs execute */
 	mame_timer_set_global_time(mame_timer_get_time());
+
+	//krb
+	_frame = 0;
 }
 
 

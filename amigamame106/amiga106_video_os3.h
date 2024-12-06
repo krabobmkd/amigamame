@@ -13,6 +13,7 @@ public:
   Drawable_OS3(IntuitionDrawable &drawable);
   virtual ~Drawable_OS3();
   void draw_WPA8(_mame_display *display);
+  void draw_WriteChunkyPixels(_mame_display *display);
 protected:
   void initRemapTable();
   void close();
@@ -51,7 +52,7 @@ public:
     Intuition_Window_OS3(const AbstractDisplay::params &params);
     ~Intuition_Window_OS3();
 
-    //bool open() override;
+    bool open() override;
     void close() override;
     void draw(_mame_display *display) override;
 

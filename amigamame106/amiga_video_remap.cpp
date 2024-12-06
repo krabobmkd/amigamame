@@ -263,7 +263,7 @@ Paletted_Screen8::Paletted_Screen8(struct Screen *pScreen)
 void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
 {
     if(!_pScreen) return;
-
+    //    printf("Paletted_Screen8::updatePaletteRemap\n");
     const rgb_t *gpal1 = display->game_palette;
     USHORT nbc = (USHORT)display->game_palette_entries;
     UINT32 *pdirtrybf =	display->game_palette_dirty;
@@ -279,6 +279,7 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
 
     if(_needFirstRemap)
     {
+        //printf("Paletted_Screen8::updatePaletteRemap _needFirstRemap\n");
         // on first force all dirty to have all done once.
         int nbdirstybf = (nbc+31)>>5;
         for(int i=0;i<nbdirstybf;i++) pdirtrybf[i]=~0;
@@ -307,6 +308,7 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
             *pc++= (c<<24) & 0xff000000;
         }
         *pc = 0; // term.
+            //    printf("LoadRGB32\n");
         LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &_palette[0]);
      }
      // todo: if more color, remap to first
@@ -322,11 +324,11 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
 Paletted_Pens8::Paletted_Pens8(struct Screen *pScreen)
     : Paletted(), _pScreen(pScreen)
 {
-
+//    printf("Paletted_Pens8:%08x\n",pScreen);
 }
 Paletted_Pens8::~Paletted_Pens8()
 {
-    printf("~Paletted_Pens8\n");
+//    printf("~Paletted_Pens8\n");
 //    if(_pScreen)
 //    {
 //        struct ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
@@ -340,10 +342,11 @@ Paletted_Pens8::~Paletted_Pens8()
 }
 void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
 {
+//    printf("updatePaletteRemap:\n");
     if(!_pScreen) return;
     struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
     if(!pColorMap) return;
-
+//    printf("updatePaletteRemap: go\n");
     const rgb_t *gpal1 = display->game_palette;
     USHORT nbc = (USHORT)display->game_palette_entries;
     UINT32 *pdirtrybf =	display->game_palette_dirty;
@@ -353,6 +356,8 @@ void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
         // on first force all dirty to have all done once.
         int nbdirstybf = (nbc+31)>>5;
         for(int i=0;i<nbdirstybf;i++) pdirtrybf[i]=~0;
+        // also that,
+        initRemapCube();
     }
     if(_clut8.size()<nbc) _clut8.resize(nbc,0);
     UBYTE *pclut = _clut8.data();
@@ -370,21 +375,59 @@ void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
 
             if(dirtybf&1)
             {
-                 ULONG c = *gpal;
-                LONG p = ObtainBestPenA(pColorMap,
-                (c<<8) & 0xff000000,
-                (c<<16) & 0xff000000,
-                (c<<24) & 0xff000000,
-                 NULL);
-              if(p>=0){
-                ReleasePen(pColorMap,p); // test
-                pclut[i] = (UBYTE)p;
-              } else pclut[i] =0;
+                ULONG c = *gpal;
+                UWORD rgb4 = ((c>>(20-8)) & 0x0f00) |
+                              ((c>>(12-4)) & 0x00f0) |
+                              ((c>>4) & 0x000f) ;
+                pclut[i] =_rgb4cube[rgb4];
             } // end if dirty
             dirtybf>>=1;
             gpal++;
         } // end loop per 32
      }
 
+}
+void Paletted_Pens8::initRemapCube()
+{
+    // should lock -> no, the window locks the WB.
+    struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
+    if(!pColorMap) return;
+
+    // 16*16*16
+    const UBYTE excluded = 255;
+    _rgb4cube.resize(4096,excluded); // don't allow 255
+
+    for(LONG i=0;i<pColorMap->Count ; i++)
+    {
+       ULONG rgb4 = GetRGB4(pColorMap,i) & 0x0fff;
+       _rgb4cube[rgb4] = (UBYTE)i;
+    }
+    for(UWORD rgbi=0;rgbi<4096;rgbi++)
+    {
+        //UWORD rgbi = rgi | b;
+        if(_rgb4cube[rgbi] ==excluded)
+        {
+            UBYTE isbest=0;
+            ULONG isbesterr=0x0fffffff;
+            BYTE r = rgbi>>8;
+            BYTE g = (rgbi>>4) & 0x0f;
+            BYTE b = rgbi & 0x0f;
+
+            for(UWORD is=0;is<4096;is++)
+            {
+                if(_rgb4cube[is] == excluded) continue;
+                BYTE rs = rgbi>>8;
+                BYTE gs = (rgbi>>4) & 0x0f;
+                BYTE bs = rgbi & 0x0f;
+                ULONG err = (rs-r)*(rs-r) + (gs-g)*(gs-g) + (bs-b)*(bs-b);
+                if(err<isbesterr) {
+                    isbest = _rgb4cube[is];
+                    isbesterr = err;
+                    if(isbesterr ==0) break;
+                }
+            }
+            _rgb4cube[rgbi] = isbest;
+        } // end if excluded
+    }
 }
 

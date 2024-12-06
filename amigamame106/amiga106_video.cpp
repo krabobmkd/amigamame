@@ -113,8 +113,6 @@ static ULONG FrameCounterUpdate=0;
 static INT64 FrameCounter=0;
 INT64 StartTime = 0;
 ULONG GetStartTime=0;
-ULONG TotalFrameCounter = 0;
-
 
 //ledBitmap _ledBitmap(3,4); // nbleds, ledwidth
 bool SwitchWindowFullscreen()
@@ -251,7 +249,6 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
 
     AllocInputs(); // input object depends of screen or window.
 
-    TotalFrameCounter = 0;
     FrameCounterUpdate = 0;
     FrameCounter = 0;
     StartTime = 0;
@@ -294,7 +291,9 @@ void osd_close_display(void)
   simulated using the keyboard LEDs, or in other ways e.g. by placing graphics
   on the window title bar.
 */
-
+// this counter is from mame and take account of resets.
+extern ULONG _frame;
+extern ULONG _bootframeskip;
 void osd_update_video_and_audio(struct _mame_display *display)
 {
 
@@ -319,7 +318,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
         {
             ResetWatchTimer();
         }
-
+        if(_frame>=_bootframeskip)
         while(cnow<cyclethatShouldBeNow)
         {
             // some functions that knowns how to actually pass priority to other tasks.
@@ -402,8 +401,7 @@ extern ULONG _bootframeskip;
 */
 int osd_skip_this_frame(void)
 {
-    if(TotalFrameCounter< _bootframeskip && TotalFrameCounter>0) return 1;
-    TotalFrameCounter++;
+    if(_frame< _bootframeskip && _frame>0) return FrameCounterUpdate & 1;
     MameConfig::Display &config = getMainConfig().display();
     if(config._flags & CONFDISPLAYFLAGS_FRAMESKIP) return FrameCounterUpdate & 1;
     return 0 ;
