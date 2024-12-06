@@ -114,13 +114,11 @@ public:
     Screen *screen() override;
     Window *window() override;
     RastPort *rastPort() override;
-    BitMap *bitmap() override;
 #ifdef USE_DIRECT_WB_RENDERING
     bool isOnTop();
 #endif
 protected:
     Window *_pWbWindow;
-    BitMap *_sWbWinSBitmap;
 
     int _machineWidth,_machineHeight;
     int _maxzoomfactor;

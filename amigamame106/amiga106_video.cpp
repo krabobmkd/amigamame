@@ -318,16 +318,27 @@ void osd_update_video_and_audio(struct _mame_display *display)
         {
             ResetWatchTimer();
         }
+        static int lastwaitskipped = 0;
         if(_frame>=_bootframeskip)
-        while(cnow<cyclethatShouldBeNow)
         {
-            // some functions that knowns how to actually pass priority to other tasks.
-            // Graphics/WaitTOF() does but is 50 or 60Hz, and will wait a random time on first call.
-            // Graphics/WaitBOVP(vp) should fit exact screen frame but is commonly bad implemented and hogs cpu.
-            g_pMameDisplay->WaitFrame();
+            if(lastwaitskipped) {
+                ResetWatchTimer();
+                lastwaitskipped = 0;
+                cnow = cyclethatShouldBeNow;
+            }
 
-            cnow = osd_cycles();
-        }
+            while(cnow<cyclethatShouldBeNow)
+            {
+                // some functions that knowns how to actually pass priority to other tasks.
+                // Graphics/WaitTOF() does but is 50 or 60Hz, and will wait a random time on first call.
+                // Graphics/WaitBOVP(vp) should fit exact screen frame but is commonly bad implemented and hogs cpu.
+                g_pMameDisplay->WaitFrame();
+
+                cnow = osd_cycles();
+            }
+
+        } else lastwaitskipped = 1;
+
     }
 
     g_pMameDisplay->draw(display);

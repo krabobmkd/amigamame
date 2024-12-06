@@ -320,7 +320,7 @@ void Intuition_Window_OS3::close()
 void Intuition_Window_OS3::draw(_mame_display *display)
 {
    // printf("Intuition_Window_OS3::draw:\n");
-     if(!_pWbWindow || !_sWbWinSBitmap) return;
+     if(!_pWbWindow) return;
     // would draw a OS3 window on workbench possibly AGA or CGX 8Bit.
     // will draw to the current size.
     _widthtarget = (int)(_pWbWindow->GZZWidth);
@@ -340,14 +340,5 @@ void Intuition_Window_OS3::draw(_mame_display *display)
     } else {
         return;
     }
-
-    // then use os copy to window, it manages layers, slow because 2 pass but easy way.
-    BltBitMapRastPort( _sWbWinSBitmap,//CONST struct BitMap *srcBitMap,
-           0,0, //LONG xSrc, LONG ySrc,
-           _pWbWindow->RPort,//struct RastPort *destRP,
-           0,0,//LONG xDest, LONG yDest,
-           _widthtarget, _heighttarget,
-           0x00c0//ULONG minterm  -> copy minterm.
-           );
 
 }

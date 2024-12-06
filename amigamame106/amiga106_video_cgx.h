@@ -62,8 +62,9 @@ public:
     void draw(_mame_display *display) override;
     bool open() override;
     void close() override;
+    BitMap *bitmap() override;
 protected:
-
+    BitMap *_sWbWinSBitmap;
 
 };
 

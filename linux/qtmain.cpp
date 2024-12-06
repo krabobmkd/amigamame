@@ -167,7 +167,7 @@ void QProc::process()
 //    "bublbobl"
 //   "dino"
 //                 "arkretrn"
-        "demonwld"
+        "psychic5"
 //"pdrift"
 //"qbert"
  //   "rastsaga"

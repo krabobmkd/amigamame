@@ -20,6 +20,8 @@ extern "C" {
     #include "mamecore.h"
     #include "video.h"
 }
+#include <vector>
+using namespace std;
 
 Paletted::Paletted() : _needFirstRemap(1)
 {
@@ -376,8 +378,8 @@ void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
             if(dirtybf&1)
             {
                 ULONG c = *gpal;
-                UWORD rgb4 = ((c>>(20-8)) & 0x0f00) |
-                              ((c>>(12-4)) & 0x00f0) |
+                UWORD rgb4 = ((c>>12) & 0x0f00) |
+                              ((c>>8) & 0x00f0) |
                               ((c>>4) & 0x000f) ;
                 pclut[i] =_rgb4cube[rgb4];
             } // end if dirty
@@ -394,40 +396,42 @@ void Paletted_Pens8::initRemapCube()
     if(!pColorMap) return;
 
     // 16*16*16
-    const UBYTE excluded = 255;
-    _rgb4cube.resize(4096,excluded); // don't allow 255
+    _rgb4cube.resize(4096); // don't allow 255
 
+    vector<UWORD> pal(pColorMap->Count);
     for(LONG i=0;i<pColorMap->Count ; i++)
     {
-       ULONG rgb4 = GetRGB4(pColorMap,i) & 0x0fff;
-       _rgb4cube[rgb4] = (UBYTE)i;
+       pal[i] = GetRGB4(pColorMap,i);
     }
     for(UWORD rgbi=0;rgbi<4096;rgbi++)
     {
-        //UWORD rgbi = rgi | b;
-        if(_rgb4cube[rgbi] ==excluded)
-        {
-            UBYTE isbest=0;
-            ULONG isbesterr=0x0fffffff;
-            BYTE r = rgbi>>8;
-            BYTE g = (rgbi>>4) & 0x0f;
-            BYTE b = rgbi & 0x0f;
+        UBYTE isbest=0;
+        ULONG isbesterr=0x0fffffff;
+        WORD r = rgbi>>8;
+        WORD g = (rgbi>>4) & 0x0f;
+        WORD b = rgbi & 0x0f;
 
-            for(UWORD is=0;is<4096;is++)
-            {
-                if(_rgb4cube[is] == excluded) continue;
-                BYTE rs = rgbi>>8;
-                BYTE gs = (rgbi>>4) & 0x0f;
-                BYTE bs = rgbi & 0x0f;
-                ULONG err = (rs-r)*(rs-r) + (gs-g)*(gs-g) + (bs-b)*(bs-b);
-                if(err<isbesterr) {
-                    isbest = _rgb4cube[is];
-                    isbesterr = err;
-                    if(isbesterr ==0) break;
-                }
+        for(UWORD i=0;i<pColorMap->Count;i++)
+        {
+            UWORD c =pal[i];
+            WORD rs = c>>8;
+            WORD gs = (c>>4) & 0x0f;
+            WORD bs = c & 0x0f;
+            // error between color is better with greater error
+            LONG err = (rs-r)*(rs-r); // that makes a abs without test.
+            LONG err_g = (gs-g)*(gs-g);
+            LONG err_b = (bs-b)*(bs-b);
+            if(err_g>err) err = err_g;
+            if(err_b>err) err = err_b;
+
+            if(err<isbesterr) {
+                isbest = i;
+                isbesterr = err;
+                if(isbesterr ==0) break;
             }
-            _rgb4cube[rgbi] = isbest;
-        } // end if excluded
+        }
+        _rgb4cube[rgbi] = isbest;
+
     }
 }
 

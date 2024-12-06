@@ -575,7 +575,7 @@ static void pdo32(sBlitMaskParams *p REGTM(a0) )
     INT16 i,y,y_next,count;
 
     const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    UINT32 *dest0 = p->dest;
     UINT8 *pri0 = p->pri;
     y = p->y;
     y_next = p->y_next;
@@ -586,7 +586,7 @@ static void pdo32(sBlitMaskParams *p REGTM(a0) )
     for(;;)
     {
         const UINT16 *source = source0;
-        UINT16 *dest = dest0;
+        UINT32 *dest = dest0;
         UINT8 *pri = pri0;
         for( i=0; i<count; i++ )
         {
@@ -609,7 +609,7 @@ static void npdo32(sBlitMaskParams *p REGTM(a0) )
     INT16 i,y,y_next,count;
 
     const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    UINT32 *dest0 = p->dest;
     y = p->y;
     y_next = p->y_next;
     count = p->count;
@@ -623,7 +623,7 @@ static void npdo32(sBlitMaskParams *p REGTM(a0) )
     for(;;)
     {
         const UINT16 *source = source0;
-        UINT16 *dest = dest0;
+        UINT32 *dest = dest0;
         for( i=0; i<oddcount; i++ )
         {
             dest[i] = clut[source[i]];
@@ -828,7 +828,7 @@ static void pdt32(sBlitMaskParams *p REGTM(a0) )
     INT16 i,y,y_next,count;
 
     const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    UINT32 *dest0 = p->dest;
     const UINT8 *pMask0 = p->pMask;
     UINT8 *pri0 = p->pri;
     y = p->y;
@@ -841,7 +841,7 @@ static void pdt32(sBlitMaskParams *p REGTM(a0) )
     for(;;)
     {
         const UINT16 *source = source0;
-        UINT16 *dest = dest0;
+        UINT32 *dest = dest0;
         const UINT8 *pMask = pMask0;
         UINT8 *pri = pri0;
 
@@ -872,7 +872,7 @@ static void npdt32(sBlitMaskParams *p REGTM(a0) )
     INT16 i,y,y_next,count;
 
     const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    UINT32 *dest0 = p->dest;
     const UINT8 *pMask0 = p->pMask;
     y = p->y;
     y_next = p->y_next;
@@ -885,7 +885,7 @@ static void npdt32(sBlitMaskParams *p REGTM(a0) )
     for(;;)
     {
         const UINT16 *source = source0;
-        UINT16 *dest = dest0;
+        UINT32 *dest = dest0;
         const UINT8 *pMask = pMask0;
 
 
@@ -956,7 +956,7 @@ static void pbo32(sBlitMaskParams *p REGTM(a0) )
     INT16 i,y,y_next,count;
     UINT8 *pri0 = p->pri;
     const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    UINT32 *dest0 = p->dest;
 
     y = p->y;
     y_next = p->y_next;
@@ -965,7 +965,7 @@ static void pbo32(sBlitMaskParams *p REGTM(a0) )
     for(;;)
     {
         const UINT16 *source = source0;
-        UINT16 *dest = dest0;
+        UINT32 *dest = dest0;
         UINT8 *pri = pri0;
 
         for( i=0; i<count; i++ )
@@ -988,7 +988,7 @@ static void npbo32(sBlitMaskParams *p REGTM(a0)  )
 {
     INT16 i,y,y_next,count;
     const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    UINT32 *dest0 = p->dest;
         UINT32 pcode = p->pcode;
     y = p->y;
     y_next = p->y_next;
@@ -1002,9 +1002,7 @@ static void npbo32(sBlitMaskParams *p REGTM(a0)  )
     for(;;)
     {
         const UINT16 *source = source0;
-        UINT16 *dest = dest0;
-
-
+        UINT32 *dest = dest0;
         for( i=0; i<oddcount; i++ )
         {
             dest[i] = alpha_blend32(dest[i], clut[source[i]]);
@@ -1070,7 +1068,7 @@ static void pbt32(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 i,y,y_next,count;
     const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    UINT32 *dest0 = p->dest;
     const UINT8 *pMask0 = p->pMask;
         UINT32 pcode = p->pcode;
     y = p->y;
@@ -1085,7 +1083,7 @@ static void pbt32(sBlitMaskParams *p REGTM(a0) )
     for(;;)
     {
         const UINT16 *source = source0;
-        UINT16 *dest = dest0;
+        UINT32 *dest = dest0;
         const UINT8 *pMask = pMask0;
         UINT8 *pri = pri0;
 
@@ -1112,7 +1110,7 @@ static void npbt32(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 i,y,y_next,count;
     const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    UINT32 *dest0 = p->dest;
     const UINT8 *pMask0 = p->pMask;
         UINT32 pcode = p->pcode;
     y = p->y;
@@ -1130,7 +1128,7 @@ static void npbt32(sBlitMaskParams *p REGTM(a0) )
     for(;;)
     {
         const UINT16 *source = source0;
-        UINT16 *dest = dest0;
+        UINT32 *dest = dest0;
         const UINT8 *pMask = pMask0;
         UINT8 *pri = pri0;
 

@@ -1,6 +1,13 @@
 
 todo R1
 
+
+ - O repair Aurail ?
+ - O 8Bit Rendering on Windows.
+ - O Amigaguide
+ - O samples load for QBert
+ - O bug tilemap psychic5
+
  - X bug galaga white bg when window to fullscreen
  - O optimize gauntlet
  - X no sound mix if no audio

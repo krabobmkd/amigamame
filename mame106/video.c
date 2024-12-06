@@ -843,7 +843,7 @@ UINT32 _frame=0;
 void updatescreen(void)
 {
     /* update sound */
-	if(Machine->sample_rate>0 && soundMixerIsOn() && _frame<_bootframeskip)  sound_frame_update();
+	if(Machine->sample_rate>0 && soundMixerIsOn() && _frame>=_bootframeskip)  sound_frame_update();
 
 
 	/* if we're not skipping this frame, draw the screen */

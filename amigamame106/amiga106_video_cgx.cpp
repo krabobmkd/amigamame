@@ -77,7 +77,6 @@ void Drawable_CGX::initRemapTable()
     if(_useIntuitionPalette)
     {
         // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
-        printf("Paletted_Screen8\n");
         _pRemap = new Paletted_Screen8(_drawable.screen());
     } else
     {
@@ -400,7 +399,7 @@ void Intuition_Screen_CGX::draw(_mame_display *display)
 }
 // - - -- -  - - --
 Intuition_Window_CGX::Intuition_Window_CGX(const AbstractDisplay::params &params)
- :Intuition_Window(params), Drawable_CGX((IntuitionDrawable&)*this)
+    :Intuition_Window(params), Drawable_CGX((IntuitionDrawable&)*this),_sWbWinSBitmap(NULL)
 {
     _colorsIndexLength = params._colorsIndexLength;
     _video_attributes = params._video_attributes;
@@ -469,6 +468,18 @@ bool Intuition_Window_CGX::open()
     bool ok = Intuition_Window::open();
     if(!ok) return false;
 
+    if(!_sWbWinSBitmap && _pWbWindow)
+    {
+        _sWbWinSBitmap = AllocBitMap(
+                        _machineWidth*_maxzoomfactor,_machineHeight*_maxzoomfactor,
+                    _pWbWindow->WScreen->RastPort.BitMap->Depth,
+                        BMF_CLEAR|BMF_DISPLAYABLE, _pWbWindow->WScreen->RastPort.BitMap);
+        if(!_sWbWinSBitmap) {
+            close();
+            return false;
+        }
+    }
+
     if(CyberGfxBase && _sWbWinSBitmap && GetCyberMapAttr(_sWbWinSBitmap,CYBRMATTR_ISCYBERGFX))
     {   // this should be the case:
         _PixelFmt = GetCyberMapAttr(_sWbWinSBitmap,CYBRMATTR_PIXFMT);
@@ -491,7 +502,13 @@ bool Intuition_Window_CGX::open()
 }
 void Intuition_Window_CGX::close()
 {
+    if(_sWbWinSBitmap) FreeBitMap(_sWbWinSBitmap);
+    _sWbWinSBitmap = NULL;
     Intuition_Window::close();
     Drawable_CGX::close();
 
+}
+BitMap *Intuition_Window_CGX::bitmap()
+{
+    return _sWbWinSBitmap;
 }
