@@ -1,20 +1,17 @@
 
 todo R1
 
-
- - O repair Aurail ?
- - O 8Bit Rendering on Windows.
- - O Amigaguide
+ - O 8Bit Rendering on Screens for 16b.
+ - X 8Bit Rendering on Windows.
+ - X Amigaguide
  - O samples load for QBert
- - O bug tilemap psychic5
+ - X bug tilemap psychic5
 
  - X bug galaga white bg when window to fullscreen
  - O optimize gauntlet
  - X no sound mix if no audio
 - O fastboot neogeo, batrider -> no mix
- - O amigaguide with md2ag
-     - controllers image
-     - P96 add mode
+
 
 todo beta4
 

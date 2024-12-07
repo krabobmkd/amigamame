@@ -908,7 +908,12 @@ INLINE void compose_pathStr(std::string &str, const char *gamename, const char *
     if(filename) ss << filename;
 
 	/* if there's no extension in the filename, add the extension */
-	if (extension && str.rfind(".")==string::npos)
+    if (
+        // this is to make sample.wav
+        (extension && filename && strstr(filename,extension) != (filename+(strlen(filename)-strlen(extension))))
+        || // this is to make game.zip ... yes, it's messy.
+        (extension && gamename && filename==NULL)
+        )
 	{
     	ss <<"." << extension;
 	}
@@ -1191,6 +1196,7 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 		/* now look for it within a ZIP file */
 		if (!(flags & (FILEFLAG_OPENWRITE | FILEFLAG_NOZIP)))
 		{
+
 			/* first look for path/gamename.zip */
 			compose_pathStr(strname, gamename, NULL, "zip");
 			VPRINTF(("Trying %s file\n", name));
@@ -1245,7 +1251,6 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 					int err;
 					/* Try loading the file */
 					err = load_zipped_file(pathtype, pathindex, strname.c_str(),  tempnamestr.c_str(), &file.data, &ziplength);
-
 					/* If it failed, since this is a ZIP file, we can try to load by CRC
                        if an expected hash has been provided. unzip.c uses this ugly hack
                        of specifying the CRC as filename. */

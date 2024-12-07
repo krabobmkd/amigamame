@@ -197,6 +197,7 @@ int osd_get_path_count(int pathtype)
     {
         case AFT_ABSOLUTE: return 1;
         case AFT_ROM: return 1;
+        case AFT_SAMPLE: return 1;
         case AFT_USER: return 1;
         default: return 0;
     }
@@ -209,6 +210,7 @@ void composeFilePath(int pathtype, int pathindex, const char *filename, std::str
     switch( getAmigaFileType(pathtype))
     {
         case AFT_ROM: p = conf.getRomsDir(); break;
+        case AFT_SAMPLE: p = conf.getSamplesDir(); break;
         case AFT_USER:
         {
             // where configs are written should be only one dir, no search.
@@ -233,13 +235,10 @@ osd_file *osd_fopen(int pathtype, int pathindex, const char *filename, const cha
     string spath;
     composeFilePath(pathtype,pathindex,filename,spath);
 
-// printf("osd_fopen:%d mode:%s file:%s\n",pathtype,mode,spath.c_str());
-
     _osd_file *posd = new _osd_file();
     if(!posd) return NULL;
     if(! posd->open(spath.c_str(),mode))
     {
-       //  printf("fail\n");
         delete posd;
         return NULL;
     }

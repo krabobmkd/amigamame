@@ -314,6 +314,7 @@ void MameConfig::toDefault()
     _controls._parallel_type[1]=0;
 
     _misc._romsPath = "PROGDIR:roms";
+    _misc._samplesPath = "PROGDIR:samples";
  //NOT THIS ONE !! decide where configs are written:  _misc._userPath = "PROGDIR:user";
     _misc._useCheatCodeFile = false;
     _misc._cheatFilePath = "PROGDIR:cheat.dat";
@@ -385,6 +386,8 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
     serializer("Mode",(int &)_mode,{"  None  ","   AHI   "});
     serializer("Frequency",_freq,11025,22050,22050); // not more low hz than 11025 it does too little buffers for AHI.
   //hide this for the moment  serializer("Force Mono",_forceMono);
+
+    serializer("Flags",_Flags,1,{"Use Samples"});
 }
 extern "C" {
      int hasParallelPort();
@@ -445,7 +448,8 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
  extern const bios_entry *system_bios_neogeo_first;
 #endif
 MameConfig::Misc::Misc() : ASerializable()
-     , _userPath("PROGDIR:user") // this can be chanegd at init by args, not by load/save/todefault.
+     , _userPath("PROGDIR:user")
+// this can be chanegd at init by args, not by load/save/todefault.
  {
 // #define SYSTEM_BIOS_START(name)						static const bios_entry system_bios_##name[] = {
 #ifdef LINK_NEOGEO
@@ -462,7 +466,8 @@ MameConfig::Misc::Misc() : ASerializable()
 
 void MameConfig::Misc::serialize(ASerializer &serializer)
 {
-    serializer("Roms",_romsPath,SERFLAG_STRING_ISPATH);    
+    serializer("Roms",_romsPath,SERFLAG_STRING_ISPATH);
+    serializer("Samples",_samplesPath,SERFLAG_STRING_ISPATH);
     serializer("Use Cheat Code File",_useCheatCodeFile);
     serializer("Cheat Code File",_cheatFilePath,SERFLAG_STRING_ISFILE);
 
@@ -827,7 +832,7 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
   //old  options.gamma= _display._color_gamma;
 
     options.samplerate=(_audio._mode == AudioMode::None)?0:_audio._freq;
-    options.use_samples = 0;
+    options.use_samples = ((_audio._Flags & 1) != 0);
 
     options.skip_disclaimer = (_misc._skipflags & 1) != 0;
     options.skip_gameinfo =

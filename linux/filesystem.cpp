@@ -215,6 +215,7 @@ int osd_get_path_count(int pathtype)
     {
         case AFT_ABSOLUTE: return 1;
         case AFT_ROM: return 1;
+        case AFT_SAMPLE: return 1;
         case AFT_USER: return 1;
         default: return 0;
     }
@@ -226,6 +227,7 @@ void composeFilePath(int pathtype, int pathindex, const char *filename, std::str
     switch( getAmigaFileType(pathtype))
     {
         case AFT_ROM: p ="roms"; break;
+        case AFT_SAMPLE: p ="samples"; break;
         case AFT_USER:
         {
             // where configs are written should be only one dir, no search.

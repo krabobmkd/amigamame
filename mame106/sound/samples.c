@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "streams.h"
 #include "samples.h"
-
+#include <stdio.h>
 
 struct sample_channel
 {
@@ -196,6 +196,7 @@ struct loaded_samples *readsamples(const char **samplenames, const char *basenam
 		if (samplenames[i+skipfirst][0])
 		{
 			f = mame_fopen(basename, samplenames[i+skipfirst], FILETYPE_SAMPLE, 0);
+
 			if (f == NULL && skipfirst)
 				f = mame_fopen(samplenames[0] + 1, samplenames[i+skipfirst], FILETYPE_SAMPLE, 0);
 			if (f != NULL)

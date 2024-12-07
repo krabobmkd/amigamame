@@ -117,7 +117,7 @@ options.ui_orientation = uiapplied & ORIENTATION_MASK;  // uiorientation;
 options.skip_disclaimer = 1;
 options.skip_gameinfo = 1;
 options.skip_warnings = 1;
-
+options.use_samples = 1;
 options.pause_bright = 1.0f;
     /* Clear the zip filename caches. */
 
@@ -167,7 +167,7 @@ void QProc::process()
 //    "bublbobl"
 //   "dino"
 //                 "arkretrn"
-        "psychic5"
+        "qbert"
 //"pdrift"
 //"qbert"
  //   "rastsaga"

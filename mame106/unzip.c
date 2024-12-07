@@ -629,7 +629,7 @@ int readuncompresszip(zip_file* zip, zip_entry* ent, char* data) {
 #ifdef ZIP_CACHE
 
 /* ZIP cache entries */
-#define ZIP_CACHE_MAX 5
+#define ZIP_CACHE_MAX 6
 
 /* ZIP cache buffer LRU ( Last Recently Used )
      zip_cache_map[0] is the newer
@@ -680,7 +680,6 @@ static zip_file* cache_openzip(int pathtype, int pathindex, const char* zipfile)
 	if (!zip)
 		return 0;
 
-//printf("cache_openzip: open ok\n ");
 	/* close the oldest entry */
 	if (zip_cache_map[ZIP_CACHE_MAX-1]) {
 		/* close last zip */
@@ -782,7 +781,6 @@ int /* error */ load_zipped_file (int pathtype, int pathindex, const char* zipfi
 	zip_file* zip;
 	zip_entry* ent;
 
- //   printf("load_zipped_file:%s %s\n",zipfile,filename);
 	zip = cache_openzip(pathtype, pathindex, zipfile);
 	if (!zip)
 		return -1;
@@ -801,7 +799,7 @@ int /* error */ load_zipped_file (int pathtype, int pathindex, const char* zipfi
 			*buf = (unsigned char*)malloc( *length );
 			if (!*buf) {
 				if (!gUnzipQuiet)
-					printf("load_zipped_file(): Unable to allocate %d bytes of RAM\n",*length);
+					loginfo(2,"load_zipped_file(): Unable to allocate %d bytes of RAM\n",*length);
 				cache_closezip(zip);
 				return -1;
 			}
@@ -809,6 +807,8 @@ int /* error */ load_zipped_file (int pathtype, int pathindex, const char* zipfi
 			if (readuncompresszip(zip, ent, (char*)*buf)!=0) {
 				free(*buf);
 				cache_closezip(zip);
+                loginfo(2,"zip failed readuncompresszip %s\n",filename);
+
 				return -1;
 			}
 

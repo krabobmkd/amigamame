@@ -100,6 +100,7 @@ public:
 
     const char *getUserDir() const {return _misc._userPath.c_str(); }
     const char *getRomsDir() const {return _misc._romsPath.c_str(); }
+    const char *getSamplesDir() const {return _misc._samplesPath.c_str(); }
 
     const std::vector<const _game_driver *const*> &romsFound() const { return _romsFound; };
     // do not keep that table...
@@ -196,6 +197,7 @@ public:
         AudioMode _mode = AudioMode::AHI;
         int _freq=0;
         bool _forceMono=true;
+        ULONG_FLAGS  _Flags = 1; // 1 use samples
     };
     Audio &audio() { return _audio; }
 
@@ -231,11 +233,11 @@ public:
     {
         Misc();
         void serialize(ASerializer &serializer) override;        
-        std::string _romsPath,_userPath;
+        std::string _romsPath,_samplesPath,_userPath;
         bool    _useCheatCodeFile = false;
         std::string _cheatFilePath="PROGDIR:cheat.dat";
         float     _speedlimit = 100.0f;
-        ULONG_FLAGS  _skipflags = 0;
+        ULONG_FLAGS  _skipflags = 0;       
         int         _neogeo_bios = 0;
 
         std::vector<std::string> _neogeoBiosList;
