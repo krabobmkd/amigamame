@@ -9,6 +9,7 @@
 #include <iostream>
 #include <proto/graphics.h>
 
+#include "amiga_video_tracers_clut16.h"
 extern "C" {
     // for pixel formats
     #include <cybergraphx/cybergraphics.h>
@@ -314,7 +315,10 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
         LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &_palette[0]); // change 1 to 32 colors at a time.
      }
 }
-
+void Paletted_Screen8::directDraw(directDrawParams *p)
+{
+    directDraw_UBYTE_UBYTE(p);
+}
 
 
 // - - - - - - --
@@ -372,6 +376,11 @@ void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
         } // end loop per 32
      }
 
+}
+void Paletted_Pens8::directDraw(directDrawParams *p)
+{
+    if(_clut8.size()==0) return;
+    directDrawClutT_UBYTE_UBYTE(p,_clut8.data());
 }
 void Paletted_Pens8::initRemapCube()
 {

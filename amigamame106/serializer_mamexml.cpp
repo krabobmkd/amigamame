@@ -81,6 +81,7 @@ void XmlWriter::operator()(const char *sMemberName, int &v,const std::vector<std
 
     int vv = v;
     if(vv<0) vv=0;
+
     if(values.size()>0 && vv>=(int)values.size()) vv = (int)values.size()-1;
 
     xml_data_node *p = xml_add_child(_recursenode.back(),name.c_str(), NULL/*values[vv].c_str()*/ );

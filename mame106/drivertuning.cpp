@@ -21,6 +21,7 @@ static map<string,sDriverTuning> _tunings={
 	{"truxton",{12*60,MDTF_LONGBOOT}}, // boot after the end of the world.
 	{"hellfire",{12*60,MDTF_LONGBOOT}},
 
+    {"arkretrn",{11*60,0}},
     {"arkretrn",{12*60,0}},
     {"ashura",{3*60,0}},
     {"slapfigh",{9*60,0}},

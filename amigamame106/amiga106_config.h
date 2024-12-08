@@ -161,6 +161,8 @@ public:
         ScreenModeChoice _ScreenModeChoice=ScreenModeChoice::Best;
         FSScaleMode _FSscaleMode = FSScaleMode::CenterWithNoScale;
         ULONG_SCREENMODEID _modeid=~0;
+        // these one are saved but ot on ui.
+        int _window_posx,_window_posy,_window_width,_window_height,_window_validpos=0;
     };
     struct Display : public ASerializable
     {

@@ -336,6 +336,13 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
         ScreenModeChoice *pScreenModeChoice = (ScreenModeChoice *)p;
         serializer.enable("Display.Per Screen Mode.Screen mode",(*pScreenModeChoice == ScreenModeChoice::Choose)?1:0);
     });
+
+//         int _window_posx,_window_posy,_window_width,_window_height,_window_validpos;
+    serializer("wx",_window_posx,{});
+    serializer("wx",_window_posy,{});
+    serializer("ww",_window_width,{});
+    serializer("wh",_window_height,{});
+    serializer("wv",_window_validpos,{});
 }
 void MameConfig::Display_PerScreenMode::valueUpdated(std::string upatedValue)
 {

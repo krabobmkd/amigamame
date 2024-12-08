@@ -7,7 +7,7 @@ extern "C"
     #include <exec/types.h>
 }
 #include "amiga106_video.h"
-
+#include "amiga_video_tracers.h"
 class Paletted
 {
 public:
@@ -15,6 +15,8 @@ public:
     virtual ~Paletted(){}
     int needRemap() const { return _needFirstRemap; }
      virtual void updatePaletteRemap(_mame_display *display) = 0;
+    // actual tracer to use with this kind of remap :)
+     virtual void directDraw(directDrawParams *p) {};
      // color lookup table to final screen pixel format. Use either table.
     std::vector<UBYTE> _clut8;
     std::vector<USHORT> _clut16;
@@ -41,6 +43,7 @@ class Paletted_Screen8 : public Paletted
  public:
     Paletted_Screen8(struct Screen *pScreen);
     void updatePaletteRemap(_mame_display *display) override;
+    void directDraw(directDrawParams *p) override;
 protected:
     struct Screen *_pScreen;
     ULONG _palette[3*32+2]; // LOADRGB32 format, used to load colors per 32.
@@ -58,6 +61,7 @@ class Paletted_Pens8 : public Paletted
     Paletted_Pens8(struct Screen *pScreen);
     ~Paletted_Pens8();
     void updatePaletteRemap(_mame_display *display) override;
+    void directDraw(directDrawParams *p) override;
 protected:
     struct Screen *_pScreen;
     std::vector<UBYTE> _rgb4cube;

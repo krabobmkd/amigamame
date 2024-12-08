@@ -34,13 +34,9 @@ public:
     virtual RastPort *rastPort() = 0;
     virtual Screen *screen() { return NULL; }
     virtual BitMap *bitmap() { return NULL; }
-    //virtual void waitFrame();
-    //inline ULONG pixelFmt() const { return _PixelFmt; }
-    //inline ULONG pixelBytes() const { return _PixelBytes; }
+
     inline int flags() const { return _flags; }
     void getGeometry(_mame_display *display,int &cenx,int &ceny,int &ww,int &hh, int &sourceWidth,int &sourceHeight);
-  //  virtual void drawRastPort_CGX(_mame_display *display,Paletted *pRemap);
-  //   void drawRastPortWPA8(_mame_display *display,Paletted *pRemap);
 
     inline int width() const { return _widthtarget; }
     inline int height() const { return _heighttarget; }
@@ -143,6 +139,7 @@ public:
     bool switchFullscreen() override;
     void WaitFrame() override;
 
+    WindowGeo getWindowGeometry() override; // to save/reload
 protected:
     IntuitionDrawable   *_drawable; // this manages screen or window opening
  //   IntuitionDrawer     *_drawer; // this manages drawing API.
@@ -164,7 +161,7 @@ protected:
 //    void releasePens();
     struct TextFont *_font;
 
-
+    void syncWindowGeo();
 };
 
 

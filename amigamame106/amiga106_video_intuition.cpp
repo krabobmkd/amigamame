@@ -527,6 +527,21 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
         close();
         return false;
     }
+    // re-apply size/pos when window
+    if(_params._flags & DISPFLAG_STARTWITHWINDOW && _params._wingeo._valid) // if set
+    {
+        Window *pwin = _drawable->window();
+        if(pwin)
+        {
+           // printf("ChangeWindowBox: %d\n",(int)_params._wingeo._window_posx);
+            ChangeWindowBox( pwin,
+                            _params._wingeo._window_posx,
+                            _params._wingeo._window_posy,
+                            _params._wingeo._window_width,
+                            _params._wingeo._window_height );
+        }
+    }
+
     //obtainPens();
     if(!_font)
     {
@@ -598,15 +613,30 @@ void IntuitionDisplay::init_rgb_components(unsigned int *rgbcomponents)
 //        }
 //    }
 //}
-
+void IntuitionDisplay::syncWindowGeo()
+{
+    // if current context is a floating window...
+    if(_drawable && (_params._flags & DISPFLAG_STARTWITHWINDOW) && _drawable->window())
+    {
+        Window *pwin = _drawable->window();
+        _params._wingeo._window_posx = pwin->LeftEdge;
+        _params._wingeo._window_posy = pwin->TopEdge;
+        _params._wingeo._window_width = pwin->Width;
+        _params._wingeo._window_height = pwin->Height;
+        _params._wingeo._valid = 1;
+      //  printf("getWindowGeo:%d\n",(int)_params._wingeo._window_posx);
+    }
+}
 bool IntuitionDisplay::switchFullscreen()
 {
-   close();
-   _params._flags ^= DISPFLAG_STARTWITHWINDOW; // switch bit.
-   return open(_params);
+    syncWindowGeo();
+    close();
+    _params._flags ^= DISPFLAG_STARTWITHWINDOW; // switch bit.
+    return open(_params);
 }
 void IntuitionDisplay::close()
 {
+    syncWindowGeo();
     if(_font)
     {
       CloseFont(_font);
@@ -785,4 +815,9 @@ void IntuitionDisplay::WaitFrame()
     WaitTOF();
 }
 
+WindowGeo IntuitionDisplay::getWindowGeometry()  // to save/reload
+{
+    syncWindowGeo();
 
+    return _params._wingeo;
+}

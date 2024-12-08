@@ -15,6 +15,12 @@ struct Screen;
 struct RastPort;
 struct BitMap;
 
+struct WindowGeo {
+    int _valid;
+    WORD _window_posx,_window_posy;
+    WORD _window_width,_window_height;
+};
+
 /** full virtual */
 class AbstractDisplay
 {
@@ -33,7 +39,8 @@ public:
         int _width,_height;
         int _colorsIndexLength;
         int _video_attributes;
-        int _driverDepth;        
+        int _driverDepth;
+        WindowGeo _wingeo;
     };
     virtual bool open(const params &params) = 0;
     virtual void init_rgb_components(unsigned int *rgbcomponents) = 0; // needed for RGB mode.
@@ -44,6 +51,8 @@ public:
     virtual bool switchFullscreen() = 0;
     virtual MsgPort *userPort() = 0;
     virtual void WaitFrame() = 0; // either WaitTTOF or Wait beam
+
+    virtual WindowGeo getWindowGeometry() = 0; // to save/reload
 protected:
 };
 //// experimental trick for leds -> not done

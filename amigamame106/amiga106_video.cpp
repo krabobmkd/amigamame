@@ -187,7 +187,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     if((pparams->video_attributes &VIDEO_TYPE_VECTOR)==0) // means not vector,= bitmap
     {
         // keep the 3 orientation bits
-        AbstractDisplay::params params;
+        AbstractDisplay::params params={0};
 
 
         // if just flip and no rot at start, special case
@@ -212,6 +212,13 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         params._colorsIndexLength = pparams->colors;
         params._video_attributes = pparams->video_attributes;
         params._driverDepth = pparams->depth;
+
+        params._wingeo._window_posx = screenModeConf._window_posx;
+        params._wingeo._window_posy = screenModeConf._window_posy;
+        params._wingeo._window_width = screenModeConf._window_width;
+        params._wingeo._window_height = screenModeConf._window_height;
+        params._wingeo._valid = screenModeConf._window_validpos;
+
         // this will decide video implemntation against available hardware and config.
         g_pMameDisplay = new IntuitionDisplay();
 
@@ -272,6 +279,18 @@ void osd_close_display(void)
 {
     FreeInputs();
     if(g_pMameDisplay) {
+        WindowGeo wgeo = g_pMameDisplay->getWindowGeometry();
+
+        MameConfig &mainConfig = getMainConfig();
+        MameConfig::Display &config = mainConfig.display();
+        MameConfig::Display_PerScreenMode &screenmodeprefs = config.getActiveMode();
+
+        screenmodeprefs._window_posx = wgeo._window_posx;
+        screenmodeprefs._window_posy = wgeo._window_posy;
+        screenmodeprefs._window_width = wgeo._window_width;
+        screenmodeprefs._window_height = wgeo._window_height;
+        screenmodeprefs._window_validpos = wgeo._valid;
+
         delete g_pMameDisplay;
         g_pMameDisplay = NULL;
     }
