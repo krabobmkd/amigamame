@@ -3,10 +3,10 @@
  * Copyright (C) 2024 Vic Krb Ferry
  *
  *************************************************************************/
-
+//#define LOADPALETTE 1
 #include "amiga_video_remap.h"
 #include <stdio.h>
-
+#include <iostream>
 #include <proto/graphics.h>
 
 extern "C" {
@@ -301,7 +301,7 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
         if(iend>(nbc1-j)) iend=(nbc1-j);
         const rgb_t *gpal = gpal1+j;
         ULONG *pc = &_palette[0];
-        *pc++ = ((ULONG)iend)<<16 | j;
+        *pc++ = (((ULONG)iend)<<16) | j; // nbumber of colors to change / palette shift.
 
         for(USHORT i=0;i<iend;i++) {
             ULONG c = (*gpal++);
@@ -311,36 +311,20 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
         }
         *pc = 0; // term.
             //    printf("LoadRGB32\n");
-        LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &_palette[0]);
+        LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &_palette[0]); // change 1 to 32 colors at a time.
      }
-     // todo: if more color, remap to first
-//     for(;j<nbc;j+=32)
-//     {
-//         UINT32 dirtybf = *pdirtrybf++;
-//         if(!dirtybf) continue; // superfast escape.
-//         USHORT iend = 32;
-//         if(iend>(nbc-j)) iend=(nbc1-j);
-//     }
 }
+
+
+
 // - - - - - - --
+// remap clut with nbc  [1,256+[ to forced 8bit palette , for workbench.
 Paletted_Pens8::Paletted_Pens8(struct Screen *pScreen)
     : Paletted(), _pScreen(pScreen)
 {
-//    printf("Paletted_Pens8:%08x\n",pScreen);
 }
 Paletted_Pens8::~Paletted_Pens8()
 {
-//    printf("~Paletted_Pens8\n");
-//    if(_pScreen)
-//    {
-//        struct ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
-//        if(pColorMap)
-//        // basically clean like that.
-//        for(ULONG i=0;i<256 ;i++ )
-//        {
-//            ReleasePen(pColorMap,i);
-//        }
-//    }
 }
 void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
 {
@@ -348,7 +332,7 @@ void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
     if(!_pScreen) return;
     struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
     if(!pColorMap) return;
-//    printf("updatePaletteRemap: go\n");
+
     const rgb_t *gpal1 = display->game_palette;
     USHORT nbc = (USHORT)display->game_palette_entries;
     UINT32 *pdirtrybf =	display->game_palette_dirty;
@@ -431,7 +415,121 @@ void Paletted_Pens8::initRemapCube()
             }
         }
         _rgb4cube[rgbi] = isbest;
-
     }
 }
 
+// - - - - - - - - - - -
+#ifdef LOADPALETTE
+#ifdef LSB_FIRST
+//todo, but no need (aros ? :) Hello you.
+#else
+inline ULONG lbe32(const UBYTE*pbin) { return *((const ULONG *)pbin);  }
+inline UWORD lbe16(const UBYTE*pbin) { return *((const UWORD *)pbin);  }
+#endif
+#define TAGID(a,b,c,d) ((ULONG)  ((((ULONG)a)<<24) | (((ULONG)b)<<16) | (((ULONG)c)<<8) | (((ULONG)d)) ))
+
+const UBYTE *searchIlbmTag(const UBYTE *pbin,const UBYTE *pbinend, ULONG ID,ULONG &bsize)
+{
+    while(pbin<pbinend)
+    {
+        ULONG tagid = lbe32(pbin);
+        bsize = lbe32(pbin+4);
+        printf("tagid %c %c %c %c\n",((tagid>>24) & 0x0ff),((tagid>>16) & 0x0ff),((tagid>>8) & 0x0ff),tagid & 0x0ff);
+        if (tagid == ID) return pbin+8;
+        pbin += (bsize+8);
+    }
+    return NULL;
+
+}
+
+
+int loadPaletteIlbm()
+{
+    printf("a\n");
+    FILE *fh = fopen("PROGDIR:optimumpalette.ilbm","rb");
+    if(!fh) return 1;
+    fseek(fh, 0, SEEK_END);
+     ULONG filesize = ftell(fh);
+    if(filesize ==0)
+    {
+         fclose(fh);
+         return 1;
+    }
+    printf("b\n");
+    fseek(fh, 0, SEEK_SET);
+
+    std::vector<UBYTE> v(filesize);
+    fread(v.data(),filesize,1,fh);
+    fclose(fh);
+    const UBYTE *pbin = v.data();
+    ULONG formid = lbe32(pbin);
+    printf("c\n");
+    if(formid != TAGID('F','O','R','M')) return 1;
+    pbin +=4;
+    ULONG formidsize = lbe32(pbin);
+    pbin +=4;
+    const UBYTE *pbinend = pbin + formidsize;
+    ULONG ilbm = lbe32(pbin);
+    pbin +=4;
+    if(ilbm != TAGID('I','L','B','M')) return 1;
+    printf("d\n");
+    ULONG cmapSize=0;
+    pbin = searchIlbmTag(pbin,pbinend,TAGID('C','M','A','P'),cmapSize);
+    if(!pbin) return 1;
+    printf("nbc3size:%d\n",cmapSize);
+    if(cmapSize>768) cmapSize=768; // brillance can adds work colors.
+
+    int nb=0;
+    for(ULONG i=0;i<cmapSize;i++)
+    {
+        UBYTE b = *pbin++;
+        cout << (int) b << ",";
+        nb++;
+        if(nb>=48) {
+            cout << "\n";
+            nb=0;
+        }
+    }
+    cout << endl;
+
+
+    return 0;
+}
+#endif
+// when screen8 and nbc>258, force our palette and use Paletted_Screen8 like on WB.
+Paletted_Screen8ForcePalette::Paletted_Screen8ForcePalette(struct Screen *pScreen)
+    : Paletted_Pens8(pScreen) {
+}
+extern "C" { extern const unsigned char fixedpal8[768]; }
+void Paletted_Screen8ForcePalette::initRemapCube()
+{
+    // set fixed palette
+    initFixedPalette(fixedpal8,256);
+    // then... like for 8bit WB windows, use 12bit precision remap. could be 15.
+    Paletted_Pens8::initRemapCube();
+
+}
+void Paletted_Screen8ForcePalette::initFixedPalette(const UBYTE *prgb,ULONG nbc)
+{
+    // to RGB32
+    ULONG paletteRGB32[3*32+2]; // LOADRGB32 format, used to load colors per 32.
+    if(nbc>256) nbc=256;
+    // the 256 first colors are used as intuition color palette.
+    int j=0;
+    for(;j<nbc;j+=32)
+    {
+        USHORT iend = 32;
+        if(iend>(nbc-j)) iend=(nbc-j);
+        const UBYTE *gpal = prgb+(j*3);
+        ULONG *pc = &paletteRGB32[0];
+        *pc++ = (((ULONG)iend)<<16) | j; // nbumber of colors to change / palette shift.
+
+        for(USHORT i=0;i<iend;i++) {
+            *pc++= (((ULONG)*gpal++)<<24) ;
+            *pc++= (((ULONG)*gpal++)<<24) ;
+            *pc++= (((ULONG)*gpal++)<<24) ;
+        }
+        *pc = 0; // term.
+        LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &paletteRGB32[0]); // change 1 to 32 colors at a time.
+    }
+}

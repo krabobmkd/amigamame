@@ -387,7 +387,7 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
     serializer("Frequency",_freq,11025,22050,22050); // not more low hz than 11025 it does too little buffers for AHI.
   //hide this for the moment  serializer("Force Mono",_forceMono);
 
-    serializer("Flags",_Flags,1,{"Use Samples"});
+   //finaly not serializer("Flags",_Flags,1,{"Use Samples"});
 }
 extern "C" {
      int hasParallelPort();
@@ -832,7 +832,7 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
   //old  options.gamma= _display._color_gamma;
 
     options.samplerate=(_audio._mode == AudioMode::None)?0:_audio._freq;
-    options.use_samples = ((_audio._Flags & 1) != 0);
+    options.use_samples = 1; // ((_audio._Flags & 1) != 0); // really, ...
 
     options.skip_disclaimer = (_misc._skipflags & 1) != 0;
     options.skip_gameinfo =

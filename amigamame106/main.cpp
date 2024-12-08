@@ -199,6 +199,7 @@ beforeMainInit _ginit;
 #endif
 
 // #define STACK_WATCH 1
+int loadPaletteIlbm();
 
 int main(int argc, char **argv)
 {

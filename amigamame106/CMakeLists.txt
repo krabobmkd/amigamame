@@ -84,6 +84,7 @@ set(AMIGA_SRC
 	amiga106_video.cpp
 	amiga_video_remap.h
 	amiga_video_remap.cpp
+	amiga_video_remap_fixedpalette.c
 	amiga106_video_intuition.h
 	amiga106_video_intuition.cpp	
 	amiga106_video_os3.h

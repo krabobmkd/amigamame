@@ -34,7 +34,7 @@ public:
     virtual RastPort *rastPort() = 0;
     virtual Screen *screen() { return NULL; }
     virtual BitMap *bitmap() { return NULL; }
-    virtual void waitFrame();
+    //virtual void waitFrame();
     //inline ULONG pixelFmt() const { return _PixelFmt; }
     //inline ULONG pixelBytes() const { return _PixelBytes; }
     inline int flags() const { return _flags; }
@@ -71,7 +71,7 @@ public:
     Window *window() override;
     RastPort *rastPort() override;
     BitMap *bitmap() override;
-    void waitFrame() override;
+   // void waitFrame() override;
 protected:
     Screen *_pScreen;
     Window *_pScreenWindow;
@@ -95,7 +95,7 @@ public:
     virtual RastPort *rastPort() = 0;
     virtual BitMap *bitmap() =0;
     //virtual int beforeBufferDrawn() =0;
-    virtual void waitFrame() = 0;
+    //now private virtual void waitFrame() = 0;
     virtual void afterBufferDrawn() =0;
     char _tripleBufferInitOk;
     char _lastIndexDrawn;

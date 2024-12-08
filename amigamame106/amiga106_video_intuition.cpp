@@ -191,11 +191,11 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
 
     if(_heightBufferSwitch) ceny+= _heightBufferSwitchApplied;
 }
-void IntuitionDrawable::waitFrame()
-{
-    // default behaviour, 50Hz or less.
-    WaitTOF();
-}
+// void IntuitionDrawable::waitFrame()
+// {
+//     // default behaviour, 50Hz or less.
+//     WaitTOF();
+// }
 
 // - - - - - - - - -
 Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
@@ -293,10 +293,11 @@ bool Intuition_Screen::open()
 
     if(_flags & DISPFLAG_USETRIPLEBUFFER)
     {
+
         if(_pTripleBufferImpl) delete _pTripleBufferImpl;
         _pTripleBufferImpl = new TripleBuffer_CSB(*this); // could fail, in which case back to direct rendering
         _pTripleBufferImpl->init();
-     //   printf("TRP IMPL!\n");
+
     }
 
     return true;
@@ -328,8 +329,9 @@ RastPort *Intuition_Screen::rastPort()
     // may use triple buffer
     if(_pTripleBufferImpl &&
     _pTripleBufferImpl->_tripleBufferInitOk)
+    {
         return _pTripleBufferImpl->rastPort();
-
+    }
    return &_pScreen->RastPort;
 }
 Screen *Intuition_Screen::screen()
@@ -343,15 +345,17 @@ BitMap *Intuition_Screen::bitmap()
 
     return _pScreen->RastPort.BitMap;
 }
-void Intuition_Screen::waitFrame()
-{
-    //
-    if(!_pTripleBufferImpl) {
-        WaitTOF();
-        return;
-    }
-    _pTripleBufferImpl->waitFrame();
-}
+// void Intuition_Screen::waitFrame()
+// {
+//     WaitTOF();
+//     // dangerous, can't use triple buffer for synch bevause call too generic ?
+//     //
+//     // if(!_pTripleBufferImpl) {
+//     //     WaitTOF();
+//     //     return;
+//     // }
+//     // _pTripleBufferImpl->waitFrame();
+// }
 // - - - - - - - - -
 
 Intuition_Window::Intuition_Window(const AbstractDisplay::params &params) : IntuitionDrawable(params._flags)
@@ -777,7 +781,8 @@ MsgPort *IntuitionDisplay::userPort()
 void IntuitionDisplay::WaitFrame()
 {
     if(!_drawable) return
-    _drawable->waitFrame();
+    // _drawable->waitFrame(); // no, can't be apired with triple buffr wait finally.
+    WaitTOF();
 }
 
 

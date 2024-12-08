@@ -14,6 +14,7 @@ extern "C" {
 TripleBuffer_CSB::TripleBuffer_CSB(Intuition_Screen &screen)
  : TripleBuffer(), _screen(screen),_dbufport(NULL),_isSignalToWait(0)
 {
+    //    printf(" TripleBuffer_CSB alloc\n");
     memset(&_screenBuffer[0],0,sizeof(_screenBuffer));
 }
 TripleBuffer_CSB::~TripleBuffer_CSB()
@@ -62,7 +63,7 @@ int TripleBuffer_CSB::init()
     _lastIndexDrawn = 0;
     _indexToDraw = 1;
     _tripleBufferInitOk = 1;
- //   printf("trpl init ok\n");
+
     return 1;
 }
 void TripleBuffer_CSB::close()
@@ -103,10 +104,9 @@ void TripleBuffer_CSB::waitFrame()
 {
     if(_isSignalToWait)
     {
-        // unlink previous buffer to message port first.
-        _screenBuffer[_lastIndexDrawn]._pScreenBuffer->
-            sb_DBufInfo->dbi_DispMessage.mn_ReplyPort = NULL;
-
+        // Wait only if previius screen never displayed.
+        // only happens when we goes very fast.
+        // theorically does best vertical synch.
         // this would do a perfect 60Hz timer, with Process sleep.        
         Wait(1<<_dbufport->mp_SigBit);
 
@@ -114,6 +114,9 @@ void TripleBuffer_CSB::waitFrame()
         struct Message *dbmsg;
 	    while ( dbmsg = GetMsg( _dbufport ) ) {}
 
+         // unlink previous buffer to message port .
+        _screenBuffer[_lastIndexDrawn]._pScreenBuffer->
+            sb_DBufInfo->dbi_DispMessage.mn_ReplyPort = NULL;
         _isSignalToWait =0;
     }
 }
@@ -125,6 +128,7 @@ void TripleBuffer_CSB::afterBufferDrawn()
 
     // may wait previous ChangeScreenBuffer() acknoledge call, which happens.
     // this is sent once the previous screen has been seen one frame.
+    //no, done elsewhere
     waitFrame();
 
     SBuffer &sb = _screenBuffer[_indexToDraw];

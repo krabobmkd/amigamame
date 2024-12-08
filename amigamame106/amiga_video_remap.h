@@ -43,8 +43,10 @@ class Paletted_Screen8 : public Paletted
     void updatePaletteRemap(_mame_display *display) override;
 protected:
     struct Screen *_pScreen;
-    ULONG _palette[3*32+2]; // LOADRGB32 format.
+    ULONG _palette[3*32+2]; // LOADRGB32 format, used to load colors per 32.
 };
+
+
 
 /* Whe target screen pixels is 8bit but palette is imposed by OS.
 * then Use CLUT
@@ -59,7 +61,27 @@ class Paletted_Pens8 : public Paletted
 protected:
     struct Screen *_pScreen;
     std::vector<UBYTE> _rgb4cube;
-    void initRemapCube();
+    virtual void initRemapCube();
 };
+
+class Palette8 {
+public:
+    void loadIlbmClut(const UBYTE *pbin,ULONG bsize);
+protected:
+    std::vector<UBYTE> _p;
+};
+
+/* When target is a 8Bit screen and game 16bit, use fixed palette and pens remap */
+class Paletted_Screen8ForcePalette : public Paletted_Pens8
+{
+public:
+    Paletted_Screen8ForcePalette(struct Screen *pScreen);
+    int loadIlbmClut(const UBYTE *pbin,ULONG bsize);
+protected:
+    void initRemapCube() override;
+    void initFixedPalette(const UBYTE *prgb,ULONG nbc);
+
+};
+
 
 #endif

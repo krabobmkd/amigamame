@@ -81,15 +81,24 @@ void Drawable_OS3::draw_WPA8(_mame_display *display)
         // actually does WORD to BYTE conversion with no lut.
         directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
         directDraw_UBYTE_UBYTE(&p);
-    } else
+    } else  if(_pRemap->_clut8.size()>0 && _colorsIndexLength<=258 )
     {   // remap to shared screen colors, need a clut.
         // 8bit but with WB palette, remap to shared screen colors, need a clut.
-        if(_pRemap->_clut8.size()>0)
-        {
-            directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
-            directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
-        }
+
+        directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
+        directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
+    } else if(_pRemap->_clut8.size()>0 && _colorsIndexLength<=32768)
+    {   // 8bit but with WB palette, remap to shared screen colors, need a clut.
+        // or screen with >258 indexed color, need fixed palette and clut.
+        directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
+        directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
+    } else
+    {
+        // would manage 15b true or 32b true color here.
+
     }
+
+
     //WritePixelArray8(rp,xstart,ystart,xstop,ystop,array,temprp)
 
   if(_trp._rp.BitMap)
@@ -148,17 +157,21 @@ void Drawable_OS3::draw_WriteChunkyPixels(_mame_display *display)
         _drawable.flags()
     };
     directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
-    if(_useIntuitionPalette)
+    if(_useIntuitionPalette && _colorsIndexLength<=258)
     {   // no clut table and use intuition LoadRGB32 to change screen colors
         // actually does WORD to BYTE conversion with no lut.
         directDraw_UBYTE_UBYTE(&p);
-    } else
+    } else if(_pRemap->_clut8.size()>0 && _colorsIndexLength<=32768)
     {   // 8bit but with WB palette, remap to shared screen colors, need a clut.
-        if(_pRemap->_clut8.size()>0)
-        {
-            directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
-        }
+        // or screen with >258 indexed color, need fixed palette and clut.
+        directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
+    } else
+    {
+        // would manage 15b true or 32b true color here.
+
     }
+
+    //
 //	WriteChunkyPixels(rp,xstart,ystart,xstop,ystop,array,bytesperrow)
 //	                  A0 D0     D1     D2    D3    A2     D4
 
@@ -171,9 +184,14 @@ void Drawable_OS3::initRemapTable()
     if(_useIntuitionPalette)
     {
         // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
-        _pRemap = new Paletted_Screen8(_drawable.screen());
+        if(_colorsIndexLength<=258)
+            _pRemap = new Paletted_Screen8(_drawable.screen());
+        // 8Bits screens will have a fixed 256c palette and  16b index color remap to this.
+        else _pRemap = new Paletted_Screen8ForcePalette(_drawable.screen());
+
     } else
     {
+        // windows on Workbench 8Bit will remap 8&16bits to the palette given by workbench.
         _pRemap = new Paletted_Pens8(_drawable.screen());
     }
 }
@@ -249,6 +267,7 @@ Intuition_Screen_OS3::~Intuition_Screen_OS3()
 
 bool Intuition_Screen_OS3::open()
 {
+    //printf("Intuition_Screen_OS3::open\n");
     bool ok = Intuition_Screen::open();
     if(!ok) return false;
     // after Screen is open, may create create color remap table for clut.
@@ -262,7 +281,6 @@ void Intuition_Screen_OS3::close()
 }
 void Intuition_Screen_OS3::draw(_mame_display *display)
 {
-//    if(_pTripleBufferImpl && !_pTripleBufferImpl->beforeBufferDrawn()) return;
     // WritePixelArrays is OS3.0, We could use WriteChunkyPixels which is OS3.1.
     if(GfxBase->LibNode.lib_Version>=40)
     {

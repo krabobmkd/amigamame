@@ -4,13 +4,13 @@ todo R1
  - O 8Bit Rendering on Screens for 16b.
  - X 8Bit Rendering on Windows.
  - X Amigaguide
- - O samples load for QBert
+ - X samples load for QBert
  - X bug tilemap psychic5
 
  - X bug galaga white bg when window to fullscreen
  - O optimize gauntlet
  - X no sound mix if no audio
-- O fastboot neogeo, batrider -> no mix
+- X fastboot neogeo, batrider -> no mix
 
 
 todo beta4

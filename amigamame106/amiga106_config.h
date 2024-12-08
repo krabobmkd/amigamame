@@ -197,7 +197,7 @@ public:
         AudioMode _mode = AudioMode::AHI;
         int _freq=0;
         bool _forceMono=true;
-        ULONG_FLAGS  _Flags = 1; // 1 use samples
+        // ULONG_FLAGS  _Flags = 1; // 1 use samples
     };
     Audio &audio() { return _audio; }
 
