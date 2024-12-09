@@ -427,6 +427,20 @@ void Paletted_Pens8::initRemapCube()
     }
 }
 
+
+Paletted_Pens8_15b::Paletted_Pens8_15b(struct Screen *pScreen)
+    :Paletted_Pens8(pScreen)
+{
+    initRemapCube();
+}
+Paletted_Pens8_15b::~Paletted_Pens8_15b(){}
+void Paletted_Pens8_15b::updatePaletteRemap(_mame_display *display) {}
+void Paletted_Pens8_15b::directDraw(directDrawParams *p)
+{
+
+}
+
+
 // - - - - - - - - - - -
 #ifdef LOADPALETTE
 #ifdef LSB_FIRST
@@ -514,7 +528,7 @@ void Paletted_Screen8ForcePalette::initRemapCube()
 {
     // set fixed palette
     initFixedPalette(fixedpal8,256);
-    // then... like for 8bit WB windows, use 12bit precision remap. could be 15.
+    // then... like for 8bit WB windows, use 12bit precision remap. could be 15.-
     Paletted_Pens8::initRemapCube();
 
 }
@@ -546,22 +560,10 @@ void Paletted_Screen8ForcePalette::initFixedPalette(const UBYTE *prgb,ULONG nbc)
 Paletted_Screen8ForcePalette_15b::Paletted_Screen8ForcePalette_15b(struct Screen *pScreen)
     :Paletted_Screen8ForcePalette(pScreen)
 {
-}
-// for 15bit RGB just does clut to
-void Paletted_Screen8ForcePalette_15b::updatePaletteRemap(_mame_display *display)
-{
-    if(_needFirstRemap==0) return;
-    if(!_pScreen) return;
-    struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
-    if(!pColorMap) return;
-
     initRemapCube();
-    _needFirstRemap = 0;
-
     int nbc = 32*32*32;
     if(_clut8.size()<nbc) _clut8.resize(nbc,0);
     UBYTE *pclut = _clut8.data();
-
     for(int j=0;j<nbc;j++)
     {
         UWORD rgb4 = ((j>>3) & 0x0f00) |
@@ -569,15 +571,21 @@ void Paletted_Screen8ForcePalette_15b::updatePaletteRemap(_mame_display *display
                      ((j>>1) & 0x000f) ;
         pclut[j] =_rgb4cube[rgb4];
     }
-
 }
+// for 15bit RGB just does clut to
+// void Paletted_Screen8ForcePalette_15b::updatePaletteRemap(_mame_display *display)
+// {   // finnaly, init in constructor, no color will change, updatePaletteRemap not used.
+// }
+// --------------------------------------
 Paletted_Screen8ForcePalette_32b::Paletted_Screen8ForcePalette_32b(struct Screen *pScreen)
-    :Paletted_Screen8ForcePalette(pScreen)
+    : Paletted_Screen8ForcePalette_15b(pScreen)
 {
 }
 
 void Paletted_Screen8ForcePalette_32b::directDraw(directDrawParams *p)
 {
-
+    if(_clut8.size()==0) return;
+    // same as 15 bit, but use this function that does RGB32 to RGB15 conversion.
+    directDrawClut_UBYTE_UBYTE_ARGB32(p,_clut8.data());
 }
 

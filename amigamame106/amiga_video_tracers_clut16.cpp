@@ -11,17 +11,19 @@ struct type24{
     type24(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
     char r,g,b;
 };
-
-struct typeARGB32ToRGB15{
-    typeARGB32ToRGB15(ULONG argb) : _c(
-                ((argb>>(16+3-10))&0x7c00) |
-                ((argb>>(8+3-5))&0x03e0) |
-                ((argb>>3)&0x001f)
-                )  {}
-    UWORD _c;
+struct typeUWORDToUWord {
+     static UWORD conv(UWORD i) { return i; }
+};
+struct typeARGB32ToRGB15 {
+    static UWORD conv(ULONG argb) {
+        return ((argb>>(16+3-10))&0x7c00) |
+               ((argb>>(8+3-5))&0x03e0) |
+               ((argb>>3)&0x001f);
+    }
 };
 
-template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,bool C_swapXY,bool useClut>
+template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,typename SOURCEBMCLUTCONVERT,
+         bool C_swapXY,bool useClut>
 void directDrawScaleClutTT(directDrawParams *p,
                 CLUTTYPE *lut
             )
@@ -97,7 +99,8 @@ void directDrawScaleClutTT(directDrawParams *p,
             {
                 if(useClut)
                 {
-                    *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = lut[psoline[((UWORD)(vx>>16))*vmod]];
+                    *pscline = pscline[wscbpr] = pscline[wscbpr<<1] =
+                        lut[SOURCEBMCLUTCONVERT::conv(psoline[((UWORD)(vx>>16))*vmod])];
                 } else
                 {
                     *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = (SCREENPIXTYPE)psoline[((UWORD)(vx>>16))*vmod];
@@ -117,10 +120,11 @@ void directDrawScaleClutTT(directDrawParams *p,
             {
                 if(useClut)
                 {
-                *pscline = pscline[wscbpr] = lut[psoline[((UWORD)(vx>>16))*vmod]];
+                    *pscline = pscline[wscbpr] =
+                        lut[SOURCEBMCLUTCONVERT::conv(psoline[((UWORD)(vx>>16))*vmod])];
                 } else
                 {
-                *pscline = pscline[wscbpr] = (SCREENPIXTYPE)psoline[((UWORD)(vx>>16))*vmod];
+                    *pscline = pscline[wscbpr] = (SCREENPIXTYPE)psoline[((UWORD)(vx>>16))*vmod];
                 }
                 pscline++;
                 vx += addw;
@@ -151,7 +155,8 @@ void directDrawScaleClutTT(directDrawParams *p,
     } // end loop h
 
 }
-template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,bool C_swapXY,bool useClut>
+template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,typename SOURCEBMCLUTCONVERT,
+         bool C_swapXY,bool useClut>
 void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
 {
     directDrawScreen *screen = p->screen;
@@ -210,7 +215,7 @@ void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
             for(WORD ww=0;ww<w;ww++)
             {
                 if(useClut)
-                *pscline++ = lut[psoline[vx]];
+                *pscline++ = lut[SOURCEBMCLUTCONVERT::conv(psoline[vx])];
                 else
                 *pscline++ = (SCREENPIXTYPE) psoline[vx];
                 vx += addw;
@@ -245,7 +250,7 @@ void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
                 for(WORD ww=0;ww<w;ww++)
                 {
                     if(useClut)
-                    *pscline++ = lut[psoline[vx++]];
+                    *pscline++ = lut[SOURCEBMCLUTCONVERT::conv(psoline[vx++])];
                     else
                     *pscline++ = (SCREENPIXTYPE)psoline[vx++];
                 }
@@ -254,7 +259,7 @@ void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
                 for(WORD ww=0;ww<w;ww++)
                 {
                     if(useClut)
-                    *pscline++ = lut[psoline[--vx]];
+                    *pscline++ = lut[SOURCEBMCLUTCONVERT::conv(psoline[--vx])];
                     else
                     *pscline++ = (SCREENPIXTYPE)psoline[--vx];
                 }
@@ -267,7 +272,8 @@ void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
 }
 
 
-template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,bool useClut>
+template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,typename SOURCEBMCLUTCONVERT,
+         bool useClut>
 void directDrawClutT(directDrawParams *p, CLUTTYPE *lut  )
 {
     directDrawSource *source = p->source;
@@ -281,11 +287,11 @@ void directDrawClutT(directDrawParams *p, CLUTTYPE *lut  )
 
     const bool doScale = ((sourcewidth!=w) || (sourceheight!=h));
     if(doSwapXY)
-        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,true,useClut>( p,lut);
-        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,true,useClut>( p,lut);
+        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,SOURCEBMCLUTCONVERT,true,useClut>( p,lut);
+        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,SOURCEBMCLUTCONVERT,true,useClut>( p,lut);
     else
-        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,false,useClut>(p,lut);
-        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,false,useClut>( p,lut);
+        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,SOURCEBMCLUTCONVERT,false,useClut>(p,lut);
+        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,SOURCEBMCLUTCONVERT,false,useClut>( p,lut);
 
 }
 
@@ -293,32 +299,34 @@ void directDrawClutT(directDrawParams *p, CLUTTYPE *lut  )
 
 void directDrawClut_UWORD_UWORD_UWORD(directDrawParams *p,UWORD *lut)
 {
-    directDrawClutT<UWORD,UWORD,UWORD,true>(p,lut);
+    directDrawClutT<UWORD,UWORD,UWORD,typeUWORDToUWord,true>(p,lut);
 }
 void directDrawClut_ULONG_ULONG_UWORD(directDrawParams *p,ULONG *lut)
 {
-    directDrawClutT<ULONG,ULONG,UWORD,true>(p,lut);
+    directDrawClutT<ULONG,ULONG,UWORD,typeUWORDToUWord,true>(p,lut);
 }
 void directDrawClut_type24_ULONG_UWORD(directDrawParams *p,ULONG *lut)
 {
-    directDrawClutT<type24,ULONG,UWORD,true>(p,lut);
+    directDrawClutT<type24,ULONG,UWORD,typeUWORDToUWord,true>(p,lut);
 }
 void directDrawClut_UBYTE_UBYTE_UWORD(directDrawParams *p,UBYTE *lut)
 {
-    directDrawClutT<UBYTE,UBYTE,UWORD,true>(p,lut);
+    directDrawClutT<UBYTE,UBYTE,UWORD,typeUWORDToUWord,true>(p,lut);
 }
 
 // - - --
 void directDraw_UBYTE_UBYTE_UWORD(directDrawParams *p)
 {
-    directDrawClutT<UBYTE,UBYTE,UWORD,false>(p,0L);
+    directDrawClutT<UBYTE,UBYTE,UWORD,typeUWORDToUWord,false>(p,0L);
 }
 
 // - - - -
 // special one, target screen is 8b, mame sreen is ARGB32, and use  long clut.
 void directDrawClut_UBYTE_UBYTE_ARGB32(directDrawParams *p,UBYTE *lut)
 {
-    directDrawClutT<typeARGB32ToRGB15,UBYTE,ULONG,true>(p,lut);
+//< SCREENPIXTYPE, CLUTTYPE, SOURCEBMTYPE,SOURCEBMCLUTCONVERT,bool useClut>
+    directDrawClutT<UBYTE,UBYTE,ULONG,typeARGB32ToRGB15,true>(p,lut);
+
 }
 
 

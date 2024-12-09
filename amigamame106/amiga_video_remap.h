@@ -67,6 +67,18 @@ protected:
     std::vector<UBYTE> _rgb4cube;
     virtual void initRemapCube();
 };
+class Paletted_Pens8_15b : public Paletted_Pens8
+{
+public:
+    Paletted_Pens8_15b(struct Screen *pScreen);
+    ~Paletted_Pens8_15b();
+    void updatePaletteRemap(_mame_display *display) override;
+    void directDraw(directDrawParams *p) override;
+protected:
+    struct Screen *_pScreen;
+    std::vector<UBYTE> _rgb4cube;
+    virtual void initRemapCube();
+};
 
 class Palette8 {
 public:
@@ -90,11 +102,10 @@ class Paletted_Screen8ForcePalette_15b : public Paletted_Screen8ForcePalette
 {
 public:
     Paletted_Screen8ForcePalette_15b(struct Screen *pScreen);
-    void updatePaletteRemap(_mame_display *display) override;
 protected:
 
 };
-class Paletted_Screen8ForcePalette_32b : public Paletted_Screen8ForcePalette
+class Paletted_Screen8ForcePalette_32b : public Paletted_Screen8ForcePalette_15b
 {
 public:
     Paletted_Screen8ForcePalette_32b(struct Screen *pScreen);

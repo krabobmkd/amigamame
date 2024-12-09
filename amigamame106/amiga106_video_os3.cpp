@@ -149,23 +149,46 @@ void Drawable_OS3::draw_WriteChunkyPixels(_mame_display *display)
 
 void Drawable_OS3::initRemapTable()
 {
-    if(_useIntuitionPalette)
+    if(_useIntuitionPalette) // cases where we set the screen's palette with LOADRGB32.
     {
         // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
-        if(_colorsIndexLength<=258)
-            _pRemap = new Paletted_Screen8(_drawable.screen());
-        // 8Bits screens will have a fixed 256c palette and  16b index color remap to this.
-        else if(_video_attributes & VIDEO_RGB_DIRECT)
+        // if(_colorsIndexLength<=258)
+        //     _pRemap = new Paletted_Screen8(_drawable.screen());
+        // 8Bits screens will have a fixed 256c palette and  16b index color remap to this.        
+        if(_video_attributes & VIDEO_RGB_DIRECT)
         {
-            _pRemap = new Paletted_Screen8ForcePalette_15b(_drawable.screen());
-        }
+            if(_video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)
+            {
+                _pRemap = new Paletted_Screen8ForcePalette_32b(_drawable.screen());
+            } else
+            {
+                _pRemap = new Paletted_Screen8ForcePalette_15b(_drawable.screen());
+            }
+        } else
+        {
+            // use exact palette index and update if nb color fits.
+            if(_colorsIndexLength<=258)
+                     _pRemap = new Paletted_Screen8(_drawable.screen());
+            // force fixed palette and manage large index to this index at palette change.
+            else _pRemap = new Paletted_Screen8ForcePalette(_drawable.screen());
 
-    } else
+        }
+    } else // case where we reuse an existing intuition screen indexed palette. (like on a 8Bit WB)
     {
         // windows on Workbench 8Bit will remap 8&16bits to the palette given by workbench.
+        if(_video_attributes & VIDEO_RGB_DIRECT)
+        {
+            if(_video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)
+            {
+                _pRemap = new Paletted_Pens8_src15b(_drawable.screen());
+            } else
+            {
+                _pRemap = new Paletted_Pens8_src32b(_drawable.screen());
+            }
+        } else
         if(_colorsIndexLength>0 && _colorsIndexLength<32768)
         {
-            _pRemap = new Paletted_Pens8(_drawable.screen());
+            _pRemap = new Paletted_Pens8(_drawable.screen()); // same case for <258 colors or more.
         }
     }
 }
@@ -188,6 +211,7 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
     int height = params._height;
     if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
     _screenDepthAsked = 8; // used by OpenSCreen(), AGA max.
+
     _useIntuitionPalette = true;
 
     if(_ScreenModeId == INVALID_ID)
