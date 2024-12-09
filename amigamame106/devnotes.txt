@@ -2,11 +2,12 @@
 todo R1
 
  - X 8Bit Rendering on Screens for 16b.
+ - O 8Bit Rendering on Screens for 15b + 32b.
  - X 8Bit Rendering on Windows.
  - X Amigaguide
  - X samples load for QBert
  - X bug tilemap psychic5
- - O Remember window position size per res.
+ - X Remember window position size per res.
 
  - X bug galaga white bg when window to fullscreen
  - O optimize gauntlet
