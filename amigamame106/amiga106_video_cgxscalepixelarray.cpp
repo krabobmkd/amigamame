@@ -113,7 +113,7 @@ void Drawable_CGXScalePixelArray::drawCGX_scale(_mame_display *display)
         // remap in unscaled true color buffer.
         // note should work with 24b, test that.
         // cgx XXXPixelArray only support 24 or 32b format RECTFMT_ARGB
-        directDrawClutT_ULONG_ULONG(&p,_pRemap->_clut32.data());
+        directDrawClut_ULONG_ULONG_UWORD(&p,_pRemap->_clut32.data());
     }
 
     // let Gfx acceleration do its job (hopefully ;)

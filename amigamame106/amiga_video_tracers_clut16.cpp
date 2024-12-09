@@ -12,8 +12,16 @@ struct type24{
     char r,g,b;
 };
 
+struct typeARGB32ToRGB15{
+    typeARGB32ToRGB15(ULONG argb) : _c(
+                ((argb>>(16+3-10))&0x7c00) |
+                ((argb>>(8+3-5))&0x03e0) |
+                ((argb>>3)&0x001f)
+                )  {}
+    UWORD _c;
+};
 
-template<typename SCREENPIXTYPE,typename CLUTTYPE,bool C_swapXY,bool useClut>
+template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,bool C_swapXY,bool useClut>
 void directDrawScaleClutTT(directDrawParams *p,
                 CLUTTYPE *lut
             )
@@ -23,10 +31,10 @@ void directDrawScaleClutTT(directDrawParams *p,
     LONG x1=p->x1, y1=p->y1;
     LONG w=p->w, h=p->h;
 
-    UWORD wsobpr = source->_bpr>>1;
+    UWORD wsobpr = source->_bpr/sizeof(SOURCEBMTYPE);
     UWORD wscbpr = screen->_bpr/sizeof(SCREENPIXTYPE);
 
-    UWORD *psourcebm = (UWORD *)source->_base;
+    SOURCEBMTYPE *psourcebm = (SOURCEBMTYPE *)source->_base;
     psourcebm += (source->_y1 * wsobpr) + source->_x1;
 
     SCREENPIXTYPE *pscreenbm = (SCREENPIXTYPE *)screen->_base;
@@ -78,9 +86,9 @@ void directDrawScaleClutTT(directDrawParams *p,
 
     for(WORD hh=0;hh<h;)
     {
-        UWORD *psoline = psourcebm + hmod*(vh>>16);
-        UWORD *psoline2 = psourcebm + hmod*((vh+addh)>>16);
-        UWORD *psoline3 = psourcebm + hmod*((vh+addh+addh)>>16);
+        SOURCEBMTYPE *psoline = psourcebm + hmod*(vh>>16);
+        SOURCEBMTYPE *psoline2 = psourcebm + hmod*((vh+addh)>>16);
+        SOURCEBMTYPE *psoline3 = psourcebm + hmod*((vh+addh+addh)>>16);
         if(psoline == psoline3) // means 3 lines are the same.
         {
             SCREENPIXTYPE *pscline = pscreenbm;
@@ -143,7 +151,7 @@ void directDrawScaleClutTT(directDrawParams *p,
     } // end loop h
 
 }
-template<typename SCREENPIXTYPE,typename CLUTTYPE,bool C_swapXY,bool useClut>
+template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,bool C_swapXY,bool useClut>
 void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
 {
     directDrawScreen *screen = p->screen;
@@ -151,10 +159,10 @@ void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
     LONG x1=p->x1, y1=p->y1;
     LONG w=p->w, h=p->h;
 
-    UWORD wsobpr = source->_bpr>>1;
+    UWORD wsobpr = source->_bpr/sizeof(SOURCEBMTYPE);
     UWORD wscbpr = screen->_bpr/sizeof(SCREENPIXTYPE);
 
-    UWORD *psourcebm = (UWORD *)source->_base;
+    SOURCEBMTYPE *psourcebm = (SOURCEBMTYPE *)source->_base;
     psourcebm += (source->_y1 * wsobpr) + source->_x1;
 
     SCREENPIXTYPE *pscreenbm = (SCREENPIXTYPE *)screen->_base;
@@ -195,7 +203,7 @@ void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
         }
         for(WORD hh=0;hh<h;)
         {
-            UWORD *psoline = psourcebm + vh;
+            SOURCEBMTYPE *psoline = psourcebm + vh;
 
             SCREENPIXTYPE *pscline = pscreenbm;
             LONG vx = vxStart;
@@ -228,7 +236,7 @@ void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
 
         for(WORD hh=0;hh<h;)
         {
-            UWORD *psoline = psourcebm + vh;
+            SOURCEBMTYPE *psoline = psourcebm + vh;
 
             SCREENPIXTYPE *pscline = pscreenbm;
             LONG vx = vxStart;
@@ -259,7 +267,7 @@ void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
 }
 
 
-template<typename SCREENPIXTYPE,typename CLUTTYPE,bool useClut>
+template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,bool useClut>
 void directDrawClutT(directDrawParams *p, CLUTTYPE *lut  )
 {
     directDrawSource *source = p->source;
@@ -273,40 +281,45 @@ void directDrawClutT(directDrawParams *p, CLUTTYPE *lut  )
 
     const bool doScale = ((sourcewidth!=w) || (sourceheight!=h));
     if(doSwapXY)
-        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,true,useClut>( p,lut);
-        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,true,useClut>( p,lut);
+        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,true,useClut>( p,lut);
+        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,true,useClut>( p,lut);
     else
-        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,false,useClut>(p,lut);
-        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,false,useClut>( p,lut);
+        if(doScale) directDrawScaleClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,false,useClut>(p,lut);
+        else  directDrawClutTT<SCREENPIXTYPE,CLUTTYPE,SOURCEBMTYPE,false,useClut>( p,lut);
 
 }
 
 
 
-void directDrawClutT_UWORD_UWORD(directDrawParams *p,UWORD *lut)
+void directDrawClut_UWORD_UWORD_UWORD(directDrawParams *p,UWORD *lut)
 {
-    directDrawClutT<UWORD,UWORD,true>(p,lut);
+    directDrawClutT<UWORD,UWORD,UWORD,true>(p,lut);
 }
-void directDrawClutT_ULONG_ULONG(directDrawParams *p,ULONG *lut)
+void directDrawClut_ULONG_ULONG_UWORD(directDrawParams *p,ULONG *lut)
 {
-    directDrawClutT<ULONG,ULONG,true>(p,lut);
+    directDrawClutT<ULONG,ULONG,UWORD,true>(p,lut);
 }
-void directDrawClutT_type24_ULONG(directDrawParams *p,ULONG *lut)
+void directDrawClut_type24_ULONG_UWORD(directDrawParams *p,ULONG *lut)
 {
-    directDrawClutT<type24,ULONG,true>(p,lut);
+    directDrawClutT<type24,ULONG,UWORD,true>(p,lut);
 }
-void directDrawClutT_UBYTE_UBYTE(directDrawParams *p,UBYTE *lut)
+void directDrawClut_UBYTE_UBYTE_UWORD(directDrawParams *p,UBYTE *lut)
 {
-    directDrawClutT<UBYTE,UBYTE,true>(p,lut);
+    directDrawClutT<UBYTE,UBYTE,UWORD,true>(p,lut);
 }
 
 // - - --
-void directDraw_UBYTE_UBYTE(directDrawParams *p)
+void directDraw_UBYTE_UBYTE_UWORD(directDrawParams *p)
 {
-    directDrawClutT<UBYTE,UBYTE,false>(p,0L);
+    directDrawClutT<UBYTE,UBYTE,UWORD,false>(p,0L);
 }
 
-
+// - - - -
+// special one, target screen is 8b, mame sreen is ARGB32, and use  long clut.
+void directDrawClut_UBYTE_UBYTE_ARGB32(directDrawParams *p,UBYTE *lut)
+{
+    directDrawClutT<typeARGB32ToRGB15,UBYTE,ULONG,true>(p,lut);
+}
 
 
 

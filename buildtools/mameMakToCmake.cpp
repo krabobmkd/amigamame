@@ -779,7 +779,141 @@ int patchMiniMachines(
         m._sound_defs["K007232"]=1;
         m._sound_defs["UPD7759"]=1;
 
-        //MCPU_KONAMI
+    }
+    {
+        TMachine  &src=machinetargets["konami"];
+        string mname=string("minikonami2");
+        TMachine  &m=machinetargets[mname];
+        m._name = mname;
+
+        // added 12/2024
+        m._gamedrivers["gberet"] = src._gamedrivers["gberet"];
+        m._gamedrivers["gberetb"] = src._gamedrivers["gberetb"];
+        m._gamedrivers["rushatck"] = src._gamedrivers["rushatck"];
+        m._gamedrivers["mrgoemon"] = src._gamedrivers["mrgoemon"];
+
+        m._gamedrivers["pingpong"] = src._gamedrivers["pingpong"];
+        m._gamedrivers["merlinmm"] = src._gamedrivers["merlinmm"];
+
+        m._gamedrivers["gyruss"] = src._gamedrivers["gyruss"];
+        m._gamedrivers["gyrussce"] = src._gamedrivers["gyrussce"];
+
+        //nemesis machines
+        m._gamedrivers["nemesis"] = src._gamedrivers["nemesis"];
+        m._gamedrivers["nemesuk"] = src._gamedrivers["nemesuk"];
+        m._gamedrivers["konamigt"] = src._gamedrivers["konamigt"];
+        m._gamedrivers["rf2"] = src._gamedrivers["rf2"];
+        m._gamedrivers["twinbee"] = src._gamedrivers["twinbee"];
+        m._gamedrivers["gradius"] = src._gamedrivers["gradius"];
+        m._gamedrivers["gwarrior"] = src._gamedrivers["gwarrior"];
+        m._gamedrivers["salamand"] = src._gamedrivers["salamand"];
+        m._gamedrivers["salamanj"] = src._gamedrivers["salamanj"];
+        m._gamedrivers["lifefrce"] = src._gamedrivers["lifefrce"];
+        m._gamedrivers["lifefrcj"] = src._gamedrivers["lifefrcj"];
+        m._gamedrivers["blkpnthr"] = src._gamedrivers["blkpnthr"];
+        m._gamedrivers["citybomb"] = src._gamedrivers["citybomb"];
+        m._gamedrivers["citybmrj"] = src._gamedrivers["citybmrj"];
+        m._gamedrivers["hcrash"] = src._gamedrivers["hcrash"];
+        m._gamedrivers["hcrashc"] = src._gamedrivers["hcrashc"];
+        m._gamedrivers["kittenk"] = src._gamedrivers["kittenk"];
+        m._gamedrivers["nyanpani"] = src._gamedrivers["nyanpani"];
+
+        //twin16
+        m._gamedrivers["devilw"] = src._gamedrivers["devilw"];
+        m._gamedrivers["majuu"] = src._gamedrivers["majuu"];
+        m._gamedrivers["darkadv"] = src._gamedrivers["darkadv"];
+        m._gamedrivers["vulcan"] = src._gamedrivers["vulcan"];
+        m._gamedrivers["gradius2"] = src._gamedrivers["gradius2"];
+        m._gamedrivers["grdius2a"] = src._gamedrivers["grdius2a"];
+        m._gamedrivers["grdius2b"] = src._gamedrivers["grdius2b"];
+        m._gamedrivers["fround"] = src._gamedrivers["fround"];
+        m._gamedrivers["froundl"] = src._gamedrivers["froundl"];
+        m._gamedrivers["hpuncher"] = src._gamedrivers["hpuncher"];
+        m._gamedrivers["miaj"] = src._gamedrivers["miaj"];
+        m._gamedrivers["cuebrick"] = src._gamedrivers["cuebrick"];
+
+
+        m._gamedrivers["gradius3"] = src._gamedrivers["gradius3"];
+
+        //parodius
+        m._gamedrivers["parodius"] = src._gamedrivers["parodius"];
+        m._gamedrivers["parodisj"] = src._gamedrivers["parodisj"];
+
+        m._sources = {
+            "drivers/gberet.c","vidhrdw/gberet.c",
+            "drivers/gyruss.c", "sndhrdw/gyruss.c", "vidhrdw/gyruss.c",
+            "machine/konami.c",
+            "drivers/pingpong.c","vidhrdw/pingpong.c",
+            "drivers/gradius3.c","vidhrdw/gradius3.c",
+            "drivers/nemesis.c","vidhrdw/nemesis.c",
+            "drivers/twin16.c","vidhrdw/twin16.c", // gradius 2
+            "drivers/parodius.c","vidhrdw/parodius.c"
+
+        };
+        m._cpu_defs["M68000"]=1;
+        m._cpu_defs["Z80"]=1;
+        m._cpu_defs["KONAMI"]=1; // parodius
+
+
+        m._cpu_defs["M6809"]=1; // gyrus
+        m._cpu_defs["I8039"]=1; // gyrus
+
+        m._sound_defs["AY8910"]=1;  // nemesis, gyrus
+        m._sound_defs["K005289"]=1;
+        m._sound_defs["VLM5030"]=1;
+
+        m._sound_defs["SN76496"]=1; // gberet / pingpong
+
+        // gyrus has dreadful reverb !
+        m._sound_defs["DAC"]=1; // gyruss
+
+        // twin16
+        m._sound_defs["YM2151"]=1;
+        m._sound_defs["K007232"]=1;
+        m._sound_defs["UPD7759"]=1;
+
+        m._sound_defs["K053260"]=1; // parodius
+        m._sound_defs["K051649"]=1; // parodius
+    }
+  {
+        TMachine  &src=machinetargets["konami"];
+        string mname=string("minikonami3");
+        TMachine  &m=machinetargets[mname];
+        m._name = mname;
+
+        // added 12/2024
+        m._gamedrivers["dbz"] = src._gamedrivers["dbz"];
+        m._gamedrivers["dbz2"] = src._gamedrivers["dbz2"];
+
+        // parodius, konamigx many non working games (removed)
+        m._gamedrivers["konamigx"] = src._gamedrivers["konamigx"];
+        m._gamedrivers["le2"] = src._gamedrivers["le2"];
+        m._gamedrivers["le2u"] = src._gamedrivers["le2u"];
+        m._gamedrivers["gokuparo"] = src._gamedrivers["gokuparo"];
+        m._gamedrivers["puzldama"] = src._gamedrivers["puzldama"];
+        m._gamedrivers["tbyahhoo"] = src._gamedrivers["tbyahhoo"];
+        m._gamedrivers["tkmmpzdm"] = src._gamedrivers["tkmmpzdm"];
+        m._gamedrivers["dragoona"] = src._gamedrivers["dragoona"];
+        m._gamedrivers["dragoonj"] = src._gamedrivers["dragoonj"];
+        m._gamedrivers["sexyparo"] = src._gamedrivers["sexyparo"];
+        m._gamedrivers["daiskiss"] = src._gamedrivers["daiskiss"];
+        m._gamedrivers["tokkae"] = src._gamedrivers["tokkae"];
+        m._gamedrivers["salmndr2"] = src._gamedrivers["salmndr2"];
+        m._gamedrivers["winspike"] = src._gamedrivers["winspike"];
+        m._gamedrivers["winspikj"] = src._gamedrivers["winspikj"];
+
+        m._sources = {
+            "drivers/dbz.c","vidhrdw/dbz.c",
+            "drivers/konamigx.c","machine/konamigx.c","vidhrdw/konamigx.c"
+        };
+        m._cpu_defs["M68EC020"]=1;
+        m._cpu_defs["M68000"]=1;
+        m._cpu_defs["Z80"]=1;
+
+        m._sound_defs["K054539"]=1;
+        m._sound_defs["YM2151"]=1;
+        m._sound_defs["OKIM6295"]=1;
+
     }
     {
         TMachine  &src=machinetargets["midway"];
@@ -1037,7 +1171,8 @@ int createCmake(map<string,TMachine> machinetargets,
         if(upname == "TOAPLAN" ) onShouldBeDefault = true;
         // konami is huge, need ninja turtles and simpsons.
         if(upname == "MINIKONAMI" ) onShouldBeDefault = true;
-
+        if(upname == "MINIKONAMI2" ) onShouldBeDefault = true;
+        if(upname == "MINIKONAMI3" ) onShouldBeDefault = true;
         if(upname == "NEOGEO" ) onShouldBeDefault = true;
         // toki & cabal
         if(upname == "TAD" ) onShouldBeDefault = true;

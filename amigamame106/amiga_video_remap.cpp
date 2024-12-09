@@ -317,7 +317,7 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
 }
 void Paletted_Screen8::directDraw(directDrawParams *p)
 {
-    directDraw_UBYTE_UBYTE(p);
+    directDraw_UBYTE_UBYTE_UWORD(p);
 }
 
 
@@ -380,7 +380,7 @@ void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
 void Paletted_Pens8::directDraw(directDrawParams *p)
 {
     if(_clut8.size()==0) return;
-    directDrawClutT_UBYTE_UBYTE(p,_clut8.data());
+    directDrawClut_UBYTE_UBYTE_UWORD(p,_clut8.data());
 }
 void Paletted_Pens8::initRemapCube()
 {

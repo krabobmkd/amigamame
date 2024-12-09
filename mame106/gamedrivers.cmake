@@ -41,6 +41,8 @@ option(OPT_MIDWAYTUNIT "" ON)
 option(OPT_MINIATARI "" ON)
 option(OPT_MINIDTEA "" ON)
 option(OPT_MINIKONAMI "" ON)
+option(OPT_MINIKONAMI2 "" ON)
+option(OPT_MINIKONAMI3 "" ON)
 option(OPT_MININAMCOS1 "" ON)
 option(OPT_MISC "" OFF)
 option(OPT_NAMCO "" OFF)
@@ -1179,6 +1181,53 @@ if(OPT_MINIKONAMI)
 		HAS_SAMPLES=1 HAS_UPD7759=1 HAS_YM2151=1 	)
 	list(APPEND CPU_DEFS
 		HAS_KONAMI=1 HAS_M68000=1 HAS_Z80=1 	)
+endif()
+if(OPT_MINIKONAMI2)
+	add_compile_definitions(LINK_MINIKONAMI2=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/gberet.c vidhrdw/gberet.c drivers/gyruss.c sndhrdw/gyruss.c 
+		vidhrdw/gyruss.c machine/konami.c drivers/pingpong.c vidhrdw/pingpong.c 
+		drivers/gradius3.c vidhrdw/gradius3.c drivers/nemesis.c vidhrdw/nemesis.c 
+		drivers/twin16.c vidhrdw/twin16.c drivers/parodius.c vidhrdw/parodius.c 
+	)
+	set(MSND_AY8910 ON)
+	set(MSND_DAC ON)
+	set(MSND_K005289 ON)
+	set(MSND_K007232 ON)
+	set(MSND_K051649 ON)
+	set(MSND_K053260 ON)
+	set(MSND_SN76496 ON)
+	set(MSND_UPD7759 ON)
+	set(MSND_VLM5030 ON)
+	set(MSND_YM2151 ON)
+	set(MCPU_I8039 ON)
+	set(MCPU_KONAMI ON)
+	set(MCPU_M68000 ON)
+	set(MCPU_M6809 ON)
+	set(MCPU_Z80 ON)
+	list(APPEND CPU_DEFS
+		HAS_AY8910=1 HAS_DAC=1 HAS_K005289=1 HAS_K007232=1 
+		HAS_K051649=1 HAS_K053260=1 HAS_SN76496=1 HAS_UPD7759=1 
+		HAS_VLM5030=1 HAS_YM2151=1 	)
+	list(APPEND CPU_DEFS
+		HAS_I8039=1 HAS_KONAMI=1 HAS_M68000=1 HAS_M6809=1 
+		HAS_Z80=1 	)
+endif()
+if(OPT_MINIKONAMI3)
+	add_compile_definitions(LINK_MINIKONAMI3=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/dbz.c vidhrdw/dbz.c drivers/konamigx.c machine/konamigx.c 
+		vidhrdw/konamigx.c 	)
+	set(MSND_K054539 ON)
+	set(MSND_OKIM6295 ON)
+	set(MSND_YM2151 ON)
+	set(MCPU_M68000 ON)
+	set(MCPU_M68EC020 ON)
+	set(MCPU_Z80 ON)
+	list(APPEND CPU_DEFS
+		HAS_K054539=1 HAS_OKIM6295=1 HAS_YM2151=1 	)
+	list(APPEND CPU_DEFS
+		HAS_M68000=1 HAS_M68EC020=1 HAS_Z80=1 	)
 endif()
 if(OPT_MININAMCOS1)
 	add_compile_definitions(LINK_MININAMCOS1=1)

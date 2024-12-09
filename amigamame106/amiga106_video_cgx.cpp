@@ -159,19 +159,19 @@ void Drawable_CGX::drawCGX_DirectCPU16(
             case PIXFMT_RGB16:case PIXFMT_BGR16:case PIXFMT_RGB16PC:case PIXFMT_BGR16PC:
             if(_pRemap->_clut16.size()>0)
             {
-                directDrawClutT_UWORD_UWORD(&p,_pRemap->_clut16.data());
+                directDrawClut_UWORD_UWORD_UWORD(&p,_pRemap->_clut16.data());
             }
             break;
             case PIXFMT_RGB24:case PIXFMT_BGR24:
             if(_pRemap->_clut32.size()>0)
             {
-                directDrawClutT_type24_ULONG(&p,_pRemap->_clut32.data());
+                directDrawClut_type24_ULONG_UWORD(&p,_pRemap->_clut32.data());
             }
             break;
             case PIXFMT_ARGB32:case PIXFMT_BGRA32:case PIXFMT_RGBA32:
             if(_pRemap->_clut32.size()>0)
             {
-                directDrawClutT_ULONG_ULONG(&p,_pRemap->_clut32.data());
+                directDrawClut_ULONG_ULONG_UWORD(&p,_pRemap->_clut32.data());
             }
             break;
             case PIXFMT_LUT8:
@@ -179,12 +179,12 @@ void Drawable_CGX::drawCGX_DirectCPU16(
             {
                 //dbg =1;
                 //8Bit using fullscreen with dynamic palette change, should just copy pixels.
-                directDraw_UBYTE_UBYTE(&p);
+                directDraw_UBYTE_UBYTE_UWORD(&p);
             } else {
                //  dbg =2;
                 if(_pRemap->_clut8.size()>0)
                 {   // 8bit using remap and static palette (like on workbench 8bit)
-                    directDrawClutT_UBYTE_UBYTE(&p,_pRemap->_clut8.data());
+                    directDrawClut_UBYTE_UBYTE_UWORD(&p,_pRemap->_clut8.data());
                  //    dbg =3;
                 }
             }

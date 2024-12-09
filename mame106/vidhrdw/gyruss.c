@@ -124,12 +124,10 @@ static void draw_sprites(mame_bitmap *bitmap)
 	int offs;
 	int line;
 
-
 	
-	{ 
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
-		Machine->gfx[1 + (sr[offs + 1] & 1)], 	// gfx
+		NULL, // gfx
 		0, 	// code
 		0, 	// color
 		0, 	// flipx
@@ -144,6 +142,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 		NULL, 	// pri_buffer
 		0 	// priority_mask
 	  };
+
 	for (line = 0;line < 256;line++)
 	{
 		if (line >= Machine->visible_area.min_y && line <= Machine->visible_area.max_y)
@@ -161,7 +160,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 				sy = 241 - sr[offs + 3];
 				if (sy > line-16 && sy <= line)
 				{
-					
+					dgp0.gfx = Machine->gfx[1 + (sr[offs + 1] & 1)];
 					dgp0.code = sr[offs + 1]/2 + 4*(sr[offs + 2] & 0x20);
 					dgp0.color = sr[offs + 2] & 0x0f;
 					dgp0.flipx = !(sr[offs + 2] & 0x40);
@@ -173,8 +172,6 @@ static void draw_sprites(mame_bitmap *bitmap)
 			}
 		}
 	}
-	} // end of patch paragraph
-
 }
 
 
@@ -186,7 +183,6 @@ VIDEO_UPDATE( gyruss )
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 	
-	{ 
 	struct drawgfxParams dgp1={
 		tmpbitmap, 	// dest
 		Machine->gfx[0], 	// gfx
@@ -204,6 +200,7 @@ VIDEO_UPDATE( gyruss )
 		NULL, 	// pri_buffer
 		0 	// priority_mask
 	  };
+
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		if (dirtybuffer[offs])
@@ -225,7 +222,6 @@ VIDEO_UPDATE( gyruss )
 				flipy = !flipy;
 			}
 
-			
 			dgp1.code = videoram[offs] + 8 * (colorram[offs] & 0x20);
 			dgp1.color = colorram[offs] & 0x0f;
 			dgp1.flipx = flipx;
@@ -235,7 +231,7 @@ VIDEO_UPDATE( gyruss )
 			drawgfx(&dgp1);
 		}
 	}
-	} // end of patch paragraph
+
 
 
 
@@ -248,7 +244,6 @@ VIDEO_UPDATE( gyruss )
 
 	/* redraw the characters which have priority over sprites */
 	
-	{ 
 	struct drawgfxParams dgp2={
 		bitmap, 	// dest
 		Machine->gfx[0], 	// gfx
@@ -294,7 +289,7 @@ VIDEO_UPDATE( gyruss )
 			drawgfx(&dgp2);
         }
 	}
-	} // end of patch paragraph
+
 
 }
 

@@ -2850,6 +2850,68 @@ const game_driver * const drivers[] =
 	DRIVER( tmnt ) /* 1989 "Konami" "Teenage Mutant Ninja Turtles (World 4 Players)" */
 	DRIVER( tmnt2 ) /* 1991 "Konami" "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)" */
 #endif
+#ifdef LINK_MINIKONAMI2
+	DRIVER( blkpnthr ) /* 1987 "Konami" "Black Panther" */
+	DRIVER( citybmrj ) /* 1987 "Konami" "City Bomber (Japan)" */
+	DRIVER( citybomb ) /* 1987 "Konami" "City Bomber (World)" */
+	DRIVER( cuebrick ) /* 1989 "Konami" "Cue Brick (Japan)" */
+	DRIVER( darkadv ) /* 1987 "Konami" "Dark Adventure" */
+	DRIVER( devilw ) /* 1987 "Konami" "Devil World" */
+	DRIVER( fround ) /* 1988 "Konami" "The Final Round (version M)" */
+	DRIVER( froundl ) /* 1988 "Konami" "The Final Round (version L)" */
+	DRIVER( gberet ) /* 1985 "Konami" "Green Beret" */
+	DRIVER( gberetb ) /* 1985 "bootleg" "Green Beret (bootleg)" */
+	DRIVER( gradius ) /* 1985 "Konami" "Gradius" */
+	DRIVER( gradius2 ) /* 1988 "Konami" "Gradius II - GOFER no Yabou (Japan New Ver.)" */
+	DRIVER( gradius3 ) /* 1989 "Konami" "Gradius III (Japan)" */
+	DRIVER( grdius2a ) /* 1988 "Konami" "Gradius II - GOFER no Yabou (Japan Old Ver.)" */
+	DRIVER( grdius2b ) /* 1988 "Konami" "Gradius II - GOFER no Yabou (Japan Older Ver.)" */
+	DRIVER( gwarrior ) /* 1985 "Konami" "Galactic Warriors" */
+	DRIVER( gyruss ) /* 1983 "Konami" "Gyruss (Konami)" */
+	DRIVER( gyrussce ) /* 1983 "Konami (Centuri license)" "Gyruss (Centuri)" */
+	DRIVER( hcrash ) /* 1987 "Konami" "Hyper Crash (version D)" */
+	DRIVER( hcrashc ) /* 1987 "Konami" "Hyper Crash (version C)" */
+	DRIVER( hpuncher ) /* 1988 "Konami" "Hard Puncher (Japan)" */
+	DRIVER( kittenk ) /* 1988 "Konami" "Kitten Kaboodle" */
+	DRIVER( konamigt ) /* 1985 "Konami" "Konami GT" */
+	DRIVER( lifefrce ) /* 1986 "Konami" "Lifeforce (US)" */
+	DRIVER( lifefrcj ) /* 1986 "Konami" "Lifeforce (Japan)" */
+	DRIVER( majuu ) /* 1987 "Konami" "Majuu no Ohkoku" */
+	DRIVER( merlinmm ) /* 1986 "Zilec - Zenitone" "Merlins Money Maze" */
+	DRIVER( miaj ) /* 1989 "Konami" "M.I.A. - Missing in Action (Japan)" */
+	DRIVER( mrgoemon ) /* 1986 "Konami" "Mr. Goemon (Japan)" */
+	DRIVER( nemesis ) /* 1985 "Konami" "Nemesis" */
+	DRIVER( nemesuk ) /* 1985 "Konami" "Nemesis (World?)" */
+	DRIVER( nyanpani ) /* 1988 "Konami" "Nyan Nyan Panic (Japan)" */
+	DRIVER( parodisj ) /* 1990 "Konami" "Parodius DA! (Japan)" */
+	DRIVER( parodius ) /* 1990 "Konami" "Parodius DA! (World)" */
+	DRIVER( pingpong ) /* 1985 "Konami" "Ping Pong" */
+	DRIVER( rf2 ) /* 1985 "Konami" "Konami RF2 - Red Fighter" */
+	DRIVER( rushatck ) /* 1985 "Konami" "Rush'n Attack (US)" */
+	DRIVER( salamand ) /* 1986 "Konami" "Salamander (version D)" */
+	DRIVER( salamanj ) /* 1986 "Konami" "Salamander (version J)" */
+	DRIVER( twinbee ) /* 1985 "Konami" "TwinBee" */
+	DRIVER( vulcan ) /* 1988 "Konami" "Vulcan Venture" */
+#endif
+#ifdef LINK_MINIKONAMI3
+	DRIVER( daiskiss ) /* 1996 "Konami" "Daisu-Kiss (ver JAA)" */
+	DRIVER( dbz ) /* 1993 "Banpresto" "Dragonball Z" */
+	DRIVER( dbz2 ) /* 1994 "Banpresto" "Dragonball Z 2 - Super Battle" */
+	DRIVER( dragoona ) /* 1995 "Konami" "Dragoon Might (ver AAB)" */
+	DRIVER( dragoonj ) /* 1995 "Konami" "Dragoon Might (ver JAA)" */
+	DRIVER( gokuparo ) /* 1994 "Konami" "Gokujyou Parodius (ver JAD)" */
+	DRIVER( konamigx ) /* 1994 "Konami" "System GX" */
+	DRIVER( le2 ) /* 1994 "Konami" "Lethal Enforcers II: Gun Fighters (ver EAA)" */
+	DRIVER( le2u ) /* 1994 "Konami" "Lethal Enforcers II: Gun Fighters (ver UAA)" */
+	DRIVER( puzldama ) /* 1994 "Konami" "Taisen Puzzle-dama (ver JAA)" */
+	DRIVER( salmndr2 ) /* 1996 "Konami" "Salamander 2 (ver JAA)" */
+	DRIVER( sexyparo ) /* 1996 "Konami" "Sexy Parodius (ver JAA)" */
+	DRIVER( tbyahhoo ) /* 1995 "Konami" "Twin Bee Yahhoo! (ver JAA)" */
+	DRIVER( tkmmpzdm ) /* 1995 "Konami" "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)" */
+	DRIVER( tokkae ) /* 1996 "Konami" "Taisen Tokkae-dama (ver JAA)" */
+	DRIVER( winspike ) /* 1997 "Konami" "Winning Spike (ver EAA)" */
+	DRIVER( winspikj ) /* 1997 "Konami" "Winning Spike (ver JAA)" */
+#endif
 #ifdef LINK_MININAMCOS1
 	DRIVER( bakutotu ) /*    */
 	DRIVER( berabohm ) /*    */
