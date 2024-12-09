@@ -80,12 +80,26 @@ class Paletted_Screen8ForcePalette : public Paletted_Pens8
 {
 public:
     Paletted_Screen8ForcePalette(struct Screen *pScreen);
-    int loadIlbmClut(const UBYTE *pbin,ULONG bsize);
+   // int loadIlbmClut(const UBYTE *pbin,ULONG bsize);
 protected:
     void initRemapCube() override;
     void initFixedPalette(const UBYTE *prgb,ULONG nbc);
 
 };
+class Paletted_Screen8ForcePalette_15b : public Paletted_Screen8ForcePalette
+{
+public:
+    Paletted_Screen8ForcePalette_15b(struct Screen *pScreen);
+    void updatePaletteRemap(_mame_display *display) override;
+protected:
 
+};
+class Paletted_Screen8ForcePalette_32b : public Paletted_Screen8ForcePalette
+{
+public:
+    Paletted_Screen8ForcePalette_32b(struct Screen *pScreen);
+    void directDraw(directDrawParams *p) override;
+protected:
 
+};
 #endif

@@ -61,6 +61,7 @@ void XmlWriter::operator()(const char *sMemberName, std::string &str,int flags)
 }
 void XmlWriter::operator()(const char *sMemberName, int &v, int min, int max, int defv)
 {
+    if(defv == v) return;
     string name = checkXmlName(sMemberName);
     xml_data_node *p = xml_add_child(_recursenode.back(),name.c_str(),  NULL );
     if(p) xml_set_attribute_int(p,"v",v);
@@ -99,6 +100,7 @@ void XmlWriter::operator()(const char *sMemberName, bool &v)
 }
 void XmlWriter::operator()(const char *sMemberName, ULONG_FLAGS &v,ULONG_FLAGS valdef,const std::vector<std::string> &values)
 {
+    if(v == valdef) return; // no need.
     UINT32 ib=1;
     for(int i=0;i<values.size() ;i++)
     {

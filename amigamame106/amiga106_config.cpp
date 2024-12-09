@@ -339,7 +339,7 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
 
 //         int _window_posx,_window_posy,_window_width,_window_height,_window_validpos;
     serializer("wx",_window_posx,{});
-    serializer("wx",_window_posy,{});
+    serializer("wy",_window_posy,{});
     serializer("ww",_window_width,{});
     serializer("wh",_window_height,{});
     serializer("wv",_window_validpos,{});
@@ -352,7 +352,9 @@ void MameConfig::Display_PerScreenMode::valueUpdated(std::string upatedValue)
 bool MameConfig::Display_PerScreenMode::isDefault()
 {   // will not be written if is default.
     return (_ScreenModeChoice == ScreenModeChoice::Best &&
-            _rotateMode == RotateMode::Rot0);
+            _rotateMode == RotateMode::Rot0 &&
+            _window_validpos == 0
+            );
 }
 
 MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode)

@@ -155,12 +155,18 @@ void Drawable_OS3::initRemapTable()
         if(_colorsIndexLength<=258)
             _pRemap = new Paletted_Screen8(_drawable.screen());
         // 8Bits screens will have a fixed 256c palette and  16b index color remap to this.
-        else _pRemap = new Paletted_Screen8ForcePalette(_drawable.screen());
+        else if(_video_attributes & VIDEO_RGB_DIRECT)
+        {
+            _pRemap = new Paletted_Screen8ForcePalette_15b(_drawable.screen());
+        }
 
     } else
     {
         // windows on Workbench 8Bit will remap 8&16bits to the palette given by workbench.
-        _pRemap = new Paletted_Pens8(_drawable.screen());
+        if(_colorsIndexLength>0 && _colorsIndexLength<32768)
+        {
+            _pRemap = new Paletted_Pens8(_drawable.screen());
+        }
     }
 }
 void Drawable_OS3::close()

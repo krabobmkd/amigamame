@@ -542,3 +542,42 @@ void Paletted_Screen8ForcePalette::initFixedPalette(const UBYTE *prgb,ULONG nbc)
         LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &paletteRGB32[0]); // change 1 to 32 colors at a time.
     }
 }
+
+Paletted_Screen8ForcePalette_15b::Paletted_Screen8ForcePalette_15b(struct Screen *pScreen)
+    :Paletted_Screen8ForcePalette(pScreen)
+{
+}
+// for 15bit RGB just does clut to
+void Paletted_Screen8ForcePalette_15b::updatePaletteRemap(_mame_display *display)
+{
+    if(_needFirstRemap==0) return;
+    if(!_pScreen) return;
+    struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
+    if(!pColorMap) return;
+
+    initRemapCube();
+    _needFirstRemap = 0;
+
+    int nbc = 32*32*32;
+    if(_clut8.size()<nbc) _clut8.resize(nbc,0);
+    UBYTE *pclut = _clut8.data();
+
+    for(int j=0;j<nbc;j++)
+    {
+        UWORD rgb4 = ((j>>3) & 0x0f00) |
+                     ((j>>2) & 0x00f0) |
+                     ((j>>1) & 0x000f) ;
+        pclut[j] =_rgb4cube[rgb4];
+    }
+
+}
+Paletted_Screen8ForcePalette_32b::Paletted_Screen8ForcePalette_32b(struct Screen *pScreen)
+    :Paletted_Screen8ForcePalette(pScreen)
+{
+}
+
+void Paletted_Screen8ForcePalette_32b::directDraw(directDrawParams *p)
+{
+
+}
+
