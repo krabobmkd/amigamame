@@ -426,21 +426,37 @@ void Paletted_Pens8::initRemapCube()
         _rgb4cube[rgbi] = isbest;
     }
 }
-
-
-Paletted_Pens8_15b::Paletted_Pens8_15b(struct Screen *pScreen)
+// - - - -
+// RGB15 remap to workbench 8bit, external palette.
+Paletted_Pens8_src15b::Paletted_Pens8_src15b(struct Screen *pScreen)
     :Paletted_Pens8(pScreen)
 {
     initRemapCube();
+    int nbc = 32*32*32;
+    if(_clut8.size()<nbc) _clut8.resize(nbc,0);
+    UBYTE *pclut = _clut8.data();
+    for(int j=0;j<nbc;j++)
+    {
+        UWORD rgb4 = ((j>>3) & 0x0f00) |
+                     ((j>>2) & 0x00f0) |
+                     ((j>>1) & 0x000f) ;
+        pclut[j] =_rgb4cube[rgb4];
+    }
 }
-Paletted_Pens8_15b::~Paletted_Pens8_15b(){}
-void Paletted_Pens8_15b::updatePaletteRemap(_mame_display *display) {}
-void Paletted_Pens8_15b::directDraw(directDrawParams *p)
+Paletted_Pens8_src15b::~Paletted_Pens8_src15b(){}
+void Paletted_Pens8_src15b::updatePaletteRemap(_mame_display *display) {} // does nothing
+// - - - - - - - - -
+// RGB32 to remap to workbench 8bit, external palette.
+Paletted_Pens8_src32b::Paletted_Pens8_src32b(struct Screen *pScreen)
+    : Paletted_Pens8_src15b(pScreen)
+{}
+Paletted_Pens8_src32b::~Paletted_Pens8_src32b(){}
+void Paletted_Pens8_src32b::directDraw(directDrawParams *p)
 {
-
+    if(_clut8.size()==0) return;
+    // same as 15 bit, but use this function that does RGB32 to RGB15 conversion.
+    directDrawClut_UBYTE_UBYTE_ARGB32(p,_clut8.data());
 }
-
-
 // - - - - - - - - - - -
 #ifdef LOADPALETTE
 #ifdef LSB_FIRST
@@ -572,6 +588,8 @@ Paletted_Screen8ForcePalette_15b::Paletted_Screen8ForcePalette_15b(struct Screen
         pclut[j] =_rgb4cube[rgb4];
     }
 }
+// - - - -
+
 // for 15bit RGB just does clut to
 // void Paletted_Screen8ForcePalette_15b::updatePaletteRemap(_mame_display *display)
 // {   // finnaly, init in constructor, no color will change, updatePaletteRemap not used.

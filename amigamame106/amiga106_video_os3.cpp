@@ -149,7 +149,7 @@ void Drawable_OS3::draw_WriteChunkyPixels(_mame_display *display)
 
 void Drawable_OS3::initRemapTable()
 {
-    if(_useIntuitionPalette) // cases where we set the screen's palette with LOADRGB32.
+    if(_useIntuitionPalette) // cases where we set a private screen palette with LOADRGB32.
     {
         // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
         // if(_colorsIndexLength<=258)
@@ -173,7 +173,7 @@ void Drawable_OS3::initRemapTable()
             else _pRemap = new Paletted_Screen8ForcePalette(_drawable.screen());
 
         }
-    } else // case where we reuse an existing intuition screen indexed palette. (like on a 8Bit WB)
+    } else // case where we re-use an existing intuition screen indexed palette. (like on a 8Bit Workbench)
     {
         // windows on Workbench 8Bit will remap 8&16bits to the palette given by workbench.
         if(_video_attributes & VIDEO_RGB_DIRECT)
@@ -185,7 +185,7 @@ void Drawable_OS3::initRemapTable()
             {
                 _pRemap = new Paletted_Pens8_src32b(_drawable.screen());
             }
-        } else
+        } else // most games not RGB
         if(_colorsIndexLength>0 && _colorsIndexLength<32768)
         {
             _pRemap = new Paletted_Pens8(_drawable.screen()); // same case for <258 colors or more.

@@ -67,19 +67,24 @@ protected:
     std::vector<UBYTE> _rgb4cube;
     virtual void initRemapCube();
 };
-class Paletted_Pens8_15b : public Paletted_Pens8
+// RGB15 to 8bit external palette (WB)
+class Paletted_Pens8_src15b : public Paletted_Pens8
 {
 public:
-    Paletted_Pens8_15b(struct Screen *pScreen);
-    ~Paletted_Pens8_15b();
+    Paletted_Pens8_src15b(struct Screen *pScreen);
+    ~Paletted_Pens8_src15b();
     void updatePaletteRemap(_mame_display *display) override;
+protected:
+};
+// RGB32 to 8bit external palette  (WB)
+class Paletted_Pens8_src32b : public Paletted_Pens8_src15b
+{
+public:
+    Paletted_Pens8_src32b(struct Screen *pScreen);
+    ~Paletted_Pens8_src32b();
     void directDraw(directDrawParams *p) override;
 protected:
-    struct Screen *_pScreen;
-    std::vector<UBYTE> _rgb4cube;
-    virtual void initRemapCube();
 };
-
 class Palette8 {
 public:
     void loadIlbmClut(const UBYTE *pbin,ULONG bsize);
@@ -98,13 +103,13 @@ protected:
     void initFixedPalette(const UBYTE *prgb,ULONG nbc);
 
 };
+// RGB15 to 8Bit Workbench palette
 class Paletted_Screen8ForcePalette_15b : public Paletted_Screen8ForcePalette
 {
 public:
     Paletted_Screen8ForcePalette_15b(struct Screen *pScreen);
-protected:
-
 };
+// RGB32 to 8Bit Workbench palette
 class Paletted_Screen8ForcePalette_32b : public Paletted_Screen8ForcePalette_15b
 {
 public:

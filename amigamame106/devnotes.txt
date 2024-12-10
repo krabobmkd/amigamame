@@ -2,7 +2,7 @@
 todo R1
 
  - X 8Bit Rendering on Screens for 16b.
- - O 8Bit Rendering on Screens for 15b + 32b.
+ - X 8Bit Rendering on Screens for 15b + 32b. (+wb)
  - X 8Bit Rendering on Windows.
  - X Amigaguide
  - X samples load for QBert

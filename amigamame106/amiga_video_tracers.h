@@ -39,7 +39,7 @@ struct directDrawSource {
     int _swapFlags;
 };
 
-// actually optimize the 3 recursive calls to reach drawing routnie
+// actually optimize the 3 recursive calls to reach drawing routine
 struct directDrawParams {
     directDrawScreen *screen;
     directDrawSource *source;
