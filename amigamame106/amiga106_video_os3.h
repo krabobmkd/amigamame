@@ -14,6 +14,10 @@ public:
   virtual ~Drawable_OS3();
   void draw_WPA8(_mame_display *display);
   void draw_WriteChunkyPixels(_mame_display *display);
+  inline bool isSourceRGBA32() {
+      const ULONG fritata = (VIDEO_RGB_DIRECT|VIDEO_NEEDS_6BITS_PER_GUN);
+      return ((_video_attributes&fritata)==fritata);
+  }
 protected:
   void initRemapTable();
   void close();

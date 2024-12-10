@@ -38,7 +38,7 @@ Drawable_OS3::Drawable_OS3(IntuitionDrawable &drawable)
 }
 Drawable_OS3::~Drawable_OS3()
 {
-
+    close();
 }
 void Drawable_OS3::draw_WPA8(_mame_display *display)
 {
@@ -57,7 +57,7 @@ void Drawable_OS3::draw_WPA8(_mame_display *display)
 
     // align on 16
     int wwal = (ww+15)&0xfffffff0;
-    const int bmsize = wwal*(hh+2); // +2 because this looks very messy
+    const int bmsize = wwal*(hh+4); // +4 because zoom trick in draswcale.
     if(bmsize != _wpatempbm.size())
     {
         _wpatempbm.resize(bmsize);
@@ -122,7 +122,7 @@ void Drawable_OS3::draw_WriteChunkyPixels(_mame_display *display)
     _drawable.getGeometry(display,cenx,ceny,ww,hh,sourcewidth,sourceheight);
 
     // - - get a 8bit bitmap from the 16b one, we know there's only 256 color max. - -
-    const int bmsize = ww*(hh);
+    const int bmsize = ww*(hh+4); // +2 becaus of zoom trick but well.
     if(bmsize != _wpatempbm.size()) _wpatempbm.resize(bmsize);
 
     directDrawScreen ddscreen={
@@ -175,20 +175,23 @@ void Drawable_OS3::initRemapTable()
         }
     } else // case where we re-use an existing intuition screen indexed palette. (like on a 8Bit Workbench)
     {
+        //printf("_colorsIndexLength:%d\n",_colorsIndexLength);
         // windows on Workbench 8Bit will remap 8&16bits to the palette given by workbench.
         if(_video_attributes & VIDEO_RGB_DIRECT)
-        {
+        {            
             if(_video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)
             {
-                _pRemap = new Paletted_Pens8_src15b(_drawable.screen());
+                _pRemap = new Paletted_Pens8_src32b(_drawable.screen());
             } else
             {
-                _pRemap = new Paletted_Pens8_src32b(_drawable.screen());
+                _pRemap = new Paletted_Pens8_src15b(_drawable.screen());
             }
         } else // most games not RGB
-        if(_colorsIndexLength>0 && _colorsIndexLength<32768)
         {
-            _pRemap = new Paletted_Pens8(_drawable.screen()); // same case for <258 colors or more.
+            if(_colorsIndexLength>0)
+            {
+                _pRemap = new Paletted_Pens8(_drawable.screen()); // same case for <258 colors or more.
+            }
         }
     }
 }
@@ -309,7 +312,8 @@ void Intuition_Screen_OS3::draw(_mame_display *display)
 Intuition_Window_OS3::Intuition_Window_OS3(const AbstractDisplay::params &params)
     : Intuition_Window(params), Drawable_OS3((IntuitionDrawable&)*this)
 {
-    printf("Intuition_Window_OS3\n");
+    _colorsIndexLength = params._colorsIndexLength;
+    _video_attributes = params._video_attributes;
 }
 Intuition_Window_OS3::~Intuition_Window_OS3()
 {

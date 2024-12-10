@@ -332,10 +332,7 @@ Paletted_Pens8::~Paletted_Pens8()
 }
 void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
 {
-//    printf("updatePaletteRemap:\n");
     if(!_pScreen) return;
-    struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
-    if(!pColorMap) return;
 
     const rgb_t *gpal1 = display->game_palette;
     USHORT nbc = (USHORT)display->game_palette_entries;
@@ -348,11 +345,12 @@ void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
         for(int i=0;i<nbdirstybf;i++) pdirtrybf[i]=~0;
         // also that,
         initRemapCube();
+        _needFirstRemap = 0;
     }
     if(_clut8.size()<nbc) _clut8.resize(nbc,0);
     UBYTE *pclut = _clut8.data();
 
-    _needFirstRemap = 0;
+
     for(int j=0;j<nbc;j+=32)
     {
         UINT32 dirtybf = *pdirtrybf++;
@@ -379,7 +377,10 @@ void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
 }
 void Paletted_Pens8::directDraw(directDrawParams *p)
 {
-    if(_clut8.size()==0) return;
+    if(_clut8.size()==0)
+    {
+        return;
+    }
     directDrawClut_UBYTE_UBYTE_UWORD(p,_clut8.data());
 }
 void Paletted_Pens8::initRemapCube()

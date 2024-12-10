@@ -86,7 +86,8 @@ void directDrawScaleClutTT(directDrawParams *p,
     if(x1<screen->_clipX1) { w-=(screen->_clipX1-x1); x1=screen->_clipX1;  }
     if(y1<screen->_clipY1) { h-=(screen->_clipY1-y1); y1=screen->_clipY1;  }
 
-    for(WORD hh=0;hh<h;)
+    WORD hh=0;
+    while(hh<h-2) // -2 because 3line trick could go too low.
     {
         SOURCEBMTYPE *psoline = psourcebm + hmod*(vh>>16);
         SOURCEBMTYPE *psoline2 = psourcebm + hmod*((vh+addh)>>16);
@@ -141,7 +142,7 @@ void directDrawScaleClutTT(directDrawParams *p,
             {
                 if(useClut)
                 {
-                    *pscline++ = lut[psoline[((UWORD)(vx>>16))*vmod]];
+                    *pscline++ = lut[SOURCEBMCLUTCONVERT::conv(psoline[((UWORD)(vx>>16))*vmod])];
                 } else
                 {
                     *pscline++ = (SCREENPIXTYPE) psoline[((UWORD)(vx>>16))*vmod];
@@ -153,6 +154,26 @@ void directDrawScaleClutTT(directDrawParams *p,
             hh++;
         }
     } // end loop h
+    while(hh<h)
+    {   // last lines must be one at same time.
+        SOURCEBMTYPE *psoline = psourcebm + hmod*(vh>>16);
+        SCREENPIXTYPE *pscline = pscreenbm;
+        LONG vx = vxStart;
+        for(WORD ww=0;ww<w;ww++)
+        {
+            if(useClut)
+            {
+                *pscline++ = lut[SOURCEBMCLUTCONVERT::conv(psoline[((UWORD)(vx>>16))*vmod])];
+            } else
+            {
+                *pscline++ = (SCREENPIXTYPE) psoline[((UWORD)(vx>>16))*vmod];
+            }
+            vx += addw;
+        }
+        vh += addh;
+        pscreenbm += wscbpr;
+        hh++;
+    }
 
 }
 template<typename SCREENPIXTYPE,typename CLUTTYPE,typename SOURCEBMTYPE,typename SOURCEBMCLUTCONVERT,
@@ -190,7 +211,6 @@ void directDrawClutTT(directDrawParams *p, CLUTTYPE *lut )
     LONG addw,addh;
     LONG vh =0;
     LONG vxStart=0 ;
-
 
     if(C_swapXY)
     {
