@@ -885,7 +885,9 @@ int patchMiniMachines(
         m._gamedrivers["dbz"] = src._gamedrivers["dbz"];
         m._gamedrivers["dbz2"] = src._gamedrivers["dbz2"];
 
-        // parodius, konamigx many non working games (removed)
+        // parodius, konamigx many non working games areremoved
+        // yet does not work either -> raus.
+#ifdef USE_KONAMIGX
         m._gamedrivers["konamigx"] = src._gamedrivers["konamigx"];
         m._gamedrivers["le2"] = src._gamedrivers["le2"];
         m._gamedrivers["le2u"] = src._gamedrivers["le2u"];
@@ -901,10 +903,12 @@ int patchMiniMachines(
         m._gamedrivers["salmndr2"] = src._gamedrivers["salmndr2"];
         m._gamedrivers["winspike"] = src._gamedrivers["winspike"];
         m._gamedrivers["winspikj"] = src._gamedrivers["winspikj"];
-
+#endif
         m._sources = {
             "drivers/dbz.c","vidhrdw/dbz.c",
+#ifdef USE_KONAMIGX
             "drivers/konamigx.c","machine/konamigx.c","vidhrdw/konamigx.c"
+#endif
         };
         m._cpu_defs["M68EC020"]=1;
         m._cpu_defs["M68000"]=1;

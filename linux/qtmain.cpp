@@ -167,7 +167,8 @@ void QProc::process()
 //    "bublbobl"
 //   "dino"
 //                 "arkretrn"
-        "qbert"
+ //       "qbert"
+ "gokuparo"
 //"pdrift"
 //"qbert"
  //   "rastsaga"
@@ -238,8 +239,8 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
-        this->setFixedSize(w*3,h*3);
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w,h)) );
+        this->setFixedSize(w,h);
     _imageMutex.unlock();
 
 	//lbl.show();

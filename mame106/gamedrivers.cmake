@@ -1216,8 +1216,7 @@ endif()
 if(OPT_MINIKONAMI3)
 	add_compile_definitions(LINK_MINIKONAMI3=1)
 	list(APPEND MAME_DRIVERS_SRC
-		drivers/dbz.c vidhrdw/dbz.c drivers/konamigx.c machine/konamigx.c 
-		vidhrdw/konamigx.c 	)
+		drivers/dbz.c vidhrdw/dbz.c 	)
 	set(MSND_K054539 ON)
 	set(MSND_OKIM6295 ON)
 	set(MSND_YM2151 ON)

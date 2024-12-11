@@ -11,6 +11,11 @@ extern "C"
 
 #include "serializer.h"
 
+extern "C"
+{
+
+}
+
 typedef long BPTR;
 struct FileInfoBlock;
 struct _game_driver;

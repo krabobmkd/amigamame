@@ -313,7 +313,8 @@ void directDrawRGB32ScaleTT(directDrawParams *p )
     if(x1<screen->_clipX1) { w-=(screen->_clipX1-x1); x1=screen->_clipX1;  }
     if(y1<screen->_clipY1) { h-=(screen->_clipY1-y1); y1=screen->_clipY1;  }
 
-    for(WORD hh=0;hh<h;)
+    WORD hh=0;
+    while(hh<h-2)
     {
         ULONG *psoline = psourcebm + hmod*(vh>>16);
         ULONG *psoline2 = psourcebm + hmod*((vh+addh)>>16);
@@ -361,6 +362,23 @@ void directDrawRGB32ScaleTT(directDrawParams *p )
             hh++;
         }
     } // end loop h
+    // last lines must be one line
+    while(hh<h)
+    {
+        // other do normal one line ...
+        ULONG *psoline = psourcebm + hmod*(vh>>16);
+        SCREENPIXTYPE *pscline = pscreenbm;
+        LONG vx = vxStart;
+        for(WORD ww=0;ww<w;ww++)
+        {
+            *pscline++ = SCREENPIXTYPE(psoline[((UWORD)(vx>>16))*vmod]);
+            vx += addw;
+        }
+        vh += addh;
+        pscreenbm += wscbpr;
+        hh++;
+    }
+
 
 }
 

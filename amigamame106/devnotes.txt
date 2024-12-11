@@ -1,6 +1,18 @@
 
-todo R1
+  since beta4:
+ - A large Amigaguide documentation with tons of tricks for better usage !
+ - lots of early 80 games added, also some early konami and atari games:
+  pacman,galaga,pengo,qbert,donkey kong (&jr),green beret,pingpong,gyruss,gradius, gauntlet1&2,klax,....
+ - extra samples archive in dir samples/ are now supported so q*bert can say things like "@!#?@!".
+ - switching fullscreen to window with F10 now remember window's size and position. Also this window position is saved by resolution. This gives a high comfort.
+ - 8Bit 256 colors screen and AGA workbenchs window mode can now display any source color format (8bit,16b,32bit) through color remap. So basically, you can display anything with anywhat.
+ - bugs repaired: psychic5 (and 32b tilemaps) was broken+ bugs in DrawScaleXXX() that could hit memory.
 
+todo R1
+ - O config from commandline
+ - O test rotate 8bit + remap
+ - O test error message when parent missing
+ - O remove konamigx if not working, or repair.
  - X 8Bit Rendering on Screens for 16b.
  - X 8Bit Rendering on Screens for 15b + 32b. (+wb)
  - X 8Bit Rendering on Windows.
@@ -9,8 +21,9 @@ todo R1
  - X bug tilemap psychic5
  - X Remember window position size per res.
 
+ - O Amigaguide from MUI button -> NO.
  - X bug galaga white bg when window to fullscreen
- - O optimize gauntlet
+ - O optimize gauntlet -> verify loginfo
  - X no sound mix if no audio
 - X fastboot neogeo, batrider -> no mix
 
@@ -18,7 +31,7 @@ todo R1
 todo beta4
 
 - X activate miniatari
-- O cheat file accelerate
+- O cheat file accelerate -> dead end no good solution
 - O apply super simple memread/write when driver allow.
 - X repair gforce2 sprites -> was musashi bug.
 - O repair optims YM2151

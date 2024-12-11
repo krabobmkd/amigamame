@@ -604,6 +604,14 @@ void MameConfig::initDriverIndex()
 
     }
 }
+// provide this C tool:
+//const game_driver *getDriverByName(const char *pName)
+//{
+//    int idriver = getMainConfig().driverIndex().index(pName);
+//    if(idriver<0) return NULL;
+//    return drivers[idriver];
+//}
+
 // list all drivers to output.
 void MameConfig::listFull()
 {

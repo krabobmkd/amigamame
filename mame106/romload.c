@@ -938,6 +938,24 @@ int rom_init(const rom_entry *romp)
 	if (romp == NULL)
 		return 0;
 
+    // KRB: We want a clear error message if rom archive or parent is missing.
+    int fileinfo = mame_faccess(Machine->gamedrv->name,FILETYPE_ROM);
+    if(fileinfo == PATH_NOT_FOUND) // could be PATH_IS_FILE or PATH_IS_DIRECTORY
+    {
+        loginfo(2,"Archive not found: %s.zip\n", Machine->gamedrv->name);
+        return 1;
+    }
+    if(Machine->gamedrv->parent)
+    {
+        fileinfo = mame_faccess(Machine->gamedrv->parent,FILETYPE_ROM);
+        if(fileinfo == PATH_NOT_FOUND) // could be PATH_IS_FILE or PATH_IS_DIRECTORY
+        {
+            // very important message
+            loginfo(2,"Parent archive missing: %s\n", Machine->gamedrv->parent);
+            return 1;
+        }
+    }
+
 	/* reset the region list */
 	memset((void *)regionlist, 0, sizeof(regionlist));
 

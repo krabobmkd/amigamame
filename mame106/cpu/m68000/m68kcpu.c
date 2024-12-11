@@ -809,6 +809,8 @@ int m68k_execute(int num_cycles)
 		USE_CYCLES(CPU_INT_CYCLES);
 		CPU_INT_CYCLES = 0;
 
+//        REG_PC &= opcode_mask; // test
+
 		/* Return point if we had an address error */
 		m68ki_set_address_error_trap(); /* auto-disable (see m68kcpu.h) */
 

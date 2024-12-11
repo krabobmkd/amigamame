@@ -1082,7 +1082,7 @@ static void init_machine(void)
 	/* load the ROMs if we have some */
 	/* this must be done before memory_init in order to allocate memory regions */
 	if (rom_init(Machine->gamedrv->rom) != 0)
-		fatalerror("rom_init failed");
+		fatalerror("rom init failed, maybe not a MAME106 version.");
 
 
 
