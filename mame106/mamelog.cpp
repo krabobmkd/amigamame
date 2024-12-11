@@ -5,12 +5,14 @@
 
 static int doStdOut = 0;
 static logCallbcack logcb = NULL;
-static int max_iwe=1;
+static int max_iwe=2;
+static int min_iwe=1;
 // make it simple....
 void log_enableStdOut(int e)
 {
     doStdOut = e;
     max_iwe = 2;
+    min_iwe = 0;
 }
 
 void log_setCallback(logCallbcack cb)
@@ -20,12 +22,13 @@ void log_setCallback(logCallbcack cb)
 
 void vloginfo(int i_w_e, const char * format, va_list args )
 {
-    if(i_w_e>max_iwe) return;
+    if(i_w_e>max_iwe || i_w_e<min_iwe) return;
 
     if(doStdOut)
     {
         vprintf(format,args);
     }
+
     if(logcb)
     {
         char tmp[128];
@@ -36,7 +39,7 @@ void vloginfo(int i_w_e, const char * format, va_list args )
 }
 void loginfo(int i_w_e,const char *format, ...)
 {
-        if(i_w_e>max_iwe) return;
+    if(i_w_e>max_iwe || i_w_e<min_iwe) return;
 
     va_list args;
     va_start(args, format);
@@ -48,7 +51,7 @@ void logerror( const char *format, ...)
  //krb: I use this print  to watch which driver is crying out too much logs.
     // this is sometimes the cause for slowness.
 //   printf("vloginfo: %s\n",format);
-    if(2>max_iwe) return;
+    if(2>max_iwe || 2<min_iwe) return;
 //    printf("prout\n");
     va_list args;
     va_start(args, format);

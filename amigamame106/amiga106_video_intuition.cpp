@@ -365,8 +365,11 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params) : Intu
 {
 //   printf(" ***** ** Intuition_Window CREATE:%d %d %08x\n",params._width,params._height,params._flags);
 
-  if(params._flags & ORIENTATION_SWAP_XY) doSwap(_machineWidth,_machineHeight);
+    if(params._flags & ORIENTATION_SWAP_XY)
+    {
+        doSwap(_machineWidth,_machineHeight);
 
+    }
   // this enable or disbale window sizing:
   _maxzoomfactor = 3;
   _useScale = 1;
@@ -533,12 +536,17 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
         Window *pwin = _drawable->window();
         if(pwin)
         {
+            WORD wwidth = _params._wingeo._window_width;
+            WORD wheight = _params._wingeo._window_height;
+            if(_params._flags & ORIENTATION_SWAP_XY)
+            {
+                doSwap(wwidth,wheight);
+            }
            // printf("ChangeWindowBox: %d\n",(int)_params._wingeo._window_posx);
             ChangeWindowBox( pwin,
                             _params._wingeo._window_posx,
                             _params._wingeo._window_posy,
-                            _params._wingeo._window_width,
-                            _params._wingeo._window_height );
+                           wwidth,wheight );
         }
     }
 
@@ -623,6 +631,11 @@ void IntuitionDisplay::syncWindowGeo()
         _params._wingeo._window_posy = pwin->TopEdge;
         _params._wingeo._window_width = pwin->Width;
         _params._wingeo._window_height = pwin->Height;
+        if(_params._flags & ORIENTATION_SWAP_XY)
+        {
+            doSwap(_params._wingeo._window_width,_params._wingeo._window_height);
+        }
+
         _params._wingeo._valid = 1;
       //  printf("getWindowGeo:%d\n",(int)_params._wingeo._window_posx);
     }

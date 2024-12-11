@@ -1084,8 +1084,6 @@ static void init_machine(void)
 	if (rom_init(Machine->gamedrv->rom) != 0)
 		fatalerror("rom init failed, maybe not a MAME106 version.");
 
-
-
 	/* initialize the timers and allocate a soft_reset timer */
 	/* this must be done before cpu_init so that CPU's can allocate timers */
 	timer_init();

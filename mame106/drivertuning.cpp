@@ -13,7 +13,7 @@ using namespace std;
 
 
 static map<string,sDriverTuning> _tunings={
-	{"neogeo",{120,0}}, //
+	{"neogeo",{50,0}}, //
 	{"batrider",{4*60,0}},
 	{"sgemf",{8*60,0}},
 	//toaplan1
@@ -24,7 +24,7 @@ static map<string,sDriverTuning> _tunings={
     {"arkretrn",{11*60,0}},
     {"arkretrn",{12*60,0}},
     {"ashura",{3*60,0}},
-    {"slapfigh",{9*60,0}},
+    {"slapfigh",{13*60,0}},
     {"bbakraid",{16*60,0}},
     {"battleg",{20*60,0}},
     {"wb32",{9*60,0}},

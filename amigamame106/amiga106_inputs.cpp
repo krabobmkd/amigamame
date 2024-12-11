@@ -271,6 +271,7 @@ void ConfigureLowLevelLib()
         askedPadsRawKey = 1;
     }
     // note: if needed
+    //printf("input init: useParallelExtension:%d\n",(int)useParallelExtension);
     if(!g_pParallelPads && useParallelExtension)
     {
         g_pParallelPads = createParallelPads(); // could fail.
@@ -578,44 +579,54 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     // apply change from parallel pads to player 3 & 4
     if(g_pParallelPads && g_pParallelPads->_ppidata->_last_checked_changes )
     {
+        MameConfig::Controls &configControls = getMainConfig().controls();
+
         UWORD changed = g_pParallelPads->_ppidata->_last_checked_changes;
         UWORD state = g_pParallelPads->_ppidata->_last_checked;
+
+        printf("g_pParallelPads change %04x %04x\n",(int)changed,(int)state);
+        printf("configControls._parallelPort_Player %d %d\n",
+               configControls._parallelPort_Player[0],
+               configControls._parallelPort_Player[1]);
         static const UWORD rk[]={
-
             // it's the order of the bits in parrallel registers.
-            RAWKEY_PORT3_JOY_RIGHT,RAWKEY_PORT3_JOY_LEFT,
-            RAWKEY_PORT3_JOY_DOWN,RAWKEY_PORT3_JOY_UP,
-            RAWKEY_PORT2_JOY_RIGHT,RAWKEY_PORT2_JOY_LEFT,
-            RAWKEY_PORT2_JOY_DOWN,RAWKEY_PORT2_JOY_UP,
-
-//            RAWKEY_PORT2_JOY_UP,RAWKEY_PORT2_JOY_DOWN,RAWKEY_PORT2_JOY_LEFT,RAWKEY_PORT2_JOY_RIGHT,
-//            RAWKEY_PORT3_JOY_UP,RAWKEY_PORT3_JOY_DOWN,RAWKEY_PORT3_JOY_LEFT,RAWKEY_PORT3_JOY_RIGHT,
-//            0,RAWKEY_PORT3_BUTTON_RED,0,RAWKEY_PORT2_BUTTON_RED
+            RAWKEY_PORT0_JOY_RIGHT,RAWKEY_PORT0_JOY_LEFT,
+            RAWKEY_PORT0_JOY_DOWN,RAWKEY_PORT0_JOY_UP,
         };
-        UWORD testbit=0x8000;
-        for(int i=0;i<8;i++) {
-           // if((changed & testbit) )
-            {
-                  g_pInputs->_Keys[rk[i]] = (BYTE)((testbit & state)!=0); // down
+
+        // prport 4
+        if(configControls._parallelPort_Player[1] >0)
+        {
+            int iPlayerP4_rkshift = ((configControls._parallelPort_Player[1]-1) & 3)<<8;
+
+            UWORD testbit=0x8000;
+            for(int i=0;i<4;i++) {
+                g_pInputs->_Keys[rk[i]+iPlayerP4_rkshift] = (BYTE)((testbit & state)!=0); // down
+                testbit>>=1;
             }
-            testbit>>=1;
+
+            g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+iPlayerP4_rkshift] =
+                (BYTE)((0x0001 & state)!=0); // down
         }
-        // then 2 fires
-        testbit = 0x0004;
-      //  if((changed & testbit) )
+
+        if(configControls._parallelPort_Player[0]>0)
         {
-              g_pInputs->_Keys[RAWKEY_PORT2_BUTTON_RED] = (BYTE)((testbit & state)!=0); // down
-        }
-        testbit = 0x0001;
-      //  if((changed & testbit) )
-        {
-              g_pInputs->_Keys[RAWKEY_PORT3_BUTTON_RED] = (BYTE)((testbit & state)!=0); // down
+            int iPlayerP3_rkshift = ((configControls._parallelPort_Player[0]-1) & 3)<<8;
+            // prport 3
+            UWORD testbit=0x0800;
+            for(int i=0;i<4;i++) {
+                g_pInputs->_Keys[rk[i]+iPlayerP3_rkshift] = (BYTE)((testbit & state)!=0); // down
+                testbit>>=1;
+            }
+            // fire bt
+            g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+iPlayerP3_rkshift] =
+                (BYTE)((0x0004 & state)!=0); // down
         }
 
         g_pParallelPads->_ppidata->_last_checked = 0;
         g_pParallelPads->_ppidata->_last_checked_changes = 0;
     }
-
+ grosse merde
 
     if(doSwitchFS) SwitchWindowFullscreen();
 }
@@ -1156,7 +1167,7 @@ INT32 osd_get_code_value(os_code oscode)
 */
 int osd_readkey_unicode(int flush)
 {
-    printf("osd_readkey_unicode\n");
+   // printf("osd_readkey_unicode\n");
     return 0;
 }
 

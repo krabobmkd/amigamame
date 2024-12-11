@@ -168,7 +168,7 @@ void QProc::process()
 //   "dino"
 //                 "arkretrn"
  //       "qbert"
- "gokuparo"
+ "1941"
 //"pdrift"
 //"qbert"
  //   "rastsaga"
