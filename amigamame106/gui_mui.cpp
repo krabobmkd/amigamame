@@ -175,7 +175,7 @@ static ULONG ASM DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG 
     }
   return(0);
 }
-static struct Hook DriverSelectHook;
+
 std::string DisplayNameBuffer;
 
 static STRPTR Shows[] =
@@ -184,7 +184,7 @@ static STRPTR Shows[] =
   (STRPTR)"Found",
   NULL
 };
-
+static struct Hook DriverSelectHook={0};
 static struct Hook DriverDisplayHook={0};
 static struct Hook DriverSortHook={0};
 static struct Hook DriverNotifyHook={0};
@@ -685,7 +685,7 @@ static ULONG ASM DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * ob
   ULONG i;
   UBYTE key;
 
-//printf("msg->MethodID:%08x\n",msg->MethodID);
+printf("DriverDispatcherMUI5 msg->MethodID:%08x\n",msg->MethodID);
   switch(msg->MethodID)
   {
     case MUIM_Setup:
@@ -831,12 +831,14 @@ void AllocGUI(void)
 
   if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
   {
-    DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcher);
+    DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),
+        (APTR) DriverDispatcher);
   } else
   {
-    DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcherMUI5);
-//    DriverClass = NULL;
+    DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),
+      (APTR) DriverDispatcherMUI5);
   }
+
 
 }
 
@@ -926,7 +928,7 @@ Object *createPanel_Drivers()
           Child,(ULONG)(BU_Scan = SimpleButton((ULONG)GetMessagec("Scan"))),
         TAG_DONE),
     TAG_DONE);
-
+    printf("createPanel_Drivers end\n");
     return panel;
 }
 
@@ -985,18 +987,14 @@ int MainGUI(void)
         }
         ULONG Child_Gif = (GIF_cornerlogo)?Child:TAG_DONE;
 
-printf("after gif\n");
-
 
     MameConfig &config = getMainConfig();
     muiConfigCreator("Main",(ASerializable &)config);
     Object *panelDriver = createPanel_Drivers();
     muiConfigCreator.insertFirstPanel(panelDriver,GetMessagec("Drivers"));
-printf("before muiConfigCreator.compile()\n");
+
     RE_Options = muiConfigCreator.compile();
 
-printf("after createOptionTabGroup : %08x\n",(int)RE_Options);
-fflush(stdout);
  Object *windowContent = MUINewObject(MUIC_Group, // vertical group because no horiz. specified.
             // MUIA_Group_HorizSpacing,0,
             // MUIA_Group_VertSpacing,0,
@@ -1016,10 +1014,9 @@ fflush(stdout);
               Child_Gif,(ULONG)GIF_cornerlogo,
           //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessagec("Quit")),
             TAG_DONE,0), // end WindowContent Group
+
           TAG_DONE,0);
 
-printf("after windowContent:%08x\n",(int)windowContent);
-fflush(stdout);
 //static  std::string appName(APPNAME);
 //  printf("go MUINewObject()\n");
       //  MainWin =  MUINewObject(MUIC_Window,
@@ -1051,13 +1048,9 @@ fflush(stdout);
 
         {WindowContents, (ULONG)windowContent},
         TAG_DONE,0};
-printf("after taglist\n");
-fflush(stdout);
+
         MainWin =  MUI_NewObjectA(MUIC_Window, (struct TagItem *) &mainwintags[0]);// MUINewObject(MUIC_Window,
-//        printf("after MUINewObject():%08x\n",(int)MainWin);
-// MUIA_Disabled
-printf("after MUI_NewObjectA:%08x\n",(int)MainWin);
-fflush(stdout);
+        printf("after MUINewObject():%08x\n",(int)MainWin);
 
         if(MainWin)
         {
@@ -1129,7 +1122,6 @@ fflush(stdout);
         // BU_Start disabled at init
         set(BU_Start,  MUIA_Disabled, TRUE);
       }
-printf("after DoMethods:\n");
 
       if(MainWin)
       {
@@ -1273,7 +1265,7 @@ static void CreateApp(void)
     {
         sTextAbout =
             "\33c\n\33b\33uMAME - Multiple Arcade Machine Emulator\33n\n\n"
-            "0."REVISION" \n\n"
+            "0." REVISION " \n\n"
             "Copyright (C) 1997-2024 by Nicola Salmoria and the MAME team\n"
             "http://mamedev.org\n\n"
             "Amiga port by Vic 'Krb' Ferry (2024) source:\n"

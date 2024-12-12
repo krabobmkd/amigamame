@@ -10,7 +10,6 @@ extern "C" {
     #include <utility/hooks.h>
 }
 #ifdef __GNUC__
-#define ASM
 #define REG(r) __asm(#r)
 #endif
 
@@ -91,7 +90,7 @@ protected:
         std::vector<std::string> _flagNames;
         std::vector<Object *> _buttons;
         struct Hook _notifyHook;
-        static ULONG ASM HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+        static ULONG HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 
 	};
     struct LSwitchGroup : public LGroup {
@@ -109,7 +108,7 @@ protected:
 	};
 
     struct LString : public Level {
-        static ULONG ASM HNotify(struct Hook *hook REG(a0), APTR obj REG(a2),const char **par REG(a1));
+        static ULONG HNotify(struct Hook *hook REG(a0), APTR obj REG(a2),const char **par REG(a1));
         LString(MUISerializer &ser,std::string &str, int flgs);
         void compile() override;
         void update() override;
@@ -119,7 +118,7 @@ protected:
         struct Hook _notifyHook;
 	};
     struct LSlider : public Level {
-        static ULONG ASM HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+        static ULONG HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
         LSlider(MUISerializer &ser,int &value,int min,int max);
         void compile() override;
         void update() override;
@@ -129,8 +128,8 @@ protected:
 	};
 #ifdef MUISERIALIZER_USES_FLOAT
     struct LSliderF : public Level {
-        static ULONG ASM HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
-        static ULONG ASM HNotifyDef(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+        static ULONG HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+        static ULONG HNotifyDef(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
         LSliderF(MUISerializer &ser,float &value,float min,float max,float step,float defval);
         void compile() override;
         void update() override;
@@ -147,7 +146,7 @@ protected:
 	};
 #endif
     struct LCycle : public Level {
-        static ULONG ASM HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+        static ULONG HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
         LCycle(MUISerializer &ser,int &value,const std::vector<std::string> &values);
         void compile() override;
         void update() override;
@@ -162,7 +161,7 @@ protected:
         void update() override;
         Object *_Button;
         bool *_value;
-        static ULONG ASM HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
+        static ULONG HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
         struct Hook _notifyHook;
 	};
     struct LScreenModeReq : public Level {
@@ -174,8 +173,8 @@ protected:
         Object *_PopUpScreenMode;
         struct Hook _ScreenModeStartHook;
         struct Hook _ScreenModeStopHook;
-        static ULONG ASM PopupStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1));
-        static ULONG ASM PopupStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1));
+        static ULONG PopupStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1));
+        static ULONG PopupStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1));
         void SetDisplayName(ULONG displayid);
         std::vector<struct TagItem> _ScreenModeTags;
         std::string _strDisplay;
