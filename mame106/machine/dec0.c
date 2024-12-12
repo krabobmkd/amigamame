@@ -384,7 +384,7 @@ static void baddudes_i8751_write(int data)
 		case 0x75b: i8751_return=0x70f; break;
 	}
 
-	if (!i8751_return) logerror("%04x: warning - write unknown command %02x to 8571\n",activecpu_get_pc(),data);
+//	if (!i8751_return) logerror("%04x: warning - write unknown command %02x to 8571\n",activecpu_get_pc(),data);
 }
 
 static void birdtry_i8751_write(int data)
@@ -453,7 +453,9 @@ static void birdtry_i8751_write(int data)
 		/*These are activated after a shot (???)*/
 		case 0x6ca: i8751_return = 0xff;      break;
 		case 0x7ff: i8751_return = 0x200;     break;
-		default: logerror("%04x: warning - write unknown command %02x to 8571\n",activecpu_get_pc(),data);
+		default:
+            //logerror("%04x: warning - write unknown command %02x to 8571\n",activecpu_get_pc(),data);
+            break;
 	}
 }
 

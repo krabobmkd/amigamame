@@ -168,7 +168,7 @@ static ULONG ASM DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG 
     }
   return(0);
 }
-static struct Hook DriverSelectHook;
+static struct Hook DriverSelectHook={};
 std::string DisplayNameBuffer;
 
 static STRPTR Shows[] =
@@ -178,11 +178,10 @@ static STRPTR Shows[] =
   NULL
 };
 
-static struct Hook DriverDisplayHook={0};
-static struct Hook DriverSortHook={0};
-static struct Hook DriverNotifyHook={0};
-
-static struct Hook ShowNotifyHook={0};
+static struct Hook DriverDisplayHook={};
+static struct Hook DriverSortHook={};
+static struct Hook DriverNotifyHook={};
+static struct Hook ShowNotifyHook={};
 
 // list column names
 static const char *String_Driver;
@@ -1259,7 +1258,7 @@ static void CreateApp(void)
     {
         sTextAbout =
             "\33c\n\33b\33uMAME - Multiple Arcade Machine Emulator\33n\n\n"
-            "0."REVISION" \n\n"
+            "0." REVISION " \n\n"
             "Copyright (C) 1997-2024 by Nicola Salmoria and the MAME team\n"
             "http://mamedev.org\n\n"
             "Amiga port by Vic 'Krb' Ferry (2024) source:\n"

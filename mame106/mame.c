@@ -488,7 +488,7 @@ void mame_schedule_exit(void)
 {
 	exit_pending = TRUE;
 
-    loginfo(0,"Exit game."); // just for UI
+    loginfo(1,"Exit game."); // just for UI
 
 	/* if we're autosaving on exit, schedule a save as well */
 	if (options.auto_save && (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE))

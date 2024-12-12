@@ -228,7 +228,7 @@ struct ParallelPads *createParallelPads()
 
     return pparpads;
 error:
-    closeParallelPads((struct AParallelPads *)pparpads);
+    closeParallelPads(pparpads);
     return NULL;
 }
 
