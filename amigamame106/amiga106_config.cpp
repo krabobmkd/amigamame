@@ -309,9 +309,9 @@ void MameConfig::toDefault()
     _controls._llPort_Type[3] = 0;
 
     _controls._parallelPort_Player[0]=0;
-    _controls._parallel_type[0]=0;
+    _controls._parallel_type[0]=1; // joy1 by def because the only way up to date
     _controls._parallelPort_Player[1]=0;
-    _controls._parallel_type[1]=0;
+    _controls._parallel_type[1]=1; // joy1 by def because the only way up to date
 
     _misc._romsPath = "PROGDIR:roms";
     _misc._samplesPath = "PROGDIR:samples";

@@ -558,15 +558,15 @@ void UpdateInputs(struct MsgPort *pMsgPort)
 #ifdef USE_DIRECT_KEYBOARD_DEVICE
     if(g_pInputs->_doUseDirectKeyboard)
     {   // this is ored on interuption
-        if(!(*g_pInputs->_keyboard_data == g_pInputs->_mainthreadkeys) )
-        {
-            printf("ks: %08x %08x %08x %08x\n",
-                g_pInputs->_keyboard_data->_kl[0],
-                g_pInputs->_keyboard_data->_kl[1],
-                g_pInputs->_keyboard_data->_kl[2],
-                g_pInputs->_keyboard_data->_kl[3]
-                   );
-        }
+//        if(!(*g_pInputs->_keyboard_data == g_pInputs->_mainthreadkeys) )
+//        {
+//            printf("ks: %08x %08x %08x %08x\n",
+//                g_pInputs->_keyboard_data->_kl[0],
+//                g_pInputs->_keyboard_data->_kl[1],
+//                g_pInputs->_keyboard_data->_kl[2],
+//                g_pInputs->_keyboard_data->_kl[3]
+//                   );
+//        }
         g_pInputs->_mainthreadkeys = *g_pInputs->_keyboard_data;
 
          g_pInputs->_keyboard_data->_kl[0]=
@@ -577,56 +577,50 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     }
 #endif
     // apply change from parallel pads to player 3 & 4
+    // g_pParallelPads exists if any player selected for either pr port.
     if(g_pParallelPads && g_pParallelPads->_ppidata->_last_checked_changes )
     {
         MameConfig::Controls &configControls = getMainConfig().controls();
+        int prport3_player = configControls._parallelPort_Player[0];
+        int prport4_player = configControls._parallelPort_Player[1];
 
         UWORD changed = g_pParallelPads->_ppidata->_last_checked_changes;
-        UWORD state = g_pParallelPads->_ppidata->_last_checked;
+        const UWORD state = g_pParallelPads->_ppidata->_last_checked;
 
-        printf("g_pParallelPads change %04x %04x\n",(int)changed,(int)state);
-        printf("configControls._parallelPort_Player %d %d\n",
-               configControls._parallelPort_Player[0],
-               configControls._parallelPort_Player[1]);
+        // rk means rawkey, spud.
         static const UWORD rk[]={
-            // it's the order of the bits in parrallel registers.
+            // order of the bits in parrallel registers for loop test.
             RAWKEY_PORT0_JOY_RIGHT,RAWKEY_PORT0_JOY_LEFT,
             RAWKEY_PORT0_JOY_DOWN,RAWKEY_PORT0_JOY_UP,
         };
+        static const UWORD prportDirectionsBits[]={0x0800,0x8000};
+        static const UWORD prportFireBits[]={0x0004,0x0001};
 
-        // prport 4
-        if(configControls._parallelPort_Player[1] >0)
+        for(int iparallelportJoystick=0 ; iparallelportJoystick<2 ; iparallelportJoystick++)
         {
-            int iPlayerP4_rkshift = ((configControls._parallelPort_Player[1]-1) & 3)<<8;
-
-            UWORD testbit=0x8000;
-            for(int i=0;i<4;i++) {
-                g_pInputs->_Keys[rk[i]+iPlayerP4_rkshift] = (BYTE)((testbit & state)!=0); // down
-                testbit>>=1;
+            int iplayer = configControls._parallelPort_Player[iparallelportJoystick];
+            if(iplayer>0)
+            {
+                //NO ! int iPlayer_rkshift = ((iplayer-1) & 3)<<8;
+                // we always declare prp3/prp4 as LL3&4.
+                // the redirection "to either player1,2,3,4 controller" is done
+                // up there in osd_get_code_list()->rawkeymap.init() at game init.
+                int iPlayer_rkshift = (iparallelportJoystick+2)<<8;
+                //  test directions
+                UWORD testbit=prportDirectionsBits[iparallelportJoystick];
+                for(int i=0;i<4;i++) {
+                    g_pInputs->_Keys[rk[i]+iPlayer_rkshift] = (BYTE)((testbit & state)!=0); // down
+                    testbit>>=1;
+                }
+                // fire bt
+                g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+iPlayer_rkshift] =
+                    (BYTE)((prportFireBits[iparallelportJoystick] & state)!=0); // down
             }
-
-            g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+iPlayerP4_rkshift] =
-                (BYTE)((0x0001 & state)!=0); // down
-        }
-
-        if(configControls._parallelPort_Player[0]>0)
-        {
-            int iPlayerP3_rkshift = ((configControls._parallelPort_Player[0]-1) & 3)<<8;
-            // prport 3
-            UWORD testbit=0x0800;
-            for(int i=0;i<4;i++) {
-                g_pInputs->_Keys[rk[i]+iPlayerP3_rkshift] = (BYTE)((testbit & state)!=0); // down
-                testbit>>=1;
-            }
-            // fire bt
-            g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+iPlayerP3_rkshift] =
-                (BYTE)((0x0004 & state)!=0); // down
         }
 
         g_pParallelPads->_ppidata->_last_checked = 0;
         g_pParallelPads->_ppidata->_last_checked_changes = 0;
     }
- grosse merde
 
     if(doSwitchFS) SwitchWindowFullscreen();
 }
@@ -757,7 +751,7 @@ void RawKeyMap::init()
     // according to Amiga keyboard locale settings.
     // here are all the easy constant ones that match all keyboards:
 
-    // note: most code calling this just uglily test all values all along,
+    // note: some code calling this just uglily test all values all along,
     // so a good optimisation is stupidly to have the most comon key used first.
 
     _kbi = {
@@ -973,10 +967,8 @@ void RawKeyMap::init()
         } // loop by player
     }
 
-
-
     // then add rawkeys which meanings changes by locale settings
-    vector<unsigned char> keystodo={0x0b,0x0c,0x0d};
+    vector<unsigned char> keystodo={0x0b,0x0c,0x0d}; // first of each lines
     {   unsigned char ic=0;
         while(ic<12) {keystodo.push_back(0x10+ic); ic++; }
         ic=0;
@@ -998,7 +990,6 @@ void RawKeyMap::init()
         if( keystodo[i]==26) {
             mkm._name = "?";  // MapRawKey doesnt get this one well.
         }
-
 
         if(mkm._name.length()>0)
         {

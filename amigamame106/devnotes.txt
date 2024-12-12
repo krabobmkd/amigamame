@@ -12,10 +12,10 @@
 
 todo R1
 -  O parrallel port doesnt work.
- - O config from commandline
- - O test rotate 8bit + remap
- - O test error message when parent missing
- - O remove konamigx if not working, or repair.
+ - O config from commandline ->NO
+ - X test rotate 8bit + remap
+ - X test error message when parent missing
+ - X remove konamigx if not working, or repair.
  - X 8Bit Rendering on Screens for 16b.
  - X 8Bit Rendering on Screens for 15b + 32b. (+wb)
  - X 8Bit Rendering on Windows.
@@ -37,7 +37,7 @@ todo beta4
 - O cheat file accelerate -> dead end no good solution
 - O apply super simple memread/write when driver allow.
 - X repair gforce2 sprites -> was musashi bug.
-- O repair optims YM2151
+- O repair optims YM2151 (rastan coin reverb LFO)
 - X drawgfx prio -> validate slikworm/rygar/...
 - X drawgfx
 		X pack4
