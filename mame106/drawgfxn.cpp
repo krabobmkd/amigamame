@@ -111,9 +111,9 @@ public:
 
         if((_np &priobef)==0) // bit lighted in _np means "hidden by"
         {
-            _prio[n] = priobef | 0x1f; // |0x1f mask all next, means reverse sprite draw order
+            _prio[n] = /*priobef |*/ 0x1f; // |0x1f mask all next, means reverse sprite draw order
             _p[n] = color;
-        } //TODO DOESNT WORK VALIDATE AGAINST SILKWORM/RYGAR/... first. vidhrw/tecmo.c
+        } //TODO VALIDATE AGAINST SILKWORM/RYGAR/CPS1 .... vidhrw/tecmo.c
     }
 
     destPix_t *_p;

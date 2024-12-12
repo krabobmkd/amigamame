@@ -1121,12 +1121,20 @@ VIDEO_START( cps )
 
     machine_reset_cps();
 
-	cps1_bg_tilemap[0] = tilemap_create(get_tile0_info,tilemap0_scan,TILEMAP_SPLIT, 8, 8,64,64);
-	cps1_bg_tilemap[1] = tilemap_create(get_tile1_info,tilemap1_scan,TILEMAP_SPLIT,16,16,64,64);
-	cps1_bg_tilemap[2] = tilemap_create(get_tile2_info,tilemap2_scan,TILEMAP_SPLIT,32,32,64,64);
+// krb changed TILEMAP_SPLIT TILEMAP_TRANSPARENT_COLOR
+	cps1_bg_tilemap[0] = tilemap_create(get_tile0_info,tilemap0_scan,TILEMAP_TRANSPARENT_COLOR, 8, 8,64,64);
+	cps1_bg_tilemap[1] = tilemap_create(get_tile1_info,tilemap1_scan,TILEMAP_TRANSPARENT_COLOR,16,16,64,64);
+	cps1_bg_tilemap[2] = tilemap_create(get_tile2_info,tilemap2_scan,TILEMAP_TRANSPARENT_COLOR,32,32,64,64);
+
+
 
 	if (!cps1_bg_tilemap[0] || !cps1_bg_tilemap[1] || !cps1_bg_tilemap[2])
 		return 1;
+
+    //krb
+	tilemap_set_transparent_pen(cps1_bg_tilemap[0],15);
+	tilemap_set_transparent_pen(cps1_bg_tilemap[1],15);
+	tilemap_set_transparent_pen(cps1_bg_tilemap[2],15);
 
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();
@@ -1361,18 +1369,17 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	UINT16 *base=cps1_buffered_obj;
 
 	/* some sf2 hacks draw the sprites in reverse order */
-	if (cps1_game_config->kludge == 10)
-	{
+//	if (cps1_game_config->kludge == 10)
+//	{
+// krb now always
 		base += cps1_last_sprite_offset;
 		baseadd = -4;
-	}
-	else
-	{
-		baseadd = 4;
-	}
+//	}
+//	else
+//	{
+//		baseadd = 4;
+//	}
 
-	
-	{ 
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
 		Machine->gfx[2], 	// gfx
@@ -1387,8 +1394,8 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		15, 	// transparent_color
 		0, 	// scalex
 		0, 	// scaley
-		priority_bitmap, 	// pri_buffer
-		0x02 | (1<<31) 	// priority_mask -> (|1<<31) for priority draw
+		NULL, //priority_bitmap, 	// pri_buffer
+		0, // 0x02 | (1<<31) 	// priority_mask -> (|1<<31) for priority draw
 	  };
 	for (i=cps1_last_sprite_offset; i>=0; i-=4)
 	{
@@ -1452,7 +1459,7 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
                         dgp0.sx = sx;
                         dgp0.sy = sy;
                        // drawgfx(&dgp0);
-                        drawgfx_clut16_Src4_prio(&dgp0);
+                        drawgfx_clut16_Src4(&dgp0);
                     }
                 }// end loop y
 
@@ -1468,14 +1475,12 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
                 dgp0.sx = x & 0x1ff;
                 dgp0.sy = y & 0x1ff;
                // drawgfx(&dgp0);
-                drawgfx_clut16_Src4_prio(&dgp0);
+                drawgfx_clut16_Src4(&dgp0);
 			}
 		}
 		base += baseadd;
 	}
-	} // end of patch paragraph
 
-#undef DRAWSPRITE
 }
 
 
@@ -1802,7 +1807,8 @@ void cps1_render_high_layer(mame_bitmap *bitmap, const rectangle *cliprect, int 
 
 VIDEO_UPDATE( cps1 )
 {
-    int layercontrol,l0,l1,l2,l3;
+    UINT8 l[4];
+    UINT16 layercontrol;
 	int videocontrol=cps1_port(0x22);
 
 
@@ -1855,65 +1861,135 @@ VIDEO_UPDATE( cps1 )
 	cps1_render_stars(bitmap,cliprect);
 
 	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
-	l0 = (layercontrol >> 0x06) & 03;
-	l1 = (layercontrol >> 0x08) & 03;
-	l2 = (layercontrol >> 0x0a) & 03;
-	l3 = (layercontrol >> 0x0c) & 03;
-	fillbitmap(priority_bitmap,0,cliprect);
-
+	l[0] = (layercontrol >> 0x06) & 03;
+	l[1] = (layercontrol >> 0x08) & 03;
+	l[2] = (layercontrol >> 0x0a) & 03;
+	l[3] = (layercontrol >> 0x0c) & 03;
+//olde
+    fillbitmap(priority_bitmap,0,cliprect);
+/*
+#define TILEMAP_IGNORE_TRANSPARENCY		0x10
+#define TILEMAP_BACK					0x20
+#define TILEMAP_FRONT					0x40
+#define TILEMAP_ALPHA					0x80
+*/
 	if (cps_version == 1)
 	{
-		cps1_render_layer(bitmap,cliprect,l0,0);
-		if (l1 == 0) cps1_render_high_layer(bitmap,cliprect,l0); /* prepare mask for sprites */
+        //krb way
+        // 4 means not drawn.
+        // assume we don't draw many times.
+        if(l[2]==l[3]) l[2]=4;
+        if(l[1]==l[3]) l[1]=4;
+        if(l[0]==l[3]) l[0]=4;
+
+        if(l[1]==l[2]) l[1]=4;
+        if(l[0]==l[2]) l[0]=4;
+
+        if(l[0]==l[1]) l[0]=4;
+
+        for(INT16 i=0; i<4 ;i++)
+        {
+            if(l[i]==4) continue;
+            if(l[i]==0)
+            {
+                cps1_render_sprites(bitmap,cliprect);
+            } else
+            {
+                tilemap_draw(bitmap,cliprect,cps1_bg_tilemap[l[i]-1],TILEMAP_BACK,0);
+            }
+        }
+
+	// sprite test mask was : 0x02 | (1<<31) ->TILEMAP_BACK
+        /* olde
+		cps1_render_layer(bitmap,cliprect,l0,0); // render bg or sprites
+		if (l1 == 0) cps1_render_high_layer(bitmap,cliprect,l0); // render front // prepare mask for sprites
+
 		cps1_render_layer(bitmap,cliprect,l1,0);
-		if (l2 == 0) cps1_render_high_layer(bitmap,cliprect,l1); /* prepare mask for sprites */
+		if (l2 == 0) cps1_render_high_layer(bitmap,cliprect,l1); // prepare mask for sprites
+
 		cps1_render_layer(bitmap,cliprect,l2,0);
-		if (l3 == 0) cps1_render_high_layer(bitmap,cliprect,l2); /* prepare mask for sprites */
+		if (l3 == 0) cps1_render_high_layer(bitmap,cliprect,l2); // prepare mask for sprites
+
 		cps1_render_layer(bitmap,cliprect,l3,0);
-	}
-	else
+		*/
+/*
+void cps1_render_layer(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int primask)
+{
+	switch (layer)
 	{
-		int l0pri,l1pri,l2pri,l3pri;
-		int primasks[8],i;
-		l0pri = (pri_ctrl >> 4*l0) & 0x0f;
-		l1pri = (pri_ctrl >> 4*l1) & 0x0f;
-		l2pri = (pri_ctrl >> 4*l2) & 0x0f;
-		l3pri = (pri_ctrl >> 4*l3) & 0x0f;
-
-
-
-		/* take out the CPS1 sprites layer */
-		if (l0 == 0) { l0 = l1; l1 = 0; l0pri = l1pri; }
-		if (l1 == 0) { l1 = l2; l2 = 0; l1pri = l2pri; }
-		if (l2 == 0) { l2 = l3; l3 = 0; l2pri = l3pri; }
-
-		{
-			int mask0 = 0xaa;
-			int mask1 = 0xcc;
-			if(l0pri>l1pri) mask0 &= ~0x88;
-			if(l0pri>l2pri) mask0 &= ~0xa0;
-			if(l1pri>l2pri) mask1 &= ~0xc0;
-
-			primasks[0] = 0xff;
-			for (i = 1;i < 8;i++)
-			{
-				if (i <= l0pri && i <= l1pri && i <= l2pri)
-				{
-					primasks[i] = 0xfe;
-					continue;
-				}
-				primasks[i] = 0;
-				if (i <= l0pri) primasks[i] |= mask0;
-				if (i <= l1pri) primasks[i] |= mask1;
-				if (i <= l2pri) primasks[i] |= 0xf0;
-			}
-		}
-
-		cps1_render_layer(bitmap,cliprect,l0,1);
-		cps1_render_layer(bitmap,cliprect,l1,2);
-		cps1_render_layer(bitmap,cliprect,l2,4);
-		cps2_render_sprites(bitmap,cliprect,primasks);
+		case 0:
+			cps1_render_sprites(bitmap,cliprect);
+			break;
+		case 1:
+		case 2:
+		case 3:
+			tilemap_draw(bitmap,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_BACK,primask);
+			break;
 	}
+}
+
+void cps1_render_high_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer)
+{
+	switch (layer)
+	{
+		case 0:
+			// there are no high priority sprites
+			break;
+		case 1:
+		case 2:
+		case 3:
+			tilemap_draw(NULL,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_FRONT,1);
+			break;
+	}
+}
+
+*/
+
+	}
+
+//	else
+//	{
+//		int l0pri,l1pri,l2pri,l3pri;
+//		int primasks[8],i;
+//		l0pri = (pri_ctrl >> 4*l0) & 0x0f;
+//		l1pri = (pri_ctrl >> 4*l1) & 0x0f;
+//		l2pri = (pri_ctrl >> 4*l2) & 0x0f;
+//		l3pri = (pri_ctrl >> 4*l3) & 0x0f;
+
+
+
+//		/* take out the CPS1 sprites layer */
+//		if (l0 == 0) { l0 = l1; l1 = 0; l0pri = l1pri; }
+//		if (l1 == 0) { l1 = l2; l2 = 0; l1pri = l2pri; }
+//		if (l2 == 0) { l2 = l3; l3 = 0; l2pri = l3pri; }
+
+//		{
+//			int mask0 = 0xaa;
+//			int mask1 = 0xcc;
+//			if(l0pri>l1pri) mask0 &= ~0x88;
+//			if(l0pri>l2pri) mask0 &= ~0xa0;
+//			if(l1pri>l2pri) mask1 &= ~0xc0;
+
+//			primasks[0] = 0xff;
+//			for (i = 1;i < 8;i++)
+//			{
+//				if (i <= l0pri && i <= l1pri && i <= l2pri)
+//				{
+//					primasks[i] = 0xfe;
+//					continue;
+//				}
+//				primasks[i] = 0;
+//				if (i <= l0pri) primasks[i] |= mask0;
+//				if (i <= l1pri) primasks[i] |= mask1;
+//				if (i <= l2pri) primasks[i] |= 0xf0;
+//			}
+//		}
+
+//		cps1_render_layer(bitmap,cliprect,l0,1);
+//		cps1_render_layer(bitmap,cliprect,l1,2);
+//		cps1_render_layer(bitmap,cliprect,l2,4);
+//		cps2_render_sprites(bitmap,cliprect,primasks);
+//	}
 
 #if CPS1_DUMP_VIDEO
 	if (code_pressed(KEYCODE_F))
