@@ -364,22 +364,19 @@ void MameConfig::Display::serialize(ASerializer &serializer)
 {
     serializer("Draw Engine",(int &)_drawEngine,{"CGX Direct CPU Or WPA8",
                                                  "CPU Remap+ScalePixelArray"});
-
     //
     serializer("Screen Buffer",(int&)_buffering,{"Single","Triple Buffer CSB (slow if nasty driver)","Double Buffer SVP (Also slow if...)"});
-
     serializer(" ",_flags,0,{
                "On Workbench","Bad FrameSkip"
                });
 
-
-                                            // min,max,step, default
+                                 // min,max,step, default
     serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
+
                                          // min,max,step, default
    //old serializer("Gamma",_color_gamma,0.125f,1.0f,0.0625f,1.0f);
 
     serializer("Per Screen Mode",_perScreenModeS);
-
 }
 MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
 {

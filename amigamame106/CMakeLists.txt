@@ -30,7 +30,7 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 #string(REPLACE "/" "." GIT_BRANCH ${GIT_BRANCH} )
-# message(WARNING "git branch detected:${GIT_BRANCH}")
+message(WARNING "git branch detected:${GIT_BRANCH}")
 
 if(AMIGA)
 
@@ -104,10 +104,14 @@ set(AMIGA_SRC
 
 	serializer_mamexml.cpp
 	serializer_mamexml.h
+
+	gui_mui.h
+	gui_mui.cpp
 	audio.h
-		${COMMONLIBS}/libserializer/serializer.h
-		${COMMONLIBS}/libserializer/serializer_mui.h
-		${COMMONLIBS}/libserializer/serializer_mui.cpp
+
+	serializer.h
+	serializer_mui.h
+	serializer_mui.cpp
 
 	mame_ver.h
 	../mame106/vidhrdw/neogeodrawasm.s
@@ -117,22 +121,23 @@ set(AMIGA_SRC
 	devnotes.txt
 	)
 # - - -have some Amiga code using O0
-	add_library(Mame106AmigaO0 STATIC
+#	add_library(Mame106AmigaO0 STATIC
 
-		gui_mui.h
-		gui_mui.cpp
+#		gui_mui.h
+#		gui_mui.cpp
 
-	)
-	set_property(TARGET Mame106AmigaO0 PROPERTY C_STANDARD 11)
-	set_property(TARGET Mame106AmigaO0 PROPERTY CXX_STANDARD 11)
-	if(MAME_USE_HARDFLOAT)
-		target_compile_definitions(Mame106AmigaO0 PRIVATE MAME_USE_HARD_FLOAT=1 )
-	endif()
-	target_include_directories(Mame106AmigaO0 PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
-	target_compile_options(Mame106AmigaO0 PRIVATE -O0 ${AMIGA_COMPILER_OPTIONS} )
-	target_include_directories(Mame106AmigaO0 PUBLIC "${COMMONLIBS}/extrasdk/MUI38/include")
-	# those for mame includes
-	target_compile_definitions(Mame106AmigaO0 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 MUISERIALIZER_USES_FLOAT=1  ${CPU_DEFS} )
+#	)
+#	set_property(TARGET Mame106AmigaO0 PROPERTY C_STANDARD 11)
+#	set_property(TARGET Mame106AmigaO0 PROPERTY CXX_STANDARD 11)
+#	if(MAME_USE_HARDFLOAT)
+#		target_compile_definitions(Mame106AmigaO0 PRIVATE MAME_USE_HARD_FLOAT=1 )
+#	endif()
+#	target_include_directories(Mame106AmigaO0 PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
+#	target_compile_options(Mame106AmigaO0 PRIVATE -O2 ${AMIGA_COMPILER_OPTIONS} )
+#	target_include_directories(Mame106AmigaO0 PUBLIC "${COMMONLIBS}/extrasdk/MUI38/include")
+#	# those for mame includes
+#	target_compile_definitions(Mame106AmigaO0 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 MUISERIALIZER_USES_FLOAT=1  ${CPU_DEFS}  GIT_BRANCH="${GIT_BRANCH}" )
+
 # - - -have some Amiga code using O3
 	add_library(Mame106AmigaO3 STATIC
 		amiga_video_tracers.h
@@ -168,10 +173,10 @@ if(MAME_USE_HARDFLOAT)
 	target_compile_definitions(${PROGNAME} PRIVATE MAME_USE_HARD_FLOAT=1 )
 endif()
 # the static libs that are part eof this repo:
-target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO0 Mame106AmigaO3 mamecore mamecoreUNROLL z expat)
+target_link_libraries(${PROGNAME} PUBLIC Mame106AmigaO3 mamecore mamecoreUNROLL z expat)
 
 # target_include_directories(${PROGNAME} PUBLIC "../mame037b/src")
-target_include_directories(${PROGNAME} PUBLIC "../mame106" "${COMMONLIBS}/libserializer")
+target_include_directories(${PROGNAME} PUBLIC "../mame106" )
 
 # MUI is not provided by gccbebbo6.5 ndk by default, we have it there:
 target_include_directories(${PROGNAME} PUBLIC "${COMMONLIBS}/extrasdk/MUI38/include")
