@@ -50,7 +50,7 @@ void logerror( const char *format, ...)
 {
  //krb: I use this print  to watch which driver is crying out too much logs.
     // this is sometimes the cause for slowness.
-   printf("vloginfo: %s\n",format);
+//   printf("vloginfo: %s\n",format);
     if(2>max_iwe || 2<min_iwe) return;
 //    printf("prout\n");
     va_list args;
