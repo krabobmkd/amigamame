@@ -25,6 +25,13 @@ struct Library *MUIMasterBase = 0L;
 #include <proto/keymap.h>
 #include <proto/timer.h>
 
+// test, there is an obvious problem with intuition includes
+APTR SafeNewObject(struct IClass *classPtr, CONST_STRPTR classID, ULONG tag1, ... ) {
+    return NewObjectA(classPtr,classID,(struct TagItem *)&tag1);
+}
+
+
+
 extern "C" {
     #include <libraries/mui.h>
     #include <libraries/iffparse.h>
@@ -133,7 +140,7 @@ static Object * PU_ScreenMode=NULL;
 static Object *LA_statusbar=NULL;
 static Object *GIF_cornerlogo=NULL;
 
-MUISerializer muiConfigCreator;
+static MUISerializer muiConfigCreator;
 static int columnToSort = 0;
 
 //  MUIM_Notify,  MUIA_List_Active, MUIV_EveryTime,
@@ -168,7 +175,7 @@ static ULONG ASM DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG 
     }
   return(0);
 }
-static struct Hook DriverSelectHook={};
+
 std::string DisplayNameBuffer;
 
 static STRPTR Shows[] =
@@ -178,10 +185,13 @@ static STRPTR Shows[] =
   NULL
 };
 
-static struct Hook DriverDisplayHook={};
-static struct Hook DriverSortHook={};
-static struct Hook DriverNotifyHook={};
-static struct Hook ShowNotifyHook={};
+static struct Hook DriverSelectHook={0};
+static struct Hook DriverDisplayHook={0};
+static struct Hook DriverSortHook={0};
+static struct Hook DriverNotifyHook={0};
+
+static struct Hook ShowNotifyHook={0};
+
 
 // list column names
 static const char *String_Driver;
@@ -677,7 +687,7 @@ static ULONG ASM DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * ob
   ULONG i;
   UBYTE key;
 
-//printf("msg->MethodID:%08x\n",msg->MethodID);
+printf("DriverDispatcherMUI5 msg->MethodID:%08x\n",msg->MethodID);
   switch(msg->MethodID)
   {
     case MUIM_Setup:
@@ -823,12 +833,14 @@ void AllocGUI(void)
 
   if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
   {
-    DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcher);
+    DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),
+        (APTR) DriverDispatcher);
   } else
   {
-    DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcherMUI5);
-//    DriverClass = NULL;
+    DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),
+      (APTR) DriverDispatcherMUI5);
   }
+
 
 }
 
@@ -875,16 +887,17 @@ void FreeGUI(void)
 
 Object *createPanel_Drivers()
 {
+    printf("createPanel_Drivers\n");
     const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,";
     if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
     {
         ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,";
     }
-
+    printf("createPanel_Drivers1\n");
   Object *panel = MUINewObject(MUIC_Group,
         Child,(ULONG)( LV_Driver = (DriverClass!=NULL)?
 
-            ((Object *)NewObject(DriverClass->mcc_Class, NULL,
+            ((Object *)SafeNewObject(DriverClass->mcc_Class, NULL,
           MUIA_Listview_Input,    TRUE,
             MUIA_Listview_List, (ULONG)( LI_Driver = MUINewObject(MUIC_List,
               MUIA_List_Title,    TRUE,
@@ -917,23 +930,11 @@ Object *createPanel_Drivers()
           Child,(ULONG)(BU_Scan = SimpleButton((ULONG)GetMessagec("Scan"))),
         TAG_DONE),
     TAG_DONE);
-
+    printf("createPanel_Drivers end\n");
     return panel;
 }
 
 
-ULONG createOptionTabGroup()
-{
-    MameConfig &config = getMainConfig();
-
-    muiConfigCreator("Main",(ASerializable &)config);
-
-    muiConfigCreator.insertFirstPanel(createPanel_Drivers(),GetMessagec("Drivers"));
-
-    RE_Options = muiConfigCreator.compile();
-
-    return (ULONG)RE_Options;
-}
 
 // at init
 void UpdateUIToConfig()
@@ -989,10 +990,17 @@ int MainGUI(void)
         ULONG Child_Gif = (GIF_cornerlogo)?Child:TAG_DONE;
 
 
+    MameConfig &config = getMainConfig();
+    muiConfigCreator("Main",(ASerializable &)config);
+    Object *panelDriver = createPanel_Drivers();
+    muiConfigCreator.insertFirstPanel(panelDriver,GetMessagec("Drivers"));
+
+    RE_Options = muiConfigCreator.compile();
+
  Object *windowContent = MUINewObject(MUIC_Group, // vertical group because no horiz. specified.
             // MUIA_Group_HorizSpacing,0,
             // MUIA_Group_VertSpacing,0,
-            Child,createOptionTabGroup(),
+            Child,(ULONG)RE_Options,
 
             Child, (ULONG)MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
                 MUIA_Group_HorizSpacing,0,
@@ -1008,6 +1016,7 @@ int MainGUI(void)
               Child_Gif,(ULONG)GIF_cornerlogo,
           //olde    Child, BU_Quit    = SimpleButton((ULONG)GetMessagec("Quit")),
             TAG_DONE,0), // end WindowContent Group
+
           TAG_DONE,0);
 
 //static  std::string appName(APPNAME);
@@ -1043,8 +1052,7 @@ int MainGUI(void)
         TAG_DONE,0};
 
         MainWin =  MUI_NewObjectA(MUIC_Window, (struct TagItem *) &mainwintags[0]);// MUINewObject(MUIC_Window,
-//        printf("after MUINewObject():%08x\n",(int)MainWin);
-// MUIA_Disabled
+        printf("after MUINewObject():%08x\n",(int)MainWin);
 
         if(MainWin)
         {
@@ -1116,6 +1124,7 @@ int MainGUI(void)
         // BU_Start disabled at init
         set(BU_Start,  MUIA_Disabled, TRUE);
       }
+
       if(MainWin)
       {
         set(MainWin,  MUIA_Window_ActiveObject, (ULONG) LV_Driver);
@@ -1124,7 +1133,7 @@ int MainGUI(void)
         /* This must be done after the window has been opened. */
         DoMethod( LI_Driver, MUIM_List_Jump, MUIV_List_Jump_Active);
 
-//printf("before MUI loop\n");
+printf("before MUI loop\n");
         do
         {
           rid = DoMethod(App,MUIM_Application_NewInput,&signals);
@@ -1275,7 +1284,6 @@ static void CreateApp(void)
         }
     }
 
-
   App = MUINewObject(MUIC_Application,
     MUIA_Application_Title      , (ULONG)APPNAME,
     //MUIA_Application_Version    , (ULONG)("$VER: " APPNAME " (" REVDATE ")"),
@@ -1304,7 +1312,6 @@ static void CreateApp(void)
     TAG_DONE)),
   TAG_DONE);
 
-
   if(App)
   {
     DoMethod(BU_About_OK, MUIM_Notify, MUIA_Pressed, FALSE,
@@ -1313,6 +1320,7 @@ static void CreateApp(void)
     DoMethod(AboutWin, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
              App, 2, MUIM_Application_ReturnID, RID_CloseAbout);
   }
+
 }
 
 #ifndef MESS
