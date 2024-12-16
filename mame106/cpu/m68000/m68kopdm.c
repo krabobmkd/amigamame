@@ -16,15 +16,20 @@ void m68k_op_dbt_16(M68KOPT_PARAMS)
 	REG_PC += 2;
 }
 
-
 void m68k_op_dbf_16(M68KOPT_PARAMS)
 {
+
+#ifdef LSB_FIRST
 	uint* r_dst = &DY;
 	uint res = MASK_OUT_ABOVE_16(*r_dst - 1);
-
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
-	if(res != 0xffff)
-	{
+#else
+    uint16 * r_dst = ((uint16 *)&DY)+1; //krb:  just shift to get value, no mask needed.
+    uint16 res = *r_dst -1;
+    *r_dst = res;
+#endif
+    if(res != 0xffff)
+    {
 		uint offset = OPER_I_16(p68k);
 		REG_PC -= 2;
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
