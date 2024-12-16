@@ -24,11 +24,8 @@ extern "C" {
 #endif
 
 extern "C" {
-
-    #include "muimasterasm.h"
     #include <libraries/mui.h>
     #include <proto/muimaster.h>
-   // #include "muimasterasm.h"
     #include <libraries/asl.h>
 }
 
@@ -408,7 +405,7 @@ void MUISerializer::LGroup::compile()
         {
        // printf("group: add member:%s\n",plevel->_pMemberName);
             tagitems.push_back(Child);
-            tagitems.push_back((ULONG)MUILabel((ULONG)plevel->_pMemberName));
+            tagitems.push_back((ULONG)Label((ULONG)plevel->_pMemberName));
             tagitems.push_back(Child);
             tagitems.push_back((ULONG)plevel->_Object);
             nbadded++;
@@ -418,9 +415,9 @@ void MUISerializer::LGroup::compile()
     if(nbadded==0)
     {
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)MUILabel((ULONG)"-"));
+        tagitems.push_back((ULONG)Label((ULONG)"-"));
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)MUILabel((ULONG)"-"));
+        tagitems.push_back((ULONG)Label((ULONG)"-"));
     }
     tagitems.push_back(TAG_DONE);
 
@@ -532,7 +529,7 @@ void MUISerializer::LFlags::compile()
                                 TAG_DONE);
 
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)MUILabel((ULONG)_flagNames[iflag].c_str()));
+        tagitems.push_back((ULONG)Label((ULONG)_flagNames[iflag].c_str()));
         tagitems.push_back(Child);
         tagitems.push_back((ULONG)_buttons[iflag]);
 
@@ -551,9 +548,9 @@ void MUISerializer::LFlags::compile()
     if(_flagNames.size()==0)
     {
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)MUILabel((ULONG)"-"));
+        tagitems.push_back((ULONG)Label((ULONG)"-"));
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)MUILabel((ULONG)"-"));
+        tagitems.push_back((ULONG)Label((ULONG)"-"));
     }
     tagitems.push_back(TAG_DONE);
 
@@ -759,9 +756,9 @@ void MUISerializer::LSliderF::compile()
               MUIA_Slider_Quiet, TRUE, // we don't display the int value.
             TAG_DONE);
 
-    _pValueLabel = MUILabel((ULONG)"-");
+    _pValueLabel = Label((ULONG)"-");
 
-    _pDefBt = MUISimpleButton((ULONG)"Default");
+    _pDefBt = SimpleButton((ULONG)"Default");
 
    _Object =MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
             Child,(ULONG)_Slider,
