@@ -624,7 +624,9 @@ int readuncompresszip(zip_file* zip, zip_entry* ent, char* data) {
  ------------------------------------------------------------------------- */
 
 /* Use the zip cache */
+#ifndef ZIP_CACHE
 #define ZIP_CACHE
+#endif
 
 #ifdef ZIP_CACHE
 

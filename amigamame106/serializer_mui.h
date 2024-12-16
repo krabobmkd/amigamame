@@ -11,6 +11,8 @@ extern "C" {
 }
 #ifdef __GNUC__
 #define REG(r) __asm(#r)
+#else
+#define REG(r)
 #endif
 
 

@@ -11,8 +11,8 @@
 
 
 todo R1
--  O parrallel port doesnt work.
- - O config from commandline ->NO
+ - O Volume AHI check
+-  X parrallel port doesnt work.
  - X test rotate 8bit + remap
  - X test error message when parent missing
  - X remove konamigx if not working, or repair.
@@ -25,6 +25,7 @@ todo R1
  - X Remember window position size per res.
 
  - O Amigaguide from MUI button -> NO.
+ - O config from commandline ->NO
  - X bug galaga white bg when window to fullscreen
  - O optimize gauntlet -> verify loginfo
  - X no sound mix if no audio

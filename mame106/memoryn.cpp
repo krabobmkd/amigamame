@@ -580,6 +580,48 @@ void memory_writebyte_d16_be(UINT32 address REGM(d0), UINT32 data REGM(d1) )
 
 }
 
+extern "C" {
+UINT32 memory_readmovem32_16SAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
+
+}
+
+UINT32 memory_readmovem32_16SAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) )
+{
+    /*
+	uint i = 0;
+	uint register_list = OPER_I_16(p68k);
+	uint ea = AY;
+	uint count = 0;
+    uint countadd = 1<<CYC_MOVEM_L;
+	for(; i < 16; i++)
+    {
+		if(register_list & 1)
+		{
+			REG_DA[i] = p68k->mem.read32(ea);
+			ea += 4;
+			count+=countadd;
+		}
+        register_list>>=1;
+    }
+	AY = ea;
+
+	USE_CYCLES(count);
+*/
+
+    uint count = 0;
+    for(uint i = 0; i < 16; i++)
+    {
+        if(bits & 1)
+        {
+            preg[i] = memory_readlong_d16_be(address);
+            count++;
+            address += 4;
+        }
+        bits>>=1;
+    }
+    return count;
+
+}
 
 // return number of bits actually applied
 // IS USED

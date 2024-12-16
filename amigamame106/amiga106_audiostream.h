@@ -15,7 +15,7 @@ struct sSoundToWrite
 	WORD 	    *m_pBuffer;
 	WORD 	    *m_pPrevBuffer; // previous buffer, for tricks.
 	// write: AHI Volume multiplier. should be 0x00010000; or do not touch.
-	ULONG 	    m_Volume;
+	//ULONG 	    m_Volume;
 	// read: the amount of data to write in pBuffer. *2 for stereo.
 	ULONG m_nbSampleToFill;
 	// read: play frequency (22050,44100,...) should be the one given with AHIS_Init()

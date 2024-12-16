@@ -1,3 +1,9 @@
+
+extern "C" {
+    struct Library;
+    extern struct Library *MUIMasterBase;
+}
+
 #include "serializer_mui.h"
 
 #include <vector>
@@ -12,36 +18,24 @@
 #include <string.h>
 
 #ifdef __GNUC__
-//#define ASM __saveds
-#define ASM
 #define REG(r) __asm(#r)
+#else
+#define REG(r)
 #endif
 
 extern "C" {
+
+    #include "muimasterasm.h"
     #include <libraries/mui.h>
-    #include <inline/muimaster.h>
+    #include <proto/muimaster.h>
+   // #include "muimasterasm.h"
     #include <libraries/asl.h>
 }
-extern struct Library *MUIMasterBase;
+
 typedef ULONG (*RE_HOOKFUNC)(); // because C++ type issue.
 
-
-
-__inline Object * MUINewObject(CONST_STRPTR cl, Tag tags, ...)
-{
-    return MUI_NewObjectA((char *)cl, (struct TagItem *) &tags);
-}
-// __inline Object * MUINewObject(CONST_STRPTR cl, struct TagItem *tags)
-// {
-//     return MUI_NewObjectA((char *)cl, tags);
-// }
-
-
-
-extern struct Library *MUIMasterBase;
-
 #define OString(contents,maxlen)\
-	MUINewObject(MUIC_String,\
+	MUI_NewObject(MUIC_String,\
 		StringFrame,\
 		MUIA_String_MaxLen  , maxlen,\
 		MUIA_String_Contents, contents,\
@@ -85,7 +79,9 @@ void MUISerializer::operator()(const char *sMemberName, ASerializable &subconf, 
     _pGrower = &plevel->_pFirstChild;
 
     _irecurse++;
+
         subconf.serialize(*this);
+
     _irecurse--;
 
     // next wil be bro
@@ -279,9 +275,11 @@ Object *MUISerializer::compile()
     while(rit != _stack.rend())
     {
         Level *level = *rit++;
+     //   printf("compile:%d\n",i);
         if(!level->_Object) level->compile(); // create object if not done
         i++;
     }
+  // printf("end compile\n");
     return _pRoot->_Object;
 }
 void MUISerializer::updateUI()
@@ -338,7 +336,7 @@ MUISerializer::Level::~Level() {}
 MUISerializer::Level *MUISerializer::Level::getChild(const char *pMemberName)
 {
     Level *plevel = _pFirstChild;
-    int nbadded=0;
+
     while(plevel)
     {
         if(plevel->_Object && plevel->_pMemberName &&
@@ -410,7 +408,7 @@ void MUISerializer::LGroup::compile()
         {
        // printf("group: add member:%s\n",plevel->_pMemberName);
             tagitems.push_back(Child);
-            tagitems.push_back((ULONG)Label((ULONG)plevel->_pMemberName));
+            tagitems.push_back((ULONG)MUILabel((ULONG)plevel->_pMemberName));
             tagitems.push_back(Child);
             tagitems.push_back((ULONG)plevel->_Object);
             nbadded++;
@@ -420,9 +418,9 @@ void MUISerializer::LGroup::compile()
     if(nbadded==0)
     {
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)Label((ULONG)"-"));
+        tagitems.push_back((ULONG)MUILabel((ULONG)"-"));
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)Label((ULONG)"-"));
+        tagitems.push_back((ULONG)MUILabel((ULONG)"-"));
     }
     tagitems.push_back(TAG_DONE);
 
@@ -437,10 +435,10 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
 
     if(_flgs & SERFLAG_GROUP_SCROLLER)
     {
-        Object *ob = MUINewObject(MUIC_Virtgroup,VirtualFrame,
+        Object *ob = MUI_NewObject(MUIC_Virtgroup,VirtualFrame,
                 MUIA_Background, MUII_TextBack,
                Child, (ULONG)HVSpace,
-               Child, (ULONG)MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+               Child, (ULONG)MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
                                      Child, (ULONG)HSpace(0),
                                      Child,(ULONG)pinnerGroup,
                                      Child, (ULONG)HSpace(0),
@@ -453,16 +451,16 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
 
 
         Object *scrollgroup  =
-            MUINewObject(MUIC_Scrollgroup,
+            MUI_NewObject(MUIC_Scrollgroup,
              MUIA_Scrollgroup_FreeHoriz, TRUE,
              MUIA_Scrollgroup_FreeVert, TRUE,
              MUIA_Scrollgroup_Contents, (ULONG)ob,
             TAG_DONE);
         return scrollgroup;
     }
-   return MUINewObject(MUIC_Group,
+   return MUI_NewObject(MUIC_Group,
                   Child, (ULONG)HVSpace,
-                  Child, (ULONG)MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+                  Child, (ULONG)MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
                                         Child, (ULONG)HSpace(0),
                                         Child,(ULONG)pinnerGroup,
                                         Child, (ULONG)HSpace(0),
@@ -484,7 +482,7 @@ void MUISerializer::LGroup::update()
     }
 }
 // - - - - - - - - - - - - - - -
-ULONG ASM MUISerializer::LFlags::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
+ULONG MUISerializer::LFlags::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
 {
     if(!hook || !par ) return 0;
     MUISerializer::LFlags *plevel = (MUISerializer::LFlags *)hook->h_Data;
@@ -517,14 +515,13 @@ void MUISerializer::LFlags::compile()
     int nbcolumns = 4;
    // if(_flgs & SERFLAG_GROUP_2COLUMS) nbcolumns=4;
     vector<ULONG> tagitems= {MUIA_Group_Columns,nbcolumns,MUIA_HorizWeight,1000};
-    Level *plevel = _pFirstChild;
-    int iflag=0;
+
     unsigned int startval = (_pflugs)?*_pflugs:0;
     unsigned int ib=1;
     for(int iflag=0;iflag<(int)_flagNames.size() ;iflag++)
     {
         _buttons[iflag] =
-                MUINewObject(MUIC_Image,
+                MUI_NewObject(MUIC_Image,
                                 ImageButtonFrame,
                                 MUIA_InputMode        , MUIV_InputMode_Toggle,
                                 MUIA_Image_Spec       , MUII_CheckMark,
@@ -535,7 +532,7 @@ void MUISerializer::LFlags::compile()
                                 TAG_DONE);
 
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)Label((ULONG)_flagNames[iflag].c_str()));
+        tagitems.push_back((ULONG)MUILabel((ULONG)_flagNames[iflag].c_str()));
         tagitems.push_back(Child);
         tagitems.push_back((ULONG)_buttons[iflag]);
 
@@ -554,9 +551,9 @@ void MUISerializer::LFlags::compile()
     if(_flagNames.size()==0)
     {
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)Label((ULONG)"-"));
+        tagitems.push_back((ULONG)MUILabel((ULONG)"-"));
         tagitems.push_back(Child);
-        tagitems.push_back((ULONG)Label((ULONG)"-"));
+        tagitems.push_back((ULONG)MUILabel((ULONG)"-"));
     }
     tagitems.push_back(TAG_DONE);
 
@@ -584,13 +581,13 @@ MUISerializer::LSwitchGroup::LSwitchGroup(MUISerializer &ser,int flgs,AStringMap
 }
 Object *MUISerializer::LSwitchGroup::compileOuterFrame(Object *pinnerGroup)
 {
-    _SelectedItemText = MUINewObject(MUIC_Text,
+    _SelectedItemText = MUI_NewObject(MUIC_Text,
                  //   TextFrame,
                   //  MUIA_Background, MUII_TextBack,
                     MUIA_Text_Contents,(ULONG)"...",
                   TAG_DONE);
 
-    Object *obj = MUINewObject(MUIC_Group,
+    Object *obj = MUI_NewObject(MUIC_Group,
             GroupFrameT((ULONG)_displayName.c_str()),
             MUIA_Disabled, TRUE,
             Child,(ULONG)(_SelectedItemText),
@@ -624,7 +621,7 @@ MUISerializer::LString::LString(MUISerializer &ser,std::string &str,int flgs): L
 {
 
 }
-ULONG ASM MUISerializer::LString::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), const char **par REG(a1))
+ULONG MUISerializer::LString::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), const char **par REG(a1))
 {
     if(!par || !hook) return 0;
 
@@ -638,7 +635,7 @@ void MUISerializer::LString::compile()
     if(_flgs & (SERFLAG_STRING_ISPATH|SERFLAG_STRING_ISFILE))
     {
         // if manage path, have a requester and all.
-        _Object = MUINewObject(MUIC_Popasl,
+        _Object = MUI_NewObject(MUIC_Popasl,
                   MUIA_Popstring_String,(ULONG)(_STRING_Path = OString(0, 2048)),
                   MUIA_Popstring_Button, (ULONG)(PopButton(MUII_PopDrawer)),
                   ASLFR_DrawersOnly, ( _flgs & SERFLAG_STRING_ISPATH )?TRUE:FALSE,
@@ -672,11 +669,11 @@ void  MUISerializer::LString::update()
     SetAttrs(_STRING_Path,MUIA_String_Contents,(ULONG)_str->c_str(),TAG_DONE);
 }
 // - - - - - - - - - - - - - - -
-ULONG ASM MUISerializer::LSlider::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
+ULONG MUISerializer::LSlider::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
 {
     if(!hook || !par) return 0;
     LSlider *plevel = (LSlider *)hook->h_Data;
-    if(*plevel->_value != *par)
+    if(*plevel->_value != (int) *par)
     {
         *plevel->_value = *par;
         plevel->update();
@@ -690,7 +687,7 @@ MUISerializer::LSlider::LSlider(MUISerializer &ser,int &value,int min,int max): 
 }
 void MUISerializer::LSlider::compile()
 {
-    _Object = MUINewObject(MUIC_Slider,
+    _Object = MUI_NewObject(MUIC_Slider,
               MUIA_Slider_Min,    _min,
               MUIA_Slider_Max,    _max,
             TAG_DONE);
@@ -716,7 +713,7 @@ void MUISerializer::LSlider::update()
 }
 // - - - - - - - - - - - - - - -
 #ifdef MUISERIALIZER_USES_FLOAT
-ULONG ASM MUISerializer::LSliderF::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
+ULONG MUISerializer::LSliderF::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
 {
     if(!hook || !par) return 0;
     LSliderF *plevel = (LSliderF *)hook->h_Data;
@@ -730,7 +727,7 @@ ULONG ASM MUISerializer::LSliderF::HNotify(struct Hook *hook REG(a0), APTR obj R
     }
    return 0;
 }
-ULONG ASM MUISerializer::LSliderF::HNotifyDef(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
+ULONG MUISerializer::LSliderF::HNotifyDef(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
 {
     if(!hook || !par) return 0;
     LSliderF *plevel = (LSliderF *)hook->h_Data;
@@ -745,7 +742,7 @@ ULONG ASM MUISerializer::LSliderF::HNotifyDef(struct Hook *hook REG(a0), APTR ob
 MUISerializer::LSliderF::LSliderF(MUISerializer &ser,float &value,float min,float max,float step
     ,float defval): Level(ser)
     ,_Slider(NULL)
-    ,_pValueLabel(NULL)
+    , _pValueLabel(NULL)
     , _value(&value),_fmin(min),_fmax(max),_fstep(step)
     ,_defval(defval)
     ,_nbsteps(0),_imin(0),_imax(0)
@@ -756,17 +753,17 @@ MUISerializer::LSliderF::LSliderF(MUISerializer &ser,float &value,float min,floa
 }
 void MUISerializer::LSliderF::compile()
 {
-    _Slider = MUINewObject(MUIC_Slider,
+    _Slider = MUI_NewObject(MUIC_Slider,
               MUIA_Slider_Min, 0  /* _min*/,
               MUIA_Slider_Max,    _nbsteps,
               MUIA_Slider_Quiet, TRUE, // we don't display the int value.
             TAG_DONE);
 
-    _pValueLabel = Label((ULONG)"-");
+    _pValueLabel = MUILabel((ULONG)"-");
 
-    _pDefBt = SimpleButton((ULONG)"Default");
+    _pDefBt = MUISimpleButton((ULONG)"Default");
 
-   _Object =MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+   _Object =MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
             Child,(ULONG)_Slider,
             Child,(ULONG)_pValueLabel,
             Child,(ULONG)_pDefBt,
@@ -792,8 +789,6 @@ void MUISerializer::LSliderF::compile()
         DoMethod(_pDefBt, MUIM_Notify, MUIA_Pressed, MUIV_EveryTime,
             _pDefBt,  3,
             MUIM_CallHook,(ULONG) &_defHook,  MUIV_TriggerValue );
-
-        struct Hook _defHook;
 
     }
 
@@ -831,11 +826,11 @@ MUISerializer::LCycle::LCycle(MUISerializer &ser,int &value,const std::vector<st
     _valuesptr.push_back(NULL);
 }
 
-ULONG ASM MUISerializer::LCycle::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
+ULONG MUISerializer::LCycle::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
 {
     if(!hook || !par) return 0;
     MUISerializer::LCycle *plevel = (MUISerializer::LCycle *)hook->h_Data;
-    if(*plevel->_value != *par)
+    if(*plevel->_value != (int) *par)
     {
         *plevel->_value = *par;
         plevel->update();
@@ -845,8 +840,7 @@ ULONG ASM MUISerializer::LCycle::HNotify(struct Hook *hook REG(a0), APTR obj REG
 
 void MUISerializer::LCycle::compile()
 {
-    _Object = MUINewObject(MUIC_Cycle,MUIA_Cycle_Entries,(ULONG)_valuesptr.data(),TAG_DONE);
-
+    _Object = MUI_NewObject(MUIC_Cycle,MUIA_Cycle_Entries,(ULONG)_valuesptr.data(),TAG_DONE);
     if(_Object)
     {
         _notifyHook.h_Entry =(RE_HOOKFUNC)&HNotify;
@@ -859,8 +853,8 @@ void MUISerializer::LCycle::compile()
                     // FollowParams to 3.
                     // - - - notification methods
                     MUIM_CallHook,(ULONG) &_notifyHook,  MUIV_TriggerValue);
-    }
 
+    }
 }
 void MUISerializer::LCycle::update()
 {
@@ -884,7 +878,7 @@ MUISerializer::LCheckBox::LCheckBox(MUISerializer &ser,bool &value): Level(ser)
 }
 void MUISerializer::LCheckBox::compile()
 {
-    _Button = MUINewObject(MUIC_Image,
+    _Button = MUI_NewObject(MUIC_Image,
                 ImageButtonFrame,
                 MUIA_InputMode        , MUIV_InputMode_Toggle,
                 MUIA_Image_Spec       , MUII_CheckMark,
@@ -894,7 +888,7 @@ void MUISerializer::LCheckBox::compile()
                 MUIA_ShowSelState     , FALSE,
                 TAG_DONE);
 
- _Object = MUINewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+ _Object = MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
             Child,(ULONG)_Button,
             Child, (ULONG)HSpace(0),
             TAG_DONE
@@ -920,7 +914,7 @@ void MUISerializer::LCheckBox::update()
     SetAttrs(_Button,MUIA_Selected,(ULONG)(*_value?1:0),TAG_DONE);
 
 }
-ULONG ASM MUISerializer::LCheckBox::HNotify(
+ULONG MUISerializer::LCheckBox::HNotify(
         struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1)
         )
 {
@@ -952,9 +946,9 @@ void MUISerializer::LScreenModeReq::compile()
     _ScreenModeStopHook.h_Entry = (RE_HOOKFUNC) PopupStop;
     _ScreenModeStopHook.h_Data = this;
 
-     _Object = MUINewObject(MUIC_Popasl,
+     _Object = MUI_NewObject(MUIC_Popasl,
 
-              MUIA_Popstring_String,(ULONG)( _DisplayName = MUINewObject(MUIC_Text,
+              MUIA_Popstring_String,(ULONG)( _DisplayName = MUI_NewObject(MUIC_Text,
                     TextFrame,
                     MUIA_Background, MUII_TextBack,
                   TAG_DONE)),
@@ -976,7 +970,7 @@ void MUISerializer::LScreenModeReq::update()
 }
 
 
-ULONG ASM MUISerializer::LScreenModeReq::PopupStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1))
+ULONG MUISerializer::LScreenModeReq::PopupStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1))
 {
     if(!hook || !taglist || !hook->h_Data) return 1;
     MUISerializer::LScreenModeReq *plevel = (MUISerializer::LScreenModeReq *)hook->h_Data;
@@ -990,7 +984,7 @@ ULONG ASM MUISerializer::LScreenModeReq::PopupStart(struct Hook *hook REG(a0), A
     return(TRUE);
 }
 
-ULONG ASM MUISerializer::LScreenModeReq::PopupStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1))
+ULONG MUISerializer::LScreenModeReq::PopupStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1))
 {
     if(!hook || !popasl || !hook->h_Data) return 1;
     MUISerializer::LScreenModeReq *plevel = (MUISerializer::LScreenModeReq *)hook->h_Data;
@@ -1000,12 +994,14 @@ ULONG ASM MUISerializer::LScreenModeReq::PopupStop(struct Hook *hook REG(a0), AP
 
     *(plevel->_value) = (ULONG_SCREENMODEID)smreq->sm_DisplayID;
     plevel->SetDisplayName(smreq->sm_DisplayID);
+
+    return 0;
 }
 
 void MUISerializer::LScreenModeReq::SetDisplayName(ULONG displayid)
 {
   if(!_DisplayName) return;
-  if(displayid == INVALID_ID)
+  if(displayid == (ULONG) INVALID_ID)
   {
     _strDisplay = "Invalid";
   }
@@ -1016,7 +1012,7 @@ void MUISerializer::LScreenModeReq::SetDisplayName(ULONG displayid)
     v = GetDisplayInfoData(NULL, (UBYTE *) &DisplayNameInfo, sizeof(DisplayNameInfo),
                          DTAG_NAME, displayid);
 
-    if(v > sizeof(struct QueryHeader))
+    if(v > (LONG)sizeof(struct QueryHeader))
     {
         _strDisplay = (const char *) DisplayNameInfo.Name;
     }
@@ -1031,7 +1027,7 @@ MUISerializer::LInfoText::LInfoText(MUISerializer &ser,strText &str, int flgs)
 {}
 void MUISerializer::LInfoText::compile()
 {
-    _Object = MUINewObject(MUIC_Text,
+    _Object = MUI_NewObject(MUIC_Text,
                     MUIA_Text_Contents,(ULONG)"...",
                   TAG_DONE);
     if(_Object && _str)

@@ -415,6 +415,8 @@ static UINT8 m68000_win_layout[] = {
 	 0,23,80, 1 	/* command line window (bottom rows) */
 };
 
+extern UINT32 memory_readmovem32_16SAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
+
 static void check_xfast16(struct m68k_memory_interface *pmem)
 {
     pmem->writemovem32reverse = &memory_writemovem32_wr16_reverse; // default, fast.
@@ -424,6 +426,10 @@ static void check_xfast16(struct m68k_memory_interface *pmem)
     if(ptuning && (ptuning->_flags & MDTF_M68K_SAFE_MOVEMWRITE)!=0)
     {
         pmem->writemovem32reverse = &memory_writemovem32_wr16_reverseSAFE;
+    }
+    if(ptuning && (ptuning->_flags & MDTF_M68K_SAFE_MOVEMREAD)!=0)
+    {
+        pmem->readmovem32 = &memory_readmovem32_16SAFE;
     }
 
 }

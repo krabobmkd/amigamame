@@ -227,7 +227,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
 
 		soundToWrite.m_pBuffer = p1;
 		soundToWrite.m_pPrevBuffer = _pThreadAHI->m_pSBuff2; // for tricks.
-		soundToWrite.m_Volume = 0x00020000; // 0x00010000;
+		//soundToWrite.m_Volume = 0x00020000; // 0x00010000;
 
 		// write the signal:
         if(iloop<2)
@@ -266,7 +266,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
                 AHIio->ahir_Std.io_Length = numSampleWritten<<1;
             }
 			//Workout mode to set
-			AHIio->ahir_Volume = 0x010000;
+            AHIio->ahir_Volume = 0x010000; // 0x010000;
 			AHIio->ahir_Position = 0x8000; // stereo position to the middle, means 0.5.
 			AHIio->ahir_Link = _pThreadAHI->m_join;
 //printf(" TTT bef sendio\n");

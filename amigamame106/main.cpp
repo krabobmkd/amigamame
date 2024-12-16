@@ -339,7 +339,7 @@ int main(int argc, char **argv)
     // loop per emulation launched
     while(!quit)
     {
-        quit = MainGUI(); // select game with GUI.
+        quit = _pMameUI->MainGUI(); // select game with GUI.
         if(quit) break;
 
         StartGame();
