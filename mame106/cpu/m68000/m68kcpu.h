@@ -1206,7 +1206,7 @@ INLINE uint m68ki_read_imm_16( struct m68k_cpu_instance *p68k COREREG)
     #else
         // what m68k_read_immediate_16 actually does:
         //  this is "direct rom reading"
-        UINT16 v= (*(UINT16 *)&opcode_base[p68k->m_cpu.pc & opcode_mask]);
+        UINT16 v= (*(UINT16 *)&opcode_base[p68k->m_cpu.pc /*& opcode_mask*/]);
 
         REG_PC+=2;
         return (uint)v;
@@ -1538,8 +1538,12 @@ INLINE void m68ki_fake_pull_32(struct m68k_cpu_instance *p68k COREREG)
  */
 INLINE void m68ki_jump(struct m68k_cpu_instance *p68k COREREG,uint new_pc)
 {
+/*olde
 	REG_PC = new_pc;
 	m68ki_pc_changed(REG_PC);
+*/
+    m68ki_pc_changed(new_pc); // update opcode_mask
+    REG_PC = new_pc & opcode_mask;
 }
 
 INLINE void m68ki_jump_vector(struct m68k_cpu_instance *p68k COREREG,uint vector)
@@ -1547,6 +1551,7 @@ INLINE void m68ki_jump_vector(struct m68k_cpu_instance *p68k COREREG,uint vector
 	REG_PC = (vector<<2) + REG_VBR;
 	REG_PC = m68ki_read_data_32(REG_PC);
 	m68ki_pc_changed(REG_PC);
+	REG_PC &= opcode_mask;
 }
 
 

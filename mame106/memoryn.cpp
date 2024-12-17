@@ -608,8 +608,8 @@ UINT32 memory_readmovem32_16SAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), 
 	USE_CYCLES(count);
 */
 
-    uint count = 0;
-    for(uint i = 0; i < 16; i++)
+    UINT32 count = 0;
+    for(UINT32 i = 0; i < 16; i++)
     {
         if(bits & 1)
         {

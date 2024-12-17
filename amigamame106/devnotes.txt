@@ -3,15 +3,14 @@
  - A large Amigaguide documentation with tons of tricks for better usage !
  - lots of early 80 games added, also some early konami and atari games:
   pacman,galaga,pengo,qbert,donkey kong (&jr),green beret,pingpong,gyruss,gradius, gauntlet1&2,klax,....
- - extra samples archive in dir samples/ are now supported so q*bert can say things like "@!#?@!".
- - switching fullscreen to window with F10 now remember window's size and position. Also this window position is saved by resolution. This gives a high comfort.
- - 8Bit 256 colors screen and AGA workbenchs window mode can now display any source color format (8bit,16b,32bit) through color remap. So basically, you can display anything with anywhat.
- - bugs repaired: psychic5 (and 32b tilemaps) was broken+ bugs in DrawScaleXXX() that could hit memory.
+ - extra sound samples archive in dir samples/ are now supported so q*bert can say things like "@!#?@!".
+ - switching fullscreen to window with F10 now remember window's size and position, and this is saved by resolution. This gives a high comfort.
+ - 8Bit 256 colors screen and AGA workbenchs window mode can now display any source color format (8bit,16b,32bit) through color remap. Anything can be displayed by anywhat with rotation support and all.
+ - ThunderForceAC repaired, psychic5 (and 32b tilemaps) was broken+ bugs in DrawScaleXXX() that could hit memory.
  - parallel port joysticks could only work if directed to player3 and 4. now anything is fine.
 
-
 todo R1
- - O Volume AHI check
+ - X Volume AHI check
 -  X parrallel port doesnt work.
  - X test rotate 8bit + remap
  - X test error message when parent missing

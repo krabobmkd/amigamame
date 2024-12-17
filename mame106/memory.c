@@ -625,7 +625,6 @@ extern FILE *traceFH;
 void memory_set_opbase(offs_t pc)
 {
 //    printf("\nmsetopbase:%08x\n",pc);
-//Re    if(pc == 0x000330a6) exit(1);
 #if DOTRACEMEM
     openTraceFH();
     fprintf(traceFH,"\nmsetopbase:%08x\n",pc);

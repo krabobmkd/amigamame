@@ -880,10 +880,10 @@ int m68k_execute(int num_cycles)
     // this on has multiple 68k,...
         do
 		{
-			REG_PPC = REG_PC;
 			uint16 ir = m68ki_read_imm_16(p68k);
 			m68ki_instruction_jump_table[ir](p68k,ir);
             m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
+
 		} while(m68k_ICount > 0);
 
         /* original:
@@ -1021,7 +1021,7 @@ void m68k_pulse_reset(void)
 	/* Read the initial stack pointer and program counter */
 	m68ki_jump(p68k,0);
 	REG_SP = m68ki_read_imm_32(p68k);
-	REG_PC = m68ki_read_imm_32(p68k);
+	REG_PC = m68ki_read_imm_32(p68k);	
 	m68ki_jump(p68k,REG_PC);
 
 	CPU_RUN_MODE = RUN_MODE_NORMAL;
