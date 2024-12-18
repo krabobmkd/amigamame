@@ -529,9 +529,7 @@ int MameUI::MainGUI(void)
                         break;
 
                     case MID_About:
-                        printf("MID_About\n");
                         set(AboutWin, MUIA_Window_Open, TRUE);
-
                         break;
 
                     case RID_CloseAbout:
@@ -941,8 +939,6 @@ static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2
                         if(res.column != columnToSort)
                         {
                             columnToSort = res.column;
-    printf("MUIM_HandleInput column:%d\n",columnToSort);
-
                             DoMethod(obj,MUIM_List_Sort);
                            // finnaly, propagate. return(MUI_EventHandlerRC_Eat);
                         }

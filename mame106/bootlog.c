@@ -49,11 +49,15 @@ void bootlog_setprogress(eProgress e)
     int enumpercent = ((int)e * restweigth) / divider;
     if(romstotal>0)
     {
-        enumpercent += (romsloaded * romloadweight) / romstotal;
+        int romrate = (romsloaded * romloadweight) / romstotal;
+        if(romrate >= romstotal) romrate = romstotal-1; // to not reach next enum
+        enumpercent += romrate;
     }
     if(gfxdecoded>0)
     {
-        enumpercent += (gfxdecoded * initvidweight) / gfxtotal;
+        int decodegfxrate = (gfxdecoded * initvidweight) / gfxtotal;
+        if(decodegfxrate >= gfxtotal) decodegfxrate = gfxtotal-1; // to not reach next enum
+        enumpercent += decodegfxrate;
     }
     if(enumpercent>256) enumpercent=256;
 
