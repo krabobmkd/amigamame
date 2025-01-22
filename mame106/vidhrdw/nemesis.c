@@ -295,7 +295,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	{ 
 	struct drawgfxParams dgpz0={
 		bitmap, 	// dest
-		Machine->gfx[char_type], 	// gfx
+		NULL, // Machine->gfx[char_type], 	// gfx
 		0, 	// code
 		0, 	// color
 		0, 	// flipx
@@ -398,6 +398,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					}
 					
 					dgpz0.code = code;
+					dgpz0.gfx = Machine->gfx[char_type];
 					dgpz0.color = color;
 					dgpz0.flipx = flipx;
 					dgpz0.flipy = flipy;
@@ -405,7 +406,11 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					dgpz0.sy = sy;
 					dgpz0.scalex = zoom;
 					dgpz0.scaley = zoom;
-					drawgfxzoom(&dgpz0);
+					if(zoom == 0x0001000)
+					{
+                        drawgfx(&dgpz0);
+					} else
+                        drawgfxzoom(&dgpz0);
 				}
 			} /* if sprite */
 		} /* for loop */

@@ -1,4 +1,15 @@
 
+todo R1.2
+ - X wrong colors on shadows Dynamite Dux, golden Axe.
+ - X Outzone set1->4 "black" -> repaired
+ - X Salamander corrupted sprite graphics
+ - O zoom909/buckrogers wrong colors
+ - O Carrier Air Wing has graphic corruptions in first level (cawing)
+        "No matter which set, has graphic corruption in the first level."
+        "After some enemies move from the background to the foreground, the entire game freezes."
+ - O Bubble Bobble 2
+
+
   since beta4:
  - A large Amigaguide documentation with tons of tricks for better usage !
  - lots of early 80 games added, also some early konami and atari games:

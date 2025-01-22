@@ -246,7 +246,7 @@ public:
         float     _speedlimit = 100.0f;
         ULONG_FLAGS  _skipflags = 0;       
         int         _neogeo_bios = 0;
-
+        bool        _LLUseReadJoyPort=false;
         std::vector<std::string> _neogeoBiosList;
     };
     Misc &misc() { return _misc; }

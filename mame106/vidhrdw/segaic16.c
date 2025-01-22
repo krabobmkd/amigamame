@@ -613,12 +613,16 @@ WRITE16_HANDLER( segaic16_paletteram_fast_w )
 	r = (r << 3) | (r >> 2);
 	g = (g << 3) | (g >> 2);
 	b = (b << 3) | (b >> 2);
-    setpalettefast_neogeo(offset, (r<<16)|(g<<8)|b );
 
-	/* normal colors */
-//	palette_set_color(offset + 0 * palette.entries, palette.normal[r],  palette.normal[g],  palette.normal[b]);
-//	palette_set_color(offset + 1 * palette.entries, palette.shadow[r],  palette.shadow[g],  palette.shadow[b]);
-//	palette_set_color(offset + 2 * palette.entries, palette.hilight[r], palette.hilight[g], palette.hilight[b]);
+    UINT32 rgb=  (r<<16)|(g<<8)|b ;
+    setpalettefast_neogeo(offset, rgb );
+    // shadows
+    UINT32 rgbshadow = (rgb>>1) &0x007f7f7f;
+    setpalettefast_neogeo(offset+palette.entries, rgbshadow );
+    // never saw that one:
+//    UINT32 rgbbright = rgb + (0x00ffffff - rgbshadow);
+//    setpalettefast_neogeo(offset+2*palette.entries, rgbbright );
+
 }
 
 

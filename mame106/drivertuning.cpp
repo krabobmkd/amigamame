@@ -16,8 +16,7 @@ static map<string,sDriverTuning> _tunings={
 	{"neogeo",{50,0}}, //
 	{"batrider",{4*60,0}},
 	{"sgemf",{8*60,0}},
-	//toaplan1
-	{"demonwld",{0,MDTF_M68K_SAFE_MOVEMWRITE}},
+
 	{"gtmr",{0,MDTF_M68K_SAFE_MOVEMWRITE}},     // 1000 miglia
 	{"1944",{0,MDTF_M68K_SAFE_MOVEMWRITE/*|MDTF_M68K_SAFE_MOVEMREAD*/}},
 	{"bublbob2",{0,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
@@ -40,6 +39,18 @@ static map<string,sDriverTuning> _tunings={
  	{"sfa2",{8*60,0}},
 	{"sfa3",{8*60,0}},
 	{"ssf2",{15*60,0}},
+
+	//toaplan1
+	{"demonwld",{0,MDTF_M68K_SAFE_MOVEMWRITE}},     // NEEDED
+	{"outzone",{8*60,MDTF_M68K_SAFE_MOVEMWRITE}},   //NEEDED
+	// following not tested but may need MDTF_M68K_SAFE_MOVEMWRITE
+	{"samesame",{0*60,MDTF_M68K_SAFE_MOVEMWRITE}},
+	{"rallybik",{0*60,MDTF_M68K_SAFE_MOVEMWRITE}},
+	{"truxton",{0*60,MDTF_M68K_SAFE_MOVEMWRITE}},
+	{"hellfire",{0*60,MDTF_M68K_SAFE_MOVEMWRITE}},
+	{"vimana",{0*60,MDTF_M68K_SAFE_MOVEMWRITE}},
+	{"zerowing",{0*60,MDTF_M68K_SAFE_MOVEMWRITE}},
+
 };
 
 sDriverTuning *getDriverTuning(const char *drivername)
@@ -72,7 +83,7 @@ void applyDriverTuning(const struct _game_driver *pd)
     if(!ptuning) return;
     _bootframeskip = ptuning->_bootframeskip;
 
-    if(ptuning->_flags & MDTF_M68K_SAFE_MOVEMWRITE)
+    if(ptuning->_flags & MDTF_LONGBOOT)
     {
         ui_popup("Long boot, must wait...");
     }

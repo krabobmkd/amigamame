@@ -154,7 +154,7 @@ static inline void setpalettefast_neogeo(pen_t pen REGPL(d0), rgb_t color REGPL(
 
      adjusted_palette_dirty = 1;
     // mark_pen_dirty(pen);
-   	dirty_palette[pen / 32] |= 1 << (pen % 32);
+   	dirty_palette[pen>>5] |= 1 << (pen & 0x1f ); // %32
 }
 
 void palette_set_brightness(pen_t pen, double bright);

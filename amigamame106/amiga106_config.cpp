@@ -318,6 +318,7 @@ void MameConfig::toDefault()
  //NOT THIS ONE !! decide where configs are written:  _misc._userPath = "PROGDIR:user";
     _misc._useCheatCodeFile = false;
     _misc._cheatFilePath = "PROGDIR:cheat.dat";
+    _misc._LLUseReadJoyPort = false;
 
 }
 MameConfig::Display_PerScreenMode::Display_PerScreenMode() : ASerializable() {
@@ -482,6 +483,7 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
 
     serializer("Skip",_skipflags,0,{"Disclaimer","Game Info"});
     serializer("NeoGeo Bios",_neogeo_bios,_neogeoBiosList);
+    serializer("NewLowLevel Patch Compatible",_LLUseReadJoyPort);
 
 }
 MameConfig::Help::Help() : ASerializable() {
