@@ -127,7 +127,7 @@ PALETTE_INIT( buckrog )
 	/* Buck Rogers uses 1024 entries for the sprite color PROM */
 	for (i = 0; i < 1024; i++, color_prom++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		UINT32 bit0, bit1, bit2, r, g, b;
 
 		/* red component */
 		bit0 = (*color_prom >> 0) & 1;
@@ -147,6 +147,10 @@ PALETTE_INIT( buckrog )
 		bit2 = (*color_prom >> 7) & 1;
 		b = 34 * bit0 + 68 * bit1 + 137 * bit2;
 
+       if(r>255) r=255;
+       if(g>255) g=255;
+       if(b>255) b=255;
+//krb color problem would be here
 		palette_set_color(i,r,g,b);
 	}
 
@@ -173,6 +177,9 @@ PALETTE_INIT( buckrog )
 		bit2 = (*color_prom >> 5) & 1;
 		b = 34 * bit0 + 68 * bit1 + 137 * bit2;
 
+       if(r>255) r=255;
+       if(g>255) g=255;
+       if(b>255) b=255;
 		palette_set_color(i+1024,r,g,b);
 	}
 
@@ -202,6 +209,7 @@ PALETTE_INIT( buckrog )
 
 		palette_set_color(i+1024+512,r,g,b);
 	}
+
 }
 
 

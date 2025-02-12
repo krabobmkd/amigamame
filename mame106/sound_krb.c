@@ -211,7 +211,7 @@ int sound_init(void)
 	/* initialize the OSD layer */
 	VPRINTF(("osd_start_audio_stream\n"));
     // normal cod for stereo/mono switch look likes:
-      	samples_this_frame = osd_start_audio_stream(0);
+      	samples_this_frame = osd_start_audio_stream(0); // force to mono here
 
     // patched code to force mono looks like:
 //	samples_this_frame = osd_start_audio_stream(0);

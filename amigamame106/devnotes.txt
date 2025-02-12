@@ -1,9 +1,13 @@
 
 todo R1.2
- - X wrong colors on shadows Dynamite Dux, golden Axe.
- - X Outzone set1->4 "black" -> repaired
- - X Salamander corrupted sprite graphics
- - O zoom909/buckrogers wrong colors
+ - X wrong colors on shadows Dynamite Dux, golden Axe -> corrected.
+ - X Outzone set1->4 "black" -> repaired.
+ - X Salamander corrupted sprite ->corrected.
+ - X more memory clean at alloc, should resolve some boot problems.
+ - O neogeo sound mixer simplified, may accelerate. ->TOTEST
+ - X zoom909 wrong colors ->corrected (palette rom is wrong, reuse parent palette.)
+ - O corrected amigaguide with OS3.2 version that includes images.
+
  - O Carrier Air Wing has graphic corruptions in first level (cawing)
         "No matter which set, has graphic corruption in the first level."
         "After some enemies move from the background to the foreground, the entire game freezes."

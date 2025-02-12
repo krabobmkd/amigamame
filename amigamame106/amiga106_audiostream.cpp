@@ -152,8 +152,9 @@ static LONG AHISStaticThread_Open( sAHISoundServer *pAHIS )
     if (pAHIS->m_AHIio) {
         pAHIS->m_AHIio->ahir_Version = 4;
         // AHI_NO_UNIT crash on my conf , 0 means "default", looks better
+
         deviceResult =
-            OpenDevice(AHINAME,/*AHI_NO_UNIT*/0, (struct IORequest *)(pAHIS->m_AHIio), 0);
+            OpenDevice(AHINAME,AHI_DEFAULT_UNIT, (struct IORequest *)(pAHIS->m_AHIio), 0);
     }
     if (deviceResult) {
         pAHIS->m_Error = eAHIS_DeviceError;

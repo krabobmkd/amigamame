@@ -86,7 +86,7 @@
 
 #include <stdarg.h>
 #include <setjmp.h>
-
+#include <stdlib.h>
 #include <stdio.h>
 
 /***************************************************************************
@@ -656,7 +656,8 @@ int new_memory_region(int type, size_t length, UINT32 flags)
 	mem_region[num].length = length;
 	mem_region[num].type = type;
 	mem_region[num].flags = flags;
-	mem_region[num].base = malloc(length);
+//krb	mem_region[num].base = malloc(length);
+    mem_region[num].base = calloc(length,1);
 	return (mem_region[num].base == NULL) ? 1 : 0;
 }
 
@@ -918,7 +919,8 @@ void *_malloc_or_die(size_t size, const char *file, int line)
 		fatalerror("Attempted to malloc zero bytes (%s:%d)", file, line);
 
 	/* allocate and return if we succeeded */
-	result = malloc(size);
+//krb	result = malloc(size);
+    result = calloc(size,1);
 	if (result != NULL)
 		return result;
 

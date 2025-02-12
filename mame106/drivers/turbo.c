@@ -978,7 +978,11 @@ ROM_START( zoom909 )
 	ROM_LOAD( "5203.91", 0x0000, 0x2000, CRC(631f5b65) SHA1(ce8b23cf97f7e08a13f426964ef140a20a884335) )
 
 	ROM_REGION( 0x0a40, REGION_PROMS, 0 )	/* various PROMs */
-	ROM_LOAD( "pr-5199.95", 0x0000, 0x0400, CRC(f3cd9254) SHA1(5fc5e4137fa260f5463395719449e4a542f1b08c) ) /* sprite colortable */
+//krb: the sprite colortable was total trash for zoom909, so reuse buckrogers one, looks very OK.
+// this was the z909 one:	ROM_LOAD( "pr-5199.95", 0x0000, 0x0400, CRC(f3cd9254) SHA1(5fc5e4137fa260f5463395719449e4a542f1b08c) ) /* sprite colortable */
+    // and this is the buckroger one, just copied. It's in parent archive.
+	ROM_LOAD( "ic95",    0x0000, 0x0400, CRC(45e997a8) SHA1(023703b90b503310351b12157b1e732e61430fa5) ) /* sprite colortable */
+
 	ROM_LOAD( "5198.93",    0x0400, 0x0200, CRC(32e74bc8) SHA1(dd2c812efd7b8f6b31a45e698d6453ea6bec132e) ) /* char colortable */
 
 	/* unknown */

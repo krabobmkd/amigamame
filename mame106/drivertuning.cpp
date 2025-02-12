@@ -14,7 +14,6 @@ using namespace std;
 
 static map<string,sDriverTuning> _tunings={
 	{"neogeo",{50,0}}, //
-	{"batrider",{4*60,0}},
 	{"sgemf",{8*60,0}},
 
 	{"gtmr",{0,MDTF_M68K_SAFE_MOVEMWRITE}},     // 1000 miglia
@@ -28,8 +27,11 @@ static map<string,sDriverTuning> _tunings={
     {"arkretrn",{12*60,0}},
     {"ashura",{3*60,0}},
     {"slapfigh",{13*60,0}},
+
     {"bbakraid",{16*60,0}},
     {"battleg",{20*60,0}},
+	{"batrider",{18*60,0}},
+
     {"wb32",{9*60,0}},
     {"gauntlet",{9*60,0}},
     {"gaunt2",{9*60,0}},
