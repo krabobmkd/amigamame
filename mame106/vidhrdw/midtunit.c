@@ -278,7 +278,7 @@ WRITE16_HANDLER( midwunit_control_w )
         other important bits:
             bit 2 (0x0004) is toggled periodically
     */
-	loginfo(2,"Wolf-unit control = %04X\n", data);
+	//loginfo(2,"Wolf-unit control = %04X\n", data);
 
 	COMBINE_DATA(&midtunit_control);
 
@@ -782,7 +782,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 		dma_state.offset = gfxoffset;
 	else
 	{
-		loginfo(2,"DMA source out of range: %08X\n", gfxoffset);
+		//loginfo(2,"DMA source out of range: %08X\n", gfxoffset);
 		goto skipdma;
 	}
 

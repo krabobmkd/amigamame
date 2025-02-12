@@ -688,7 +688,7 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
   static char screen[32];
   static char archive[16];
   static char parent[16];
- static char players[12];
+ static char players[16];
  static char year[12];
 //  static char comment[128];
  static std::string strComment;
@@ -702,8 +702,8 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
     archive[15]=0;
     snprintf(parent,15,  "\033b\033u%s", ui->String_Parent);
     parent[15]=0;
-    snprintf(players,11,    "\033b\033u%s", ui->String_Players);
-    players[11]=0;
+    snprintf(players,15,    "\033b\033u%s", ui->String_Players);
+    players[15]=0;
     snprintf(year,11,    "\033b\033u%s", ui->String_Year);
     year[11]=0;
    // snprintf(comment,127,  "\033b\033u%s", String_Comment);

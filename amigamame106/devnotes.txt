@@ -3,7 +3,7 @@ todo R1.2
  - X wrong colors on shadows Dynamite Dux, golden Axe -> corrected.
  - X Outzone set1->4 "black" -> repaired.
  - X Salamander corrupted sprite ->corrected.
- - X more memory clean at alloc, should resolve some boot problems.
+ - X more memory clean at alloc, should resolve some boot problems. ->TEST mk /nba /chasehq
  - O neogeo sound mixer simplified, may accelerate. ->TOTEST
  - X zoom909 wrong colors ->corrected (palette rom is wrong, reuse parent palette.)
  - O corrected amigaguide with OS3.2 version that includes images.

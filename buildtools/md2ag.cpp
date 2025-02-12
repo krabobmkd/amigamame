@@ -14,6 +14,7 @@ namespace fs = std::filesystem;
 
 using namespace std;
 
+bool useOS32Img=true;
 
 std::string trim(const std::string& str) {
     const std::string whitespace = " \t\r";
@@ -263,13 +264,23 @@ string replaceImage(const string s)
          string visible = s.substr(i+2,ib-(i+2));
          string link = s.substr(ic+1,id-(ic+1));
         // link = rreplace(link,"#","");
-
         final += s.substr(iprev,(i== string::npos)?i:(i-iprev));
+    if(useOS32Img)
+    {
+        final += "@{IMG \"GUIDEDIR:";
+       // final += visible;
+        final +=link;
+        final += "\"}";
+    }
+    else
+    {
         final += "@{\" Display: ";
         final += visible;
         final += " \" SYSTEM \"multiview ";
         final +=link;
         final += "\"}";
+    }
+
         iprev = id+1;
         i=iprev;
     }
