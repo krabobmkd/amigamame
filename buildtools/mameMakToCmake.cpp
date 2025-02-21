@@ -9,7 +9,7 @@
 #include <filesystem>
 using namespace std;
 
-string sourcebase("../mame106/");
+string sourcebase("../../../mame106/");
 
 class TGameDriver {
     public:
@@ -672,18 +672,39 @@ int patchMiniMachines(
         m._gamedrivers["bouldash"] = src._gamedrivers["bouldash"];
         m._gamedrivers["bouldshj"] = src._gamedrivers["bouldshj"];
 
+        // c,ninja machine
+
+        m._gamedrivers["edrandy"] = src._gamedrivers["edrandy"];
+        m._gamedrivers["edrandy1"] = src._gamedrivers["edrandy1"];
+        m._gamedrivers["edrandyj"] = src._gamedrivers["edrandyj"];
+        m._gamedrivers["cninja"] = src._gamedrivers["cninja"];
+        m._gamedrivers["cninja0"] = src._gamedrivers["cninja0"];
+        m._gamedrivers["cninjau"] = src._gamedrivers["cninjau"];
+        m._gamedrivers["joemac"] = src._gamedrivers["joemac"];
+        m._gamedrivers["stoneage"] = src._gamedrivers["stoneage"];
+        m._gamedrivers["robocop2"] = src._gamedrivers["robocop2"];
+        m._gamedrivers["robocp2u"] = src._gamedrivers["robocp2u"];
+        m._gamedrivers["robocp2j"] = src._gamedrivers["robocp2j"];
+        m._gamedrivers["mutantf"] = src._gamedrivers["mutantf"];
+        m._gamedrivers["mutantfa"] = src._gamedrivers["mutantfa"];
+        m._gamedrivers["deathbrd"] = src._gamedrivers["deathbrd"];
+
         m._sources = {
             "drivers/supbtime.c","vidhrdw/supbtime.c","vidhrdw/deco16ic.c",
             "drivers/karnov.c","vidhrdw/karnov.c",
-            "drivers/dec0.c","machine/dec0.c","vidhrdw/dec0.c","vidhrdw/dec0n.cpp"
+            "drivers/dec0.c","machine/dec0.c","vidhrdw/dec0.c","vidhrdw/dec0n.cpp",
+
+            "drivers/cninja.c","vidhrdw/cninja.c","machine/decoprot.c",
+            "machine/decocrpt.c"
         };
         m._cpu_defs["M68000"]=1;
         m._cpu_defs["M6502"]=1;
         m._cpu_defs["H6280"]=1;
+        m._cpu_defs["Z80"]=1;
 
         m._sound_defs["YM2203"]=1;
         m._sound_defs["YM3526"]=1;
-
+        m._sound_defs["YM2151"]=1;
         m._sound_defs["YM3812"]=1;
         m._sound_defs["OKIM6295"]=1;
 

@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "deco16ic.h"
 #include "cninja.h"
-
+#include "drawgfxn.h"
 /******************************************************************************/
 
 static int cninja_bank_callback(const int bank)
@@ -186,7 +186,7 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		pri 	// priority_mask
+		0 	// priority_mask
 	  };
 	for (offs = 0x400-4;offs >=0 ;offs -= 4)
 	{
@@ -199,11 +199,12 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		/* Sprite/playfield priority */
 		switch (x&0xc000) {
-		case 0x0000: pri=0; break;
-		case 0x4000: pri=0xf0; break;
-		case 0x8000: pri=0xf0|0xcc; break;
-		case 0xc000: pri=0xf0|0xcc; break; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
+		case 0x0000: pri=0 |(1<<31); break;
+		case 0x4000: pri=0xf0|(1<<31); break;
+		case 0x8000: pri=0xf0|0xcc|(1<<31); break;
+		case 0xc000: pri=0xf0|0xcc|(1<<31); break; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
 		}
+        dgp0.priority_mask = pri;
 
 		y = buffered_spriteram16[offs];
 		flash=y&0x1000;
@@ -239,17 +240,18 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 		else mult=-16;
 
+        dgp0.color = colour;
+        dgp0.flipx = fx;
+        dgp0.flipy = fy;
+
 		while (multi >= 0)
 		{
 			
 			dgp0.code = sprite - multi * inc;
-			dgp0.color = colour;
-			dgp0.flipx = fx;
-			dgp0.flipy = fy;
 			dgp0.sx = x;
 			dgp0.sy = y + mult * multi;
 			drawgfx(&dgp0);
-
+            //doesnt work drawgfx_clut16_Src8_prio(&dgp0);
 			multi--;
 		}
 	}
@@ -278,7 +280,7 @@ static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		pri 	// priority_mask
+		0 	// priority_mask
 	  };
 	for (offs = 0x400-4;offs >=0 ;offs -= 4)
 	{
@@ -290,11 +292,12 @@ static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		/* Sprite/playfield priority */
 		switch (x&0xc000) {
-		case 0x0000: pri=0; break;
-		case 0x4000: pri=0xf0; break;
-		case 0x8000: pri=0xf0|0xcc; break;
-		case 0xc000: pri=0xf0|0xcc; break; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
+		case 0x0000: pri=0 |(1<<31) ; break;
+		case 0x4000: pri=0xf0|(1<<31); break;
+		case 0x8000: pri=0xf0|0xcc|(1<<31); break;
+		case 0xc000: pri=0xf0|0xcc|(1<<31); break; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
 		}
+		dgp1.priority_mask = pri;
 
 		y = buffered_spriteram16[offs];
 		flash=y&0x1000;
@@ -330,17 +333,17 @@ static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 		else mult=-16;
 
+        dgp1.color = colour;
+        dgp1.flipx = fx;
+        dgp1.flipy = fy;
+
 		while (multi >= 0)
-		{
-			
+		{			
 			dgp1.code = sprite - multi * inc;
-			dgp1.color = colour;
-			dgp1.flipx = fx;
-			dgp1.flipy = fy;
 			dgp1.sx = x;
 			dgp1.sy = y + mult * multi;
 			drawgfx(&dgp1);
-
+            //doesnt work drawgfx_clut16_Src8_prio(&dgp1);
 			multi--;
 		}
 	}
@@ -395,12 +398,12 @@ static void mutantf_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 		0, 	// sx
 		0, 	// sy
 		&Machine->visible_area, 	// clip
-		trans, 	// transparency
+		0, // trans, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		0 	// priority_mask
+		(1<<31) 	// priority_mask
 	  };
 	while (offs!=end)
 	{
@@ -430,6 +433,8 @@ static void mutantf_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 			trans=TRANSPARENCY_ALPHA;
 			colour&=0xf;
 		}
+		dgp2.transparency = trans;
+		dgp2.color = colour;
 
 		fx = (spriteptr[offs+0]&0x4000);
 		fy = (spriteptr[offs+0]&0x8000);
@@ -457,14 +462,13 @@ static void mutantf_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 			if (fx) { x_mult=-16; sx+=16; } else { x_mult=16; sx-=16*w; }
 			if (fy) { y_mult=-16; sy+=16; } else { y_mult=16; sy-=16*h; }
 		}
+        dgp2.flipx = fx;
+        dgp2.flipy = fy;
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
 				
 				dgp2.code = sprite + y + h * x;
-				dgp2.color = colour;
-				dgp2.flipx = fx;
-				dgp2.flipy = fy;
 				dgp2.sx = sx + x_mult * (w-x);
 				dgp2.sy = sy + y_mult * (h-y);
 				drawgfx(&dgp2);

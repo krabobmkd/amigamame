@@ -2813,26 +2813,40 @@ const game_driver * const drivers[] =
 	DRIVER( chelnovj ) /* 1988 "Data East Corporation" "Chelnov - Atomic Runner (Japan)" */
 	DRIVER( chelnovu ) /* 1988 "Data East USA" "Chelnov - Atomic Runner (US)" */
 	DRIVER( chinatwn ) /* 1991 "Data East Corporation" "China Town (Japan)" */
+	DRIVER( cninja ) /* 1991 "Data East Corporation" "Caveman Ninja (World revision 3)" */
+	DRIVER( cninja0 ) /* 1991 "Data East Corporation" "Caveman Ninja (World revision 0)" */
+	DRIVER( cninjau ) /* 1991 "Data East Corporation" "Caveman Ninja (US)" */
+	DRIVER( deathbrd ) /* 1992 "Data East Corporation" "Death Brade (Japan Rev 2 */
 	DRIVER( drgninja ) /* 1988 "Data East Corporation" "Dragonninja (Japan)" */
+	DRIVER( edrandy ) /* 1990 "Data East Corporation" "The Cliffhanger - Edward Randy (World revision 2)" */
+	DRIVER( edrandy1 ) /* 1990 "Data East Corporation" "The Cliffhanger - Edward Randy (World revision 1)" */
+	DRIVER( edrandyj ) /* 1990 "Data East Corporation" "The Cliffhanger - Edward Randy (Japan)" */
 	DRIVER( ffantasa ) /* 1989 "Data East Corporation" "Fighting Fantasy (Japan)" */
 	DRIVER( ffantasy ) /* 1989 "Data East Corporation" "Fighting Fantasy (Japan revision 2)" */
 	DRIVER( hbarrel ) /* 1987 "Data East USA" "Heavy Barrel (US)" */
 	DRIVER( hbarrelw ) /* 1987 "Data East Corporation" "Heavy Barrel (World)" */
 	DRIVER( hippodrm ) /* 1989 "Data East USA" "Hippodrome (US)" */
+	DRIVER( joemac ) /* 1991 "Data East Corporation" "Tatakae Genshizin Joe & Mac (Japan)" */
 	DRIVER( karnov ) /* 1987 "Data East USA" "Karnov (US)" */
 	DRIVER( karnovj ) /* 1987 "Data East Corporation" "Karnov (Japan)" */
 	DRIVER( midres ) /* 1989 "Data East Corporation" "Midnight Resistance (World)" */
 	DRIVER( midresj ) /* 1989 "Data East Corporation" "Midnight Resistance (Japan)" */
 	DRIVER( midresu ) /* 1989 "Data East USA" "Midnight Resistance (US)" */
+	DRIVER( mutantf ) /* 1992 "Data East Corporation" "Mutant Fighter (World Rev 4 */
+	DRIVER( mutantfa ) /* 1992 "Data East Corporation" "Mutant Fighter (World Rev 3 */
 	DRIVER( robocop ) /* 1988 "Data East Corporation" "Robocop (World revision 4)" */
+	DRIVER( robocop2 ) /* 1991 "Data East Corporation" "Robocop 2 (Euro/Asia v0.10)" */
 	DRIVER( robocopb ) /* 1988 "bootleg" "Robocop (World bootleg)" */
 	DRIVER( robocopj ) /* 1988 "Data East Corporation" "Robocop (Japan)" */
 	DRIVER( robocopu ) /* 1988 "Data East USA" "Robocop (US revision 1)" */
 	DRIVER( robocopw ) /* 1988 "Data East Corporation" "Robocop (World revision 3)" */
+	DRIVER( robocp2j ) /* 1991 "Data East Corporation" "Robocop 2 (Japan v0.11)" */
+	DRIVER( robocp2u ) /* 1991 "Data East Corporation" "Robocop 2 (US v0.05)" */
 	DRIVER( robocpu0 ) /* 1988 "Data East USA" "Robocop (US revision 0)" */
 	DRIVER( secretag ) /* 1989 "Data East Corporation" "Secret Agent (World)" */
 	DRIVER( slyspy ) /* 1989 "Data East USA" "Sly Spy (US revision 3)" */
 	DRIVER( slyspy2 ) /* 1989 "Data East USA" "Sly Spy (US revision 2)" */
+	DRIVER( stoneage ) /* 1991 "bootleg" "Stoneage" */
 	DRIVER( supbtime ) /* 1990 "Data East Corporation" "Super Burger Time (World)" */
 	DRIVER( supbtimj ) /* 1990 "Data East Corporation" "Super Burger Time (Japan)" */
 	DRIVER( wndrplnt ) /* 1987 "Data East Corporation" "Wonder Planet (Japan)" */

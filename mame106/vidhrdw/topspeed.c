@@ -40,12 +40,16 @@ VIDEO_START( topspeed )
 
 void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
-	int offs,map_offset,x,y,curx,cury,sprite_chunk;
+	int offs,map_offset,x,y,curx,cury;
+	UINT16 sprite_chunk;
 	UINT16 *spritemap = topspeed_spritemap;
 	UINT16 data,tilenum,code,color;
 	UINT8 flipx,flipy,priority,bad_chunks;
 	UINT8 j,k,px,py,zx,zy,zoomx,zoomy;
-	static const int primasks[2] = {0xff00,0xfffc};	/* Sprites are over bottom layer or under top layer */
+	static const int primasks[2] = {
+	0xff00 | (1<<31),
+	0xfffc | (1<<31)
+	};	/* Sprites are over bottom layer or under top layer */
 
 	/* Most of spriteram is not used by the 68000: rest is scratch space for the h/w perhaps ? */
 
@@ -66,7 +70,7 @@ void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		primasks[priority] 	// priority_mask
+		0, //primasks[priority] 	// priority_mask
 	  };
 	for (offs = 0;offs <(0x2c0/2);offs += 4)
 	{
@@ -98,10 +102,13 @@ void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		bad_chunks = 0;
 
+		dgpz0.color = color;
+		dgpz0.priority_mask = primasks[priority];
+
 		for (sprite_chunk = 0;sprite_chunk < 128;sprite_chunk++)
 		{
-			k = sprite_chunk % 8;   /* 8 sprite chunks per row */
-			j = sprite_chunk / 8;   /* 16 rows */
+			k = sprite_chunk & 0x07; // % 8;   /* 8 sprite chunks per row */
+			j = sprite_chunk>>3;  // /8;   /* 16 rows */
 
 			/* pick tiles back to front for x and y flips */
 			px = (flipx) ? (7-k) : (k);
@@ -118,23 +125,23 @@ void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			curx = x + ((k*zoomx)/8);
 			cury = y + ((j*zoomy)/16);
 
-			zx = x + (((k+1)*zoomx)/8) - curx;
-			zy = y + (((j+1)*zoomy)/16) - cury;
+			zx = x + (((k+1)*zoomx)>>3) - curx;
+			zy = y + (((j+1)*zoomy)>>4) - cury;
 
-			
 			dgpz0.code = code;
-			dgpz0.color = color;
+
 			dgpz0.flipx = flipx;
 			dgpz0.flipy = flipy;
 			dgpz0.sx = curx;
 			dgpz0.sy = cury;
 			dgpz0.scalex = zx<<12;
 			dgpz0.scaley = zy<<13;
+
 			drawgfxzoom(&dgpz0);
 		}
 
-		if (bad_chunks)
-loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+// 		if (bad_chunks)
+// loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 	} // end of patch paragraph
 

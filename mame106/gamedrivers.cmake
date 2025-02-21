@@ -1147,19 +1147,23 @@ if(OPT_MINIDTEA)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/supbtime.c vidhrdw/supbtime.c vidhrdw/deco16ic.c drivers/karnov.c 
 		vidhrdw/karnov.c drivers/dec0.c machine/dec0.c vidhrdw/dec0.c 
-		vidhrdw/dec0n.cpp 	)
+		vidhrdw/dec0n.cpp drivers/cninja.c vidhrdw/cninja.c machine/decoprot.c 
+		machine/decocrpt.c 	)
 	set(MSND_OKIM6295 ON)
+	set(MSND_YM2151 ON)
 	set(MSND_YM2203 ON)
 	set(MSND_YM3526 ON)
 	set(MSND_YM3812 ON)
 	set(MCPU_H6280 ON)
 	set(MCPU_M6502 ON)
 	set(MCPU_M68000 ON)
+	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
-		HAS_OKIM6295=1 HAS_YM2203=1 HAS_YM3526=1 HAS_YM3812=1 
+		HAS_OKIM6295=1 HAS_YM2151=1 HAS_YM2203=1 HAS_YM3526=1 
+		HAS_YM3812=1 	)
+	list(APPEND CPU_DEFS
+		HAS_H6280=1 HAS_M6502=1 HAS_M68000=1 HAS_Z80=1 
 	)
-	list(APPEND CPU_DEFS
-		HAS_H6280=1 HAS_M6502=1 HAS_M68000=1 	)
 endif()
 if(OPT_MINIKONAMI)
 	add_compile_definitions(LINK_MINIKONAMI=1)
