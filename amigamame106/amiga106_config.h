@@ -131,6 +131,7 @@ public:
         CgxScalePixelArray,
        // WritePixelArray8,
        // GLShader :)
+       // extend this if you wih to add render engine.
     };
     enum class FSScaleMode :  int
     {
@@ -166,8 +167,15 @@ public:
         ScreenModeChoice _ScreenModeChoice=ScreenModeChoice::Best;
         FSScaleMode _FSscaleMode = FSScaleMode::CenterWithNoScale;
         ULONG_SCREENMODEID _modeid=~0;
-        // these one are saved but ot on ui.
+        // these one are saved but not on ui.
         int _window_posx=0,_window_posy=0,_window_width=0,_window_height=0,_window_validpos=0;
+    };
+    struct Display_PerGame : public ASerializable
+    {
+        Display_PerGame();
+        void serialize(ASerializer &serializer) override;
+        bool isDefault() override;
+        bool _frameSkip = false;
     };
     struct Display : public ASerializable
     {
@@ -175,17 +183,24 @@ public:
         void serialize(ASerializer &serializer) override;
         DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;        
 #define CONFDISPLAYFLAGS_ONWORKBENCH 1
-#define CONFDISPLAYFLAGS_FRAMESKIP 2
+//#define CONFDISPLAYFLAGS_FRAMESKIP 2
 //#define CONFDISPLAYFLAGS_TRIPLEBUFFER 4
         ULONG_FLAGS _flags = 0;
         ScreenBufferMode  _buffering = ScreenBufferMode::Single;
         //bool    _startOnWorkbench = false;
         Display_PerScreenMode &getActiveMode();
+        Display_PerGame &getActiveGameConf();
+        inline bool frameSkip() {
+            return getActiveGameConf()._frameSkip;
+        }
      protected:
         std::map<std::string,Display_PerScreenMode> _perScreenMode;
         ASerializer::StringMap<Display_PerScreenMode> _perScreenModeS;
+
+        std::map<std::string,Display_PerGame> _perGame;
+        ASerializer::StringMap<Display_PerGame> _perGameS;
         float _color_brightness=1.0f;
-       // old useless float _color_gamma=1.0f;
+
         friend class MameConfig;
     };
     Display &display() { return _display; }
@@ -236,6 +251,8 @@ public:
     };
     Controls &controls() { return _controls; }
 
+    #define MISCFLAG_USEREADJOYPORT 1
+
     struct Misc : public ASerializable
     {
         Misc();
@@ -246,7 +263,8 @@ public:
         float     _speedlimit = 100.0f;
         ULONG_FLAGS  _skipflags = 0;       
         int         _neogeo_bios = 0;
-        bool        _LLUseReadJoyPort=false;
+        ULONG_FLAGS  _MiscFlags = 0;
+
         std::vector<std::string> _neogeoBiosList;
     };
     Misc &misc() { return _misc; }

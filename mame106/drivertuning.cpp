@@ -20,7 +20,7 @@ static map<string,sDriverTuning> _tunings={
 	{"gtmr",{0,MDTF_M68K_SAFE_MOVEMWRITE}},     // 1000 miglia
 	{"1944",{0,MDTF_M68K_SAFE_MOVEMWRITE/*|MDTF_M68K_SAFE_MOVEMREAD*/}},
 	{"bublbob2",{0,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
-	{"armwar",{0,MDTF_M68K_SAFE_MOVEMWRITE}},     // 1000 miglia
+	{"armwar",{0,MDTF_M68K_SAFE_MOVEMWRITE}},
 	{"truxton",{12*60,MDTF_LONGBOOT}}, // boot after the end of the world.
 	{"hellfire",{12*60,MDTF_LONGBOOT}},
 
@@ -44,9 +44,9 @@ static map<string,sDriverTuning> _tunings={
 	{"ssf2",{15*60,0}},
 
 	//toaplan1
-	{"demonwld",{0,MDTF_M68K_SAFE_MOVEMWRITE}},     // NEEDED
-	{"outzone",{8*60,MDTF_M68K_SAFE_MOVEMWRITE}},   //NEEDED
-	// following not tested but may need MDTF_M68K_SAFE_MOVEMWRITE
+	{"demonwld",{0,MDTF_M68K_SAFE_MOVEMWRITE}},     // NEEDED FOR SURE
+	{"outzone",{8*60,MDTF_M68K_SAFE_MOVEMWRITE}},   //NEEDED FOR SURE
+	// following not tested but same hardware &editor may need MDTF_M68K_SAFE_MOVEMWRITE
 	{"samesame",{0*60,MDTF_M68K_SAFE_MOVEMWRITE}},
 	{"rallybik",{0*60,MDTF_M68K_SAFE_MOVEMWRITE}},
 	{"truxton",{0*60,MDTF_M68K_SAFE_MOVEMWRITE}},
@@ -56,7 +56,7 @@ static map<string,sDriverTuning> _tunings={
 
 };
 
-sDriverTuning *getDriverTuning(const char *drivername)
+sDriverTuning *getDriverTuningByName(const char *drivername)
 {
 	map<string,sDriverTuning> ::iterator fit = _tunings.find(string(drivername));
 	if(fit == _tunings.end()) return 0L;
@@ -65,7 +65,7 @@ sDriverTuning *getDriverTuning(const char *drivername)
 sDriverTuning *getDriverTuning(const struct _game_driver *pdriver)
 {
     if(!pdriver) return NULL;
-    sDriverTuning *dt = getDriverTuning(pdriver->name);
+    sDriverTuning *dt = getDriverTuningByName(pdriver->name);
     if(dt) return dt;
     if(pdriver->parent)
     {

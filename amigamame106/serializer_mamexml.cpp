@@ -152,6 +152,7 @@ XmlReader::XmlReader(xml_data_node *rootnode) : ASerializer()
 {
     _recursenode.push_back(rootnode);
 }
+
 void XmlReader::operator()(const char *sMemberName, ASerializable &subconf, int flags)
 {
     string name = checkXmlName(sMemberName);

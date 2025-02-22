@@ -23,6 +23,8 @@ extern "C" {
 #define REG(r)
 #endif
 
+
+
 extern "C" {
     #include <libraries/mui.h>
     #include <proto/muimaster.h>
@@ -501,7 +503,9 @@ ULONG MUISerializer::LFlags::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2)
 
 MUISerializer::LFlags::LFlags(MUISerializer &ser,ULONG_FLAGS &flugs,
                               ULONG_FLAGS defval,const std::vector<std::string> &names)
-: Level(ser), _pflugs(&flugs),_flagNames(names),_notifyHook({})
+: Level(ser), _pflugs(&flugs)
+ , _defval((ULONG)defval)
+ ,_flagNames(names),_notifyHook({})
 {
     _buttons.resize(names.size());
     _notifyHook.h_Entry =(RE_HOOKFUNC)&MUISerializer::LFlags::HNotify;
@@ -510,7 +514,7 @@ MUISerializer::LFlags::LFlags(MUISerializer &ser,ULONG_FLAGS &flugs,
 void MUISerializer::LFlags::compile()
 {
     int nbcolumns = 4;
-   // if(_flgs & SERFLAG_GROUP_2COLUMS) nbcolumns=4;
+   if(_defval & SERFLAG_GROUP_FLAGINT2COLUMS) nbcolumns=2;
     vector<ULONG> tagitems= {MUIA_Group_Columns,nbcolumns,MUIA_HorizWeight,1000};
 
     unsigned int startval = (_pflugs)?*_pflugs:0;
@@ -572,18 +576,21 @@ void MUISerializer::LFlags::update()
 
 // - - - - - - - - - - - - - - -
 MUISerializer::LSwitchGroup::LSwitchGroup(MUISerializer &ser,int flgs,AStringMap &map) : LGroup(ser,flgs)
-  ,_map(&map), _displayName("(select a driver)"),_SelectedItemText(NULL)
+  ,_map(&map), _displayName("(select a driver)")
+#ifndef USEGROUPTITLE
+  ,_SelectedItemText(NULL)
+#endif
 {
 
 }
 Object *MUISerializer::LSwitchGroup::compileOuterFrame(Object *pinnerGroup)
 {
+#ifndef USEGROUPTITLE
     _SelectedItemText = MUI_NewObject(MUIC_Text,
                  //   TextFrame,
                   //  MUIA_Background, MUII_TextBack,
                     MUIA_Text_Contents,(ULONG)"...",
                   TAG_DONE);
-
     Object *obj = MUI_NewObject(MUIC_Group,
             GroupFrameT((ULONG)_displayName.c_str()),
             MUIA_Disabled, TRUE,
@@ -591,23 +598,43 @@ Object *MUISerializer::LSwitchGroup::compileOuterFrame(Object *pinnerGroup)
             Child,(ULONG)pinnerGroup,
         TAG_DONE
         );
+#else
+     Object *obj = MUI_NewObject(MUIC_Group,
+            GroupFrameT((ULONG)_displayName.c_str()),
+            MUIA_Disabled, TRUE,
+            Child,(ULONG)pinnerGroup,
+        TAG_DONE
+        );
+#endif
+
     return obj;
 }
 void MUISerializer::LSwitchGroup::setGroup(const char *pid)
 {
     if(!_map || !_Object) return;
+#ifdef USEGROUPTITLE
+    _displayName = pid;
+#else
     _displayName = "Configuration for: ";
     _displayName += pid;
-    ASerializable &actual = _map->get(pid); // we need one to build UI.
+#endif
+    ASerializable &actual = _map->get(pid); // the new current data
+
     ReAssigner reassigner(*this);
     actual.serialize(reassigner); // change pointed data and does updates.
-    // change title name
+
      SetAttrs(_Object, MUIA_Disabled, FALSE,TAG_DONE);
+
+         // change title name
+#ifdef USEGROUPTITLE
+      SetAttrs(_Object,MUIA_FrameTitle,(ULONG)_displayName.c_str(),TAG_DONE);
+#else
      SetAttrs(_Object,MUIA_FrameTitle,(ULONG)"",TAG_DONE);
      if(_SelectedItemText)
      {
         SetAttrs(_SelectedItemText,MUIA_Text_Contents,(ULONG)_displayName.c_str(),TAG_DONE);
      }
+#endif
 
      update();
 }

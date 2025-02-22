@@ -15,6 +15,7 @@ extern "C" {
 #define REG(r)
 #endif
 
+#define USEGROUPTITLE 1
 
 struct ScreenModeRequester;
 
@@ -89,6 +90,7 @@ protected:
         void compile() override;
         void update() override;
         ULONG_FLAGS *_pflugs;
+        ULONG _defval;
         std::vector<std::string> _flagNames;
         std::vector<Object *> _buttons;
         struct Hook _notifyHook;
@@ -101,7 +103,9 @@ protected:
         void setGroup(const char *pid);
         AStringMap *_map;
         std::string _displayName;
+#ifndef USEGROUPTITLE
         Object *_SelectedItemText;
+#endif
 	};
     struct LTabs : public LGroup {
         LTabs(MUISerializer &ser);

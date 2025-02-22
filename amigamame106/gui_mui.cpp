@@ -1116,11 +1116,12 @@ static ULONG DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG *par
         if(ppdrv && *ppdrv)
         {
             //printf("DriverSelect:%s\n",(*ppdrv)->name);
-            std::string screenconf;
+            std::string screenconf;           
             int videoAttribs;
             config.getDriverScreenModestring(ppdrv, screenconf,videoAttribs);
 
             muiConfigCreator.selectGroup("Display.Per Screen Mode",screenconf);
+            muiConfigCreator.selectGroup("Display.Per Game",(*ppdrv)->name);
 
             set(ui->BU_Start,  MUIA_Disabled, FALSE);
             //   printf("screen:%s:\n",screenconf.c_str());

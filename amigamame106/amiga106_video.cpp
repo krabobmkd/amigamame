@@ -113,7 +113,7 @@ static ULONG FrameCounterUpdate=0;
 static INT64 FrameCounter=0;
 INT64 StartTime = 0;
 ULONG GetStartTime=0;
-
+static int frameSkipConfiguration = false;
 //ledBitmap _ledBitmap(3,4); // nbleds, ledwidth
 bool SwitchWindowFullscreen()
 {
@@ -271,6 +271,9 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     speedlimit = 100.0f/speedlimit;
 
     gameCyclePerFrame =  (cycles_t) (1000000.0 * speedlimit / pparams->fps );
+
+    frameSkipConfiguration = config.frameSkip();
+
 //    printf("gameCyclePerFrame fps:%d\n",(int)gameCyclePerFrame);
     return 0; // success
 
@@ -432,8 +435,7 @@ extern ULONG _bootframeskip;
 int osd_skip_this_frame(void)
 {
     if(_frame< _bootframeskip && _frame>0) return FrameCounterUpdate & 1;
-    MameConfig::Display &config = getMainConfig().display();
-    if(config._flags & CONFDISPLAYFLAGS_FRAMESKIP) return FrameCounterUpdate & 1;
+    if(frameSkipConfiguration ) return FrameCounterUpdate & 1;
     return 0 ;
 }
 

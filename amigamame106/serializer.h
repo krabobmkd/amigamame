@@ -12,6 +12,7 @@ struct ASerializer;
 
 #define SERFLAG_GROUP_TABS 1
 #define SERFLAG_GROUP_2COLUMS 2
+#define SERFLAG_GROUP_FLAGINT2COLUMS (1<<24)
 #define SERFLAG_GROUP_SCROLLER 4
 
 struct ASerializable {
@@ -20,6 +21,9 @@ struct ASerializable {
     virtual void serialize(ASerializer &serializer)=0;
     // - - - - - - - - - to apply rules...
     virtual void valueUpdated(std::string upatedValue) {}
+    // usefull in some case when in container
+    //virtual void youAreCreatedWithId(const char *pId) {}
+    // to optimize serialization
     virtual bool isDefault() { return false; }
 };
 
@@ -76,7 +80,11 @@ struct ASerializer {
         StringMap(std::map<std::string,ASER> &v) : AStringMap() ,_v(v){}
          void clear() override { _v.clear(); }
         bool contains(const char *pid) override { return (_v.find(pid)!=_v.end()); }
-        ASerializable &get(const char *pid) override { return (ASerializable &)_v[pid]; }
+        ASerializable &get(const char *pid) override {
+            //bool isCreated = !contains(pid);
+            //ASerializable &o = (ASerializable &)_v[pid];
+            //if(isCreated) o.youAreCreatedWithId(pid);
+            return (ASerializable &)_v[pid]; }
         void remove(const char *pid) override {
             typename std::map<std::string,ASER>::iterator fit = _v.find(pid);
             if(fit != _v.end()) _v.erase(fit);
@@ -89,7 +97,7 @@ struct ASerializer {
                     //std::make_pair<std::string,ASerializable *>(p.first,(ASerializable *)&p.second);
         }
         void setActive(std::string strid) { _active = strid; }
-        ASER &getActive(){ return _v[_active];};
+        ASER &getActive(){ return _v[_active]; };
         std::map<std::string,ASER> &_v;
         std::string _active; // set here because suits fine, we map and tell current selection in map.
         typename std::map<std::string,ASER>::iterator _it;

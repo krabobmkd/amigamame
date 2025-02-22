@@ -6,6 +6,8 @@
 #include <proto/dos.h>
 #include <string.h>
 #include <fstream>
+#include "drivertuning.h"
+
 // from mame
 extern "C" {
     #include "driver.h"
@@ -54,11 +56,15 @@ void MameConfig::setActiveDriver(int indexInDriverList)
     {
         _activeDriver = -1;
         _display._perScreenModeS.setActive("");
+        _display._perGameS.setActive("");
         return;
     }
 
     _activeDriver = indexInDriverList;
     _display._perScreenModeS.setActive( _resolutionStrings[indexInDriverList]);
+
+    const game_driver *drv  =drivers[indexInDriverList];
+    _display._perGameS.setActive(drv->name);
 
 }
 void MameConfig::setDriverListState(int listState)
@@ -318,7 +324,8 @@ void MameConfig::toDefault()
  //NOT THIS ONE !! decide where configs are written:  _misc._userPath = "PROGDIR:user";
     _misc._useCheatCodeFile = false;
     _misc._cheatFilePath = "PROGDIR:cheat.dat";
-    _misc._LLUseReadJoyPort = false;
+    _misc._MiscFlags = 0;
+
 
 }
 MameConfig::Display_PerScreenMode::Display_PerScreenMode() : ASerializable() {
@@ -357,8 +364,23 @@ bool MameConfig::Display_PerScreenMode::isDefault()
             _window_validpos == 0
             );
 }
+// - - - - - - -
 
-MameConfig::Display::Display() : ASerializable() ,_perScreenModeS(_perScreenMode)
+MameConfig::Display_PerGame::Display_PerGame() : ASerializable() {
+}
+void MameConfig::Display_PerGame::serialize(ASerializer &serializer)
+{
+    serializer("FrameSkip",_frameSkip);
+}
+bool MameConfig::Display_PerGame::isDefault()
+{   // will not be written if is default.
+    return (!_frameSkip);
+}
+
+// - - - - - - -
+MameConfig::Display::Display() : ASerializable()
+    ,_perScreenModeS(_perScreenMode)
+    ,_perGameS(_perGame)
 {
 }
 void MameConfig::Display::serialize(ASerializer &serializer)
@@ -368,20 +390,22 @@ void MameConfig::Display::serialize(ASerializer &serializer)
     //
     serializer("Screen Buffer",(int&)_buffering,{"Single","Triple Buffer CSB (slow if nasty driver)","Double Buffer SVP (Also slow if...)"});
     serializer(" ",_flags,0,{
-               "On Workbench","Bad FrameSkip"
+               "On Workbench"
                });
 
                                  // min,max,step, default
     serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
 
-                                         // min,max,step, default
-   //old serializer("Gamma",_color_gamma,0.125f,1.0f,0.0625f,1.0f);
-
     serializer("Per Screen Mode",_perScreenModeS);
+    serializer("Per Game",_perGameS);
 }
 MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
 {
     return _perScreenModeS.getActive();
+}
+MameConfig::Display_PerGame &MameConfig::Display::getActiveGameConf()
+{
+    return _perGameS.getActive();
 }
 
 MameConfig::Audio::Audio() : ASerializable()
@@ -483,7 +507,13 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
 
     serializer("Skip",_skipflags,0,{"Disclaimer","Game Info"});
     serializer("NeoGeo Bios",_neogeo_bios,_neogeoBiosList);
-    serializer("NewLowLevel Patch Compatible",_LLUseReadJoyPort);
+
+    serializer(" ",_MiscFlags,
+                        0 | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
+                    ,{
+        "Prefer ReadJoyPort() to Rawkeys"
+        });
+
 
 }
 MameConfig::Help::Help() : ASerializable() {
