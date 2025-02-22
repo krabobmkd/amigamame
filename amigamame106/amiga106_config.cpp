@@ -390,7 +390,8 @@ void MameConfig::Display::serialize(ASerializer &serializer)
     //
     serializer("Screen Buffer",(int&)_buffering,{"Single","Triple Buffer CSB (slow if nasty driver)","Double Buffer SVP (Also slow if...)"});
     serializer(" ",_flags,0,{
-               "On Workbench"
+               "On Workbench",
+               "Force Depth 16"
                });
 
                                  // min,max,step, default

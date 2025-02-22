@@ -33,6 +33,7 @@ public:
     #define DISPFLAG_USESCALEPIXARRAY  32
     #define DISPFLAG_USETRIPLEBUFFER  64
     #define DISPFLAG_USEHEIGHTBUFFER  128
+    #define DISPFLAG_FORCEDEPTH16      256
     struct params {
         ULONG _flags;
         ULONG _forcedModeID;

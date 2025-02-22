@@ -183,6 +183,7 @@ public:
         void serialize(ASerializer &serializer) override;
         DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;        
 #define CONFDISPLAYFLAGS_ONWORKBENCH 1
+#define CONFDISPLAYFLAGS_FORCEDEPTH16 2
 //#define CONFDISPLAYFLAGS_FRAMESKIP 2
 //#define CONFDISPLAYFLAGS_TRIPLEBUFFER 4
         ULONG_FLAGS _flags = 0;

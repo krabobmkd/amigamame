@@ -225,6 +225,9 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         if(config._flags & CONFDISPLAYFLAGS_ONWORKBENCH )
             params._flags |= DISPFLAG_STARTWITHWINDOW;
 
+        if(config._flags & CONFDISPLAYFLAGS_FORCEDEPTH16 )
+            params._flags |= DISPFLAG_FORCEDEPTH16;
+
         // these 2 are exclusive:
         if(config._buffering == MameConfig::ScreenBufferMode::TripleBufferCSB )
              params._flags |= DISPFLAG_USETRIPLEBUFFER;

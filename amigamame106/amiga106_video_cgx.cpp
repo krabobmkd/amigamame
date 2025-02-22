@@ -264,7 +264,6 @@ void Drawable_CGX::drawCGX_DirectCPU32(
 void Drawable_CGX::initARGB32DrawFunctionFromPixelFormat()
 {
     // find function pointer to draw that mode. _PixelFmt
-
     switch(_PixelFmt) {
         case PIXFMT_RGB15:directDrawARGB32=&directDraw_RGB15_ARGB32; break;
         case PIXFMT_BGR15:directDrawARGB32=&directDraw_BGR15_ARGB32; break;
@@ -279,7 +278,9 @@ void Drawable_CGX::initARGB32DrawFunctionFromPixelFormat()
             case PIXFMT_BGR24:
         directDrawARGB32=&directDraw_type24_ARGB32;
         break;
+        // 11, wrong:
         case PIXFMT_ARGB32:directDrawARGB32=&directDrawARGB32_ARGB32; break;
+        // 12, ok:
         case PIXFMT_BGRA32:directDrawARGB32=&directDrawBGRA32_ARGB32; break;
         case PIXFMT_RGBA32:directDrawARGB32=&directDrawRGBA32_ARGB32; break;
     default:
@@ -307,9 +308,12 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
     }else
         _screenDepthAsked = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
 
+    if(_screenDepthAsked == 32 && (_flags & DISPFLAG_FORCEDEPTH16)!=0)
+        _screenDepthAsked = 16;
+
     if(_ScreenModeId == INVALID_ID)
     {
-//    printf("find best mode...\n");
+   // printf("find best mode, _screenDepthAsked:%d...\n",(int)_screenDepthAsked);
 
         struct TagItem cgxtags[]={
                 CYBRBIDTG_NominalWidth,width,
@@ -335,8 +339,10 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
 
         _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
 
-//        printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d\n",_fullscreenWidth,_fullscreenHeight,
-//                    (int)_PixelFmt, (int)_PixelBytes,(int)_screenDepthAsked);
+       // printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d MODE:%08x\n",
+       //          _fullscreenWidth,_fullscreenHeight,
+       //             (int)_PixelFmt, (int)_PixelBytes,(int)_screenDepthAsked,
+       //             (int)_ScreenModeId);
 
     } else
     {

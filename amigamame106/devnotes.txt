@@ -1,18 +1,23 @@
 todo R1.2
- - Added such excellent games as Caveman Ninja, Cliffhanger Edward Randy,Robocop 2, and Mutant fighter
 
- - O wrong colors 15b -> 24b , and wrong screen choice :(.
- - X wrong colors on shadows Dynamite Dux, golden Axe -> corrected.
- - X Outzone set1->4 "black" -> repaired.
- - X Salamander corrupted sprite ->corrected.
- - X topspeed sprite priority corrected.
- - X more memory clean at alloc, should resolve some boot problems.
+ Disclaimer: If after some driver update, RGB32 color games like mutant fighter or psychic5
+ have wrong colors (Mame logo orange insead of blue),
+  the problem stands in cgx function BestCModeIDTagList() managed by the driver.
+ Use option "Force Depth 16" in such case, or select a 32bit mode explicitly, to bypass problems.
 
- - O neogeo sound mixer simplified, may accelerate. ->TOTEST
- - X zoom909 wrong colors ->corrected (palette rom is wrong, reuse parent palette.)
+ - Added such excellent games as Caveman Ninja, Cliffhanger Edward Randy,Robocop 2, and Mutant fighter (machine deco16)
+ - Frameskip is now a preference "Per game". It was time.
+
+ - X wrong colors on shadows: Dynamite Dux, golden Axe -> corrected.
+ - X Outzone set1->4 "black screen", repaired.
+ - X Salamander corrupted sprite, corrected.
+ - X topspeed (pre-chasehq outrun clone) sprite priority, corrected.
+ - X more memory clean at alloc, may resolve some problems.
+ - X neogeo sound mixer simplified, may accelerate a bit on rPi3.
+ - X zoom909 wrong colors: corrected (palette rom is wrong, luckily could re-use parent palette.)
  - O corrected amigaguide with OS3.2 version that includes images.
 
- - O Carrier Air Wing has graphic corruptions in first level (cawing)
+ - O "Carrier Air Wing has graphic corruptions in first level (cawing)"
         "No matter which set, has graphic corruption in the first level."
         "After some enemies move from the background to the foreground, the entire game freezes."
  - O Bubble Bobble 2

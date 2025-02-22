@@ -134,8 +134,16 @@ struct typeBGR16PC{
     union { typeBGR16 a; USHORT b;};
 }; // sizeof() ==2
 
+/*
+    krb 2025/02/22
+    grrr... P96 vc tells 32b modes are BGRA,
+    but it's actually BRGA "PC", so native p96 modes looks more AGRB...
+
+*/
+// wrong -> NO.
 typedef ULONG typeARGB32;
 
+//ok:
 struct typeBGRA32{
     typeBGRA32(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
     char b,g,r,a;
@@ -451,6 +459,7 @@ void directDrawARGB32_ARGB32(directDrawParams *p)
 {
     directDrawRGB32T<typeARGB32>(p);
 }
+//ok
 void directDrawBGRA32_ARGB32(directDrawParams *p)
 {
     directDrawRGB32T<typeBGRA32>(p);
