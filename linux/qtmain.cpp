@@ -137,7 +137,7 @@ options.pause_bright = 1.0f;
 //  if(options.record)
 //    osd_fclose(options.record);
 }
-
+int nbframe=0;
 int w = 320;
 int h = 224;
 vector<uint8_t> bm(w * h * 3, 128);
@@ -172,7 +172,9 @@ void QProc::process()
 //"tfrceac"
 //"rastan"
 //"bublbob2"
-"zoom909"
+//"zoom909"
+//"topspeed"
+//"othunder"
 //"pdrift"
 //"qbert"
  //   "rastsaga"
@@ -183,7 +185,7 @@ void QProc::process()
 //                "gforce2"
 
 //        "aof"
-//"chasehq"
+"chasehq"
 //      "mslug"
 
 //                "mp_sor2"
@@ -222,15 +224,15 @@ QWin::QWin() : QLabel()
 // }
 void QWin::mouseMoveEvent(QMouseEvent* event)
 {
-  //  dbg_nbt = event->x();
+//    dbg_nbt = event->x();
 
 }
 void QWin::paintEvent(QPaintEvent *event)
 {
     QLabel::paintEvent(event);
     QPainter p(this);
-
-    p.drawText(60,60,QString("woot:")+QString::number(0));
+// dbg_nbt
+    p.drawText(60,60,QString("woot:")+QString::number(nbframe));
 
 //    p.drawText(60,60,QString("woot:")+QString::number(nbframe));
 }
@@ -243,8 +245,8 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w,h)) );
-        this->setFixedSize(w,h);
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
+        this->setFixedSize(w*3,h*3);
     _imageMutex.unlock();
 
 	//lbl.show();
@@ -362,10 +364,15 @@ void osd_update_video_and_audio(struct _mame_display *display)
           // if(nbframe>300)
      //      QThread::msleep(1000/60);
 
-//nbframe++;
+nbframe++;
     // logo
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
-//if(nbframe == 3350) mame_pause(1);
+
+// chasehq sprite prio bug:
+//if(nbframe == 2650) mame_pause(1);
+
+//if(nbframe == 950) mame_pause(1);
+
 //if(nbframe == 60*25) mame_pause(1);
 // if(nbframe==1200) exit(1);
 // if(nbframe==60*10)  mame_schedule_exit();

@@ -15,7 +15,7 @@ using namespace std;
 static map<string,sDriverTuning> _tunings={
 	{"neogeo",{50,0}}, //
 	{"sgemf",{8*60,0}},
-	{"chasehq",{5*60,0}},
+	{"chasehq",{5*60+ 40*60,0}},
 
 	{"gtmr",{0,MDTF_M68K_SAFE_MOVEMWRITE}},     // 1000 miglia
 	{"1944",{0,MDTF_M68K_SAFE_MOVEMWRITE/*|MDTF_M68K_SAFE_MOVEMREAD*/}},

@@ -452,9 +452,6 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
     serializer("Joy Port 2", (int&)_llPort_Player[1],strPlayers);
     serializer("Types P2", (int&)_llPort_Type[1],strLLTypes);
 
-//    _ll = "These two mysterious 3/4 ports was defined for CD32\n"
-
-//    serializer(" ", _ll);
 
     serializer("Lowlevel Port 3", (int&)_llPort_Player[2],strPlayers);
     serializer("Types P3", (int&)_llPort_Type[2],strLLTypes);
@@ -463,9 +460,6 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
     serializer("Types P4", (int&)_llPort_Type[3],strLLTypes);
 
     // - - - -
-//    _pr = "These other two need a parallel port extension\n"
-//          " and can only manage one button joystick.";
-//    serializer(" ", _pr);
 
     if(hasParallelPort())
     {
@@ -512,7 +506,7 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
     serializer(" ",_MiscFlags,
                         0 | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
                     ,{
-        "Prefer ReadJoyPort() to Rawkeys"
+        "Prefer ReadJoyPort() to Rawkeys\n( for NewLowlevel )"
         });
 
 

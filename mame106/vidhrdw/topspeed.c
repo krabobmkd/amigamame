@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "vidhrdw/taitoic.h"
+#include "drawgfxn.h"
 
 UINT16 *topspeed_spritemap;
 UINT16 *topspeed_raster_ctrl;
@@ -45,7 +46,7 @@ void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	UINT16 *spritemap = topspeed_spritemap;
 	UINT16 data,tilenum,code,color;
 	UINT8 flipx,flipy,priority,bad_chunks;
-	UINT8 j,k,px,py,zx,zy,zoomx,zoomy;
+	UINT8 zx,zy,zoomx,zoomy;
 	static const int primasks[2] = {
 	0xff00 | (1<<31),
 	0xfffc | (1<<31)
@@ -104,9 +105,12 @@ void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		dgpz0.color = color;
 		dgpz0.priority_mask = primasks[priority];
+        dgpz0.flipx = flipx;
+        dgpz0.flipy = flipy;
 
 		for (sprite_chunk = 0;sprite_chunk < 128;sprite_chunk++)
 		{
+            UINT8 j,k,px,py;
 			k = sprite_chunk & 0x07; // % 8;   /* 8 sprite chunks per row */
 			j = sprite_chunk>>3;  // /8;   /* 16 rows */
 
@@ -129,15 +133,13 @@ void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			zy = y + (((j+1)*zoomy)>>4) - cury;
 
 			dgpz0.code = code;
-
-			dgpz0.flipx = flipx;
-			dgpz0.flipy = flipy;
 			dgpz0.sx = curx;
 			dgpz0.sy = cury;
 			dgpz0.scalex = zx<<12;
 			dgpz0.scaley = zy<<13;
 
-			drawgfxzoom(&dgpz0);
+			//drawgfxzoom(&dgpz0);
+			drawgfxzoom_clut16_Src8_prio(&dgpz0);
 		}
 
 // 		if (bad_chunks)

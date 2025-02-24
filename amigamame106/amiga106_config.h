@@ -25,26 +25,7 @@ typedef struct _game_driver game_driver;
 // driver name list could actually get big, avoid looping it.
 class NameDriverMap {
 public:
-/*old , looks ok but problems with os4 ?
-    void insert(const char *n, int mamedriverindex) {
-        using namespace std;
-        if(!n || *n==0) return;
-        _m[*n][string(n)]=mamedriverindex;
-    }
-    // tell if driver known, and return index on mame driver list.
-    int index(const char *n) const {
-        using namespace std;
-        if(!n || *n==0) return -1;
-         unordered_map<char,unordered_map<string,int>>::const_iterator cit = _m.find(*n);
-        if(cit==_m.end()) return -1;
-        const std::unordered_map<std::string,int> &mm = cit->second;
-        unordered_map<string,int>::const_iterator cit2 = mm.find(string(n));
-        if(cit2==mm.end()) return -1;
-        return cit2->second;
-    }
 
-    std::unordered_map<char,std::unordered_map<std::string,int>> _m;
-    */
     void insert(const char *n, int mamedriverindex) {
         using namespace std;
         if(!n || *n==0) return;
@@ -184,8 +165,7 @@ public:
         DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;        
 #define CONFDISPLAYFLAGS_ONWORKBENCH 1
 #define CONFDISPLAYFLAGS_FORCEDEPTH16 2
-//#define CONFDISPLAYFLAGS_FRAMESKIP 2
-//#define CONFDISPLAYFLAGS_TRIPLEBUFFER 4
+
         ULONG_FLAGS _flags = 0;
         ScreenBufferMode  _buffering = ScreenBufferMode::Single;
         //bool    _startOnWorkbench = false;
@@ -243,12 +223,6 @@ public:
         int _parallelPort_Player[2]; // value 1-4
         int _parallel_type[2];
 
-        //bool _useDirectKeyboard = true;
-
-        strText _ll,_pr;
-
-        //ControlPortLL _PlayerPort[4];
-        //int _PlayerPortType[4];
     };
     Controls &controls() { return _controls; }
 

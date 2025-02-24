@@ -1,6 +1,6 @@
 #include "driver.h"
 #include "vidhrdw/taitoic.h"
-
+#include "drawgfxn.h"
 #define TC0100SCN_GFX_NUM 1
 
 UINT16 *othunder_ram;
@@ -116,7 +116,6 @@ static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 	struct tempsprite *sprite_ptr = spritelist;
 
 	
-	{ 
 	struct drawgfxParams dgpz0={
 		bitmap, 	// dest
 		Machine->gfx[0], 	// gfx
@@ -131,9 +130,10 @@ static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 		0, 	// transparent_color
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
-		NULL, 	// pri_buffer
-		0 	// priority_mask
+		priority_bitmap, 	// pri_buffer
+		0//sprite_ptr->primask 	// priority_mask
 	  };
+
 	for (offs = (spriteram_size/2)-4;offs >=0;offs -= 4)
 	{
 		data = spriteram16[offs+0];
@@ -229,36 +229,18 @@ static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 				dgpz0.sy = sprite_ptr->y;
 				dgpz0.scalex = sprite_ptr->zoomx;
 				dgpz0.scaley = sprite_ptr->zoomy;
-				drawgfxzoom(&dgpz0);
+				//drawgfxzoom(&dgpz0);
+				drawgfxzoom_clut16_Src8_prio(&dgpz0);
 			}
 		}
 
-		if (bad_chunks)
-loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+//		if (bad_chunks)
+//loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
-	} // end of patch paragraph
-
 
 	/* this happens only if primsks != NULL */
 	
-	{ 
-	struct drawgfxParams dgpz0={
-		bitmap, 	// dest
-		Machine->gfx[0], 	// gfx
-		0, 	// code
-		0, 	// color
-		0, 	// flipx
-		0, 	// flipy
-		0, 	// sx
-		0, 	// sy
-		cliprect, 	// clip
-		TRANSPARENCY_PEN, 	// transparency
-		0, 	// transparent_color
-		0x00010000, 	// scalex
-		0x00010000, 	// scaley
-		priority_bitmap, 	// pri_buffer
-		0//sprite_ptr->primask 	// priority_mask
-	  };
+
 	while (sprite_ptr != spritelist)
 	{
 		sprite_ptr--;
@@ -273,9 +255,9 @@ loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 		dgpz0.scalex = sprite_ptr->zoomx;
 		dgpz0.scaley = sprite_ptr->zoomy;
         dgpz0.priority_mask = sprite_ptr->primask  | (1<<31);
-		drawgfxzoom(&dgpz0);
+		//drawgfxzoom(&dgpz0);
+		drawgfxzoom_clut16_Src8_prio(&dgpz0);
 	}
-	} // end of patch paragraph
 
 }
 

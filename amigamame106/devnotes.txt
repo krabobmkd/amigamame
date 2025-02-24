@@ -6,16 +6,21 @@ todo R1.2
  Use option "Force Depth 16" in such case, or select a 32bit mode explicitly, to bypass problems.
 
  - Added such excellent games as Caveman Ninja, Cliffhanger Edward Randy,Robocop 2, and Mutant fighter (machine deco16)
- - Frameskip is now a preference "Per game". It was time.
-
+ - Frameskip is now a preference "Per game".
+ - A Misc option for patch "NewLowLevel" needed by some A2000 configuration.
+ Corrections:
  - X wrong colors on shadows: Dynamite Dux, golden Axe -> corrected.
  - X Outzone set1->4 "black screen", repaired.
  - X Salamander corrupted sprite, corrected.
- - X topspeed (pre-chasehq outrun clone) sprite priority, corrected.
+ - X topspeed (outrun clone) sprite priority, corrected.
  - X more memory clean at alloc, may resolve some problems.
  - X neogeo sound mixer simplified, may accelerate a bit on rPi3.
  - X zoom909 wrong colors: corrected (palette rom is wrong, luckily could re-use parent palette.)
+ - X a few optimisations for chasehq,topspeed,nightstriker,Capcom CPS2.
+ - O mortal kombat/NBAJam boot !!
  - O corrected amigaguide with OS3.2 version that includes images.
+
+
 
  - O "Carrier Air Wing has graphic corruptions in first level (cawing)"
         "No matter which set, has graphic corruption in the first level."

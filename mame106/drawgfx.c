@@ -2317,6 +2317,7 @@ void drawgfxzoom(struct drawgfxParams *p DGREG(a0))
 							}
 							else
 							{
+							// CHASEHQ HERE
 								for( y=sy; y<ey; y++ )
 								{
 									UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
@@ -2329,6 +2330,7 @@ void drawgfxzoom(struct drawgfxParams *p DGREG(a0))
 										int c = source[x_index>>16];
 										if( c != transparent_color )
 										{
+                                            // krb test
 											if (((1 << pri[x]) & pri_mask) == 0)
 												dest[x] = pal[c];
 											pri[x] = 31;

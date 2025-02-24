@@ -79,23 +79,61 @@ static UINT8 sillyPrioTable[]={
     1,2,2,4, // 0
 };
 
-//map<int,int> _k;
-typedef UINT8 pri_t;
+
+ typedef UINT8 pri_t;
+// //map<int,int> _k;
+// template<typename destPix_t>
+// class DestPixPrioContext {
+// public:
+//     DestPixPrioContext(struct drawgfxParams *p DGREG(a0),
+//                        UINT16 ofsx, UINT16 ofsy) :
+//         _p( ((destPix_t *)p->dest->line[ofsy]) + ofsx),
+//         _prio(((pri_t *)p->pri_buffer->line[ofsy])+ofsx),
+//         _rowpixels((UINT16)p->dest->rowpixels),
+//         _np(
+//             // works with silworm and cps1
+//             (((p->priority_mask)>>2) & 4) | // silkw text playfield
+//             (((p->priority_mask)>>2) & 2) | // silkw foreg
+//             (((p->priority_mask)>>1) & 1)   // silkw backg
+
+//             ){}
+//     void incrementx(INT16 n) {
+//         _p += n;
+//         _prio += n;
+//     }
+//     void incrementy(INT16 n) {
+//         _p += _rowpixels*n;
+//         _prio += _rowpixels*n;
+//     }
+//     void setPix(UINT32 n,pen_t color) {
+//         // for silkworm values goes 0->7 because of the 3 playfields.
+//         // 0xf0
+//         UINT8 priobef = _prio[n]; // 1 lighted if background, 2 is foregroud, 4 is text.
+
+//         if((_np &priobef)==0) // bit lighted in _np means "hidden by"
+//         {
+//             _prio[n] = priobef | 0x1f; // |0x1f mask all next, means reverse sprite draw order
+//             _p[n] = color;
+//         } //TODO DOESNT WORK VALIDATE AGAINST SILKWORM/RYGAR/... first. vidhrw/tecmo.c
+//     }
+
+//     destPix_t *_p;
+//     pri_t   *_prio;
+//     UINT16 _rowpixels;
+//     const pri_t _np;
+// };
+
+// - - -- -
 template<typename destPix_t>
-class DestPixPrioContext {
+class DestPixRealPrioContext {
 public:
-    DestPixPrioContext(struct drawgfxParams *p DGREG(a0),
+    DestPixRealPrioContext(struct drawgfxParams *p DGREG(a0),
                        UINT16 ofsx, UINT16 ofsy) :
         _p( ((destPix_t *)p->dest->line[ofsy]) + ofsx),
         _prio(((pri_t *)p->pri_buffer->line[ofsy])+ofsx),
         _rowpixels((UINT16)p->dest->rowpixels),
-        _np(
-            // works with silworm and cps1
-            (((p->priority_mask)>>2) & 4) | // silkw text playfield
-            (((p->priority_mask)>>2) & 2) | // silkw foreg
-            (((p->priority_mask)>>1) & 1)   // silkw backg
-
-            ){}
+        _mask(p->priority_mask)
+       {}
     void incrementx(INT16 n) {
         _p += n;
         _prio += n;
@@ -107,19 +145,16 @@ public:
     void setPix(UINT32 n,pen_t color) {
         // for silkworm values goes 0->7 because of the 3 playfields.
         // 0xf0
-        UINT8 priobef = _prio[n]; // 1 lighted if background, 2 is foregroud, 4 is text.
-
-        if((_np &priobef)==0) // bit lighted in _np means "hidden by"
-        {
-            _prio[n] = priobef | 0x1f; // |0x1f mask all next, means reverse sprite draw order
+        if((_mask & (1<<_prio[n]))==0) // bit lighted in _np means "hidden by"
             _p[n] = color;
-        } //TODO DOESNT WORK VALIDATE AGAINST SILKWORM/RYGAR/... first. vidhrw/tecmo.c
+        _prio[n] = 31;
     }
 
     destPix_t *_p;
     pri_t   *_prio;
     UINT16 _rowpixels;
-    const pri_t _np;
+    UINT32 _mask;
+
 };
 
 
@@ -260,8 +295,8 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
         if (flipx)
         {
             // adjust 
-            dstdata.incrementx(dstwidth - 1);
-            srcdata.incrementx(srcwidth - dstwidth - leftskip);
+            dstdata.incrementx(dstwidth /*aparently not, against topspeed sprite tiling - 1*/);
+            srcdata.incrementx(srcwidth - dstwidth - leftskip );
 
             INT16 destmodulo = ydir*dstdata._rowpixels + dstwidth;
             while (dstheight)
@@ -298,6 +333,7 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
                 dstdata.incrementx(destmodulo);
                 dstheight--;
             }
+
         }
         else
         {
@@ -347,7 +383,7 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
         if (flipx)
         {
             // adjust 
-            dstdata.incrementx(dstwidth - 1);
+            dstdata.incrementx(dstwidth  /*aparently not, against topspeed sprite tiling - 1*/);
             srcdata.incrementx(srcwidth - dstwidth - leftskip);
 
             INT16 destmodulo = ydir*dstdata._rowpixels + dstwidth;
@@ -822,7 +858,7 @@ void drawgfx_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
         return;
     }
 
-    drawgfxT<DestPixPrioContext<UINT16>,UINT16,
+    drawgfxT<DestPixRealPrioContext<UINT16>,UINT16,
         SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
 
 }
@@ -833,8 +869,187 @@ void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
         drawgfx_clut16_Src4(p);
         return;
     }
-    drawgfxPack4T<DestPixPrioContext<UINT16>,UINT16,
+    drawgfxPack4T<DestPixRealPrioContext<UINT16>,UINT16,
         SourceContextP4,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
 
 }
 
+
+// - - - - - - - - - - - -
+
+// extern int nbframe;
+/*
+.L67:
+	move.l d0,d4
+	asr.l #8,d4
+	asr.l #8,d4
+	move.b (a2,d4.l),(-47,a5)
+	jeq .L47
+	clr.l d4
+	move.b (a0),d4
+	btst d4,d5
+	jne .L48
+	clr.w d4
+	move.b (-47,a5),d4
+	add.w (-2,a5),d4
+	move.w d4,(a1)
+.L48:
+	move.b #31,(a0)
+.L47:
+	add.l d2,d0
+	addq.l #2,a1
+	addq.l #1,a0
+*/
+/*
+ d5 color
+.L67:
+	move.l d0,d4
+	asr.l #8,d4
+	asr.l #8,d4
+	move.b (a2,d4.l),d4
+	jeq .L47
+	clr.l d4
+	move.b (a0),d4
+	btst d4,d5
+	jne .L48
+	clr.w d4
+
+	add.w d5,d4
+	move.w d4,(a1)
+.L48:
+	move.b #31,(a0)
+.L47:
+	add.l d2,d0
+	addq.l #2,a1
+	addq.l #1,a0
+
+*/
+// chasehq, experimental
+void drawgfxzoom_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
+{
+    int scalex = p->scalex;
+    int scaley = p->scaley;
+
+	if (scalex == 0x10000 && scaley == 0x10000)
+	{
+       drawgfx_clut16_Src8_prio(p);
+       return;
+	}
+
+    mame_bitmap *dest_bmp = p->dest;
+    const gfx_element *gfx = p->gfx;
+    unsigned int code = p->code;
+
+    int flipx = p->flipx,flipy = p->flipy;
+    int sx=p->sx,sy=p->sy;
+
+    // - - - -
+    mame_bitmap *pri_buffer = p->pri_buffer; // optional
+    UINT32 pri_mask = p->priority_mask;
+
+    UINT8 *source_base = gfx->gfxdata + (code /*% gfx->total_elements*/) * gfx->char_modulo;
+
+    int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
+    int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+
+    if (!sprite_screen_width || !sprite_screen_height) return;
+
+    /* compute sprite increment per screen pixel */
+    int dx = (gfx->width<<16)/sprite_screen_width;
+    int dy = (gfx->height<<16)/sprite_screen_height;
+
+    int ex = sx+sprite_screen_width;
+    int ey = sy+sprite_screen_height;
+
+    int x_index_base;
+    int y_index;
+
+    if( flipx )
+    {
+        x_index_base = (sprite_screen_width-1)*dx;
+        dx = -dx;
+    }
+    else
+    {
+        x_index_base = 0;
+    }
+
+    if( flipy )
+    {
+        y_index = (sprite_screen_height-1)*dy;
+        dy = -dy;
+    }
+    else
+    {
+        y_index = 0;
+    }
+
+    {
+        const rectangle *clip = p->clip;
+        if( clip )
+        {
+            if( sx < clip->min_x)
+            { /* clip left */
+                int pixels = clip->min_x-sx;
+                sx += pixels;
+                x_index_base += pixels*dx;
+            }
+            if( sy < clip->min_y )
+            { /* clip top */
+                int pixels = clip->min_y-sy;
+                sy += pixels;
+                y_index += pixels*dy;
+            }
+            /* NS 980211 - fixed incorrect clipping */
+            if( ex > clip->max_x+1 )
+            { /* clip right */
+                int pixels = ex-clip->max_x-1;
+                ex -= pixels;
+            }
+            if( ey > clip->max_y+1 )
+            { /* clip bottom */
+                int pixels = ey-clip->max_y-1;
+                ey -= pixels;
+            }
+        }
+    }
+
+    if( ex<=sx ) return;
+
+    /* case 1: TRANSPARENCY_PEN prio */
+    // used by chasehq/topspeed/ HERE
+    {
+        const register UINT16 colorOfs = gfx->color_granularity * p->color;
+       //int transparency = p->transparency;
+       // UINT8 transparent_color = (UINT8)p->transparent_color;
+
+        for(int y=sy; y<ey; y++ )
+        {
+            UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+            UINT16 *dest = (UINT16 *)dest_bmp->line[y];
+            UINT8 *pri = (UINT8 *)pri_buffer->line[y];
+            UINT8 *priend = pri+ex;
+            pri += sx;
+            dest +=sx;
+            int x_index = x_index_base;            
+            //for(int x=sx; x<ex; x++ )
+            while(pri<priend)
+            {
+                register int c = source[x_index>>16];
+                if( c /*!= transparent_color*/ )
+                {
+                    UINT8 pr = *pri;
+                    if (((1UL <<pr ) & pri_mask) == 0)
+                        *dest = colorOfs + c;
+                    *pri = 31;
+                }
+                pri++;
+                dest++;
+                x_index += dx;
+            }
+
+            y_index += dy;
+        }
+    }
+
+}

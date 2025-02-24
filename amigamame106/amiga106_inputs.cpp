@@ -194,8 +194,11 @@ void InitLowLevelLib()
         LowLevelBase = OpenLibrary("lowlevel.library", 0);
     }
 }
+// when effective;y asked, to further close.
 static USHORT askedPadsRawKey = 0;
 static USHORT useAnyMouse = 0;
+static USHORT useReadJoyPortForPads = 0; // else rawkeys, added for NewLowlevel patch for A2000.
+
 void ConfigureLowLevelLib()
 {
 //printf(" ***** ConfigureLowLevelLib\n");
@@ -217,6 +220,8 @@ void ConfigureLowLevelLib()
 //    printf("configure lowlevel\n");
 
     MameConfig::Controls &configControls = getMainConfig().controls();
+    MameConfig::Misc &configMisc = getMainConfig().misc();
+    useReadJoyPortForPads = ((configMisc._MiscFlags & MISCFLAG_USEREADJOYPORT) != 0);
 
     // for correct autosense,
     for(int itest=0;itest<2;itest++)
@@ -236,11 +241,6 @@ void ConfigureLowLevelLib()
 
         if(lowlevelState<0 || lowlevelState>3) continue; // shouldnt
 
-//        if(lowlevelState == SJA_TYPE_AUTOSENSE)
-//        {
-//            //lowlevelState = ReadJoyPort(iLLPort)>>28;
-//            //configControls._llPort_Type[iLLPort] = lowlevelState;
-//        }
 
         if(lowlevelState != SJA_TYPE_AUTOSENSE)
         {
@@ -262,7 +262,7 @@ void ConfigureLowLevelLib()
     }
 
 
-    if(askedPadsRawKey==0)
+    if(askedPadsRawKey==0 && useReadJoyPortForPads==0)
     {
         SystemControl(
             SCON_AddCreateKeys,0,
@@ -522,19 +522,20 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     }
     // if any mouse (or anything that needs direct joyport ?)
     // no rawkey for this
-    if(useAnyMouse)
+    if(useAnyMouse || useReadJoyPortForPads)
     {
         MameConfig::Controls &configControls = getMainConfig().controls();
 
-        for(int iLLPort=0;iLLPort<4;iLLPort++) // actually 2
+        for(int iLLPort=0;iLLPort<4;iLLPort++) // actually 2, ... but 4.
         {
             int iplayer = configControls._llPort_Player[iLLPort];
             if(iplayer ==0) continue;
             int itype = configControls._llPort_Type[iLLPort];
-            if(itype != SJA_TYPE_MOUSE ) continue;
+            //OLD, now manage more. if(itype != SJA_TYPE_MOUSE ) continue;
 
             ULONG state = ReadJoyPort( iLLPort);
-            if(state>>28 == SJA_TYPE_MOUSE)
+            ULONG portType = state>>28;
+            if(portType == SJA_TYPE_MOUSE)
             {
            //validated ok
                // printf("g_pInputs->_mousestate %d %08x\n",iLLPort,(int)state);
@@ -552,7 +553,28 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 //#define JP_MHORZ_MASK	(255<<0)	/* horzizontal position */
                 //#define JP_MVERT_MASK	(255<<8)	/* vertical position	*/
                 //#define JP_MOUSE_MASK	(JP_MHORZ_MASK|JP_MVERT_MASK)
+            } else if(useReadJoyPortForPads &&
+                ( portType == SJA_TYPE_JOYSTK || portType == SJA_TYPE_GAMECTLR))
+            {
+                int playershift = (iplayer-1)<<8;
+                // NOT NEEDED WHEN RAWKEY MODE
+                g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+playershift] = (int)((state & JPF_BUTTON_RED)!=0);
+                g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_BLUE+playershift] = (int)((state & JPF_BUTTON_BLUE)!=0);
+
+                g_pInputs->_Keys[RAWKEY_PORT0_JOY_UP+playershift] = (int)((state & JPF_JOY_UP)!=0);
+                g_pInputs->_Keys[RAWKEY_PORT0_JOY_DOWN+playershift] = (int)((state & JPF_JOY_DOWN)!=0);
+                g_pInputs->_Keys[RAWKEY_PORT0_JOY_LEFT+playershift] = (int)((state & JPF_JOY_LEFT)!=0);
+                g_pInputs->_Keys[RAWKEY_PORT0_JOY_RIGHT+playershift] = (int)((state & JPF_JOY_RIGHT)!=0);
+                if(portType == SJA_TYPE_GAMECTLR)
+                {
+                    g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_YELLOW+playershift] = (int)((state & JPF_BUTTON_YELLOW)!=0);
+                    g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_GREEN+playershift] = (int)((state & JPF_BUTTON_GREEN)!=0);
+                    g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_FORWARD+playershift] = (int)((state & JPF_BUTTON_FORWARD)!=0);
+                    g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_REVERSE+playershift] = (int)((state & JPF_BUTTON_REVERSE)!=0);
+                    g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_PLAY+playershift] = (int)((state & JPF_BUTTON_PLAY)!=0);
+                }
             }
+
         } // loop by port
     }
 #ifdef USE_DIRECT_KEYBOARD_DEVICE

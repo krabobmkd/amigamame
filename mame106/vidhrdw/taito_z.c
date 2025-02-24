@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "vidhrdw/taitoic.h"
-
+#include "drawgfxn.h"
+#include <stdio.h>
 #define TC0100SCN_GFX_NUM 1
 #define TC0480SCP_GFX_NUM 1
 
@@ -292,8 +293,6 @@ static void contcirc_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 
 }
 
-
-
 static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
@@ -305,8 +304,6 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 	int bad_chunks;
 
 	static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
-
-
     struct drawgfxParams dgpz1={
         bitmap, 	// dest
         Machine->gfx[0], 	// gfx
@@ -349,8 +346,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 
 		data = spriteram16[offs+1];
 		priority = (data & 0x8000) >> 15;
-        dgpz1.priority_mask = primasks[priority];
-        dgpz2.priority_mask = primasks[priority];
+
 		color = (data & 0x7f80) >> 7;
 		zoomx = (data & 0x7f);
 
@@ -381,7 +377,8 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 		{
 			map_offset = tilenum << 6;
 
-			
+            dgpz1.priority_mask = primasks[priority];
+            dgpz1.color = color;
 
 			for (sprite_chunk=0;sprite_chunk<64;sprite_chunk++)
 			{
@@ -415,20 +412,21 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 
 				
 				dgpz1.code = code;
-				dgpz1.color = color;
 				dgpz1.flipx = flipx;
 				dgpz1.flipy = flipy;
 				dgpz1.sx = curx;
 				dgpz1.sy = cury;
 				dgpz1.scalex = zx<<12;
 				dgpz1.scaley = zy<<12;
-				drawgfxzoom(&dgpz1);
+				//drawgfxzoom(&dgpz1);
+                drawgfxzoom_clut16_Src8_prio(&dgpz1);
 			}
 		}
 		else if ((zoomx-1) & 0x20)	/* 64x128 sprites, $40000-$5ffff in spritemap rom, OBJB */
 		{
 			map_offset = (tilenum << 5) + 0x20000;
-
+            dgpz2.priority_mask = primasks[priority];
+            dgpz2.color = color;
 			for (sprite_chunk=0;sprite_chunk<32;sprite_chunk++)
 			{
 				j = sprite_chunk / 4;   /* 8 rows */
@@ -461,14 +459,14 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 
 				
 				dgpz2.code = code;
-				dgpz2.color = color;
 				dgpz2.flipx = flipx;
 				dgpz2.flipy = flipy;
 				dgpz2.sx = curx;
 				dgpz2.sy = cury;
 				dgpz2.scalex = zx<<12;
 				dgpz2.scaley = zy<<12;
-				drawgfxzoom(&dgpz2);
+				//drawgfxzoom(&dgpz2);
+                drawgfxzoom_clut16_Src8_prio(&dgpz2);
 			}
 
 
@@ -476,7 +474,8 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 		else if (!((zoomx-1) & 0x60))	/* 32x128 sprites, $60000-$7ffff in spritemap rom, OBJB */
 		{
 			map_offset = (tilenum << 4) + 0x30000;
-
+            dgpz2.priority_mask = primasks[priority];
+            dgpz2.color = color;
 			for (sprite_chunk=0;sprite_chunk<16;sprite_chunk++)
 			{
 				j = sprite_chunk / 2;   /* 8 rows */
@@ -508,14 +507,15 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				}
 
 				dgpz2.code = code;
-				dgpz2.color = color;
 				dgpz2.flipx = flipx;
 				dgpz2.flipy = flipy;
 				dgpz2.sx = curx;
 				dgpz2.sy = cury;
 				dgpz2.scalex = zx<<12;
 				dgpz2.scaley = zy<<12;
-				drawgfxzoom(&dgpz2);
+
+				//drawgfxzoom(&dgpz2);
+				drawgfxzoom_clut16_Src8_prio(&dgpz2);
 			}
 		}
 
