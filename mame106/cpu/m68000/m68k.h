@@ -28,8 +28,7 @@
 
 /* Import the configuration for this build */
 #include "m68kconf.h"
-#include "m68kkrbopt.h"
-#include "memory.h"
+
 
 /* ======================================================================== */
 /* ============================ GENERAL DEFINES =========================== */
@@ -121,7 +120,7 @@ typedef enum
 
 	/* Convenience registers */
 	M68K_REG_PPC,		/* Previous value in the program counter */
-	//M68K_REG_IR,		/* Instruction register */
+	M68K_REG_IR,		/* Instruction register */
 	M68K_REG_CPU_TYPE	/* Type of CPU being run */
 } m68k_register_t;
 
@@ -206,7 +205,7 @@ void m68k_write_memory_32_pd(unsigned int address, unsigned int value);
  * services the interrupt.
  * Default behavior: return M68K_INT_ACK_AUTOVECTOR.
  */
-void m68k_set_int_ack_callback(struct m68k_cpu_instance *p68k COREREG, int  (*callback)(int int_level));
+void m68k_set_int_ack_callback(int  (*callback)(int int_level));
 
 
 /* Set the callback for a breakpoint acknowledge (68010+).
@@ -215,7 +214,7 @@ void m68k_set_int_ack_callback(struct m68k_cpu_instance *p68k COREREG, int  (*ca
  * BKPT instruction for 68020+, or 0 for 68010.
  * Default behavior: do nothing.
  */
-void m68k_set_bkpt_ack_callback(struct m68k_cpu_instance *p68k COREREG, void (*callback)(unsigned int data));
+void m68k_set_bkpt_ack_callback(void (*callback)(unsigned int data));
 
 
 /* Set the callback for the RESET instruction.
@@ -223,7 +222,7 @@ void m68k_set_bkpt_ack_callback(struct m68k_cpu_instance *p68k COREREG, void (*c
  * The CPU calls this callback every time it encounters a RESET instruction.
  * Default behavior: do nothing.
  */
-void m68k_set_reset_instr_callback(struct m68k_cpu_instance *p68k COREREG, void  (*callback)(void));
+void m68k_set_reset_instr_callback(void  (*callback)(void));
 
 
 /* Set the callback for the CMPI.L #v, Dn instruction.
@@ -231,7 +230,7 @@ void m68k_set_reset_instr_callback(struct m68k_cpu_instance *p68k COREREG, void 
  * The CPU calls this callback every time it encounters a CMPI.L #v, Dn instruction.
  * Default behavior: do nothing.
  */
-void m68k_set_cmpild_instr_callback(struct m68k_cpu_instance *p68k COREREG, void  (*callback)(unsigned int val, int reg));
+void m68k_set_cmpild_instr_callback(void  (*callback)(unsigned int val, int reg));
 
 
 /* Set the callback for the RTE instruction.
@@ -239,7 +238,7 @@ void m68k_set_cmpild_instr_callback(struct m68k_cpu_instance *p68k COREREG, void
  * The CPU calls this callback every time it encounters a RTE instruction.
  * Default behavior: do nothing.
  */
-void m68k_set_rte_instr_callback(struct m68k_cpu_instance *p68k COREREG, void  (*callback)(void));
+void m68k_set_rte_instr_callback(void  (*callback)(void));
 
 
 /* Set the callback for informing of a large PC change.
@@ -248,7 +247,7 @@ void m68k_set_rte_instr_callback(struct m68k_cpu_instance *p68k COREREG, void  (
  * by a large value (currently set for changes by longwords).
  * Default behavior: do nothing.
  */
-void m68k_set_pc_changed_callback(struct m68k_cpu_instance *p68k COREREG, void  (*callback)(unsigned int new_pc));
+void m68k_set_pc_changed_callback(void  (*callback)(unsigned int new_pc));
 
 
 /* Set the callback for CPU function code changes.
@@ -258,7 +257,7 @@ void m68k_set_pc_changed_callback(struct m68k_cpu_instance *p68k COREREG, void  
  * access it is (supervisor/user, program/data and such).
  * Default behavior: do nothing.
  */
-//void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc));
+void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc));
 
 
 /* Set a callback for the instruction cycle of the CPU.
@@ -267,7 +266,7 @@ void m68k_set_pc_changed_callback(struct m68k_cpu_instance *p68k COREREG, void  
  * instruction cycle.
  * Default behavior: do nothing.
  */
-//void m68k_set_instr_hook_callback(void  (*callback)(void));
+void m68k_set_instr_hook_callback(void  (*callback)(void));
 
 
 
@@ -279,14 +278,12 @@ void m68k_set_pc_changed_callback(struct m68k_cpu_instance *p68k COREREG, void  
  * Currently supported types are: M68K_CPU_TYPE_68000, M68K_CPU_TYPE_68008,
  * M68K_CPU_TYPE_68010, M68K_CPU_TYPE_EC020, and M68K_CPU_TYPE_68020.
  */
-void m68k_set_cpu_type(struct m68k_cpu_instance *p68k COREREG, unsigned int cpu_type);
+void m68k_set_cpu_type(unsigned int cpu_type);
 
-struct m68k_cpu_instance ;
-struct m68k_cpu_instance *m68k_getcpu(int index);
 /* Do whatever initialisations the core requires.  Should be called
  * at least once at init time.
  */
-void m68k_init(int cpuindex);
+void m68k_init(void);
 
 /* Pulse the RESET pin on the CPU.
  * You *MUST* reset the CPU at least once to initialize the emulation
@@ -332,7 +329,7 @@ unsigned int m68k_get_context(void* dst);
 void m68k_set_context(void* dst);
 
 /* Register the CPU state information */
-void m68k_state_register(struct m68k_cpu_instance *p68k COREREG, const char *type, int index);
+void m68k_state_register(const char *type, int index);
 
 
 /* Peek at the internals of a CPU context.  This can either be a context

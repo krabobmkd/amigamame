@@ -5,8 +5,8 @@ cmake_minimum_required (VERSION 3.1)
 
 option(USE_QT_APP "" ON)
 
-set(CXX_STANDARD 11)
-set(C_STANDARD 11)
+set(CXX_STANDARD 17)
+set(C_STANDARD 17)
 project(LinuxMame LANGUAGES C CXX VERSION 1.0)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -123,8 +123,8 @@ if(USE_QT_APP)
     target_link_libraries(${GUI_APPNAME} PUBLIC mamecore mamecoreUNROLL z expat)
     target_include_directories(${GUI_APPNAME} PUBLIC "../linux" "${COMMONLIBS}/libserializer")
 
-    set_property(TARGET ${GUI_APPNAME} PROPERTY C_STANDARD 11)
-    set_property(TARGET ${GUI_APPNAME} PROPERTY CXX_STANDARD 11)
+    set_property(TARGET ${GUI_APPNAME} PROPERTY C_STANDARD 17)
+    set_property(TARGET ${GUI_APPNAME} PROPERTY CXX_STANDARD 17)
     target_compile_definitions(${GUI_APPNAME} PUBLIC MAMEVERSION=106 ZIP_CACHE=1 MUISERIALIZER_USES_FLOAT=1 GIT_BRANCH="${GIT_BRANCH}" LSB_FIRST=1 __LP64__=1 )
     if(MAME_USE_HARDFLOAT)
         target_compile_definitions(${GUI_APPNAME} PRIVATE MAME_USE_HARD_FLOAT=1 )

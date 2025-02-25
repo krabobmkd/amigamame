@@ -79,7 +79,12 @@ typedef signed long long	 INT64;
 //}	PAIR;
 //#endif
 
+/* And some MSVC optimizations/warnings */
+#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+#define DECL_NORETURN			__declspec(noreturn)
+#else
 #define DECL_NORETURN
+#endif
 #define CLIB_DECL
 
 

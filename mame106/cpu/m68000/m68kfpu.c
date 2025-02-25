@@ -1,9 +1,7 @@
-#include "m68kkrbopt.h"
 #include "cpuintrf.h"
 #include <math.h>
 
-
-static UINT8 READ_EA_8( M68KOPT_PARAMS, int ea)
+static UINT8 READ_EA_8(int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -30,14 +28,14 @@ static UINT8 READ_EA_8( M68KOPT_PARAMS, int ea)
 			{
 				case 1:		// (xxx).L
 				{
-					UINT32 d1 = OPER_I_16(p68k);
-					UINT32 d2 = OPER_I_16(p68k);
+					UINT32 d1 = OPER_I_16();
+					UINT32 d2 = OPER_I_16();
 					UINT32 ea = (d1 << 16) | d2;
 					return m68ki_read_8(ea);
 				}
 				case 4:		// #<data>
 				{
-					return  OPER_I_8(p68k);
+					return  OPER_I_8();
 				}
 				default:	fatalerror("MC68040: READ_EA_8: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
@@ -47,7 +45,7 @@ static UINT8 READ_EA_8( M68KOPT_PARAMS, int ea)
 	}
 }
 
-static UINT16 READ_EA_16(M68KOPT_PARAMS, int ea)
+static UINT16 READ_EA_16(int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -72,7 +70,7 @@ static UINT16 READ_EA_16(M68KOPT_PARAMS, int ea)
 	}
 }
 
-static UINT32 READ_EA_32(M68KOPT_PARAMS, int ea)
+static UINT32 READ_EA_32(int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -109,8 +107,8 @@ static UINT32 READ_EA_32(M68KOPT_PARAMS, int ea)
 			{
 				case 1:		// (xxx).L
 				{
-					UINT32 d1 = OPER_I_16(p68k);
-					UINT32 d2 = OPER_I_16(p68k);
+					UINT32 d1 = OPER_I_16();
+					UINT32 d2 = OPER_I_16();
 					UINT32 ea = (d1 << 16) | d2;
 					return m68ki_read_32(ea);
 				}
@@ -121,7 +119,7 @@ static UINT32 READ_EA_32(M68KOPT_PARAMS, int ea)
 				}
 				case 4:		// #<data>
 				{
-					return  OPER_I_32(p68k);
+					return  OPER_I_32();
 				}
 				default:	fatalerror("MC68040: READ_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
@@ -131,7 +129,7 @@ static UINT32 READ_EA_32(M68KOPT_PARAMS, int ea)
 	}
 }
 
-static void WRITE_EA_32(M68KOPT_PARAMS, int ea, UINT32 data)
+static void WRITE_EA_32(int ea, UINT32 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -179,8 +177,8 @@ static void WRITE_EA_32(M68KOPT_PARAMS, int ea, UINT32 data)
 			{
 				case 1:		// (xxx).L
 				{
-					UINT32 d1 = OPER_I_16(p68k);
-					UINT32 d2 = OPER_I_16(p68k);
+					UINT32 d1 = OPER_I_16();
+					UINT32 d2 = OPER_I_16();
 					UINT32 ea = (d1 << 16) | d2;
 					m68ki_write_32(ea, data);
 					break;
@@ -199,7 +197,7 @@ static void WRITE_EA_32(M68KOPT_PARAMS, int ea, UINT32 data)
 	}
 }
 
-static UINT64 READ_EA_64( M68KOPT_PARAMS, int ea)
+static UINT64 READ_EA_64(int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -235,8 +233,8 @@ static UINT64 READ_EA_64( M68KOPT_PARAMS, int ea)
 			{
 				case 4:		// #<data>
 				{
-					h1 = OPER_I_32(p68k);
-					h2 = OPER_I_32(p68k);
+					h1 = OPER_I_32();
+					h2 = OPER_I_32();
 					return  (UINT64)(h1) << 32 | (UINT64)(h2);
 				}
 				case 2:		// (d16, PC)
@@ -254,7 +252,7 @@ static UINT64 READ_EA_64( M68KOPT_PARAMS, int ea)
 	}
 }
 
-static void WRITE_EA_64( M68KOPT_PARAMS, int ea, UINT64 data)
+static void WRITE_EA_64(int ea, UINT64 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -281,7 +279,7 @@ static void WRITE_EA_64( M68KOPT_PARAMS, int ea, UINT64 data)
 	}
 }
 
-fp_reg READ_EA_FPE( M68KOPT_PARAMS,  int ea)
+fp_reg READ_EA_FPE(int ea)
 {
 	fp_reg r;
 	int mode = (ea >> 3) & 0x7;
@@ -308,8 +306,7 @@ fp_reg READ_EA_FPE( M68KOPT_PARAMS,  int ea)
 	return r;
 }
 
-
-void WRITE_EA_FPE(M68KOPT_PARAMS, int ea, fp_reg fpr)
+void WRITE_EA_FPE(int ea, fp_reg fpr)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -333,7 +330,7 @@ void WRITE_EA_FPE(M68KOPT_PARAMS, int ea, fp_reg fpr)
 }
 
 
-static void fpgen_rm_reg(M68KOPT_PARAMS, UINT16 w2)
+static void fpgen_rm_reg(UINT16 w2)
 {
 	int ea = REG_IR & 0x3f;
 	int rm = (w2 >> 14) & 0x1;
@@ -348,13 +345,13 @@ static void fpgen_rm_reg(M68KOPT_PARAMS, UINT16 w2)
 		{
 			case 0:		// Long-Word Integer
 			{
-				INT32 d = READ_EA_32(M68KOPT_PASSPARAMS, ea);
+				INT32 d = READ_EA_32(ea);
 				source = (double)(d);
 				break;
 			}
 			case 1:		// Single-precision Real
 			{
-				UINT32 d = READ_EA_32(M68KOPT_PASSPARAMS, ea);
+				UINT32 d = READ_EA_32(ea);
 				source = (double)(*(float*)&d);
 				break;
 			}
@@ -370,19 +367,19 @@ static void fpgen_rm_reg(M68KOPT_PARAMS, UINT16 w2)
 			}
 			case 4:		// Word Integer
 			{
-				INT16 d = READ_EA_16(M68KOPT_PASSPARAMS, ea);
+				INT16 d = READ_EA_16(ea);
 				source = (double)(d);
 				break;
 			}
 			case 5:		// Double-precision Real
 			{
-				UINT64 d = READ_EA_64(M68KOPT_PASSPARAMS, ea);
+				UINT64 d = READ_EA_64(ea);
 				source = *(double*)&d;
 				break;
 			}
 			case 6:		// Byte Integer
 			{
-				INT8 d = READ_EA_8(M68KOPT_PASSPARAMS, ea);
+				INT8 d = READ_EA_8(ea);
 				source = (double)(d);
 				break;
 			}
@@ -467,7 +464,7 @@ static void fpgen_rm_reg(M68KOPT_PARAMS, UINT16 w2)
 	}
 }
 
-static void fmove_reg_mem(M68KOPT_PARAMS, UINT16 w2)
+static void fmove_reg_mem(UINT16 w2)
 {
 	int ea = REG_IR & 0x3f;
 	int src = (w2 >>  7) & 0x7;
@@ -479,14 +476,14 @@ static void fmove_reg_mem(M68KOPT_PARAMS, UINT16 w2)
 		case 0:		// Long-Word Integer
 		{
 			INT32 d = (INT32)(REG_FP[src].f);
-			WRITE_EA_32(M68KOPT_PASSPARAMS, ea, d);
+			WRITE_EA_32(ea, d);
 			break;
 		}
 		case 1:		// Single-precision Real
 		{
 			float f = (float)(REG_FP[src].f);
 			UINT32 d = *(UINT32 *)&f;
-			WRITE_EA_32(M68KOPT_PASSPARAMS, ea, d);
+			WRITE_EA_32(ea, d);
 			break;
 		}
 		case 2:		// Extended-precision Real
@@ -507,7 +504,7 @@ static void fmove_reg_mem(M68KOPT_PARAMS, UINT16 w2)
 		case 5:		// Double-precision Real
 		{
 			UINT64 d = REG_FP[src].i;
-			WRITE_EA_64(M68KOPT_PASSPARAMS, ea, d);
+			WRITE_EA_64(ea, d);
 			break;
 		}
 		case 6:		// Byte Integer
@@ -525,7 +522,7 @@ static void fmove_reg_mem(M68KOPT_PARAMS, UINT16 w2)
 	USE_CYCLES(12);
 }
 
-static void fmove_fpcr(M68KOPT_PARAMS, UINT16 w2)
+static void fmove_fpcr(UINT16 w2)
 {
 	int ea = REG_IR & 0x3f;
 	int dir = (w2 >> 13) & 0x1;
@@ -535,9 +532,9 @@ static void fmove_fpcr(M68KOPT_PARAMS, UINT16 w2)
 	{
 		switch (reg)
 		{
-			case 1:		WRITE_EA_32(M68KOPT_PASSPARAMS, ea, REG_FPIAR); break;
-			case 2:		WRITE_EA_32(M68KOPT_PASSPARAMS, ea, REG_FPSR); break;
-			case 4:		WRITE_EA_32(M68KOPT_PASSPARAMS, ea, REG_FPCR); break;
+			case 1:		WRITE_EA_32(ea, REG_FPIAR); break;
+			case 2:		WRITE_EA_32(ea, REG_FPSR); break;
+			case 4:		WRITE_EA_32(ea, REG_FPCR); break;
 			default:	fatalerror("fmove_fpcr: unknown reg %d, dir %d\n", reg, dir);
 		}
 	}
@@ -545,9 +542,9 @@ static void fmove_fpcr(M68KOPT_PARAMS, UINT16 w2)
 	{
 		switch (reg)
 		{
-			case 1:		REG_FPIAR = READ_EA_32(M68KOPT_PASSPARAMS, ea); break;
-			case 2:		REG_FPSR = READ_EA_32(M68KOPT_PASSPARAMS, ea); break;
-			case 4:		REG_FPCR = READ_EA_32(M68KOPT_PASSPARAMS, ea); break;
+			case 1:		REG_FPIAR = READ_EA_32(ea); break;
+			case 2:		REG_FPSR = READ_EA_32(ea); break;
+			case 4:		REG_FPCR = READ_EA_32(ea); break;
 			default:	fatalerror("fmove_fpcr: unknown reg %d, dir %d\n", reg, dir);
 		}
 	}
@@ -555,7 +552,7 @@ static void fmove_fpcr(M68KOPT_PARAMS, UINT16 w2)
 	USE_CYCLES(10);
 }
 
-static void fmovem(M68KOPT_PARAMS, UINT16 w2)
+static void fmovem(UINT16 w2)
 {
 	int i;
 	int ea = REG_IR & 0x3f;
@@ -573,7 +570,7 @@ static void fmovem(M68KOPT_PARAMS, UINT16 w2)
 				{
 					if (reglist & (1 << i))
 					{
-						WRITE_EA_FPE(M68KOPT_PASSPARAMS,ea, REG_FP[i]);
+						WRITE_EA_FPE(ea, REG_FP[i]);
 						USE_CYCLES(2);
 					}
 				}
@@ -593,7 +590,7 @@ static void fmovem(M68KOPT_PARAMS, UINT16 w2)
 				{
 					if (reglist & (1 << i))
 					{
-						REG_FP[7-i] = READ_EA_FPE(M68KOPT_PASSPARAMS, ea);
+						REG_FP[7-i] = READ_EA_FPE(ea);
 						USE_CYCLES(2);
 					}
 				}
@@ -605,7 +602,7 @@ static void fmovem(M68KOPT_PARAMS, UINT16 w2)
 	}
 }
 
-static void fbcc(M68KOPT_PARAMS)
+static void fbcc(void)
 {
 	INT32 disp;
 //  int condition = REG_IR & 0x3f;
@@ -613,11 +610,11 @@ static void fbcc(M68KOPT_PARAMS)
 
 	if (size)	// 32-bit displacement
 	{
-		disp = OPER_I_32(p68k);
+		disp = OPER_I_32();
 	}
 	else
 	{
-		disp = (INT16)(OPER_I_16(p68k));
+		disp = (INT16)(OPER_I_16());
 	}
 
 	// TODO: condition and jump!!!
@@ -626,39 +623,39 @@ static void fbcc(M68KOPT_PARAMS)
 }
 
 
-void m68040_fpu_op0(M68KOPT_PARAMS)
+void m68040_fpu_op0(void)
 {
 	switch ((REG_IR >> 6) & 0x3)
 	{
 		case 0:
 		{
-			UINT16 w2 = OPER_I_16(p68k);
+			UINT16 w2 = OPER_I_16();
 			switch ((w2 >> 13) & 0x7)
 			{
 				case 0x0:	// FPU ALU FP, FP
 				case 0x2:	// FPU ALU ea, FP
 				{
-					fpgen_rm_reg(M68KOPT_PASSPARAMS,w2);
+					fpgen_rm_reg(w2);
 					break;
 				}
 
 				case 0x3:	// FMOVE FP, ea
 				{
-					fmove_reg_mem(M68KOPT_PASSPARAMS,w2);
+					fmove_reg_mem(w2);
 					break;
 				}
 
 				case 0x4:	// FMOVE ea, FPCR
 				case 0x5:	// FMOVE FPCR, ea
 				{
-					fmove_fpcr(M68KOPT_PASSPARAMS,w2);
+					fmove_fpcr(w2);
 					break;
 				}
 
 				case 0x6:	// FMOVEM ea, list
 				case 0x7:	// FMOVEM list, ea
 				{
-					fmovem(M68KOPT_PASSPARAMS,w2);
+					fmovem(w2);
 					break;
 				}
 
@@ -670,7 +667,7 @@ void m68040_fpu_op0(M68KOPT_PARAMS)
 		case 2:		// FBcc disp16
 		case 3:		// FBcc disp32
 		{
-			fbcc(M68KOPT_PASSPARAMS);
+			fbcc();
 			break;
 		}
 
@@ -678,7 +675,7 @@ void m68040_fpu_op0(M68KOPT_PARAMS)
 	}
 }
 
-void m68040_fpu_op1(M68KOPT_PARAMS)
+void m68040_fpu_op1(void)
 {
 	int ea = REG_IR & 0x3f;
 
@@ -686,14 +683,14 @@ void m68040_fpu_op1(M68KOPT_PARAMS)
 	{
 		case 0:		// FSAVE <ea>
 		{
-			WRITE_EA_32(M68KOPT_PASSPARAMS, ea, 0x00000000);
+			WRITE_EA_32(ea, 0x00000000);
 			// TODO: correct state frame
 			break;
 		}
 
 		case 1:		// FRESTORE <ea>
 		{
-			READ_EA_32(M68KOPT_PASSPARAMS, ea);
+			READ_EA_32(ea);
 			// TODO: correct state frame
 			break;
 		}

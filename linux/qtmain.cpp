@@ -149,6 +149,7 @@ QMutex _imageMutex;
 bool isinexit=false;
 QMutex m_mutex;
 bool m_bIs15b = false;
+bool m_bIs32b = false;
 QProc::QProc() : QObject()
 {}
 void QProc::process()
@@ -185,7 +186,7 @@ void QProc::process()
 //                "gforce2"
 
 //        "aof"
-"chasehq"
+"bublbob2"
 //      "mslug"
 
 //                "mp_sor2"
@@ -253,9 +254,7 @@ void QWin::updateWin()
 //    m_mutex.unlock();
 //    m_mutex.lock();
 }
-extern "C" {
-void logEntries();
-}
+
 int main(int argc, char* argv[])
 {
     // imageToMigabm();
@@ -265,7 +264,6 @@ int main(int argc, char* argv[])
     QWin w;
     int r =  a.exec();
     isinexit = true;
-    logEntries();
 
 	return r;
 }
@@ -280,14 +278,24 @@ int osd_create_display(const osd_create_params *params, UINT32 *rgb_components)
 {
     if((params->video_attributes & VIDEO_RGB_DIRECT) && (rgb_components))
     {
-//        rgb_components[0] = 0x00ff0000;
-//        rgb_components[1] = 0x0000ff00;
-//        rgb_components[2] = 0x000000ff;
-        rgb_components[0] = 0x00007c00;
+        if(params->video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)
+        {
+        rgb_components[0] = 0x00ff0000;
+        rgb_components[1] = 0x0000ff00;
+        rgb_components[2] = 0x000000ff;
+        m_bIs32b = true;
+        } else
+        {
+         rgb_components[0] = 0x00007c00;
         rgb_components[1] = 0x000003e0;
         rgb_components[2] = 0x0000001f;
         m_bIs15b = true;
+        }
+
+
     }
+    if(m_bIs32b)
+
 
 
     return 0;
@@ -332,6 +340,23 @@ void osd_update_video_and_audio(struct _mame_display *display)
                 bm[i]= ((rgb>>10)<<3) & 0xf8;
                 bm[i+1]=  ((rgb>>5)<<3) & 0xf8;
                 bm[i+2]=((rgb)<<3) & 0xf8;
+
+            }
+        }
+    } else if(m_bIs32b)
+    {
+        for(int y=0;y<realHeight;y++)
+        {
+            uint32_t *pline = (uint32_t *)display->game_bitmap->line[y+y1];
+            pline += x1;
+            for(int x=0;x<_display->game_bitmap->width;x++)
+            {
+                uint32_t rgb = *pline++;
+
+                int i = (x+y*w)*3;
+                bm[i]= rgb>>16;
+                bm[i+1]= rgb>>8;
+                bm[i+2]=rgb;
 
             }
         }
