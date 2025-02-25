@@ -171,7 +171,7 @@ void QProc::process()
 // "1944"
 //"tfrceac"
 //"rastan"
-//"bublbob2"
+"bublbob2"
 //"zoom909"
 //"topspeed"
 //"othunder"
@@ -185,7 +185,7 @@ void QProc::process()
 //                "gforce2"
 
 //        "aof"
-"chasehq"
+//"chasehq"
 //      "mslug"
 
 //                "mp_sor2"
