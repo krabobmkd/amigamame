@@ -13,12 +13,17 @@
 #define OPTIM68K_SKIPMOVECCRV 1
 #define OPTIM68K_SKIPMOVECCRC 1
 
+#define TRAAACE 1
+
 // only do one entry search for whole movems.
 // now works both on amiga and PC.
-#define OPTIM68K_USEFASTMOVEMREAD 1
+#ifndef TRAAACE
+//#define OPTIM68K_USEFASTMOVEMREAD 1
+
 // there is an option per game in drivertuning.cpp to toggle this to a 100%safe version.
 // would affect games were a single movem call is between 2 incompatible memory entries. rare but neogeo+demonwld.
 #define OPTIM68K_USEFASTMOVEMWRITE 1
+#endif
 
 #ifdef __AMIGA__
      #define OPTIM68K_USEFAST32INTRF 1

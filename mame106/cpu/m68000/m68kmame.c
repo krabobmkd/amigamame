@@ -125,7 +125,7 @@ void openTraceFH()
 {
     nbtt++;
     nbt++;
-    if(nbt==4096) exit(1);
+    if(nbt==1024) exit(1);
     if(traceFH)
     {
         if(nbtt==32) {
