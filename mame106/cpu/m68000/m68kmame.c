@@ -114,8 +114,8 @@ static void writeword_d32(offs_t address REGM(d0), UINT16 data REGM(d1));
 #include <stdlib.h>
 FILE *traceFH = NULL;
 UINT64 nbt=0;
-int mintrace=(746265*32)+25;
 UINT64 nbtt=0;
+UINT64 mintrace=  0x00000000086fb587;
 extern UINT32 last68kpc;
 extern UINT32 last68ki;
 /*
@@ -125,7 +125,7 @@ void openTraceFH()
 {
     nbtt++;
     nbt++;
-    if(nbt==1024) exit(1);
+    if(nbt>=0x00000000092f339c) exit(1);
     if(traceFH)
     {
         if(nbtt==32) {
@@ -143,9 +143,11 @@ UINT8 m68kmemtrace_read8(offs_t adr REGM(d0))
 {
     UINT8 v = program_read_byte_16be(adr);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"r:%08x ______%02x",adr,(int)v);
-
+}
     return v;
 }
 
@@ -156,9 +158,11 @@ UINT16 m68kmemtrace_read16(offs_t adr REGM(d0))
 //    {
 //        printf("?");
 //    }
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"r:%08x ____%04x",adr,(int)v);
-
+}
     return v;
 }
 
@@ -166,9 +170,11 @@ UINT32 m68kmemtrace_read32(offs_t adr REGM(d0))
 {
     UINT32 v = readlong_d16(adr);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"r:%08x %08x",adr,(int)v);
-
+}
     return v;
 }
 // - - -
@@ -177,9 +183,11 @@ void m68kmemtrace_write8(offs_t adr REGM(d0),UINT8 data REGM(d1))
     adr = adr & 0x00ffffff;
     program_write_byte_16be(adr,data);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"w:%08x ______%02x",adr,(int)data);
-
+}
 }
 
 void m68kmemtrace_write16(offs_t adr REGM(d0),UINT16 data REGM(d1))
@@ -187,9 +195,11 @@ void m68kmemtrace_write16(offs_t adr REGM(d0),UINT16 data REGM(d1))
     adr = adr & 0x00ffffff;
     program_write_word_16be(adr,data);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"w:%08x ____%04x",adr,(int)data);
-
+}
 }
 
 void m68kmemtrace_write32(offs_t adr REGM(d0),UINT32 data REGM(d1))
@@ -197,9 +207,11 @@ void m68kmemtrace_write32(offs_t adr REGM(d0),UINT32 data REGM(d1))
     adr = adr & 0x00ffffff;
     writelong_d16(adr,data);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"w:%08x %08x",adr,(int)data);
-
+}
 }
 struct m68k_memory_interface m68k_memory_tracer_d16 ={
     0,
@@ -218,9 +230,11 @@ UINT8 m68kmemtrace32_read8(offs_t adr REGM(d0))
 {
     UINT8 v = program_read_byte_32be(adr);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"R:%08x ______%02x",adr,(int)v);
-
+}
     return v;
 }
 
@@ -232,9 +246,11 @@ UINT16 m68kmemtrace32_read16(offs_t adr REGM(d0))
 //        printf("?");
 //    }
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"R:%08x ____%04x",adr,(int)v);
-
+}
     return v;
 }
 
@@ -242,9 +258,11 @@ UINT32 m68kmemtrace32_read32(offs_t adr REGM(d0))
 {
     UINT32 v = readlong_d32(adr);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"R:%08x %08x",adr,(int)v);
-
+}
     return v;
 }
 // - - -
@@ -253,9 +271,11 @@ void m68kmemtrace32_write8(offs_t adr REGM(d0),UINT8 data REGM(d1))
     adr = adr & 0x00ffffff;
     program_write_byte_32be(adr,data);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"W:%08x ______%02x",adr,(int)data);
-
+}
 }
 
 void m68kmemtrace32_write16(offs_t adr REGM(d0),UINT16 data REGM(d1))
@@ -263,9 +283,11 @@ void m68kmemtrace32_write16(offs_t adr REGM(d0),UINT16 data REGM(d1))
     adr = adr & 0x00ffffff;
     writeword_d32(adr,data);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"W:%08x ____%04x",adr,(int)data);
-
+}
 }
 
 void m68kmemtrace32_write32(offs_t adr REGM(d0),UINT32 data REGM(d1))
@@ -273,9 +295,11 @@ void m68kmemtrace32_write32(offs_t adr REGM(d0),UINT32 data REGM(d1))
     adr = adr & 0x00ffffff;
     writelong_d32(adr,data);
     openTraceFH();
+    if(nbt>mintrace)
+    {
     fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"W:%08x %08x",adr,(int)data);
-
+}
 }
 
 /* interface for 32-bit data bus (68EC020, 68020) */
