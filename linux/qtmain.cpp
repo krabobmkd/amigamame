@@ -254,7 +254,9 @@ void QWin::updateWin()
 //    m_mutex.unlock();
 //    m_mutex.lock();
 }
-
+extern "C" {
+    extern UINT64 nbt;
+}
 int main(int argc, char* argv[])
 {
     // imageToMigabm();
@@ -264,6 +266,8 @@ int main(int argc, char* argv[])
     QWin w;
     int r =  a.exec();
     isinexit = true;
+
+    printf("nbt: %016llx\n",(uint64_t)nbt);
 
 	return r;
 }
