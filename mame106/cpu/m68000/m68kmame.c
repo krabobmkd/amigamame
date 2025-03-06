@@ -186,8 +186,9 @@ static void writeword_d32(offs_t address REGM(d0), UINT16 data REGM(d1));
 #include <stdlib.h>
 FILE *traceFH = NULL;
 UINT64 nbt=0;
-int mintrace=(746265*32)+25;
+//int mintrace=(746265*32)+25;
 UINT64 nbtt=0;
+extern UINT32 last68kpc;
 /*
 
 */
@@ -195,7 +196,7 @@ void openTraceFH()
 {
     nbtt++;
     nbt++;
- //   if(nbt==131072*16) exit(1);
+    if(nbt==1024) exit(1);
     if(traceFH)
     {
         if(nbtt==32) {
@@ -204,7 +205,7 @@ void openTraceFH()
         }
      return;
     }
-    traceFH = fopen("memtrace.txt","wb");
+    traceFH = fopen("memtraceO.txt","wb");
 }
 
 UINT32 readlong_d16(offs_t address  REGM(d0));
@@ -213,6 +214,7 @@ UINT8 m68kmemtrace_read8(offs_t adr)
 {
     UINT8 v = program_read_byte_16be(adr);
     openTraceFH();
+    fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"r:%08x ______%02x",adr,(int)v);
 
     return v;
@@ -226,6 +228,7 @@ UINT16 m68kmemtrace_read16(offs_t adr)
 //        printf("?");
 //    }
     openTraceFH();
+    fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"r:%08x ____%04x",adr,(int)v);
 
     return v;
@@ -235,6 +238,7 @@ UINT32 m68kmemtrace_read32(offs_t adr)
 {
     UINT32 v = readlong_d16(adr);
     openTraceFH();
+    fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"r:%08x %08x",adr,(int)v);
 
     return v;
@@ -245,6 +249,7 @@ void m68kmemtrace_write8(offs_t adr,UINT8 data)
     adr = adr & 0x00ffffff;
     program_write_byte_16be(adr,data);
     openTraceFH();
+    fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"w:%08x ______%02x",adr,(int)data);
 
 }
@@ -254,6 +259,7 @@ void m68kmemtrace_write16(offs_t adr,UINT16 data)
     adr = adr & 0x00ffffff;
     program_write_word_16be(adr,data);
     openTraceFH();
+    fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"w:%08x ____%04x",adr,(int)data);
 
 }
@@ -263,6 +269,7 @@ void m68kmemtrace_write32(offs_t adr,UINT32 data)
     adr = adr & 0x00ffffff;
     writelong_d16(adr,data);
     openTraceFH();
+    fprintf(traceFH,"pc:%08x ",last68kpc);
     fprintf(traceFH,"w:%08x %08x",adr,(int)data);
 
 }
@@ -283,6 +290,7 @@ UINT8 m68kmemtrace32_read8(offs_t adr)
 {
     UINT8 v = program_read_byte_32be(adr);
     openTraceFH();
+    fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"R:%08x ______%02x",adr,(int)v);
 
     return v;
@@ -296,6 +304,7 @@ UINT16 m68kmemtrace32_read16(offs_t adr)
 //        printf("?");
 //    }
     openTraceFH();
+    fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"R:%08x ____%04x",adr,(int)v);
 
     return v;
@@ -305,6 +314,7 @@ UINT32 m68kmemtrace32_read32(offs_t adr)
 {
     UINT32 v = readlong_d32(adr);
     openTraceFH();
+    fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"R:%08x %08x",adr,(int)v);
 
     return v;
@@ -315,6 +325,7 @@ void m68kmemtrace32_write8(offs_t adr,UINT8 data)
     adr = adr & 0x00ffffff;
     program_write_byte_32be(adr,data);
     openTraceFH();
+    fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"W:%08x ______%02x",adr,(int)data);
 
 }
@@ -324,6 +335,7 @@ void m68kmemtrace32_write16(offs_t adr,UINT16 data)
     adr = adr & 0x00ffffff;
     writeword_d32(adr,data);
     openTraceFH();
+    fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"W:%08x ____%04x",adr,(int)data);
 
 }
@@ -333,6 +345,7 @@ void m68kmemtrace32_write32(offs_t adr,UINT32 data)
     adr = adr & 0x00ffffff;
     writelong_d32(adr,data);
     openTraceFH();
+    fprintf(traceFH,"PC:%08x ",last68kpc);
     fprintf(traceFH,"W:%08x %08x",adr,(int)data);
 
 }
@@ -428,9 +441,9 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
 //	m68k_memory_intf = interface_d16;
 #if DOTRACEMEM
-    p68k->mem =   m68k_memory_tracer_d16;
+    m68k_memory_intf =   m68k_memory_tracer_d16;
 #else
-    p68k->mem =   interface_d16;
+    m68k_memory_intf =   interface_d16;
 #endif
 
 	m68k_state_register("m68000", index);
@@ -459,8 +472,11 @@ static void m68000_get_context(void *dst)
 
 static void m68000_set_context(void *src)
 {
-	if (m68k_memory_intf.read8 != program_read_byte_16be)
-		m68k_memory_intf = interface_d16;
+#if DOTRACEMEM
+    m68k_memory_intf =   m68k_memory_tracer_d16;
+#else
+    m68k_memory_intf =   interface_d16;
+#endif
 	m68k_set_context(src);
 }
 
@@ -609,7 +625,12 @@ static void m68020_init(int index, int clock, const void *config, int (*irqcallb
 {
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68020);
-	m68k_memory_intf = interface_d32;
+//	m68k_memory_intf = interface_d32;
+#if DOTRACEMEM
+    m68k_memory_intf =   interface_tracer_d32;
+#else
+    m68k_memory_intf =   interface_d32;
+#endif
 	m68k_state_register("m68020", index);
 	m68k_set_int_ack_callback(irqcallback);
 }
@@ -636,8 +657,11 @@ static void m68020_get_context(void *dst)
 
 static void m68020_set_context(void *src)
 {
-	if (m68k_memory_intf.read8 != program_read_byte_32be)
-		m68k_memory_intf = interface_d32;
+#if DOTRACEMEM
+    m68k_memory_intf =   interface_tracer_d32;
+#else
+    m68k_memory_intf =   interface_d32;
+#endif
 	m68k_set_context(src);
 }
 
@@ -665,9 +689,9 @@ static void m68ec020_init(int index, int clock, const void *config, int (*irqcal
 	m68k_set_cpu_type(M68K_CPU_TYPE_68EC020);
 
 #if DOTRACEMEM
-    p68k->mem =   interface_tracer_d32;
+    m68k_memory_intf =   interface_tracer_d32;
 #else
-    p68k->mem =   interface_d32;
+    m68k_memory_intf =   interface_d32;
 #endif
 
 //	m68k_memory_intf = interface_d32;

@@ -768,7 +768,11 @@ void m68k_set_cpu_type(unsigned int cpu_type)
 			return;
 	}
 }
-
+#define TRAAACE 1
+#ifdef TRAAACE
+UINT32 last68kpc=0;
+UINT32 last68ki=0;
+#endif
 /* Execute some instructions until we use up num_cycles clock cycles */
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(int num_cycles)
@@ -801,7 +805,9 @@ int m68k_execute(int num_cycles)
 
 			/* Record previous program counter */
 			REG_PPC = REG_PC;
-
+#ifdef TRAAACE
+ last68kpc=REG_PC;
+#endif
 			/* Read an instruction and call its handler */
 			REG_IR = m68ki_read_imm_16();
 			m68ki_instruction_jump_table[REG_IR]();
@@ -809,6 +815,9 @@ int m68k_execute(int num_cycles)
 
 			/* Trace m68k_exception, if necessary */
 			m68ki_exception_if_trace(); /* auto-disable (see m68kcpu.h) */
+#ifdef TRAAACE
+last68ki++;
+#endif
 		} while(GET_CYCLES() > 0);
 
 		/* set previous PC to current PC for the next entry into the loop */
