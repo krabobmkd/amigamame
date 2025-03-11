@@ -140,12 +140,32 @@ struct typeBGR16PC{
     but it's actually BRGA "PC", so native p96 modes looks more AGRB...
 
 */
-// wrong -> NO.
+// perfect copy for this type
 typedef ULONG typeARGB32;
 
-//ok:
+//ok: write on PIXFMT_BGRA32
 struct typeBGRA32{
-    typeBGRA32(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
+//    typeBGRA32(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
+    typeBGRA32(ULONG argb) {
+
+    asm volatile(
+       "move.b %0,(%1)\n"
+       "\tlsr.l #8,%0\n"
+       "\tmove.b %0,1(%1)\n"
+       "\tlsr.l #8,%0\n"
+       "\tmove.b %0,2(%1)\n"
+       "\tnop"
+       : "+d"(argb) // out
+       : "a"(this)  // in
+       : // trashed
+       );
+//        b = (char)argb;
+//        argb>>=8;
+//        g = (char)argb;
+//        argb>>=8;
+//        r = (char)argb;
+    }
+
     char b,g,r,a;
 };
 
@@ -459,7 +479,7 @@ void directDrawARGB32_ARGB32(directDrawParams *p)
 {
     directDrawRGB32T<typeARGB32>(p);
 }
-//ok
+// PIXFMT_BGRA32 type 12.
 void directDrawBGRA32_ARGB32(directDrawParams *p)
 {
     directDrawRGB32T<typeBGRA32>(p);

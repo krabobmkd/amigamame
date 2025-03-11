@@ -278,7 +278,7 @@ void Drawable_CGX::initARGB32DrawFunctionFromPixelFormat()
             case PIXFMT_BGR24:
         directDrawARGB32=&directDraw_type24_ARGB32;
         break;
-        // 11, wrong:
+        // 11
         case PIXFMT_ARGB32:directDrawARGB32=&directDrawARGB32_ARGB32; break;
         // 12, ok:
         case PIXFMT_BGRA32:directDrawARGB32=&directDrawBGRA32_ARGB32; break;
@@ -339,10 +339,10 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
 
         _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
 
-       // printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d MODE:%08x\n",
-       //          _fullscreenWidth,_fullscreenHeight,
-       //             (int)_PixelFmt, (int)_PixelBytes,(int)_screenDepthAsked,
-       //             (int)_ScreenModeId);
+//        printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d MODE:%08x\n",
+//                 _fullscreenWidth,_fullscreenHeight,
+//                    (int)_PixelFmt, (int)_PixelBytes,(int)_screenDepthAsked,
+//                    (int)_ScreenModeId);
 
     } else
     {
