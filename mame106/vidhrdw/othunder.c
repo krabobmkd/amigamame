@@ -230,7 +230,7 @@ static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 				dgpz0.scalex = sprite_ptr->zoomx;
 				dgpz0.scaley = sprite_ptr->zoomy;
 				//drawgfxzoom(&dgpz0);
-				drawgfxzoom_clut16_Src8_prio(&dgpz0);
+				drawgfxzoom_clut16_Src8_tr0_prio(&dgpz0);
 			}
 		}
 
@@ -256,7 +256,7 @@ static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 		dgpz0.scaley = sprite_ptr->zoomy;
         dgpz0.priority_mask = sprite_ptr->primask  | (1<<31);
 		//drawgfxzoom(&dgpz0);
-		drawgfxzoom_clut16_Src8_prio(&dgpz0);
+		drawgfxzoom_clut16_Src8_tr0_prio(&dgpz0);
 	}
 
 }

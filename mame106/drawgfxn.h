@@ -22,7 +22,12 @@ void drawgfx_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0));
 void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0));
 
 // chasehq, experimental
-void drawgfxzoom_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0));
+// - does zoom or redirected.
+// - dest pixel format: clut16
+// - source pixel format is 1b per pix but 16 colors (+palette slot shift).
+// - transparen color is zero, hardcoded.
+// - does priority plane test.
+void drawgfxzoom_clut16_Src8_tr0_prio(struct drawgfxParams *p DGREG(a0));
 
 #ifdef __cplusplus
 }

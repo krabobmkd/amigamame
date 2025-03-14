@@ -178,10 +178,20 @@ template<typename destPix_t>
 class ClutColor {
 public:
     ClutColor(const pen_t *paldata) : _paldata(paldata) { }
-    destPix_t color(UINT8 c) {
+    destPix_t color(UINT16 c) {
         return _paldata[c];
     }
     const pen_t *_paldata;
+};
+
+template<typename destPix_t>
+class ClutColorDirect {
+public:
+    ClutColorDirect(UINT32 offset) : _offset(offset) { }
+    destPix_t color(UINT16 c) {
+        return c + _offset;
+    }
+    UINT32 _offset;
 };
 
 /*
@@ -252,7 +262,9 @@ void drawgfxT(struct drawgfxParams *p DGREG(a0), int isOpaque)
 		int topskip = sy-oy;											/* top skip */
         destContext dstdata(p,sx,sy);
 
-        MapColor pal(&gfx->colortable[gfx->color_granularity * p->color]);
+//        MapColor pal(&gfx->colortable[gfx->color_granularity * p->color]);
+
+        MapColor pal(gfx->color_granularity * p->color);
 
 //		UINT8 *pribuf = (p->pri_buffer) ? ((UINT8 *)p->pri_buffer->line[sy]) + sx : NULL;
 
@@ -294,7 +306,7 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
     {
         if (flipx)
         {
-            // adjust 
+            // adjust
             dstdata.incrementx(dstwidth /*aparently not, against topspeed sprite tiling - 1*/);
             srcdata.incrementx(srcwidth - dstwidth - leftskip );
 
@@ -382,7 +394,7 @@ BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
 
         if (flipx)
         {
-            // adjust 
+            // adjust
             dstdata.incrementx(dstwidth  /*aparently not, against topspeed sprite tiling - 1*/);
             srcdata.incrementx(srcwidth - dstwidth - leftskip);
 
@@ -572,7 +584,8 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
 		int topskip = sy-oy;											/* top skip */
         destContext dstdata(p,sx,sy);
 
-        MapColor pal(&gfx->colortable[gfx->color_granularity * p->color]);
+       // MapColor pal(&gfx->colortable[gfx->color_granularity * p->color]);
+        MapColor pal(gfx->color_granularity * p->color);
 
     // - - - - - - ADJUST
 
@@ -650,7 +663,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
                 srcdata.incrementx(srcmodulo);
                 dstdata.incrementx(destmodulo);
                 dstheight--;
-            }            
+            }
         }
         else
         {
@@ -841,13 +854,13 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
 void drawgfx_clut16_Src8(struct drawgfxParams *p DGREG(a0))
 {
     drawgfxT<DestPixContext<UINT16>,UINT16,
-        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+        SourceContext,ClutColorDirect<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
 
-}	
+}
 void drawgfx_clut16_Src4(struct drawgfxParams *p DGREG(a0))
 {
     drawgfxPack4T<DestPixContext<UINT16>,UINT16,
-        SourceContextP4,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+        SourceContextP4,ClutColorDirect<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
 }
 
 void drawgfx_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
@@ -859,7 +872,7 @@ void drawgfx_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
     }
 
     drawgfxT<DestPixRealPrioContext<UINT16>,UINT16,
-        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+        SourceContext,ClutColorDirect<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
 
 }
 void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
@@ -870,7 +883,7 @@ void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
         return;
     }
     drawgfxPack4T<DestPixRealPrioContext<UINT16>,UINT16,
-        SourceContextP4,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+        SourceContextP4,ClutColorDirect<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
 
 }
 
@@ -925,16 +938,16 @@ void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
 
 */
 // chasehq, experimental
-void drawgfxzoom_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
+#define trt_isOpaque 0
+#define trt_isTransp 1
+// very chasehq thing: invisible sprite to manage road clipping.
+#define trt_fulltransp 2
+
+template<int transptype>
+void drawgfxzoom_clut16_Src8T(struct drawgfxParams *p DGREG(a0))
 {
     int scalex = p->scalex;
     int scaley = p->scaley;
-
-	if (scalex == 0x10000 && scaley == 0x10000)
-	{
-       drawgfx_clut16_Src8_prio(p);
-       return;
-	}
 
     mame_bitmap *dest_bmp = p->dest;
     const gfx_element *gfx = p->gfx;
@@ -951,6 +964,7 @@ void drawgfxzoom_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
 
     int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
     int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+
 
     if (!sprite_screen_width || !sprite_screen_height) return;
 
@@ -1016,12 +1030,9 @@ void drawgfxzoom_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
 
     if( ex<=sx ) return;
 
-    /* case 1: TRANSPARENCY_PEN prio */
-    // used by chasehq/topspeed/ HERE
     {
+        // important for inner loop...
         const register UINT16 colorOfs = gfx->color_granularity * p->color;
-       //int transparency = p->transparency;
-       // UINT8 transparent_color = (UINT8)p->transparent_color;
 
         for(int y=sy; y<ey; y++ )
         {
@@ -1031,25 +1042,53 @@ void drawgfxzoom_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
             UINT8 *priend = pri+ex;
             pri += sx;
             dest +=sx;
-            int x_index = x_index_base;            
+            int x_index = x_index_base;
             //for(int x=sx; x<ex; x++ )
             while(pri<priend)
             {
-                register int c = source[x_index>>16];
-                if( c /*!= transparent_color*/ )
+                 int c = source[x_index>>16];
+                // per dest pixel
+                if(transptype == trt_isOpaque) // template escaped test
                 {
                     UINT8 pr = *pri;
                     if (((1UL <<pr ) & pri_mask) == 0)
                         *dest = colorOfs + c;
                     *pri = 31;
+                } else
+                {   // transparent
+                    if( c /*!= transparent_color*/ )
+                    {
+                        UINT8 pr = *pri;
+                        if (((1UL <<pr ) & pri_mask) == 0)
+                            *dest = colorOfs + c;
+                        *pri = 31;
+                    }
                 }
                 pri++;
                 dest++;
                 x_index += dx;
             }
-
             y_index += dy;
         }
     }
 
+}
+void drawgfxzoom_clut16_Src8_tr0_prio(struct drawgfxParams *p DGREG(a0))
+{
+	if (p->scalex == 0x10000 && p->scaley == 0x10000)
+	{
+       drawgfx_clut16_Src8_prio(p); // also does opaque test
+       return;
+	}
+
+    UINT32 transmask = 1 /*<< transpen*/; // always color 0 for the moment.
+    UINT32 pen_usage = p->gfx->pen_usage[p->code];
+
+	int isFullTransp = (int)((pen_usage & ~transmask) == 0);
+	if(isFullTransp) return;
+    int isOpaque = (int)((pen_usage & transmask) == 0);
+
+    if(isOpaque) drawgfxzoom_clut16_Src8T<trt_isOpaque>(p);
+   // else if(isFullTransp) drawgfxzoom_clut16_Src8T<trt_fulltransp>(p);
+    else drawgfxzoom_clut16_Src8T<trt_isTransp>(p);
 }

@@ -139,7 +139,7 @@ void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			dgpz0.scaley = zy<<13;
 
 			//drawgfxzoom(&dgpz0);
-			drawgfxzoom_clut16_Src8_prio(&dgpz0);
+			drawgfxzoom_clut16_Src8_tr0_prio(&dgpz0);
 		}
 
 // 		if (bad_chunks)

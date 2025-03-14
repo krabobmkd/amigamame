@@ -292,6 +292,7 @@ static void contcirc_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 	} // end of patch paragraph
 
 }
+//int dbg_nbt=0;
 
 static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
@@ -300,8 +301,10 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
 	int zoomx, zoomy, zx, zy;
-	int sprite_chunk,map_offset,code,j,k,px,py;
-	int bad_chunks;
+	int sprite_chunk,map_offset,j,k,px,py;
+	UINT32 code;
+
+//    int nbt=0;
 
 	static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
     struct drawgfxParams dgpz1={
@@ -371,8 +374,6 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 		if (x>0x140) x -= 0x200;
 		if (y>0x140) y -= 0x200;
 
-		bad_chunks = 0;
-
 		if ((zoomx-1) & 0x40)	/* 128x128 sprites, $0-$3ffff in spritemap rom, OBJA */
 		{
 			map_offset = tilenum << 6;
@@ -390,7 +391,12 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 
 				code = spritemap[map_offset + px + (py<<3)];
 
-				if (code == 0xffff)	bad_chunks++;
+				if (code == 0xffff) // bad_chunk
+				{
+					continue;
+				}
+				// in that case
+				code &= 0x3fff; // code %=  dgpz1.gfx->total_elements; -> always 16384.
 
 				curx = x + ((k*zoomx)/8);
 				cury = y + ((j*zoomy)/8);
@@ -408,9 +414,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 					cury = 256 - cury - zy;
 					flipx = !flipx;
 					flipy = !flipy;
-				}
-
-				
+				}				
 				dgpz1.code = code;
 				dgpz1.flipx = flipx;
 				dgpz1.flipy = flipy;
@@ -419,7 +423,16 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				dgpz1.scalex = zx<<12;
 				dgpz1.scaley = zy<<12;
 				//drawgfxzoom(&dgpz1);
-                drawgfxzoom_clut16_Src8_prio(&dgpz1);
+//				if(nbt == 500)
+//				{
+//                    static int yh=0;
+//                    dgpz1.color = 0;
+//                    yh++;
+//				}
+//				if(nbt != dbg_nbt)
+                    drawgfxzoom_clut16_Src8_tr0_prio(&dgpz1);
+
+//           nbt++;
 			}
 		}
 		else if ((zoomx-1) & 0x20)	/* 64x128 sprites, $40000-$5ffff in spritemap rom, OBJB */
@@ -437,7 +450,11 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 
 				code = spritemap[map_offset + px + (py<<2)];
 
-				if (code == 0xffff)	bad_chunks++;
+				if (code == 0xffff) // bad_chunk
+				{
+					continue;
+				}
+				code &= 0x3fff;
 
 				curx = x + ((k*zoomx)/4);
 				cury = y + ((j*zoomy)/8);
@@ -466,11 +483,11 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				dgpz2.scalex = zx<<12;
 				dgpz2.scaley = zy<<12;
 				//drawgfxzoom(&dgpz2);
-                drawgfxzoom_clut16_Src8_prio(&dgpz2);
+//				if(nbt != dbg_nbt)
+                drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
+//                nbt++;
 			}
-
-
-		}
+		} // end case 64x128
 		else if (!((zoomx-1) & 0x60))	/* 32x128 sprites, $60000-$7ffff in spritemap rom, OBJB */
 		{
 			map_offset = (tilenum << 4) + 0x30000;
@@ -486,7 +503,11 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 
 				code = spritemap[map_offset + px + (py<<1)];
 
-				if (code == 0xffff)	bad_chunks ++;
+				if (code == 0xffff) // bad_chunk
+				{
+					continue;
+				}
+				code &= 0x3fff;
 
 				curx = x + ((k*zoomx)/2);
 				cury = y + ((j*zoomy)/8);
@@ -515,13 +536,13 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				dgpz2.scaley = zy<<12;
 
 				//drawgfxzoom(&dgpz2);
-				drawgfxzoom_clut16_Src8_prio(&dgpz2);
+//				if(nbt != dbg_nbt)
+				drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
+//				nbt++;
 			}
-		}
+		} // end case 32x128
 
-//		if (bad_chunks)
-//loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
-	}
+	} // end loop per sprites
 }
 
 

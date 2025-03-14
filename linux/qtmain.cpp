@@ -171,7 +171,7 @@ void QProc::process()
 // "1944"
 //"tfrceac"
 //"rastan"
-"bublbob2"
+//"bublbob2"
 //"zoom909"
 //"topspeed"
 //"othunder"
@@ -185,7 +185,8 @@ void QProc::process()
 //                "gforce2"
 
 //        "aof"
-//"chasehq"
+"chasehq"
+//"nightstr"
 //      "mslug"
 
 //                "mp_sor2"
@@ -224,7 +225,7 @@ QWin::QWin() : QLabel()
 // }
 void QWin::mouseMoveEvent(QMouseEvent* event)
 {
-//    dbg_nbt = event->x();
+  //  dbg_nbt = event->x()<<1;
 
 }
 void QWin::paintEvent(QPaintEvent *event)
@@ -369,7 +370,7 @@ nbframe++;
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 
 // chasehq sprite prio bug:
-//if(nbframe == 2650) mame_pause(1);
+if(nbframe == 2650) mame_pause(1);
 
 //if(nbframe == 950) mame_pause(1);
 
