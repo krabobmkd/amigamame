@@ -17,7 +17,9 @@ static map<string,sDriverTuning> _tunings={
 	{"sgemf",{8*60,0}},
 	{"chasehq",{5*60,0}},
 
-	{"gtmr",{0,MDTF_M68K_SAFE_MOVEMWRITE}},     // 1000 miglia
+	{"gtmr",{0,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},     // 1000 miglia
+	{"gtmr2",{0,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},     // 1000 miglia
+
 	{"1944",{0,MDTF_M68K_SAFE_MOVEMWRITE/*|MDTF_M68K_SAFE_MOVEMREAD*/}},
 	{"bublbob2",{0,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 	{"armwar",{0,MDTF_M68K_SAFE_MOVEMWRITE}},
