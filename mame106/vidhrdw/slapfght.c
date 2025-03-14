@@ -262,7 +262,11 @@ VIDEO_UPDATE( slapfight )
 
 	/* Draw the sprites */
 	
-	{ 
+	{
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
+
 	struct drawgfxParams dgp1={
 		bitmap, 	// dest
 		Machine->gfx[2], 	// gfx
@@ -272,7 +276,7 @@ VIDEO_UPDATE( slapfight )
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&lcliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex

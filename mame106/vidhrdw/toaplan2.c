@@ -1331,7 +1331,11 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int co
 	priority_to_display <<= 8;
 
 	
-	{ 
+	{
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
+
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
 		gfx, 	// gfx
@@ -1341,7 +1345,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int co
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&lcliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex

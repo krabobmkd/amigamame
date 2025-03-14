@@ -398,6 +398,11 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				// in that case
 				code &= 0x3fff; // code %=  dgpz1.gfx->total_elements; -> always 16384.
 
+                UINT32 pen_usage = dgpz1.gfx->pen_usage[code];
+                if(pen_usage == 1) continue; // full transparent escape
+
+
+
 				curx = x + ((k*zoomx)/8);
 				cury = y + ((j*zoomy)/8);
 
@@ -456,6 +461,9 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				}
 				code &= 0x3fff;
 
+                UINT32 pen_usage = dgpz2.gfx->pen_usage[code];
+                if(pen_usage == 1) continue; // full transparent escape
+
 				curx = x + ((k*zoomx)/4);
 				cury = y + ((j*zoomy)/8);
 
@@ -508,6 +516,9 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 					continue;
 				}
 				code &= 0x3fff;
+
+                UINT32 pen_usage = dgpz2.gfx->pen_usage[code];
+                if(pen_usage == 1) continue; // full transparent escape
 
 				curx = x + ((k*zoomx)/2);
 				cury = y + ((j*zoomy)/8);

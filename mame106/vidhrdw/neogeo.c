@@ -1056,6 +1056,11 @@ static inline void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cli
 	unsigned int *pen_usage;
 	gfx_element *gfx=Machine->gfx[fix_bank]; /* Save constant struct dereference */
 
+
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
+
 	/* Save some struct de-refs */
 	pen_usage=gfx->pen_usage;
 
@@ -1099,7 +1104,7 @@ static inline void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cli
 				0, 	// flipy
 				0, 	// sx
 				0, 	// sy
-				cliprect, 	// clip
+				&lcliprect, 	// clip
 				TRANSPARENCY_PEN, 	// transparency
 				0, 	// transparent_color
 				0, 	// scalex
@@ -1154,7 +1159,7 @@ static inline void neogeo_draw_s_layer(mame_bitmap *bitmap, const rectangle *cli
 				0, 	// flipy
 				0, 	// sx
 				0, 	// sy
-				cliprect, 	// clip
+				&lcliprect, 	// clip
 				TRANSPARENCY_PEN, 	// transparency
 				0, 	// transparent_color
 				0, 	// scalex

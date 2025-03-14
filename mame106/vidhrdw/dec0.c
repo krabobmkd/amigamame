@@ -158,6 +158,10 @@ static void dec0_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int p
 {
 	int offs;
 
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
+
     const UINT16 *lspriteram = dec0_spriteram;
 	{ 
 	struct drawgfxParams dgp0={
@@ -169,7 +173,7 @@ static void dec0_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int p
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&lcliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex
@@ -234,7 +238,7 @@ static void dec0_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int p
 			dgp0.flipy = fy;
 			dgp0.sx = x;
 			dgp0.sy = y + mult * multi;
-			drawgfx_clut16_Src8(&dgp0);
+			drawgfx_clut16_Src8_pal(&dgp0);
 
 			multi--;
 		}

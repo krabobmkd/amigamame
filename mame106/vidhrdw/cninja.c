@@ -169,7 +169,9 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
-	
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
 	{ 
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
@@ -180,7 +182,7 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&lcliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex
@@ -250,8 +252,8 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			dgp0.code = sprite - multi * inc;
 			dgp0.sx = x;
 			dgp0.sy = y + mult * multi;
-			drawgfx(&dgp0);
-            //doesnt work drawgfx_clut16_Src8_prio(&dgp0);
+			//drawgfx(&dgp0);
+            drawgfx_clut16_Src8_prio_pal(&dgp0);
 			multi--;
 		}
 	}
@@ -263,7 +265,9 @@ static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
-	
+	    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
 	{ 
 	struct drawgfxParams dgp1={
 		bitmap, 	// dest
@@ -274,7 +278,7 @@ static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&lcliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex
@@ -342,8 +346,8 @@ static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			dgp1.code = sprite - multi * inc;
 			dgp1.sx = x;
 			dgp1.sy = y + mult * multi;
-			drawgfx(&dgp1);
-            //doesnt work drawgfx_clut16_Src8_prio(&dgp1);
+			//drawgfx(&dgp1);
+            drawgfx_clut16_Src8_prio_pal(&dgp1);
 			multi--;
 		}
 	}

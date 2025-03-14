@@ -164,6 +164,10 @@ WRITE8_HANDLER( ddragon_fgvideoram_w )
 
 static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
+
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
 	//const gfx_element *gfx = Machine->gfx[1];
     struct drawgfxParams dgp={
             bitmap, Machine->gfx[1],
@@ -171,7 +175,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
             0,//color,
             0,0,//flipx, flipy,
             0,0,// //sx, sy,
-            cliprect,
+            &lcliprect,
             TRANSPARENCY_PEN, 0,
             // - - optionals
             0,0,NULL,0
@@ -233,35 +237,35 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
             dgp.sx = sx;
             dgp.sy = sy;
-            drawgfx_clut16_Src8(&dgp);
+            drawgfx_clut16_Src8_pal(&dgp);
 
 			switch ( size ) {
 				case 1: /* double y */
                     dgp.code = which;
                     dgp.sy = sy+dy;
-                    drawgfx_clut16_Src8(&dgp);
+                    drawgfx_clut16_Src8_pal(&dgp);
 				break;
 				case 2: /* double x */
                     dgp.code = which;
                     dgp.sx = sx+dx;
-                    drawgfx_clut16_Src8(&dgp);
+                    drawgfx_clut16_Src8_pal(&dgp);
 				break;
 
 				case 3:
                     dgp.code = which;
                     dgp.sx = sx+dx;
                     dgp.sy = sy+dy;
-                    drawgfx_clut16_Src8(&dgp);
+                    drawgfx_clut16_Src8_pal(&dgp);
 
                     dgp.code = which+1;
                     dgp.sx = sx+dx;
                     dgp.sy = sy;
-                    drawgfx_clut16_Src8(&dgp);
+                    drawgfx_clut16_Src8_pal(&dgp);
 
                     dgp.code = which+2;
                     dgp.sx = sx;
                     dgp.sy = sy+dy;
-                    drawgfx_clut16_Src8(&dgp);
+                    drawgfx_clut16_Src8_pal(&dgp);
 				break;
 			}
 		}

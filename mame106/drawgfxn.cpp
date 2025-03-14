@@ -202,7 +202,7 @@ public:
 
 template<class destContext,typename destPix_t,
          class srcContext,class MapColor>
-void drawgfxT(struct drawgfxParams *p DGREG(a0), int isOpaque)
+void drawgfxT(struct drawgfxParams *p DGREG(a0), int isOpaque,MapColor &pal)
 {
     // - - - - from drawgfx()
   //  mame_bitmap *dest = p->dest;
@@ -241,15 +241,13 @@ void drawgfxT(struct drawgfxParams *p DGREG(a0), int isOpaque)
 
 	ex = sx + gfx->width; // consider end excluded, immense lots of useless -1 removed.
 	if (sx < clip->min_x) sx = clip->min_x;
-
-	if (ex > clip->max_x+1) ex = clip->max_x+1;
+	if (ex > clip->max_x) ex = clip->max_x;
     int dstwidth = ex-sx; /* dest width */
     if(dstwidth<=0) return;
 
 	ey = sy + gfx->height;
 	if ( sy < clip->min_y) sy = clip->min_y;
-
-	if ( ey > clip->max_y+1) ey = clip->max_y+1;
+	if ( ey > clip->max_y) ey = clip->max_y;
     int dstheight = ey-sy;	/* dest height */
     if(dstheight<=0) return;
 
@@ -261,10 +259,6 @@ void drawgfxT(struct drawgfxParams *p DGREG(a0), int isOpaque)
 		int leftskip = sx-ox;											/* left skip */
 		int topskip = sy-oy;											/* top skip */
         destContext dstdata(p,sx,sy);
-
-//        MapColor pal(&gfx->colortable[gfx->color_granularity * p->color]);
-
-        MapColor pal(gfx->color_granularity * p->color);
 
 //		UINT8 *pribuf = (p->pri_buffer) ? ((UINT8 *)p->pri_buffer->line[sy]) + sx : NULL;
 
@@ -566,12 +560,13 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
 	ex = sx + gfx->width; // consider end excluded, immense lots of useless -1 removed.
 	if (sx < clip->min_x) sx = clip->min_x;
 	if (ex > clip->max_x) ex = clip->max_x;
-    int dstwidth = ex-sx; /* dest width */
+    int dstwidth = ex-sx; /* dest width */    
     if(dstwidth<=0) return;
 
 	ey = sy + gfx->height;
 	if ( sy < clip->min_y) sy = clip->min_y;
 	if ( ey > clip->max_y) ey = clip->max_y;
+
     int dstheight = ey-sy;	/* dest height */
     if(dstheight<=0) return;
 
@@ -619,7 +614,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
         if (flipx)
         {
             // adjust x
-            dstdata.incrementx(dstwidth - 1);
+            dstdata.incrementx(dstwidth );
             srcdata.incrementx(srcwidth - dstwidth - leftskip);
             INT16 destmodulo = ydir*dstdata._rowpixels + dstwidth;
             while (dstheight)
@@ -722,7 +717,7 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
         if (flipx)
         {
             // adjust x
-            dstdata.incrementx(dstwidth - 1);
+            dstdata.incrementx(dstwidth );
             srcdata.incrementx(srcwidth - dstwidth - leftskip);
 
             INT16 destmodulo = ydir*dstdata._rowpixels + dstwidth;
@@ -853,10 +848,24 @@ void drawgfxPack4T(struct drawgfxParams *p DGREG(a0), int isOpaque)
 
 void drawgfx_clut16_Src8(struct drawgfxParams *p DGREG(a0))
 {
+    // this one will do pixel = c+offset;
+    ClutColorDirect<UINT16> pal(p->gfx->color_granularity * p->color);
+
     drawgfxT<DestPixContext<UINT16>,UINT16,
-        SourceContext,ClutColorDirect<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+        SourceContext,ClutColorDirect<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN),pal); // 0 transparent, else opaque
 
 }
+
+void drawgfx_clut16_Src8_pal(struct drawgfxParams *p DGREG(a0))
+{
+    // this one will do pixel = map[c];
+    ClutColor<UINT16> pal(&p->gfx->colortable[p->gfx->color_granularity * p->color]);
+
+    drawgfxT<DestPixContext<UINT16>,UINT16,
+        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN),pal); // 0 transparent, else opaque
+
+}
+
 void drawgfx_clut16_Src4(struct drawgfxParams *p DGREG(a0))
 {
     drawgfxPack4T<DestPixContext<UINT16>,UINT16,
@@ -870,11 +879,28 @@ void drawgfx_clut16_Src8_prio(struct drawgfxParams *p DGREG(a0))
         drawgfx_clut16_Src8(p);
         return;
     }
+    // this one will do pixel = c+offset;
+    ClutColorDirect<UINT16> pal(p->gfx->color_granularity * p->color);
 
     drawgfxT<DestPixRealPrioContext<UINT16>,UINT16,
-        SourceContext,ClutColorDirect<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN)); // 0 transparent, else opaque
+        SourceContext,ClutColorDirect<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN),pal); // 0 transparent, else opaque
 
 }
+void drawgfx_clut16_Src8_prio_pal(struct drawgfxParams *p DGREG(a0))
+{
+   if(p->priority_mask==0)
+    {
+        drawgfx_clut16_Src8(p);
+        return;
+    }
+    // this one will do pixel = map[c];
+    ClutColor<UINT16> pal(&p->gfx->colortable[p->gfx->color_granularity * p->color]);
+
+    drawgfxT<DestPixRealPrioContext<UINT16>,UINT16,
+        SourceContext,ClutColor<UINT16>>(p,(p->transparency !=TRANSPARENCY_PEN),pal); // 0 transparent, else opaque
+
+}
+
 void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
 {
     if(p->priority_mask==0)
@@ -965,8 +991,7 @@ void drawgfxzoom_clut16_Src8T(struct drawgfxParams *p DGREG(a0))
     int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
     int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
 
-
-    if (!sprite_screen_width || !sprite_screen_height) return;
+    if (sprite_screen_width<=0 || sprite_screen_height<=0 ) return; // krb personal choice.
 
     /* compute sprite increment per screen pixel */
     int dx = (gfx->width<<16)/sprite_screen_width;
@@ -1075,6 +1100,7 @@ void drawgfxzoom_clut16_Src8T(struct drawgfxParams *p DGREG(a0))
 }
 void drawgfxzoom_clut16_Src8_tr0_prio(struct drawgfxParams *p DGREG(a0))
 {
+
 	if (p->scalex == 0x10000 && p->scaley == 0x10000)
 	{
        drawgfx_clut16_Src8_prio(p); // also does opaque test
@@ -1089,6 +1115,5 @@ void drawgfxzoom_clut16_Src8_tr0_prio(struct drawgfxParams *p DGREG(a0))
     int isOpaque = (int)((pen_usage & transmask) == 0);
 
     if(isOpaque) drawgfxzoom_clut16_Src8T<trt_isOpaque>(p);
-   // else if(isFullTransp) drawgfxzoom_clut16_Src8T<trt_fulltransp>(p);
     else drawgfxzoom_clut16_Src8T<trt_isTransp>(p);
 }

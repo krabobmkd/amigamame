@@ -1370,8 +1370,10 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	{
 		baseadd = 4;
 	}
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
 
-	
 	{ 
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
@@ -1382,7 +1384,7 @@ void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&lcliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		15, 	// transparent_color
 		0, 	// scalex
@@ -1593,7 +1595,9 @@ void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 		return;
 	}
 #endif
-
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
 	
 	{ 
 	struct drawgfxParams dgp2={
@@ -1605,7 +1609,7 @@ void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&lcliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		15, 	// transparent_color
 		0, 	// scalex

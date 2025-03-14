@@ -40,6 +40,7 @@
 *****************************************************************************/
 
 #include "driver.h"
+#include "drawgfxn.h"
 
 static tilemap *pf3_wide_layer,*pf3_layer,*pf2_layer,*pf1_wide_layer,*pf1_layer;
 static INT32 pf1_control[8],pf2_control[8],pf3_control[8],pf4_control[8];
@@ -458,6 +459,10 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 	
 	{ 
+	rectangle clipex = *cliprect;
+    clipex.max_x++;
+    clipex.max_y++;
+
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
 		Machine->gfx[1], 	// gfx
@@ -467,7 +472,7 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&clipex, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex
@@ -519,16 +524,14 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					dgp0.flipy = ffy;
 					dgp0.sx = 496-x;
 					dgp0.sy = 496-(y-i*16);
-
-					drawgfx(&dgp0);
 				} else {
 
 					dgp0.flipx = fx;
 					dgp0.flipy = fy;
 					dgp0.sx = x;
 					dgp0.sy = y-i*16;
-					drawgfx(&dgp0);
 				}
+				drawgfx_clut16_Src8_prio(&dgp0);
 				if (fy) s_ptr++; else s_ptr--;
 			}
 			if (fx) x-=16; else x+=16;

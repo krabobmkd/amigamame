@@ -192,7 +192,10 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	};
 
 	
-	{ 
+	{
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
 	struct drawgfxParams dgp0={
 		bitmap, 	// dest
 		Machine->gfx[1], 	// gfx
@@ -202,7 +205,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&lcliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0, 	// scalex

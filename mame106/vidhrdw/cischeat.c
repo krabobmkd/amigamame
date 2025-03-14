@@ -670,8 +670,8 @@ void cischeat_draw_road(mame_bitmap *bitmap, const rectangle *cliprect, int road
 		&rect, 	// clip
 		transparency, 	// transparency
 		15, 	// transparent_color
-		0, 	// scalex
-		0, 	// scaley
+		1<<16, 	// scalex
+		1<<16, 	// scaley
 		NULL, 	// pri_buffer
 		0 	// priority_mask
 	  };
@@ -691,11 +691,13 @@ void cischeat_draw_road(mame_bitmap *bitmap, const rectangle *cliprect, int road
 		xscroll %= X_SIZE;
 		curr_code = code + xscroll/TILE_SIZE;
 
+		dgp0.color = attr;
+
 		for (sx = -(xscroll%TILE_SIZE) ; sx <= max_x ; sx +=TILE_SIZE)
 		{
 			
 			dgp0.code = curr_code++;
-			dgp0.color = attr;
+
 			dgp0.sx = sx;
 			dgp0.sy = sy;
 			drawgfx(&dgp0);
@@ -823,7 +825,7 @@ void f1gpstar_draw_road(mame_bitmap *bitmap, const rectangle *cliprect, int road
 			
 			dgpz0.code = code++;
 			dgpz0.color = attr >> 8;
-			dgpz0.sx = sx / 0x10000;
+			dgpz0.sx = sx>>16;
 			dgpz0.sy = sy;
 			dgpz0.scalex = xscale;
 			dgpz0.scaley = 1 << 16;
@@ -912,7 +914,7 @@ static void cischeat_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprec
 		0, 	// sx
 		0, 	// sy
 		cliprect, 	// clip
-		shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+		TRANSPARENCY_PEN, // shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
 		15, 	// transparent_color
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
@@ -994,19 +996,22 @@ if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continu
 		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
 		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
 
+        dgpz1.color = color;
+        dgpz1.flipx = flipx;
+        dgpz1.flipy = flipy;
+        dgpz1.scalex = xscale;
+        dgpz1.scaley = yscale;
+        dgpz1.transparency = shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN;
+
 		for (y = ystart; y != yend; y += yinc)
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
 				
 				dgpz1.code = code++;
-				dgpz1.color = color;
-				dgpz1.flipx = flipx;
-				dgpz1.flipy = flipy;
-				dgpz1.sx = (sx + x * xdim) / 0x10000;
-				dgpz1.sy = (sy + y * ydim) / 0x10000;
-				dgpz1.scalex = xscale;
-				dgpz1.scaley = yscale;
+				dgpz1.sx = (sx + x * xdim) >>16;
+				dgpz1.sy = (sy + y * ydim) >>16;
+
 				drawgfxzoom(&dgpz1);
 			}
 		}
@@ -1089,7 +1094,7 @@ static void bigrun_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprect,
 		0, 	// sx
 		0, 	// sy
 		cliprect, 	// clip
-		shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
+		TRANSPARENCY_PEN, //shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
 		15, 	// transparent_color
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
@@ -1151,6 +1156,11 @@ static void bigrun_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprect,
 		if ( high_sprites && !(color & 0x80) )
 			continue;
 
+        dgpz2.flipx = flipx;
+        dgpz2.flipy = flipy;
+		dgpz2.color = color;
+        dgpz2.transparency = shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN;
+
 #ifdef MAME_DEBUG
 if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continue; };
 #endif
@@ -1171,19 +1181,17 @@ if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continu
 		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
 		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
 
+        dgpz2.scalex = xscale;
+        dgpz2.scaley = yscale;
+
 		for (y = ystart; y != yend; y += yinc)
 		{
 			for (x = xstart; x != xend; x += xinc)
-			{
-				
+			{				
 				dgpz2.code = code++;
-				dgpz2.color = color;
-				dgpz2.flipx = flipx;
-				dgpz2.flipy = flipy;
-				dgpz2.sx = (sx + x * xdim) / 0x10000;
-				dgpz2.sy = (sy + y * ydim) / 0x10000;
-				dgpz2.scalex = xscale;
-				dgpz2.scaley = yscale;
+				dgpz2.sx = (sx + x * xdim) >>16;
+				dgpz2.sy = (sy + y * ydim) >>16;
+
 				drawgfxzoom(&dgpz2);
 			}
 		}
