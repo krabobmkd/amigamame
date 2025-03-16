@@ -534,10 +534,8 @@ Newer version of the I/O chip ?
 
 #include "driver.h"
 #include "taitoic.h"
+#include "taitoicn.h"
 #include "drawgfxn.h"
-
-#define TOPSPEED_ROAD_COLORS
-
 
 /* These scanline drawing routines lifted from Taito F3: optimise / merge ? */
 
@@ -701,16 +699,16 @@ static int PC080SN_chips;
 
 static UINT16 PC080SN_ctrl[PC080SN_MAX_CHIPS][8];
 
-static UINT16 *PC080SN_ram[PC080SN_MAX_CHIPS],
+UINT16 *PC080SN_ram[PC080SN_MAX_CHIPS],
 				*PC080SN_bg_ram[PC080SN_MAX_CHIPS][2],
 				*PC080SN_bgscroll_ram[PC080SN_MAX_CHIPS][2];
 
-static int PC080SN_bgscrollx[PC080SN_MAX_CHIPS][2],PC080SN_bgscrolly[PC080SN_MAX_CHIPS][2];
-static int PC080SN_xoffs,PC080SN_yoffs;
+int PC080SN_bgscrollx[PC080SN_MAX_CHIPS][2],PC080SN_bgscrolly[PC080SN_MAX_CHIPS][2];
+int PC080SN_xoffs,PC080SN_yoffs;
 
-static tilemap *PC080SN_tilemap[PC080SN_MAX_CHIPS][2];
-static int PC080SN_bg_gfx[PC080SN_MAX_CHIPS];
-static int PC080SN_yinvert,PC080SN_dblwidth;
+tilemap *PC080SN_tilemap[PC080SN_MAX_CHIPS][2];
+int PC080SN_bg_gfx[PC080SN_MAX_CHIPS];
+int PC080SN_yinvert,PC080SN_dblwidth;
 
 INLINE void common_get_PC080SN_bg_tile_info(UINT16 *ram,int gfxnum,int tile_index)
 {
@@ -1047,148 +1045,6 @@ void PC080SN_tilemap_update(void)
 }
 
 
-UINT16 topspeed_get_road_pixel_color(UINT16 pixel,UINT16 color)
-{
-	UINT16 road_body_color,off_road_color,pixel_type;
-
-	/* Color changes based on screenshots from game flyer */
-	pixel_type = (pixel % 0x10);
-	road_body_color = (pixel &0x7ff0) + 4;
-	off_road_color = road_body_color + 1;
-
-	if ((color &0xffe0) == 0xffe0)
-	{
-		pixel += 10;	/* Tunnel colors */
-		road_body_color += 10;
-		off_road_color  += 10;
-	}
-	else
-	{
-		/* Unsure which way round these bits go */
-		if (color &0x10)	road_body_color += 5;
-		if (color &0x02)	off_road_color  += 5;
-	}
-
-	switch (pixel_type)
-	{
-		case 0x01:		/* Center lines */
-		{
-			if (color &0x08)	pixel = road_body_color;
-			break;
-		}
-		case 0x02:		/* Road edge (inner) */
-		{
-			if (color &0x08)	pixel = road_body_color;
-			break;
-		}
-		case 0x03:		/* Road edge (outer) */
-		{
-			if (color &0x04)	pixel = road_body_color;
-			break;
-		}
-		case 0x04:		/* Road body */
-		{
-			pixel = road_body_color;
-			break;
-		}
-		case 0x05:		/* Off road */
-			pixel = off_road_color;
-		default:
-		{}
-	}
-	return pixel;
-}
-
-
-static void topspeed_custom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,
-							UINT32 priority,UINT16 *color_ctrl_ram)
-{
-	UINT16 *dst16,*src16;
-	UINT8 *tsrc;
-	UINT16 scanline[1024];	/* won't be called by a wide-screen game, but just in case... */
-
-	mame_bitmap *srcbitmap = tilemap_get_pixmap(PC080SN_tilemap[chip][layer]);
-	mame_bitmap *transbitmap = tilemap_get_transparency_bitmap(PC080SN_tilemap[chip][layer]);
-
-	UINT16 a,color;
-	int sx,x_index;
-	int i,y,y_index,src_y_index,row_index;
-
-	int flip = 0;
-	int machine_flip = 0;	/* for  ROT 180 ? */
-
-	int min_x = cliprect->min_x;
-	int max_x = cliprect->max_x;
-	int min_y = cliprect->min_y;
-	int max_y = cliprect->max_y;
-	int screen_width = max_x - min_x + 1;
-	int width_mask = 0x1ff;	/* underlying tilemap */
-
-	if (!flip)
-	{
-		sx =       PC080SN_bgscrollx[chip][layer] + 16 - PC080SN_xoffs;
-		y_index =  PC080SN_bgscrolly[chip][layer] + min_y - PC080SN_yoffs;
-	}
-	else	// never used
-	{
-		sx = 0;
-		y_index = 0;
-	}
-
-	if (!machine_flip) y = min_y; else y = max_y;
-
-	do
-	{
-		src_y_index = y_index &0x1ff;	/* tilemaps are 512 px up/down */
-		row_index = (src_y_index - PC080SN_bgscrolly[chip][layer]) &0x1ff;
-		color = color_ctrl_ram[(row_index + PC080SN_yoffs - 2) &0xff];
-
-		x_index = sx - (PC080SN_bgscroll_ram[chip][layer][row_index]);
-
-		src16 = (UINT16 *)srcbitmap->line[src_y_index];
-		tsrc  = (UINT8 *)transbitmap->line[src_y_index];
-		dst16 = scanline;
-
-		if (flags & TILEMAP_IGNORE_TRANSPARENCY)
-		{
-			for (i=0; i<screen_width; i++)
-			{
-				a = src16[x_index & width_mask];
-#ifdef TOPSPEED_ROAD_COLORS
-				a = topspeed_get_road_pixel_color(a,color);
-#endif
-				*dst16++ = a;
-				x_index++;
-			}
-		}
-		else
-		{
-			for (i=0; i<screen_width; i++)
-			{
-				if (tsrc[x_index & width_mask])
-				{
-					a = src16[x_index & width_mask];
-#ifdef TOPSPEED_ROAD_COLORS
-					a = topspeed_get_road_pixel_color(a,color);
-#endif
-					*dst16++ = a;
-				}
-				else
-					*dst16++ = 0x8000;
-				x_index++;
-			}
-		}
-
-		if (flags & TILEMAP_IGNORE_TRANSPARENCY)
-			taitoic_drawscanline(bitmap,0,y,scanline,0,ROT0,priority,cliprect);
-		else
-			taitoic_drawscanline(bitmap,0,y,scanline,1,ROT0,priority,cliprect);
-
-		y_index++;
-		if (!machine_flip) y++; else y--;
-	}
-	while ( (!machine_flip && y <= max_y) || (machine_flip && y >= min_y) );
-}
 
 
 void PC080SN_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
@@ -2094,9 +1950,9 @@ static rectangle myclip;
 
 const int TC0100SCN_SINGLE_VDU = 1024;
 
-static UINT16 TC0100SCN_ctrl[TC0100SCN_MAX_CHIPS][8];
+UINT16 TC0100SCN_ctrl[TC0100SCN_MAX_CHIPS][8];
 
-static UINT16 *TC0100SCN_ram[TC0100SCN_MAX_CHIPS],
+UINT16 *TC0100SCN_ram[TC0100SCN_MAX_CHIPS],
 				*TC0100SCN_bg_ram[TC0100SCN_MAX_CHIPS],
 				*TC0100SCN_fg_ram[TC0100SCN_MAX_CHIPS],
 				*TC0100SCN_tx_ram[TC0100SCN_MAX_CHIPS],
@@ -2105,7 +1961,7 @@ static UINT16 *TC0100SCN_ram[TC0100SCN_MAX_CHIPS],
 				*TC0100SCN_fgscroll_ram[TC0100SCN_MAX_CHIPS],
 				*TC0100SCN_colscroll_ram[TC0100SCN_MAX_CHIPS];
 
-static int TC0100SCN_bgscrollx[TC0100SCN_MAX_CHIPS],TC0100SCN_bgscrolly[TC0100SCN_MAX_CHIPS],
+int TC0100SCN_bgscrollx[TC0100SCN_MAX_CHIPS],TC0100SCN_bgscrolly[TC0100SCN_MAX_CHIPS],
 		TC0100SCN_fgscrollx[TC0100SCN_MAX_CHIPS],TC0100SCN_fgscrolly[TC0100SCN_MAX_CHIPS];
 
 /* We keep two tilemaps for each of the 3 actual tilemaps: one at standard width, one double */
@@ -2784,7 +2640,10 @@ void TC0100SCN_tilemap_update(void)
 		}
 	}
 }
+extern void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority);
+extern void OTC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority);
 
+/* moved to tilemapn.cpp
 static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
 {
 	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tmap);
@@ -2827,7 +2686,7 @@ static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *clipr
 		src_y=(src_y+1)&height_mask;
 	}
 }
-
+*/
 int TC0100SCN_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
 {
 	int disable = TC0100SCN_ctrl[chip][6] & 0xf7;

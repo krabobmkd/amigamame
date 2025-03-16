@@ -1089,12 +1089,17 @@ VIDEO_UPDATE( chasehq )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	fillbitmap(priority_bitmap,0,cliprect);
 
-	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+
+	UINT8 nodraw = TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+
+    /* Ensure screen blanked even when bottom layer not drawn due to disable bit */
+    if (nodraw)
+    {
+       fillbitmap(priority_bitmap,0,cliprect);
+        fillbitmap(bitmap, Machine->pens[0], cliprect);
+    }
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
 	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);

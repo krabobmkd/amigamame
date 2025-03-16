@@ -817,6 +817,7 @@ static struct MSM5205interface msm5205_interface =
 /***********************************************************
                      MACHINE DRIVERS
 ***********************************************************/
+extern void initTopSpeedRoadColorTable();
 
 static MACHINE_START( topspeed )
 {
@@ -827,6 +828,8 @@ static MACHINE_START( topspeed )
 
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
+
+	initTopSpeedRoadColorTable(); // krb
 	return 0;
 }
 

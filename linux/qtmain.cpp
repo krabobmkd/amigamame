@@ -173,7 +173,7 @@ void QProc::process()
 //"rastan"
 //"bublbob2"
 //"zoom909"
-//"topspeed"
+"topspeed"
 //"othunder"
 //"pdrift"
 //"qbert"
@@ -185,7 +185,8 @@ void QProc::process()
 //                "gforce2"
 
 //        "aof"
-"chasehq"
+//"chasehq"
+// "ninjaw"
 //"nightstr"
 //      "mslug"
 
@@ -264,7 +265,7 @@ int main(int argc, char* argv[])
 
 	QApplication a(argc, argv);
     QWin w;
-    int r =  a.exec();
+        int r =  a.exec();
     isinexit = true;
     logEntries();
 
@@ -370,8 +371,8 @@ nbframe++;
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 
 // chasehq sprite prio bug:
-if(nbframe == 2650) mame_pause(1);
-
+//if(nbframe == 2650) mame_pause(1);
+//if(nbframe == 658) mame_pause(1); // ninjaw scene
 //if(nbframe == 950) mame_pause(1);
 
 //if(nbframe == 60*25) mame_pause(1);

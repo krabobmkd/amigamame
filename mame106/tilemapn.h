@@ -10,8 +10,6 @@ extern "C" {
     #include "tilemap.h"
 
 
-
-
 #ifdef __cplusplus
 }
 #endif

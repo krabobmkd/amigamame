@@ -189,7 +189,7 @@ VIDEO_UPDATE( ninjaw )
 
 	// draw middle layer
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,1,layer[1],0,0);
+    TC0100SCN_tilemap_draw(bitmap,cliprect,1,layer[1],0,0);
 	TC0100SCN_tilemap_draw(bitmap,cliprect,2,layer[1],0,0);
 
 	ninjaw_draw_sprites(bitmap,cliprect,0,8); // draw sprites with priority 0 which are over the mid layer
