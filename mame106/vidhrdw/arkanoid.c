@@ -21,6 +21,25 @@ WRITE8_HANDLER( arkanoid_videoram_w )
 		tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 	}
 }
+extern int last_partial_scanline;
+//krb - try to allow sprite multiplexing for abyss demo.
+WRITE8_HANDLER( arkcrsn5_spriteram_w )
+{
+	if (spriteram[offset] != data)
+	{
+		spriteram[offset] = data;
+		if((offset & 3) == 1) // if write Y pos of sprite...
+		{
+    		int scanline = cpu_getscanline(); // heavy seriously optimize that.
+    		//if(scanline>12)
+    		scanline += 24; // test
+            if (scanline > last_partial_scanline) //optim
+            {
+                force_partial_update(scanline);
+            }
+		}
+	}
+}
 
 WRITE8_HANDLER( arkanoid_d008_w )
 {
@@ -88,7 +107,7 @@ VIDEO_START( arkanoid )
 	return 0;
 }
 
-static void arkanoid_draw_sprites( mame_bitmap *bitmap )
+static void arkanoid_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -148,6 +167,6 @@ static void arkanoid_draw_sprites( mame_bitmap *bitmap )
 ***************************************************************************/
 VIDEO_UPDATE( arkanoid )
 {
-	tilemap_draw(bitmap, &Machine->visible_area, bg_tilemap, 0, 0);
-	arkanoid_draw_sprites(bitmap);
+	tilemap_draw(bitmap, /*&Machine->visible_area*/ cliprect, bg_tilemap, 0, 0);
+	arkanoid_draw_sprites(bitmap, cliprect);
 }

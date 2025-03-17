@@ -52,7 +52,7 @@ static UINT8 refresh_rate_changed;
 
 /* video updating */
 static UINT8 full_refresh_pending;
-static int last_partial_scanline;
+int last_partial_scanline;
 
 /* speed computation */
 static cycles_t last_fps_time;
@@ -664,15 +664,15 @@ void reset_partial_updates(void)
 
 void force_partial_update(int scanline)
 {
-	rectangle clip = Machine->visible_area;
+	/* skip if less than the lowest so far */
+	if (scanline < last_partial_scanline)
+		return;
 
 	/* if skipping this frame, bail */
 	if (osd_skip_this_frame())
 		return;
 
-	/* skip if less than the lowest so far */
-	if (scanline < last_partial_scanline)
-		return;
+	rectangle clip = Machine->visible_area;
 
 	/* if there's a dirty bitmap and we didn't do any partial updates yet, handle it now */
 	if (full_refresh_pending && last_partial_scanline == 0)

@@ -49,6 +49,8 @@
 #include "sound/ay8910.h"
 
 extern WRITE8_HANDLER( arkanoid_videoram_w );
+extern WRITE8_HANDLER( arkcrsn5_spriteram_w );
+
 extern VIDEO_START( arkanoid );
 extern VIDEO_UPDATE( arkanoid );
 
@@ -88,6 +90,21 @@ static ADDRESS_MAP_START( arkanoid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd018, 0xd018) AM_READWRITE(arkanoid_Z80_mcu_r, arkanoid_Z80_mcu_w)  /* input from the 68705 */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe840, 0xefff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( arkcrsn5_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xd001, 0xd001) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
+	AM_RANGE(0xd008, 0xd008) AM_WRITE(arkanoid_d008_w)	/* gfx bank, flip screen etc. */
+	AM_RANGE(0xd00c, 0xd00c) AM_READ(arkanoid_68705_input_0_r)  /* mainly an input port, with 2 bits from the 68705 */
+	AM_RANGE(0xd010, 0xd010) AM_READWRITE(input_port_1_r, watchdog_reset_w)
+	AM_RANGE(0xd018, 0xd018) AM_READWRITE(arkanoid_Z80_mcu_r, arkanoid_Z80_mcu_w)  /* input from the 68705 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) AM_WRITE(arkcrsn5_spriteram_w)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
 ADDRESS_MAP_END
@@ -382,6 +399,52 @@ static MACHINE_DRIVER_START( bootleg )
 	MDRV_CPU_REMOVE("mcu")
 MACHINE_DRIVER_END
 
+//krb
+//static MACHINE_DRIVER_START( machine_arkcrsn5 )
+//	MDRV_IMPORT_FROM(arkanoid)
+//MDRV_CPU_MODIFY
+//	// basic machine hardware
+////	MDRV_CPU_MODIFY("main")
+////	MDRV_CPU_PROGRAM_MAP(bootleg_map, 0)
+////	MDRV_CPU_REMOVE("mcu")
+//MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( arkcrsn5 )
+	// basic machine hardware
+	MDRV_CPU_ADD_TAG("main", Z80, 6000000)	// 6 MHz ???
+	MDRV_CPU_PROGRAM_MAP(arkcrsn5_map, 0)
+	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+
+	MDRV_CPU_ADD_TAG("mcu", M68705, 500000)	// .5 MHz (don't know really how fast, but it doesn't need to even be this fast)
+	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
+
+	MDRV_FRAMES_PER_SECOND(60)
+	MDRV_VBLANK_DURATION(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_INTERLEAVE(100)    					// 100 CPU slices per second to synchronize between the MCU and the main CPU
+
+	MDRV_MACHINE_START(arkanoid)
+	MDRV_MACHINE_RESET(arkanoid)
+
+	// video hardware
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_PALETTE_LENGTH(512)
+
+	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MDRV_VIDEO_START(arkanoid)
+	MDRV_VIDEO_UPDATE(arkanoid)
+
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+MACHINE_DRIVER_END
+
+
 /* ROMs */
 
 ROM_START( arkanoid )
@@ -652,6 +715,12 @@ static DRIVER_INIT( tetrsark )
 	}
 }
 
+/*krb: does work as extra init but useless
+static DRIVER_INIT( arkcrsn5_init )
+{
+    printf("pouet pouet\n");
+}
+*/
 /* Game Drivers */
 
 GAME( 1986, arkanoid, 0,        arkanoid, arkanoid, 0,       ROT90, "Taito Corporation Japan", "Arkanoid (World)", GAME_SUPPORTS_SAVE ,2)
@@ -668,4 +737,6 @@ GAME( 1986, arkangc,  arkanoid, bootleg,  arknoidj, 0,       ROT90, "bootleg", "
 GAME( 1987, arkatour, arkanoid, arkanoid, arkanoid, 0,       ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE ,2)
 GAME( 19??, tetrsark, 0,        bootleg,  tetrsark, tetrsark,ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ,0)
 
-GAME( 2023, arkcrsn5, 0,        arkanoid, arkanoid, 0,       ROT90, "Abyss leader of the 80's", "Cruisin'5 Demo (Arkanoid Hw) By Abyss (2023,W0rld)", GAME_SUPPORTS_SAVE ,0)
+// (YEAR,  NAME,  PARENT ,MACHINE  ,INPUT    ,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPLAYER)
+
+GAME( 2023, arkcrsn5, 0,  arkcrsn5, arkanoid, /*arkcrsn5_init*/0,       ROT90, "Abyss leader of the 80's", "Cruisin'5 Demo (Arkanoid Hw) By Abyss (2023,W0rld)", 0 ,0)
