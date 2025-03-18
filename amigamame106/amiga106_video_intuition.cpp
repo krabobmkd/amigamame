@@ -409,6 +409,7 @@ bool Intuition_Window::open()
         WA_MinWidth, _machineWidth,
         WA_MinHeight, _machineHeight,
         WA_RptQueue,0, // no rawkey repeat messages
+        WA_RMBTrap,TRUE,
         WA_IDCMP,/* IDCMP_GADGETUP | IDCMP_GADGETDOWN |*/
             IDCMP_MOUSEBUTTONS |  IDCMP_RAWKEY | IDCMP_CHANGEWINDOW |
             IDCMP_NEWSIZE /*| IDCMP_INTUITICKS*/ | IDCMP_CLOSEWINDOW,

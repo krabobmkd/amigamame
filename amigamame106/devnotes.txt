@@ -1,26 +1,37 @@
 todo R1.2
 
- Disclaimer: If after some driver update, RGB32 color games like mutant fighter or psychic5
- have wrong colors (Mame logo orange insead of blue),
-  the problem stands in cgx function BestCModeIDTagList() managed by the driver.
- Use option "Force Depth 16" in such case, or select a 32bit mode explicitly, to bypass problems.
+ Now I test with a Rpi CM4 with no overclock.
+
 
  - Added such excellent games as Caveman Ninja, Cliffhanger Edward Randy,Robocop 2, and Mutant fighter (machine deco16)
- - Frameskip is now a preference "Per game".
- - A Misc option for patch "NewLowLevel" needed by some A2000 configuration.
+ - Few optimisations for chasehq/sci/operation thunderblot/nightstriker (+12% speed),topspeed,CPS2 games (late street fighters).
+ - The Abyss "Cruisin5" demo emulation using the arkanoid hardware,
+    now support "sprite multiplexing" so the demo is much, much more enjoyable.( There are still a few glitch left).
+
  Corrections:
  - X wrong colors on shadows: Dynamite Dux, golden Axe -> corrected.
- - X Outzone set1->4 "black screen", repaired.
- - X Salamander corrupted sprite, corrected.
- - X topspeed (outrun clone) sprite priority, corrected.
- - X more memory clean at alloc, may resolve some problems.
+ - X Outzone "black screen": repaired.
+ - X Salamander corrupted sprite: corrected.
+ - X topspeed (taito outrun clone): corrected, few glitch left.
  - X neogeo sound mixer simplified, may accelerate a bit on rPi3.
  - X zoom909 wrong colors: corrected (palette rom is wrong, luckily could re-use parent palette.)
- - X a few optimisations for chasehq,topspeed,nightstriker,Capcom CPS2.
+
+ Improvments:
+ - Operation thunderbolt display crosshair only if moves. Remember you can play with 2 players with 2 mouses.
+   Now the second mouse button in window mode is trapped (does not open menu when window is focus),
+   also second mouse button was not automatically selected as "second button" like for joystick.
+   This is now the default when selecting mouse for inputs and needed for operation thunderbolt bombs.
+
+ Preferences evolutions:
+ - Frameskip is now a preference "Per game".
+ - A P96driver update trashed my screen configurations creating "ghost 0000 screenmodes" with wrong pixel mode.
+    Use new option "Force Depth 16" in such case, or select a 32bit mode explicitly to bypass problems.
+ - A Misc option for patch "NewLowLevel" needed by some A2000 configuration.
+
+------------------------------------------- still todo
+
  - O mortal kombat/NBAJam boot !!
  - O corrected amigaguide with OS3.2 version that includes images.
-
-
 
  - O "Carrier Air Wing has graphic corruptions in first level (cawing)"
         "No matter which set, has graphic corruption in the first level."

@@ -982,6 +982,8 @@ void RawKeyMap::init()
                                 MOUSECODE_1_BUTTON2+((iplayer-1)*mameMouseBtSizePerPl) });
             }
             {
+                // note: I have never seen a working amiga mouse with that elusive 3rd button.
+                // lowlevel says it can manage it.
                 _kbi.push_back({_keepMouseNames[(iport*8)+4].c_str(),
                                 ANALOG_CODESTART+(iport*8)+4,
                                 MOUSECODE_1_BUTTON3+((iplayer-1)*mameMouseBtSizePerPl) });

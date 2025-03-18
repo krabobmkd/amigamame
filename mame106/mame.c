@@ -922,7 +922,11 @@ void *_malloc_or_die(size_t size, const char *file, int line)
 //krb	result = malloc(size);
     result = calloc(size,1);
 	if (result != NULL)
+	{
+//no, not better        memset(result,255,size); // test
 		return result;
+    }
+
 
 	/* otherwise, die horribly */
 	fatalerror("Failed to allocate %d bytes (%s:%d)", (int)size, file, line);
