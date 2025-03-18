@@ -32,7 +32,7 @@ WRITE8_HANDLER( arkcrsn5_spriteram_w )
 		{
     		int scanline = cpu_getscanline(); // heavy seriously optimize that.
     		//if(scanline>12)
-    		scanline += 24; // test
+    		scanline += 24; //ok 24; // test
             if (scanline > last_partial_scanline) //optim
             {
                 force_partial_update(scanline);

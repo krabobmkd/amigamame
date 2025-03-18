@@ -18,12 +18,42 @@ static struct tempsprite *spritelist;
 
 static int taito_hide_pixels;
 
+//krb
+struct crh_state {
+    int _lastMoveFrame;
+    int _lastx,_lasty;
 
+};
+struct crh_state movestate[2];
+extern UINT32 _frame;
+void updateCrossHair(mame_bitmap *bitmap, const rectangle *cliprect,int screenx, int screeny,int player)
+{
+    struct crh_state *ps = &movestate[player];
+    int sincemove;
+    if(screenx != ps->_lastx || screeny != ps->_lasty)
+    {
+         ps->_lastMoveFrame = _frame;
+        sincemove = 0;
+        ps->_lastx = screenx;
+        ps->_lasty = screeny;
+    } else
+    {
+        sincemove = _frame- ps->_lastMoveFrame;
+    }
+    if(sincemove<60*10)
+        draw_crosshair(bitmap,screenx,screeny,cliprect,player);
+}
 
+//krb
+static int player1Moved,player2Moved;
+static int p1lastMoveFrame,p2lastMoveFrame;
 /**********************************************************/
 
 static VIDEO_START( othunder_core )
 {
+    movestate[0]._lastx =  movestate[1]._lastx =
+    movestate[0]._lasty =  movestate[1]._lasty = - 1;
+    movestate[0]._lastMoveFrame =movestate[1]._lastMoveFrame = 0 ;
 	/* Up to $800/8 big sprites, requires 0x100 * sizeof(*spritelist)
        Multiply this by 32 to give room for the number of small sprites,
        which are what actually get put in the structure. */
@@ -336,7 +366,8 @@ VIDEO_UPDATE( othunder )
 		screeny += 2;
 
 		/* player 1 */
-		draw_crosshair(bitmap,screenx,screeny,cliprect,0);
+		updateCrossHair(bitmap,cliprect,screenx,screeny,0);
+
 
 		/* calculate p2 screen co-ords by matching routine at $AA48 */
 		rawx = othunder_ram[0x284c/2];
@@ -379,7 +410,7 @@ VIDEO_UPDATE( othunder )
 		screeny += 2;
 
 		/* player 2 */
-		draw_crosshair(bitmap,screenx,screeny,cliprect,1);
+        updateCrossHair(bitmap,cliprect,screenx,screeny,1);
 	}
 }
 
