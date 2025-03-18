@@ -39,6 +39,8 @@ void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0));
 // - does priority plane test.
 void drawgfxzoom_clut16_Src8_tr0_prio(struct drawgfxParams *p DGREG(a0));
 
+// special optim for some chasehq calls - colors not written, just sprite code update
+void drawgfxzoom_prio_write(struct drawgfxParams *p DGREG(a0));
 #ifdef __cplusplus
 }
 #endif

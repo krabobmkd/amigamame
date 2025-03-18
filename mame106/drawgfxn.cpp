@@ -991,7 +991,7 @@ void drawgfxzoom_clut16_Src8T(struct drawgfxParams *p DGREG(a0))
     int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
     int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
 
-    if (sprite_screen_width<=0 || sprite_screen_height<=0 ) return; // krb personal choice.
+    if (sprite_screen_width<=0 || sprite_screen_height<=0 ) return;
 
     /* compute sprite increment per screen pixel */
     int dx = (gfx->width<<16)/sprite_screen_width;
@@ -1040,14 +1040,14 @@ void drawgfxzoom_clut16_Src8T(struct drawgfxParams *p DGREG(a0))
                 y_index += pixels*dy;
             }
             /* NS 980211 - fixed incorrect clipping */
-            if( ex > clip->max_x+1 )
+            if( ex > clip->max_x )
             { /* clip right */
-                int pixels = ex-clip->max_x-1;
+                int pixels = ex-clip->max_x;
                 ex -= pixels;
             }
-            if( ey > clip->max_y+1 )
+            if( ey > clip->max_y )
             { /* clip bottom */
-                int pixels = ey-clip->max_y-1;
+                int pixels = ey-clip->max_y;
                 ey -= pixels;
             }
         }
@@ -1116,4 +1116,64 @@ void drawgfxzoom_clut16_Src8_tr0_prio(struct drawgfxParams *p DGREG(a0))
 
     if(isOpaque) drawgfxzoom_clut16_Src8T<trt_isOpaque>(p);
     else drawgfxzoom_clut16_Src8T<trt_isTransp>(p);
+}
+
+// special optim for some chasehq calls - colors not written, just sprite code update
+void drawgfxzoom_prio_write(struct drawgfxParams *p DGREG(a0))
+{
+    int scalex = p->scalex;
+    int scaley = p->scaley;
+
+    const gfx_element *gfx = p->gfx;
+
+    int flipx = p->flipx,flipy = p->flipy;
+    int sx=p->sx,sy=p->sy;
+
+    // - - - -
+    mame_bitmap *pri_buffer = p->pri_buffer; // optional
+    UINT32 pri_mask = p->priority_mask;
+
+    int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
+    int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+
+    if (sprite_screen_width<=0 || sprite_screen_height<=0 ) return;
+
+    int ex = sx+sprite_screen_width;
+    int ey = sy+sprite_screen_height;
+
+    const rectangle *clip = p->clip;
+    if( clip )
+    {
+        if( sx < clip->min_x)
+        { /* clip left */
+            int pixels = clip->min_x-sx;
+            sx += pixels;
+        }
+        if( sy < clip->min_y )
+        { /* clip top */
+            int pixels = clip->min_y-sy;
+            sy += pixels;
+        }
+        if( ex > clip->max_x )
+        { /* clip right */
+            int pixels = ex-clip->max_x;
+            ex -= pixels;
+        }
+        if( ey > clip->max_y )
+        { /* clip bottom */
+            int pixels = ey-clip->max_y;
+            ey -= pixels;
+        }
+    }
+
+    if( ex<=sx ) return;
+
+    for(int y=sy; y<ey; y++ )
+    {
+        UINT8 *pri = (UINT8 *)pri_buffer->line[y];
+        UINT8 *priend = pri+ex;
+        pri += sx;
+        while(pri<priend) *pri++ = 31;
+    }
+
 }

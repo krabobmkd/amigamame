@@ -175,7 +175,7 @@ void QProc::process()
 //"zoom909"
 //"topspeed"
 //"gauntlet"
-"othunder"
+//"othunder"
 //"pdrift"
 //"qbert"
  //   "rastsaga"
@@ -186,7 +186,7 @@ void QProc::process()
 //                "gforce2"
 
 //        "aof"
-//"chasehq"
+"chasehq"
 // "ninjaw"
 //"nightstr"
 //      "mslug"

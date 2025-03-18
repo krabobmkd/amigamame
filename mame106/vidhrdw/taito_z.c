@@ -305,6 +305,9 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 	UINT32 code;
 
 //    int nbt=0;
+    rectangle lcliprect = *cliprect;
+    lcliprect.max_y++;
+    lcliprect.max_x++;
 
 	static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
     struct drawgfxParams dgpz1={
@@ -316,7 +319,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
         0, 	// flipy
         0, 	// sx
         0, 	// sy
-        cliprect, 	// clip
+        &lcliprect, 	// clip
         TRANSPARENCY_PEN, 	// transparency
         0, 	// transparent_color
         0x00010000, 	// scalex
@@ -333,7 +336,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
         0, 	// flipy
         0, 	// sx
         0, 	// sy
-        cliprect, 	// clip
+        &lcliprect, 	// clip
         TRANSPARENCY_PEN, 	// transparency
         0, 	// transparent_color
         0x00010000, 	// scalex
@@ -402,7 +405,6 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
                 if(pen_usage == 1) continue; // full transparent escape
 
 
-
 				curx = x + ((k*zoomx)/8);
 				cury = y + ((j*zoomy)/8);
 
@@ -427,17 +429,10 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				dgpz1.sy = cury;
 				dgpz1.scalex = zx<<12;
 				dgpz1.scaley = zy<<12;
-				//drawgfxzoom(&dgpz1);
-//				if(nbt == 500)
-//				{
-//                    static int yh=0;
-//                    dgpz1.color = 0;
-//                    yh++;
-//				}
-//				if(nbt != dbg_nbt)
+				if(/*pen_usage == 128 &&*/ priority ==1)				
+                    drawgfxzoom_prio_write(&dgpz1);
+				else
                     drawgfxzoom_clut16_Src8_tr0_prio(&dgpz1);
-
-//           nbt++;
 			}
 		}
 		else if ((zoomx-1) & 0x20)	/* 64x128 sprites, $40000-$5ffff in spritemap rom, OBJB */
@@ -490,10 +485,12 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				dgpz2.sy = cury;
 				dgpz2.scalex = zx<<12;
 				dgpz2.scaley = zy<<12;
-				//drawgfxzoom(&dgpz2);
-//				if(nbt != dbg_nbt)
-                drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
-//                nbt++;
+
+               // drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
+				if(/*pen_usage == 128 &&*/ priority ==1)
+                    drawgfxzoom_prio_write(&dgpz2);
+				else
+                    drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
 			}
 		} // end case 64x128
 		else if (!((zoomx-1) & 0x60))	/* 32x128 sprites, $60000-$7ffff in spritemap rom, OBJB */
@@ -548,7 +545,11 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 
 				//drawgfxzoom(&dgpz2);
 //				if(nbt != dbg_nbt)
-				drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
+//				drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
+				if(/*pen_usage == 128 &&*/ priority ==1)
+                    drawgfxzoom_prio_write(&dgpz2);
+				else
+                    drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
 //				nbt++;
 			}
 		} // end case 32x128
@@ -695,6 +696,9 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 
 	
 	{ 
+    rectangle lcliprect = *cliprect;
+    lcliprect.max_y++;
+    lcliprect.max_x++;
 	struct drawgfxParams dgpz5={
 		bitmap, 	// dest
 		Machine->gfx[0], 	// gfx
@@ -704,7 +708,7 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&lcliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		0, 	// transparent_color
 		0x00010000, 	// scalex
@@ -787,7 +791,11 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 			dgpz5.sy = cury;
 			dgpz5.scalex = zx<<12;
 			dgpz5.scaley = zy<<13;
-			drawgfxzoom(&dgpz5);
+//			drawgfxzoom(&dgpz5);
+            if(/*pen_usage == 128 &&*/ priority ==1)
+                drawgfxzoom_prio_write(&dgpz5);
+            else
+                drawgfxzoom_clut16_Src8_tr0_prio(&dgpz5);
 		}
 
 // 		if (bad_chunks)
@@ -1089,10 +1097,7 @@ VIDEO_UPDATE( chasehq )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-
-
-
-	UINT8 nodraw = TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+	int nodraw = TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
 
     /* Ensure screen blanked even when bottom layer not drawn due to disable bit */
     if (nodraw)
@@ -1118,12 +1123,14 @@ VIDEO_UPDATE( bshark )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	UINT8 nodraw = TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+	if(nodraw)
+	{
+        fillbitmap(priority_bitmap,0,cliprect);
 
-	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, Machine->pens[0],cliprect);
-
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+        /* Ensure screen blanked even when bottom layer not drawn due to disable bit */
+        fillbitmap(bitmap, Machine->pens[0],cliprect);
+	}
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
 	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,1,1,2);
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
@@ -1141,13 +1148,17 @@ VIDEO_UPDATE( sci )
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
+        fillbitmap(priority_bitmap,0,cliprect);
+        fillbitmap(bitmap, Machine->pens[0], cliprect);
+	int nodraw = TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+    /* Ensure screen blanked even when bottom layer not drawn due to disable bit */
+    // if (nodraw)
+    // {
+    //     fillbitmap(priority_bitmap,0,cliprect);
+    //     fillbitmap(bitmap, Machine->pens[0], cliprect);
+    // }
 
-	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
-
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
 	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
@@ -1165,13 +1176,14 @@ VIDEO_UPDATE( aquajack )
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
-
-	fillbitmap(priority_bitmap,0,cliprect);
-
-	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
-
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+        fillbitmap(priority_bitmap,0,cliprect);
+        fillbitmap(bitmap, Machine->pens[0], cliprect);
+	int nodraw = TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+    // if (nodraw)
+    // {
+    //     fillbitmap(priority_bitmap,0,cliprect);
+    //     fillbitmap(bitmap, Machine->pens[0], cliprect);
+    // }
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
 	TC0150ROD_draw(bitmap,cliprect,-1,0,2,1,1,2);
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
@@ -1190,12 +1202,16 @@ VIDEO_UPDATE( spacegun )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	fillbitmap(priority_bitmap,0,cliprect);
 
-	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	UINT8 nodraw = TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+	if(nodraw)
+	{
+        fillbitmap(priority_bitmap,0,cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+        /* Ensure screen blanked even when bottom layer not drawn due to disable bit */
+        fillbitmap(bitmap, Machine->pens[0], cliprect);
+	}
+
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
 
