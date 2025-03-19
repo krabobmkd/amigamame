@@ -81,7 +81,7 @@ static mame_timer *timer_free_head;
 static mame_timer *timer_free_tail;
 
 /* other internal states */
-static mame_time global_basetime;
+mame_time global_basetime;
 static mame_timer *callback_timer;
 static int callback_timer_modified;
 static mame_time callback_timer_expire_time;

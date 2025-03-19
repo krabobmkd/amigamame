@@ -15,6 +15,7 @@ extern "C" {
 
 typedef struct _DriverTuning {
 	UINT32 _bootframeskip;
+	UINT32 _minimumCpuCycles;
 	UINT32 _flags;
 } sDriverTuning;
 

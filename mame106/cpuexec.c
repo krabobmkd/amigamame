@@ -468,7 +468,8 @@ void watchdog_enable(int enable)
 #pragma mark -
 #pragma mark CPU SCHEDULING
 #endif
-
+extern UINT32 _minimumCpuCycles;
+extern mame_time global_basetime;
 /*************************************
  *
  *  Execute all the CPUs for one
@@ -479,7 +480,7 @@ void watchdog_enable(int enable)
 void cpuexec_timeslice(void)
 {
 	mame_time target = mame_timer_next_fire_time();
-	mame_time base = mame_timer_get_time();
+	mame_time base = global_basetime; // mame_timer_get_time();
 	int cpunum, ran;
 
 	LOG(("------------------\n"));
@@ -501,11 +502,13 @@ void cpuexec_timeslice(void)
 		if (!cpu[cpunum].suspend)
 		{
 			/* compute how long to run */
-			cycles_running = MAME_TIME_TO_CYCLES(cpunum, sub_mame_times(target, cpu[cpunum].localtime));
+			mame_time dift = sub_mame_times(target, cpu[cpunum].localtime);
+			if(dift.seconds<0) continue; // optimise some games (mk)
+			cycles_running = MAME_TIME_TO_CYCLES(cpunum, dift);
 			LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
 
 			/* run for the requested number of cycles */
-			if (cycles_running > 16) // krb serioulsy ? 1 cycle seen ?
+			if (cycles_running > _minimumCpuCycles) // krb serioulsy ? 1 cycle seen ?
 			{
 				profiler_mark(PROFILER_CPU1 + cpunum);
 				cycles_stolen = 0;
