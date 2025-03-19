@@ -186,7 +186,8 @@ void QProc::process()
 //                "gforce2"
 
 //        "aof"
-"chasehq"
+"mk"
+//"chasehq"
 // "ninjaw"
 //"nightstr"
 //      "mslug"
@@ -248,8 +249,8 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
-        this->setFixedSize(w*3,h*3);
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*2,h*2)) );
+        this->setFixedSize(w*2,h*2);
     _imageMutex.unlock();
 
 	//lbl.show();

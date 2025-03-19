@@ -11,6 +11,7 @@
 #include "sndhrdw/dcs.h"
 #include "midtunit.h"
 
+#include <stdio.h>
 
 /* compile-time constants */
 #define ENABLE_ALL_JDREDD_LEVELS	0
@@ -363,7 +364,11 @@ static READ16_HANDLER( jdredd_hack_r )
 }
 #endif
 
-
+// krb reset thing because wont boot without a reset
+static void kludge_earlyExtraReset(int param)
+{
+    mame_schedule_soft_reset();
+}
 
 /*************************************
  *
@@ -403,6 +408,9 @@ static void init_tunit_generic(int sound)
 
 	/* default graphics functionality */
 	midtunit_gfx_rom_large = 0;
+
+    //krb test
+    timer_set(TIME_IN_SEC(0.1),0,kludge_earlyExtraReset);
 }
 
 
