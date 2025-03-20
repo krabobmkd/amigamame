@@ -483,8 +483,8 @@ void cpuexec_timeslice(void)
 	mame_time base = global_basetime; // mame_timer_get_time();
 	int cpunum, ran;
 
-	LOG(("------------------\n"));
-	LOG(("cpu_timeslice: target = %.9f\n", mame_time_to_double(target)));
+//	LOG(("------------------\n"));
+//	LOG(("cpu_timeslice: target = %.9f\n", mame_time_to_double(target)));
 
 	/* process any pending suspends */
 	for (cpunum = 0; Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum++)
@@ -503,9 +503,22 @@ void cpuexec_timeslice(void)
 		{
 			/* compute how long to run */
 			mame_time dift = sub_mame_times(target, cpu[cpunum].localtime);
+
 			if(dift.seconds<0) continue; // optimise some games (mk)
+//    asm volatile(
+//                // xor because FLAG_Z is inverted. -> no need xor.b #4,%1
+//       "nop\n"
+//       :
+//       : // in
+//       : // trashed
+//       );
 			cycles_running = MAME_TIME_TO_CYCLES(cpunum, dift);
-			LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
+//			int c = dift.seconds * cycles_per_second[cpunum];
+//			int c2 = dift.subseconds / subseconds_per_cycle[cpunum];
+//			c += c2;
+//			cycles_running = c;
+	//		((t).seconds * cycles_per_second[cpu] + (t).subseconds / subseconds_per_cycle[cpu])
+	//		LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
 
 			/* run for the requested number of cycles */
 			if (cycles_running > _minimumCpuCycles) // krb serioulsy ? 1 cycle seen ?
@@ -548,7 +561,7 @@ void cpuexec_timeslice(void)
 		if (cpu[cpunum].suspend && cpu[cpunum].eatcycles && compare_mame_times(cpu[cpunum].localtime, target) < 0)
 		{
 			/* compute how long to run */
-			cycles_running = MAME_TIME_TO_CYCLES(cpunum, sub_mame_times(target, cpu[cpunum].localtime));
+			cycles_running = MAME_TIME_TO_CYCLES_FAST(cpunum, sub_mame_times(target, cpu[cpunum].localtime));
 			LOG(("  cpu %d: %d cycles (suspended)\n", cpunum, cycles_running));
 
 			cpu[cpunum].totalcycles += cycles_running;
@@ -711,7 +724,14 @@ void cpunum_set_clock(int cpunum, int clock)
 	cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
 	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
 	subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / sec_to_cycles[cpunum];
-
+	// krb test
+	if(subseconds_per_cycle[cpunum] != 0)
+	{
+        OOsubseconds_per_cycle[cpunum] = 1.0 / ((double)subseconds_per_cycle[cpunum]);
+    } else
+    {
+     OOsubseconds_per_cycle[cpunum] = 0.0;
+    }
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
 }
@@ -906,7 +926,7 @@ int activecpu_geticount(void)
 
 /* remove me - only used by mamedbg, m92 */
 	VERIFY_EXECUTINGCPU(cpu_geticount);
-	result = MAME_TIME_TO_CYCLES(activecpu, sub_mame_times(cpu[activecpu].vblankint_period, mame_timer_timeelapsed(cpu[activecpu].vblankint_timer)));
+	result = MAME_TIME_TO_CYCLES_FAST(activecpu, sub_mame_times(cpu[activecpu].vblankint_period, mame_timer_timeelapsed(cpu[activecpu].vblankint_timer)));
 	return (result < 0) ? 0 : result;
 }
 

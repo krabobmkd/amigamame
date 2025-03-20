@@ -503,10 +503,10 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
     serializer("Skip",_skipflags,0,{"Disclaimer","Game Info"});
     serializer("NeoGeo Bios",_neogeo_bios,_neogeoBiosList);
 
-    serializer(" ",_MiscFlags,
+    serializer("Also...",_MiscFlags,
                         0 | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
                     ,{
-        "Prefer ReadJoyPort() to Rawkeys\n( for NewLowlevel )"
+        "Prefer ReadJoyPort() to Rawkeys\n( for NewLowlevel users )"
         });
 
 

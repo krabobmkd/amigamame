@@ -70,6 +70,7 @@ struct _mame_timer
 
 /* conversion constants */
 subseconds_t subseconds_per_cycle[MAX_CPU];
+double OOsubseconds_per_cycle[MAX_CPU];
 UINT32 cycles_per_second[MAX_CPU];
 double cycles_to_sec[MAX_CPU];
 double sec_to_cycles[MAX_CPU];

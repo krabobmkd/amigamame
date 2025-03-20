@@ -23,7 +23,13 @@
 ***************************************************************************/
 
 /* subseconds are tracked in attosecond (10^-18) increments */
-#define MAX_SUBSECONDS				((subseconds_t)1000000000 * (subseconds_t)1000000000)
+//#define MAX_SUBSECONDS				((subseconds_t)1000000000 * (subseconds_t)1000000000)
+//krb: let's use subseconds with this:
+// 4 611 686 018 427 387 904
+// 1 000 000 000 000 000 000
+//#define MAX_SUBSECONDS					((seconds_t)((1LL)<<62))
+#define MAX_SUBSECONDS					((seconds_t)((1LL)<<30))
+// 1 073 741 824
 #define MAX_SECONDS					((seconds_t)1000000000)
 
 /* effective now/never values as doubles */
@@ -42,6 +48,8 @@
 
 /* convert cycles on a given CPU to/from mame_time */
 #define MAME_TIME_TO_CYCLES(cpu,t)	((t).seconds * cycles_per_second[cpu] + (t).subseconds / subseconds_per_cycle[cpu])
+#define MAME_TIME_TO_CYCLES_FAST(cpu,t)	((t).seconds * cycles_per_second[cpu] + (int)( (double)(t).subseconds * OOsubseconds_per_cycle[cpu]))
+
 #define MAME_TIME_IN_CYCLES(c,cpu)	(make_mame_time((c) / cycles_per_second[cpu], (c) * subseconds_per_cycle[cpu]))
 
 /* useful macros for describing time using doubles */
@@ -94,7 +102,9 @@
 typedef struct _mame_timer mame_timer;
 
 /* these core types describe a 96-bit time value */
-typedef INT64 subseconds_t;
+//typedef INT64 subseconds_t;
+// test
+typedef INT32 subseconds_t;
 typedef INT32 seconds_t;
 
 typedef struct _mame_time mame_time;
@@ -116,6 +126,7 @@ extern mame_time time_never;
 
 /* arrays containing mappings between CPU cycle times and timer values */
 extern subseconds_t subseconds_per_cycle[];
+extern double OOsubseconds_per_cycle[];
 extern UINT32 cycles_per_second[];
 extern double cycles_to_sec[];
 extern double sec_to_cycles[];
