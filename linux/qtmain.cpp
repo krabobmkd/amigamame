@@ -186,7 +186,8 @@ void QProc::process()
 //                "gforce2"
 
 //        "aof"
-"mk"
+//"mk"
+"thndrbld"
 //"chasehq"
 // "ninjaw"
 //"nightstr"

@@ -124,7 +124,7 @@ int cpunum_get_clock(int cpunum);
 
 /* Sets the current CPU's clock speed and then adjusts for scaling */
 void cpunum_set_clock(int cpunum, int clock);
-void cpunum_set_clock_period(int cpunum, subseconds_t clock_period);
+//void cpunum_set_clock_period(int cpunum, subseconds_t clock_period);
 
 /* Returns the current scaling factor for a CPU's clock speed */
 double cpunum_get_clockscale(int cpunum);

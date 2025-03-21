@@ -70,7 +70,6 @@ struct _mame_timer
 
 /* conversion constants */
 subseconds_t subseconds_per_cycle[MAX_CPU];
-double OOsubseconds_per_cycle[MAX_CPU];
 UINT32 cycles_per_second[MAX_CPU];
 double cycles_to_sec[MAX_CPU];
 double sec_to_cycles[MAX_CPU];
@@ -257,7 +256,7 @@ void timer_init(void)
 	/* init the constant times */
 	time_zero.seconds = time_zero.subseconds = 0;
 	time_never.seconds = MAX_SECONDS;
-	time_never.subseconds = MAX_SUBSECONDS - 1;
+	time_never.subseconds = 0xffffffffffffffffULL; //MAX_SUBSECONDS - 1;
 
 	/* we need to wait until the first call to timer_cyclestorun before using real CPU times */
 	global_basetime = time_zero;
