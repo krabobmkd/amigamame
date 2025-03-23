@@ -2637,9 +2637,10 @@ profiler_mark(PROFILER_INPUT);
 			INT32 value;
 
 			/* interpolate or not */
-			if (info->interpolate && !info->port->analog.reset)
-				current = info->previous + cpu_scalebyfcount(info->accum - info->previous);
-			else
+			//krb test: cpu_scalebyfcount() is heavy
+			// if (info->interpolate && !info->port->analog.reset)
+			// 	current = info->previous + cpu_scalebyfcount(info->accum - info->previous);
+			// else
 				current = info->accum;
 
 			/* apply the min/max and then the sensitivity */

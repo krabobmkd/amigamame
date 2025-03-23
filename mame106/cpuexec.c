@@ -235,7 +235,7 @@ int cpuexec_init(void)
 
 		subseconds_per_cycle[cpunum] = ((subseconds_t)(((double)(1LL<<32)) / (sec_to_cycles[cpunum])));
         if(subseconds_per_cycle[cpunum]==0) subseconds_per_cycle[cpunum]=1;
-
+ printf("cpuexec_init %d %d\n",cpunum, subseconds_per_cycle[cpunum]);
 		/* register some of our variables for later */
 		state_save_register_item("cpu", cpunum, cpu[cpunum].suspend);
 		state_save_register_item("cpu", cpunum, cpu[cpunum].nextsuspend);
@@ -505,41 +505,43 @@ void cpuexec_timeslice(void)
 		{
 			/* compute how long to run */
 			mame_time dift = sub_mame_times(target, cpu[cpunum].localtime);
-			if(dift.seconds<0) continue; // optimise some games (mk)
+			if(dift._t<=0) continue; // optimise some games (mk)
 			cycles_running = MAME_TIME_TO_CYCLES(cpunum, dift);
-			LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
+			cycles_running += 2; // because division precision loss...
+
+//			printf("  cpu %d: %d cycles\n", cpunum, cycles_running);
 
 			/* run for the requested number of cycles */
-			if (cycles_running > _minimumCpuCycles) // krb serioulsy ? 1 cycle seen ?
-			{
-				profiler_mark(PROFILER_CPU1 + cpunum);
-				cycles_stolen = 0;
+			if (cycles_running <= _minimumCpuCycles) // krb serioulsy ? 1 cycle seen ?
+                continue;
 
-				ran = cpunum_execute(cpunum, cycles_running);
+            profiler_mark(PROFILER_CPU1 + cpunum);
+            cycles_stolen = 0;
+
+            ran = cpunum_execute(cpunum, cycles_running);
 
 #ifdef MAME_DEBUG
-				if (ran < cycles_stolen)
-					fatalerror("Negative CPU cycle count!");
+            if (ran < cycles_stolen)
+                fatalerror("Negative CPU cycle count!");
 #endif /* MAME_DEBUG */
 
-				ran -= cycles_stolen;
-				profiler_mark(PROFILER_END);
+            ran -= cycles_stolen;
+            profiler_mark(PROFILER_END);
 
-				/* account for these cycles */
-				cpu[cpunum].totalcycles += ran;
-				cpu[cpunum].localtime = add_mame_times(cpu[cpunum].localtime, MAME_TIME_IN_CYCLES(ran, cpunum));
-				LOG(("         %d ran, %d total, time = %.9f\n", ran, (INT32)cpu[cpunum].totalcycles, mame_time_to_double(cpu[cpunum].localtime)));
+            /* account for these cycles */
+            cpu[cpunum].totalcycles += ran;
+            cpu[cpunum].localtime = add_mame_times(cpu[cpunum].localtime, MAME_TIME_IN_CYCLES(ran, cpunum));
+            LOG(("         %d ran, %d total, time = %.9f\n", ran, (INT32)cpu[cpunum].totalcycles, mame_time_to_double(cpu[cpunum].localtime)));
 
-				/* if the new local CPU time is less than our target, move the target up */
-				if (compare_mame_times(cpu[cpunum].localtime, target) < 0)
-				{
-					if (compare_mame_times(cpu[cpunum].localtime, base) > 0)
-						target = cpu[cpunum].localtime;
-					else
-						target = base;
-					LOG(("         (new target)\n"));
-				}
-			}
+            /* if the new local CPU time is less than our target, move the target up */
+            if (compare_mame_times(cpu[cpunum].localtime, target) < 0)
+            {
+                if (compare_mame_times(cpu[cpunum].localtime, base) > 0)
+                    target = cpu[cpunum].localtime;
+                else
+                    target = base;
+                LOG(("         (new target)\n"));
+            }
 		}
 	}
 
@@ -712,9 +714,9 @@ void cpunum_set_clock(int cpunum, int clock)
 	sec_to_cycles[cpunum] = (double)clock * cpu[cpunum].clockscale;
 	cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
 	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
-	subseconds_per_cycle[cpunum] = (double)(1UL<<32) / (sec_to_cycles[cpunum]);
+	subseconds_per_cycle[cpunum] = (double)(1LL<<32) / (sec_to_cycles[cpunum]);
 	if(subseconds_per_cycle[cpunum]==0) subseconds_per_cycle[cpunum]=1;
-
+ printf("set_clock %d %d\n",cpunum, subseconds_per_cycle[cpunum]);
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
 }
@@ -767,9 +769,9 @@ void cpunum_set_clockscale(int cpunum, double clockscale)
 	sec_to_cycles[cpunum] = (double)cpu[cpunum].clock * clockscale;
 	cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
 	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
-	subseconds_per_cycle[cpunum] = ((double)(1UL<<31) / (sec_to_cycles[cpunum]*0.5));
+	subseconds_per_cycle[cpunum] = ((double)(1LL<<32) / (sec_to_cycles[cpunum]));
 	if(subseconds_per_cycle[cpunum]==0) subseconds_per_cycle[cpunum]=1;
-
+ printf("set_clockscale %d %d\n",cpunum, subseconds_per_cycle[cpunum]);
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
 }
@@ -1007,8 +1009,11 @@ void cpu_compute_scanline_timing(void)
 		scanline_period.subseconds /= Machine->drv->default_visible_area.max_y - Machine->drv->default_visible_area.min_y + 1;
 	}
 	else
+	{
 		scanline_period.subseconds /= Machine->drv->screen_height;
-
+    }
+    // krb note: a scanline is expressed around a 16b value in 32bit subsecond, which looks precise enough
+    // to then compute cycles per lines.
     if(scanline_period.subseconds == 0 ) scanline_period.subseconds = 1; // used for divs
 
 //	printf("cpu_compute_scanline_timing: refresh=%.9f vblank=%.9f scanline=%.9f\n", mame_time_to_double(refresh_period), mame_time_to_double(vblank_period), mame_time_to_double(scanline_period));

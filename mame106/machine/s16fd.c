@@ -11,7 +11,7 @@ make more configurable (select caches per game?)
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
-
+#include <stdio.h>
 
 #define S16_NUMCACHE 8
 
@@ -124,6 +124,7 @@ void fd1094_machine_init(void)
 	if (!fd1094_key)
 		return;
 
+
 	fd1094_setstate_and_decrypt(FD1094_STATE_RESET);
 	fd1094_kludge_reset_values();
 
@@ -136,6 +137,10 @@ void fd1094_machine_init(void)
 void fd1094_driver_init(void)
 {
 	int i;
+    //krb cleaning
+    {
+        fd1094_userregion = NULL;
+    }
 
 	fd1094_cpuregion = (UINT16*)memory_region(REGION_CPU1);
 	fd1094_cpuregionsize = memory_region_length(REGION_CPU1);
