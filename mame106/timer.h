@@ -16,8 +16,8 @@
 #define __TIMER_H__
 
 #include "mamecore.h"
-
-
+#include <stdio.h>
+#include <stdio.h>
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -26,7 +26,7 @@
 // krb: now consider subseconds a
 //#define MAX_SUBSECONDS				((subseconds_t)1000000000 * (subseconds_t)1000000000)
 #define MAX_SECONDS					((seconds_t)1000000000)
-
+#define MAX_SUBSECONDSM 0xffffffffUL
 /* effective now/never values as doubles */
 #define TIME_NOW             		(0.0)
 #define TIME_NEVER            		(1.0e30)
@@ -38,15 +38,17 @@
 ***************************************************************************/
 
 /* convert between a double and subseconds */
-#define SUBSECONDS_TO_DOUBLE(x)		((double)(x) * (1.0 / (double)18446744073709551615.0))
-#define DOUBLE_TO_SUBSECONDS(x)		((subseconds_t)((x) * (double)18446744073709551615.0))
+
+//#define SUBSECONDS_TO_DOUBLE(x)		((double)(x) * (1.0 / (double)18446744073709551615.0))
+//#define DOUBLE_TO_SUBSECONDS(x)		((subseconds_t)((x) * (double)18446744073709551615.0))
+
 //#define SUBSECONDS_TO_DOUBLE(x)		((double)(x) * (1.0 / (double)MAX_SUBSECONDS))
 //#define DOUBLE_TO_SUBSECONDS(x)		((subseconds_t)((x) * (double)MAX_SUBSECONDS))
 // 18,446,744,073,709,551,615
 // 18446744073709551615.0
 /* convert cycles on a given CPU to/from mame_time */
-#define MAME_TIME_TO_CYCLES(cpu,t)	((t).seconds * cycles_per_second[cpu] + (t).subseconds / subseconds_per_cycle[cpu])
-#define MAME_TIME_IN_CYCLES(c,cpu)	(make_mame_time((c) / cycles_per_second[cpu], (c) * subseconds_per_cycle[cpu]))
+//#define MAME_TIME_TO_CYCLES(cpu,t)	((t).seconds * cycles_per_second[cpu] + (t).subseconds / subseconds_per_cycle[cpu])
+
 
 /* useful macros for describing time using doubles */
 #define TIME_IN_HZ(hz)        (1.0 / (double)(hz))
@@ -98,15 +100,38 @@
 typedef struct _mame_timer mame_timer;
 
 /* these core types describe a 96-bit time value */
-typedef UINT64 subseconds_t;
+typedef UINT32 subseconds_t;
 typedef INT32 seconds_t;
 
 typedef struct _mame_time mame_time;
 struct _mame_time
 {
+    union {
+        INT64 _t;
+        struct {
+#ifdef LSB_FIRST
+	subseconds_t	subseconds;
+	seconds_t		seconds;
+#else
 	seconds_t		seconds;
 	subseconds_t	subseconds;
+#endif
+        };
+    };
+
 };
+
+static inline double SUBSECONDS_TO_DOUBLE(subseconds_t x)
+{
+    double d = (double)(x) * (1.0 / (double)/*18446744073709551615.0*/(1ULL<<32));
+    return d;
+}
+static inline subseconds_t DOUBLE_TO_SUBSECONDS(double d)
+{
+    subseconds_t x = ((subseconds_t)((d) * (double)/*18446744073709551615.0*/(1ULL<<32)));
+    return x;
+}
+
 
 
 
@@ -120,6 +145,7 @@ extern mame_time time_never;
 
 /* arrays containing mappings between CPU cycle times and timer values */
 extern subseconds_t subseconds_per_cycle[];
+extern INT64 subseconds_per_cycle64[];
 extern UINT32 cycles_per_second[];
 extern double cycles_to_sec[];
 extern double sec_to_cycles[];
@@ -179,7 +205,8 @@ static inline mame_time make_mame_time(seconds_t _secs, subseconds_t _subsecs)
 
 static inline double mame_time_to_double(mame_time _time)
 {
-	return (double)_time.seconds + SUBSECONDS_TO_DOUBLE(_time.subseconds);
+    double res = (double)_time.seconds + SUBSECONDS_TO_DOUBLE(_time.subseconds);
+	return res;
 }
 
 
@@ -195,13 +222,9 @@ static inline mame_time double_to_mame_time(double _time)
 	/* special case for TIME_NEVER */
 	if (_time >= TIME_NEVER)
 		return time_never;
+//optim heavy on 32b
+	abstime._t = (INT64)(_time * ((double)(1LL<<32)));
 
-	/* set seconds to the integral part */
-	abstime.seconds = (seconds_t)_time;
-
-	/* set subseconds to the fractional part */
-	_time -= (double)abstime.seconds;
-	abstime.subseconds = DOUBLE_TO_SUBSECONDS(_time);
 	return abstime;
 }
 
@@ -219,25 +242,7 @@ static inline mame_time add_mame_times(mame_time _time1, mame_time _time2)
 	if (_time1.seconds >= MAX_SECONDS || _time2.seconds >= MAX_SECONDS)
 		return time_never;
 
-// ye olde original code...
-//	// add the seconds and subseconds
-//	result.subseconds = _time1.subseconds + _time2.subseconds;
-//	result.seconds = _time1.seconds + _time2.seconds;
-
-//	// normalize and return
-//	if (result.subseconds >= MAX_SUBSECONDS)
-//	{
-//		result.subseconds -= MAX_SUBSECONDS;
-//		result.seconds++;
-//	}
-
-    result.subseconds = _time1.subseconds + _time2.subseconds;
-    // the magic
-    INT32 carry = (result.subseconds < _time1.subseconds );
-    result.seconds = _time1.seconds + _time2.seconds + carry;
-
-
-
+    result._t = _time1._t + _time2._t;
 	return result;
 }
 
@@ -252,25 +257,10 @@ static inline mame_time add_subseconds_to_mame_time(mame_time _time1, subseconds
 	mame_time result;
 
 	/* if one of the items is time_never, return time_never */
-	//OPTIM
 	if (_time1.seconds >= MAX_SECONDS)
 		return time_never;
 
-//	/* add the seconds and subseconds */
-//	result.subseconds = _time1.subseconds + _subseconds;
-//	result.seconds = _time1.seconds;
-
-//	/* normalize and return */
-//	if (result.subseconds >= MAX_SUBSECONDS)
-//	{
-//		result.subseconds -= MAX_SUBSECONDS;
-//		result.seconds++;
-//	}
-    result.subseconds = _time1.subseconds + _subseconds;
-    // the magic
-    INT32 carry = (result.subseconds < _time1.subseconds );
-    result.seconds = _time1.seconds + carry;
-
+    result._t = _time1._t + (INT64)_subseconds;
 	return result;
 }
 
@@ -287,20 +277,7 @@ static inline mame_time sub_mame_times(mame_time _time1, mame_time _time2)
 	if (_time1.seconds >= MAX_SECONDS)
 		return time_never;
 
-//	/* add the seconds and subseconds */
-//	result.subseconds = _time1.subseconds - _time2.subseconds;
-//	result.seconds = _time1.seconds - _time2.seconds;
-
-//	/* normalize and return */
-//	if (result.subseconds < 0)
-//	{
-//		result.subseconds += MAX_SUBSECONDS;
-//		result.seconds--;
-//	}
-    result.subseconds = _time1.subseconds - _time2.subseconds;
-    // the magic
-    INT32 underflow = (result.subseconds > _time1.subseconds );
-    result.seconds = _time1.seconds - _time2.seconds - underflow;
+    result._t = _time1._t - _time2._t;
 
 	return result;
 }
@@ -319,19 +296,7 @@ static inline mame_time sub_subseconds_from_mame_time(mame_time _time1, subsecon
 	if (_time1.seconds >= MAX_SECONDS)
 		return time_never;
 
-	/* add the seconds and subseconds */
-//	result.subseconds = _time1.subseconds - _subseconds;
-//	result.seconds = _time1.seconds;
-
-//	/* normalize and return */
-//	if (result.subseconds < 0)
-//	{
-//		result.subseconds += MAX_SUBSECONDS;
-//		result.seconds--;
-//	}
-    result.subseconds = _time1.subseconds -_subseconds;
-    result.seconds = _time1.seconds;
-    if(result.subseconds > _time1.subseconds ) result.seconds--; // if underflow
+    result._t = _time1._t - (INT64)_subseconds;
 
 	return result;
 }
@@ -343,14 +308,42 @@ static inline mame_time sub_subseconds_from_mame_time(mame_time _time1, subsecon
 
 static inline int compare_mame_times(mame_time _time1, mame_time _time2)
 {
-    INT32 dif = _time1.seconds - _time2.seconds;
-    if(dif != 0) return dif;
+    //printf("compare_mame_times:\n");
 
-	if (_time1.subseconds > _time2.subseconds)
+    INT64 dif = _time1._t - _time2._t;
+	if (dif > 0LL)
 		return 1;
-	if (_time1.subseconds < _time2.subseconds)
+	if (dif< 0LL)
 		return -1;
 	return 0;
+
+   // if(dif != 0) return dif;
+    //return (int)_time1.subseconds - (int)_time2.subseconds;
+	// if (_time1.subseconds > _time2.subseconds)
+	// 	return 1;
+	// if (_time1.subseconds < _time2.subseconds)
+	// 	return -1;
+	//return 0;
+}
+
+
+static inline int MAME_TIME_TO_CYCLES(int cpunum,mame_time t)
+{
+    int r = t.seconds * cycles_per_second[cpunum];
+    r += t.subseconds / subseconds_per_cycle[cpunum];
+    return r;
+}
+
+//#define MAME_TIME_IN_CYCLES(c,cpu)	(make_mame_time((c) / cycles_per_second[cpu], (c) * subseconds_per_cycle[cpu]))
+static inline mame_time MAME_TIME_IN_CYCLES(UINT32 cycles,int cpunum)
+{
+    mame_time result;
+    result._t = (INT64)cycles * (INT64)subseconds_per_cycle[cpunum];
+    // result.seconds = cycles / cycles_per_second[cpunum];
+    // printf("MAME_TIME_IN_CYCLES cpu:%d cycles:%08x subsecpc:%08x\n",cpunum,cycles,subseconds_per_cycle[cpunum]);
+    // result.subseconds = (cycles * subseconds_per_cycle[cpunum]);
+    // printf("result.subseconds:%08x\n",result.subseconds);
+    return result;
 }
 
 

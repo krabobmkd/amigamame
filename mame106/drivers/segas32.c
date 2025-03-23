@@ -412,7 +412,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
 {
 	signal_v60_irq(MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
-	timer_set(cpu_getscanlinetime(0), 0, end_of_vblank_int);
+	mame_timer_set(cpu_getscanlinetime_mt(0), 0, end_of_vblank_int);
 	if (system32_prot_vblank)
 		(*system32_prot_vblank)();
 }

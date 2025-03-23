@@ -8,7 +8,7 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
-
+//was test #pragma GCC optimize ("O1")
 #include <math.h>
 #include "driver.h"
 #include "cheat.h"
@@ -151,7 +151,7 @@ static mame_time refresh_period;
 static mame_timer *timeslice_timer;
 static mame_time timeslice_period;
 
-static mame_time scanline_period;
+mame_time scanline_period;
 
 static mame_timer *interleave_boost_timer;
 static mame_timer *interleave_boost_timer_end;
@@ -232,7 +232,9 @@ int cpuexec_init(void)
 		sec_to_cycles[cpunum] = cpu[cpunum].clockscale * cpu[cpunum].clock;
 		cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
 		cycles_per_second[cpunum] = sec_to_cycles[cpunum];
-		subseconds_per_cycle[cpunum] = ((UINT64)(((double)0x8000000000000000UL) / (sec_to_cycles[cpunum]*0.5)));
+
+		subseconds_per_cycle[cpunum] = ((subseconds_t)(((double)(1LL<<32)) / (sec_to_cycles[cpunum])));
+        if(subseconds_per_cycle[cpunum]==0) subseconds_per_cycle[cpunum]=1;
 
 		/* register some of our variables for later */
 		state_save_register_item("cpu", cpunum, cpu[cpunum].suspend);
@@ -710,7 +712,8 @@ void cpunum_set_clock(int cpunum, int clock)
 	sec_to_cycles[cpunum] = (double)clock * cpu[cpunum].clockscale;
 	cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
 	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
-	subseconds_per_cycle[cpunum] = (double)0x8000000000000000ULL / (sec_to_cycles[cpunum]*0.5);
+	subseconds_per_cycle[cpunum] = (double)(1UL<<32) / (sec_to_cycles[cpunum]);
+	if(subseconds_per_cycle[cpunum]==0) subseconds_per_cycle[cpunum]=1;
 
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
@@ -764,7 +767,8 @@ void cpunum_set_clockscale(int cpunum, double clockscale)
 	sec_to_cycles[cpunum] = (double)cpu[cpunum].clock * clockscale;
 	cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
 	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
-	subseconds_per_cycle[cpunum] = ((double)0x8000000000000000ULL / (sec_to_cycles[cpunum]*0.5));
+	subseconds_per_cycle[cpunum] = ((double)(1UL<<31) / (sec_to_cycles[cpunum]*0.5));
+	if(subseconds_per_cycle[cpunum]==0) subseconds_per_cycle[cpunum]=1;
 
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
@@ -942,9 +946,9 @@ int cpu_scalebyfcount(int value)
 
 	/* shift off some bits to ensure no overflow */
 	if (value < 65536)
-		result = value * (refresh_elapsed.subseconds >> 16) / (refresh_period.subseconds >> 16);
+		result = value * (refresh_elapsed.subseconds >> 8) / (refresh_period.subseconds >> 8);
 	else
-		result = value * (refresh_elapsed.subseconds >> 32) / (refresh_period.subseconds >> 32);
+		result = value * (refresh_elapsed.subseconds >> 16) / (refresh_period.subseconds >> 16);
 	if (value >= 0)
 		return (result < value) ? result : value;
 	else
@@ -995,7 +999,8 @@ void cpu_compute_scanline_timing(void)
 		mame_timer_adjust(vblank_timer, mame_timer_timeleft(vblank_timer), 0, vblank_period);
 
 	/* recompute the scanline period */
-	scanline_period = refresh_period;
+
+	scanline_period = refresh_period; // meant to be <0.
 	if (Machine->drv->vblank_duration)
 	{
 		scanline_period.subseconds -= DOUBLE_TO_SUBSECONDS(TIME_IN_USEC(Machine->drv->vblank_duration));
@@ -1004,7 +1009,9 @@ void cpu_compute_scanline_timing(void)
 	else
 		scanline_period.subseconds /= Machine->drv->screen_height;
 
-	LOG(("cpu_compute_scanline_timing: refresh=%.9f vblank=%.9f scanline=%.9f\n", mame_time_to_double(refresh_period), mame_time_to_double(vblank_period), mame_time_to_double(scanline_period)));
+    if(scanline_period.subseconds == 0 ) scanline_period.subseconds = 1; // used for divs
+
+//	printf("cpu_compute_scanline_timing: refresh=%.9f vblank=%.9f scanline=%.9f\n", mame_time_to_double(refresh_period), mame_time_to_double(vblank_period), mame_time_to_double(scanline_period));
 }
 
 
@@ -1038,9 +1045,39 @@ int cpu_getscanline(void)
  *
  *************************************/
 
+// mame_time cpu_getscanlinetime_mt(int scanline)
+// {
+// 	mame_time scantime, abstime;
+
+// 	/* compute the target time */
+// 	UINT64 sclt =  (scanline_period.subseconds + 1);
+// 	sclt *= scanline;
+// 	scantime = add_subseconds_to_mame_time(mame_timer_starttime(refresh_timer),sclt );
+
+// 	/* get the current absolute time */
+// 	abstime = get_current_time();
+// //re BLABLABLA segaic16_tilemap_16b_latch_values
+// 	/* if we're already past the computed time, count it for the next frame */
+// 	if (compare_mame_times(abstime, scantime) >= 0)
+// 		scantime = add_mame_times(scantime, refresh_period);
+
+// 	/* compute how long from now until that time */
+// 	return sub_mame_times(scantime, abstime);
+// }
+
+
+/*************************************
+ *
+ *  Returns time until given scanline
+ *
+ *************************************/
+int nnbtest=0;
 mame_time cpu_getscanlinetime_mt(int scanline)
 {
 	mame_time scantime, abstime;
+
+    mame_time refrt = mame_timer_starttime(refresh_timer);
+ //   printf("cpu_getscanlinetime_mt:%d refrt:%.9f scp.subs:%08lx\n",scanline,mame_time_to_double(refrt),(scanline_period.subseconds+1));
 
 	/* compute the target time */
 	scantime = add_subseconds_to_mame_time(mame_timer_starttime(refresh_timer), scanline * (scanline_period.subseconds + 1));
@@ -1048,22 +1085,30 @@ mame_time cpu_getscanlinetime_mt(int scanline)
 	/* get the current absolute time */
 	abstime = mame_timer_get_time();
 
+ //  printf("scantime:%.9f abstime:%.9f\n",mame_time_to_double(scantime),mame_time_to_double(abstime));
+
 	/* if we're already past the computed time, count it for the next frame */
-	if (compare_mame_times(abstime, scantime) >= 0)
+	int icp = compare_mame_times(abstime, scantime) ;
+	//printf("icp:%d\n",icp);
+	if (icp >= 0)
+	{
+      //  printf("do the add\n");
 		scantime = add_mame_times(scantime, refresh_period);
+    }
+ // printf("befsub scantime:%.9f abstime:%.9f\n",mame_time_to_double(scantime),mame_time_to_double(abstime));
+    mame_time r;
+    r = sub_mame_times(scantime, abstime);
 
+ // printf("cpu_getscanlinetime_mt:%d result:%.9f\n",
+ //            scanline,mame_time_to_double(r) );
+// nnbtest++;
+// if(nnbtest>300) exit(0);
 	/* compute how long from now until that time */
-	return sub_mame_times(scantime, abstime);
+	return r;
 }
 
 
 
-
-double cpu_getscanlinetime(int scanline)
-{
-	mame_time t = cpu_getscanlinetime_mt(scanline);
-	return mame_time_to_double(t);
-}
 
 
 
@@ -1080,10 +1125,10 @@ mame_time cpu_getscanlineperiod_mt(void)
 
 
 
-double cpu_getscanlineperiod(void)
-{
-	return mame_time_to_double(scanline_period);
-}
+// double cpu_getscanlineperiod(void)
+// {
+// 	return mame_time_to_double(scanline_period);
+// }
 
 
 
@@ -1449,7 +1494,9 @@ static void cpu_vblankcallback(int param)
 			updatescreen();
 
 		/* Set the timer to update the screen */
-		mame_timer_adjust(update_timer, double_to_mame_time(TIME_IN_USEC(Machine->drv->vblank_duration)), 0, time_zero);
+		mame_time vblanktime =  double_to_mame_time(TIME_IN_USEC(Machine->drv->vblank_duration));
+ //printf("update_timer vblanktime subs:%08x\n",vblanktime.seconds);
+		mame_timer_adjust(update_timer, vblanktime, 0, time_zero);
 
 		/* reset the globals */
 		cpu_vblankreset();
@@ -1489,7 +1536,10 @@ static void cpu_updatecallback(int param)
 	current_frame++;
 
 	/* reset the refresh timer */
+
 	mame_timer_adjust(refresh_timer, time_never, 0, time_never);
+
+	mame_time t =  mame_timer_starttime(refresh_timer);
 }
 
 
@@ -1556,7 +1606,7 @@ static void compute_perfect_interleave(void)
 
 	/* start with a huge time factor and find the 2nd smallest cycle time */
 	perfect_interleave = time_zero;
-	perfect_interleave.subseconds = 0xffffffffffffffffULL;
+	perfect_interleave.subseconds = MAX_SUBSECONDSM;
 	for (cpunum = 1; Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum++)
 	{
 		/* find the 2nd smallest cycle interval */
@@ -1570,7 +1620,7 @@ static void compute_perfect_interleave(void)
 	}
 
 	/* adjust the final value */
-	if (perfect_interleave.subseconds == 0xffffffffffffffffULL)
+	if (perfect_interleave.subseconds == MAX_SUBSECONDSM)
 		perfect_interleave.subseconds = subseconds_per_cycle[0];
 
 	LOG(("Perfect interleave = %.9f, smallest = %.9f\n", mame_time_to_double(perfect_interleave), SUBSECONDS_TO_DOUBLE(smallest)));

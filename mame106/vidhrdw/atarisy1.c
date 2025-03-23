@@ -336,7 +336,7 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 
 	/* but since we've adjusted it, we must reset it to the normal value
        once we hit scanline 0 again */
-	timer_adjust(yscroll_reset_timer, cpu_getscanlinetime(0), newscroll, 0);
+	mame_timer_adjust(yscroll_reset_timer, cpu_getscanlinetime_mt(0), newscroll, time_zero);
 
 	/* update the data */
 	*atarigen_yscroll = newscroll;
@@ -481,9 +481,9 @@ static void update_timers(int scanline)
 
 		/* set a new one */
 		if (best != -1)
-			timer_adjust(scanline_timer, cpu_getscanlinetime(best), best, 0);
+			mame_timer_adjust(scanline_timer, cpu_getscanlinetime_mt(best), best, time_zero);
 		else
-			timer_adjust(scanline_timer, TIME_NEVER, 0, 0);
+			mame_timer_adjust(scanline_timer, time_never, 0, time_zero);
 	}
 }
 

@@ -159,8 +159,7 @@ static void scanline_callback(int scanline)
 	update_main_irqs();
 
 	/* come back at the next appropriate scanline */
-	//timer_set(cpu_getscanlinetime(scanline), scanline, scanline_callback);
-	timer_adjust(interrupt_timer,cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_adjust(interrupt_timer,cpu_getscanlinetime_mt(scanline), scanline, time_zero);
 
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
@@ -182,7 +181,7 @@ static void scanline_callback(int scanline)
 MACHINE_RESET( yboard )
 {
     interrupt_timer = timer_alloc(scanline_callback);
-    timer_adjust(interrupt_timer,cpu_getscanlinetime(223), 223, 0);
+    mame_timer_adjust(interrupt_timer,cpu_getscanlinetime_mt(223), 223, time_zero);
 	state_save_register_global_array(misc_io_data);
 	state_save_register_global_array(analog_data);
 	state_save_register_global(vblank_irq_state);

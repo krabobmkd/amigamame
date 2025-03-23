@@ -99,7 +99,7 @@ static VIDEO_START( common )
 	memset(&dma_state, 0, sizeof(dma_state));
 
 	/* set up scanline 0 timer */
-	timer_set(cpu_getscanlinetime(0), 0, scanline0_callback);
+	mame_timer_set(cpu_getscanlinetime_mt(0), 0, scanline0_callback);
 	return 0;
 }
 
@@ -799,7 +799,7 @@ VIDEO_EOF( midyunit )
 static void scanline0_callback(int param)
 {
 	last_update_scanline = 0;
-	timer_set(cpu_getscanlinetime(0), 0, scanline0_callback);
+	mame_timer_set(cpu_getscanlinetime_mt(0), 0, scanline0_callback);
 }
 
 

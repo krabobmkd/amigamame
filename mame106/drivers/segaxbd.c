@@ -146,7 +146,7 @@ static void scanline_callback(int scanline)
 		update_main_irqs();
 
 	/* come back in 2 scanlines */
-	timer_set(cpu_getscanlinetime(next_scanline), next_scanline, scanline_callback);
+	mame_timer_set(cpu_getscanlinetime_mt(next_scanline), next_scanline, scanline_callback);
 }
 
 
@@ -205,7 +205,7 @@ MACHINE_RESET( xboard )
 	segaic16_compare_timer_init(1, NULL, NULL);
 
 	/* start timers to track interrupts */
-	timer_set(cpu_getscanlinetime(1), 1, scanline_callback);
+	mame_timer_set(cpu_getscanlinetime_mt(1), 1, scanline_callback);
 }
 
 

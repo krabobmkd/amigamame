@@ -304,13 +304,13 @@ static void generate_interrupt(int scanline)
 	scanline += 16;
 	if (scanline >= 256)
 		scanline = 0;
-	timer_set(cpu_getscanlinetime(scanline), scanline, generate_interrupt);
+	mame_timer_set(cpu_getscanlinetime_mt(scanline), scanline, generate_interrupt);
 }
 
 
 static MACHINE_RESET( centiped )
 {
-	timer_set(cpu_getscanlinetime(0), 0, generate_interrupt);
+    mame_timer_set(cpu_getscanlinetime_mt(0), 0, generate_interrupt);
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 	dsw_select = 0;
 }

@@ -185,11 +185,20 @@ int cpu_getscanline(void);
 
 /* Returns the amount of time until a given scanline */
 mame_time cpu_getscanlinetime_mt(int scanline);
-double cpu_getscanlinetime(int scanline);
+//double cpu_getscanlinetime(int scanline);
+static inline double cpu_getscanlinetime(int scanline)
+{
+	mame_time t = cpu_getscanlinetime_mt(scanline);
+	return mame_time_to_double(t);
+}
 
 /* Returns the duration of a single scanline */
 mame_time cpu_getscanlineperiod_mt(void);
-double cpu_getscanlineperiod(void);
+static inline double cpu_getscanlineperiod(void)
+{
+    extern mame_time scanline_period;
+	return mame_time_to_double(scanline_period);
+}
 
 /* Returns the current horizontal beam position in pixels */
 int cpu_gethorzbeampos(void);

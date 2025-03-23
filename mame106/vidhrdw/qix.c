@@ -58,7 +58,7 @@ void qix_scanline_callback(int scanline)
 	scanline += SCANLINE_INCREMENT;
 	if (scanline > 256)
 		scanline = SCANLINE_INCREMENT;
-	timer_set(cpu_getscanlinetime(scanline), scanline, qix_scanline_callback);
+	mame_timer_set(cpu_getscanlinetime_mt(scanline), scanline, qix_scanline_callback);
 }
 
 

@@ -70,6 +70,7 @@ struct _mame_timer
 
 /* conversion constants */
 subseconds_t subseconds_per_cycle[MAX_CPU];
+INT64 subseconds_per_cycle64[MAX_CPU];
 UINT32 cycles_per_second[MAX_CPU];
 double cycles_to_sec[MAX_CPU];
 double sec_to_cycles[MAX_CPU];
@@ -118,12 +119,15 @@ static inline mame_time get_current_time(void)
 
 	/* if we're executing as a particular CPU, use its local time as a base */
 	activecpu = cpu_getactivecpu();
+//	printf("get_current_time activecpu:%d\n",activecpu);
 	if (activecpu >= 0)
 		return cpunum_get_localtime(activecpu);
 
 	/* if we're currently in a callback, use the timer's expiration time as a base */
 	if (callback_timer)
+	{
 		return callback_timer_expire_time;
+    }
 
 	/* otherwise, return the current global base time */
 	return global_basetime;
@@ -256,7 +260,7 @@ void timer_init(void)
 	/* init the constant times */
 	time_zero.seconds = time_zero.subseconds = 0;
 	time_never.seconds = MAX_SECONDS;
-	time_never.subseconds = 0xffffffffffffffffULL; //MAX_SUBSECONDS - 1;
+	time_never.subseconds = MAX_SUBSECONDSM; //MAX_SUBSECONDS - 1;
 
 	/* we need to wait until the first call to timer_cyclestorun before using real CPU times */
 	global_basetime = time_zero;
@@ -606,14 +610,13 @@ static void mame_timer_remove(mame_timer *which)
     fire periodically
 -------------------------------------------------*/
 
-static inline void mame_timer_adjust_common(mame_timer *which, mame_time duration, INT32 param, mame_time period)
+void mame_timer_adjust(mame_timer *which, mame_time duration, INT32 param, mame_time period)
 {
 	mame_time time = get_current_time();
 
 	/* error if this is an inactive timer */
 	if (which->tag == -1)
 	{
-		printf("mame_timer_adjust: adjusting an inactive timer!\n");
 		loginfo(2,"mame_timer_adjust: adjusting an inactive timer!\n");
 		return;
 	}
@@ -645,18 +648,18 @@ static inline void mame_timer_adjust_common(mame_timer *which, mame_time duratio
 		activecpu_abort_timeslice();
 }
 
-void mame_timer_adjust(mame_timer *which, mame_time duration, INT32 param, mame_time period)
-{
-	if (which->ptr)
-		fatalerror("mame_timer_adjust called on a ptr timer!");
-	mame_timer_adjust_common(which, duration, param, period);
-}
+// void mame_timer_adjust(mame_timer *which, mame_time duration, INT32 param, mame_time period)
+// {
+// 	if (which->ptr)
+// 		fatalerror("mame_timer_adjust called on a ptr timer!");
+// 	mame_timer_adjust_common(which, duration, param, period);
+// }
 
 void mame_timer_adjust_ptr(mame_timer *which, mame_time duration, mame_time period)
 {
 	if (!which->ptr)
 		fatalerror("mame_timer_adjust_ptr called on a non-ptr timer!");
-	mame_timer_adjust_common(which, duration, 0, period);
+	mame_timer_adjust(which, duration, 0, period);
 }
 
 

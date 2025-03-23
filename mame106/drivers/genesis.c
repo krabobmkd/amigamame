@@ -101,7 +101,7 @@ void vdp_reload_counter(int scanline)
 		{
 			scanline_int = 1;
 			update_interrupts();
-			timer_set(cpu_getscanlinetime(scanline + 1), 0, vdp_int4_off);
+			mame_timer_set(cpu_getscanlinetime_mt(scanline + 1), 0, vdp_int4_off);
 		}
 
 	/* advance to the next scanline */
@@ -112,7 +112,10 @@ void vdp_reload_counter(int scanline)
 		scanline = 0;
 
 	/* set a timer */
+
 	timer_adjust(scan_timer, cpu_getscanlinetime(scanline) + cpu_getscanlineperiod() * (320. / 342.), scanline, 0);
+//krb: can't remove double format cpu_getscanlinetime() easily.
+//    mame_timer_adjust(scan_timer, double_to_mame_time(d), p, double_to_mame_time(e))
 }
 
 

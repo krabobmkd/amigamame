@@ -1182,8 +1182,8 @@ static void update_timers(void)
 	int vsblnk = SMART_IOREG(VSBLNK);
 
 	/* set new timers */
-	timer_adjust(dpyint_timer[cpunum], cpu_getscanlinetime(vcount_to_scanline(dpyint)), cpunum, 0);
-	timer_adjust(vsblnk_timer[cpunum], cpu_getscanlinetime(vcount_to_scanline(vsblnk)), cpunum, 0);
+	mame_timer_adjust(dpyint_timer[cpunum], cpu_getscanlinetime_mt(vcount_to_scanline(dpyint)), cpunum, time_zero);
+	mame_timer_adjust(vsblnk_timer[cpunum], cpu_getscanlinetime_mt(vcount_to_scanline(vsblnk)), cpunum, time_zero);
 }
 
 

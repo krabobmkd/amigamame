@@ -228,7 +228,7 @@ static void scanline_callback(int scanline)
 	update_main_irqs();
 
 	/* come back at the next targeted scanline */
-	timer_set(cpu_getscanlinetime(next_scanline), next_scanline, scanline_callback);
+	mame_timer_set(cpu_getscanlinetime_mt(next_scanline), next_scanline, scanline_callback);
 }
 
 
@@ -259,7 +259,7 @@ static MACHINE_RESET( outrun )
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);
 
 	/* start timers to track interrupts */
-	timer_set(cpu_getscanlinetime(223), 223, scanline_callback);
+	mame_timer_set(cpu_getscanlinetime_mt(223), 223, scanline_callback);
 }
 
 

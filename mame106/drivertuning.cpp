@@ -21,7 +21,8 @@ static map<string,sDriverTuning> _tunings={
 	{"sgemf",{8*60,DEFMINCPUC,0}},
 	{"chasehq",{5*60,DEFMINCPUC,0}},
 
-	{"mk",{0,450,0}}, // mortal kombat insane interupt slicing
+	{"th",{0,450,0}}, // mortal kombat insane interupt slicing
+	{"thndrbld",{0,4,/*MDTF_M68K_SAFE_MOVEMWRITE}*/MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}}, // thunderblade strange timer issues
 
 	{"gtmr",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},     // 1000 miglia
 	{"gtmr2",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},     // 1000 miglia

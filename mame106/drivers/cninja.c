@@ -111,7 +111,9 @@ static WRITE16_HANDLER( cninja_irq_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		cninja_scanline=data&0xff;
 		if ((cninja_irq_mask&0x2)==0 && cninja_scanline>0 && cninja_scanline<240)
-			timer_adjust(raster_irq_timer,cpu_getscanlinetime(cninja_scanline),cninja_scanline,TIME_NEVER);
+		{
+            mame_timer_adjust(raster_irq_timer,cpu_getscanlinetime_mt(cninja_scanline),cninja_scanline,time_never);
+        }
 		else
 			timer_adjust(raster_irq_timer,TIME_NEVER,0,0);
 		return;

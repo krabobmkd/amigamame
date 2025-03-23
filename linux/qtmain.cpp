@@ -187,6 +187,7 @@ void QProc::process()
 
 //        "aof"
 //"mk"
+//"hangon"
 "thndrbld"
 //"chasehq"
 // "ninjaw"

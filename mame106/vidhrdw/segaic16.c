@@ -1267,14 +1267,14 @@ static void segaic16_tilemap_16b_latch_values(int param)
 	}
 
 	/* set a timer to do this again next frame */
-	timer_set(cpu_getscanlinetime(261), param, segaic16_tilemap_16b_latch_values);
+	mame_timer_set(cpu_getscanlinetime_mt(261), param, segaic16_tilemap_16b_latch_values);
 }
 
 
 void segaic16_tilemap_16b_reset(struct tilemap_info *info)
 {
 	/* set a timer to latch values on scanline 261 */
-	timer_set(cpu_getscanlinetime(261), info->index, segaic16_tilemap_16b_latch_values);
+	mame_timer_set(cpu_getscanlinetime_mt(261), info->index, segaic16_tilemap_16b_latch_values);
 }
 
 

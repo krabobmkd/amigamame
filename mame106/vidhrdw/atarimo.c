@@ -264,7 +264,7 @@ static void force_update(int scanline)
 	scanline += 64;
 	if (scanline >= Machine->visible_area.max_y)
 		scanline = 0;
-	timer_set(cpu_getscanlinetime(scanline), scanline, force_update);
+	mame_timer_set(cpu_getscanlinetime_mt(scanline), scanline, force_update);
 }
 
 /*---------------------------------------------------------------
@@ -386,13 +386,13 @@ int atarimo_init(int map, const struct atarimo_desc *desc)
 	init_gfxelement(mo, desc->gfxindex);
 
 	/* start a timer to update a few times during refresh */
-	timer_set(cpu_getscanlinetime(0), 0, force_update);
+	mame_timer_set(cpu_getscanlinetime_mt(0), 0, force_update);
 
-	logerror("atarimo_init:\n");
-	logerror("  width=%d (shift=%d),  height=%d (shift=%d)\n", mo->tilewidth, mo->tilexshift, mo->tileheight, mo->tileyshift);
-	logerror("  spriteram mask=%X, size=%d\n", mo->spriterammask, mo->spriteramsize);
-	logerror("  slipram mask=%X, size=%d\n", mo->sliprammask, mo->slipramsize);
-	logerror("  bitmap size=%dx%d\n", mo->bitmapwidth, mo->bitmapheight);
+	// logerror("atarimo_init:\n");
+	// logerror("  width=%d (shift=%d),  height=%d (shift=%d)\n", mo->tilewidth, mo->tilexshift, mo->tileheight, mo->tileyshift);
+	// logerror("  spriteram mask=%X, size=%d\n", mo->spriterammask, mo->spriteramsize);
+	// logerror("  slipram mask=%X, size=%d\n", mo->sliprammask, mo->slipramsize);
+	// logerror("  bitmap size=%dx%d\n", mo->bitmapwidth, mo->bitmapheight);
 
 	return 1;
 }

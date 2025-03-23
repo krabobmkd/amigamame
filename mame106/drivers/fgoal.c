@@ -134,13 +134,14 @@ static void interrupt_callback(int scanline)
 		scanline = 0;
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, interrupt_callback);
+	mame_timer_set(cpu_getscanlinetime_mt(scanline), scanline, interrupt_callback);
+
 }
 
 
 static MACHINE_RESET( fgoal )
 {
-	timer_set(cpu_getscanlinetime(0), 0, interrupt_callback);
+	mame_timer_set(cpu_getscanlinetime_mt(0), 0, interrupt_callback);
 }
 
 
