@@ -30,7 +30,7 @@ todo R1.2
 
 ------------------------------------------- still todo
 
- - O mortal kombat/NBAJam boot !!
+ - X mortal kombat/NBAJam boot !!
  - O corrected amigaguide with OS3.2 version that includes images.
 
  - O "Carrier Air Wing has graphic corruptions in first level (cawing)"

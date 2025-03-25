@@ -11,6 +11,7 @@
 #include <proto/intuition.h>
 #include <proto/diskfont.h>
 #include "version.h"
+#include <string>
 // Amiga
 extern "C" {
     #include <intuition/intuition.h>
@@ -21,8 +22,11 @@ extern "C" {
 }
 
 extern "C" {
+    #include "intuiuncollide.h"
     // from mame
     #include "mame.h"
+    // just to get game name for title
+    #include "driver.h"
     #include "video.h"
     #include "mamecore.h"
     #include "osdepend.h"
@@ -388,6 +392,16 @@ bool Intuition_Window::open()
     _widthphys = pWbScreen->Width;
     _heightphys = pWbScreen->Height;
 
+    // window title
+    static std::string windowTitle;
+    windowTitle = APPNAMEA;
+    if(Machine && Machine->gamedrv && Machine->gamedrv->description)
+    {
+        windowTitle += "  -  ";
+        windowTitle += Machine->gamedrv->description;
+    }
+
+
     // open window in center of workbench
     int xcen = (pWbScreen->Width - _machineWidth);
     int ycen = (pWbScreen->Height - _machineHeight);
@@ -424,7 +438,7 @@ bool Intuition_Window::open()
             //| WFLG_SIMPLE_REFRESH
              | ((_maxzoomfactor>1)?WFLG_SIZEGADGET:0)
             ,
-        WA_Title,(ULONG)APPNAMEA, /* take title from version string */
+        WA_Title,(ULONG)windowTitle.c_str(), /* take title from version string */
         WA_PubScreen, (ULONG)pWbScreen,
         TAG_DONE
         );

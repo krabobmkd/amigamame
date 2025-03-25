@@ -235,7 +235,7 @@ int cpuexec_init(void)
 
 		subseconds_per_cycle[cpunum] = ((subseconds_t)(((double)(1LL<<32)) / (sec_to_cycles[cpunum])));
         if(subseconds_per_cycle[cpunum]==0) subseconds_per_cycle[cpunum]=1;
- printf("cpuexec_init %d %d\n",cpunum, subseconds_per_cycle[cpunum]);
+// printf("cpuexec_init %d %d\n",cpunum, subseconds_per_cycle[cpunum]);
 		/* register some of our variables for later */
 		state_save_register_item("cpu", cpunum, cpu[cpunum].suspend);
 		state_save_register_item("cpu", cpunum, cpu[cpunum].nextsuspend);
@@ -716,7 +716,7 @@ void cpunum_set_clock(int cpunum, int clock)
 	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
 	subseconds_per_cycle[cpunum] = (double)(1LL<<32) / (sec_to_cycles[cpunum]);
 	if(subseconds_per_cycle[cpunum]==0) subseconds_per_cycle[cpunum]=1;
- printf("set_clock %d %d\n",cpunum, subseconds_per_cycle[cpunum]);
+// printf("set_clock %d %d\n",cpunum, subseconds_per_cycle[cpunum]);
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
 }
@@ -771,7 +771,7 @@ void cpunum_set_clockscale(int cpunum, double clockscale)
 	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
 	subseconds_per_cycle[cpunum] = ((double)(1LL<<32) / (sec_to_cycles[cpunum]));
 	if(subseconds_per_cycle[cpunum]==0) subseconds_per_cycle[cpunum]=1;
- printf("set_clockscale %d %d\n",cpunum, subseconds_per_cycle[cpunum]);
+// printf("set_clockscale %d %d\n",cpunum, subseconds_per_cycle[cpunum]);
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
 }

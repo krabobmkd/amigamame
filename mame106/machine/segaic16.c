@@ -129,7 +129,7 @@ READ16_HANDLER( segaic16_open_bus_r )
 
 void segaic16_memory_mapper_init(int cpunum, const struct segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(UINT8), UINT8 (*sound_r_callback)(void))
 {
-    printf("segaic16_memory_mapper_init\n");
+//    printf("segaic16_memory_mapper_init\n");
     {
         memset(&memory_mapper,0,sizeof(memory_mapper));
         memset(&multiply[0],0,sizeof(struct multiply_chip)*3);
@@ -299,7 +299,7 @@ static void update_memory_mapping(struct memory_mapper_chip *chip)
 {
 	int rgnum;
 
-	if (LOG_MEMORY_MAP) printf("----\nRemapping:\n");
+//	if (LOG_MEMORY_MAP) printf("----\nRemapping:\n");
 
 	/* first reset everything back to the beginning */
 	memory_install_read16_handler (chip->cpunum, ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r);
@@ -364,7 +364,7 @@ static void update_memory_mapping(struct memory_mapper_chip *chip)
 			}
 		}
 
-		if (LOG_MEMORY_MAP) printf("  %06X-%06X (%06X) = %s\n", region_start, region_end, region_mirror, rgn->name);
+	//	if (LOG_MEMORY_MAP) printf("  %06X-%06X (%06X) = %s\n", region_start, region_end, region_mirror, rgn->name);
 	}
 }
 
