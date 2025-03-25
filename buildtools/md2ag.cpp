@@ -14,7 +14,7 @@ namespace fs = std::filesystem;
 
 using namespace std;
 
-bool useOS32Img=true;
+bool useOS32Img=false;
 
 std::string trim(const std::string& str) {
     const std::string whitespace = " \t\r";
@@ -503,17 +503,25 @@ void Agdoc::export_ag(ofstream &ofs)
 int main(int argc, char **argv)
 {
 //    if(argc <2) return 0;
-
-
       //  curprg = make_shared<paragr>();
+    useOS32Img=false;
+    {
+        Agdoc d;
+        string ppth(/*argv[1]*/"MAME106-MiniMix-1.x-User-Documentation.md");
+        d.treatmdfile(ppth);
 
-    Agdoc d;
-    string ppth(/*argv[1]*/"MAME106-MiniMix-1.x-User-Documentation.md");
-    d.treatmdfile(ppth);
+        ofstream ofsag("MameMinimix.guide",ios::binary);
+        if(ofsag.good()) d.export_ag(ofsag);
+    }
+    useOS32Img = true;
+    {
+        Agdoc d;
+        string ppth(/*argv[1]*/"MAME106-MiniMix-1.x-User-Documentation.md");
+        d.treatmdfile(ppth);
 
-    ofstream ofsag("Mame106Minimix.guide",ios::binary);
-    if(ofsag.good()) d.export_ag(ofsag);
-
+        ofstream ofsag("MameMinimixOS32.guide",ios::binary);
+        if(ofsag.good()) d.export_ag(ofsag);
+    }
     return 0;
 }
 

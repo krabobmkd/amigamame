@@ -1035,10 +1035,39 @@ void cpu_compute_scanline_timing(void)
     is >0.
 
 --------------------------------------------------------------*/
+//krb moved to timer for optim
 
+//int cpu_getscanline(void)
+//{
+//	mame_time elapsed = mame_timer_timeelapsed(refresh_timer);
+//	return (int)(elapsed.subseconds / scanline_period.subseconds);
+//}
 int cpu_getscanline(void)
 {
-	mame_time elapsed = mame_timer_timeelapsed(refresh_timer);
+
+	extern int activecpu;
+    mame_time currentTime;
+    // inline GetCurrentTime
+	/* if we're executing as a particular CPU, use its local time as a base */
+	if (activecpu >= 0)
+	{
+        /* if we're active, add in the time from the current slice */
+        currentTime = cpu[activecpu].localtime;
+        if (activecpu == cpu_getexecutingcpu())
+        {
+            int cycles = cycles_currently_ran();
+            currentTime = add_mame_times(currentTime, MAME_TIME_IN_CYCLES(cycles, activecpu));
+        }
+	} /*else if (callback_timer)
+	{
+		currentTime = callback_timer_expire_time;
+    }*/ else
+	{
+        currentTime = global_basetime;
+	}
+
+	mame_time elapsed = sub_mame_times(currentTime, refresh_timer->start);
+
 	return (int)(elapsed.subseconds / scanline_period.subseconds);
 }
 

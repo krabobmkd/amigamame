@@ -1307,9 +1307,9 @@ VIDEO_UPDATE( neogeo )
     }
     fillbitmap(bitmap,4095,cliprect);
 
-    // this engine was rewritten in 2004. Sort of 2003 version completely rewritten/optimized
-    // with 3 tests by sprite lines instead of 7 and just the transparent pixel test. No test for zoomx,
-    // more escape for totally transparent tiles and lines.
+    // this engine was rewritten in 2024. Sort of 2003 version completely rewritten/optimized
+    // with 3 tests by sprite lines instead of 7 and just the transparent pixel test per pixel.
+    // No test for zoomx, more fast escape for totally transparent tiles and lines.
     neogeo_drawTilesSprites(bitmap,cliprect);
 
 	neogeo_draw_s_layer(bitmap,cliprect);

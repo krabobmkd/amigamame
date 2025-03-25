@@ -121,6 +121,32 @@ struct _mame_time
 
 };
 
+
+
+/* in timer.h: typedef struct _mame_timer mame_timer; */
+struct _mame_timer
+{
+	mame_timer *	next;
+	mame_timer *	prev;
+	void 			(*callback)(int);
+	void			(*callback_ptr)(void *);
+	int 			callback_param;
+	void *			callback_ptr_param;
+	int 			tag;
+	const char *	file;
+	int 			line;
+	const char *	func;
+	UINT8 			enabled;
+	UINT8 			temporary;
+	UINT8			ptr;
+	mame_time 		period;
+	mame_time 		start;
+	mame_time 		expire;
+};
+
+
+
+
 static inline double SUBSECONDS_TO_DOUBLE(subseconds_t x)
 {
     double d = (double)(x) * (1.0 / (double)/*18446744073709551615.0*/(1ULL<<32));
@@ -172,11 +198,11 @@ void _mame_timer_set(mame_time duration, INT32 param, void (*callback)(int), con
 void _mame_timer_set_ptr(mame_time duration, void *param, void (*callback)(void *), const char *file, int line, const char *func);
 void mame_timer_reset(mame_timer *which, mame_time duration);
 int mame_timer_enable(mame_timer *which, int enable);
-mame_time mame_timer_timeelapsed(mame_timer *which);
-mame_time mame_timer_timeleft(mame_timer *which);
-mame_time mame_timer_get_time(void);
-mame_time mame_timer_starttime(mame_timer *which);
-mame_time mame_timer_firetime(mame_timer *which);
+//mame_time mame_timer_timeelapsed(mame_timer *which);
+//mame_time mame_timer_timeleft(mame_timer *which);
+//mame_time mame_timer_get_time(void);
+//mame_time mame_timer_starttime(mame_timer *which);
+//mame_time mame_timer_firetime(mame_timer *which);
 
 
 
@@ -345,6 +371,95 @@ static inline mame_time MAME_TIME_IN_CYCLES(UINT32 cycles,int cpunum)
     // printf("result.subseconds:%08x\n",result.subseconds);
     return result;
 }
+
+/*-------------------------------------------------
+    get_current_time - return the current time
+-------------------------------------------------*/
+
+static inline mame_time get_current_time(void)
+{
+    extern mame_timer *callback_timer;
+    extern mame_time callback_timer_expire_time;
+    extern mame_time cpunum_get_localtime(int cpunum);
+    extern mame_time global_basetime;
+	extern int activecpu;
+
+	/* if we're executing as a particular CPU, use its local time as a base */
+
+//	printf("get_current_time activecpu:%d\n",activecpu);
+	if (activecpu >= 0)
+		return cpunum_get_localtime(activecpu);
+
+	/* if we're currently in a callback, use the timer's expiration time as a base */
+	if (callback_timer)
+	{
+		return callback_timer_expire_time;
+    }
+
+	/* otherwise, return the current global base time */
+	return global_basetime;
+}
+
+
+/***************************************************************************
+
+    Timing functions
+
+***************************************************************************/
+
+/*-------------------------------------------------
+    timer_timeelapsed - return the time since the
+    last trigger
+-------------------------------------------------*/
+
+INLINE mame_time mame_timer_timeelapsed(mame_timer *which)
+{
+	return sub_mame_times(get_current_time(), which->start);
+}
+
+
+/*-------------------------------------------------
+    timer_timeleft - return the time until the
+    next trigger
+-------------------------------------------------*/
+
+INLINE mame_time mame_timer_timeleft(mame_timer *which)
+{
+	return sub_mame_times(which->expire, get_current_time());
+}
+
+
+/*-------------------------------------------------
+    timer_get_time - return the current time
+-------------------------------------------------*/
+
+INLINE mame_time mame_timer_get_time(void)
+{
+	return get_current_time();
+}
+
+
+/*-------------------------------------------------
+    timer_starttime - return the time when this
+    timer started counting
+-------------------------------------------------*/
+
+INLINE mame_time mame_timer_starttime(mame_timer *which)
+{
+	return which->start;
+}
+
+
+/*-------------------------------------------------
+    timer_firetime - return the time when this
+    timer will fire next
+-------------------------------------------------*/
+
+INLINE mame_time mame_timer_firetime(mame_timer *which)
+{
+	return which->expire;
+}
+
 
 
 #endif	/* __TIMER_H__ */

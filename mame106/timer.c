@@ -41,28 +41,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* in timer.h: typedef struct _mame_timer mame_timer; */
-struct _mame_timer
-{
-	mame_timer *	next;
-	mame_timer *	prev;
-	void 			(*callback)(int);
-	void			(*callback_ptr)(void *);
-	int 			callback_param;
-	void *			callback_ptr_param;
-	int 			tag;
-	const char *	file;
-	int 			line;
-	const char *	func;
-	UINT8 			enabled;
-	UINT8 			temporary;
-	UINT8			ptr;
-	mame_time 		period;
-	mame_time 		start;
-	mame_time 		expire;
-};
-
-
 
 /***************************************************************************
     GLOBALS
@@ -83,9 +61,9 @@ static mame_timer *timer_free_tail;
 
 /* other internal states */
 mame_time global_basetime;
-static mame_timer *callback_timer;
+mame_timer *callback_timer;
 static int callback_timer_modified;
-static mame_time callback_timer_expire_time;
+mame_time callback_timer_expire_time;
 
 /* other constant times */
 mame_time time_zero;
@@ -109,29 +87,6 @@ static void mame_timer_remove(mame_timer *which);
 
 ***************************************************************************/
 
-/*-------------------------------------------------
-    get_current_time - return the current time
--------------------------------------------------*/
-
-static inline mame_time get_current_time(void)
-{
-	int activecpu;
-
-	/* if we're executing as a particular CPU, use its local time as a base */
-	activecpu = cpu_getactivecpu();
-//	printf("get_current_time activecpu:%d\n",activecpu);
-	if (activecpu >= 0)
-		return cpunum_get_localtime(activecpu);
-
-	/* if we're currently in a callback, use the timer's expiration time as a base */
-	if (callback_timer)
-	{
-		return callback_timer_expire_time;
-    }
-
-	/* otherwise, return the current global base time */
-	return global_basetime;
-}
 
 
 /*-------------------------------------------------
@@ -779,66 +734,6 @@ int mame_timer_enable(mame_timer *which, int enable)
 	return old;
 }
 
-
-
-/***************************************************************************
-
-    Timing functions
-
-***************************************************************************/
-
-/*-------------------------------------------------
-    timer_timeelapsed - return the time since the
-    last trigger
--------------------------------------------------*/
-
-mame_time mame_timer_timeelapsed(mame_timer *which)
-{
-	return sub_mame_times(get_current_time(), which->start);
-}
-
-
-/*-------------------------------------------------
-    timer_timeleft - return the time until the
-    next trigger
--------------------------------------------------*/
-
-mame_time mame_timer_timeleft(mame_timer *which)
-{
-	return sub_mame_times(which->expire, get_current_time());
-}
-
-
-/*-------------------------------------------------
-    timer_get_time - return the current time
--------------------------------------------------*/
-
-mame_time mame_timer_get_time(void)
-{
-	return get_current_time();
-}
-
-
-/*-------------------------------------------------
-    timer_starttime - return the time when this
-    timer started counting
--------------------------------------------------*/
-
-mame_time mame_timer_starttime(mame_timer *which)
-{
-	return which->start;
-}
-
-
-/*-------------------------------------------------
-    timer_firetime - return the time when this
-    timer will fire next
--------------------------------------------------*/
-
-mame_time mame_timer_firetime(mame_timer *which)
-{
-	return which->expire;
-}
 
 
 
