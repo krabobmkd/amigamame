@@ -199,6 +199,7 @@ public:
         void serialize(ASerializer &serializer) override;
         AudioMode _mode = AudioMode::AHI;
         int _freq=0;
+        float _volumeboost=2.0f;
         bool _forceMono=true;
         // ULONG_FLAGS  _Flags = 1; // 1 use samples
     };

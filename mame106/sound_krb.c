@@ -41,8 +41,8 @@
 
 #define MAX_MIXER_CHANNELS		100
 
-
-
+//krb
+float globalVolumeBoost = 1.0f;
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -525,6 +525,8 @@ static int route_sound(void)
 			loginfo(2,"Warning: speaker \"%s\" has no inputs\n", info->speaker->tag);
 	}
 
+
+
 	/* iterate again over all the sound chips */
 	for (sndnum = 0; sndnum < totalsnd; sndnum++)
 	{
@@ -553,8 +555,9 @@ static int route_sound(void)
 						sndnum_to_sndti(sndnum, &index);
 
 						/* fill in the input data on this speaker */
-						speaker->input[speaker->inputs].gain = mroute->gain;
-						speaker->input[speaker->inputs].default_gain = mroute->gain;
+						float fgain = globalVolumeBoost * mroute->gain;
+						speaker->input[speaker->inputs].gain = fgain;
+						speaker->input[speaker->inputs].default_gain = fgain;
 						sprintf(namebuf, "%s:%s #%d.%d", speaker->speaker->tag, sndnum_name(sndnum), index, outputnum);
 						speaker->input[speaker->inputs].name = auto_strdup(namebuf);
 

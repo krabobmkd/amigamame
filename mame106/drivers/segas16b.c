@@ -985,7 +985,6 @@ static void sound_w(UINT8 data)
 
 static void system16b_generic_init(int _rom_board)
 {
-    printf("system16b_generic_init\n");
     {
         //krb add cleaning
         atomicp_sound_rate = 10000;

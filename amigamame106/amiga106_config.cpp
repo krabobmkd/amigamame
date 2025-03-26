@@ -291,6 +291,7 @@ void MameConfig::toDefault()
 
     _audio._mode = AudioMode::AHI;
     _audio._freq = 22050;
+    _audio._volumeboost = 2.0f;
     _audio._forceMono = true;
 
 
@@ -417,6 +418,7 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
 {
     serializer("Mode",(int &)_mode,{"  None  ","   AHI   "});
     serializer("Frequency",_freq,11025,22050,22050); // not more low hz than 11025 it does too little buffers for AHI.
+    serializer("Volume Boost",_volumeboost,1.0f,2.0f,0.25f,2.0f); // min max step defval
   //hide this for the moment  serializer("Force Mono",_forceMono);
 
    //finaly not serializer("Flags",_Flags,1,{"Use Samples"});
@@ -854,6 +856,8 @@ extern "C" {
     extern const char	* cheatfile;
 }
 // apply to mame options
+
+extern float globalVolumeBoost;
 void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driver *drv)
 {
     memset(&mameOptions, 0,sizeof(_global_options));
@@ -873,7 +877,8 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
   //old  options.gamma= _display._color_gamma;
 
     options.samplerate=(_audio._mode == AudioMode::None)?0:_audio._freq;
-    options.use_samples = 1; // ((_audio._Flags & 1) != 0); // really, ...
+    options.use_samples = 1;
+    globalVolumeBoost = _audio._volumeboost;
 
     options.skip_disclaimer = (_misc._skipflags & 1) != 0;
     options.skip_gameinfo =
@@ -893,6 +898,7 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
         //printf("set bios:%s\n",t);
     }
 #endif
+
 
 }
 
