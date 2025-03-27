@@ -3896,14 +3896,15 @@ static int z80_execute(int cycles)
 {
 	z80_ICount = cycles - Z80.extra_cycles;
 	Z80.extra_cycles = 0;
-
+int iz80_ICount;
 	do
 	{
 		PRVPC = PCD;
 		CALL_MAME_DEBUG;
 		R++;
 		EXEC_INLINE(op,ROP());
-	} while( z80_ICount > 0 );
+		iz80_ICount = z80_ICount;
+	} while( iz80_ICount > 0 );
 
 	z80_ICount -= Z80.extra_cycles;
 	Z80.extra_cycles = 0;

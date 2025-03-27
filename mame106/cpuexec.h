@@ -134,7 +134,7 @@ void cpunum_set_clockscale(int cpunum, double clockscale);
 
 /* Temporarily boosts the interleave factor */
 void cpu_boost_interleave(double timeslice_time, double boost_duration);
-
+void cpu_boost_interleave2(mame_time timeslice_time, mame_time boost_duration);
 
 
 /*************************************

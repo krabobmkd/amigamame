@@ -375,6 +375,7 @@ static void watchdog_callback(int param)
 
 static void watchdog_setup(int alloc_new)
 {
+   // printf("watchdog_setup\n");
 	if (watchdog_counter != WATCHDOG_IS_DISABLED)
 	{
 		if (Machine->drv->watchdog_vblank_count)
@@ -423,6 +424,7 @@ static void watchdog_setup(int alloc_new)
 
 void watchdog_reset(void)
 {
+
 	if (watchdog_counter == WATCHDOG_IS_TIMER_BASED)
 	{
 		timer_reset(watchdog_timer, Machine->drv->watchdog_time);
@@ -478,6 +480,7 @@ extern mame_time global_basetime;
  *  timeslice
  *
  *************************************/
+int mintc=(1<<30),maxtc=-(1<<30);
 
 void cpuexec_timeslice(void)
 {
@@ -507,12 +510,15 @@ void cpuexec_timeslice(void)
 			mame_time dift = sub_mame_times(target, cpu[cpunum].localtime);
 			if(dift._t<=0) continue; // optimise some games (mk)
 			cycles_running = MAME_TIME_TO_CYCLES(cpunum, dift);
-			cycles_running += 2; // because division precision loss...
-
+            /* krb note: DO NOT ADD EXTRA CYCLES HERE !!!
+               	this would execute unwanted ram after some eat-cycle interuption instruction
+               	0 need to be 0 !
+                cycles_running += 2; // because division precision loss.. ->NO, kills an arkanoid interuption.
+            */
 //			printf("  cpu %d: %d cycles\n", cpunum, cycles_running);
 
 			/* run for the requested number of cycles */
-			if (cycles_running <= _minimumCpuCycles) // krb serioulsy ? 1 cycle seen ?
+			if (cycles_running <= _minimumCpuCycles) // may be very cycles.
                 continue;
 
             profiler_mark(PROFILER_CPU1 + cpunum);
@@ -803,6 +809,20 @@ void cpu_boost_interleave(double _timeslice_time, double _boost_duration)
 	mame_timer_adjust(interleave_boost_timer_end, boost_duration, 0, time_never);
 }
 
+void cpu_boost_interleave2(mame_time timeslice_time, mame_time boost_duration)
+{
+	/* if you pass 0 for the timeslice_time, it means pick something reasonable */
+	if (compare_mame_times(timeslice_time, perfect_interleave) < 0)
+		timeslice_time = perfect_interleave;
+
+	LOG(("cpu_boost_interleave(%.9f, %.9f)\n", mame_time_to_double(timeslice_time), mame_time_to_double(boost_duration)));
+
+	/* adjust the interleave timer */
+	mame_timer_adjust(interleave_boost_timer, timeslice_time, 0, timeslice_time);
+
+	/* adjust the end timer */
+	mame_timer_adjust(interleave_boost_timer_end, boost_duration, 0, time_never);
+}
 
 
 #if 0
@@ -1429,7 +1449,6 @@ int cpu_getiloops(void)
 static void cpu_vblankreset(void)
 {
 	int cpunum;
-
 	/* read keyboard & update the status of the input ports */
 	input_port_vblank_start();
 
@@ -1438,6 +1457,7 @@ static void cpu_vblankreset(void)
 	{
 		if (--watchdog_counter == 0)
 		{
+		//printf("reset caused by the (vblank) watchdog\n");
 			loginfo(2,"reset caused by the (vblank) watchdog\n");
 			mame_schedule_soft_reset();
 		}

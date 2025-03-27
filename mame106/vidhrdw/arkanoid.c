@@ -167,6 +167,7 @@ static void arkanoid_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 ***************************************************************************/
 VIDEO_UPDATE( arkanoid )
 {
+//printf("arkanoid update\n");
 	tilemap_draw(bitmap, /*&Machine->visible_area*/ cliprect, bg_tilemap, 0, 0);
 	arkanoid_draw_sprites(bitmap, cliprect);
 }
