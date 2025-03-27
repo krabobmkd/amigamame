@@ -1282,9 +1282,9 @@ void MameUI::CreateApp(void)
         sTextAbout =
             "\33c\n\33b\33uMAME - Multiple Arcade Machine Emulator\33n\n\n"
             "0." REVISION "\n\n"
-            "Copyright (C) 1997-2024 by Nicola Salmoria and the MAME team\n"
+            "Copyright (C) 1997-2025 by Nicola Salmoria and the MAME team\n"
             "http://mamedev.org\n\n"
-            "Amiga port by Vic 'Krb' Ferry (2024) source:\n"
+            "Amiga port by Vic 'Krb' Ferry (2025) source:\n"
             " https://github.com/krabobmkd/amigamame\n"
             "compiled branch:" GIT_BRANCH " " REVDATE " " REVTIME "\n"
             "Partly based on Mats Eirik Hansen Mame060(1999)\n"
