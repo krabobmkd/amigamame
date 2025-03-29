@@ -17,9 +17,11 @@ using namespace std;
 
 
 static map<string,sDriverTuning> _tunings={
-	{"neogeo",{50,DEFMINCPUC,0}}, //
+	{"neogeo",{50,DEFMINCPUC,0 /*MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD*/}}, //
 	{"sgemf",{8*60,DEFMINCPUC,0}},
 	{"chasehq",{5*60,DEFMINCPUC,0}},
+
+	{"outrun",{0,400,0}},
 
 	{"th",{0,450,0}}, // mortal kombat insane interupt slicing
 	{"thndrbld",{0,4,/*MDTF_M68K_SAFE_MOVEMWRITE}*/MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}}, // thunderblade strange timer issues

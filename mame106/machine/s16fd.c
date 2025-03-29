@@ -15,7 +15,7 @@ make more configurable (select caches per game?)
 
 #define S16_NUMCACHE 8
 
-static unsigned char *fd1094_key; // the memory region containing key
+static unsigned char *fd1094_key=NULL; // the memory region containing key
 static UINT16 *fd1094_cpuregion; // the CPU region with encrypted code
 static UINT32  fd1094_cpuregionsize; // the size of this region in bytes
 

@@ -118,12 +118,12 @@ VIDEO_UPDATE( outrun )
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
 
 	/* draw the high priority road */
-	segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
+    segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
 
 	/* text layer */
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
-	/* draw the sprites */
+	// /* draw the sprites */
 	segaic16_sprites_draw(0, bitmap, cliprect);
 }

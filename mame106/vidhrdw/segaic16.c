@@ -3311,7 +3311,7 @@ static void segaic16_road_outrun_decode(struct road_info *info)
 	memset(info->gfx + 256 * 2 * 512, 3, 512);
 }
 
-
+#if 0
 static void segaic16_road_outrun_draw(struct road_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	UINT16 *roadram = info->buffer;
@@ -3501,9 +3501,178 @@ static void segaic16_road_outrun_draw(struct road_info *info, mame_bitmap *bitma
 		}
 	}
 }
+#endif
+
+static void segaic16_road_outrun_draw(struct road_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+{
+	UINT16 *roadram = info->buffer;
+	int x, y;
+
+    static const UINT8 priority_map[2][8] =
+    {
+        { 0x80,0x81,0x81,0x87,0,0,0,0x00 },
+        { 0x81,0x81,0x81,0x8f,0,0,0,0x80 }
+
+    };
+
+    /* background case: look for solid fill scanlines */
+    if (priority == SEGAIC16_ROAD_BACKGROUND)
+    {
+
+        /* loop over scanlines */
+        for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+        {
+
+            UINT16 *dest = (UINT16 *)bitmap->line[y];
+            int data0 = roadram[0x000 + y];
+            int data1 = roadram[0x100 + y];
+
+            int color = -1;
+            /* based on the info->control, we can figure out which sky to draw */
+            switch (info->control & 3)
+            {
+                case 0:
+                    if (data0 & 0x800)
+                        color = data0 & 0x7f;
+                    break;
+
+                case 1:
+                    if (data0 & 0x800)
+                        color = data0 & 0x7f;
+                    else if (data1 & 0x800)
+                        color = data1 & 0x7f;
+                    break;
+
+                case 2:
+                    if (data1 & 0x800)
+                        color = data1 & 0x7f;
+                    else if (data0 & 0x800)
+                        color = data0 & 0x7f;
+                    break;
+
+                case 3:
+                    if (data1 & 0x800)
+                        color = data1 & 0x7f;
+                    break;
+            }
+			/* fill the scanline with color */
+			if (color != -1)
+			{
+				color |= info->colorbase3;
+				for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+					dest[x] = color;
+			}
+        } // END Y LOOP
+        return;
+    } // end background
 
 
+    /* foreground case: render from ROM */
+    int hpos0, hpos1, color0, color1;
+    int control = info->control & 3;
+    UINT16 color_table[32];
+    UINT8 *src0, *src1;
+    UINT8 bgcolor;
 
+	/* loop over scanlines */
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		UINT16 *dest = (UINT16 *)bitmap->line[y];
+		int data0 = roadram[0x000 + y];
+		int data1 = roadram[0x100 + y];
+
+        /* if both roads are low priority, skip */
+        if ((data0 & 0x800) && (data1 & 0x800))
+            continue;
+
+        /* get road 0 data */
+        src0 = (data0 & 0x800) ? info->gfx + 256 * 2 * 512 : (info->gfx + (0x000 + ((data0 >> 1) & 0xff)) * 512);
+        hpos0 = (roadram[0x200 + ((info->control & 4) ? y : (data0 & 0x1ff))]) & 0xfff;
+        color0 = roadram[0x600 + ((info->control & 4) ? y : (data0 & 0x1ff))];
+
+        /* get road 1 data */
+        src1 = (data1 & 0x800) ? info->gfx + 256 * 2 * 512 : (info->gfx + (0x100 + ((data1 >> 1) & 0xff)) * 512);
+        hpos1 = (roadram[0x400 + ((info->control & 4) ? (0x100 + y) : (data1 & 0x1ff))]) & 0xfff;
+        color1 = roadram[0x600 + ((info->control & 4) ? (0x100 + y) : (data1 & 0x1ff))];
+
+        /* determine the 5 colors for road 0 */
+        color_table[0x00] = info->colorbase1 ^ 0x00 ^ ((color0 >> 0) & 1);
+        color_table[0x01] = info->colorbase1 ^ 0x02 ^ ((color0 >> 1) & 1);
+        color_table[0x02] = info->colorbase1 ^ 0x04 ^ ((color0 >> 2) & 1);
+        bgcolor = (color0 >> 8) & 0xf;
+        color_table[0x03] = (data0 & 0x200) ? color_table[0x00] : (info->colorbase2 ^ 0x00 ^ bgcolor);
+        color_table[0x07] = info->colorbase1 ^ 0x06 ^ ((color0 >> 3) & 1);
+
+        /* determine the 5 colors for road 1 */
+        color_table[0x10] = info->colorbase1 ^ 0x08 ^ ((color1 >> 4) & 1);
+        color_table[0x11] = info->colorbase1 ^ 0x0a ^ ((color1 >> 5) & 1);
+        color_table[0x12] = info->colorbase1 ^ 0x0c ^ ((color1 >> 6) & 1);
+        bgcolor = (color1 >> 8) & 0xf;
+        color_table[0x13] = (data1 & 0x200) ? color_table[0x10] : (info->colorbase2 ^ 0x10 ^ bgcolor);
+        color_table[0x17] = info->colorbase1 ^ 0x0e ^ ((color1 >> 7) & 1);
+
+        /* draw the road */
+        switch (control)
+        {
+            case 0:
+                if (data0 & 0x800)
+                    continue;
+                hpos0 = (hpos0 - (0x5f8 + info->xoffs)) & 0xfff;
+                for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+                {
+                    int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
+                    dest[x] = color_table[0x00 + pix0];
+                    hpos0 = (hpos0 + 1) & 0xfff;
+                }
+                break;
+
+            case 1:
+                hpos0 = (hpos0 - (0x5f8 + info->xoffs)) & 0xfff;
+                hpos1 = (hpos1 - (0x5f8 + info->xoffs)) & 0xfff;
+                for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+                {
+                    int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
+                    int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+                    if ((priority_map[0][pix0] >> pix1) & 1)
+                        dest[x] = color_table[0x10 + pix1];
+                    else
+                        dest[x] = color_table[0x00 + pix0];
+                    hpos0 = (hpos0 + 1) & 0xfff;
+                    hpos1 = (hpos1 + 1) & 0xfff;
+                }
+                break;
+
+            case 2:
+                hpos0 = (hpos0 - (0x5f8 + info->xoffs)) & 0xfff;
+                hpos1 = (hpos1 - (0x5f8 + info->xoffs)) & 0xfff;
+                for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+                {
+                    int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
+                    int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+                    if ((priority_map[1][pix0] >> pix1) & 1)
+                        dest[x] = color_table[0x10 + pix1];
+                    else
+                        dest[x] = color_table[0x00 + pix0];
+                    hpos0 = (hpos0 + 1) & 0xfff;
+                    hpos1 = (hpos1 + 1) & 0xfff;
+                }
+                break;
+
+            case 3:
+                if (data1 & 0x800)
+                    continue;
+                hpos1 = (hpos1 - (0x5f8 + info->xoffs)) & 0xfff;
+                for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+                {
+                    int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+                    dest[x] = color_table[0x10 + pix1];
+                    hpos1 = (hpos1 + 1) & 0xfff;
+                }
+                break;
+        } // end switch control
+    } // end y loop
+
+}
 /*************************************
  *
  *  General road initialization

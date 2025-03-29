@@ -69,6 +69,12 @@ extern void fd1094_driver_init(void);
 
 static void xboard_generic_init(void)
 {
+    //krb add
+    memset(&iochip_regs[0][0], 0, sizeof(iochip_regs));
+    iochip_force_input = 0;
+    vblank_irq_state = 0;
+    timer_irq_state = 0;
+
 	/* init the FD1094 */
 	fd1094_driver_init();
 
@@ -81,6 +87,7 @@ static void xboard_generic_init(void)
 	memset(adc_reverse, 0, sizeof(adc_reverse));
 
 	gprider_hack = 0;
+
 }
 
 

@@ -1179,6 +1179,10 @@ static void init_machine(void)
 		if (mem_region[num].flags & ROMREGION_DISPOSE)
 			free_memory_region(num);
 
+// test nasty init
+     // if(strcmp(Machine->gamedrv->name,"thndrbld")==0)
+     //     fatalerror("test thnd");
+
 
     bootlog_setprogress(eProgressEnd);
 #ifdef MAME_DEBUG

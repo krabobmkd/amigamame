@@ -104,7 +104,7 @@ if(OPT_TAITO)
 endif()
 
 # move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/neogeo.c")
-
+move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/segaic16.c")
 # ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}
 
 if(AMIGA)
