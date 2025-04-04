@@ -15,7 +15,7 @@
 #include "profiler.h"
 #include "debugger.h"
 #include "osdepend.h"
-
+#include "drivertuning.h"
 #include <stdio.h>
 
 #if defined(MAME_DEBUG) && defined(NEW_DEBUGGER)
@@ -129,8 +129,8 @@ static INT32 watchdog_counter;
 
 static int cycles_running;
 static int cycles_stolen;
-
-
+//krb, per game init:
+int canAvoidPushContext = 0;
 
 /*************************************
  *
@@ -282,6 +282,33 @@ int cpuexec_init(void)
 	state_save_register_item("cpu", 0, watchdog_counter);
 	state_save_register_item("cpu", 0, vblank_countdown);
 	state_save_pop_tag();
+
+
+    // -- krb optimisation strategy tests --
+    // 680x0 has been instancified (except "opbase")
+    // so GetContext/SetContext per slice would be useless.
+    // else this would be needed only if there is multiple instance
+    // of one given CPU.
+    // in a perfect world, each CPU would be one instance in mem + their opbase with them.
+    // that would erase the need for all those static values copies.
+    // GetContext/SetContext would then only be used for save/load states
+    UINT32 tuningFlags = getDriverTuningFlags();
+    canAvoidPushContext = 0;
+    //TODO automatically guess
+     if(cpunum == 1 || (tuningFlags & MDTF_CANAVOIDPUSHCONTEXT)!=0)
+    {
+        canAvoidPushContext = 1;
+    }
+
+    if(canAvoidPushContext)
+    {
+        // - - pushcontext once at init would be enough. (?)
+        /* loop over CPUs */
+        for (cpunum = 0; Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum++)
+        {
+            cpunum_push_for_init(cpunum);
+        }
+    }
 
 	return 0;
 }
@@ -524,7 +551,7 @@ void cpuexec_timeslice(void)
             profiler_mark(PROFILER_CPU1 + cpunum);
             cycles_stolen = 0;
 
-            ran = cpunum_execute(cpunum, cycles_running);
+            ran = cpunum_execute_nopush(cpunum, cycles_running);
 
 #ifdef MAME_DEBUG
             if (ran < cycles_stolen)

@@ -430,12 +430,12 @@ bool Intuition_Window::open()
 
         WA_Flags, /*WFLG_SIZEGADGET*/ /*| WFLG_SIZEBRIGHT | WFLG_SIZEBBOTTOM |
 
-            */ WFLG_DRAGBAR | WFLG_DEPTHGADGET | WFLG_CLOSEGADGET | WFLG_ACTIVATE /*|
-            WFLG_SUPER_BITMAP*/
-             | WFLG_GIMMEZEROZERO
+            */ WFLG_DRAGBAR | WFLG_DEPTHGADGET | WFLG_CLOSEGADGET | WFLG_ACTIVATE
+            //|WFLG_SUPER_BITMAP
            // | WFLG_NOCAREREFRESH
-             | WFLG_SMART_REFRESH
-            //| WFLG_SIMPLE_REFRESH
+            // | WFLG_SMART_REFRESH
+            | WFLG_SIMPLE_REFRESH
+            | WFLG_GIMMEZEROZERO
              | ((_maxzoomfactor>1)?WFLG_SIZEGADGET:0)
             ,
         WA_Title,(ULONG)windowTitle.c_str(), /* take title from version string */

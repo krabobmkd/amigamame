@@ -12,7 +12,7 @@ extern "C" {
 #define MDTF_M68K_SAFE_MOVEMWRITE 1
 #define MDTF_M68K_SAFE_MOVEMREAD 2
 #define MDTF_LONGBOOT 4
-
+#define MDTF_CANAVOIDPUSHCONTEXT 8
 typedef struct _DriverTuning {
 	UINT32 _bootframeskip;
 	UINT32 _minimumCpuCycles;
@@ -21,8 +21,10 @@ typedef struct _DriverTuning {
 
 sDriverTuning *getDriverTuningByName(const char *drivername);
 sDriverTuning *getDriverTuning(const struct _game_driver *);
-
-
+// when Machine pointer is set.
+//sDriverTuning *getDriverTuning();
+// when Machine pointer is set.
+UINT32 getDriverTuningFlags();
  void applyDriverTuning(const struct _game_driver *);
 #ifdef __cplusplus
 }

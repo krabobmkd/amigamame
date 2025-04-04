@@ -375,6 +375,17 @@ void osd_update_video_and_audio(struct _mame_display *display)
     FrameCounterUpdate++;
     FrameCounter++;
 
+    if((FrameCounter & 31) == 0) // from times to times check ctrl-c in the mame loop.
+    {
+            /* Get current state of signals */
+        ULONG signals = SetSignal(0L, 0L);
+        if(signals & SIGBREAKF_CTRL_C)
+        {
+            SetSignal(0L, SIGBREAKF_CTRL_C); // clear because we manage.
+            exit(0);
+        }
+    }
+
 
 }
 // for progressbar pass
@@ -407,6 +418,15 @@ static void checkExitSimple(MsgPort *userport )
     }
     if(doExit) fatalerror("User cancelled."); // setjmp to end of mame loop
 
+    {
+        /* Get current state of signals */
+        ULONG signals = SetSignal(0L, 0L);
+        if(signals & SIGBREAKF_CTRL_C)
+        {
+            SetSignal(0L, SIGBREAKF_CTRL_C); // clear because we manage.
+            exit(0);
+        }
+    }
 }
 
 // - -  update screen before boot.

@@ -17,11 +17,16 @@ using namespace std;
 
 
 static map<string,sDriverTuning> _tunings={
+    /* {"archivename_or_parent",
+            { nbframes_to_throttle_at_boot,
+             minimum_cycles_to_execute_per_cpu_slice,
+             MDTF_flags or'ed  }}
+    */
 	{"neogeo",{50,DEFMINCPUC,0 /*MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD*/}}, //
 	{"sgemf",{8*60,DEFMINCPUC,0}},
 	{"chasehq",{5*60,DEFMINCPUC,0}},
 
-	{"outrun",{0,400,0}},
+	{"outrun",{0,400,MDTF_CANAVOIDPUSHCONTEXT}},
 
 	{"th",{0,450,0}}, // mortal kombat insane interupt slicing
 	{"thndrbld",{0,4,/*MDTF_M68K_SAFE_MOVEMWRITE}*/MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}}, // thunderblade strange timer issues
@@ -88,7 +93,12 @@ sDriverTuning *getDriverTuning(const struct _game_driver *pdriver)
     }
     return NULL;
 }
-
+UINT32 getDriverTuningFlags()
+{
+    sDriverTuning *drvtunings = getDriverTuning(Machine->gamedrv);
+    if(!drvtunings) return 0;
+    return drvtunings->_flags;
+}
 void applyDriverTuning(const struct _game_driver *pd)
 {
     if(!pd) return;

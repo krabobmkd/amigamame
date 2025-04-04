@@ -21,7 +21,9 @@ struct ScreenBuffer;
 #define VIDEO_RGB_DIRECT	 			0x0004
 #define VIDEO_NEEDS_6BITS_PER_GUN		0x0008
 
-// this differenciate Screen and Windows
+/** \class IntuitionDrawable
+ * this differenciates Screen and Windows
+ */
 class IntuitionDrawable {
 public:
     IntuitionDrawable(int flags);
@@ -57,6 +59,9 @@ protected:
 
 class TripleBuffer;
 
+/** \class Intuition_Screen
+ * made to be extended as classic OS3 drawing, or CGX/ P96 api drawings.
+*/
 class Intuition_Screen : public IntuitionDrawable
 {
 public:
@@ -80,7 +85,8 @@ protected:
     TripleBuffer *_pTripleBufferImpl;
 
 };
-
+/** abtsract, to allow multiple triple buffer implementations.
+*/
 class TripleBuffer
 {
 public:
@@ -99,7 +105,9 @@ public:
     char _d;
 };
 
-
+/** \class Intuition_Window
+ * made to be extended as classic OS3 drawing, or CGX/ P96 api drawings.
+*/
 class Intuition_Window : public IntuitionDrawable
 {
 public:
@@ -123,7 +131,11 @@ protected:
 };
 
 
-
+/* \class IntuitionDisplay
+   The first Amigaish level of AbstractDisplay.
+   still asbtract, can be opened as window or screen at this level.
+   MsgPort *userPort() is used for testing keyboard or windows click events, any intuition event.
+*/
 class IntuitionDisplay : public AbstractDisplay
 {
 public:

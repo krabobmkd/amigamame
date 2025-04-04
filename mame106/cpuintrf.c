@@ -788,7 +788,11 @@ INLINE void set_cpu_context(int cpunum)
     {
         int keeplast = activecpu;  // krb , get_context need same instance activecpu
         activecpu = oldcontext;
-		(*cpu[oldcontext].intf.get_context)(cpu[oldcontext].context);
+        /*int oldfamily = cpu[oldcontext].family;
+        if(oldfamily != CPU_M68000)
+        {
+            (*cpu[oldcontext].intf.get_context)(cpu[oldcontext].context);
+		}*/
         activecpu = keeplast;
     }
 	/* swap memory spaces */
@@ -798,7 +802,10 @@ INLINE void set_cpu_context(int cpunum)
 	/* if the new CPU's context is not swapped in, do it now */
 	if (oldcontext != cpunum)
 	{
-		(*cpu[cpunum].intf.set_context)(cpu[cpunum].context);
+       /* if(newfamily != CPU_M68000)
+        {
+            (*cpu[cpunum].intf.set_context)(cpu[cpunum].context);
+		}*/
 		cpu_active_context[newfamily] = cpunum;
 	}
 }
@@ -810,13 +817,14 @@ INLINE void set_cpu_context(int cpunum)
  *  Push/pop to a new CPU context
  *
  *************************************/
-
+extern int canAvoidPushContext;
 void cpuintrf_push_context(int cpunum)
 {
 	/* push the old context onto the stack */
 	cpu_context_stack[cpu_context_stack_ptr++] = activecpu;
 
 	/* do the rest only if this isn't the activecpu */
+//	if(!canAvoidPushContext) //TODO optimize
 	if (cpunum != activecpu && cpunum != -1)
 		set_cpu_context(cpunum);
 
@@ -824,13 +832,13 @@ void cpuintrf_push_context(int cpunum)
 	activecpu = cpunum;
 }
 
-
 void cpuintrf_pop_context(void)
 {
 	/* push the old context onto the stack */
 	int cpunum = cpu_context_stack[--cpu_context_stack_ptr];
 
 	/* do the rest only if this isn't the activecpu */
+//	if(!canAvoidPushContext) //TODO optimize
 	if (cpunum != activecpu && cpunum != -1)
 		set_cpu_context(cpunum);
 
@@ -1463,7 +1471,75 @@ int cpunum_execute(int cpunum, int cycles)
 	cpuintrf_pop_context();
 	return ran;
 }
+// krb optim thing for inits.
+void cpunum_push_for_init(int cpunum)
+{
+	cpuintrf_push_context(cpunum);
+	executingcpu = cpunum;
+	memory_set_opbase(activecpu_get_physical_pc_byte());
+	executingcpu = -1;
+	cpuintrf_pop_context();
+}
 
+int cpunum_execute_nopush(int cpunum, int cycles)
+{
+	int ran;
+/*
+	CPU_M68000,
+	CPU_M68008,
+	CPU_M68010,
+	CPU_M68EC020,
+	CPU_M68020,
+	CPU_M68040,
+*/
+	cpu_context_stack[cpu_context_stack_ptr++] = activecpu;
+	if(cpunum != activecpu )
+	{
+	// this parag. replace set_cpu_context()
+        //OPTIMIZE THIS
+        int newfamily = cpu[cpunum].family;
+        int oldcontext = cpu_active_context[newfamily];
+
+        /* if we need to change contexts, save the one that was there */
+        if (oldcontext != cpunum && oldcontext != -1)
+        {
+            int keeplast = activecpu;  // krb , get_context need same instance activecpu
+            activecpu = oldcontext;
+            int oldfamily = cpu[oldcontext].family;
+            /*if(oldfamily != CPU_M68000)
+            {
+                (*cpu[oldcontext].intf.get_context)(cpu[oldcontext].context);
+            }*/
+            activecpu = keeplast;
+        }
+        /* swap memory spaces */
+        activecpu = cpunum;
+        memory_set_context(cpunum);
+
+        /* if the new CPU's context is not swapped in, do it now */
+        if (oldcontext != cpunum)
+        {
+/*?            if(newfamily != CPU_M68000)
+            {
+                (*cpu[cpunum].intf.set_context)(cpu[cpunum].context);
+            }
+*/
+            cpu_active_context[newfamily] = cpunum;
+        }
+
+	}
+	activecpu = cpunum;
+
+	executingcpu = cpunum;
+	memory_set_opbase(activecpu_get_physical_pc_byte());
+	ran = (*cpu[cpunum].intf.execute)(cycles);
+	executingcpu = -1;
+
+	int cpunumprev = cpu_context_stack[--cpu_context_stack_ptr];
+	activecpu = cpunumprev;
+
+	return ran;
+}
 
 /*--------------------------
     Reset and set IRQ ack
