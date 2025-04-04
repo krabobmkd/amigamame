@@ -26,15 +26,16 @@ static map<string,sDriverTuning> _tunings={
 	{"sgemf",{8*60,DEFMINCPUC,0}},
 	{"chasehq",{5*60,DEFMINCPUC,0}},
 
-	{"outrun",{0,400,MDTF_CANAVOIDPUSHCONTEXT}},
+	{"outrun",{0,128,0}}, // for _minimumCpuCycles
+	{"bombjack",{12*60,0,0}},
 
-	{"th",{0,450,0}}, // mortal kombat insane interupt slicing
-	{"thndrbld",{0,4,/*MDTF_M68K_SAFE_MOVEMWRITE}*/MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}}, // thunderblade strange timer issues
+	{"mk",{0,128,0}}, // mortal kombat insane interupt slicing
+	{"thndrbld",{0,2,0}}, // thunderblade strange timer issues (test) need minimum slice
 
 	{"gtmr",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},     // 1000 miglia
 	{"gtmr2",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},     // 1000 miglia
 
-	{"1944",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE/*|MDTF_M68K_SAFE_MOVEMREAD*/}},
+	{"1944",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 	{"bublbob2",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 	{"armwar",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE}},
 	{"truxton",{12*60,DEFMINCPUC,MDTF_LONGBOOT}}, // boot after the end of the world.

@@ -552,9 +552,6 @@ void cpunum_set_info_fct(int cpunum, UINT32 state, genf *data);
 int cpunum_execute(int cpunum, int cycles);
 /* execute the requested cycles on a given CPU */
 int cpunum_execute_nopush(int cpunum, int cycles);
-// krb test
-void cpunum_push_for_init(int cpunum);
-
 
 /* signal a reset for a given CPU */
 void cpunum_reset(int cpunum);

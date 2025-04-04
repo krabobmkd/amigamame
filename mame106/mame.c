@@ -253,7 +253,7 @@ static void handle_load(void);
     Core system management
 
 ***************************************************************************/
-
+extern int canAvoidPushContext;
 /*-------------------------------------------------
     run_game - run the given game in a session
 -------------------------------------------------*/
@@ -324,6 +324,7 @@ int run_game(int game)
 
 			/* run the CPUs until a reset or exit */
 			hard_reset_pending = FALSE;
+			if(canAvoidPushContext)
 			while ((!hard_reset_pending && !exit_pending) || saveload_pending_file != NULL)
 			{
                 //printf("cpu loop ...\n");
@@ -331,7 +332,7 @@ int run_game(int game)
 
 				/* execute CPUs if not paused */
 				if (!mame_paused)
-					cpuexec_timeslice();
+					cpuexec_timeslice_instances();
 
 				/* otherwise, just pump video updates through */
 				else
@@ -345,7 +346,31 @@ int run_game(int game)
 					(*saveload_schedule_callback)();
 
 				profiler_mark(PROFILER_END);
+			} else
+			while ((!hard_reset_pending && !exit_pending) || saveload_pending_file != NULL)
+			{
+                //printf("cpu loop ...\n");
+				profiler_mark(PROFILER_EXTRA);
+
+				/* execute CPUs if not paused */
+				if (!mame_paused)
+					cpuexec_timeslice();
+
+				/* otherwise, just pump video updates through */
+				else
+				{
+					updatescreen();
+					reset_partial_updates();
+				}
+
+				/* handle save/load */
+				if (saveload_schedule_callback)
+					(*saveload_schedule_callback)();
+
+				profiler_mark(PROFILER_END);
 			}
+
+
 
 			/* and out via the exit phase */
 			current_phase = MAME_PHASE_EXIT;

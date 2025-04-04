@@ -9,19 +9,22 @@
 
 ***************************************************************************/
 //was test #pragma GCC optimize ("O1")
+
 #include <math.h>
-#include "driver.h"
-#include "cheat.h"
-#include "profiler.h"
-#include "debugger.h"
-#include "osdepend.h"
-#include "drivertuning.h"
-#include <stdio.h>
+extern "C"
+{
+    #include "driver.h"
+    #include "cheat.h"
+    #include "profiler.h"
+    #include "debugger.h"
+    #include "osdepend.h"
+    #include "drivertuning.h"
+    #include <stdio.h>
 
-#if defined(MAME_DEBUG) && defined(NEW_DEBUGGER)
-#include "debug/debugcpu.h"
-#endif
-
+    #if defined(MAME_DEBUG) && defined(NEW_DEBUGGER)
+    #include "debug/debugcpu.h"
+    #endif
+}
 
 
 /*************************************
@@ -206,7 +209,7 @@ static void watchdog_setup(int alloc_new);
 
 int cpuexec_init(void)
 {
-	int cpunum;
+	int cpunum,nbCpuNotInstanciable=0;
 
 	/* initialize the refresh timer */
 	init_refresh_timer();
@@ -220,6 +223,12 @@ int cpuexec_init(void)
 		/* if this is a dummy, stop looking */
 		if (cputype == CPU_DUMMY)
 			break;
+        // for krb opt, look if we need to use push/pop context structs
+        // so far in MiniMix only tese cpu have been "instanciable"
+        if(cputype < CPU_M68000 || cputype>CPU_M68040)
+        {
+            nbCpuNotInstanciable++;
+        }
 
 		/* initialize the cpuinfo struct */
 		memset(&cpu[cpunum], 0, sizeof(cpu[cpunum]));
@@ -283,7 +292,7 @@ int cpuexec_init(void)
 	state_save_register_item("cpu", 0, vblank_countdown);
 	state_save_pop_tag();
 
-
+ printf("cpunum:%d nbCpuNotInstanciable:%d\n",cpunum,nbCpuNotInstanciable);
     // -- krb optimisation strategy tests --
     // 680x0 has been instancified (except "opbase")
     // so GetContext/SetContext per slice would be useless.
@@ -292,22 +301,12 @@ int cpuexec_init(void)
     // in a perfect world, each CPU would be one instance in mem + their opbase with them.
     // that would erase the need for all those static values copies.
     // GetContext/SetContext would then only be used for save/load states
-    UINT32 tuningFlags = getDriverTuningFlags();
     canAvoidPushContext = 0;
-    //TODO automatically guess
-     if(cpunum == 1 || (tuningFlags & MDTF_CANAVOIDPUSHCONTEXT)!=0)
+    // automatically guess if we really have to copy context or not:
+    // basically out run has 2x68000+1xz80 -> nbCpuNotInstanciable=1 -> ok.
+     if(cpunum == 1 || (nbCpuNotInstanciable<=1) )
     {
         canAvoidPushContext = 1;
-    }
-
-    if(canAvoidPushContext)
-    {
-        // - - pushcontext once at init would be enough. (?)
-        /* loop over CPUs */
-        for (cpunum = 0; Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum++)
-        {
-            cpunum_push_for_init(cpunum);
-        }
     }
 
 	return 0;
@@ -509,7 +508,8 @@ extern mame_time global_basetime;
  *************************************/
 int mintc=(1<<30),maxtc=-(1<<30);
 
-void cpuexec_timeslice(void)
+template<int allCpuAreInstances>
+void cpuexec_timesliceT(void)
 {
 	mame_time target = mame_timer_next_fire_time();
 	mame_time base = global_basetime; // mame_timer_get_time();
@@ -551,7 +551,11 @@ void cpuexec_timeslice(void)
             profiler_mark(PROFILER_CPU1 + cpunum);
             cycles_stolen = 0;
 
-            ran = cpunum_execute_nopush(cpunum, cycles_running);
+            ran = (allCpuAreInstances)? // compilation escaped test
+                        cpunum_execute_nopush(cpunum, cycles_running)
+                            :
+                         cpunum_execute(cpunum, cycles_running)
+                            ;
 
 #ifdef MAME_DEBUG
             if (ran < cycles_stolen)
@@ -611,8 +615,8 @@ void cpuexec_timeslice(void)
 	}
 	#endif
 }
-
-
+void cpuexec_timeslice(void) {cpuexec_timesliceT<0>();}
+void cpuexec_timeslice_instances(void) { cpuexec_timesliceT<1>(); }
 
 /*************************************
  *
@@ -958,7 +962,7 @@ int activecpu_geticount(void)
 	int result;
 
     int activecpu = cpu_getexecutingcpu();
-	result = MAME_TIME_TO_CYCLES(activecpu, sub_mame_times(cpu[activecpu].vblankint_period, mame_timer_timeelapsed(cpu[activecpu].vblankint_timer)));
+	result = MAME_TIME_TO_CYCLES(activecpu, sub_mame_times(cpu[activecpu].vblankint_period, mame_timer_timeelapsed((mame_timer *)cpu[activecpu].vblankint_timer)));
 	return (result < 0) ? 0 : result;
 }
 
@@ -1558,13 +1562,13 @@ static void cpu_vblankcallback(int param)
 
 				/* reset the countdown and timer */
 				cpu[cpunum].vblankint_countdown = cpu[cpunum].vblankint_multiplier;
-				mame_timer_adjust(cpu[cpunum].vblankint_timer, time_never, 0, time_never);
+				mame_timer_adjust((mame_timer *)cpu[cpunum].vblankint_timer, time_never, 0, time_never);
 			}
 		}
 
 		/* else reset the VBLANK timer if this is going to be a real VBLANK */
 		else if (vblank_countdown == 1)
-			mame_timer_adjust(cpu[cpunum].vblankint_timer, time_never, 0, time_never);
+			mame_timer_adjust((mame_timer *)cpu[cpunum].vblankint_timer, time_never, 0, time_never);
 	}
 
 	/* is it a real VBLANK? */
@@ -1801,7 +1805,7 @@ static void cpu_inittimers(void)
 		{
 			cpu[cpunum].timedint_period = double_to_mame_time(Machine->drv->cpu[cpunum].timed_interrupt_period);
 			cpu[cpunum].timedint_timer = mame_timer_alloc(cpu_timedintcallback);
-			mame_timer_adjust(cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
+			mame_timer_adjust((mame_timer *)cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
 		}
 	}
 

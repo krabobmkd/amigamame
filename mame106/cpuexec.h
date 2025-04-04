@@ -68,7 +68,10 @@ int cpuexec_init(void);
 /* Execute for a single timeslice */
 void cpuexec_timeslice(void);
 
-
+/* Execute for a single timeslice
+    krb optimisation: version that does not need push/pop context per CPU.
+*/
+void cpuexec_timeslice_instances(void);
 
 /*************************************
  *

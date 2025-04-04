@@ -52,7 +52,7 @@ set(MAME_CORE_SRC
 	  harddisk.c  mamecore.c  sha1.c      unzip.c
 	cheat.c    hash.c      mamedriv.c  sndintrf.c  usrintrf.c
 	config.c   hiscore.c   md5.c            validity.c
-	cpuexec.c  info.c      memory.c memoryn.cpp   state.c     version.c
+	cpuexec.cpp  info.c      memory.c memoryn.cpp   state.c     version.c
  debugger.h   jedparse.h            png.h        ui_text.h
  audit.h
 
