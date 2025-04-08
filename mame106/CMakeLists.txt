@@ -93,7 +93,7 @@ set(MAME_CORE_SRC
 
 set(MAME_UNROLL_SRC  drawgfx.c  drawgfxn.cpp
 					drawgfx.h  drawgfxn.h
-				 tilemapn.cpp
+				 tilemap.cpp
 				 sound_krb.c
 				 sound/wavwrite.c
 				 sound/wavwrite.h
