@@ -53,6 +53,7 @@ set(MAME_CORE_SRC
 	cheat.c    hash.c      mamedriv.c  sndintrf.c  usrintrf.c
 	config.c   hiscore.c   md5.c            validity.c
 	cpuexec.cpp  info.c      memory.c memoryn.cpp   state.c     version.c
+	cpustats.cpp
  debugger.h   jedparse.h            png.h        ui_text.h
  audit.h
 
@@ -68,7 +69,7 @@ set(MAME_CORE_SRC
  cpuexec.h    info.h       streams.h
  cpuint.h     inptport.h   osdepend.h            tilemap.h
  cpuintrf.h   input.h      palette.h             timer.h
-
+	cpustats.h
 
   cpu/m68000/m68kkrbopt.h
  sound_krb.h

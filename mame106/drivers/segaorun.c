@@ -28,6 +28,28 @@
 #define MASTER_CLOCK			50000000
 #define SOUND_CLOCK				16000000
 
+/*
+krb cpustats
+ top of adress executed
+ adr:00007dda nbr:001ca9f2
+ adr:00007de0 nbr:001ca9f2
+ adr:00007964 nbr:0005afec
+ adr:0000796c nbr:0005afec
+
+ main cpu spend 16x times just :
+00007dda    btst.w $060800   loop when 0. ->seen by cpu0
+
+void m68k_op_tst_16_al(M68KOPT_PARAMS)
+
+--------------------- cpu 1
+ adr:00001182 nbr:001bc319
+ adr:00001186 nbr:001bc318
+ adr:00001066 nbr:0003cb10
+ adr:00001060 nbr:0003cb10
+void m68k_op_tst_16_di(M68KOPT_PARAMS)
+m68k_op_bge_8
+  read .w at $3800 (seen by cpu1)
+*/
 
 
 /*************************************

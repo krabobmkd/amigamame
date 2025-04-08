@@ -21,6 +21,11 @@ static const char* copyright_notice =
 ;
 #endif
 
+#define STATCPUINSTR 1
+#ifdef STATCPUINSTR
+    #include "cpustats.h"
+#endif
+
 
 /* ======================================================================== */
 /* ================================= NOTES ================================ */
@@ -878,8 +883,20 @@ int m68k_execute(int num_cycles)
     // this on has multiple 68k,...
         do
 		{
-			REG_PPC = REG_PC;
+    		REG_PPC = REG_PC;
 			uint16 ir = m68ki_read_imm_16(p68k);
+
+#ifdef STATCPUINSTR
+        // if(REG_PPC == 0x00007dda)
+        // {
+        // printf("w");
+        // }
+        if(REG_PPC == 0x00001182)
+        {
+         printf(" ");
+        }
+    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
+#endif
 			m68ki_instruction_jump_table[ir](p68k,ir);
             m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
 		} while(m68k_ICount > 0);

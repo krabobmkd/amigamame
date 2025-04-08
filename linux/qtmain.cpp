@@ -29,8 +29,17 @@ extern "C" {
     #include "input.h"
 }
 #include <chrono>
+#define STATCPUINSTR 1
+#ifdef STATCPUINSTR
+extern "C" {
+    #include "cpustats.h"
+}
+#endif
+
 
 using namespace std;
+
+
 
 
 extern "C" {
@@ -275,6 +284,9 @@ int main(int argc, char* argv[])
     isinexit = true;
     logEntries();
 
+
+    cpustats_log();
+
 	return r;
 }
 
@@ -383,7 +395,7 @@ nbframe++;
 
 //if(nbframe == 60*25) mame_pause(1);
 // if(nbframe==1200) exit(1);
-// if(nbframe==60*10)  mame_schedule_exit();
+ if(nbframe==60*10)  mame_schedule_exit();
 //    m_mutex.lock();
 //    m_mutex.unlock();
 
