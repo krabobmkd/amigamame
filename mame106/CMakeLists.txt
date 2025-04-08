@@ -56,7 +56,7 @@ set(MAME_CORE_SRC
  debugger.h   jedparse.h            png.h        ui_text.h
  audit.h
 
- # drawgfx.h drawgfxn.h drawgfx.c  drawgfxn.cpp  tilemap.c tilemapn.cpp
+ # drawgfx.h drawgfxn.h drawgfx.c  drawgfxn.cpp tilemapn.cpp
 # sound_krb.c
 
  mame.h                profiler.h   unzip.h
@@ -93,7 +93,7 @@ set(MAME_CORE_SRC
 
 set(MAME_UNROLL_SRC  drawgfx.c  drawgfxn.cpp
 					drawgfx.h  drawgfxn.h
-				 tilemap.c tilemapn.cpp
+				 tilemapn.cpp
 				 sound_krb.c
 				 sound/wavwrite.c
 				 sound/wavwrite.h

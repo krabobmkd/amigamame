@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    tilemap.c
+    tilemap.c ->tilemapn.cpp
 
     Generic tilemap management system.
 
@@ -23,14 +23,17 @@
     -   You can currently configure a tilemap as xscroll + scrolling columns or
         yscroll + scrolling rows, but not both types of scrolling simultaneously.
 */
-#include "drawgfx.h"
+extern "C"
+{
+    #include "drawgfx.h"
+    #include "driver.h"
+    #include "osinline.h"
+    #include "tilemap.h"
+    #include "profiler.h"
+}
+//#if !defined(DECLARE) && !defined(TRANSP)
 
-#if !defined(DECLARE) && !defined(TRANSP)
 
-#include "driver.h"
-#include "osinline.h"
-#include "tilemap.h"
-#include "profiler.h"
 
 #define SWAP(X,Y) { UINT32 temp=X; X=Y; Y=temp; }
 #define MAX_TILESIZE 64
@@ -187,7 +190,7 @@ static int PenToPixel_Init( tilemap *tmap )
 	lError = 0;
 	for( i=0; i<4; i++ )
 	{
-		pPenToPixel = malloc( tmap->num_pens*sizeof(UINT32) );
+		pPenToPixel = (UINT32 *)malloc( tmap->num_pens*sizeof(UINT32) );
 		if( pPenToPixel==NULL )
 		{
 			lError = 1;
@@ -306,11 +309,11 @@ static int mappings_create( tilemap *tmap )
 	max_memory_offset++;
 	tmap->max_memory_offset = max_memory_offset;
 	/* logical to cached (tmap_mark_dirty) */
-	tmap->memory_offset_to_cached_indx = malloc( sizeof(int)*max_memory_offset );
+	tmap->memory_offset_to_cached_indx =(int *) malloc( sizeof(int)*max_memory_offset );
 	if( tmap->memory_offset_to_cached_indx )
 	{
 		/* cached to logical (get_tile_info) */
-		tmap->cached_indx_to_memory_offset = malloc( sizeof(UINT32)*tmap->num_tiles );
+		tmap->cached_indx_to_memory_offset = (UINT32 *) malloc( sizeof(UINT32)*tmap->num_tiles );
 		if( tmap->cached_indx_to_memory_offset ) return 0; /* no error */
 		free( tmap->memory_offset_to_cached_indx );
 	}
@@ -420,13 +423,12 @@ static void pit(sBlitMaskParams *p REGTM(a0) )
 
 /***********************************************************************************/
 
-#ifndef pdo16
 static void pdo16( sBlitMaskParams *p REGTM(a0) )
 {
 	INT16 i,y,y_next,count;
     UINT8 *pri0 = p->pri;
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *) p->dest;
     UINT32 pcode = p->pcode;
     y = p->y;
     y_next = p->y_next;
@@ -449,14 +451,14 @@ static void pdo16( sBlitMaskParams *p REGTM(a0) )
         source0 += p->sourcemodx;
     }
 }
-#endif
+
 static void pdo16First( sBlitMaskParams *p REGTM(a0) )
 {
     // if here means mask is zero, reset prio layer.
 	INT16 i,y,y_next,count;
     UINT8 *pri0 = p->pri;
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
     UINT32 pcode = p->pcode;
     y = p->y;
     y_next = p->y_next;
@@ -479,15 +481,15 @@ static void pdo16First( sBlitMaskParams *p REGTM(a0) )
 }
 
 
-#ifndef pdo16pal
+
 static void pdo16pal(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 i,y,y_next,count;
     UINT32 pcode = p->pcode;
 	UINT16 pal = (pcode >> 16);
     UINT8 *pri0 = p->pri;
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *) p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
     y = p->y;
     y_next = p->y_next;
     count = p->count;
@@ -510,15 +512,13 @@ static void pdo16pal(sBlitMaskParams *p REGTM(a0) )
         source0 += p->sourcemodx;
     }
 }
-#endif
 
-#ifndef pdo16np
 static void pdo16np(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
     y = p->y;
     y_next = p->y_next;
     count = p->count;
@@ -535,14 +535,14 @@ static void pdo16np(sBlitMaskParams *p REGTM(a0) )
         source0 += p->sourcemodx;
     }
 }
-#endif
+
 
 static void pdo15(sBlitMaskParams *p REGTM(a0))
 {
     INT16 i,y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
     UINT8 *pri0 = p->pri;
     y = p->y;
     y_next = p->y_next;
@@ -569,13 +569,12 @@ static void pdo15(sBlitMaskParams *p REGTM(a0))
 	}
 }
 
-#ifndef pdo32
 static void pdo32(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 i,y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT32 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT32 *dest0 = (UINT32 *)p->dest;
     UINT8 *pri0 = p->pri;
     y = p->y;
     y_next = p->y_next;
@@ -601,15 +600,13 @@ static void pdo32(sBlitMaskParams *p REGTM(a0) )
         source0 += p->sourcemodx;
 	}
 }
-#endif
 
-#ifndef npdo32
 static void npdo32(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 i,y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT32 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT32 *dest0 = (UINT32 *)p->dest;
     y = p->y;
     y_next = p->y_next;
     count = p->count;
@@ -651,17 +648,17 @@ static void npdo32(sBlitMaskParams *p REGTM(a0) )
         source0 += p->sourcemodx;
     }
 }
-#endif
+
 
 /***********************************************************************************/
 //extern int dbg_plane;
-#ifndef pdt16
+
 static void pdt16(sBlitMaskParams *p REGTM(a0)  )
 {
     INT16 i,y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
     UINT8 *pri0 = p->pri;
     const UINT8 *pMask0 = p->pMask;
     y = p->y;
@@ -697,16 +694,14 @@ static void pdt16(sBlitMaskParams *p REGTM(a0)  )
         pMask0 += p->sourcemaskmodx;
     }
 }
-#endif
 
-#ifndef pdt16pal
 static void pdt16pal(sBlitMaskParams *p REGTM(a0) )
 {
 	UINT16 pal = (p->pcode >> 16);
     INT16 i,y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
     UINT8 *pri0 = p->pri;
     const UINT8 *pMask0 = p->pMask;
     y = p->y;
@@ -740,15 +735,13 @@ static void pdt16pal(sBlitMaskParams *p REGTM(a0) )
     }
 
 }
-#endif
 
-#ifndef pdt16np
 static void pdt16np(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 i,y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
     const UINT8 *pMask0 = p->pMask;
     y = p->y;
     y_next = p->y_next;
@@ -775,7 +768,7 @@ static void pdt16np(sBlitMaskParams *p REGTM(a0) )
         pMask0 += p->sourcemaskmodx;
     }
 }
-#endif
+
 
 static void pdt15(sBlitMaskParams *p REGTM(a0) )
 {
@@ -784,8 +777,8 @@ static void pdt15(sBlitMaskParams *p REGTM(a0) )
 
     INT16 i,y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
     const UINT8 *pMask0 = p->pMask;
     UINT8 *pri0 = p->pri;
     y = p->y;
@@ -819,7 +812,7 @@ static void pdt15(sBlitMaskParams *p REGTM(a0) )
     }
 }
 
-#ifndef pdt32
+
 static void pdt32(sBlitMaskParams *p REGTM(a0) )
 {
         UINT32 pcode = p->pcode;
@@ -827,8 +820,8 @@ static void pdt32(sBlitMaskParams *p REGTM(a0) )
 
     INT16 i,y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT32 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT32 *dest0 = (UINT32 *)p->dest;
     const UINT8 *pMask0 = p->pMask;
     UINT8 *pri0 = p->pri;
     y = p->y;
@@ -861,9 +854,7 @@ static void pdt32(sBlitMaskParams *p REGTM(a0) )
         pri0 += priority_bitmap_pitch_line;
     }
 }
-#endif
 
-#ifndef npdt32
 static void npdt32(sBlitMaskParams *p REGTM(a0) )
 {
         UINT32 pcode = p->pcode;
@@ -871,8 +862,8 @@ static void npdt32(sBlitMaskParams *p REGTM(a0) )
 
     INT16 i,y,y_next,count;
 
-    const UINT16 *source0 = p->source;
-    UINT32 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT32 *dest0 = (UINT32 *)p->dest;
     const UINT8 *pMask0 = p->pMask;
     y = p->y;
     y_next = p->y_next;
@@ -909,7 +900,6 @@ static void npdt32(sBlitMaskParams *p REGTM(a0) )
         pMask0 += p->sourcemaskmodx;
     }
 }
-#endif
 
 /***********************************************************************************/
 
@@ -920,8 +910,8 @@ static void pbo15(sBlitMaskParams *p REGTM(a0))
 
     INT16 i,y,y_next,count;
     UINT8 *pri0 = p->pri;
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
 
     y = p->y;
     y_next = p->y_next;
@@ -947,7 +937,7 @@ static void pbo15(sBlitMaskParams *p REGTM(a0))
     }
 }
 
-#ifndef pbo32
+
 static void pbo32(sBlitMaskParams *p REGTM(a0) )
 {
         UINT32 pcode = p->pcode;
@@ -955,8 +945,8 @@ static void pbo32(sBlitMaskParams *p REGTM(a0) )
 
     INT16 i,y,y_next,count;
     UINT8 *pri0 = p->pri;
-    const UINT16 *source0 = p->source;
-    UINT32 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT32 *dest0 = (UINT32 *)p->dest;
 
     y = p->y;
     y_next = p->y_next;
@@ -981,14 +971,12 @@ static void pbo32(sBlitMaskParams *p REGTM(a0) )
         pri0 += priority_bitmap_pitch_line;
     }
 }
-#endif
 
-#ifndef npbo32
 static void npbo32(sBlitMaskParams *p REGTM(a0)  )
 {
     INT16 i,y,y_next,count;
-    const UINT16 *source0 = p->source;
-    UINT32 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT32 *dest0 = (UINT32 *)p->dest;
         UINT32 pcode = p->pcode;
     y = p->y;
     y_next = p->y_next;
@@ -1021,15 +1009,15 @@ static void npbo32(sBlitMaskParams *p REGTM(a0)  )
         source0 += p->sourcemodx;
     }
 }
-#endif
+
 
 /***********************************************************************************/
 
 static void pbt15(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 i,y,y_next,count;
-    const UINT16 *source0 = p->source;
-    UINT16 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT16 *dest0 = (UINT16 *)p->dest;
     const UINT8 *pMask0 = p->pMask;
         UINT32 pcode = p->pcode;
     y = p->y;
@@ -1063,12 +1051,11 @@ static void pbt15(sBlitMaskParams *p REGTM(a0) )
     }
 }
 
-#ifndef pbt32
 static void pbt32(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 i,y,y_next,count;
-    const UINT16 *source0 = p->source;
-    UINT32 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT32 *dest0 = (UINT32 *)p->dest;
     const UINT8 *pMask0 = p->pMask;
         UINT32 pcode = p->pcode;
     y = p->y;
@@ -1103,14 +1090,12 @@ static void pbt32(sBlitMaskParams *p REGTM(a0) )
         pri0 += priority_bitmap_pitch_line;
     }
 }
-#endif
 
-#ifndef npbt32
 static void npbt32(sBlitMaskParams *p REGTM(a0) )
 {
     INT16 i,y,y_next,count;
-    const UINT16 *source0 = p->source;
-    UINT32 *dest0 = p->dest;
+    const UINT16 *source0 = (const UINT16 *)p->source;
+    UINT32 *dest0 = (UINT32 *) p->dest;
     const UINT8 *pMask0 = p->pMask;
         UINT32 pcode = p->pcode;
     y = p->y;
@@ -1152,29 +1137,57 @@ static void npbt32(sBlitMaskParams *p REGTM(a0) )
         pri0 += priority_bitmap_pitch_line;
     }
 }
-#endif
 
 /***********************************************************************************/
 
-#define DEPTH 16
-#define DATA_TYPE UINT16
-#define DECLARE(function,args,body) static void function##16BPP args body
-#include "tilemap.c"
+//#define DEPTH 16
+//#define DATA_TYPE UINT16
+//#define DECLARE(function,args,body) static void function##16BPP args body
+//#include "tilemap.c"
 
-#define DEPTH 32
-#define DATA_TYPE UINT32
-#define DECLARE(function,args,body) static void function##32BPP args body
-#include "tilemap.c"
+//#define DEPTH 32
+//#define DATA_TYPE UINT32
+//#define DECLARE(function,args,body) static void function##32BPP args body
+//#include "tilemap.c"
 
-#define PAL_INIT const pen_t *pPalData = tile_info.pal_data
-#define PAL_GET(pen) pPalData[pen]
-#define TRANSP(f) f ## _ind
-#include "tilemap.c"
+//typedef void (*tilemap_draw_func)( tilemap *tmap, int xpos, int ypos, int mask, int value );
+void draw32BPP( tilemap *tmap, int xpos, int ypos, int mask, int value );
+void draw16BPP( tilemap *tmap, int xpos, int ypos, int mask, int value );
 
-#define PAL_INIT int palBase = tile_info.pal_data - Machine->remapped_colortable
-#define PAL_GET(pen) (palBase + (pen))
-#define TRANSP(f) f ## _raw
-#include "tilemap.c"
+void copyroz_core32BPP(mame_bitmap *bitmap,tilemap *tmap,
+		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
+		const rectangle *clip,
+		int mask,int value,
+		UINT32 priority,UINT32 priority_mask,UINT32 palette_offset);
+
+void copyroz_core16BPP(mame_bitmap *bitmap,tilemap *tmap,
+		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
+		const rectangle *clip,
+		int mask,int value,
+		UINT32 priority,UINT32 priority_mask,UINT32 palette_offset);
+//#define PAL_INIT const pen_t *pPalData = tile_info.pal_data
+//#define PAL_GET(pen) pPalData[pen]
+//#define TRANSP(f) f ## _ind
+//#include "tilemap.c"
+
+//#define PAL_INIT int palBase = tile_info.pal_data - Machine->remapped_colortable
+//#define PAL_GET(pen) (palBase + (pen))
+//#define TRANSP(f) f ## _raw
+//#include "tilemap.c"
+
+UINT8 HandleTransparencyBitmask_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyPenBit_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyPens_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyPen_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyColor_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyNone_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+
+UINT8 HandleTransparencyBitmask_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyPenBit_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyPens_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyPen_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyColor_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
+UINT8 HandleTransparencyNone_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags);
 
 /*********************************************************************************/
 
@@ -1263,7 +1276,7 @@ void tilemap_exit( void )
 
 static void tilemap_postload(void *param)
 {
-	tilemap *tmap = param;
+	tilemap *tmap = (tilemap *)param;
 	mappings_update(tmap);
 	recalculate_scroll(tmap);
 	tilemap_mark_all_tiles_dirty(tmap);
@@ -1281,7 +1294,7 @@ tilemap *tilemap_create(
 	UINT32 row;
 	int num_tiles;
 
-	tmap = calloc( 1,sizeof( tilemap ) );
+	tmap = (tilemap *)calloc( 1,sizeof( tilemap ) );
 	if( tmap )
 	{
 		num_tiles = num_cols*num_rows;
@@ -1289,8 +1302,8 @@ tilemap *tilemap_create(
 		tmap->num_logical_rows = num_rows;
 		tmap->logical_tile_width = tile_width;
 		tmap->logical_tile_height = tile_height;
-		tmap->logical_colscroll = calloc(num_cols*tile_width,sizeof(INT32));
-		tmap->logical_rowscroll = calloc(num_rows*tile_height,sizeof(INT32));
+		tmap->logical_colscroll = (INT32 *) calloc(num_cols*tile_width,sizeof(INT32));
+		tmap->logical_rowscroll = (INT32 *)calloc(num_rows*tile_height,sizeof(INT32));
 		tmap->num_cached_cols = num_cols;
 		tmap->num_cached_rows = num_rows;
 		tmap->num_tiles = num_tiles;
@@ -1312,11 +1325,11 @@ tilemap *tilemap_create(
 		tmap->tile_depth = 0;
 		tmap->tile_granularity = 0;
 
-		tmap->cached_rowscroll	= calloc(tmap->cached_height,sizeof(INT32));
-		tmap->cached_colscroll	= calloc(tmap->cached_width, sizeof(INT32));
+		tmap->cached_rowscroll	= (INT32*) calloc(tmap->cached_height,sizeof(INT32));
+		tmap->cached_colscroll	= (INT32*) calloc(tmap->cached_width, sizeof(INT32));
 
-		tmap->transparency_data = malloc( num_tiles );
-		tmap->transparency_data_row = malloc( sizeof(UINT8 *)*num_rows );
+		tmap->transparency_data =(UINT8*) malloc( num_tiles );
+		tmap->transparency_data_row = (UINT8**) malloc( sizeof(UINT8 *)*num_rows );
 
 		tmap->pixmap = bitmap_alloc_depth( tmap->cached_width, tmap->cached_height, -16 );
 		tmap->transparency_bitmap = bitmap_alloc_depth( tmap->cached_width, tmap->cached_height, -8 );
@@ -2210,7 +2223,7 @@ void tilemap_nb_draw( mame_bitmap *dest, UINT32 number, UINT32 scrollx, UINT32 s
 
 /***********************************************************************************/
 
-#endif // !DECLARE && !TRANSP
+//#endif // !DECLARE && !TRANSP
 
 #define ROZ_PLOT_PIXEL(INPUT_VAL)										\
 	if (blit.draw_masked == (blitmask_t)pbt32)							\
@@ -2264,13 +2277,24 @@ void tilemap_nb_draw( mame_bitmap *dest, UINT32 number, UINT32 scrollx, UINT32 s
 		*dest = INPUT_VAL ;												\
 	}
 
-#ifdef DECLARE
+//#ifdef DECLARE
 
-DECLARE(copyroz_core,(mame_bitmap *bitmap,tilemap *tmap,
+//DECLARE(copyroz_core,(mame_bitmap *bitmap,tilemap *tmap,
+//		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
+//		const rectangle *clip,
+//		int mask,int value,
+//		UINT32 priority,UINT32 priority_mask,UINT32 palette_offset),
+//#define DEPTH 16
+//#define DATA_TYPE UINT16
+//#define DECLARE(function,args,body) static void function##16BPP args body
+//#include "tilemap.c"
+
+template<typename DATA_TYPE,int DEPTH>
+void copyroz_core(mame_bitmap *bitmap,tilemap *tmap,
 		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
 		const rectangle *clip,
 		int mask,int value,
-		UINT32 priority,UINT32 priority_mask,UINT32 palette_offset),
+		UINT32 priority,UINT32 priority_mask,UINT32 palette_offset)
 {
 	UINT32 cx;
 	UINT32 cy;
@@ -2460,13 +2484,14 @@ DECLARE(copyroz_core,(mame_bitmap *bitmap,tilemap *tmap,
 			}
 		}
 	}
-})
+}
 
 #ifndef osd_pend
 #define osd_pend() do { } while (0)
 #endif
 
-DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
+template<typename DATA_TYPE,int DEPTH>
+void draw(tilemap *tmap, int xpos, int ypos, int mask, int value )
 {
 	trans_t transPrev;
 	trans_t transCur;
@@ -2523,7 +2548,7 @@ DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
 		y2 -= ypos;
 
 		source_baseaddr = (UINT16 *)tmap->pixmap->line[y1];
-		mask_baseaddr = tmap->transparency_bitmap->line[y1];
+		mask_baseaddr = (UINT8 *)tmap->transparency_bitmap->line[y1];
 
 		c1 = x1/tmap->cached_tile_width; /* round down */
 		c2 = (x2+tmap->cached_tile_width-1)/tmap->cached_tile_width; /* round up */
@@ -2671,15 +2696,65 @@ DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
 	} /* not totally clipped */
 
 	osd_pend();
-})
+}
+void draw32BPP( tilemap *tmap, int xpos, int ypos, int mask, int value )
+{
+    draw<UINT32,32>(tmap, xpos, ypos, mask, value);
+}
+void draw16BPP( tilemap *tmap, int xpos, int ypos, int mask, int value )
+{
+    draw<UINT16,16>(tmap, xpos, ypos, mask, value);
+}
+void copyroz_core32BPP(mame_bitmap *bitmap,tilemap *tmap,
+		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
+		const rectangle *clip,
+		int mask,int value,
+		UINT32 priority,UINT32 priority_mask,UINT32 palette_offset)
+{
+    copyroz_core<UINT32,32>(bitmap,tmap,
+		startx,starty,incxx,incxy,incyx,incyy,wraparound,
+		clip,
+		mask,value,
+		priority,priority_mask,palette_offset);
 
-#undef DATA_TYPE
-#undef DEPTH
-#undef DECLARE
-#endif /* DECLARE */
+}
 
-#ifdef TRANSP
+void copyroz_core16BPP(mame_bitmap *bitmap,tilemap *tmap,
+		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
+		const rectangle *clip,
+		int mask,int value,
+		UINT32 priority,UINT32 priority_mask,UINT32 palette_offset)
+{
+    copyroz_core<UINT16,16>(bitmap,tmap,
+		startx,starty,incxx,incxy,incyx,incyy,wraparound,
+		clip,
+		mask,value,
+		priority,priority_mask,palette_offset);
+}
+
 /*************************************************************************************************/
+class cPalette_ind {
+    public:
+    cPalette_ind(int palbase,const pen_t *pPalData) : _pPalData(pPalData) { }
+    inline pen_t get(int pen) {return _pPalData[pen]; }
+    const pen_t *_pPalData;
+};
+class cPalette_raw {
+    public:
+    cPalette_raw(int palbase,const pen_t *pPalData) : _palBase(palbase) { }
+    inline pen_t get(int pen) {return _palBase+pen; }
+    int _palBase;
+};
+
+//#define PAL_INIT const pen_t *pPalData = tile_info.pal_data
+//#define PAL_GET(pen) pPalData[pen]
+//#define TRANSP(f) f ## _ind
+//#include "tilemap.c"
+
+//#define PAL_INIT int palBase = tile_info.pal_data - Machine->remapped_colortable
+//#define PAL_GET(pen) (palBase + (pen))
+//#define TRANSP(f) f ## _raw
+//#include "tilemap.c"
 
 /* Each of the following routines draws pixmap and transarency data for a single tile.
  *
@@ -2690,15 +2765,15 @@ DECLARE( draw, (tilemap *tmap, int xpos, int ypos, int mask, int value ),
  * This precomputed value allows us for any particular tile and mask, to determine if all pixels
  * in that tile have the same masked transparency value.
  */
-
-static UINT8 TRANSP(HandleTransparencyBitmask)(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
+template<class cPalette>
+UINT8 HandleTransparencyBitmask(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
 {
 	UINT32 tile_width = tmap->cached_tile_width;
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
 	int pitch = tile_width + tile_info.skip;
-	PAL_INIT;
+	cPalette pal(tile_info.pal_data - Machine->remapped_colortable, tile_info.pal_data);
 	UINT32 *pPenToPixel;
 	const UINT8 *pPenData = tile_info.pen_data;
 	const UINT8 *pSource;
@@ -2735,13 +2810,13 @@ static UINT8 TRANSP(HandleTransparencyBitmask)(tilemap *tmap, UINT32 x0, UINT32 
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 
 				pen = data>>4;
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 			}
 			pPenData += pitch/2;
 		}
@@ -2757,7 +2832,7 @@ static UINT8 TRANSP(HandleTransparencyBitmask)(tilemap *tmap, UINT32 x0, UINT32 
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) =  pal.get(pen);
 			}
 			pPenData += pitch;
 		}
@@ -2788,15 +2863,15 @@ static UINT8 TRANSP(HandleTransparencyBitmask)(tilemap *tmap, UINT32 x0, UINT32 
 
 	return (bWhollyOpaque || bWhollyTransparent)?0:TILE_FLAG_FG_OPAQUE;
 }
-
-static UINT8 TRANSP(HandleTransparencyColor)(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
+template<class cPalette>
+UINT8 HandleTransparencyColor(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
 {
 	UINT32 tile_width = tmap->cached_tile_width;
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
 	int pitch = tile_width + tile_info.skip;
-	PAL_INIT;
+	cPalette pal(tile_info.pal_data - Machine->remapped_colortable, tile_info.pal_data);
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;
 	const UINT8 *pSource;
@@ -2829,8 +2904,8 @@ static UINT8 TRANSP(HandleTransparencyColor)(tilemap *tmap, UINT32 x0, UINT32 y0
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
-				if( PAL_GET(pen)==transparent_color )
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
+				if( pal.get(pen)==transparent_color )
 				{
 					((UINT8 *)transparency_bitmap->line[y])[x] = code_transparent;
 					bWhollyOpaque = 0;
@@ -2845,8 +2920,8 @@ static UINT8 TRANSP(HandleTransparencyColor)(tilemap *tmap, UINT32 x0, UINT32 y0
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
-				if( PAL_GET(pen)==transparent_color )
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
+				if( pal.get(pen)==transparent_color )
 				{
 					((UINT8 *)transparency_bitmap->line[y])[x] = code_transparent;
 					bWhollyOpaque = 0;
@@ -2871,8 +2946,8 @@ static UINT8 TRANSP(HandleTransparencyColor)(tilemap *tmap, UINT32 x0, UINT32 y0
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
-				if( PAL_GET(pen)==transparent_color )
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
+				if( pal.get(pen)==transparent_color )
 				{
 					((UINT8 *)transparency_bitmap->line[y])[x] = code_transparent;
 					bWhollyOpaque = 0;
@@ -2888,15 +2963,15 @@ static UINT8 TRANSP(HandleTransparencyColor)(tilemap *tmap, UINT32 x0, UINT32 y0
 	}
 	return (bWhollyOpaque || bWhollyTransparent)?0:TILE_FLAG_FG_OPAQUE;
 }
-
-static UINT8 TRANSP(HandleTransparencyPen)(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
+template<class cPalette>
+UINT8 HandleTransparencyPen(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
 {
 	UINT32 tile_width = tmap->cached_tile_width;
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
 	int pitch = tile_width + tile_info.skip;
-	PAL_INIT;
+	cPalette pal(tile_info.pal_data - Machine->remapped_colortable, tile_info.pal_data);
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;
 	const UINT8 *pSource;
@@ -2934,7 +3009,7 @@ static UINT8 TRANSP(HandleTransparencyPen)(tilemap *tmap, UINT32 x0, UINT32 y0, 
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				if( pen==transparent_pen )
 				{
 					((UINT8 *)transparency_bitmap->line[y])[x] = code_transparent;
@@ -2950,7 +3025,7 @@ static UINT8 TRANSP(HandleTransparencyPen)(tilemap *tmap, UINT32 x0, UINT32 y0, 
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				((UINT8 *)transparency_bitmap->line[y])[x] = (pen==transparent_pen)?code_transparent:code_opaque;
 			}
 			pPenData += pitch/2;
@@ -2967,7 +3042,7 @@ static UINT8 TRANSP(HandleTransparencyPen)(tilemap *tmap, UINT32 x0, UINT32 y0, 
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				if( pen==transparent_pen )
 				{
 					((UINT8 *)transparency_bitmap->line[y])[x] = code_transparent;
@@ -2986,15 +3061,15 @@ static UINT8 TRANSP(HandleTransparencyPen)(tilemap *tmap, UINT32 x0, UINT32 y0, 
 
 	return (bWhollyOpaque || bWhollyTransparent)?0:TILE_FLAG_FG_OPAQUE;
 }
-
-static UINT8 TRANSP(HandleTransparencyPenBit)(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
+template<class cPalette>
+UINT8 HandleTransparencyPenBit(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
 {
 	UINT32 tile_width = tmap->cached_tile_width;
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
 	int pitch = tile_width + tile_info.skip;
-	PAL_INIT;
+	cPalette pal(tile_info.pal_data - Machine->remapped_colortable, tile_info.pal_data);
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;
 	const UINT8 *pSource;
@@ -3025,7 +3100,7 @@ static UINT8 TRANSP(HandleTransparencyPenBit)(tilemap *tmap, UINT32 x0, UINT32 y
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				code = ((pen&penbit)==penbit)?code_front:code_back;
 				and_flags &= code;
 				or_flags |= code;
@@ -3035,7 +3110,7 @@ static UINT8 TRANSP(HandleTransparencyPenBit)(tilemap *tmap, UINT32 x0, UINT32 y
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				code = ((pen&penbit)==penbit)?code_front:code_back;
 				and_flags &= code;
 				or_flags |= code;
@@ -3055,7 +3130,7 @@ static UINT8 TRANSP(HandleTransparencyPenBit)(tilemap *tmap, UINT32 x0, UINT32 y
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				code = ((pen&penbit)==penbit)?code_front:code_back;
 				and_flags &= code;
 				or_flags |= code;
@@ -3066,15 +3141,15 @@ static UINT8 TRANSP(HandleTransparencyPenBit)(tilemap *tmap, UINT32 x0, UINT32 y
 	}
 	return or_flags ^ and_flags;
 }
-
-static UINT8 TRANSP(HandleTransparencyPens)(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
+template<class cPalette>
+UINT8 HandleTransparencyPens(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
 {
 	UINT32 tile_width = tmap->cached_tile_width;
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
 	int pitch = tile_width + tile_info.skip;
-	PAL_INIT;
+	cPalette pal(tile_info.pal_data - Machine->remapped_colortable, tile_info.pal_data);
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;
 	const UINT8 *pSource;
@@ -3105,7 +3180,7 @@ static UINT8 TRANSP(HandleTransparencyPens)(tilemap *tmap, UINT32 x0, UINT32 y0,
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				code = code_transparent;
 				if( !((1<<pen)&fgmask) ) code |= TILE_FLAG_FG_OPAQUE;
 				if( !((1<<pen)&bgmask) ) code |= TILE_FLAG_BG_OPAQUE;
@@ -3117,7 +3192,7 @@ static UINT8 TRANSP(HandleTransparencyPens)(tilemap *tmap, UINT32 x0, UINT32 y0,
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				code = code_transparent;
 				if( !((1<<pen)&fgmask) ) code |= TILE_FLAG_FG_OPAQUE;
 				if( !((1<<pen)&bgmask) ) code |= TILE_FLAG_BG_OPAQUE;
@@ -3139,7 +3214,7 @@ static UINT8 TRANSP(HandleTransparencyPens)(tilemap *tmap, UINT32 x0, UINT32 y0,
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				code = code_transparent;
 				if( !((1<<pen)&fgmask) ) code |= TILE_FLAG_FG_OPAQUE;
 				if( !((1<<pen)&bgmask) ) code |= TILE_FLAG_BG_OPAQUE;
@@ -3152,15 +3227,15 @@ static UINT8 TRANSP(HandleTransparencyPens)(tilemap *tmap, UINT32 x0, UINT32 y0,
 	}
 	return and_flags ^ or_flags;
 }
-
-static UINT8 TRANSP(HandleTransparencyNone)(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
+template<class cPalette>
+UINT8 HandleTransparencyNone(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags)
 {
 	UINT32 tile_width = tmap->cached_tile_width;
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
 	int pitch = tile_width + tile_info.skip;
-	PAL_INIT;
+	cPalette pal(tile_info.pal_data - Machine->remapped_colortable, tile_info.pal_data);
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;
 	const UINT8 *pSource;
@@ -3186,14 +3261,14 @@ static UINT8 TRANSP(HandleTransparencyNone)(tilemap *tmap, UINT32 x0, UINT32 y0,
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				((UINT8 *)transparency_bitmap->line[y])[x] = code_opaque;
 
 				pen = data>>4;
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				((UINT8 *)transparency_bitmap->line[y])[x] = code_opaque;
 			}
 			pPenData += pitch/2;
@@ -3210,7 +3285,7 @@ static UINT8 TRANSP(HandleTransparencyNone)(tilemap *tmap, UINT32 x0, UINT32 y0,
 				yx = *pPenToPixel++;
 				x = x0+(yx%MAX_TILESIZE);
 				y = y0+(yx/MAX_TILESIZE);
-				*(x+(UINT16 *)pixmap->line[y]) = PAL_GET(pen);
+				*(x+(UINT16 *)pixmap->line[y]) = pal.get(pen);
 				((UINT8 *)transparency_bitmap->line[y])[x] = code_opaque;
 			}
 			pPenData += pitch;
@@ -3219,8 +3294,40 @@ static UINT8 TRANSP(HandleTransparencyNone)(tilemap *tmap, UINT32 x0, UINT32 y0,
 	return 0;
 }
 
-#undef TRANSP
-#undef PAL_INIT
-#undef PAL_GET
-#endif // TRANSP
+UINT8 HandleTransparencyBitmask_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyBitmask<cPalette_ind>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyPenBit_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyPenBit<cPalette_ind>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyPens_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyPens<cPalette_ind>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyPen_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyPen<cPalette_ind>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyColor_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyColor<cPalette_ind>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyNone_ind(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyNone<cPalette_ind>(tmap,x0,y0,flags);
+}
 
+UINT8 HandleTransparencyBitmask_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyBitmask<cPalette_raw>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyPenBit_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyPenBit<cPalette_raw>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyPens_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyPens<cPalette_raw>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyPen_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyPen<cPalette_raw>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyColor_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyColor<cPalette_raw>(tmap,x0,y0,flags);
+}
+UINT8 HandleTransparencyNone_raw(tilemap *tmap, UINT32 x0, UINT32 y0, UINT32 flags){
+    return HandleTransparencyNone<cPalette_raw>(tmap,x0,y0,flags);
+}
