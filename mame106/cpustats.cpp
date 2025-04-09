@@ -58,7 +58,7 @@ void cpustats_log(int icpu)
     for(size_t i=0 ; i<v.size() && i<maxl ; i++)
     {
         cpuinstr &ci = v[i];
-        printf(" adr:%08x nbr:%08x\n",ci._adr,ci._nbrun);
+        printf(" adr:%08x nbr:%08x regir:%08x\n",ci._adr,ci._nbrun,ci._instr);
     }
     printf(" -------\n");
 

@@ -24,32 +24,10 @@
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
 
+#include "cpu/m68000/m68kops.h"
 
 #define MASTER_CLOCK			50000000
 #define SOUND_CLOCK				16000000
-
-/*
-krb cpustats
- top of adress executed
- adr:00007dda nbr:001ca9f2
- adr:00007de0 nbr:001ca9f2
- adr:00007964 nbr:0005afec
- adr:0000796c nbr:0005afec
-
- main cpu spend 16x times just :
-00007dda    btst.w $060800   loop when 0. ->seen by cpu0
-
-void m68k_op_tst_16_al(M68KOPT_PARAMS)
-
---------------------- cpu 1
- adr:00001182 nbr:001bc319
- adr:00001186 nbr:001bc318
- adr:00001066 nbr:0003cb10
- adr:00001060 nbr:0003cb10
-void m68k_op_tst_16_di(M68KOPT_PARAMS)
-m68k_op_bge_8
-  read .w at $3800 (seen by cpu1)
-*/
 
 
 /*************************************
@@ -147,6 +125,72 @@ static void sound_w(UINT8 data)
 }
 
 
+/*
+krb cpustats
+ ----- cpu 0 -----
+ adr:00007de0 nbr:0044e9b4 regir:00006cf8
+ adr:00007dda nbr:0044e9b4 regir:00004a79
+ adr:00007964 nbr:000e4051 regir:00000c79
+ adr:0000796c nbr:000e4051 regir:000067f6
+ adr:000078ec nbr:0004c77f regir:000067f8
+ adr:000078ea nbr:0004c77f regir:00004a50
+ adr:000078e6 nbr:0004c77f regir:000041e8
+ adr:00007c68 nbr:0001940c regir:000067f0
+ adr:00007c60 nbr:0001940c regir:000008b9
+ adr:00007c5a nbr:0001940c regir:00004a79
+ adr:00007bf2 nbr:00012b50 regir:00006700
+ adr:00007bec nbr:00012b50 regir:0000082d
+ -------
+ ----- cpu 1 -----
+ adr:00001182 nbr:003f83cf regir:00004a6d
+ adr:00001186 nbr:003f83ce regir:00006cfa
+ adr:00001066 nbr:000645c7 regir:00006cf8
+ adr:00001060 nbr:000645c7 regir:00000c6d
+ adr:0000208e nbr:0004e200 regir:00003100
+ adr:0000208c nbr:0004e200 regir:00004840
+ adr:0000208a nbr:0004e200 regir:0000e980
+ adr:00002088 nbr:0004e200 regir:00002003
+ adr:00002090 nbr:0004e200 regir:000051c9
+ adr:00002086 nbr:0004e200 regir:0000d682
+ adr:00001342 nbr:0004ddae regir:00006f00
+ adr:00001340 nbr:0004ddae regir:00005343
+ -------
+
+free inst slot:00000008
+free inst slot:00000009
+free inst slot:0000000a
+free inst slot:0000000b
+*/
+void krb_outrun_m68k_op_tst_16_al(M68KOPT_PARAMS);
+void krb_outrun_m68k_op_tst_16_di(M68KOPT_PARAMS);
+
+//{
+//	uint res = OPER_AL_16(M68KOPT_PASSPARAMS);
+
+//	FLAG_N = NFLAG_16(res);
+//	FLAG_Z = res;
+//	FLAG_V = VFLAG_CLEAR;
+//	FLAG_C = CFLAG_CLEAR;
+//}
+
+static void krb_outrun_patch_cpu_synchro()
+{
+    printf("krb_outrun_patch_cpu_synchro\n");
+	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
+    if(pcodemain[0x00007dda>>1] == 0x4a79) // inst. 0x4a79 triggers m68k_op_tst_16_al()
+    {   // replace that tst.w call by a patch, on an unused opcode.
+        m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
+        pcodemain[0x00007dda>>1] = 8;
+    }
+
+	UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+    if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
+    {
+        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
+        pcodesub[0x00001182>>1] = 9;
+    }
+}
+
 static void outrun_generic_init(void)
 {
 	/* allocate memory for regions not autmatically assigned */
@@ -169,6 +213,7 @@ static void outrun_generic_init(void)
 	custom_io_r = NULL;
 	custom_io_w = NULL;
 	custom_map = NULL;
+
 }
 
 
@@ -1652,6 +1697,8 @@ static DRIVER_INIT( outrun )
 	outrun_generic_init();
 	custom_io_r = outrun_custom_io_r;
 	custom_io_w = outrun_custom_io_w;
+
+	krb_outrun_patch_cpu_synchro();
 }
 
 
@@ -1693,6 +1740,8 @@ static DRIVER_INIT( outrunb )
 	length = memory_region_length(REGION_CPU3);
 	for (i = 0; i < length; i++)
 		byte[i] = BITSWAP8(byte[i], 7,5,6,4,3,2,1,0);
+
+	krb_outrun_patch_cpu_synchro();
 }
 
 

@@ -8658,6 +8658,19 @@ void m68k_op_tst_16_di(M68KOPT_PARAMS)
 	FLAG_V = VFLAG_CLEAR;
 	FLAG_C = CFLAG_CLEAR;
 }
+void krb_outrun_m68k_op_tst_16_di(M68KOPT_PARAMS)
+{
+	uint res = OPER_AY_DI_16(M68KOPT_PASSPARAMS);
+    if(res == 0)
+    {
+        // means busy wait, other cpu should work asap, force quitting execute loop just next.
+    	SET_CYCLES(0);
+    }
+	FLAG_N = NFLAG_16(res);
+	FLAG_Z = res;
+	FLAG_V = VFLAG_CLEAR;
+	FLAG_C = CFLAG_CLEAR;
+}
 
 
 void m68k_op_tst_16_ix(M68KOPT_PARAMS)
@@ -8691,7 +8704,21 @@ void m68k_op_tst_16_al(M68KOPT_PARAMS)
 	FLAG_V = VFLAG_CLEAR;
 	FLAG_C = CFLAG_CLEAR;
 }
-
+// specific to outrun main cpu waiting other cpu.
+void krb_outrun_m68k_op_tst_16_al(M68KOPT_PARAMS)
+{
+	uint res = OPER_AL_16(M68KOPT_PASSPARAMS);
+    // if !=0, let go.
+    if(res == 0)
+    {
+        // means busy wait, other cpu should work asap, force quitting execute loop just next.
+    	SET_CYCLES(0);
+    }
+	FLAG_N = NFLAG_16(res);
+	FLAG_Z = res;
+	FLAG_V = VFLAG_CLEAR;
+	FLAG_C = CFLAG_CLEAR;
+}
 
 void m68k_op_tst_16_pcdi(M68KOPT_PARAMS)
 {

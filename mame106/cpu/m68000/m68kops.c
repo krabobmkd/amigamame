@@ -4,6 +4,8 @@
 
 #include "m68kops.h"
 
+#include <stdio.h>
+
 #define NUM_CPU_TYPES 4
 
 void  (*m68ki_instruction_jump_table[0x10000])(M68KOPT_PARAMS); /* opcode handler jump table */
@@ -2002,10 +2004,12 @@ void m68ki_build_opcode_table(void)
 	int j;
 	int k;
 
+ printf("m68ki_build_opcode_table\n");
+
 	for(i = 0; i < 0x10000; i++)
 	{
 		/* default to illegal */
-		m68ki_instruction_jump_table[i] = m68k_op_illegal;
+		m68ki_instruction_jump_table[i] = m68k_op_illegal; // krb: real illegal is 4AFC.
 		for(k=0;k<NUM_CPU_TYPES;k++)
 			m68ki_cycles[k][i] = 0;
 	}
@@ -2085,6 +2089,23 @@ void m68ki_build_opcode_table(void)
 			m68ki_cycles[k][ostruct->match] = ostruct->cycles[k];
 		ostruct++;
 	}
+
+	// krb
+	int nbillegleft = 0;
+	int maxnbtellfreeslots=4;
+	for(i = 0; i < 0x10000; i++)
+	{
+		if( m68ki_instruction_jump_table[i] == m68k_op_illegal &&
+		    i != 0x00004AFC)
+		{
+            if(nbillegleft<maxnbtellfreeslots)
+                printf("free inst slot:%08x\n",i);
+            nbillegleft++;
+        }
+	}
+	printf("nb illegals:%d\n",nbillegleft);
+
+
 }
 
 

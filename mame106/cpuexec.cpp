@@ -133,8 +133,9 @@ static INT32 watchdog_counter;
 static int cycles_running;
 static int cycles_stolen;
 //krb, per game init:
+extern "C" {
 int canAvoidPushContext = 0;
-
+}
 /*************************************
  *
  *  Timer variables
@@ -153,9 +154,9 @@ static mame_time refresh_period;
 
 static mame_timer *timeslice_timer;
 static mame_time timeslice_period;
-
-mame_time scanline_period;
-
+extern "C" {
+    mame_time scanline_period;
+}
 static mame_timer *interleave_boost_timer;
 static mame_timer *interleave_boost_timer_end;
 static mame_time perfect_interleave;
@@ -498,8 +499,10 @@ void watchdog_enable(int enable)
 #pragma mark -
 #pragma mark CPU SCHEDULING
 #endif
-extern UINT32 _minimumCpuCycles;
-extern mame_time global_basetime;
+    extern "C" {
+    extern UINT32 _minimumCpuCycles;
+    extern mame_time global_basetime;
+}
 /*************************************
  *
  *  Execute all the CPUs for one
@@ -1093,10 +1096,13 @@ void cpu_compute_scanline_timing(void)
 //	mame_time elapsed = mame_timer_timeelapsed(refresh_timer);
 //	return (int)(elapsed.subseconds / scanline_period.subseconds);
 //}
+extern "C" {
+	extern int activecpu;
+}
 int cpu_getscanline(void)
 {
 
-	extern int activecpu;
+
     mame_time currentTime;
     // inline GetCurrentTime
 	/* if we're executing as a particular CPU, use its local time as a base */

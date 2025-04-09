@@ -817,70 +817,6 @@ int m68k_execute(int num_cycles)
 		/* Return point if we had an address error */
 		m68ki_set_address_error_trap(); /* auto-disable (see m68kcpu.h) */
 
-		/* Main loop.  Keep going until we run out of clock cycles */
-//static int ret=0,rest2=0;
-
-//#ifdef OPTIM68K_USEDIRECT68KASM_EXELOOP
-//   asm volatile(
-//  ".loop"
-//        "\t\n"
-//        "\t\n"
-//        "\t\n"
-//        "\t\n"
-//        "\t\n"
-//        "\t\n"
-//        "\t\n"
-//        "\t\n"
-//        "\t\n"
-//        "\t\n"
-
-//        :
-//        : "d"(regir), "a"(p68k),
-//         [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
-//         [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
-//         [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
-//        :  "d0","d1"
-//        );
-//#else
-//        uint16 ir;
-//		do
-//		{
-//			REG_PPC = REG_PC;
-////    printf("68k PC:%08x\n",REG_PC);
-//			// Read an instruction and call its handler
-//			/*REG_IRSLOT =*/ ir = m68ki_read_imm_16(p68k);
-////            printf("%04x ",(int)ir );
-////                        if(ir == 0x4eba)
-////                        {
-
-////                            printf("%d",ir);
-////                        }
-////    printf("68k IR:%08x\n",(int)ir);
-////    exit(0);
-//			m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
-//			m68ki_instruction_jump_table[ir](p68k,ir);
-//#ifndef OPTIM68K_SQUEEZEPPCREG
-//			// Record previous program counter
-//			REG_PPC = REG_PC;
-//#endif
-//            // try a bit of unroll
-//            /*REG_IRSLOT =*/ ir = m68ki_read_imm_16(p68k);
-////            printf("%04x ",(int)ir );
-
-////            ret++;
-////            rest2++;
-////            if(ret==8) { printf("\n"); ret=0; }
-//            m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
-//            m68ki_instruction_jump_table[ir](p68k,ir);
-////    if(rest2 == 1000000) exit(1);
-
-
-//		} while(m68k_ICount > 0);
-
-//#endif
-    // NOTE: unrolling can break the "consume cycles" logic by one instr.
-    // which was enough to block "pdrift" very first instructions at boot.
-    // this on has multiple 68k,...
         do
 		{
     		REG_PPC = REG_PC;
@@ -891,11 +827,12 @@ int m68k_execute(int num_cycles)
         // {
         // printf("w");
         // }
-        if(REG_PPC == 0x00001182)
+        if(REG_PPC == 0x00001182 && activecpu == 1)
         {
-         printf(" ");
+         static int uu=0;
+         uu++;
         }
-    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
+//    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
 #endif
 			m68ki_instruction_jump_table[ir](p68k,ir);
             m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
