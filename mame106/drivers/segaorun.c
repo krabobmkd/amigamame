@@ -186,8 +186,8 @@ static void krb_outrun_patch_cpu_synchro()
 	UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
     if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
     {
-        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
-        pcodesub[0x00001182>>1] = 9;
+//        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
+//        pcodesub[0x00001182>>1] = 9;
     }
 }
 
@@ -339,13 +339,13 @@ static MACHINE_RESET( outrun )
 
 static WRITE8_HANDLER( unknown_porta_w )
 {
-	loginfo(2,"8255 port A = %02X\n", data);
+//	loginfo(2,"8255 port A = %02X\n", data);
 }
 
 
 static WRITE8_HANDLER( unknown_portb_w )
 {
-	loginfo(2,"8255 port B = %02X\n", data);
+//	loginfo(2,"8255 port B = %02X\n", data);
 }
 
 
@@ -376,7 +376,7 @@ static READ16_HANDLER( misc_io_r )
 {
 	if (custom_io_r)
 		return custom_io_r(offset, mem_mask);
-	loginfo(2,"%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	//loginfo(2,"%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(0,0);
 }
 
@@ -390,8 +390,11 @@ static WRITE16_HANDLER( misc_io_w )
 	}
 //	loginfo(2,"%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
 }
-
-
+//krb: remember analog values that were tested this frame.
+// 0,1,2 are steering, gas, brakes.
+UINT16 analogValues[8];
+UINT16 analogValuesReadCount[8]={0};
+UINT16 lever,leverCount=0;
 static READ16_HANDLER( outrun_custom_io_r )
 {
 	offset &= 0x7f/2;
@@ -401,19 +404,28 @@ static READ16_HANDLER( outrun_custom_io_r )
 			return ppi8255_0_r(offset & 3);
 
 		case 0x10/2:
-			return readinputport(offset & 3);
+            UINT16 lv = readinputport(offset & 3);
+            if((offset & 3) == 3)
+            {
+                lever = lv;
+                leverCount++;
+            }
+			return lv;
 
 		case 0x30/2:
 		{
 			static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
-			return readinputportbytag_safe(ports[adc_select], 0x0010);
+			UINT16 vread = readinputportbytag_safe(ports[adc_select], 0x0010);
+			analogValues[adc_select] = vread;
+			analogValuesReadCount[adc_select]++;
+			return vread;
 		}
 
 		case 0x60/2:
 			return watchdog_reset_r(0);
 	}
 
-	loginfo(2,"%06X:outrun_custom_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+//	loginfo(2,"%06X:outrun_custom_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(0,0);
 }
 
@@ -472,7 +484,7 @@ static READ16_HANDLER( shangon_custom_io_r )
 			return readinputportbytag_safe(ports[adc_select], 0x0010);
 		}
 	}
-	loginfo(2,"%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+//	loginfo(2,"%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(0,0);
 }
 

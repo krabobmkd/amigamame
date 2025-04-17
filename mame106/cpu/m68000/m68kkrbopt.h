@@ -12,23 +12,23 @@
 
 // this one is needed to test sprite flipx in fatalfury2:
 //#define OPTIM68K_SKIPMOVECCRV 1
-#define OPTIM68K_SKIPMOVECCRC 1
+//#define OPTIM68K_SKIPMOVECCRC 1
 
 // only do one entry search for whole movems.
 // now works both on amiga and PC.
-#define OPTIM68K_USEFASTMOVEMREAD 1
+//#define OPTIM68K_USEFASTMOVEMREAD 1
 // there is an option per game in drivertuning.cpp to toggle this to a 100%safe version.
 // would affect games were a single movem call is between 2 incompatible memory entries. rare but neogeo+demonwld.
-#define OPTIM68K_USEFASTMOVEMWRITE 1
+//#define OPTIM68K_USEFASTMOVEMWRITE 1
 
 #ifdef __AMIGA__
-     #define OPTIM68K_USEFAST32INTRF 1
+//     #define OPTIM68K_USEFAST32INTRF 1
 
     // 68k assembler inline or not:
-    #define OPTIM68K_USEDIRECT68KASM_REWRITEMOVES 1
-    #define OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ 1
-     #define OPTIM68K_USEDIRECT68KASM_DIVS 1
-     #define OPTIM68K_USEDIRECT68KASM 1
+//    #define OPTIM68K_USEDIRECT68KASM_REWRITEMOVES 1
+//    #define OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ 1
+//     #define OPTIM68K_USEDIRECT68KASM_DIVS 1
+//     #define OPTIM68K_USEDIRECT68KASM 1
 #endif
 
 #if defined(__GNUC__) && defined(__AMIGA__)

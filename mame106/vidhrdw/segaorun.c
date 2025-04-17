@@ -8,6 +8,11 @@
 #include "segaic16.h"
 #include "includes/system16.h"
 
+#include "drawCtrl.h"
+
+//krb: draw optionnal control goodies
+static struct drawableExtra *_wheelgoody=NULL;
+static struct drawableExtra *_levergoody=NULL;
 
 
 /*************************************
@@ -91,6 +96,7 @@ VIDEO_UPDATE( shangon )
 
 	/* draw the sprites */
 	segaic16_sprites_draw(0, bitmap, cliprect);
+
 }
 
 
@@ -124,6 +130,10 @@ VIDEO_UPDATE( outrun )
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
-	// /* draw the sprites */
+	/* draw the sprites */
 	segaic16_sprites_draw(0, bitmap, cliprect);
+
+	//krb: draw optionnal control goodies
+struct drawableExtra
+
 }
