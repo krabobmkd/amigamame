@@ -226,8 +226,8 @@ public:
     };
     Controls &controls() { return _controls; }
 
-    #define MISCFLAG_USEREADJOYPORT 1
-
+//    #define MISCFLAG_USEREADJOYPORT 1
+    #define MISCFLAG_MEGADRIVE6BT_ALTCONF 1
     struct Misc : public ASerializable
     {
         Misc();

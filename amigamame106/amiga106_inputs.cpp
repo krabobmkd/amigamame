@@ -197,8 +197,9 @@ void InitLowLevelLib()
 // when effective;y asked, to further close.
 static USHORT askedPadsRawKey = 0;
 static USHORT useAnyMouse = 0;
+#ifdef RJP_OPTION
 static USHORT useReadJoyPortForPads = 0; // else rawkeys, added for NewLowlevel patch for A2000.
-
+#endif
 void ConfigureLowLevelLib()
 {
 //printf(" ***** ConfigureLowLevelLib\n");
@@ -221,8 +222,9 @@ void ConfigureLowLevelLib()
 
     MameConfig::Controls &configControls = getMainConfig().controls();
     MameConfig::Misc &configMisc = getMainConfig().misc();
+#ifdef RJP_OPTION
     useReadJoyPortForPads = ((configMisc._MiscFlags & MISCFLAG_USEREADJOYPORT) != 0);
-
+#endif
     // for correct autosense,
     for(int itest=0;itest<2;itest++)
     {
@@ -262,7 +264,11 @@ void ConfigureLowLevelLib()
     }
 
 
-    if(askedPadsRawKey==0 && useReadJoyPortForPads==0)
+    if(askedPadsRawKey==0
+#ifdef RJP_OPTION
+     && useReadJoyPortForPads==0
+#endif
+     )
     {
         SystemControl(
             SCON_AddCreateKeys,0,
@@ -522,7 +528,11 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     }
     // if any mouse (or anything that needs direct joyport ?)
     // no rawkey for this
-    if(useAnyMouse || useReadJoyPortForPads)
+    if(useAnyMouse
+#ifdef RJP_OPTION
+    || useReadJoyPortForPads
+#endif
+    )
     {
         MameConfig::Controls &configControls = getMainConfig().controls();
 
@@ -553,7 +563,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 //#define JP_MHORZ_MASK	(255<<0)	/* horzizontal position */
                 //#define JP_MVERT_MASK	(255<<8)	/* vertical position	*/
                 //#define JP_MOUSE_MASK	(JP_MHORZ_MASK|JP_MVERT_MASK)
-            } else if(useReadJoyPortForPads &&
+            }
+#ifdef RJP_OPTION
+             else if(useReadJoyPortForPads &&
                 ( portType == SJA_TYPE_JOYSTK || portType == SJA_TYPE_GAMECTLR))
             {
                 int playershift = (iplayer-1)<<8;
@@ -574,7 +586,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                     g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_PLAY+playershift] = (int)((state & JPF_BUTTON_PLAY)!=0);
                 }
             }
-
+#endif
         } // loop by port
     }
 #ifdef USE_DIRECT_KEYBOARD_DEVICE
@@ -851,6 +863,10 @@ void RawKeyMap::init()
         {"ENTER PAD",0x43,KEYCODE_ENTER_PAD},
 
     };
+    MameConfig::Controls &configControls = getMainConfig().controls();
+    MameConfig::Misc &configMisc = getMainConfig().misc();
+    int amega32order = (int)((configMisc._MiscFlags & ) != 0);
+
     // then add player to paddle according to conf.    
     // lowlevel send rawkeys for each CD32 pads.
     {
@@ -868,7 +884,8 @@ void RawKeyMap::init()
                 int ipshft = iport<<8;
                 const int mamecodeshift =
                     ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *(iplayer-1) ;
-
+            if(amega32order == 0)
+            {
               vector<os_code_info> kbi2={
                 {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
                 {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
@@ -883,7 +900,9 @@ void RawKeyMap::init()
                 {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
                 };
                 _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
-
+           } else {
+                //TODO
+           }
 
 //            // if parralel port hacks as port 3 and 4.
 //           if(controlPort == cp::Para3 ||

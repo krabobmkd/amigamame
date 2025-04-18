@@ -506,7 +506,7 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
     serializer("Also...",_MiscFlags,
                         0 | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
                     ,{
-        "Prefer ReadJoyPort() to Rawkeys\n( for NewLowlevel users )"
+        "CD32 Pads uses AMEGA32 Adapter:\nSwitch 6 buttons to fit SF2."
         });
 
 
