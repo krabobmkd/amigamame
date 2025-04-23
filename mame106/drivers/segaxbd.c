@@ -124,6 +124,7 @@ static void update_main_irqs(void)
 
 static void scanline_callback(int scanline)
 {
+ printf("xbd scanline_callback\n");
 	int next_scanline = (scanline + 2) % 262;
 	int update = 0;
 

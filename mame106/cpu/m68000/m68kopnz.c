@@ -8664,6 +8664,7 @@ void krb_outrun_m68k_op_tst_16_di(M68KOPT_PARAMS)
     if(res == 0)
     {
         // means busy wait, other cpu should work asap, force quitting execute loop just next.
+   		//CPU_INT_CYCLES = m68k_ICount;
     	SET_CYCLES(0);
     }
 	FLAG_N = NFLAG_16(res);
@@ -8712,8 +8713,9 @@ void krb_outrun_m68k_op_tst_16_al(M68KOPT_PARAMS)
     if(res == 0)
     {
         // means busy wait, other cpu should work asap, force quitting execute loop just next.
-    	//SET_CYCLES(0);
-    	m68k_ICount = 0;
+
+    	SET_CYCLES(0);
+    	//m68k_ICount = 0;
     }
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;

@@ -832,10 +832,12 @@ int m68k_execute(int num_cycles)
         //  static int uu=0;
         //  uu++;
         // }
+
 //    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
 #endif
 			m68ki_instruction_jump_table[ir](p68k,ir);
-            m68k_ICount -= CYC_INSTRUCTION[ir]; // krb moved before exec
+			int icyc= CYC_INSTRUCTION[ir];
+            m68k_ICount -= icyc; // krb moved before exec
 		} while(m68k_ICount > 0);
 
         /* original:

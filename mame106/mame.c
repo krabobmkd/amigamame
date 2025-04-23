@@ -768,7 +768,7 @@ UINT32 memory_region_flags(int num)
     auto_malloc_add - add pointer to malloc list
 -------------------------------------------------*/
 
-static inline void auto_malloc_add(void *result)
+static inline void auto_malloc_add(void *result, const char *file, int line)
 {
 	/* make sure we have tracking space */
 	if (malloc_list_index == malloc_list_size)
@@ -787,6 +787,7 @@ static inline void auto_malloc_add(void *result)
 			fatalerror("Unable to extend malloc tracking array to %d slots", malloc_list_size);
 		malloc_list = list;
 	}
+	//printf("auto_malloc_add:%d file:%s line:%d\n",malloc_list_index,file,line);
 	malloc_list[malloc_list_index++] = result;
 }
 
@@ -799,8 +800,12 @@ static void auto_malloc_free(void)
 {
 	/* start at the end and free everything till you reach the sentinel */
 	while (malloc_list_index > 0 && malloc_list[--malloc_list_index] != NULL)
-		free(malloc_list[malloc_list_index]);
-
+	{
+        int i=malloc_list_index;
+       // printf("free index:%d\n",i);
+        void *pmem = malloc_list[i];
+		free(pmem);
+    }
 	/* if we free everything, free the list */
 	if (malloc_list_index == 0)
 	{
@@ -819,7 +824,7 @@ static void auto_malloc_free(void)
 void begin_resource_tracking(void)
 {
 	/* add a NULL as a sentinel */
-	auto_malloc_add(NULL);
+	auto_malloc_add(NULL,"",0);
 
 	/* increment the tag counter */
 	resource_tracking_tag++;
@@ -855,7 +860,7 @@ void *_auto_malloc(size_t size, const char *file, int line)
 	result = _malloc_or_die(size, file, line);
 
 	/* track this item in our list */
-	auto_malloc_add(result);
+	auto_malloc_add(result,file,line);
 	return result;
 }
 
@@ -945,7 +950,8 @@ void *_malloc_or_die(size_t size, const char *file, int line)
 
 	/* allocate and return if we succeeded */
 //krb	result = malloc(size);
-    result = calloc(size,1);
+    // krb: add 4*16 because of silly m68k movem optimisation
+    result = calloc(size+(4*16),1);
 	if (result != NULL)
 	{
 //no, not better        memset(result,255,size); // test

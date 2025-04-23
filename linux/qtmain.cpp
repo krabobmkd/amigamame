@@ -131,10 +131,9 @@ options.pause_bright = 1.0f;
     /* Clear the zip filename caches. */
 
     osd_set_mastervolume(0);
-//    printf("before run_game\n");
-
-    run_game(idriver);
-//    printf("after run_game\n");
+    printf("before run_game\n");
+        run_game(idriver);
+    printf("after run_game\n");
 
  //re?   unzip_cache_clear();
     mame_pause(0);// remove pause that could be set while quiting previous game.
@@ -158,6 +157,7 @@ QMutex _imageMutex;
 bool isinexit=false;
 QMutex m_mutex;
 bool m_bIs15b = false;
+int m_nbtest=0;
 QProc::QProc() : QObject()
 {}
 void QProc::process()
@@ -166,56 +166,28 @@ void QProc::process()
 //    getMainConfig().load();
 
     int idriver = -1;
+    m_nbtest = 0;
     // test if just "mame romname".
-    int itest = getMainConfig().driverIndex().index(
-    //"arkretrn"
-//    "wb3"
-// "shinobi"
-//               "goldnaxe"
-//                "altbeast"
-//    "bublbobl"
-//   "dino"
-//                 "arkretrn"
- //       "qbert"
-// "1944"
-//"tfrceac"
-//"rastan"
-//"bublbob2"
-//"zoom909"
-//"topspeed"
-//"gauntlet"
-//"othunder"
-//"pdrift"
-//"qbert"
- //   "rastsaga"
-//  "opwolf"
-// "bublbob2"
-// "silkworm"
-// "mslugx"
-//                "gforce2"
-
-//        "aof"
-//"mk"
-//"hangon"
-//"thndrbld"
-//"outrun"
-"bigrun"
-//"arkanoid"
-//"chasehq"
-// "ninjaw"
-//"nightstr"
-//      "mslug"
-
-//                "mp_sor2"
-    );
-    if(itest>0) idriver= itest;
-
-    //  if game was explicit, no GUI
-    if(idriver>0)
     {
-        getMainConfig().setActiveDriver(idriver);
-        StartGame(idriver);
+        int idriver = getMainConfig().driverIndex().index("thndrbld");
+        if(idriver>0)
+        {
+            getMainConfig().setActiveDriver(idriver);
+            StartGame(idriver);
+        }
     }
+   //  nbframe = 0;
+   //  m_nbtest = 1;
+   //  {
+   //      int idriver = getMainConfig().driverIndex().index("outrun");
+
+   //      //  if game was explicit, no GUI
+   //      if(idriver>0)
+   //      {
+   //          getMainConfig().setActiveDriver(idriver);
+   //          StartGame(idriver);
+   //      }
+   // }
 }
 
 QWin::QWin() : QLabel()
@@ -250,6 +222,7 @@ void QWin::paintEvent(QPaintEvent *event)
     QLabel::paintEvent(event);
     QPainter p(this);
 // dbg_nbt
+    p.setPen(QPen(Qt::white));
     p.drawText(60,60,QString("woot:")+QString::number(nbframe));
 
 //    p.drawText(60,60,QString("woot:")+QString::number(nbframe));
@@ -390,7 +363,10 @@ nbframe++;
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 
 // chasehq sprite prio bug:
-//if(nbframe == 2650) mame_pause(1);
+if(nbframe == 60*100 && m_nbtest == 0)
+{
+ mame_schedule_exit();
+}
 //if(nbframe == 658) mame_pause(1); // ninjaw scene
 //if(nbframe == 950) mame_pause(1);
 
