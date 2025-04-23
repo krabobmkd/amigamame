@@ -12,7 +12,7 @@
 
 // this one is needed to test sprite flipx in fatalfury2:
 //#define OPTIM68K_SKIPMOVECCRV 1
-#define OPTIM68K_SKIPMOVECCRC 1
+//#define OPTIM68K_SKIPMOVECCRC 1
 
 // only do one entry search for whole movems.
 // now works both on amiga and PC.

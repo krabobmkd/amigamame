@@ -128,7 +128,7 @@ static void superchs_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 			{ 
 			struct drawgfxParams dgpz0={
 				bitmap, 	// dest
-				Machine->gfx[sprite_ptr->gfx], 	// gfx
+				NULL, 	// gfx
 				0, 	// code
 				0, 	// color
 				0, 	// flipx
@@ -198,7 +198,7 @@ static void superchs_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 				}
 				else
 				{
-					
+					dgpz0.gfx = Machine->gfx[sprite_ptr->gfx];
 					dgpz0.code = sprite_ptr->code;
 					dgpz0.color = sprite_ptr->color;
 					dgpz0.flipx = sprite_ptr->flipx;
@@ -214,16 +214,16 @@ static void superchs_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 
 		}
 
-		if (bad_chunks)
-loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
-	}
+// 		if (bad_chunks)
+// loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+ 	}
 
 	/* this happens only if primsks != NULL */
 	
 	{ 
 	struct drawgfxParams dgpz0={
 		bitmap, 	// dest
-		Machine->gfx[sprite_ptr->gfx], 	// gfx
+		NULL, 	// gfx
 		0, 	// code
 		0, 	// color
 		0, 	// flipx
@@ -236,13 +236,13 @@ loginfo(2,"Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		sprite_ptr->primask 	// priority_mask
+		0	// priority_mask
 	  };
 	while (sprite_ptr != spritelist)
 	{
 		sprite_ptr--;
-
-		
+        dgpz0.gfx = Machine->gfx[sprite_ptr->gfx];
+		dgpz0.priority_mask = (1<<31) | sprite_ptr->primask;
 		dgpz0.code = sprite_ptr->code;
 		dgpz0.color = sprite_ptr->color;
 		dgpz0.flipx = sprite_ptr->flipx;

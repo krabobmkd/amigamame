@@ -1140,7 +1140,7 @@ static void bigrun_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprect,
 			ydim	=	SHRINK(16,yzoom);
 		}
 
-		if ( ( (xdim / 0x10000) == 0 ) || ( (ydim / 0x10000) == 0) )	continue;
+		if ( ( (xdim>>16) == 0 ) || ( (ydim >>16) == 0) )	continue;
 
 //      sy -= (ydim * ynum);
 

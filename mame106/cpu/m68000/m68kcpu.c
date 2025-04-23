@@ -827,11 +827,11 @@ int m68k_execute(int num_cycles)
         // {
         // printf("w");
         // }
-        if(REG_PPC == 0x00001182 && activecpu == 1)
-        {
-         static int uu=0;
-         uu++;
-        }
+        // if(REG_PPC == 0x00001182 && activecpu == 1)
+        // {
+        //  static int uu=0;
+        //  uu++;
+        // }
 //    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
 #endif
 			m68ki_instruction_jump_table[ir](p68k,ir);

@@ -1,3 +1,13 @@
+todo R1.3
+
+ - O outrun lever & wheel gadgets
+ - O
+ - O thunderblade boot bugs
+correcs:
+ - X correct flipx neogo sprites
+ - O BigRun sprite prio
+ - O 64th street(& lots of jaleco games) sprite priority bug.
+
 todo R1.2
 
  Now I test with a Rpi CM4 with no overclock.
