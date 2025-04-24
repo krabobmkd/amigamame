@@ -8340,7 +8340,7 @@ GAMEB( 1996, wakuwak7, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Sunso
 
 /* Taito */
 GAMEB( 1994, pbobblen, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 1)", 0 ,2)
-GAMEB( 1994, pbobblna, pbobblen, neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 2)", 0 ,0)
+GAMEB( 1994, pbobblna, pbobblen, neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 2)", 0 ,2)
 GAMEB( 1999, pbobbl2n, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Taito (SNK license)", "Puzzle Bobble 2 / Bust-A-Move Again (Neo-Geo)", 0 ,2)
 GAMEB( 2003, pnyaa,    neogeo,   neogeo, neogeo, neogeo,  pnyaa,    ROT0, "Aiky / Taito", "Pochi and Nyaa", 0 ,2)
 
