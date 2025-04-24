@@ -3774,6 +3774,7 @@ const game_driver * const drivers[] =
 	DRIVER( turfmast ) /* 1996 "Nazca" "Neo Turf Masters / Big Tournament Golf" */
 	DRIVER( twinspri ) /* 1996 "ADK" "Twinkle Star Sprites" */
 	DRIVER( tws96 ) /* 1996 "Tecmo" "Tecmo World Soccer '96" */
+	DRIVER( vaporous ) /* 2025 "The Twitch Elite" "Vaporous - Revision Demo" */
 	DRIVER( viewpoin ) /* 1992 "Sammy" "Viewpoint" */
 	DRIVER( vliner ) /* 2001 "Dyna / BreezaSoft" "V-Liner (set 1)" */
 	DRIVER( vlinero ) /* 2001 "Dyna / BreezaSoft" "V-Liner (set 2)" */
@@ -5192,7 +5193,7 @@ const game_driver * const drivers[] =
 	DRIVER( arkangc ) /* 1986 "bootleg" "Arkanoid (Game Corporation bootleg)" */
 	DRIVER( arkanoid ) /* 1986 "Taito Corporation Japan" "Arkanoid (World)" */
 	DRIVER( arkatayt ) /* 1986 "bootleg" "Arkanoid (Tayto bootleg */
-	DRIVER( arkatour ) /* 1987 "Taito America Corporation (Romstar license)" "Tournament Arkanoid (US)" */
+	DRIVER( arkatour ) /* 1987 "Taito America Corporation (Romstar license)" "Arkanoid Tournament (US)" */
 	DRIVER( arkbloc2 ) /* 1986 "bootleg" "Block (Game Corporation bootleg)" */
 	DRIVER( arkblock ) /* 1986 "bootleg" "Block (bootleg */
 	DRIVER( arkcrsn5 ) /* 2023 "Abyss leader of the 80's" "Cruisin'5 Demo (Arkanoid Hw) By Abyss (2023 */

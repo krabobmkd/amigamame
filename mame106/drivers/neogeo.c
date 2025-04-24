@@ -4983,7 +4983,7 @@ ROM_START( rbff2k )
 	ROM_LOAD16_BYTE( "240-c6.bin", 0x2000001, 0x800000, CRC(4609e507) SHA1(bb17f50a377dddb77c1eeda5944a7bcbf0cca5f7) ) /* Plane 2,3 */
 ROM_END
 
-
+// this is the 0.106 romlist:
 ROM_START( mslug2 )
 	ROM_REGION( 0x300000, REGION_CPU1, 0 )
 	ROM_LOAD16_WORD_SWAP( "241-p1.bin", 0x000000, 0x100000, CRC(2a53c5da) SHA1(5a6aba482cac588a6c2c51179c95b487c6e11899) )
@@ -5004,6 +5004,51 @@ ROM_START( mslug2 )
 	ROM_LOAD16_BYTE( "241-c2.bin", 0x0000001, 0x800000, CRC(e5806221) SHA1(1e5475cfab129c77acc610f09369ca42ba5aafa5) ) /* Plane 2,3 */
 	ROM_LOAD16_BYTE( "241-c3.bin", 0x1000000, 0x800000, CRC(9f6bfa6f) SHA1(a4319b48004e723f81a980887678e3e296049a53) ) /* Plane 0,1 */
 	ROM_LOAD16_BYTE( "241-c4.bin", 0x1000001, 0x800000, CRC(7d3e306f) SHA1(1499316fb381775218d897b81a6a0c3465d1a37c) ) /* Plane 2,3 */
+ROM_END
+
+// this is the recent 0.207 romlist
+//ROM_START( mslug2 ) /* MVS AND AES VERSION */
+//	ROM_REGION( 0x300000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+//	ROM_LOAD16_WORD_SWAP( "241-p1.p1",  0x000000, 0x100000, CRC(2a53c5da) SHA1(5a6aba482cac588a6c2c51179c95b487c6e11899) ) /* TC538200 */
+//	ROM_LOAD16_WORD_SWAP( "241-p2.sp2", 0x100000, 0x200000, CRC(38883f44) SHA1(fcf34b8c6e37774741542393b963635412484a27) ) /* TC5316200 */
+
+//	NEO_SFIX_128K( "241-s1.s1", CRC(f3d32f0f) SHA1(2dc38b7dfd3ff14f64d5c0733c510b6bb8c692d0) ) /* TC531000 */
+
+//	NEO_BIOS_AUDIO_128K( "241-m1.m1", CRC(94520ebd) SHA1(f8a1551cebcb91e416f30f50581feed7f72899e9) ) /* TC531001 */
+
+//	ROM_REGION( 0x800000, "cslot1:ymsnd", 0 )
+//	ROM_LOAD( "241-v1.v1", 0x000000, 0x400000, CRC(99ec20e8) SHA1(80597707f1fe115eed1941bb0701fc00790ad504) ) /* TC5332204 */
+//	ROM_LOAD( "241-v2.v2", 0x400000, 0x400000, CRC(ecb16799) SHA1(b4b4ddc680836ed55942c66d7dfe756314e02211) ) /* TC5332204 */
+
+//	ROM_REGION( 0x2000000, "cslot1:sprites", 0 )
+//	/* Different layout with 8xC (16 mbit) also exists; naming sheme 241-Cx */
+//	ROM_LOAD16_BYTE( "241-c1.c1", 0x0000000, 0x800000, CRC(394b5e0d) SHA1(4549926f5054ee6aa7689cf920be0327e3908a50) ) /* Plane 0,1 */ /* TC5364205 */
+//	ROM_LOAD16_BYTE( "241-c2.c2", 0x0000001, 0x800000, CRC(e5806221) SHA1(1e5475cfab129c77acc610f09369ca42ba5aafa5) ) /* Plane 2,3 */ /* TC5364205 */
+//	ROM_LOAD16_BYTE( "241-c3.c3", 0x1000000, 0x800000, CRC(9f6bfa6f) SHA1(a4319b48004e723f81a980887678e3e296049a53) ) /* Plane 0,1 */ /* TC5364205 */
+//	ROM_LOAD16_BYTE( "241-c4.c4", 0x1000001, 0x800000, CRC(7d3e306f) SHA1(1499316fb381775218d897b81a6a0c3465d1a37c) ) /* Plane 2,3 */ /* TC5364205 */
+//ROM_END
+// vaporous demo for mame was released with the "mslug2 mame0.207 rom names"
+// so use recent mslug2 rom list names with .s1 instead of .bin, then check crc
+ROM_START( vaporous )
+	ROM_REGION( 0x300000, REGION_CPU1, 0 )
+	ROM_LOAD16_WORD_SWAP( "241-p1.p1", 0x000000, 0x100000, CRC(536517ca) SHA1(448cc860cb4e91e8a9ce9fcd24fe7a8b9e45c760) )
+	ROM_LOAD16_WORD_SWAP( "241-p2.sp2", 0x100000, 0x200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+
+	NEO_SFIX_128K( "241-s1.s1",  CRC(11ac8ba5) SHA1(c58496d0a2d7674b5eb6ec4809ac7c3ac8814825) )
+
+	NEO_BIOS_SOUND_64K( "241-m1.m1", CRC(1df9cbdc) SHA1(8d48cb63b7a05270e56b463539d1720f219e9003) )
+
+	ROM_REGION( 0x800000, REGION_SOUND1, 0 )
+	ROM_LOAD( "241-v1.v1", 0x000000, 0x400000, CRC(90f21f51) SHA1(302a8edbefa5a697d641cf39ce2932fa90219ed1) )
+	ROM_LOAD( "241-v2.v2", 0x400000, 0x400000, CRC(3354e822) SHA1(0973b579f0951a905df176706157062ece512342) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x2000000, REGION_GFX3, 0 )
+	ROM_LOAD16_BYTE( "241-c1.c1", 0x0000000, 0x800000, CRC(cd5b5b97) SHA1(6e2451343f159728869fa16879075ad741866866) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "241-c2.c2", 0x0000001, 0x800000, CRC(ecbcf96f) SHA1(bc875ab87cae1146d12d77f8dd17ce9b574ed080) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "241-c3.c3", 0x1000000, 0x800000, CRC(cd5b5b97) SHA1(6e2451343f159728869fa16879075ad741866866) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "241-c4.c4", 0x1000001, 0x800000, CRC(ecbcf96f) SHA1(bc875ab87cae1146d12d77f8dd17ce9b574ed080) ) /* Plane 2,3 */
 ROM_END
 
 ROM_START( kof98 ) /* encrypted code + protection */
@@ -8150,7 +8195,10 @@ GAMEB( 1997, irrmaze,  neogeo,   neogeo, neogeo, irrmaze, neogeo,   ROT0, "SNK /
 GAMEB( 1998, rbff2,    neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (set 1)", 0 ,2)
 GAMEB( 1998, rbff2a,   rbff2,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (set 2)", 0 ,0)
 GAMEB( 1998, rbff2k,   rbff2,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", 0 ,0) // no Japanese title / mode
+
 GAMEB( 1998, mslug2,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Metal Slug 2 - Super Vehicle-001/II", 0 ,2)
+GAMEB( 2025, vaporous,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "The Twitch Elite", "Vaporous Demo - ( Revision, W0rld )", 0 ,0)
+
 GAMEB( 1998, kof98,    neogeo,   neogeo, neogeo, neogeo,  kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends", 0 ,2)
 GAMEB( 1998, kof98k,   kof98,    neogeo, neogeo, neogeo,  kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (Korean board)", 0 ,0)
 GAMEB( 1998, kof98n,   kof98,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (not encrypted)", 0 ,0)

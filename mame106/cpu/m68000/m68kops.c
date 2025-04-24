@@ -2004,7 +2004,7 @@ void m68ki_build_opcode_table(void)
 	int j;
 	int k;
 
- printf("m68ki_build_opcode_table\n");
+// printf("m68ki_build_opcode_table\n");
 
 	for(i = 0; i < 0x10000; i++)
 	{
@@ -2090,20 +2090,20 @@ void m68ki_build_opcode_table(void)
 		ostruct++;
 	}
 
-	// krb
-	int nbillegleft = 0;
-	int maxnbtellfreeslots=4;
-	for(i = 0; i < 0x10000; i++)
-	{
-		if( m68ki_instruction_jump_table[i] == m68k_op_illegal &&
-		    i != 0x00004AFC)
-		{
-            if(nbillegleft<maxnbtellfreeslots)
-                printf("free inst slot:%08x\n",i);
-            nbillegleft++;
-        }
-	}
-	printf("nb illegals:%d\n",nbillegleft);
+	// krb - code to find free opcodes to hack.
+//	int nbillegleft = 0;
+//	int maxnbtellfreeslots=4;
+//	for(i = 0; i < 0x10000; i++)
+//	{
+//		if( m68ki_instruction_jump_table[i] == m68k_op_illegal &&
+//		    i != 0x00004AFC)
+//		{
+//            if(nbillegleft<maxnbtellfreeslots)
+//                printf("free inst slot:%08x\n",i);
+//            nbillegleft++;
+//        }
+//	}
+//	printf("nb illegals:%d\n",nbillegleft);
 
 
 }

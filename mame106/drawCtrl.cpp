@@ -54,8 +54,8 @@ struct drawableExtra_lever *drawextra_createLever()
     struct drawableExtra_lever *p =
     (struct drawableExtra_lever *) auto_malloc(sizeof(struct drawableExtra_lever));
     if(!p) return NULL; // should have jmp throwed anyway.
-    int r = open_and_read_png("skin/lever.png",&p->_img1._png );
-    r = open_and_read_png("skin/lever2.png",&p->_img2._png );
+//    int r = open_and_read_png("skin/lever.png",&p->_img1._png );
+//    r = open_and_read_png("skin/lever2.png",&p->_img2._png );
 
     return p;
 }
@@ -65,7 +65,7 @@ struct drawableExtra_steeringWheel *drawextra_createSteeringWheel()
     struct drawableExtra_steeringWheel *p =
     (struct drawableExtra_steeringWheel *) auto_malloc(sizeof(struct drawableExtra_steeringWheel));
     if(!p) return NULL; // should have jmp throwed anyway.
-    int r = open_and_read_png("skin/swheel.png",&p->_img._png );
+//    int r = open_and_read_png("skin/swheel.png",&p->_img._png );
 
     return p;
 }

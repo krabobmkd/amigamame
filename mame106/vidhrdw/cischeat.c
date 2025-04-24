@@ -819,16 +819,20 @@ void f1gpstar_draw_road(mame_bitmap *bitmap, const rectangle *cliprect, int road
            to avoid holes in between tiles */
 		xscale += (1<<16)/TILE_SIZE;
 
+		dgpz0.sy = sy;
+		dgpz0.color = attr >> 8;
+		dgpz0.scalex = xscale;
+
+
 		/* Draw the line */
 		for (sx = xstart ; sx <= max_x ; sx += xdim)
 		{
 			
 			dgpz0.code = code++;
-			dgpz0.color = attr >> 8;
+
 			dgpz0.sx = sx>>16;
-			dgpz0.sy = sy;
-			dgpz0.scalex = xscale;
-			dgpz0.scaley = 1 << 16;
+
+
 			drawgfxzoom(&dgpz0);
 
 			/* stop when the end of the line of gfx is reached */
@@ -873,7 +877,7 @@ void f1gpstar_draw_road(mame_bitmap *bitmap, const rectangle *cliprect, int road
 
 ***************************************************************************/
 
-#define SHRINK(_org_,_fact_) ( ( ( (_org_) << 16 ) * (_fact_ & 0x01ff) ) / 0x80 )
+#define SHRINK(_org_,_fact_) ( ( ( (_org_) << 16 ) * (_fact_ & 0x01ff) )>>7 )
 
 /*  Draw sprites, in the given priority range, to a bitmap.
 
@@ -1063,26 +1067,23 @@ if (code_pressed(KEYCODE_X))
 
 ***************************************************************************/
 
-static void bigrun_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprect, int priority1, int priority2)
+static void bigrun_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprect, int priority)
 {
 	int x, sx, flipx, xzoom, xscale, xdim, xnum, xstart, xend, xinc;
 	int y, sy, flipy, yzoom, yscale, ydim, ynum, ystart, yend, yinc;
 	int code, attr, color, size, shadow;
 
-	int min_priority, max_priority, high_sprites;
-
 	UINT16		*source	=	spriteram16;
 	const UINT16	*finish	=	source + 0x1000/2;
 
 	/* Move the priority values in place */
-	high_sprites = (priority1 >= 16) | (priority2 >= 16);
-	priority1 = (priority1 & 0x0f) * 0x100;
-	priority2 = (priority2 & 0x0f) * 0x100;
+	//krb: it's always 0-7
+	//int min_priority = (priority)<<8;
+	//int max_priority = (priority+1)<<8;
+	int appliedprio=(priority)<<8;
+//	if(priority == 0) appliedprio = priority<<8;
+//	else appliedprio = (priority+1)<<8;
 
-	if (priority1 < priority2)	{	min_priority = priority1;	max_priority = priority2; }
-	else						{	min_priority = priority2;	max_priority = priority1; }
-
-	
 	{ 
 	struct drawgfxParams dgpz2={
 		bitmap, 	// dest
@@ -1101,10 +1102,18 @@ static void bigrun_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprect,
 		NULL, 	// pri_buffer
 		0 	// priority_mask
 	  };
+	  // 4096/16= 256 sprites ? -> but then
 	for (; source < finish; source += 0x10/2 )
 	{
 		size	=	source[ 0 ];
 		if (size & 0x1000)	continue;
+        attr	=	source[ 7 ];
+		/* high byte is a priority information */
+		//krb: basically means it's drawn 2 times :(
+//		if ( ((attr & 0x700) < min_priority) || ((attr & 0x700) > max_priority) )
+//			continue;
+        if ( (attr & 0x700) != appliedprio)
+			continue;
 
 		/* number of tiles */
 		xnum	=	( (size & 0x0f) >> 0 ) + 1;
@@ -1142,19 +1151,12 @@ static void bigrun_draw_sprites(mame_bitmap *bitmap , const rectangle *cliprect,
 
 		if ( ( (xdim>>16) == 0 ) || ( (ydim >>16) == 0) )	continue;
 
-//      sy -= (ydim * ynum);
-
-		code	=	source[ 6 ];
-		attr	=	source[ 7 ];
 		color	=	attr & 0x007f;
 		shadow	=	attr & 0x1000;
 
-		/* high byte is a priority information */
-		if ( ((attr & 0x700) < min_priority) || ((attr & 0x700) > max_priority) )
-			continue;
-
-		if ( high_sprites && !(color & 0x80) )
-			continue;
+		code	=	source[ 6 ];
+//		if ( high_sprites && !(color & 0x80) )
+//			continue;
 
         dgpz2.flipx = flipx;
         dgpz2.flipy = flipy;
@@ -1186,12 +1188,12 @@ if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continu
 
 		for (y = ystart; y != yend; y += yinc)
 		{
+			dgpz2.sy = (sy + y * ydim) >>16;
 			for (x = xstart; x != xend; x += xinc)
 			{				
 				dgpz2.code = code++;
 				dgpz2.sx = (sx + x * xdim) >>16;
-				dgpz2.sy = (sy + y * ydim) >>16;
-
+				
 				drawgfxzoom(&dgpz2);
 			}
 		}
@@ -1253,7 +1255,7 @@ if ( code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X) ) \
 VIDEO_UPDATE( bigrun )
 {
 	int i;
-	int megasys1_active_layers1, flag;
+	int megasys1_active_layers1;
 
 #ifdef MAME_DEBUG
 	/* FAKE Videoreg */
@@ -1275,23 +1277,29 @@ VIDEO_UPDATE( bigrun )
 
 	fillbitmap(bitmap,Machine->pens[0],cliprect);
 
+
 	for (i = 7; i >= 4; i--)
-	{											/* bitmap, road, min_priority, max_priority, transparency */
+	{
+
+		/* bitmap, road, min_priority, max_priority, transparency */
 		if (megasys1_active_layers & 0x10)	cischeat_draw_road(bitmap,cliprect,0,i,i,TRANSPARENCY_NONE);
 		if (megasys1_active_layers & 0x20)	cischeat_draw_road(bitmap,cliprect,1,i,i,TRANSPARENCY_PEN);
+        if(i<7) bigrun_draw_sprites(bitmap,cliprect,i+1); // 7,6,5
 	}
 
-	flag = 0;
+    int flag=0; // needed by macro
 	cischeat_tmap_DRAW(0)
 	cischeat_tmap_DRAW(1)
 
 	for (i = 3; i >= 0; i--)
-	{											/* bitmap, road, min_priority, max_priority, transparency */
+	{
+		/* bitmap, road, min_priority, max_priority, transparency */
 		if (megasys1_active_layers & 0x10)	cischeat_draw_road(bitmap,cliprect,0,i,i,TRANSPARENCY_PEN);
 		if (megasys1_active_layers & 0x20)	cischeat_draw_road(bitmap,cliprect,1,i,i,TRANSPARENCY_PEN);
+        bigrun_draw_sprites(bitmap,cliprect,i+1); // 4,3,2,1
 	}
-
-	if (megasys1_active_layers & 0x08)	bigrun_draw_sprites(bitmap,cliprect,15,0);
+    bigrun_draw_sprites(bitmap,cliprect,0);
+	//orginal bugged if (megasys1_active_layers & 0x08)	bigrun_draw_sprites(bitmap,cliprect,15,0);
 
 	cischeat_tmap_DRAW(2)
 

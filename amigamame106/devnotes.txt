@@ -1,16 +1,19 @@
 todo R1.3
 
  - O outrun lever & wheel gadgets
- - O
+ - O outrun cpu sync optim.
+ - O run recent neogeo demo
+
+   correcs:
+ - X correct flipx neogo sprites some neogeo games.
+ - X "Super Chase Criminal Termination" sprite priorities fixed.
+ - X BigRun sprite prio -> was a 106 original bug. Bigrun is super cool now.
+ - X 64th street(& lots of megasys jaleco games) sprite priority bug fixed.
  - O thunderblade boot bugs
-correcs:
- - X correct flipx neogo sprites
- - O BigRun sprite prio
- - O 64th street(& lots of jaleco games) sprite priority bug.
 
 todo R1.2
 
- Now I test with a Rpi CM4 with no overclock.
+ Now I test with a Rpi CM4 with no overclock (1.5Ghz).
 
 
  - Added such excellent games as Caveman Ninja, Cliffhanger Edward Randy,Robocop 2, and Mutant fighter (machine deco16)
