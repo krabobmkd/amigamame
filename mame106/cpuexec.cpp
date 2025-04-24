@@ -293,7 +293,7 @@ int cpuexec_init(void)
 	state_save_register_item("cpu", 0, vblank_countdown);
 	state_save_pop_tag();
 
- printf("cpunum:%d nbCpuNotInstanciable:%d\n",cpunum,nbCpuNotInstanciable);
+// printf("cpunum:%d nbCpuNotInstanciable:%d\n",cpunum,nbCpuNotInstanciable);
     // -- krb optimisation strategy tests --
     // 680x0 has been instancified (except "opbase")
     // so GetContext/SetContext per slice would be useless.

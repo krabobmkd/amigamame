@@ -951,6 +951,7 @@ void *_malloc_or_die(size_t size, const char *file, int line)
 	/* allocate and return if we succeeded */
 //krb	result = malloc(size);
     // krb: add 4*16 because of silly m68k movem optimisation
+    // should be removed for valgrind tests
     result = calloc(size+(4*16),1);
 	if (result != NULL)
 	{
