@@ -73,6 +73,9 @@ set(MAME_CORE_SRC
 
   cpu/m68000/m68kkrbopt.h
  sound_krb.h
+
+  drawCtrl.cpp
+  drawCtrl.h
 	# minimal common driver needs:
 	vidhrdw/generic.c vidhrdw/vector.c
 
@@ -89,6 +92,7 @@ set(MAME_CORE_SRC
 
 	sndhrdw/generic.c
 	sndhrdw/generic.h
+
 
 	)
 
