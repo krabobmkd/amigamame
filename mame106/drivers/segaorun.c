@@ -183,12 +183,14 @@ static void krb_outrun_patch_cpu_synchro()
         pcodemain[0x00007dda>>1] = 8;
     }
 
-	UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
-    if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
-    {
-//        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
-//        pcodesub[0x00001182>>1] = 9;
-    }
+
+	// UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+ //    if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
+ //    {
+ //        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
+ //        pcodesub[0x00001182>>1] = 9;
+ //    }
+
 }
 
 static void outrun_generic_init(void)
@@ -404,6 +406,7 @@ static READ16_HANDLER( outrun_custom_io_r )
 			return ppi8255_0_r(offset & 3);
 
 		case 0x10/2:
+		{
             UINT16 lv = readinputport(offset & 3);
             if((offset & 3) == 3)
             {
@@ -411,7 +414,7 @@ static READ16_HANDLER( outrun_custom_io_r )
                 leverCount++;
             }
 			return lv;
-
+        }
 		case 0x30/2:
 		{
 			static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };

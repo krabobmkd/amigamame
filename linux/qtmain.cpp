@@ -168,7 +168,6 @@ void QProc::process()
     int idriver = -1;
     m_nbtest = 0;
     // test if just "mame romname".
-    //"thndrbld"
     {
         int idriver = getMainConfig().driverIndex().index("thndrbld");
         if(idriver>0)
@@ -177,18 +176,18 @@ void QProc::process()
             StartGame(idriver);
         }
     }
-    nbframe = 0;
-    m_nbtest = 1;
-    {
-        int idriver = getMainConfig().driverIndex().index("outrun");
+   //  nbframe = 0;
+   //  m_nbtest = 1;
+   //  {
+   //      int idriver = getMainConfig().driverIndex().index("outrun");
 
-        //  if game was explicit, no GUI
-        if(idriver>0)
-        {
-            getMainConfig().setActiveDriver(idriver);
-            StartGame(idriver);
-        }
-   }
+   //      //  if game was explicit, no GUI
+   //      if(idriver>0)
+   //      {
+   //          getMainConfig().setActiveDriver(idriver);
+   //          StartGame(idriver);
+   //      }
+   // }
 }
 
 QWin::QWin() : QLabel()

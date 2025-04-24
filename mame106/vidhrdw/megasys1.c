@@ -193,7 +193,7 @@ actual code sent to the hardware.
 
 #include "driver.h"
 #include "megasys1.h"
-
+#include "drawgfxn.h"
 /* Variables defined here, that have to be shared: */
 tilemap *megasys1_tmap[3];
 
@@ -581,11 +581,15 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 	/* sprite order is from first in Sprite Data RAM (frontmost) to last */
 
+
+    rectangle lcliprect = *cliprect;
+	lcliprect.max_x++;
+	lcliprect.max_y++;
+
 	if (hardware_type_z == 0)	/* standard sprite hardware */
 	{
 		color_mask = (megasys1_sprite_flag & 0x100) ? 0x07 : 0x0f;
 
-		
 		{ 
 		struct drawgfxParams dgp0={
 			bitmap, 	// dest
@@ -596,13 +600,13 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			0, 	// flipy
 			0, 	// sx
 			0, 	// sy
-			cliprect, 	// clip
+			&lcliprect, 	// clip
 			TRANSPARENCY_PEN, 	// transparency
 			15, 	// transparent_color
 			0, 	// scalex
 			0, 	// scaley
 			priority_bitmap, 	// pri_buffer
-			(attr & 0x08) ? 0x0c : 0x0a 	// priority_mask
+			0	// priority_mask
 		  };
 		for (offs = (0x800-8)/2;offs >= 0;offs -= 8/2)
 		{
@@ -634,13 +638,14 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				code  = spritedata[0x0E/2] + objectdata[0x06/2];
 				color = (attr & color_mask);
 
-				
+				dgp0.priority_mask = (attr & 0x08) ? ((1<<31)|0x0c) : ((1<<31)|0x0a);
 				dgp0.code = (code & 0xfff ) + ((megasys1_sprite_bank & 1) << 12);
 				dgp0.color = color;
 				dgp0.flipx = flipx;
 				dgp0.flipy = flipy;
 				dgp0.sx = sx;
 				dgp0.sy = sy;
+                //drawgfx_clut16_Src8(&dgp0);
 				drawgfx(&dgp0);
 			}	/* sprite */
 		}
@@ -663,13 +668,13 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			0, 	// flipy
 			0, 	// sx
 			0, 	// sy
-			cliprect, 	// clip
+			&lcliprect, 	// clip
 			TRANSPARENCY_PEN, 	// transparency
 			15, 	// transparent_color
 			0, 	// scalex
 			0, 	// scaley
 			priority_bitmap, 	// pri_buffer
-			(attr & 0x08) ? 0x0c : 0x0a 	// priority_mask
+			0 	// priority_mask
 		  };
 		for (sprite = 0x80-1;sprite >= 0;sprite--)
 		{
@@ -702,6 +707,8 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			dgp1.flipy = flipy;
 			dgp1.sx = sx;
 			dgp1.sy = sy;
+			dgp1.priority_mask = (attr & 0x08) ? ((1<<31)|0x0c) : ((1<<31)|0x0a);
+			//drawgfx_clut16_Src8(&dgp1);
 			drawgfx(&dgp1);
 		}
 		} // end of patch paragraph

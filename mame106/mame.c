@@ -787,7 +787,7 @@ static inline void auto_malloc_add(void *result, const char *file, int line)
 			fatalerror("Unable to extend malloc tracking array to %d slots", malloc_list_size);
 		malloc_list = list;
 	}
-	printf("auto_malloc_add:%d file:%s line:%d\n",malloc_list_index,file,line);
+	//printf("auto_malloc_add:%d file:%s line:%d\n",malloc_list_index,file,line);
 	malloc_list[malloc_list_index++] = result;
 }
 
@@ -802,7 +802,7 @@ static void auto_malloc_free(void)
 	while (malloc_list_index > 0 && malloc_list[--malloc_list_index] != NULL)
 	{
         int i=malloc_list_index;
-        printf("free index:%d\n",i);
+       // printf("free index:%d\n",i);
         void *pmem = malloc_list[i];
 		free(pmem);
     }

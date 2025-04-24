@@ -134,6 +134,6 @@ VIDEO_UPDATE( outrun )
 	segaic16_sprites_draw(0, bitmap, cliprect);
 
 	//krb: draw optionnal control goodies
-struct drawableExtra
+    //TODO
 
 }

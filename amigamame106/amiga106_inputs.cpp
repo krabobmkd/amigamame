@@ -865,7 +865,7 @@ void RawKeyMap::init()
     };
     MameConfig::Controls &configControls = getMainConfig().controls();
     MameConfig::Misc &configMisc = getMainConfig().misc();
-    int amega32order = (int)((configMisc._MiscFlags & ) != 0);
+    int amega32order = (int)((configMisc._MiscFlags & 1) != 0);
 
     // then add player to paddle according to conf.    
     // lowlevel send rawkeys for each CD32 pads.

@@ -520,7 +520,6 @@ void cpuexec_timesliceT(void)
 
 //	LOG(("------------------\n"));
 //	LOG(("cpu_timeslice: target = %.9f\n", mame_time_to_double(target)));
- printf("T");
 
 	/* process any pending suspends */
 	for (cpunum = 0; Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum++)
@@ -547,7 +546,6 @@ void cpuexec_timesliceT(void)
                	0 need to be 0 !
                 cycles_running += 2; // because division precision loss.. ->NO, kills an arkanoid interuption.
             */
-			printf("C %d %d ", cpunum, cycles_running);
 
 
 			/* run for the requested number of cycles */
@@ -587,7 +585,7 @@ void cpuexec_timesliceT(void)
             }
 		}
 	}
- printf("F\n");
+
 	/* update the local times of all CPUs */
 	for (cpunum = 0; Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum++)
 	{
@@ -612,7 +610,7 @@ void cpuexec_timesliceT(void)
 
 	/* update the global time */
 	mame_timer_set_global_time(target);
- printf("B\n");
+
 	/* huh? something for the debugger */
 	#if defined(MAME_DEBUG) && !defined(NEW_DEBUGGER)
 	{
