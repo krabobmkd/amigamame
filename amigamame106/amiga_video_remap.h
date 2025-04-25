@@ -54,7 +54,6 @@ protected:
 /* Whe target screen pixels is 8bit but palette is imposed by OS.
 * then Use CLUT
 */
-// beta experimental
 class Paletted_Pens8 : public Paletted
 {
  public:
@@ -64,6 +63,7 @@ class Paletted_Pens8 : public Paletted
     void directDraw(directDrawParams *p) override;
 protected:
     struct Screen *_pScreen;
+    int _screenNbc;
     std::vector<UBYTE> _rgb4cube;
     virtual void initRemapCube();
 };

@@ -208,13 +208,13 @@ Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
     , _pScreenWindow(NULL)
 
     , _ScreenModeId(params._forcedModeID)
+    , _ScreenDepthAsked(params._forcedDepth)
     , _fullscreenWidth(0)
     , _fullscreenHeight(0)
-    , _screenDepthAsked(8) // default.
     , _pMouseRaster(NULL)
     , _pTripleBufferImpl(NULL)
 {
-
+ printf("params._forcedDepth:%d\n",params._forcedDepth);
 }
 
 bool Intuition_Screen::open()
@@ -240,8 +240,8 @@ bool Intuition_Screen::open()
     _blackpen = 0;
 
     // that stupid OS function (or driver) want SA_Depth,24 for 32bit depth, or fail.
-    if(_screenDepthAsked == 32 )_screenDepthAsked =24;
-
+    if(_ScreenDepthAsked == 32 )_ScreenDepthAsked =24;
+    printf("ask depth:%d\n",_ScreenDepthAsked);
 
     ULONG appliedHeight = _fullscreenHeight;
     if(_flags & DISPFLAG_USEHEIGHTBUFFER)
@@ -255,7 +255,7 @@ bool Intuition_Screen::open()
                         SA_Title, (ULONG)"MAME", // used as ID by promotion tools and else ?
                         SA_Width, _fullscreenWidth,
                         SA_Height,appliedHeight,
-                        SA_Depth,_screenDepthAsked,
+                        SA_Depth,_ScreenDepthAsked,
 //                        SA_Behind,TRUE,    /* Open behind */
                         SA_Quiet,TRUE,     /* quiet */
 			SA_Type,CUSTOMSCREEN,

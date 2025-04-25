@@ -323,8 +323,8 @@ void Paletted_Screen8::directDraw(directDrawParams *p)
 
 // - - - - - - --
 // remap clut with nbc  [1,256+[ to forced 8bit palette , for workbench.
-Paletted_Pens8::Paletted_Pens8(struct Screen *pScreen)
-    : Paletted(), _pScreen(pScreen)
+Paletted_Pens8::Paletted_Pens8(struct Screen *pScreen )
+    : Paletted(), _pScreen(pScreen), _screenNbc(1<<(pScreen->RastPort.BitMap->Depth))
 {
 }
 Paletted_Pens8::~Paletted_Pens8()
@@ -387,11 +387,12 @@ void Paletted_Pens8::initRemapCube()
 {
     // should lock -> no, the window locks the WB.
     struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
+    printf("initRemapCube\n");
     if(!pColorMap) return;
-
     // 16*16*16
     _rgb4cube.resize(4096); // don't allow 255
 
+    printf("colormap:%d\n",(int)pColorMap->Count);
     vector<UWORD> pal(pColorMap->Count);
     for(LONG i=0;i<pColorMap->Count ; i++)
     {
@@ -539,18 +540,22 @@ int loadPaletteIlbm()
 // when screen8 and nbc>258, force our palette and use Paletted_Screen8 like on WB.
 Paletted_Screen8ForcePalette::Paletted_Screen8ForcePalette(struct Screen *pScreen)
     : Paletted_Pens8(pScreen) {
+
+    printf("Paletted_Screen8ForcePalette::Paletted_Screen8ForcePalette\n");
 }
 extern "C" { extern const unsigned char fixedpal8[768]; }
 void Paletted_Screen8ForcePalette::initRemapCube()
 {
     // set fixed palette
-    initFixedPalette(fixedpal8,256);
+
+    initFixedPalette(fixedpal8,_screenNbc);
     // then... like for 8bit WB windows, use 12bit precision remap. could be 15.-
     Paletted_Pens8::initRemapCube();
 
 }
 void Paletted_Screen8ForcePalette::initFixedPalette(const UBYTE *prgb,ULONG nbc)
 {
+    printf("initFixedPalette:nbc:%d\n",nbc);
     // to RGB32
     ULONG paletteRGB32[3*32+2]; // LOADRGB32 format, used to load colors per 32.
     if(nbc>256) nbc=256;

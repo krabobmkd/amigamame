@@ -77,9 +77,9 @@ protected:
     Screen *_pScreen;
     Window *_pScreenWindow;
     ULONG   _ScreenModeId;
+    ULONG   _ScreenDepthAsked; // only for 8b screen to get 32c/16c.
     int _fullscreenWidth; // guessed from modeid.
     int _fullscreenHeight;
-    int _screenDepthAsked; // 8 or 16, needed for screen opening.
     void *_pMouseRaster;
 
     TripleBuffer *_pTripleBufferImpl;

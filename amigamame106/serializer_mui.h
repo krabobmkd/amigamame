@@ -181,7 +181,7 @@ protected:
         struct Hook _ScreenModeStopHook;
         static ULONG PopupStart(struct Hook *hook REG(a0), APTR popasl REG(a2), struct TagItem *taglist REG(a1));
         static ULONG PopupStop(struct Hook *hook REG(a0), APTR popasl REG(a2), struct ScreenModeRequester *smreq REG(a1));
-        void SetDisplayName(ULONG displayid);
+        void SetDisplayName(ULONG_SCREENMODEID &displayid);
         std::vector<struct TagItem> _ScreenModeTags;
         std::string _strDisplay;
 	};

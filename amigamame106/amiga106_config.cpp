@@ -354,8 +354,11 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
 }
 void MameConfig::Display_PerScreenMode::valueUpdated(std::string upatedValue)
 {
-    if(_ScreenModeChoice == ScreenModeChoice::Best) _modeid = INVALID_ID;
-
+    if(_ScreenModeChoice == ScreenModeChoice::Best)
+    {
+        _modeid._modeId = INVALID_ID;
+        _modeid._depth = 8;
+    }
 }
 bool MameConfig::Display_PerScreenMode::isDefault()
 {   // will not be written if is default.

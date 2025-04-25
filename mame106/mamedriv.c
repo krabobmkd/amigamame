@@ -3699,6 +3699,7 @@ const game_driver * const drivers[] =
 	DRIVER( neocup98 ) /* 1998 "SNK" "Neo-Geo Cup '98 - The Road to the Victory" */
 	DRIVER( neodrift ) /* 1996 "Visco" "Neo Drift Out - New Technology" */
 	DRIVER( neogeo ) /* 1990 "SNK" "Neo-Geo" */
+	DRIVER( neogeo3d ) /* 2012 "Oxygene" "NeoGeo 3D ! - ( W0rld )" */
 	DRIVER( neomrdo ) /* 1996 "Visco" "Neo Mr. Do!" */
 	DRIVER( ninjamas ) /* 1996 "ADK / SNK" "Ninja Master's - haoh-ninpo-cho" */
 	DRIVER( nitd ) /* 2000 "Eleven / Gavaking" "Nightmare in the Dark" */
@@ -3774,7 +3775,7 @@ const game_driver * const drivers[] =
 	DRIVER( turfmast ) /* 1996 "Nazca" "Neo Turf Masters / Big Tournament Golf" */
 	DRIVER( twinspri ) /* 1996 "ADK" "Twinkle Star Sprites" */
 	DRIVER( tws96 ) /* 1996 "Tecmo" "Tecmo World Soccer '96" */
-	DRIVER( vaporous ) /* 2025 "The Twitch Elite" "Vaporous - Revision Demo" */
+	DRIVER( vaporous ) /* 2025 "The Twitch Elite" "Vaporous Demo - ( Revision */
 	DRIVER( viewpoin ) /* 1992 "Sammy" "Viewpoint" */
 	DRIVER( vliner ) /* 2001 "Dyna / BreezaSoft" "V-Liner (set 1)" */
 	DRIVER( vlinero ) /* 2001 "Dyna / BreezaSoft" "V-Liner (set 2)" */

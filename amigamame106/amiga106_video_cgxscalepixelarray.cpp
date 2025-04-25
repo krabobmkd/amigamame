@@ -158,7 +158,7 @@ Intuition_Screen_CGXScale::Intuition_Screen_CGXScale(const AbstractDisplay::para
 //        else _screenDepthAsked= 16;
 //    }else
 
-    _screenDepthAsked = 32;  // or 16? -> problems with 32 ??? why ?
+    _ScreenDepthAsked = 32;  // or 16? -> problems with 32 ??? why ?
 
 //printf("Intuition_Screen_CGXScale %08x\n",_ScreenModeId);
 
@@ -167,12 +167,12 @@ Intuition_Screen_CGXScale::Intuition_Screen_CGXScale(const AbstractDisplay::para
         struct TagItem cgxtags[]={
                 CYBRBIDTG_NominalWidth,width,
                 CYBRBIDTG_NominalHeight,height,
-                CYBRBIDTG_Depth,_screenDepthAsked,
+                CYBRBIDTG_Depth,_ScreenDepthAsked,
                 TAG_DONE,0 };
         _ScreenModeId = BestCModeIDTagList(cgxtags);
         if(_ScreenModeId == INVALID_ID)
         {
-            printf("Can't find cyber screen mode for w%d h%d d%d\n",width,height,_screenDepthAsked);
+            printf("Can't find cyber screen mode for w%d h%d d%d\n",width,height,_ScreenDepthAsked);
             //loginfo(2,"Can't find cyber screen mode for w%d h%d d%d ",width,height,_screenDepthAsked);
             return;
         }
@@ -184,7 +184,7 @@ Intuition_Screen_CGXScale::Intuition_Screen_CGXScale(const AbstractDisplay::para
     {
         _fullscreenWidth = GetCyberIDAttr( CYBRIDATTR_WIDTH, _ScreenModeId );
         _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
-        _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
+        _ScreenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
     }
 //    printf("dim found: %d %d\n",_fullscreenWidth,_fullscreenHeight);
 

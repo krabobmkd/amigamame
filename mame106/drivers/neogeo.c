@@ -4035,6 +4035,26 @@ ROM_START( puzzledp )
 	ROM_LOAD16_BYTE( "202-c2.bin", 0x000001, 0x100000, CRC(42371307) SHA1(df794f989e2883634bf7ffeea48d6bc3854529af) ) /* Plane 2,3 */
 ROM_END
 
+// added demo !
+ROM_START( neogeo3d )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_LOAD16_WORD_SWAP( "202-p1.bin", 0x000000, 0x080000, CRC(2b61415b) SHA1(0e3e4faf2fd6e63407425e1ac788003e75aeeb4f) )
+
+	NEO_SFIX_64K( "202-s1.bin", CRC(4a421612) SHA1(8a79055be7bf6e2c344a72d6afe6a33be3d4a6c3) )
+
+	NEO_BIOS_SOUND_128K( "202-m1.bin", CRC(9c0291ea) SHA1(3fa67c62acba79be6b3a98cc1601e45569fa11ae) )
+
+	ROM_REGION( 0x080000, REGION_SOUND1, 0 )
+	ROM_LOAD( "202-v1.bin", 0x000000, 0x080000, CRC(debeb8fb) SHA1(49a3d3578c087f1a0050168571ef8d1b08c5dc05) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x200000, REGION_GFX3, 0 )
+	ROM_LOAD16_BYTE( "202-c1.bin", 0x000000, 0x100000, CRC(cc0095ef) SHA1(3d86f455e6db10a2449b775dc386f1826ba3b62e) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "202-c2.bin", 0x000001, 0x100000, CRC(42371307) SHA1(df794f989e2883634bf7ffeea48d6bc3854529af) ) /* Plane 2,3 */
+ROM_END
+
+
 ROM_START( mosyougi )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )
 	ROM_LOAD16_WORD_SWAP( "203-p1.bin", 0x000000, 0x100000, CRC(7ba70e2d) SHA1(945f472cc3e7706f613c52df18de35c986d166e7) )
@@ -8195,9 +8215,11 @@ GAMEB( 1997, irrmaze,  neogeo,   neogeo, neogeo, irrmaze, neogeo,   ROT0, "SNK /
 GAMEB( 1998, rbff2,    neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (set 1)", 0 ,2)
 GAMEB( 1998, rbff2a,   rbff2,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (set 2)", 0 ,0)
 GAMEB( 1998, rbff2k,   rbff2,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", 0 ,0) // no Japanese title / mode
-
 GAMEB( 1998, mslug2,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Metal Slug 2 - Super Vehicle-001/II", 0 ,2)
-GAMEB( 2025, vaporous,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "The Twitch Elite", "Vaporous Demo - ( Revision, W0rld )", 0 ,0)
+
+// demoscene !
+GAMEB( 2025, vaporous,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "The Twitch Elite", "Vaporous Demo - ( TTE, Revision, W0rld )", 0 ,0)
+GAMEB( 2012, neogeo3d, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Oxygene", "NeoGeo 3D ! - ( Oxygene, W0rld )", 0 ,0)
 
 GAMEB( 1998, kof98,    neogeo,   neogeo, neogeo, neogeo,  kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends", 0 ,2)
 GAMEB( 1998, kof98k,   kof98,    neogeo, neogeo, neogeo,  kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (Korean board)", 0 ,0)

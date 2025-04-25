@@ -958,10 +958,12 @@ MUISerializer::LScreenModeReq::LScreenModeReq(MUISerializer &ser,ULONG_SCREENMOD
     _ScreenModeTags =
     {
       { ASLSM_InitialDisplayID,   0 },
+      { ASLSM_InitialDisplayDepth,   8 },
+      { ASLSM_DoDepth,        TRUE  },
       { TAG_END,0 }
     };
 #define SMT_DISPLAYID 0
-//#define SMT_DEPTH     1
+#define SMT_DEPTH     1
 }
 void MUISerializer::LScreenModeReq::compile()
 {
@@ -989,7 +991,8 @@ void MUISerializer::LScreenModeReq::update()
 {
     if(!_value) return;
     Level::update();
-    _ScreenModeTags[SMT_DISPLAYID].ti_Data = *_value;
+    _ScreenModeTags[SMT_DISPLAYID].ti_Data = (*_value)._modeId;
+    _ScreenModeTags[SMT_DEPTH].ti_Data = (*_value)._depth;
     SetDisplayName(*_value);
 }
 
@@ -1014,18 +1017,22 @@ ULONG MUISerializer::LScreenModeReq::PopupStop(struct Hook *hook REG(a0), APTR p
     MUISerializer::LScreenModeReq *plevel = (MUISerializer::LScreenModeReq *)hook->h_Data;
 
     plevel->_ScreenModeTags[SMT_DISPLAYID].ti_Data = smreq->sm_DisplayID;
- //no more   plevel->_ScreenModeTags[SMT_DEPTH].ti_Data   = smreq->sm_DisplayDepth;
+    plevel->_ScreenModeTags[SMT_DEPTH].ti_Data   = smreq->sm_DisplayDepth;
 
-    *(plevel->_value) = (ULONG_SCREENMODEID)smreq->sm_DisplayID;
-    plevel->SetDisplayName(smreq->sm_DisplayID);
+    if(plevel->_value)
+    {
+        plevel->_value->_modeId = smreq->sm_DisplayID;
+        plevel->_value->_depth = smreq->sm_DisplayDepth;
+    }
+    plevel->SetDisplayName(*(plevel->_value));
 
     return 0;
 }
 
-void MUISerializer::LScreenModeReq::SetDisplayName(ULONG displayid)
+void MUISerializer::LScreenModeReq::SetDisplayName(ULONG_SCREENMODEID &displayid)
 {
   if(!_DisplayName) return;
-  if(displayid == (ULONG) INVALID_ID)
+  if(displayid._modeId == (ULONG) INVALID_ID)
   {
     _strDisplay = "Invalid";
   }
@@ -1034,12 +1041,21 @@ void MUISerializer::LScreenModeReq::SetDisplayName(ULONG displayid)
     LONG v;
     struct NameInfo DisplayNameInfo;
     v = GetDisplayInfoData(NULL, (UBYTE *) &DisplayNameInfo, sizeof(DisplayNameInfo),
-                         DTAG_NAME, displayid);
+                         DTAG_NAME, displayid._modeId);
 
     if(v > (LONG)sizeof(struct QueryHeader))
     {
         _strDisplay = (const char *) DisplayNameInfo.Name;
+        if(displayid._depth<= 8 && displayid._depth>0)
+        {
+            int nbc=1<<displayid._depth;
+            char t[8];
+            snprintf(&t[0],7," %dc",nbc);
+            _strDisplay += t;
+        }
+
     }
+
   }
 
   SetAttrs(_DisplayName, MUIA_Text_Contents, (ULONG) _strDisplay.c_str(),TAG_DONE);

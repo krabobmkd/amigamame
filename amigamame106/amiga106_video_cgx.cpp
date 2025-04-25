@@ -303,13 +303,13 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
     if(params._video_attributes & VIDEO_RGB_DIRECT)
     {
         if(params._video_attributes &VIDEO_NEEDS_6BITS_PER_GUN)
-            _screenDepthAsked= 32;
-        else _screenDepthAsked= 16;
+            _ScreenDepthAsked= 32;
+        else _ScreenDepthAsked= 16;
     }else
-        _screenDepthAsked = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
+        _ScreenDepthAsked = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
 
-    if(_screenDepthAsked == 32 && (_flags & DISPFLAG_FORCEDEPTH16)!=0)
-        _screenDepthAsked = 16;
+    if(_ScreenDepthAsked == 32 && (_flags & DISPFLAG_FORCEDEPTH16)!=0)
+        _ScreenDepthAsked = 16;
 
     if(_ScreenModeId == INVALID_ID)
     {
@@ -318,12 +318,12 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
         struct TagItem cgxtags[]={
                 CYBRBIDTG_NominalWidth,width,
                 CYBRBIDTG_NominalHeight,height,
-                CYBRBIDTG_Depth,_screenDepthAsked,
+                CYBRBIDTG_Depth,_ScreenDepthAsked,
                 TAG_DONE,0 };
         _ScreenModeId = BestCModeIDTagList(cgxtags);
         if(_ScreenModeId == INVALID_ID)
         {
-            loginfo(2,"Can't find cyber screen mode for w%d h%d d%d ",width,height,_screenDepthAsked);
+            loginfo(2,"Can't find cyber screen mode for w%d h%d d%d ",width,height,_ScreenDepthAsked);
             return;
         }
 
@@ -337,7 +337,7 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
         _PixelFmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, _ScreenModeId );
         _PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
 
-        _screenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
+        _ScreenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
 
 //        printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d MODE:%08x\n",
 //                 _fullscreenWidth,_fullscreenHeight,

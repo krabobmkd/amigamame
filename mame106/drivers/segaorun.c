@@ -175,7 +175,7 @@ void krb_outrun_m68k_op_tst_16_di(M68KOPT_PARAMS);
 
 static void krb_outrun_patch_cpu_synchro()
 {
-    printf("krb_outrun_patch_cpu_synchro\n");
+//    printf("krb_outrun_patch_cpu_synchro\n");
 	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
     if(pcodemain[0x00007dda>>1] == 0x4a79) // inst. 0x4a79 triggers m68k_op_tst_16_al()
     {   // replace that tst.w call by a patch, on an unused opcode.

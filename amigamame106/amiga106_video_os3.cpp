@@ -138,14 +138,16 @@ void Drawable_OS3::draw_WriteChunkyPixels(_mame_display *display)
     };
 
     directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
+
     if(_pRemap) _pRemap->directDraw(&p);
 
 //	WriteChunkyPixels(rp,xstart,ystart,xstop,ystop,array,bytesperrow)
 //	                  A0 D0     D1     D2    D3    A2     D4
+
+
     WriteChunkyPixels(pRPort,cenx,ceny,cenx+ww-1,ceny+hh-1,_wpatempbm.data(),ww );
 
 }
-
 
 void Drawable_OS3::initRemapTable()
 {
@@ -213,12 +215,12 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
     int width = params._width;
     int height = params._height;
     if(params._flags & ORIENTATION_SWAP_XY) doSwap(width,height);
-    _screenDepthAsked = 8; // used by OpenSCreen(), AGA max.
 
     _useIntuitionPalette = true;
-
+    _ScreenDepthAsked = params._forcedDepth; // used by OpenSCreen(), AGA max, default.
     if(_ScreenModeId == INVALID_ID)
     {
+
         _ScreenModeId = BestModeID(
                 BIDTAG_Depth,8,
                 BIDTAG_NominalWidth,width,
@@ -239,6 +241,7 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
                      DTAG_DIMS, _ScreenModeId);
         if(v>0)
         {
+            //_screenDepthAsked = (int)dims.MaxDepth; // if mode was
             _fullscreenWidth = (int)(dims.Nominal.MaxX - dims.Nominal.MinX)+1;
             _fullscreenHeight = (int)(dims.Nominal.MaxY - dims.Nominal.MinY)+1;
             // if game screen big, try some oversan conf.
@@ -283,6 +286,7 @@ void Intuition_Screen_OS3::close()
 void Intuition_Screen_OS3::draw(_mame_display *display)
 {
     // WritePixelArrays is OS3.0, We could use WriteChunkyPixels which is OS3.1.
+    // note: all (even OS3.2.x) AGA/ECS versions are damn slow, must use patch blazewcp (not new WPA)
     if(GfxBase->LibNode.lib_Version>=40)
     {
         Drawable_OS3::draw_WriteChunkyPixels(display);
@@ -296,6 +300,7 @@ void Intuition_Screen_OS3::draw(_mame_display *display)
 
    if(_pTripleBufferImpl) _pTripleBufferImpl->afterBufferDrawn();
 
+   // double buffer that use scroll is patched here:
    if(_flags & DISPFLAG_USEHEIGHTBUFFER) {
         if(_pScreen)
         {

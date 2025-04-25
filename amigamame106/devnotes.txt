@@ -2,14 +2,18 @@ todo R1.3
 
  - O outrun lever & wheel gadgets
  - O outrun cpu sync optim.
- - O run recent neogeo demo
+ - X run vaporous neogeo demo
+ - O allow ECS/AGA 16c screens, test with blasewpc, -> document blazewpc.
 
    correcs:
  - X correct flipx neogo sprites some neogeo games.
  - X "Super Chase Criminal Termination" sprite priorities fixed.
  - X BigRun sprite prio -> was a 106 original bug. Bigrun is super cool now.
  - X 64th street(& lots of megasys jaleco games) sprite priority bug fixed.
+ - X 1944 fixed !
  - O thunderblade boot bugs
+ - O pbubblen
+
 
 todo R1.2
 

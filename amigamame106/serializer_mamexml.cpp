@@ -119,9 +119,9 @@ void XmlWriter::operator()(const char *sMemberName, ULONG_SCREENMODEID &v)
     string name = checkXmlName(sMemberName);
     // true if tag present...
     char temp[16];
-    snprintf(temp,15,"0x%08x",(int)v);
+    snprintf(temp,15,"0x%08x %d",(int)v._modeId,(int)v._depth);
 
-    if(v)
+    if(v._modeId != ~0 && v._modeId != 0 )
     {
         xml_data_node *p = xml_add_child(_recursenode.back(),name.c_str(),NULL );
         if(p) xml_set_attribute(p,"modeid",temp);
@@ -234,9 +234,11 @@ void XmlReader::operator()(const char *sMemberName, ULONG_SCREENMODEID &v)
         xml_attribute_node * pattrib =  xml_get_attribute(p,"modeid");
         if(pattrib && pattrib->value)
         {
-            unsigned int vv;
-            int done = sscanf(pattrib->value,"0x%08x",&vv);
-            if(done ==1) v=vv;
+            unsigned int vv,dd;
+            int done = sscanf(pattrib->value,"0x%08x %d",&vv,&dd);
+            if(done >=1) v._modeId=vv;
+            if(done >=2) v._depth = dd;
+            else v._depth = 8;
         }
     }
 }

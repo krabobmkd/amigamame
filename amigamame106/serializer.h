@@ -30,7 +30,11 @@ struct ASerializable {
 // specific serializable types
 typedef std::string strcomment;
 typedef std::string strText;
-typedef unsigned int ULONG_SCREENMODEID;
+//typedef unsigned int ULONG_SCREENMODEID;
+typedef struct {
+    unsigned int _modeId;
+    unsigned int _depth;
+} ULONG_SCREENMODEID;
 // list of booleans
 typedef unsigned int ULONG_FLAGS;
 struct ASerializer {

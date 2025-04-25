@@ -27,16 +27,18 @@ class AbstractDisplay
 public:
     AbstractDisplay();
     virtual ~AbstractDisplay();
-    // flags are orientations bits + our prefs
+    // 3 first flags 1/2/4 are mame orientations bits, then + our prefs
     #define DISPFLAG_STARTWITHWINDOW 8
     #define DISPFLAG_INTUITIONPALETTE  16
     #define DISPFLAG_USESCALEPIXARRAY  32
     #define DISPFLAG_USETRIPLEBUFFER  64
     #define DISPFLAG_USEHEIGHTBUFFER  128
     #define DISPFLAG_FORCEDEPTH16      256
+
     struct params {
         ULONG _flags;
         ULONG _forcedModeID;
+        ULONG _forcedDepth;
         int _width,_height;
         int _colorsIndexLength;
         int _video_attributes;

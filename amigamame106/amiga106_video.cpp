@@ -204,8 +204,16 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         params._flags &= ORIENTATION_MASK;
 
         if(screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose)
-            params._forcedModeID = (ULONG) screenModeConf._modeid;
-         else  params._forcedModeID = ~0; // undefined.
+        {
+            params._forcedModeID = (ULONG) screenModeConf._modeid._modeId;
+            params._forcedDepth = (ULONG) screenModeConf._modeid._depth;
+            printf("screenModeConf._modeid._depth:%d\n",params._forcedDepth);
+        }
+         else
+        {
+           params._forcedModeID = ~0; // undefined.
+           params._forcedDepth = 8; // default, only used for 8bit and less.
+        }
 
         params._width = pparams->width;
         params._height = pparams->height;

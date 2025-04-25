@@ -147,7 +147,7 @@ public:
         RotateMode _rotateMode = RotateMode::Rot0;
         ScreenModeChoice _ScreenModeChoice=ScreenModeChoice::Best;
         FSScaleMode _FSscaleMode = FSScaleMode::CenterWithNoScale;
-        ULONG_SCREENMODEID _modeid=~0;
+        ULONG_SCREENMODEID _modeid;
         // these one are saved but not on ui.
         int _window_posx=0,_window_posy=0,_window_width=0,_window_height=0,_window_validpos=0;
     };
