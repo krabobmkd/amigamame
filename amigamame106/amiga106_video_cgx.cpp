@@ -76,7 +76,7 @@ void Drawable_CGX::initRemapTable()
 {
     if(_useIntuitionPalette) // actually means dest is private screen 8bit
     {
-        printf("Drawable_CGX::initRemapTable useipalette\n");
+
         // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
     //    _pRemap = new Paletted_Screen8(_drawable.screen());
         if(_video_attributes & VIDEO_RGB_DIRECT)
@@ -93,8 +93,8 @@ void Drawable_CGX::initRemapTable()
             // use exact palette index and update if nb color fits.
             Screen *pScreen = _drawable.screen();
             int privScreenNbColors = 1<<(pScreen->RastPort.BitMap->Depth);
-            printf("_colorsIndexLength:%d privScreenNbColors:%d\n",
-                _colorsIndexLength,privScreenNbColors);
+            // printf("_colorsIndexLength:%d privScreenNbColors:%d\n",
+            //     _colorsIndexLength,privScreenNbColors);
             if(_colorsIndexLength<=(privScreenNbColors+6))
                      _pRemap = new Paletted_Screen8(pScreen);
             // force fixed palette and manage large index to this index at palette change.
@@ -330,7 +330,7 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
 
     if(_ScreenModeId == INVALID_ID)
     {
-    printf("find best mode, _screenDepthAsked:%d...\n",(int)_ScreenDepthAsked);
+   // printf("find best mode, _screenDepthAsked:%d...\n",(int)_ScreenDepthAsked);
 
         struct TagItem cgxtags[]={
                 CYBRBIDTG_NominalWidth,width,
@@ -356,10 +356,10 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
 
         _ScreenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
 
-       printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d MODE:%08x\n",
-                _fullscreenWidth,_fullscreenHeight,
-                   (int)_PixelFmt, (int)_PixelBytes,(int)_ScreenDepthAsked,
-                   (int)_ScreenModeId);
+       // printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d MODE:%08x\n",
+       //          _fullscreenWidth,_fullscreenHeight,
+       //             (int)_PixelFmt, (int)_PixelBytes,(int)_ScreenDepthAsked,
+       //             (int)_ScreenModeId);
 
     } else
     {
