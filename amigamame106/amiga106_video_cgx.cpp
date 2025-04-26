@@ -202,7 +202,7 @@ void Drawable_CGX::drawCGX_DirectCPU16(
             break;
             case PIXFMT_LUT8:
             {
-                if(_pRemap) _pRemap->directDraw(&p);
+                _pRemap->directDraw(&p);
             }
             break;
         default:
@@ -232,7 +232,7 @@ void Drawable_CGX::drawCGX_DirectCPU32(
 {
     //RastPort *pRPort = _drawable.rastPort();
   //  BitMap *pBitmap = _drawable.bitmap();
-    if(/*!pRPort ||*/ !pBitmap || !directDrawARGB32) return;
+    if(/*!pRPort ||*/ !pBitmap) return;
 
     // applied width height if using scale or not, and centering.
     int sourcewidth,sourceheight;
@@ -272,7 +272,8 @@ void Drawable_CGX::drawCGX_DirectCPU32(
 
     // this function pointer has been choosen for the right _PixelFmt and avoid an ugly switch.
     directDrawParams p{ &ddscreen,&ddsource,cenx,ceny,ww,hh};
-    directDrawARGB32(&p);
+    if(directDrawARGB32) directDrawARGB32(&p);
+    else if(_pRemap) _pRemap->directDraw(&p); // 8bit cases
 
     UnLockBitMap(hdl);
 
@@ -300,7 +301,7 @@ void Drawable_CGX::initARGB32DrawFunctionFromPixelFormat()
         case PIXFMT_BGRA32:directDrawARGB32=&directDrawBGRA32_ARGB32; break;
         case PIXFMT_RGBA32:directDrawARGB32=&directDrawRGBA32_ARGB32; break;
     default:
-        directDrawARGB32 = NULL;
+        directDrawARGB32 = NULL; // case for LUT8
         break;
     }
 
@@ -329,7 +330,7 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
 
     if(_ScreenModeId == INVALID_ID)
     {
-   // printf("find best mode, _screenDepthAsked:%d...\n",(int)_screenDepthAsked);
+    printf("find best mode, _screenDepthAsked:%d...\n",(int)_ScreenDepthAsked);
 
         struct TagItem cgxtags[]={
                 CYBRBIDTG_NominalWidth,width,
@@ -355,10 +356,10 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
 
         _ScreenDepthAsked = GetCyberIDAttr( CYBRIDATTR_DEPTH, _ScreenModeId );
 
-//        printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d MODE:%08x\n",
-//                 _fullscreenWidth,_fullscreenHeight,
-//                    (int)_PixelFmt, (int)_PixelBytes,(int)_screenDepthAsked,
-//                    (int)_ScreenModeId);
+       printf("cgx mode w:%d h:%d pixfmt:%d pixbytes:%d final depth:%d MODE:%08x\n",
+                _fullscreenWidth,_fullscreenHeight,
+                   (int)_PixelFmt, (int)_PixelBytes,(int)_ScreenDepthAsked,
+                   (int)_ScreenModeId);
 
     } else
     {

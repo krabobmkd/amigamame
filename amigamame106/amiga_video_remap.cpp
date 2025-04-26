@@ -707,7 +707,10 @@ Paletted_Screen8ForcePalette_32b::Paletted_Screen8ForcePalette_32b(struct Screen
 
 void Paletted_Screen8ForcePalette_32b::directDraw(directDrawParams *p)
 {
-    if(_clut8.size()==0) initRemapCube(); // will loadrgb32 at first draw.
+    if(_clut8.size()==0)
+    {
+     initRemapCube(); // will loadrgb32 at first draw.
+    }
     if(_clut8.size()==0) return;
     // same as 15 bit, but use this function that does RGB32 to RGB15 conversion.   
     directDrawClut_UBYTE_UBYTE_ARGB32(p,_clut8.data());
