@@ -6,13 +6,13 @@ todo R1.3
  - X run vaporous neogeo demo + neogeo3d.
 
  big round of "let's make it better on native AGA and OCS".
- - O allow 16,32 colors screen modes for OCS/ECS - only 16,32,256 are supported with fixed palette.
+ - X allow 16,32 colors screen modes for OCS/ECS - only 16,32,256 are supported with fixed palette.
  - O test with blasewpc, -> document blazewpc.
  - X more precise color remap on >=8b screens.
  - O integrates own C2P on native screens ?
 
   correcs:
- - O load screen logo on aga/ocs bug.
+ - X load screen logo on aga/ocs bug.
  - O qbert on selected 16c ocs screens
 
    emu correcs:
@@ -21,8 +21,10 @@ todo R1.3
  - X BigRun sprite prio -> was a 106 original bug. few glitches left but Bigrun is super cool now one of the best racing game.
  - X 64th street(& lots of megasys jaleco games) sprite priority bug fixed.
  - X 1944 fixed !
+ - X PuzzleBobble Neogeo fixed !
+
  - O thunderblade boot bugs
- - O pbubblen
+
 
 
 todo R1.2

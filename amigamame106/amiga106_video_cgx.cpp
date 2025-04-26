@@ -74,10 +74,36 @@ Drawable_CGX::~Drawable_CGX()
 }
 void Drawable_CGX::initRemapTable()
 {
-    if(_useIntuitionPalette)
+    if(_useIntuitionPalette) // actually means dest is private screen 8bit
     {
+        printf("Drawable_CGX::initRemapTable useipalette\n");
         // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
-        _pRemap = new Paletted_Screen8(_drawable.screen());
+    //    _pRemap = new Paletted_Screen8(_drawable.screen());
+        if(_video_attributes & VIDEO_RGB_DIRECT)
+        {
+            if(_video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)
+            {
+                _pRemap = new Paletted_Screen8ForcePalette_32b(_drawable.screen());
+            } else
+            {
+                _pRemap = new Paletted_Screen8ForcePalette_15b(_drawable.screen());
+            }
+        } else
+        {
+            // use exact palette index and update if nb color fits.
+            Screen *pScreen = _drawable.screen();
+            int privScreenNbColors = 1<<(pScreen->RastPort.BitMap->Depth);
+            printf("_colorsIndexLength:%d privScreenNbColors:%d\n",
+                _colorsIndexLength,privScreenNbColors);
+            if(_colorsIndexLength<=(privScreenNbColors+6))
+                     _pRemap = new Paletted_Screen8(pScreen);
+            // force fixed palette and manage large index to this index at palette change.
+            else
+            {
+             _pRemap = new Paletted_Screen8ForcePalette(pScreen);
+            }
+
+        }
     } else
     {
         if((_video_attributes & VIDEO_RGB_DIRECT)==0 &&
@@ -175,18 +201,8 @@ void Drawable_CGX::drawCGX_DirectCPU16(
             }
             break;
             case PIXFMT_LUT8:
-            if(_drawable.flags() & DISPFLAG_INTUITIONPALETTE)
             {
-                //dbg =1;
-                //8Bit using fullscreen with dynamic palette change, should just copy pixels.
-                directDraw_UBYTE_UBYTE_UWORD(&p);
-            } else {
-               //  dbg =2;
-                if(_pRemap->_clut8.size()>0)
-                {   // 8bit using remap and static palette (like on workbench 8bit)
-                    directDrawClut_UBYTE_UBYTE_UWORD(&p,_pRemap->_clut8.data());
-                 //    dbg =3;
-                }
+                if(_pRemap) _pRemap->directDraw(&p);
             }
             break;
         default:
@@ -308,7 +324,7 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
     }else
         _ScreenDepthAsked = (params._colorsIndexLength<=256)?8:16; // more would be Display_CGX_TrueColor.
 
-    if(_ScreenDepthAsked == 32 && (_flags & DISPFLAG_FORCEDEPTH16)!=0)
+    if(/*_ScreenDepthAsked == 32 &&*/ (_flags & DISPFLAG_FORCEDEPTH16)!=0)
         _ScreenDepthAsked = 16;
 
     if(_ScreenModeId == INVALID_ID)

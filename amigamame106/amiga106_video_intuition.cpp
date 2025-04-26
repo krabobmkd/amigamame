@@ -226,7 +226,7 @@ bool Intuition_Screen::open()
 //                        SA_Behind,TRUE,    /* Open behind */
                         SA_Quiet,TRUE,     /* quiet */
 			SA_Type,CUSTOMSCREEN,
-			SA_Interleaved,TRUE, // test, may C2P faster
+			SA_Interleaved,TRUE, // test, may make C2P faster
 			SA_Colors,(ULONG)&colspec[0],
                         0 );
 //    printf("screen:%08x\n",(int)_pScreen);

@@ -243,13 +243,14 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
     int blackpen = _drawable->blackPen(); // _pens[eBlack];
     int whitepen = _drawable->whitePen(); // _pens[eWhite];
     int greypen= _drawable->greyPen();
+
 //    if(blackpen == -1) blackpen = GetAPen(rp);
 //    if(whitepetopn == -1) whitepen = GetBPen(rp);
 
     if(per256 >=256)
     {
         // means final pass before game screen , must clean again and quit.
-        SetAPen(rp,blackpen);
+        SetAPen(rp,blackpen); // that time 0, not blackpen, for the case of galaga 0 white
         RectFill(rp,0,0,w,h);
         return;
     }

@@ -93,6 +93,7 @@ protected:
     std::vector<UBYTE> _p;
 };
 
+// =========================================================================
 /* When target is a 8Bit screen and game 16bit, use fixed palette and pens remap */
 class Paletted_Screen8ForcePalette : public Paletted_Pens8
 {
@@ -101,16 +102,19 @@ public:
    // int loadIlbmClut(const UBYTE *pbin,ULONG bsize);
 protected:
     void initRemapCube() override;
+    // do LoadRgb32()
     void initFixedPalette(const UBYTE *prgb,ULONG nbc);
 
 };
-// RGB15 to 8Bit Workbench palette
+// RGB15 to 8Bit, our palette
 class Paletted_Screen8ForcePalette_15b : public Paletted_Screen8ForcePalette
 {
 public:
     Paletted_Screen8ForcePalette_15b(struct Screen *pScreen);
+    void initRemapCube() override;
+    void directDraw(directDrawParams *p) override;
 };
-// RGB32 to 8Bit Workbench palette
+// RGB32 to 8Bit,  our palette
 class Paletted_Screen8ForcePalette_32b : public Paletted_Screen8ForcePalette_15b
 {
 public:

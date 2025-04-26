@@ -538,7 +538,7 @@ Paletted_Pens8_src32b::~Paletted_Pens8_src32b(){}
 void Paletted_Pens8_src32b::directDraw(directDrawParams *p)
 {
     if(_clut8.size()==0) return;
-    // same as 15 bit, but use this function that does RGB32 to RGB15 conversion.
+    // same as 15 bit, but use this function that does RGB32 to RGB15 to 8Bit(clut) conversion.
     directDrawClut_UBYTE_UBYTE_ARGB32(p,_clut8.data());
 }
 // - - - - - - - - - - -
@@ -665,7 +665,10 @@ void Paletted_Screen8ForcePalette::initFixedPalette(const UBYTE *prgb,ULONG nbc)
 Paletted_Screen8ForcePalette_15b::Paletted_Screen8ForcePalette_15b(struct Screen *pScreen)
     :Paletted_Screen8ForcePalette(pScreen)
 {
-    initRemapCube();
+}
+void Paletted_Screen8ForcePalette_15b::initRemapCube()
+{
+    Paletted_Screen8ForcePalette::initRemapCube();
     if(_use15BitPrecision)
     {
         _clut8 = _rgbcube; //lol
@@ -683,6 +686,13 @@ Paletted_Screen8ForcePalette_15b::Paletted_Screen8ForcePalette_15b(struct Screen
         }
     }
 }
+void Paletted_Screen8ForcePalette_15b::directDraw(directDrawParams *p)
+{
+    if(_clut8.size()==0) initRemapCube(); // will loadrgb32 at first draw.
+    if(_clut8.size()==0)  return;
+
+    directDrawClut_UBYTE_UBYTE_UWORD(p,_clut8.data());
+}
 // - - - -
 
 // for 15bit RGB just does clut to
@@ -697,8 +707,9 @@ Paletted_Screen8ForcePalette_32b::Paletted_Screen8ForcePalette_32b(struct Screen
 
 void Paletted_Screen8ForcePalette_32b::directDraw(directDrawParams *p)
 {
+    if(_clut8.size()==0) initRemapCube(); // will loadrgb32 at first draw.
     if(_clut8.size()==0) return;
-    // same as 15 bit, but use this function that does RGB32 to RGB15 conversion.
+    // same as 15 bit, but use this function that does RGB32 to RGB15 conversion.   
     directDrawClut_UBYTE_UBYTE_ARGB32(p,_clut8.data());
 }
 

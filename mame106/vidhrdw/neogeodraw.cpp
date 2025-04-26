@@ -74,6 +74,7 @@ static UINT16 *neogeo_Yjumps=NULL;
 
 // - -  values that are static to a game driver.
 static UINT32 no_of_tiles=0;
+static UINT32 no_of_tiles_mask=0;
 static UINT32 tileOffsetFilter=0;
 
 // used by Yloop that treat one tile of 16x16 pix.
@@ -1158,7 +1159,9 @@ static inline void tileYLoopZoomY(
                 if (tileatr & 0x08) tileno=(tileno&~7)|(neogeo_frame_counter&7);	/* fixed */
                 else if (tileatr & 0x04) tileno=(tileno&~3)|(neogeo_frame_counter&3);	/* fixed */
 
-                if(tileno>=no_of_tiles) return; // less divs, souldnt happen anyway.
+                tileno &= no_of_tiles_mask;
+                // HAPPENS WITH PBOBLEN
+                //if(tileno>=no_of_tiles) return; // less divs, souldnt happen anyway.
 
 
                 penusage = gfx->pen_usage[tileno];            // escape whole tile here ?
@@ -1260,7 +1263,8 @@ static inline void tileYLoopNozoomY(
         else if (tileatr & 0x04) tileno=(tileno&~3)|(neogeo_frame_counter&3);	/* fixed */
 
         // tileno = tileno % no_of_tiles; // safety.
-        if(tileno>=no_of_tiles) return; // less divs, souldnt happen anyway.
+        tileno &= no_of_tiles_mask;
+        //if(tileno>=no_of_tiles) return; // less divs, souldnt happen anyway.
 
         UINT32 penusage = gfx->pen_usage[tileno];
 
@@ -1396,7 +1400,10 @@ void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect)
 
     // - - - - get tile rom length configuration...
     // should be done per game launch .
-    no_of_tiles=gfx->total_elements;
+    no_of_tiles=gfx->total_elements; // not necessarily pow 2.
+    no_of_tiles_mask=1;
+    while(no_of_tiles_mask<no_of_tiles)  no_of_tiles_mask<<=1;
+    no_of_tiles_mask--;
 
     if (no_of_tiles>0x40000)  tileOffsetFilter = 0x70;
 	else if (no_of_tiles>0x20000)  tileOffsetFilter = 0x30;

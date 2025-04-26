@@ -63,6 +63,8 @@ static map<string,sDriverTuning> _tunings={
 	{"sfa3",{8*60,DEFMINCPUC,0}},
 	{"ssf2",{15*60,DEFMINCPUC,0}},
 
+	{"galaga",{14*60,DEFMINCPUC,0}},
+
 	//toaplan1
 	{"demonwld",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE}},     // NEEDED FOR SURE
 	{"outzone",{8*60,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE}},   //NEEDED FOR SURE
