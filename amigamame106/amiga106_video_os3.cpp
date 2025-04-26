@@ -169,10 +169,12 @@ void Drawable_OS3::initRemapTable()
         } else
         {
             // use exact palette index and update if nb color fits.
-            if(_colorsIndexLength<=258)
-                     _pRemap = new Paletted_Screen8(_drawable.screen());
+            Screen *pScreen = _drawable.screen();
+            int privScreenNbColors = 1<<(pScreen->RastPort.BitMap->Depth);
+            if(_colorsIndexLength<=(privScreenNbColors+6))
+                     _pRemap = new Paletted_Screen8(pScreen);
             // force fixed palette and manage large index to this index at palette change.
-            else _pRemap = new Paletted_Screen8ForcePalette(_drawable.screen());
+            else _pRemap = new Paletted_Screen8ForcePalette(pScreen);
 
         }
     } else // case where we re-use an existing intuition screen indexed palette. (like on a 8Bit Workbench)

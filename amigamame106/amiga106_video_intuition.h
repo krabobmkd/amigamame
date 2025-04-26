@@ -105,6 +105,13 @@ public:
     char _d;
 };
 
+// how luxuous is that ?
+class IDrawProgress {
+public:
+    virtual ~IDrawProgress() {}
+    virtual void drawProgress(int per256, int enm) = 0;
+};
+
 /** \class Intuition_Window
  * made to be extended as classic OS3 drawing, or CGX/ P96 api drawings.
 */
@@ -154,6 +161,7 @@ public:
     WindowGeo getWindowGeometry() override; // to save/reload
 protected:
     IntuitionDrawable   *_drawable; // this manages screen or window opening
+    IDrawProgress *_pProgressDrawer;
  //   IntuitionDrawer     *_drawer; // this manages drawing API.
     params _params; // last params set
 
@@ -167,11 +175,6 @@ protected:
         eBlue2,
         eEnd
     };
-
-//    int _pens[eEnd];
-//    void obtainPens();
-//    void releasePens();
-    struct TextFont *_font;
 
     void syncWindowGeo();
 };

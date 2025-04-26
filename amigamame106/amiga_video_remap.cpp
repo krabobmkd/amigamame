@@ -325,6 +325,7 @@ void Paletted_Screen8::directDraw(directDrawParams *p)
 // remap clut with nbc  [1,256+[ to forced 8bit palette , for workbench.
 Paletted_Pens8::Paletted_Pens8(struct Screen *pScreen )
     : Paletted(), _pScreen(pScreen), _screenNbc(1<<(pScreen->RastPort.BitMap->Depth))
+    , _use15BitPrecision(true)
 {
 }
 Paletted_Pens8::~Paletted_Pens8()
@@ -350,29 +351,57 @@ void Paletted_Pens8::updatePaletteRemap(_mame_display *display)
     if(_clut8.size()<nbc) _clut8.resize(nbc,0);
     UBYTE *pclut = _clut8.data();
 
-
-    for(int j=0;j<nbc;j+=32)
+    if(_use15BitPrecision)
     {
-        UINT32 dirtybf = *pdirtrybf++;
-        if(!dirtybf) continue; // superfast escape.
+        for(int j=0;j<nbc;j+=32)
+        {
+            UINT32 dirtybf = *pdirtrybf++;
+            if(!dirtybf) continue; // superfast escape.
 
-        USHORT iend = j+32;
-        if(iend>nbc) iend=nbc;
-        const rgb_t *gpal = gpal1+j;
-        for(USHORT i=j;i<iend;i++) {
+            USHORT iend = j+32;
+            if(iend>nbc) iend=nbc;
+            const rgb_t *gpal = gpal1+j;
+            for(USHORT i=j;i<iend;i++) {
 
-            if(dirtybf&1)
-            {
-                ULONG c = *gpal;
-                UWORD rgb4 = ((c>>12) & 0x0f00) |
-                              ((c>>8) & 0x00f0) |
-                              ((c>>4) & 0x000f) ;
-                pclut[i] =_rgb4cube[rgb4];
-            } // end if dirty
-            dirtybf>>=1;
-            gpal++;
-        } // end loop per 32
-     }
+                if(dirtybf&1)
+                {
+                    ULONG c = *gpal;
+                    UWORD rgb5 =  ((c>>9) & 0x7c00) | // >>16 >>3 <<10 -> >>9
+                                  ((c>>6) & 0x03e0) | // >>8  >>3 <<5  -> >>6
+                                  ((c>>3) & 0x001f) ; // >>0  >>3 <<0  -> >>3
+                    pclut[i] =_rgbcube[rgb5];
+                } // end if dirty
+                dirtybf>>=1;
+                gpal++;
+            } // end loop per 32
+         }
+    } else
+    {   // 12b precision
+        for(int j=0;j<nbc;j+=32)
+        {
+            UINT32 dirtybf = *pdirtrybf++;
+            if(!dirtybf) continue; // superfast escape.
+
+            USHORT iend = j+32;
+            if(iend>nbc) iend=nbc;
+            const rgb_t *gpal = gpal1+j;
+            for(USHORT i=j;i<iend;i++) {
+
+                if(dirtybf&1)
+                {
+                    ULONG c = *gpal;
+                    UWORD rgb4 = ((c>>12) & 0x0f00) |
+                                  ((c>>8) & 0x00f0) |
+                                  ((c>>4) & 0x000f) ;
+                    pclut[i] =_rgbcube[rgb4];
+                } // end if dirty
+                dirtybf>>=1;
+                gpal++;
+            } // end loop per 32
+         }
+    }
+
+
 
 }
 void Paletted_Pens8::directDraw(directDrawParams *p)
@@ -387,45 +416,92 @@ void Paletted_Pens8::initRemapCube()
 {
     // should lock -> no, the window locks the WB.
     struct	ColorMap *pColorMap = _pScreen->ViewPort.ColorMap;
-    printf("initRemapCube\n");
+
     if(!pColorMap) return;
-    // 16*16*16
-    _rgb4cube.resize(4096); // don't allow 255
 
-    printf("colormap:%d\n",(int)pColorMap->Count);
-    vector<UWORD> pal(pColorMap->Count);
-    for(LONG i=0;i<pColorMap->Count ; i++)
+    if(_use15BitPrecision)
     {
-       pal[i] = GetRGB4(pColorMap,i);
-    }
-    for(UWORD rgbi=0;rgbi<4096;rgbi++)
-    {
-        UBYTE isbest=0;
-        ULONG isbesterr=0x0fffffff;
-        WORD r = rgbi>>8;
-        WORD g = (rgbi>>4) & 0x0f;
-        WORD b = rgbi & 0x0f;
+        _rgbcube.resize(32768);
+        int colorcount = 1<<(_pScreen->RastPort.BitMap->Depth);
+        if(pColorMap->Count<colorcount) colorcount = pColorMap->Count;
+       // printf("initRemapCube pColorMap->Count:%d\n",pColorMap->Count);
 
-        for(UWORD i=0;i<pColorMap->Count;i++)
+        vector<UBYTE> pal(colorcount*3*4);
+        GetRGB32(pColorMap,0,colorcount,(ULONG *)pal.data());
+        // make it 32b->5b
+        for(int i=0;i<colorcount*3;i++)
         {
-            UWORD c =pal[i];
-            WORD rs = c>>8;
-            WORD gs = (c>>4) & 0x0f;
-            WORD bs = c & 0x0f;
-            // error between color is better with greater error
-            LONG err = (rs-r)*(rs-r); // that makes a abs without test.
-            LONG err_g = (gs-g)*(gs-g);
-            LONG err_b = (bs-b)*(bs-b);
-            if(err_g>err) err = err_g;
-            if(err_b>err) err = err_b;
-
-            if(err<isbesterr) {
-                isbest = i;
-                isbesterr = err;
-                if(isbesterr ==0) break;
-            }
+            UBYTE v = pal[i<<2];
+            pal[i] = v>>3;
         }
-        _rgb4cube[rgbi] = isbest;
+        // this is obviously 8 times longer than 4b precision.
+        for(UWORD rgbi=0;rgbi<32768;rgbi++)
+        {
+            UBYTE isbest=0;
+            ULONG isbesterr=0x0fffffff;
+            WORD r = rgbi>>10;
+            WORD g = (rgbi>>5) & 0x1f;
+            WORD b = rgbi & 0x1f;
+
+            for(UWORD i=0;i<colorcount;i++)
+            {
+                WORD rs = pal[i*3];
+                WORD gs = pal[i*3+1];
+                WORD bs = pal[i*3+2];
+                // error between color is better with greater error
+                LONG err = (rs-r)*(rs-r); // that makes a abs without test.
+                LONG err_g = (gs-g)*(gs-g);
+                LONG err_b = (bs-b)*(bs-b);
+                if(err_g>err) err = err_g;
+                if(err_b>err) err = err_b;
+
+                if(err<isbesterr) {
+                    isbest = i;
+                    isbesterr = err;
+                    if(isbesterr ==0) break;
+                }
+            }
+            _rgbcube[rgbi] = isbest;
+        }
+    } else
+    {
+        // 16*16*16
+        _rgbcube.resize(4096);
+
+        vector<UWORD> pal(pColorMap->Count);
+        for(LONG i=0;i<pColorMap->Count ; i++)
+        {
+           pal[i] = GetRGB4(pColorMap,i);
+        }
+        for(UWORD rgbi=0;rgbi<4096;rgbi++)
+        {
+            UBYTE isbest=0;
+            ULONG isbesterr=0x0fffffff;
+            WORD r = rgbi>>8;
+            WORD g = (rgbi>>4) & 0x0f;
+            WORD b = rgbi & 0x0f;
+
+            for(UWORD i=0;i<pColorMap->Count;i++)
+            {
+                UWORD c =pal[i];
+                WORD rs = c>>8;
+                WORD gs = (c>>4) & 0x0f;
+                WORD bs = c & 0x0f;
+                // error between color is better with greater error
+                LONG err = (rs-r)*(rs-r); // that makes a abs without test.
+                LONG err_g = (gs-g)*(gs-g);
+                LONG err_b = (bs-b)*(bs-b);
+                if(err_g>err) err = err_g;
+                if(err_b>err) err = err_b;
+
+                if(err<isbesterr) {
+                    isbest = i;
+                    isbesterr = err;
+                    if(isbesterr ==0) break;
+                }
+            }
+            _rgbcube[rgbi] = isbest;
+        }
     }
 }
 // - - - -
@@ -434,15 +510,21 @@ Paletted_Pens8_src15b::Paletted_Pens8_src15b(struct Screen *pScreen)
     :Paletted_Pens8(pScreen)
 {
     initRemapCube();
-    int nbc = 32*32*32;
-    if(_clut8.size()<nbc) _clut8.resize(nbc,0);
-    UBYTE *pclut = _clut8.data();
-    for(int j=0;j<nbc;j++)
+    if(_use15BitPrecision)
     {
-        UWORD rgb4 = ((j>>3) & 0x0f00) |
-                     ((j>>2) & 0x00f0) |
-                     ((j>>1) & 0x000f) ;
-        pclut[j] =_rgb4cube[rgb4];
+        _clut8 = _rgbcube; //lol
+    } else
+    {
+        int nbc = 32*32*32;
+        if(_clut8.size()<nbc) _clut8.resize(nbc,0);
+        UBYTE *pclut = _clut8.data();
+        for(int j=0;j<nbc;j++)
+        {
+            UWORD rgb4 = ((j>>3) & 0x0f00) |
+                         ((j>>2) & 0x00f0) |
+                         ((j>>1) & 0x000f) ;
+            pclut[j] =_rgbcube[rgb4];
+        }
     }
 }
 Paletted_Pens8_src15b::~Paletted_Pens8_src15b(){}
@@ -540,8 +622,6 @@ int loadPaletteIlbm()
 // when screen8 and nbc>258, force our palette and use Paletted_Screen8 like on WB.
 Paletted_Screen8ForcePalette::Paletted_Screen8ForcePalette(struct Screen *pScreen)
     : Paletted_Pens8(pScreen) {
-
-    printf("Paletted_Screen8ForcePalette::Paletted_Screen8ForcePalette\n");
 }
 extern "C" { extern const unsigned char fixedpal8[768]; }
 void Paletted_Screen8ForcePalette::initRemapCube()
@@ -555,24 +635,27 @@ void Paletted_Screen8ForcePalette::initRemapCube()
 }
 void Paletted_Screen8ForcePalette::initFixedPalette(const UBYTE *prgb,ULONG nbc)
 {
-    printf("initFixedPalette:nbc:%d\n",nbc);
+    if(nbc==0) return;
     // to RGB32
     ULONG paletteRGB32[3*32+2]; // LOADRGB32 format, used to load colors per 32.
     if(nbc>256) nbc=256;
     // the 256 first colors are used as intuition color palette.
+    int stride = (256*3/nbc);
+
     int j=0;
     for(;j<nbc;j+=32)
     {
         USHORT iend = 32;
         if(iend>(nbc-j)) iend=(nbc-j);
-        const UBYTE *gpal = prgb+(j*3);
+        const UBYTE *gpal = prgb+(j*stride);
         ULONG *pc = &paletteRGB32[0];
         *pc++ = (((ULONG)iend)<<16) | j; // nbumber of colors to change / palette shift.
 
         for(USHORT i=0;i<iend;i++) {
-            *pc++= (((ULONG)*gpal++)<<24) ;
-            *pc++= (((ULONG)*gpal++)<<24) ;
-            *pc++= (((ULONG)*gpal++)<<24) ;
+            *pc++= (((ULONG)gpal[0])<<24) ;
+            *pc++= (((ULONG)gpal[1])<<24) ;
+            *pc++= (((ULONG)gpal[2])<<24) ;
+            gpal += stride;
         }
         *pc = 0; // term.
         LoadRGB32(&(_pScreen->ViewPort),(ULONG *) &paletteRGB32[0]); // change 1 to 32 colors at a time.
@@ -583,15 +666,21 @@ Paletted_Screen8ForcePalette_15b::Paletted_Screen8ForcePalette_15b(struct Screen
     :Paletted_Screen8ForcePalette(pScreen)
 {
     initRemapCube();
-    int nbc = 32*32*32;
-    if(_clut8.size()<nbc) _clut8.resize(nbc,0);
-    UBYTE *pclut = _clut8.data();
-    for(int j=0;j<nbc;j++)
+    if(_use15BitPrecision)
     {
-        UWORD rgb4 = ((j>>3) & 0x0f00) |
-                     ((j>>2) & 0x00f0) |
-                     ((j>>1) & 0x000f) ;
-        pclut[j] =_rgb4cube[rgb4];
+        _clut8 = _rgbcube; //lol
+    } else
+    {
+        int nbc = 32*32*32;
+        if(_clut8.size()<nbc) _clut8.resize(nbc,0);
+        UBYTE *pclut = _clut8.data();
+        for(int j=0;j<nbc;j++)
+        {
+            UWORD rgb4 = ((j>>3) & 0x0f00) |
+                         ((j>>2) & 0x00f0) |
+                         ((j>>1) & 0x000f) ;
+            pclut[j] =_rgbcube[rgb4];
+        }
     }
 }
 // - - - -

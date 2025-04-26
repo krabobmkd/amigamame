@@ -960,6 +960,7 @@ MUISerializer::LScreenModeReq::LScreenModeReq(MUISerializer &ser,ULONG_SCREENMOD
       { ASLSM_InitialDisplayID,   0 },
       { ASLSM_InitialDisplayDepth,   8 },
       { ASLSM_DoDepth,        TRUE  },
+      { ASLSM_MinDepth, 2},
       { TAG_END,0 }
     };
 #define SMT_DISPLAYID 0

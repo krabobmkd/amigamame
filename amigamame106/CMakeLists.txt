@@ -95,6 +95,8 @@ set(AMIGA_SRC
 	amiga106_video_cgxscalepixelarray.cpp
 	amiga106_video_intuition_tbufcsb.h
 	amiga106_video_intuition_tbufcsb.cpp
+	amiga106_video_drawprogress.h
+	amiga106_video_drawprogress.cpp
 	amiga106_inputs.h
 	amiga106_inputs.cpp
 	amiga_locale.h

@@ -207,7 +207,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         {
             params._forcedModeID = (ULONG) screenModeConf._modeid._modeId;
             params._forcedDepth = (ULONG) screenModeConf._modeid._depth;
-            printf("screenModeConf._modeid._depth:%d\n",params._forcedDepth);
+           // printf("screenModeConf._modeid._depth:%d\n",params._forcedDepth);
         }
          else
         {
@@ -441,14 +441,14 @@ static void checkExitSimple(MsgPort *userport )
 void osd_update_boot_progress(int per256, int enm)
 {
     if(!g_pMameDisplay) return;
-    g_pMameDisplay->drawProgress(per256,enm);
-
     // like main thread is under the rungame init ,
-    // galme not started yet,
-    // but test possible exit.
+    // game is not started yet,
+    // still we can test possible exit.
     MsgPort *userport = g_pMameDisplay->userPort();
     if(!userport) return ;
     checkExitSimple(userport);
+
+    g_pMameDisplay->drawProgress(per256,enm);
 
 }
 

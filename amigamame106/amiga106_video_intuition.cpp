@@ -4,12 +4,12 @@
 #include "amiga106_video_os3.h"
 #include "amiga106_video_cgx.h"
 #include "amiga106_video_cgxscalepixelarray.h"
+#include "amiga106_video_drawprogress.h"
 #include "amiga106_config.h"
 
 #include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
-#include <proto/diskfont.h>
 #include "version.h"
 #include <string>
 // Amiga
@@ -51,35 +51,6 @@ extern "C" {
 
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
-
-
-//
-extern "C" {
-static const unsigned char tlogomamebm[(128/8)*36]={
-    0,0,0,0,0,0,0,0,0,0,0,0,0,31,255,255,0,0,0,32,4,0,0,128,0,4,0,192,0,63,255,254,
-    0,0,0,96,12,0,1,128,0,12,1,192,0,127,255,252,0,0,0,224,28,0,3,128,0,28,3,192,0,255,255,248,
-    0,0,1,224,60,0,7,128,0,60,7,192,1,255,255,240,0,0,3,224,124,0,15,128,0,124,15,192,3,255,255,224,
-    0,0,7,224,252,0,31,128,0,252,31,192,7,255,255,192,0,0,15,225,252,0,63,128,1,252,63,192,15,254,0,0,
-    0,0,31,227,252,0,127,128,3,252,127,192,31,252,0,0,0,0,63,231,252,0,255,128,7,252,255,192,63,248,0,0,
-    0,0,127,239,252,1,255,128,15,253,255,192,127,255,128,0,0,0,255,255,252,3,255,128,31,255,255,192,255,255,0,0,
-    0,1,255,255,252,7,255,128,63,255,255,193,255,254,0,0,0,3,255,255,252,15,255,128,127,255,255,195,255,252,0,0,
-    0,7,255,255,252,31,255,128,255,255,255,199,255,248,0,0,0,15,255,255,252,63,255,129,255,255,255,207,255,240,0,0,
-    0,31,255,255,252,127,255,131,255,255,255,223,255,224,0,0,0,63,243,255,252,255,255,135,255,127,255,191,248,0,0,0,
-    0,127,227,255,249,255,191,143,254,127,223,127,240,0,0,0,0,255,195,253,243,255,63,159,252,127,158,255,224,0,0,0,
-    1,255,131,249,231,254,63,191,248,127,29,255,255,255,240,0,3,255,3,241,207,252,63,127,240,126,27,255,255,255,224,0,
-    7,254,3,225,159,248,62,255,224,124,23,255,255,255,192,0,15,252,3,193,63,240,61,255,192,120,15,255,255,255,128,0,
-    31,248,3,128,127,224,59,255,128,112,31,255,255,255,0,0,63,240,3,0,255,192,55,255,0,96,63,255,255,254,0,0,
-    127,224,2,1,255,128,47,254,0,64,127,255,255,252,0,0,0,0,0,3,255,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,7,254,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,252,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,31,248,0,0,0,0,0,0,0,0,0,0,0,0,0,0,63,240,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,127,224,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,192,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,1,255,128,0,0,0,0,0,0,0,0,0,0,0,0,0,3,255,0,0,0,0,0,0,0,0,0,0,0,0
-};
-
-BitMap *g_res_BitmapLogo=NULL;
-
-}
-
 TripleBuffer::TripleBuffer()
     : _tripleBufferInitOk(0)
     ,_lastIndexDrawn(0)
@@ -88,9 +59,6 @@ TripleBuffer::TripleBuffer()
 {
 
 }
-
-
-
 
 IntuitionDrawable::IntuitionDrawable(int flags)
 : _widthtarget(0),_heighttarget(0)
@@ -214,7 +182,6 @@ Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
     , _pMouseRaster(NULL)
     , _pTripleBufferImpl(NULL)
 {
- printf("params._forcedDepth:%d\n",params._forcedDepth);
 }
 
 bool Intuition_Screen::open()
@@ -241,7 +208,7 @@ bool Intuition_Screen::open()
 
     // that stupid OS function (or driver) want SA_Depth,24 for 32bit depth, or fail.
     if(_ScreenDepthAsked == 32 )_ScreenDepthAsked =24;
-    printf("ask depth:%d\n",_ScreenDepthAsked);
+    //printf("ask depth:%d\n",_ScreenDepthAsked);
 
     ULONG appliedHeight = _fullscreenHeight;
     if(_flags & DISPFLAG_USEHEIGHTBUFFER)
@@ -259,6 +226,7 @@ bool Intuition_Screen::open()
 //                        SA_Behind,TRUE,    /* Open behind */
                         SA_Quiet,TRUE,     /* quiet */
 			SA_Type,CUSTOMSCREEN,
+			SA_Interleaved,TRUE, // test, may C2P faster
 			SA_Colors,(ULONG)&colspec[0],
                         0 );
 //    printf("screen:%08x\n",(int)_pScreen);
@@ -426,7 +394,8 @@ bool Intuition_Window::open()
         WA_RMBTrap,TRUE,
         WA_IDCMP,/* IDCMP_GADGETUP | IDCMP_GADGETDOWN |*/
             IDCMP_MOUSEBUTTONS |  IDCMP_RAWKEY | IDCMP_CHANGEWINDOW |
-            IDCMP_NEWSIZE /*| IDCMP_INTUITICKS*/ | IDCMP_CLOSEWINDOW,
+            IDCMP_NEWSIZE /*| IDCMP_INTUITICKS*/ | IDCMP_CLOSEWINDOW
+            /*| IDCMP_REFRESHWINDOW*/,
 
         WA_Flags, /*WFLG_SIZEGADGET*/ /*| WFLG_SIZEBRIGHT | WFLG_SIZEBBOTTOM |
 
@@ -491,15 +460,15 @@ RastPort *Intuition_Window::rastPort()
 IntuitionDisplay::IntuitionDisplay()
 : AbstractDisplay()
 , _drawable(NULL)
+, _pProgressDrawer(NULL)
 , _params({0})
-//, _pens(0)
-, _font(NULL)
 {
 
 }
 IntuitionDisplay::~IntuitionDisplay()
 {
     close();
+    if(_pProgressDrawer) delete _pProgressDrawer;
 }
 bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
 {
@@ -564,17 +533,6 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
                            wwidth,wheight );
         }
     }
-
-    //obtainPens();
-    if(!_font)
-    {
-        struct TextAttr fntatrb={
-            (STRPTR)"topaz.font",7,0,0
-        };
-        _font = OpenDiskFont(&fntatrb );
-    }
-
-
 
     return true;
 }
@@ -665,11 +623,7 @@ bool IntuitionDisplay::switchFullscreen()
 void IntuitionDisplay::close()
 {
     syncWindowGeo();
-    if(_font)
-    {
-      CloseFont(_font);
-      _font=NULL;
-    }
+
     if(_drawable)
     {
         //releasePens();
@@ -693,141 +647,27 @@ void IntuitionDisplay::draw(_mame_display *display)
 // so this would work on any type of screen.
 void IntuitionDisplay::drawProgress(int per256, int enm)
 {
+    if(!_drawable) return;
+
     static int lastprog = -1;
-    if(lastprog == per256) return;
+    if(lastprog == per256)
+    {   // value already drawn.
+        return;
+    }
     lastprog = per256;
 
-//     printf("drawProgress\n");
-    if(!_drawable) return;
-    Window *win = _drawable->window();
-    if(!win) return;
-
-    RastPort *rp = win->RPort;
-    if(!rp) return;
-
-    // avoid glitches (very slow because usually just loop but well, ... avoid glitches)
-    WaitBOVP(&(win->WScreen->ViewPort));
-
-    // - -  draw progress screen
-    int w = (int)(win->GZZWidth); // this way manage window border size
-    int h = (int)(win->GZZHeight);
-
-    int blackpen = _drawable->blackPen(); // _pens[eBlack];
-    int whitepen = _drawable->whitePen(); // _pens[eWhite];
-    int greypen= _drawable->greyPen();
-//    if(blackpen == -1) blackpen = GetAPen(rp);
-//    if(whitepen == -1) whitepen = GetBPen(rp);
-
-//     printf("a:%d b:%d\n",blackpen,whitepen);
-// printf("w:%d h:%d\n",w,h);
-    SetAPen(rp,blackpen);
-    RectFill(rp,0,0,w,h);
-    if(per256 >=256) return; // ok, last used to clear.
-
-    int x1 =  (2*w)/256;
-    int x2 = (254*w)/256;
-    int y1 =  (198*h)/256;
-    int y2 =  (208*h)/256;
-    int wless = w;
-    if(h<wless) wless=h;
-    int border =  (1*wless)/256;
-    if(border<1) border=1;
-
-    SetAPen(rp,greypen);
-    RectFill(rp,x1,y1,x2,y1+border);
-    RectFill(rp,x1,y2-border,x2,y2);
-    RectFill(rp,x1,y1+border,x1+border,y2-border);
-    RectFill(rp,x2-border,y1+border,x2,y2-border);
-
-    // bar
-    int xb1 = x1+3*border;
-    int xb2 = x2-3*border;
-    int yb1 = y1+3*border;
-    int yb2 = y2-3*border;
-    RectFill(rp,xb1,yb1,xb1 + ((xb2-xb1)*per256)/256,yb2);
-
-    const char *phases[]={
-        "Temporal convector flux init.",
-        "Initialize input ports.",
-        "Rom load...",
-        "Memory and CPU inits...",
-        "Hi Score load.",
-        "Rebuild machine...",
-        "Decode graphics...",
-        "Load cheats...",
-        ""
-    };
-    if(_font && enm<sizeof(phases)/sizeof(const char *))
+    if(!_pProgressDrawer) _pProgressDrawer = new IntuiProgressBar(_drawable);
+    if(_pProgressDrawer)
     {
-        SetFont(rp,_font);
-
-/*
-        ebStart=0,
-        ebInput,
-        ebRomLoad,
-        ebMemoryAndCpu,
-        ebHighScoreSaveLoad,
-        eDriver, //  decryption is done and memory maps altered
-        eSoundVideo,
-        eCheat,
-        eProgressEnd
-*/
-        int xt= 8;
-        const char *p = phases[enm];
-        int l = strlen(p);
-        SetDrMd(rp,  JAM1  );
-        SetAPen(rp,blackpen);
-        Move(rp,xt,yb2+6);
-        Text(rp,p,l);
-        Move(rp,xt+1,yb2+6);
-        Text(rp,p,l);
-
-        SetAPen(rp,whitepen);
-        Move(rp,xt+1,yb2+7);
-        Text(rp,p,l);
-    }
-    // totally need a glowing point at the corner
-    // finnaly not
-    // SetAPen(rp,whitepen);
-    // WritePixel(rp,x2,y1);
-    // WritePixel(rp,x2-1,y1);
-    // - - - logo !
-    BitMap bm;
-    InitBitMap(&bm, 2, 128, 36 );
-    bm.Planes[0] = (PLANEPTR)&tlogomamebm[0];
-    bm.Planes[1] = (PLANEPTR)&tlogomamebm[0];
-
-    // mask erase shadow
-    if(blackpen==0)
-    {
-        BltMaskBitMapRastPort
-            (&bm,0,0,rp,w-128-16-2  ,y1-37+11,128,36,
-             0x0022, /*0x00c0*/
-             (PLANEPTR)&tlogomamebm[0]
-             );
+        _pProgressDrawer->drawProgress( per256, enm);
     }
 
-    // mask write logo
-   BltMaskBitMapRastPort
-        (&bm,0,0,rp,w-128-16,y1-37+10,128,36,
-         0x00e4, /*0x00c0*/   // d8 e4 ?
-         (PLANEPTR)&tlogomamebm[0]
-         );
-    // f0 A -> source
-    // cc B -> mask
-    // aa C -> dest ! -> nothing change.
-/* A source, B mask, C dest
-A B C BitPos in minterm
-0 0 0 0
-0 0 1 1
-0 1 0 2
-0 1 1 3
-
-1 0 0 4
-1 0 1 5
-1 1 0 6
-1 1 1 7
-*/
+    if(per256 >=256)
+    {
+        if(_pProgressDrawer) delete _pProgressDrawer;
+        _pProgressDrawer = NULL;
+        return; // ok, last used to clear.
+    }
 }
 MsgPort *IntuitionDisplay::userPort()
 {

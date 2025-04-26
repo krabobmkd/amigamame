@@ -35,6 +35,7 @@ extern "C" {
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/graphics.h>
+#include <proto/layers.h>
 #include <proto/intuition.h>
 #include <proto/timer.h>
 #include <proto/misc.h>
@@ -84,6 +85,7 @@ struct DosLibrary   *DOSBase    = NULL;
 struct GfxBase      *GfxBase    = NULL;
 struct IntuitionBase  *IntuitionBase  = NULL;
 struct Library      *AslBase    = NULL;
+struct Library      *LayersBase    = NULL;
 struct Library      *KeymapBase   = NULL;
 struct Library      *UtilityBase  = NULL;
 struct Library      *CyberGfxBase = NULL;
@@ -121,7 +123,7 @@ int libs_init()
     if(!(UtilityBase = OpenLibrary("utility.library",0))) return(1);
     if(!(KeymapBase = OpenLibrary("keymap.library", 36))) return(1);
     if(!(AslBase = OpenLibrary("asl.library", 36))) return(1);
-
+    if(!(LayersBase = OpenLibrary("layers.library", 39))) return(1);   
     InitLowLevelLib();
     // optional:
     CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
@@ -166,6 +168,7 @@ void main_close()
 
     if(KeymapBase) CloseLibrary(KeymapBase);
 
+    if(LayersBase) CloseLibrary(LayersBase);
     if(UtilityBase) CloseLibrary(UtilityBase);
 
     if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);

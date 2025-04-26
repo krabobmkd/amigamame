@@ -64,7 +64,8 @@ class Paletted_Pens8 : public Paletted
 protected:
     struct Screen *_pScreen;
     int _screenNbc;
-    std::vector<UBYTE> _rgb4cube;
+    std::vector<UBYTE> _rgbcube; // is either 4x4x4=4096 or 5x5x5=32768
+    bool _use15BitPrecision;
     virtual void initRemapCube();
 };
 // RGB15 to 8bit external palette (WB)
