@@ -12,16 +12,16 @@ todo R1.3
  - O integrates own C2P on native screens ?
 
   correcs:
- - X load screen logo on aga/ocs bug.
+ - X no more glitch on boot screen on aga/ocs and window mode.
  - O qbert on selected 16c ocs screens
 
-   emu correcs:
+   game corrected:
+ - X 1944 is back and fixed !
+ - X PuzzleBobble Neogeo fixed !
  - X correct flipx neogo sprites on some neogeo games.
  - X "Super Chase Criminal Termination" sprite priorities fixed.
  - X BigRun sprite prio -> was a 106 original bug. few glitches left but Bigrun is super cool now one of the best racing game.
  - X 64th street(& lots of megasys jaleco games) sprite priority bug fixed.
- - X 1944 fixed !
- - X PuzzleBobble Neogeo fixed !
 
  - O thunderblade boot bugs
 

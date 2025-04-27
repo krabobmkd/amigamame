@@ -528,7 +528,7 @@ void OTC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *cliprect, i
 
 INLINE void taitoic_drawscanline(
 		mame_bitmap *bitmap,int x,int y,
-		const UINT16 *src,int transparent,UINT32 orient,int pri, const rectangle *cliprect)
+		const UINT16 *src,UINT32 orient,int pri, const rectangle *cliprect)
 {
 	ADJUST_FOR_ORIENTATION(UINT16, orient, bitmap, priority_bitmap, x, y);
 	{
@@ -536,24 +536,36 @@ INLINE void taitoic_drawscanline(
 		src+=cliprect->min_x;
 		dsti+=xadv * cliprect->min_x;
 		dstp+=xadv * cliprect->min_x;
-		if (transparent) {
-			while (length--) {
-				UINT32 spixel = *src++;
-				if (spixel<0x7fff) {
-					*dsti = spixel;
-					*dstp = pri;
-				}
-				dsti += xadv;
-				dstp += xadv;
-			}
-		} else { /* Not transparent case */
-			while (length--) {
-				*dsti = *src++;
-				*dstp = pri;
-				dsti += xadv;
-				dstp += xadv;
-			}
-		}
+        while (length--) {
+            *dsti = *src++;
+            *dstp = pri;
+            dsti += xadv;
+            dstp += xadv;
+        }
+	}
+}
+
+INLINE void taitoic_drawscanlineTransp(
+		mame_bitmap *bitmap,int x,int y,
+		const UINT16 *src,UINT32 orient,int pri, const rectangle *cliprect)
+{
+	ADJUST_FOR_ORIENTATION(UINT16, orient, bitmap, priority_bitmap, x, y);
+	{
+		int length=cliprect->max_x - cliprect->min_x + 1;
+		src+=cliprect->min_x;
+		dsti+=xadv * cliprect->min_x;
+		dstp+=xadv * cliprect->min_x;
+
+        while (length--) {
+            UINT32 spixel = *src++;
+            if (spixel<0x7fff) {
+                *dsti = spixel;
+                *dstp = pri;
+            }
+            dsti += xadv;
+            dstp += xadv;
+        }
+
 	}
 }
 #undef ADJUST_FOR_ORIENTATION
@@ -743,9 +755,9 @@ void topspeed_custom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip
 		}
 
 		if (flags & TILEMAP_IGNORE_TRANSPARENCY)
-			taitoic_drawscanline(bitmap,0,y,scanline,0,ROT0,priority,cliprect);
+			taitoic_drawscanline(bitmap,0,y,scanline,ROT0,priority,cliprect);
 		else
-			taitoic_drawscanline(bitmap,0,y,scanline,1,ROT0,priority,cliprect);
+			taitoic_drawscanlineTransp(bitmap,0,y,scanline,ROT0,priority,cliprect);
 
 		y_index++;
 		if (!machine_flip) y++; else y--;

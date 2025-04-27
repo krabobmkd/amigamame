@@ -203,31 +203,13 @@ VIDEO_UPDATE( topspeed )
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap, Machine->pens[0], cliprect);
 
-#ifdef MAME_DEBUG
-	if (dislayer[3]==0)
-#endif
-	PC080SN_tilemap_draw(bitmap,cliprect,1,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+    //bg
+	//PC080SN_tilemap_draw(bitmap,cliprect,1,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+	 PC080SN_tilemap_draw_special(bitmap,cliprect,1,layer[1],0,2,topspeed_raster_ctrl);
+ // 	PC080SN_tilemap_draw_special(bitmap,cliprect,0,layer[2],0,4,topspeed_raster_ctrl + 0x100);
+	// PC080SN_tilemap_draw(bitmap,cliprect,0,layer[3],0,8);
 
-#ifdef MAME_DEBUG
-	if (dislayer[2]==0)
-#endif
-	PC080SN_tilemap_draw_special(bitmap,cliprect,1,layer[1],0,2,topspeed_raster_ctrl);
-
-#ifdef MAME_DEBUG
-	if (dislayer[1]==0)
-#endif
- 	PC080SN_tilemap_draw_special(bitmap,cliprect,0,layer[2],0,4,topspeed_raster_ctrl + 0x100);
-
-#ifdef MAME_DEBUG
-	if (dislayer[0]==0)
-#endif
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[3],0,8);
-
-#ifdef MAME_DEBUG
-	if (dislayer[4]==0)
-#endif
-
-	topspeed_draw_sprites(bitmap,cliprect);
+//	topspeed_draw_sprites(bitmap,cliprect);
 }
 
 

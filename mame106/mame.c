@@ -955,7 +955,6 @@ void *_malloc_or_die(size_t size, const char *file, int line)
     result = calloc(size+(4*16),1);
 	if (result != NULL)
 	{
-//no, not better        memset(result,255,size); // test
 		return result;
     }
 
