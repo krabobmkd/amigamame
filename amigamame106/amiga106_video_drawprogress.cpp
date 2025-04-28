@@ -228,15 +228,22 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
 
     // - -  get geometry
     int w = (int)(win->GZZWidth); // this way manage window border size
-    int h = (int)(win->GZZHeight);
+    int h = (int)(win->GZZHeight & 0x0000ffff);
+//    printf("drawProgress1 w:%d h:%d\n",w,h);
+    if(_drawable->flags() & DISPFLAG_USEHEIGHTBUFFER)
+    {
+//     printf("make div\n");
+       h>>=1; // double height screen for double buffer trick...
+    }
+//    printf("drawProgress w:%d h:%d\n",w,h);
 
-    int x1 =  (2*w)/256;
-    int x2 = (254*w)/256;
-    int y1 =  (198*h)/256;
-    int y2 =  (208*h)/256;
+    int x1 =  (16*w)>>8;
+    int x2 = ((256-16)*w)>>8;
+    int y1 =  (198*h)>>8;
+    int y2 =  (208*h)>>8;
     int wless = w;
     if(h<wless) wless=h;
-    int border =  (1*wless)/256;
+    int border =  (1*wless)>>8;
     if(border<1) border=1;
 
 
@@ -317,7 +324,7 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         eCheat,
         eProgressEnd
 */
-        int xt= 8;
+        int xt= x1+8;
         const char *p = phases[enm];
 
         drawTextTmp(_font,xt,yb2+6,blackpen,p);

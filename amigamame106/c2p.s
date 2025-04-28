@@ -29,7 +29,7 @@
 
 
 	XDEF	_c2p
-
+	XDEF	_c2pdbg
 	incdir	include:
 	include	graphics/gfx.i
 
@@ -42,6 +42,7 @@
 ; d4.l  chunky bytes per row
 ; a0	chunkyscreen
 ; a1	BitMap
+_c2pdbg: dc.l 0
 
 _c2p:
 c2p:

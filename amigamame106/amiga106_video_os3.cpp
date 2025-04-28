@@ -146,8 +146,76 @@ void Drawable_OS3::draw_WriteChunkyPixels(_mame_display *display)
 
 
     WriteChunkyPixels(pRPort,cenx,ceny,cenx+ww-1,ceny+hh-1,_wpatempbm.data(),ww );
-
 }
+extern "C" {
+#ifdef __GNUC__
+#define REG(r) __asm(#r)
+#else
+#define REG(r)
+#endif
+
+    void c2p(UBYTE *chunkyscreen REG(a0),
+             struct BitMap *bm REG(a1),
+            WORD chunkyx REG(d0),
+            WORD chunkyy REG(d1),
+            WORD offsx REG(d2),
+            WORD offsy REG(d3),
+            LONG chunkybpr REG(d4)
+             );
+}
+
+void Drawable_OS3::draw_c2p(_mame_display *display)
+{
+    RastPort *pRPort = _drawable.rastPort();
+    if(!pRPort) return;
+    mame_bitmap *bitmap = display->game_bitmap;
+
+    // - - update palette if exist and is needed.
+    if(_pRemap && ((display->changed_flags & GAME_PALETTE_CHANGED) !=0 || _pRemap->needRemap()))
+    {
+        _pRemap->updatePaletteRemap(display);
+    }
+    int sourcewidth,sourceheight;
+    int cenx,ceny,ww,hh;
+    _drawable.getGeometry(display,cenx,ceny,ww,hh,sourcewidth,sourceheight);
+
+    // when screen
+    int c2pww = ww;
+    if(c2pww>_drawable.widthPhys()) c2pww = _drawable.widthPhys();
+    // c2p needs 32pixels aligned width
+    c2pww =(c2pww+31)& 0xffffffe0 ;
+
+
+    // - - get a 8bit bitmap for pixel conversion and then c2p - -
+    const int bmsize = ww*(hh+4); // +2 becaus of zoom trick but well.
+    if(bmsize != _wpatempbm.size()) _wpatempbm.resize(bmsize);
+
+    directDrawScreen ddscreen={
+        _wpatempbm.data(),
+        ww, // bpr
+        0,0,ww,hh // clip rect
+    };
+
+    directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
+        display->game_visible_area.min_x,display->game_visible_area.min_y,
+        display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
+        _drawable.flags()
+    };
+
+    directDrawParams p{&ddscreen,&ddsource,0,0,ww,hh};
+
+    if(_pRemap) _pRemap->directDraw(&p);
+
+    c2p(  _wpatempbm.data(), // chunky
+            pRPort->BitMap,
+           c2pww,// WORD chunkyx REG(d0),
+           hh,// WORD chunkyy REG(d1),
+          (((WORD)cenx)+15) & 0xfff0, //it's in pixels, round it 16 pixels, (should be 32 for AGA).
+          (WORD)ceny, // WORD offsy REG(d3)
+          ww
+             );
+}
+
 
 void Drawable_OS3::initRemapTable()
 {
@@ -222,12 +290,19 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
     _ScreenDepthAsked = params._forcedDepth; // used by OpenSCreen(), AGA max, default.
     if(_ScreenModeId == INVALID_ID)
     {
-
-        _ScreenModeId = BestModeID(
-                BIDTAG_Depth,8,
-                BIDTAG_NominalWidth,width,
-                BIDTAG_NominalHeight,height,
-                TAG_DONE );
+        // 1.3: test 16b/24b depth then if fail 8b,5b,4b , for native modes AGA/OCS.
+        static const char depthsToTest[4]={8,5,4,0}; // OCS has 32b and 16b modes, 0 is termination.
+        int idepth = 0;
+        while(depthsToTest[idepth] != 0 &&
+           _ScreenModeId == INVALID_ID)
+        {
+            _ScreenModeId = BestModeID(
+                    BIDTAG_Depth,(int)depthsToTest[idepth],
+                    BIDTAG_NominalWidth,width,
+                    BIDTAG_NominalHeight,height,
+                    TAG_DONE );
+            idepth++;
+        }
         if(_ScreenModeId == INVALID_ID)
         {
             loginfo(2," **** Can't find screen mode for w%d h%d",width,height);
@@ -274,6 +349,7 @@ Intuition_Screen_OS3::~Intuition_Screen_OS3()
 bool Intuition_Screen_OS3::open()
 {
     //printf("Intuition_Screen_OS3::open\n");
+    _fullscreenWidth = (_fullscreenWidth+31) & 0xffffffe0; // 32pixel align for c2p
     bool ok = Intuition_Screen::open();
     if(!ok) return false;
     // after Screen is open, may create create color remap table for clut.
@@ -285,10 +361,17 @@ void Intuition_Screen_OS3::close()
     Intuition_Screen::close();
     Drawable_OS3::close();
 }
+
 void Intuition_Screen_OS3::draw(_mame_display *display)
 {
     // WritePixelArrays is OS3.0, We could use WriteChunkyPixels which is OS3.1.
     // note: all (even OS3.2.x) AGA/ECS versions are damn slow, must use patch blazewcp (not new WPA)
+
+    ULONG destflags = GetBitMapAttr(_pScreen->RastPort.BitMap,BMA_FLAGS);
+    if( (destflags & BMF_STANDARD) != 0 )
+    {   // would mean it's OCS/AGA
+        Drawable_OS3::draw_c2p(display);
+    } else
     if(GfxBase->LibNode.lib_Version>=40)
     {
         Drawable_OS3::draw_WriteChunkyPixels(display);
@@ -305,11 +388,10 @@ void Intuition_Screen_OS3::draw(_mame_display *display)
    // double buffer that use scroll is patched here:
    if(_flags & DISPFLAG_USEHEIGHTBUFFER) {
         if(_pScreen)
-        {
+        {          
             _pScreen->ViewPort.DyOffset = ((_heightBufferSwitch)?_heightBufferSwitchApplied:0);
             ScrollVPort(&(_pScreen->ViewPort));
-         }
-
+        }
         _heightBufferSwitch^=1;
    }
 

@@ -42,14 +42,14 @@ public:
 
     inline int width() const { return _widthtarget; }
     inline int height() const { return _heighttarget; }
-
+    inline int widthPhys() const { return _widthphys; }
     inline int blackPen() const { return (int)_blackpen; }
     inline int greyPen() const { return (int)_greyPen; }
     inline int whitePen() const { return 2; }
 protected:
     int _widthtarget,_heighttarget;
     int _widthphys,_heightphys;
-    int _screenshiftx,_screenshifty; // when direct WB bitmap rendering trick.
+    int _screenshiftx,_screenshifty;
     int _useScale;
     int _flags;
     int _heightBufferSwitch;

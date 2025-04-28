@@ -1,5 +1,7 @@
 todo R1.3
 
+ O checksum neogeo3d TODO
+
  new feats:
  - O outrun lever & wheel gadgets
  - O outrun cpu sync optim.
