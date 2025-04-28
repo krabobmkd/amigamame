@@ -116,6 +116,7 @@ set(AMIGA_SRC
 	serializer_mui.cpp
 
 	mame_ver.h
+	c2p.s
 	../mame106/vidhrdw/neogeodrawasm.s
 
 	devnotes.txt

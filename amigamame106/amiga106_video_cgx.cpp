@@ -331,13 +331,19 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
     if(_ScreenModeId == INVALID_ID)
     {
    // printf("find best mode, _screenDepthAsked:%d...\n",(int)_ScreenDepthAsked);
-
-        struct TagItem cgxtags[]={
-                CYBRBIDTG_NominalWidth,width,
-                CYBRBIDTG_NominalHeight,height,
-                CYBRBIDTG_Depth,_ScreenDepthAsked,
-                TAG_DONE,0 };
-        _ScreenModeId = BestCModeIDTagList(cgxtags);
+        char depthsToTest[5]={_ScreenDepthAsked,8,5,4,0};  // OCS has 32b and 16b modes, 0 is termination
+        int idepth = 0;
+        while(depthsToTest[idepth] != 0 &&
+           _ScreenModeId == INVALID_ID)
+        {
+            struct TagItem cgxtags[]={
+                    CYBRBIDTG_NominalWidth,width,
+                    CYBRBIDTG_NominalHeight,height,
+                    CYBRBIDTG_Depth,depthsToTest[idepth],
+                    TAG_DONE,0 };
+            _ScreenModeId = BestCModeIDTagList(cgxtags);
+            idepth++;
+        }
         if(_ScreenModeId == INVALID_ID)
         {
             loginfo(2,"Can't find cyber screen mode for w%d h%d d%d ",width,height,_ScreenDepthAsked);

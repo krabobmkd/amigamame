@@ -171,7 +171,7 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
 
 // - - - - - - - - -
 Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
-    : IntuitionDrawable((params._flags/*&15*/))
+    : IntuitionDrawable(params._flags)
     , _pScreen(NULL)
     , _pScreenWindow(NULL)
 
@@ -226,7 +226,7 @@ bool Intuition_Screen::open()
 //                        SA_Behind,TRUE,    /* Open behind */
                         SA_Quiet,TRUE,     /* quiet */
 			SA_Type,CUSTOMSCREEN,
-			SA_Interleaved,TRUE, // test, may make C2P faster
+			SA_Interleaved,FALSE, // test, may make C2P faster
 			SA_Colors,(ULONG)&colspec[0],
                         0 );
 //    printf("screen:%08x\n",(int)_pScreen);
@@ -330,7 +330,8 @@ BitMap *Intuition_Screen::bitmap()
 // }
 // - - - - - - - - -
 
-Intuition_Window::Intuition_Window(const AbstractDisplay::params &params) : IntuitionDrawable(params._flags)
+Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
+    : IntuitionDrawable(params._flags)
     , _pWbWindow(NULL)
     , _machineWidth(params._width),_machineHeight(params._height)
     , _maxzoomfactor(1)
