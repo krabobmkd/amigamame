@@ -1401,7 +1401,7 @@ void neogeo_drawTilesSprites( mame_bitmap *bitmap, const rectangle *cliprect)
     // - - - - get tile rom length configuration...
     // should be done per game launch .
     no_of_tiles=gfx->total_elements; // not necessarily pow 2.
-    no_of_tiles_mask=1;
+    no_of_tiles_mask=256;
     while(no_of_tiles_mask<no_of_tiles)  no_of_tiles_mask<<=1;
     no_of_tiles_mask--;
 

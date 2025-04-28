@@ -1,3 +1,46 @@
+
+ new Release 1.3 ...
+
+ - a lot of games corrected:
+  1944 and PuzzleBobble Neogeo are back and fixed.
+  lots of games with sprite priorities error fixed:
+  "Super Chase Criminal Termination", 64th street, & lots of megasys jaleco games.
+  "BigRun" corrected and works very well on a 1.5Ghz pi4, very cool game.
+  Also corrected wrong sprite flipx on some neogeo games.
+
+ - Big round of corrections for AGA and OCS native modes to make things clean:
+  More accurate color remap on all 8bit screens, now you can select screen mode depth
+  (256c,32c,16c,..) or let the automatic mode choose the right mode according to your hardware.
+  Also, No more screen glitch during progress bar.
+  After testing some c2p, it has been verified that your best choice is to install
+  patch "blazewcp" from aminet to accelerate rendering on native modes (and on all the os).
+  Writting Video memory is slow on pistorm, we stick to use OS function WriteChunkyPixels().
+  You can also low down the color depth, and click frameskip for faster refresh.
+
+- Support for 2 more demoscene productions for arcade machines !
+  We have the pleasure to announce that Mame Minimix can run the excellent NeoGeo demo
+  "Vaporous" by TTE, that reached 2nd at the recent Revision party, last week.
+  It is quite big, so unlike the Abyss "cruisin'5" demo included with This release,
+  Download it at: https://files.scene.org/view/parties/2025/revision25/oldskool-demo/tte25-vaporous.zip
+  To install the demo: unzip tte25-vaporous, rename file mame/mslug2.zip as vaporous.zip,
+  then copy it to your roms/ directory, and press scan on UI.
+  As we were at it, we also officialy support Oxygene's neogeo3D demo from 2012.
+  Download it at https://www.pouet.net/prod.php?which=59253 ,
+  rename puzzledp.zip as neogeo3d.zip and copy it to roms/ and scan. Finally, enjoy.
+
+
+
+
+
+
+ - X PuzzleBobble Neogeo fixed !
+ - X correct flipx neogo sprites on some neogeo games.
+ - X "Super Chase Criminal Termination" sprite priorities fixed.
+ - X BigRun sprite prio -> was a 106 original bug. few glitches left but Bigrun is super cool now one of the best racing game.
+ - X 64th street(& lots of megasys jaleco games) sprite priority bug fixed.
+
+
+
 todo R1.3
 
  O checksum neogeo3d TODO
@@ -15,7 +58,7 @@ todo R1.3
 
   correcs:
  - X no more glitch on boot screen on aga/ocs and window mode.
- - O qbert on selected 16c ocs screens
+ - X qbert on selected 16c ocs screens
 
    game corrected:
  - X 1944 is back and fixed !
