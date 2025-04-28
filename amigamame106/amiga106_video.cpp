@@ -212,16 +212,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
          else
         {
            params._forcedModeID = ~0; // undefined.
-           // finish in askedDepth: screen will be choosen with depth is accoring to game mode.
-           if(pparams->colors+4<256)
-           {
-             params._forcedDepth = 8;
-           } else
-           {
-                params._forcedDepth = 16;
-                if(pparams->video_attributes &VIDEO_NEEDS_6BITS_PER_GUN)
-                    params._forcedDepth = 24;
-           }
+           params._forcedDepth = 24;
         }
 
         params._width = pparams->width;

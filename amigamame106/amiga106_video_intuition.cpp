@@ -187,6 +187,7 @@ Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
 bool Intuition_Screen::open()
 {
      if(_pScreenWindow) return true; // already open.
+
     if(_ScreenModeId == INVALID_ID)
     {
         loginfo(2,"Can't find a screen mode ");
@@ -217,6 +218,8 @@ bool Intuition_Screen::open()
         _heightBufferSwitchApplied = _fullscreenHeight;
         appliedHeight*=2;
     }
+
+
  	_pScreen = OpenScreenTags( NULL,
 			SA_DisplayID,_ScreenModeId,
                         SA_Title, (ULONG)"MAME", // used as ID by promotion tools and else ?
@@ -229,7 +232,7 @@ bool Intuition_Screen::open()
 			SA_Interleaved,FALSE, // test, may make C2P faster
 			SA_Colors,(ULONG)&colspec[0],
                         0 );
-//    printf("screen:%08x\n",(int)_pScreen);
+
 	if( _pScreen == NULL ) return false;
 
 	// --------- open intuition fullscreen window for this screen:

@@ -222,7 +222,15 @@ void MUISerializer::enable(std::string memberUrl, int enable)
     Level *p = getByUrl(memberUrl);
     if(!p || !p->_Object) return;
      SetAttrs(p->_Object, MUIA_Disabled,enable?0:1,TAG_DONE);
+
+    // valueUpdated
 }
+// void MUISerializer::update(std::string memberUrl)
+// {
+//     Level *p = getByUrl(memberUrl);
+//     if(!p || !p->_Object) return;
+//     p->update();
+// }
 struct MUISerializer::Level *MUISerializer::getByUrl(const std::string &memberUrl)
 {
     struct Level *p = _pRoot;
@@ -888,11 +896,14 @@ void MUISerializer::LCycle::update()
     if(v<0) v=0;
     if(_values.size()>0 && v>=(int)_values.size()) v =(int)_values.size()-1;
     SetAttrs(_Object,MUIA_Cycle_Active,v,TAG_DONE);
-
+    int anydone = 0;
     for(function<void(ASerializer &serializer, void *p)> &func : _rules)
     {
         func(_ser,_value);
+
+        anydone = 1;
     }
+    if(anydone && _pNextBrother) _pNextBrother->update(); // trick
 }
 // - - - - - - - - - - - - - - -
 MUISerializer::LCheckBox::LCheckBox(MUISerializer &ser,bool &value): Level(ser)

@@ -43,6 +43,7 @@ public:
     inline int width() const { return _widthtarget; }
     inline int height() const { return _heighttarget; }
     inline int widthPhys() const { return _widthphys; }
+    inline int heightPhys() const { return _heightphys; }
     inline int blackPen() const { return (int)_blackpen; }
     inline int greyPen() const { return (int)_greyPen; }
     inline int whitePen() const { return 2; }

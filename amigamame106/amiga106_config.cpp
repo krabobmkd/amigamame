@@ -339,9 +339,16 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
     serializer("Rotate Screens",(int &)_rotateMode,{"None","+90","180","-90"});
 
     // want modeid greyed if screen not choosen
+    // can't do [=] because real object is a clone
     serializer.listenChange("Screen Selection",[](ASerializer &serializer, void *p)
     {
         ScreenModeChoice *pScreenModeChoice = (ScreenModeChoice *)p;
+        // if(*pScreenModeChoice == ScreenModeChoice::Best)
+        // {
+        //      _modeid._modeId = INVALID_ID;
+        //      _modeid._depth = 8;
+        //     //serializer.update("Display.Per Screen Mode.Screen mode");
+        // }
         serializer.enable("Display.Per Screen Mode.Screen mode",(*pScreenModeChoice == ScreenModeChoice::Choose)?1:0);
     });
 
@@ -352,14 +359,15 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
     serializer("wh",_window_height,{});
     serializer("wv",_window_validpos,{});
 }
-void MameConfig::Display_PerScreenMode::valueUpdated(std::string upatedValue)
-{
-    if(_ScreenModeChoice == ScreenModeChoice::Best)
-    {
-        _modeid._modeId = INVALID_ID;
-        _modeid._depth = 8;
-    }
-}
+// void MameConfig::Display_PerScreenMode::valueUpdated(std::string upatedValue)
+// {
+
+//     if(_ScreenModeChoice == ScreenModeChoice::Best)
+//     {
+//         _modeid._modeId = INVALID_ID;
+//         _modeid._depth = 8;
+//     }
+// }
 bool MameConfig::Display_PerScreenMode::isDefault()
 {   // will not be written if is default.
     return (_ScreenModeChoice == ScreenModeChoice::Best &&

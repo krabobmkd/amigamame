@@ -14,7 +14,10 @@ public:
   virtual ~Drawable_OS3();
   void draw_WPA8(_mame_display *display);
   void draw_WriteChunkyPixels(_mame_display *display);
+#ifdef ACTIVATE_OWN_C2P
+// removed because slower than "blazewcp"+writechunkypixels()
   void draw_c2p(_mame_display *display);
+#endif
   inline bool isSourceRGBA32() {
       const ULONG fritata = (VIDEO_RGB_DIRECT|VIDEO_NEEDS_6BITS_PER_GUN);
       return ((_video_attributes&fritata)==fritata);

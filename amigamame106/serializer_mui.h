@@ -51,7 +51,7 @@ struct MUISerializer : public ASerializer {
     // - - - -rules
     void listenChange(const char *sMemberName,std::function<void(ASerializer &serializer, void *p)> condition) override;
     void enable(std::string memberUrl, int enable) override;
-
+    //void update(std::string memberUrl) override;
 	// - - - - - -
     // allow insertion of tabs before compile...
     void insertFirstPanel(Object *pPanel,const char *pName);

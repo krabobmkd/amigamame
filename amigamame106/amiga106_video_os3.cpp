@@ -163,7 +163,7 @@ extern "C" {
             LONG chunkybpr REG(d4)
              );
 }
-
+#ifdef ACTIVATE_OWN_C2P
 void Drawable_OS3::draw_c2p(_mame_display *display)
 {
     RastPort *pRPort = _drawable.rastPort();
@@ -185,15 +185,16 @@ void Drawable_OS3::draw_c2p(_mame_display *display)
     // c2p needs 32pixels aligned width
     c2pww =(c2pww+31)& 0xffffffe0 ;
 
-
+    int c2phh = hh;
+     if(c2phh>_drawable.heightPhys()) c2phh = _drawable.heightPhys();
     // - - get a 8bit bitmap for pixel conversion and then c2p - -
-    const int bmsize = ww*(hh+4); // +2 becaus of zoom trick but well.
+    const int bmsize = ww*(c2phh+4); // +2 becaus of zoom trick but well.
     if(bmsize != _wpatempbm.size()) _wpatempbm.resize(bmsize);
 
     directDrawScreen ddscreen={
         _wpatempbm.data(),
         ww, // bpr
-        0,0,ww,hh // clip rect
+        0,0,ww,c2phh // clip rect
     };
 
     directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
@@ -209,13 +210,13 @@ void Drawable_OS3::draw_c2p(_mame_display *display)
     c2p(  _wpatempbm.data(), // chunky
             pRPort->BitMap,
            c2pww,// WORD chunkyx REG(d0),
-           hh,// WORD chunkyy REG(d1),
+           c2phh,// WORD chunkyy REG(d1),
           (((WORD)cenx)+15) & 0xfff0, //it's in pixels, round it 16 pixels, (should be 32 for AGA).
           (WORD)ceny, // WORD offsy REG(d3)
           ww
              );
 }
-
+#endif
 
 void Drawable_OS3::initRemapTable()
 {
@@ -301,6 +302,7 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
                     BIDTAG_NominalWidth,width,
                     BIDTAG_NominalHeight,height,
                     TAG_DONE );
+            if(_ScreenModeId != INVALID_ID) _ScreenDepthAsked = (int)depthsToTest[idepth];
             idepth++;
         }
         if(_ScreenModeId == INVALID_ID)
@@ -322,17 +324,17 @@ Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params
             _fullscreenWidth = (int)(dims.Nominal.MaxX - dims.Nominal.MinX)+1;
             _fullscreenHeight = (int)(dims.Nominal.MaxY - dims.Nominal.MinY)+1;
             // if game screen big, try some oversan conf.
-            if(_fullscreenWidth< width )
-            {
-                _fullscreenWidth = (int)(dims.MaxOScan.MaxX - dims.MaxOScan.MinX)+1;
-            }
+            // if(_fullscreenWidth< width )
+            // {
+            //     _fullscreenWidth = (int)(dims.MaxOScan.MaxX - dims.MaxOScan.MinX)+1;
+            // }
             if(_fullscreenHeight< height )
             {
                 _fullscreenHeight = (int)(dims.MaxOScan.MaxY - dims.MaxOScan.MinY)+1;
             }
 
-//        printf("aga mode $%08x w:%d h:%d\n",
-//              (int)_ScreenModeId, _fullscreenWidth,_fullscreenHeight);
+        // printf("aga mode $%08x w:%d h:%d\n",
+        //       (int)_ScreenModeId, _fullscreenWidth,_fullscreenHeight);
 
         } else
         {   // shouldnt happen, fallback
@@ -368,10 +370,12 @@ void Intuition_Screen_OS3::draw(_mame_display *display)
     // note: all (even OS3.2.x) AGA/ECS versions are damn slow, must use patch blazewcp (not new WPA)
 
     ULONG destflags = GetBitMapAttr(_pScreen->RastPort.BitMap,BMA_FLAGS);
+#ifdef ACTIVATE_OWN_C2P
     if( (destflags & BMF_STANDARD) != 0 )
     {   // would mean it's OCS/AGA
         Drawable_OS3::draw_c2p(display);
     } else
+#endif
     if(GfxBase->LibNode.lib_Version>=40)
     {
         Drawable_OS3::draw_WriteChunkyPixels(display);

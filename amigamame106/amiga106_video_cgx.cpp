@@ -42,8 +42,21 @@ template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 bool Intuition_Screen_CGX::useForThisMode(ULONG modeID)
 {
     if(!CyberGfxBase) return false;
-    return ((modeID != INVALID_ID && IsCyberModeID(modeID))
-           ||(modeID == INVALID_ID ));
+    if (modeID != INVALID_ID)
+    {   // if screen Id explicit, we know if native or cgx.
+        return (bool)IsCyberModeID(modeID);
+    }
+    // case where some p96 or cgx installed but no monitor activated.
+    // check a standard resolution
+    struct TagItem cgxtags[]={
+            CYBRBIDTG_NominalWidth,320,
+            CYBRBIDTG_NominalHeight,240,
+            CYBRBIDTG_Depth,8,
+            TAG_DONE,0 };
+    ULONG someModeId = BestCModeIDTagList(cgxtags);
+
+    if( someModeId== INVALID_ID) return false;
+    return (bool)IsCyberModeID(someModeId);
 }
 bool Intuition_Window_CGX::useForWbWindow()
 {
@@ -342,6 +355,7 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
                     CYBRBIDTG_Depth,depthsToTest[idepth],
                     TAG_DONE,0 };
             _ScreenModeId = BestCModeIDTagList(cgxtags);
+            if(_ScreenModeId != INVALID_ID) _ScreenDepthAsked = (int)depthsToTest[idepth];
             idepth++;
         }
         if(_ScreenModeId == INVALID_ID)

@@ -142,7 +142,7 @@ public:
     {
         Display_PerScreenMode();
         void serialize(ASerializer &serializer) override;
-        void valueUpdated(std::string upatedValue) override;
+        //void valueUpdated(std::string upatedValue) override;
         bool isDefault() override;
         RotateMode _rotateMode = RotateMode::Rot0;
         ScreenModeChoice _ScreenModeChoice=ScreenModeChoice::Best;
