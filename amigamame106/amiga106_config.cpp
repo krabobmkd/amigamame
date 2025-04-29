@@ -524,11 +524,11 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
     serializer("Skip",_skipflags,0,{"Disclaimer","Game Info"});
     serializer("NeoGeo Bios",_neogeo_bios,_neogeoBiosList);
 
-    serializer("Also...",_MiscFlags,
-                        0 | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
-                    ,{
-        "CD32 Pads uses AMEGA32 Adapter:\nSwitch 6 buttons to fit SF2."
-        });
+    // serializer("Also...",_MiscFlags,
+    //                     0 | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
+    //                 ,{
+    //     "CD32 Pads uses AMEGA32 Adapter:\nSwitch 6 buttons to fit SF2."
+    //     });
 
 
 }
