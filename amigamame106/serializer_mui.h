@@ -51,7 +51,8 @@ struct MUISerializer : public ASerializer {
     // - - - -rules
     void listenChange(const char *sMemberName,std::function<void(ASerializer &serializer, void *p)> condition) override;
     void enable(std::string memberUrl, int enable) override;
-    //void update(std::string memberUrl) override;
+    void update(std::string memberUrl) override;
+    ASerializable *getObject(std::string memberUrl) override;
 	// - - - - - -
     // allow insertion of tabs before compile...
     void insertFirstPanel(Object *pPanel,const char *pName);
@@ -79,11 +80,13 @@ protected:
         std::vector<std::function<void(ASerializer &serializer, void *p)>> _rules;
 	};
     struct LGroup : public Level {
-        LGroup(MUISerializer &ser,int flgs);
+        LGroup(MUISerializer &ser,ASerializable *pconf,int flgs);
         void compile() override;
         void update() override;
         virtual Object *compileOuterFrame(Object *pinnerGroup);
         int _flgs;
+        // dangerous, keep it to apply rules
+        ASerializable *_serialized;
 	};
     struct LFlags : public Level {
         LFlags(MUISerializer &ser,ULONG_FLAGS &flugs,ULONG_FLAGS defval,const std::vector<std::string> &names);
@@ -98,7 +101,7 @@ protected:
 
 	};
     struct LSwitchGroup : public LGroup {
-        LSwitchGroup(MUISerializer &ser,int flgs,AStringMap &map);
+        LSwitchGroup(MUISerializer &ser,ASerializable *pconf,int flgs,AStringMap &map);
         Object *compileOuterFrame(Object *pinnerGroup) override;
         void setGroup(const char *pid);
         AStringMap *_map;
@@ -108,7 +111,7 @@ protected:
 #endif
 	};
     struct LTabs : public LGroup {
-        LTabs(MUISerializer &ser);
+        LTabs(MUISerializer &ser,ASerializable *pconf);
         void compile() override;
         std::vector<const char *> _registerTitles;
 	};

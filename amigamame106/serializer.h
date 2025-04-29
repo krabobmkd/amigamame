@@ -66,6 +66,8 @@ struct ASerializer {
     // - - - -rules
     virtual void listenChange(const char *sMemberName,std::function<void(ASerializer &serializer, void *p)> condition) {}
     virtual void enable(std::string memberUrl, int enable) {}
+    virtual void update(std::string memberUrl) {}
+    virtual ASerializable *getObject(std::string memberUrl) { return NULL; }
     // - - - - -  serialize abstract class string map - - - - -
     // first use to serialize confs per screen mode.
     struct AStringMap {

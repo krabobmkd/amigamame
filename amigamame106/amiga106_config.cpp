@@ -350,6 +350,16 @@ void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
         //     //serializer.update("Display.Per Screen Mode.Screen mode");
         // }
         serializer.enable("Display.Per Screen Mode.Screen mode",(*pScreenModeChoice == ScreenModeChoice::Choose)?1:0);
+        ASerializable *pser = serializer.getObject("Display.Per Screen Mode");
+        if(pser) {
+            Display_PerScreenMode *pthis = (Display_PerScreenMode *)pser;
+            if(pthis && *pScreenModeChoice == ScreenModeChoice::Best)
+            {
+              pthis->_modeid._modeId = INVALID_ID;
+              pthis->_modeid._depth = 8;
+            }
+            serializer.update("Display.Per Screen Mode.Screen mode");
+        }
     });
 
 //         int _window_posx,_window_posy,_window_width,_window_height,_window_validpos;

@@ -63,10 +63,10 @@ void MUISerializer::operator()(const char *sMemberName, ASerializable &subconf, 
     // let's add a sub level.
     if(_irecurse==0)
     {
-        plevel = new LTabs(*this);
+        plevel = new LTabs(*this,&subconf);
     } else
     {
-        plevel = new LGroup(*this,flags);
+        plevel = new LGroup(*this,&subconf,flags);
     }
     if(!plevel) return;
 
@@ -162,7 +162,7 @@ void MUISerializer::operator()(const char *sMemberName, AStringMap &confmap)
 
     Level *plevel;
     // let's add a sub level.
-    plevel = new LSwitchGroup(*this,0,confmap);
+    plevel = new LSwitchGroup(*this,&subconf,0,confmap);
     if(!plevel) return;
 
     _stack.push_back(plevel);
@@ -225,12 +225,20 @@ void MUISerializer::enable(std::string memberUrl, int enable)
 
     // valueUpdated
 }
-// void MUISerializer::update(std::string memberUrl)
-// {
-//     Level *p = getByUrl(memberUrl);
-//     if(!p || !p->_Object) return;
-//     p->update();
-// }
+ void MUISerializer::update(std::string memberUrl)
+ {
+     Level *p = getByUrl(memberUrl);
+     if(!p || !p->_Object) return;
+     p->update();
+ }
+ASerializable *MUISerializer::getObject(std::string memberUrl)
+{
+    Level *p = getByUrl(memberUrl);
+    if(!p ) return NULL;
+    //hopefully
+    LGroup *pgroup = (LGroup *)p;
+    return (ASerializable *)pgroup->_serialized;
+}
 struct MUISerializer::Level *MUISerializer::getByUrl(const std::string &memberUrl)
 {
     struct Level *p = _pRoot;
@@ -359,7 +367,7 @@ void MUISerializer::Level::update()
 {
 }
 // - - - - - - - - - - - - - - -
-MUISerializer::LTabs::LTabs(MUISerializer &ser) : LGroup(ser,0)
+MUISerializer::LTabs::LTabs(MUISerializer &ser,ASerializable *pconf) : LGroup(ser,pconf,0)
 {
 
 }
@@ -399,7 +407,8 @@ void MUISerializer::LTabs::compile()
 
 }
 // - - - - - - - - - - - - - - -
-MUISerializer::LGroup::LGroup(MUISerializer &ser,int flgs) : Level(ser), _flgs(flgs)
+MUISerializer::LGroup::LGroup(MUISerializer &ser,ASerializable *pconf,int flgs) : Level(ser), _flgs(flgs),
+_serialized(pconf)
 {
 }
 void MUISerializer::LGroup::compile()
@@ -583,7 +592,7 @@ void MUISerializer::LFlags::update()
 //ULONG_FLAGS *_pflugs;
 
 // - - - - - - - - - - - - - - -
-MUISerializer::LSwitchGroup::LSwitchGroup(MUISerializer &ser,int flgs,AStringMap &map) : LGroup(ser,flgs)
+MUISerializer::LSwitchGroup::LSwitchGroup(MUISerializer &ser,ASerializable *pconf,int flgs,AStringMap &map) : LGroup(ser,pconf,flgs)
   ,_map(&map), _displayName("(select a driver)")
 #ifndef USEGROUPTITLE
   ,_SelectedItemText(NULL)
@@ -627,6 +636,7 @@ void MUISerializer::LSwitchGroup::setGroup(const char *pid)
     _displayName += pid;
 #endif
     ASerializable &actual = _map->get(pid); // the new current data
+    _serialized = &actual;
 
     ReAssigner reassigner(*this);
     actual.serialize(reassigner); // change pointed data and does updates.
@@ -1046,7 +1056,7 @@ void MUISerializer::LScreenModeReq::SetDisplayName(ULONG_SCREENMODEID &displayid
   if(!_DisplayName) return;
   if(displayid._modeId == (ULONG) INVALID_ID)
   {
-    _strDisplay = "Invalid";
+    _strDisplay = "-";
   }
   else
   {
