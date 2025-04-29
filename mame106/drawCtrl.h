@@ -12,6 +12,15 @@ extern "C" {
     // orriginaly for "artwork":
     #include "png.h"
 
+struct CommonControlsValues {
+    int _lever;
+    int _leverCount;
+    INT16 analogValues[8];
+    UINT16 analogValuesReadCount[8];
+};
+
+extern struct CommonControlsValues commonControlsValues;
+
 struct extraBitmap{
     png_info _png;
     UINT16 _colormap[16]; // for clut.

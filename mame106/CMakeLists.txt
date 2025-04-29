@@ -53,7 +53,7 @@ set(MAME_CORE_SRC
 	cheat.c    hash.c      mamedriv.c  sndintrf.c  usrintrf.c
 	config.c   hiscore.c   md5.c            validity.c
 	cpuexec.cpp  info.c      memory.c memoryn.cpp   state.c     version.c
-	cpustats.cpp
+#re	cpustats.cpp
  debugger.h   jedparse.h            png.h        ui_text.h
  audit.h
 

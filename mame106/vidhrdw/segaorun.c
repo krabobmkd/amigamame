@@ -14,7 +14,6 @@
 static struct drawableExtra *_wheelgoody=NULL;
 static struct drawableExtra *_levergoody=NULL;
 
-
 /*************************************
  *
  *  Video startup
@@ -100,6 +99,7 @@ VIDEO_UPDATE( shangon )
 }
 
 
+
 VIDEO_UPDATE( outrun )
 {
 	/* if no drawing is happening, fill with black and get out */
@@ -135,5 +135,6 @@ VIDEO_UPDATE( outrun )
 
 	//krb: draw optionnal control goodies
     //TODO
+    //outrun_poorLever(bitmap,cliprect);
 
 }

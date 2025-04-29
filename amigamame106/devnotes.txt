@@ -43,9 +43,9 @@ todo R1.3
 
  big round of "let's make it better on native AGA and OCS".
  - X allow 16,32 colors screen modes for OCS/ECS - only 16,32,256 are supported with fixed palette.
- - O test with blasewpc, -> document blazewpc.
+ - X test with blasewpc, -> document blazewpc.
  - X more precise color remap on >=8b screens.
- - O integrates own C2P on native screens ?
+ - X integrates own C2P on native screens ? ->NO (done but disabled).
 
   correcs:
  - X no more glitch on boot screen on aga/ocs and window mode.

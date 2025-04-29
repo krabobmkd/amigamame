@@ -26,6 +26,8 @@
 
 #include "cpu/m68000/m68kops.h"
 
+#include "drawCtrl.h"
+
 #define MASTER_CLOCK			50000000
 #define SOUND_CLOCK				16000000
 
@@ -394,9 +396,7 @@ static WRITE16_HANDLER( misc_io_w )
 }
 //krb: remember analog values that were tested this frame.
 // 0,1,2 are steering, gas, brakes.
-UINT16 analogValues[8];
-UINT16 analogValuesReadCount[8]={0};
-UINT16 lever,leverCount=0;
+
 static READ16_HANDLER( outrun_custom_io_r )
 {
 	offset &= 0x7f/2;
@@ -410,8 +410,8 @@ static READ16_HANDLER( outrun_custom_io_r )
             UINT16 lv = readinputport(offset & 3);
             if((offset & 3) == 3)
             {
-                lever = lv;
-                leverCount++;
+                commonControlsValues._lever = (int) lv;
+                commonControlsValues._leverCount++;
             }
 			return lv;
         }
@@ -419,8 +419,8 @@ static READ16_HANDLER( outrun_custom_io_r )
 		{
 			static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
 			UINT16 vread = readinputportbytag_safe(ports[adc_select], 0x0010);
-			analogValues[adc_select] = vread;
-			analogValuesReadCount[adc_select]++;
+			commonControlsValues.analogValues[adc_select] = (INT16) vread;
+			commonControlsValues.analogValuesReadCount[adc_select]++;
 			return vread;
 		}
 

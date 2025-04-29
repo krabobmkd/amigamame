@@ -3,6 +3,9 @@
 #include "png.h"
 #include "fileio.h"
 
+
+struct CommonControlsValues commonControlsValues={0};
+
 //int loadPng(const char *ppath,struct extraBitmap *pbm )
 //{
 

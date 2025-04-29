@@ -21,7 +21,7 @@ static const char* copyright_notice =
 ;
 #endif
 
-#define STATCPUINSTR 1
+//#define STATCPUINSTR 1
 #ifdef STATCPUINSTR
     #include "cpustats.h"
 #endif
