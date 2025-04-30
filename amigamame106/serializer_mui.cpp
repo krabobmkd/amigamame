@@ -556,6 +556,8 @@ void MUISerializer::LFlags::compile()
 
         if(_buttons[iflag])
         {
+            _ser._cyclechain.push_back(_buttons[iflag]);
+
             DoMethod(_buttons[iflag],MUIM_Notify,
                         MUIA_Selected, // attribute that triggers the notification.
                         MUIV_EveryTime, // TrigValue ,  every time when TrigAttr changes
@@ -701,7 +703,7 @@ void MUISerializer::LString::compile()
             MUIM_CallHook,(ULONG) &_notifyHook,  MUIV_TriggerValue
            );
     }
-
+    if(_Object) _ser._cyclechain.push_back(_Object);
 
 }
 void  MUISerializer::LString::update()
@@ -885,6 +887,7 @@ void MUISerializer::LCycle::compile()
     _Object = MUI_NewObject(MUIC_Cycle,MUIA_Cycle_Entries,(ULONG)_valuesptr.data(),TAG_DONE);
     if(_Object)
     {
+        _ser._cyclechain.push_back(_Object);
         _notifyHook.h_Entry =(RE_HOOKFUNC)&HNotify;
         _notifyHook.h_Data = this;
         DoMethod(_Object, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
@@ -941,6 +944,8 @@ void MUISerializer::LCheckBox::compile()
 
     if(_Button)
     {
+        _ser._cyclechain.push_back(_Button);
+
         _notifyHook.h_Entry =(RE_HOOKFUNC)&MUISerializer::LCheckBox::HNotify;
         _notifyHook.h_Data = this;
         DoMethod(_Button,MUIM_Notify,
@@ -1006,6 +1011,7 @@ void MUISerializer::LScreenModeReq::compile()
               MUIA_Popasl_StartHook,  (ULONG) &_ScreenModeStartHook,
               MUIA_Popasl_StopHook, (ULONG) &_ScreenModeStopHook,
             TAG_DONE);
+    if(_Object) _ser._cyclechain.push_back(_Object);
 
 
 }

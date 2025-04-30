@@ -196,6 +196,7 @@ protected:
 
 
     std::list<Level *> _stack;
+    std::vector<Object *> _cyclechain;
     int _irecurse;
     Level **_pGrower;
     Level *_pRoot;
