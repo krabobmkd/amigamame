@@ -55,8 +55,8 @@ This cmake platform:
  Bug reports, requests, ideas, love letters and maybe pull requests have one natural place:
  https://github.com/krabobmkd/amigamame/issues
  
- Most games are now at 80% of the native speed on a RPi3. Beta1 release with original source + O3 option
-  gave around 40%. 9 monthes of optimizations gave an average 100% speed gain. 
+ Most games are now at 100% of the native speed on a RPi3. (Beta1 release with original source + O3 option
+  gave around 40%.)
  
  You can switch on and off the linking of drivers with cmake options on top of: mame106\gamedrivers.cmake,
  which makes things very handy. This .cmake is generated with buildtools/mameMakToCmake that made it possible. Not all switch are tested and some sub-configurations may have some missing defines. In that case the correction should be made in mameMakToCmake, not the .cmake itself.
