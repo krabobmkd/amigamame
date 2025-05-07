@@ -1,36 +1,10 @@
 
- new Release 1.3 ...
 
- - a lot of games corrected:
-  1944 and PuzzleBobble Neogeo are back. "BigRun" corrected. Cool game.
-  sprite priorities error fixed on:
-  "Super Chase CT", 64th street (& all megasys jaleco games).
-  Also corrected wrong sprite flipx on some neogeo games (final fights).
-  outrun optimized again like just by 4%.
+todo R1.3b
 
- - Big round of corrections for AGA and OCS native modes:
 
-  More accurate color remap on 8bit screens.
-  Support for color depths under 8b. (256c,32c,16c,...), screen size selection is better.
-  Now you can select screen mode depth or let the automatic mode on UI, OCS machines should automatically select 32c.
-  No more screen glitch during progress bar.
+ O revalider dispatcher list with "NO MUI5" version.
 
-  Writing native video memory is slow on Pistorm, not mentioning the sound engine is also writing Chip Mem,
-  which floods the bus. You may select a light AHI audio mode and less color depth if you are into native screen mode.
-   The Chunky-To-Planar routine used by old Mame060 didn't proove better than the "BlazeWCP" patch available on aminet, that accelerates "WriteChunkyPixels()". You may install that if you're into native screens, you will be 10 or 15% faster than default OS implementation.
-  Minimix will still use WriteChunkyPixels() for depth<=8, which in theory can be adapted to any hardware extensions.
-
-- Support for 2 more demoscene productions for arcade machines !
-
-  We have the pleasure to announce that MAME Minimix can run the excellent NeoGeo demo
-  "Vaporous" by TTE, which reached 2nd place at the recent Revision party 2025.
-  It is quite big, so unlike the Abyss "cruisin'5" demo included with This release,
-  you have to download it at: https://files.scene.org/view/parties/2025/revision25/oldskool-demo/tte25-vaporous.zip
-  To install the demo: unzip tte25-vaporous, rename file mame/mslug2.zip as vaporous.zip,
-  then copy it to your roms/ directory, and press scan on UI or type "Mame106 vaporous".
-  As we were at it, we also officialy support Oxygene's neogeo3D demo from 2012 (sound not working).
-  Download it at https://www.pouet.net/prod.php?which=59253 ,
-  rename puzzledp.zip as neogeo3d.zip and copy it to roms/ and scan. Finally, enjoy.
 
 todo R1.3
 

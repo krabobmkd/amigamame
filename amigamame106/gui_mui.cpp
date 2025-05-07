@@ -43,6 +43,7 @@ extern "C" {
     #include <../../MUI50/include/mui/Guigfx_mcc.h>
     #include <../../MUI50/include/mui/GIFAnim_mcc.h>
 
+    #include <devices/timer.h>
 }
 extern "C" {
     #include "driver.h"
@@ -68,11 +69,15 @@ inline Object * MUINewObject(CONST_STRPTR cl, Tag tags, ...)
 
 struct DriverData
 {
-  struct MUI_EventHandlerNode EventHandler;
-  ULONG           CurrentEntry;
-  ULONG           CharIndex;
-  ULONG           Seconds;
-  ULONG           Micros;
+    struct MUI_EventHandlerNode EventHandler;
+
+    char    typedAccum[8];
+    UWORD   nbTypedAccum;
+
+    // last typed time
+    ULONG           Seconds;
+    ULONG           Micros;
+
   APTR            List;
 };
 
@@ -490,7 +495,7 @@ int MameUI::MainGUI(void)
                 /* This must be done after the window has been opened. */
                 DoMethod( LI_Driver, MUIM_List_Jump, MUIV_List_Jump_Active);
 
-                printf("before MUI loop\n");
+               // printf("before MUI loop\n");
                 do
                 {          
                     std::string strdbg = drivdispdbg.str();
@@ -806,66 +811,96 @@ pColumns->_players = players;
 }
 
 
+//  Else is in timer device SubTime().
+static inline timeval subtime( const timeval &a,const timeval &b)
+{
+    timeval dest = a;
+
+    if (dest.tv_micro < b.tv_micro)
+    {
+        dest.tv_micro += 1000000;
+        dest.tv_secs--;
+    }
+    dest.tv_micro -= b.tv_micro;
+    dest.tv_secs  -= b.tv_secs;
+    return dest;
+}
+static inline int nbcharOk(const char *pphrase,const char *ppattern)
+{
+    int i=0;
+    while(*pphrase != 0 && *ppattern != 0)
+    {
+        char a = *pphrase;
+        if(a>='A' && a<='Z') a+=32;
+
+        if(a == *ppattern) i++;
+        pphrase++;
+        ppattern++;
+    }
+    return i;
+}
+
+
 // extend list class
-//static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1))
-//{
-//  struct DriverData   *data;
-//  struct IntuiMessage *imsg;
-//  struct _game_driver   **drv_indirect;
-//  struct _game_driver   *drv;
-//  struct InputEvent   ie;
+static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1))
+{
+  struct DriverData   *data;
+  struct IntuiMessage *imsg;
+  struct _game_driver   **drv_indirect;
+  struct _game_driver   *drv;
+  struct InputEvent   ie;
 
-//  Object  *list;
-//  APTR  active_obj;
-//  ULONG i;
-//  UBYTE key;
+  Object  *list;
+  APTR  active_obj;
+  ULONG i;
+  UBYTE key;
 
-////printf("msg->MethodID:%08x\n",msg->MethodID);
-//  switch(msg->MethodID)
-//  {
-//    case MUIM_Setup:
-//      data = (struct DriverData *)INST_DATA(cclass, obj);
+//printf("msg->MethodID:%08x\n",msg->MethodID);
+  switch(msg->MethodID)
+  {
+    case MUIM_Setup:
+      data = (struct DriverData *)INST_DATA(cclass, obj);
 
-//      if(DoSuperMethodA(cclass, obj, msg))
-//      {
-//        data->Seconds = 0;
-//        data->Micros  = 0;
+      if(DoSuperMethodA(cclass, obj, msg))
+      {
+        data->Seconds = 0;
+        data->Micros  = 0;
 
-//        data->EventHandler.ehn_Priority = 0;
-//        data->EventHandler.ehn_Flags    = 0;
-//        data->EventHandler.ehn_Object   = obj;
-//        data->EventHandler.ehn_Class    = cclass;
-//        data->EventHandler.ehn_Events   = IDCMP_RAWKEY;
-//        DoMethod(_win(obj), MUIM_Window_AddEventHandler, &data->EventHandler);
+        data->EventHandler.ehn_Priority = 0;
+        data->EventHandler.ehn_Flags    = 0;
+        data->EventHandler.ehn_Object   = obj;
+        data->EventHandler.ehn_Class    = cclass;
+        data->EventHandler.ehn_Events   = IDCMP_RAWKEY;
+        DoMethod(_win(obj), MUIM_Window_AddEventHandler, &data->EventHandler);
 
-//        return(TRUE);
-//      }
+        return(TRUE);
+      }
 
-//      return(FALSE);
+      return(FALSE);
 
-//    case MUIM_Cleanup:
-//      data = (struct DriverData *)INST_DATA(cclass, obj);
+    case MUIM_Cleanup:
+      data = (struct DriverData *)INST_DATA(cclass, obj);
 
-//      DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->EventHandler);
-//      break;
+      DoMethod(_win(obj), MUIM_Window_RemEventHandler, &data->EventHandler);
+      break;
 
-//    case MUIM_HandleEvent:
-//      data =  (struct DriverData *) INST_DATA(cclass, obj);
-//      imsg = (struct IntuiMessage *) msg[1].MethodID;
+    case MUIM_HandleEvent:
+      data =  (struct DriverData *) INST_DATA(cclass, obj);
+      imsg = (struct IntuiMessage *) msg[1].MethodID;
 
 
-//      get(_win(obj), MUIA_Window_ActiveObject, &active_obj);
+      get(_win(obj), MUIA_Window_ActiveObject, &active_obj);
 
-//      if(obj == active_obj)
-//      {
-//        if(imsg->Class == IDCMP_RAWKEY)
-//        {
-//          ie.ie_Class   = IECLASS_RAWKEY;
-//          ie.ie_SubClass  = 0;
-//          ie.ie_Code    = imsg->Code;
-//          ie.ie_Qualifier = 0;
+      if(obj == active_obj)
+      {
+        if(imsg->Class == IDCMP_RAWKEY)
+        {
+          ie.ie_Class   = IECLASS_RAWKEY;
+          ie.ie_SubClass  = 0;
+          ie.ie_Code    = imsg->Code;
+          ie.ie_Qualifier = 0;
 
-////  MapRawKey( CONST struct InputEvent *event, STRPTR buffer, LONG length, CONST struct KeyMap *keyMap );
+//  MapRawKey( CONST struct InputEvent *event, STRPTR buffer, LONG length, CONST struct KeyMap *keyMap );
 //          if(MapRawKey(&ie,(STRPTR)&key, 1, NULL) && isalnum(key))
 //          {
 //            i = imsg->Seconds - data->Seconds;
@@ -916,63 +951,63 @@ pColumns->_players = players;
 
 //            return(MUI_EventHandlerRC_Eat);
 //          }
-//        }
-//      }
-//      return(0);
-//      //break;
-//      case MUIM_HandleInput: // krb added
-//        {
-//	#define _between(a,x,b) ((x)>=(a) && (x)<=(b))
-//	#define _isinobject(x,y) (_between(_mleft(obj),(x),_mright(obj)) && _between(_mtop(obj),(y),_mbottom(obj)))
+        }
+      }
+      return(0);
+      //break;
+      case MUIM_HandleInput: // krb added
+        {
+	#define _between(a,x,b) ((x)>=(a) && (x)<=(b))
+	#define _isinobject(x,y) (_between(_mleft(obj),(x),_mright(obj)) && _between(_mtop(obj),(y),_mbottom(obj)))
 
-//            // if MUI<5, use this to get selected column.
-//            // if MUI>=5 use MUIA_List_SortColumn
-//             if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
-//             {
-//            // - - - check clicks on title bar
-//            //  struct IntuiMessage *imsg; LONG muikey;
-//            struct MUIP_HandleInput *msghi = (struct MUIP_HandleInput *)msg;
-//            if(msghi->imsg && msghi->imsg->Class == IDCMP_MOUSEBUTTONS &&
-//             msghi->imsg->Code == SELECTDOWN )
+            // if MUI<5, use this to get selected column.
+            // if MUI>=5 use MUIA_List_SortColumn
+             if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
+             {
+            // - - - check clicks on title bar
+            //  struct IntuiMessage *imsg; LONG muikey;
+            struct MUIP_HandleInput *msghi = (struct MUIP_HandleInput *)msg;
+            if(msghi->imsg && msghi->imsg->Class == IDCMP_MOUSEBUTTONS &&
+             msghi->imsg->Code == SELECTDOWN )
+            {
+                // receive all clicks on the window.
+                // we have to check list bounds
+                if(_isinobject( msghi->imsg->MouseX,msghi->imsg->MouseY))
+                {
+                    struct MUI_List_TestPos_Result res;
+                    DoMethod(obj,MUIM_List_TestPos,
+                        msghi->imsg->MouseX,msghi->imsg->MouseY, &res);
+                    if(res.column>=0 && res.entry == -1)
+                    {
+                        // would indicate clicking titles
+                        if(res.column != columnToSort)
+                        {
+                            columnToSort = res.column;
+                            DoMethod(obj,MUIM_List_Sort);
+                           // finnaly, propagate. return(MUI_EventHandlerRC_Eat);
+                        }
+                    }
+                }
+                // Class
+            }
+//            if (msghi->muikey!=MUIKEY_NONE)
 //            {
-//                // receive all clicks on the window.
-//                // we have to check list bounds
-//                if(_isinobject( msghi->imsg->MouseX,msghi->imsg->MouseY))
+//                switch (msg->muikey)
 //                {
-//                    struct MUI_List_TestPos_Result res;
-//                    DoMethod(obj,MUIM_List_TestPos,
-//                        msghi->imsg->MouseX,msghi->imsg->MouseY, &res);
-//                    if(res.column>=0 && res.entry == -1)
-//                    {
-//                        // would indicate clicking titles
-//                        if(res.column != columnToSort)
-//                        {
-//                            columnToSort = res.column;
-//                            DoMethod(obj,MUIM_List_Sort);
-//                           // finnaly, propagate. return(MUI_EventHandlerRC_Eat);
-//                        }
-//                    }
+//                    case MUIKEY_LEFT : data->sx=-1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
+//                    case MUIKEY_RIGHT: data->sx= 1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
+//                    case MUIKEY_UP   : data->sy=-1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
+//                    case MUIKEY_DOWN : data->sy= 1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
 //                }
-//                // Class
 //            }
-////            if (msghi->muikey!=MUIKEY_NONE)
-////            {
-////                switch (msg->muikey)
-////                {
-////                    case MUIKEY_LEFT : data->sx=-1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
-////                    case MUIKEY_RIGHT: data->sx= 1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
-////                    case MUIKEY_UP   : data->sy=-1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
-////                    case MUIKEY_DOWN : data->sy= 1; MUI_Redraw(obj,MADF_DRAWUPDATE); break;
-////                }
-////            }
-//            }
+            }
 
-//        } // end case
-//      break;
-//  }
+        } // end case
+      break;
+  }
 
-//  return(DoSuperMethodA(cclass, obj, msg));
-//}
+  return(DoSuperMethodA(cclass, obj, msg));
+}
 
 static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1))
 {
@@ -997,6 +1032,7 @@ static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj RE
       {
         data->Seconds = 0;
         data->Micros  = 0;
+        data->nbTypedAccum = 0;
 
         data->EventHandler.ehn_Priority = 0;
         data->EventHandler.ehn_Flags    = 0;
@@ -1043,55 +1079,60 @@ static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj RE
 //  MapRawKey( CONST struct InputEvent *event, STRPTR buffer, LONG length, CONST struct KeyMap *keyMap );
           if(MapRawKey(&ie,(STRPTR)&key[0], 4, NULL) && isalnum(key[0]))
           {
-//            i = imsg->Seconds - data->Seconds;
+            timeval diftime = subtime({imsg->Seconds,imsg->Micros},{data->Seconds,data->Micros});
 
-//            if(imsg->Micros < data->Micros)
-//              i--;
+            // addchar if time dif less than 0.8 sec, else restart.
+            int doAddChar=( diftime.tv_sec==0 && diftime.tv_micro< (1000000) );
 
-//            if(i < 1)
-//            {
-//              data->CharIndex++;
-//              i = data->CurrentEntry;
-//            }
-//            else
-//            {
-//              data->CharIndex = 0;
-//              i = 0;
-//            }
+            data->Seconds = imsg->Seconds;
+            data->Micros = imsg->Micros;
 
-//            data->Seconds = imsg->Seconds;
-//            data->Micros  = imsg->Micros;
+            if(doAddChar)
+            {
+                if(data->nbTypedAccum<4)
+                {
+                    data->typedAccum[data->nbTypedAccum] = key[0];
+                    data->nbTypedAccum++;
+                    data->typedAccum[data->nbTypedAccum] = 0;
+                }
+            } else
+            {
+                data->typedAccum[0] = key[0];
+                data->typedAccum[1] = 0;
+                data->nbTypedAccum = 1;
+            }
 
-             char temp[64];
-             snprintf(temp,63,"key:%c\n",(char)key[0]);
-             drivdispdbg << temp;
-/*
+//             char temp[64];
+//             snprintf(temp,63,"key:%c\n",(char)key[0]);
+//             drivdispdbg << temp;
+
+            i = 0;
+            int bestIndex = -1;
+            int bestIndexScore = 0;
+            // really loop anything (posibly 2000 items). It's one by key stroke anyway.
+            // list items can be sorted in any manner.
             do
             {
               DoMethod(list, MUIM_List_GetEntry, i, &drv_indirect);
+              if(! drv_indirect) break;
 
-              if(drv_indirect)
+              drv = *drv_indirect;
+              int nbcharok = nbcharOk(drv->description,data->typedAccum);
+              if(nbcharok>bestIndexScore)
               {
-                drv = *drv_indirect;
-
-                if(data->CharIndex < strlen(drv->description))
-                {
-                  if(key <= tolower(drv->description[data->CharIndex]))
-                  {
-                    data->CurrentEntry = i;
-
-                    set(list, MUIA_List_Active, i);
-
-                    break;
-                  }
-                }
+                bestIndexScore = nbcharok;
+                bestIndex = i;
               }
 
               i++;
 
-            } while(drv_indirect);
-*/
-             return(MUI_EventHandlerRC_Eat);
+            } while(1);
+
+            if(bestIndex>=0)
+            {
+               set(list, MUIA_List_Active, bestIndex);
+               return(MUI_EventHandlerRC_Eat);
+            }
           }
 
         }
@@ -1280,7 +1321,7 @@ int MameUI::init()
 
     if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)
     {
-   //Re     DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcher);
+        DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcher);
     } else
     {
         DriverClass = MUI_CreateCustomClass(NULL, MUIC_Listview, NULL, sizeof(struct DriverData),(APTR) DriverDispatcherMUI5);

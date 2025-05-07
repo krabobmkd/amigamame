@@ -203,13 +203,14 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         params._flags ^= reportFlags;
         params._flags &= ORIENTATION_MASK;
 
-        if(screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose)
+        if( screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose
+            && screenModeConf._modeid._modeId != INVALID_ID )
         {
             params._forcedModeID = (ULONG) screenModeConf._modeid._modeId;
             params._forcedDepth = (ULONG) screenModeConf._modeid._depth; // only used in AGA/OCS
            // printf("screenModeConf._modeid._depth:%d\n",params._forcedDepth);
         }
-         else
+        else
         {
            params._forcedModeID = ~0; // undefined.
            params._forcedDepth = 24;
