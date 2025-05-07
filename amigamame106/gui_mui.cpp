@@ -1009,6 +1009,7 @@ static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2
   return(DoSuperMethodA(cclass, obj, msg));
 }
 
+// DriverDispatcherMUI5 does not patch column sorting , it lets MUI5 list do it.
 static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1))
 {
   struct DriverData   *data;
@@ -1058,9 +1059,15 @@ static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj RE
       imsg = (struct IntuiMessage *) msg[1].MethodID;
 
 // printf("MUIM_HandleEvent\n");
-//      int vis;
-//      get(obj, MUIA_List_Visible, &vis);
-//      if(vis) break;
+      int nbvisisbles;
+      get(obj, MUIA_List_Visible, &nbvisisbles);
+      // -1 means list not visible at all (not the right panel ?).
+      // do not accaparate keyboard in that case
+      if(nbvisisbles<=0) break;
+
+//             char temp[64];
+//             snprintf(temp,63,"nbvisisbles:%d\n",nbvisisbles);
+//             drivdispdbg << temp;
 
       get(_win(obj), MUIA_Window_ActiveObject, &active_obj);
       get(obj, MUIA_Listview_List, &list);

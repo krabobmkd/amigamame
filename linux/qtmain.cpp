@@ -169,7 +169,10 @@ void QProc::process()
     m_nbtest = 0;
     // test if just "mame romname".
     {
-        int idriver = getMainConfig().driverIndex().index("outrun");
+        int idriver = getMainConfig().driverIndex().index(
+       // "outrun"
+       "thndrbld"
+        );
         if(idriver>0)
         {
             getMainConfig().setActiveDriver(idriver);
@@ -259,7 +262,7 @@ int main(int argc, char* argv[])
     logEntries();
 
 
-    cpustats_log();
+//    cpustats_log();
 
 	return r;
 }

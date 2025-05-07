@@ -13,6 +13,7 @@ make more configurable (select caches per game?)
 #include "machine/fd1094.h"
 #include <stdio.h>
 
+
 #define S16_NUMCACHE 8
 
 static unsigned char *fd1094_key=NULL; // the memory region containing key
@@ -26,6 +27,9 @@ static int fd1094_current_cacheposition; // current position in cache array
 
 void *fd1094_get_decrypted_base(void)
 {
+#ifdef DBG16FD
+ printf("fd1094_get_decrypted_base:%08x %08x\n",(int)fd1094_key,(int)fd1094_userregion);
+#endif
 	if (!fd1094_key)
 		return NULL;
 	return fd1094_userregion;
@@ -37,6 +41,10 @@ void *fd1094_get_decrypted_base(void)
    cache position using the functions in fd1094.c */
 void fd1094_setstate_and_decrypt(int state)
 {
+#ifdef DBG16FD
+//Re printf("fd1094_setstate_and_decrypt:%d\n",state);
+#endif
+
 	int i;
 	UINT32 addr;
 
@@ -88,6 +96,9 @@ void fd1094_setstate_and_decrypt(int state)
 /* Callback for CMP.L instructions (state change) */
 void fd1094_cmp_callback(unsigned int val, int reg)
 {
+#ifdef DBG16FD
+ printf("fd1094_cmp_callback:%08x %08x\n",(int)fd1094_key,(int)fd1094_userregion);
+#endif
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
 		fd1094_setstate_and_decrypt((val & 0xffff0000) >> 16);
@@ -97,12 +108,18 @@ void fd1094_cmp_callback(unsigned int val, int reg)
 /* Callback when the FD1094 enters interrupt code */
 int fd1094_int_callback (int irq)
 {
+#ifdef DBG16FD
+ printf("fd1094_int_callback: irq:%d\n",irq);
+#endif
 	fd1094_setstate_and_decrypt(FD1094_STATE_IRQ);
 	return (0x60+irq*4)/4; // vector address
 }
 
 void fd1094_rte_callback (void)
 {
+#ifdef DBG16FD
+//Re printf("fd1094_rte_callback\n");
+#endif
 	fd1094_setstate_and_decrypt(FD1094_STATE_RTE);
 }
 
@@ -110,6 +127,9 @@ void fd1094_rte_callback (void)
 /* KLUDGE, set the initial PC / SP based on table as we can't decrypt them yet */
 void fd1094_kludge_reset_values(void)
 {
+#ifdef DBG16FD
+ printf("fd1094_kludge_reset_values key:%02x\n",(int)fd1094_key[0]);
+#endif
 	int i;
 
 	for (i = 0;i < 4;i++)
@@ -120,6 +140,9 @@ void fd1094_kludge_reset_values(void)
 /* function, to be called from MACHINE_RESET (every reset) */
 void fd1094_machine_init(void)
 {
+#ifdef DBG16FD
+ printf("fd1094_machine_init\n");
+#endif
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
 	if (!fd1094_key)
 		return;
@@ -136,6 +159,9 @@ void fd1094_machine_init(void)
 /* startup function, to be called from DRIVER_INIT (once on startup) */
 void fd1094_driver_init(void)
 {
+#ifdef DBG16FD
+ printf("fd1094_driver_init\n");
+#endif
 	int i;
     //krb cleaning
     {

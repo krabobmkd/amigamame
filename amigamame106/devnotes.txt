@@ -2,13 +2,14 @@
 
 todo R1.3b
 
-
+ X multiple key selection whatever the sort + only when list panel.
  O revalider dispatcher list with "NO MUI5" version.
-
+ O MUIM_Window_SetCycleChain with serializer ?
+ O remove stream drivdispdbg in gui after its ok
 
 todo R1.3
 
- O checksum neogeo3d TODO
+ X checksum neogeo3d TODO
 
  new feats:
  - O outrun lever & wheel gadgets
