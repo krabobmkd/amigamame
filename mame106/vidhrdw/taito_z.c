@@ -558,6 +558,271 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 }
 
 
+static void nightstr_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+{
+	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
+	int offs, data, tilenum, color, flipx, flipy;
+	int x, y, priority, curx, cury;
+	int sprites_flipscreen = 0;
+	int zoomx, zoomy, zx, zy;
+	int sprite_chunk,map_offset,j,k,px,py;
+	UINT32 code;
+
+//    int nbt=0;
+    rectangle lcliprect = *cliprect;
+    lcliprect.max_y++;
+    lcliprect.max_x++;
+
+// nightstr: 16384
+// printf("gfx0nbelt:%d gfx2nb:%d\n", Machine->gfx[0]->total_elements,Machine->gfx[2]->total_elements);
+// exit(0);
+	static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
+    struct drawgfxParams dgpz1={
+        bitmap, 	// dest
+        Machine->gfx[0], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        &lcliprect, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        0, 	// transparent_color
+        0x00010000, 	// scalex
+        0x00010000, 	// scaley
+        priority_bitmap, 	// pri_buffer
+        0//primasks[priority] 	// priority_mask
+      };
+    struct drawgfxParams dgpz2={
+        bitmap, 	// dest
+        Machine->gfx[2], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        &lcliprect, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        0, 	// transparent_color
+        0x00010000, 	// scalex
+        0x00010000, 	// scaley
+        priority_bitmap, 	// pri_buffer
+        0,// primasks[priority] 	// priority_mask
+      };
+	for (offs = spriteram_size/2-4;offs >=0;offs -= 4)
+	{
+		data = spriteram16[offs+0];
+		zoomy = (data & 0xfe00) >> 9;
+		y = data & 0x1ff;
+
+		data = spriteram16[offs+1];
+		priority = (data & 0x8000) >> 15;
+
+		color = (data & 0x7f80) >> 7;
+		zoomx = (data & 0x7f);
+
+		data = spriteram16[offs+2];
+		flipy = (data & 0x8000) >> 15;
+		flipx = (data & 0x4000) >> 14;
+		x = data & 0x1ff;
+
+		data = spriteram16[offs+3];
+		/* higher bits are sometimes used... e.g. sign over flashing enemy car...! */
+		tilenum = data & 0x7ff;
+
+		if (!tilenum) continue;
+
+		zoomx += 1;
+		zoomy += 1;
+
+		y += y_offs;
+		y += (128-zoomy);
+
+		/* treat coords as signed */
+		if (x>0x140) x -= 0x200;
+		if (y>0x140) y -= 0x200;
+
+		if ((zoomx-1) & 0x40)	/* 128x128 sprites, $0-$3ffff in spritemap rom, OBJA */
+		{
+			map_offset = tilenum << 6;
+
+            dgpz1.priority_mask = primasks[priority];
+            dgpz1.color = color;
+
+			for (sprite_chunk=0;sprite_chunk<64;sprite_chunk++)
+			{
+				j = sprite_chunk / 8;   /* 8 rows */
+				k = sprite_chunk % 8;   /* 8 sprite chunks per row */
+
+				px = flipx ? (7-k) : k;	/* pick tiles back to front for x and y flips */
+				py = flipy ? (7-j) : j;
+
+				code = spritemap[map_offset + px + (py<<3)];
+
+				// if (code == 0xffff) // bad_chunk
+				// {
+				// 	continue;
+				// }
+				// in that case
+				//code &= 0x3fff; // code %=  dgpz1.gfx->total_elements; -> always 16384 fOR chasehq and nightstr
+
+                UINT32 pen_usage = dgpz1.gfx->pen_usage[code];
+             //   if(pen_usage == 1) continue; // full transparent escape
+
+
+				curx = x + ((k*zoomx)/8);
+				cury = y + ((j*zoomy)/8);
+
+				zx = x + (((k+1)*zoomx)/8) - curx;
+				zy = y + (((j+1)*zoomy)/8) - cury;
+
+				if (sprites_flipscreen)
+				{
+					/* -zx/y is there to fix zoomed sprite coords in screenflip.
+                       drawgfxzoom does not know to draw from flip-side of sprites when
+                       screen is flipped; so we must correct the coords ourselves. */
+
+					curx = 320 - curx - zx;
+					cury = 256 - cury - zy;
+					flipx = !flipx;
+					flipy = !flipy;
+				}
+				dgpz1.code = code;
+				dgpz1.flipx = flipx;
+				dgpz1.flipy = flipy;
+				dgpz1.sx = curx;
+				dgpz1.sy = cury;
+				dgpz1.scalex = zx<<12;
+				dgpz1.scaley = zy<<12;
+                drawgfxzoom(&dgpz1);
+				 // if(/*pen_usage == 128 &&*/ priority ==1)
+     //                 drawgfxzoom_prio_write(&dgpz1);
+				 // else
+                //    drawgfxzoom_clut16_Src8_tr0_prio(&dgpz1);
+			}
+		}
+		else if ((zoomx-1) & 0x20)	/* 64x128 sprites, $40000-$5ffff in spritemap rom, OBJB */
+		{
+			map_offset = (tilenum << 5) + 0x20000;
+            dgpz2.priority_mask = primasks[priority];
+            dgpz2.color = color;
+			for (sprite_chunk=0;sprite_chunk<32;sprite_chunk++)
+			{
+				j = sprite_chunk / 4;   /* 8 rows */
+				k = sprite_chunk % 4;   /* 4 sprite chunks per row */
+
+				px = flipx ? (3-k) : k;	/* pick tiles back to front for x and y flips */
+				py = flipy ? (7-j) : j;
+
+				code = spritemap[map_offset + px + (py<<2)];
+
+				// if (code == 0xffff) // bad_chunk
+				// {
+				// 	continue;
+				// }
+				//code &= 0x3fff;
+
+                UINT32 pen_usage = dgpz2.gfx->pen_usage[code];
+            //    if(pen_usage == 1) continue; // full transparent escape
+
+				curx = x + ((k*zoomx)/4);
+				cury = y + ((j*zoomy)/8);
+
+				zx = x + (((k+1)*zoomx)/4) - curx;
+				zy = y + (((j+1)*zoomy)/8) - cury;
+
+				if (sprites_flipscreen)
+				{
+					/* -zx/y is there to fix zoomed sprite coords in screenflip.
+                       drawgfxzoom does not know to draw from flip-side of sprites when
+                       screen is flipped; so we must correct the coords ourselves. */
+
+					curx = 320 - curx - zx;
+					cury = 256 - cury - zy;
+					flipx = !flipx;
+					flipy = !flipy;
+				}
+
+
+				dgpz2.code = code;
+				dgpz2.flipx = flipx;
+				dgpz2.flipy = flipy;
+				dgpz2.sx = curx;
+				dgpz2.sy = cury;
+				dgpz2.scalex = zx<<12;
+				dgpz2.scaley = zy<<12;
+
+                drawgfxzoom(&dgpz2);
+				 // if(/*pen_usage == 128 &&*/ priority ==1)
+     //                 drawgfxzoom_prio_write(&dgpz2);
+				 // else
+       //             drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
+			}
+		} // end case 64x128
+		else if (!((zoomx-1) & 0x60))	/* 32x128 sprites, $60000-$7ffff in spritemap rom, OBJB */
+		{
+			map_offset = (tilenum << 4) + 0x30000;
+            dgpz2.priority_mask = primasks[priority];
+            dgpz2.color = color;
+			for (sprite_chunk=0;sprite_chunk<16;sprite_chunk++)
+			{
+				j = sprite_chunk / 2;   /* 8 rows */
+				k = sprite_chunk % 2;   /* 2 sprite chunks per row */
+
+				px = flipx ? (1-k) : k;	/* pick tiles back to front for x and y flips */
+				py = flipy ? (7-j) : j;
+
+				code = spritemap[map_offset + px + (py<<1)];
+
+				// if (code == 0xffff) // bad_chunk
+				// {
+				// 	continue;
+				// }
+				//code &= 0x3fff;
+
+                UINT32 pen_usage = dgpz2.gfx->pen_usage[code];
+            //    if(pen_usage == 1) continue; // full transparent escape
+
+				curx = x + ((k*zoomx)/2);
+				cury = y + ((j*zoomy)/8);
+
+				zx = x + (((k+1)*zoomx)/2) - curx;
+				zy = y + (((j+1)*zoomy)/8) - cury;
+
+				if (sprites_flipscreen)
+				{
+					/* -zx/y is there to fix zoomed sprite coords in screenflip.
+                       drawgfxzoom does not know to draw from flip-side of sprites when
+                       screen is flipped; so we must correct the coords ourselves. */
+
+					curx = 320 - curx - zx;
+					cury = 256 - cury - zy;
+					flipx = !flipx;
+					flipy = !flipy;
+				}
+
+				dgpz2.code = code;
+				dgpz2.flipx = flipx;
+				dgpz2.flipy = flipy;
+				dgpz2.sx = curx;
+				dgpz2.sy = cury;
+				dgpz2.scalex = zx<<12;
+				dgpz2.scaley = zy<<12;
+
+				drawgfxzoom(&dgpz2);
+				  // if(/*pen_usage == 128 &&*/ priority ==1)
+      //                 drawgfxzoom_prio_write(&dgpz2);
+				  // else
+            //         drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
+//				nbt++;
+			}
+		} // end case 32x128
+
+	} // end loop per sprites
+}
+
 
 static void bshark_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
@@ -1111,6 +1376,53 @@ VIDEO_UPDATE( chasehq )
 
 	chasehq_draw_sprites_16x16(bitmap,cliprect,7);
 }
+
+VIDEO_UPDATE( nightstr )
+{
+	UINT8 layer[3];
+
+	TC0100SCN_tilemap_update();
+
+	layer[0] = TC0100SCN_bottomlayer(0);
+	layer[1] = layer[0]^1;
+	layer[2] = 2;
+
+	int nodraw = TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+
+    /* Ensure screen blanked even when bottom layer not drawn due to disable bit */
+    if (nodraw)
+    {
+        fillbitmap(priority_bitmap,0,cliprect);
+        fillbitmap(bitmap, Machine->pens[0], cliprect);
+    }
+	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
+	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
+	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+
+	nightstr_draw_sprites_16x16(bitmap,cliprect,7);
+
+
+	// UINT8 layer[3];
+
+	// TC0100SCN_tilemap_update();
+
+	// layer[0] = TC0100SCN_bottomlayer(0);
+	// layer[1] = layer[0]^1;
+	// layer[2] = 2;
+
+	// fillbitmap(priority_bitmap,0,cliprect);
+
+	// /* Ensure screen blanked even when bottom layer not drawn due to disable bit */
+	// fillbitmap(bitmap, Machine->pens[0], cliprect);
+
+	// TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+	// TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
+	// TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
+	// TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+
+	// nightstr_draw_sprites_16x16(bitmap,cliprect,7);
+}
+
 
 
 VIDEO_UPDATE( bshark )

@@ -124,6 +124,7 @@ protected:
         std::string *_str;
         int _flgs;
         Object *_STRING_Path;
+        Object *_popBt;
         struct Hook _notifyHook;
 	};
     struct LSlider : public Level {
@@ -196,7 +197,6 @@ protected:
 
 
     std::list<Level *> _stack;
-    std::vector<Object *> _cyclechain;
     int _irecurse;
     Level **_pGrower;
     Level *_pRoot;

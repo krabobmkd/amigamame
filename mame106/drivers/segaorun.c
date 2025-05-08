@@ -313,6 +313,8 @@ static void scanline_callback(int scanline)
 static void outrun_reset(void)
 {
 	cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+	//krb test, copy from xbd
+	cpu_boost_interleave(0, TIME_IN_USEC(100));
 }
 
 

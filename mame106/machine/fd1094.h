@@ -6,4 +6,4 @@ int fd1094_set_state(unsigned char *key,int state);
 int fd1094_decode(int address,int val,unsigned char *key,int vector_fetch);
 
 
-#define DBG16FD 1
+//#define DBG16FD 1

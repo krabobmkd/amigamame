@@ -3,13 +3,17 @@
 todo R1.3b
 
  X multiple key selection whatever the sort + only when list panel.
- O revalider dispatcher list with "NO MUI5" version.
+ X revalider dispatcher list with "NO MUI5" version.
  O MUIM_Window_SetCycleChain with serializer ?
- O remove stream drivdispdbg in gui after its ok
+ X remove stream drivdispdbg in gui after its ok
+ X thunderblade/outrun/wb3/shangon interblocking -> CORRECTED
+ X nightstriker spriteprio
 
+
+--------------------------------------------------------------------------
 todo R1.3
 
- X checksum neogeo3d TODO
+ X checksum neogeo3d
 
  new feats:
  - O outrun lever & wheel gadgets
@@ -33,8 +37,6 @@ todo R1.3
  - X "Super Chase Criminal Termination" sprite priorities fixed.
  - X BigRun sprite prio -> was a 106 original bug. few glitches left but Bigrun is super cool now one of the best racing game.
  - X 64th street(& lots of megasys jaleco games) sprite priority bug fixed.
-
- - O thunderblade boot bugs
 
 
 

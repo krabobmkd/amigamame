@@ -782,6 +782,7 @@ VIDEO_START( spacegun );
 
 VIDEO_UPDATE( contcirc );
 VIDEO_UPDATE( chasehq );
+VIDEO_UPDATE( nightstr );
 VIDEO_UPDATE( bshark );
 VIDEO_UPDATE( sci );
 VIDEO_UPDATE( aquajack );
@@ -3478,7 +3479,7 @@ static MACHINE_DRIVER_START( nightstr )
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
-	MDRV_VIDEO_UPDATE(chasehq)
+	MDRV_VIDEO_UPDATE(nightstr)
 
 	/* sound hardware */
 #ifndef CHASEHQ_MONO

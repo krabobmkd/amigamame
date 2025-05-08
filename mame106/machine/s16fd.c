@@ -11,12 +11,11 @@ make more configurable (select caches per game?)
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
-#include <stdio.h>
 
 
 #define S16_NUMCACHE 8
 
-static unsigned char *fd1094_key=NULL; // the memory region containing key
+static unsigned char *fd1094_key; // the memory region containing key
 static UINT16 *fd1094_cpuregion; // the CPU region with encrypted code
 static UINT32  fd1094_cpuregionsize; // the size of this region in bytes
 
@@ -25,10 +24,11 @@ static UINT16* fd1094_cacheregion[S16_NUMCACHE]; // a cache region where S16_NUM
 static int fd1094_cached_states[S16_NUMCACHE]; // array of cached state numbers
 static int fd1094_current_cacheposition; // current position in cache array
 
+
 void *fd1094_get_decrypted_base(void)
 {
 #ifdef DBG16FD
- printf("fd1094_get_decrypted_base:%08x %08x\n",(int)fd1094_key,(int)fd1094_userregion);
+ printf("fd1094_get_decrypted_base: key:%08x ur:%08x\n",(int)fd1094_key,(int)fd1094_userregion);
 #endif
 	if (!fd1094_key)
 		return NULL;
@@ -41,12 +41,12 @@ void *fd1094_get_decrypted_base(void)
    cache position using the functions in fd1094.c */
 void fd1094_setstate_and_decrypt(int state)
 {
-#ifdef DBG16FD
-//Re printf("fd1094_setstate_and_decrypt:%d\n",state);
-#endif
-
 	int i;
 	UINT32 addr;
+
+#ifdef DBG16FD
+ printf("fd1094_setstate_and_decrypt: state: %d\n",state);
+#endif
 
 //	cpunum_set_info_int(0, CPUINFO_INT_REGISTER + M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
@@ -58,6 +58,10 @@ void fd1094_setstate_and_decrypt(int state)
 	{
 		if (fd1094_cached_states[i] == state)
 		{
+#ifdef DBG16FD
+ printf("cache fd1094_cached_states[%d]  == state: %d\n",i, state);
+#endif
+
 			/* copy cached state */
 			fd1094_userregion=fd1094_cacheregion[i];
 			memory_set_decrypted_region(0, 0, fd1094_cpuregionsize - 1, fd1094_userregion);
@@ -97,7 +101,7 @@ void fd1094_setstate_and_decrypt(int state)
 void fd1094_cmp_callback(unsigned int val, int reg)
 {
 #ifdef DBG16FD
- printf("fd1094_cmp_callback:%08x %08x\n",(int)fd1094_key,(int)fd1094_userregion);
+ printf("fd1094_cmp_callback: %d %d\n",val,reg);
 #endif
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
@@ -118,7 +122,7 @@ int fd1094_int_callback (int irq)
 void fd1094_rte_callback (void)
 {
 #ifdef DBG16FD
-//Re printf("fd1094_rte_callback\n");
+ printf("fd1094_rte_callback\n");
 #endif
 	fd1094_setstate_and_decrypt(FD1094_STATE_RTE);
 }
@@ -128,7 +132,7 @@ void fd1094_rte_callback (void)
 void fd1094_kludge_reset_values(void)
 {
 #ifdef DBG16FD
- printf("fd1094_kludge_reset_values key:%02x\n",(int)fd1094_key[0]);
+ printf("fd1094_kludge_reset_values\n");
 #endif
 	int i;
 
@@ -141,12 +145,11 @@ void fd1094_kludge_reset_values(void)
 void fd1094_machine_init(void)
 {
 #ifdef DBG16FD
- printf("fd1094_machine_init\n");
+ printf("fd1094_machine_init: fd1094_key: %08x\n",(int)fd1094_key);
 #endif
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
 	if (!fd1094_key)
 		return;
-
 
 	fd1094_setstate_and_decrypt(FD1094_STATE_RESET);
 	fd1094_kludge_reset_values();
@@ -159,19 +162,15 @@ void fd1094_machine_init(void)
 /* startup function, to be called from DRIVER_INIT (once on startup) */
 void fd1094_driver_init(void)
 {
-#ifdef DBG16FD
- printf("fd1094_driver_init\n");
-#endif
 	int i;
-    //krb cleaning
-    {
-        fd1094_userregion = NULL;
-    }
 
 	fd1094_cpuregion = (UINT16*)memory_region(REGION_CPU1);
 	fd1094_cpuregionsize = memory_region_length(REGION_CPU1);
 	fd1094_key = memory_region(REGION_USER1);
-
+	fd1094_userregion = NULL;
+#ifdef DBG16FD
+ printf("fd1094_driver_init: fd1094_key: %08x\n",(int)fd1094_key);
+#endif
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
 	if (!fd1094_key)
 		return;
@@ -187,3 +186,10 @@ void fd1094_driver_init(void)
 
 	fd1094_current_cacheposition = 0;
 }
+
+void fd1094_krb_preclean(void) // need super early clean
+{
+	fd1094_key = NULL;
+	fd1094_userregion = NULL;
+}
+

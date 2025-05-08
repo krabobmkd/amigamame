@@ -170,8 +170,9 @@ void QProc::process()
     // test if just "mame romname".
     {
         int idriver = getMainConfig().driverIndex().index(
+       "nightstr"
        // "outrun"
-       "thndrbld"
+       //"thndrbld"
         );
         if(idriver>0)
         {
@@ -239,8 +240,8 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*2,h*2)) );
-        this->setFixedSize(w*2,h*2);
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
+        this->setFixedSize(w*3,h*3);
     _imageMutex.unlock();
 
 	//lbl.show();
@@ -366,10 +367,10 @@ nbframe++;
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 
 // chasehq sprite prio bug:
-if(nbframe == 60*100 && m_nbtest == 0)
-{
- mame_schedule_exit();
-}
+// if(nbframe == 60*100 && m_nbtest == 0)
+// {
+//  mame_schedule_exit();
+// }
 //if(nbframe == 658) mame_pause(1); // ninjaw scene
 //if(nbframe == 950) mame_pause(1);
 

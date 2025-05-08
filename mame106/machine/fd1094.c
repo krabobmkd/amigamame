@@ -2,7 +2,6 @@
 
 FD1094 encryption
 
-
 The FD1094 is a custom CPU based on the 68000, which runs encrypted code.
 The decryption key is stored in 8KB of battery-backed RAM; when the battery
 dies, the CPU can no longer decrypt the program code and the game stops
@@ -180,7 +179,8 @@ bad       11100000 10101011 10111001 (flaky 317-0049)
 
 #include "driver.h"
 #include "fd1094.h"
-#include <stdio.h>
+
+
 /*
 317-0162 CPU also needs to mask:
 0x107a,
@@ -193,7 +193,7 @@ bad       11100000 10101011 10111001 (flaky 317-0049)
 0x1e7a,
 this only happens with 317-0162 so far; I assume it is a fault in the CPU.
 */
-const static int masked_opcodes[] =
+static int masked_opcodes[] =
 {
 	0x013a,0x033a,0x053a,0x073a,0x083a,0x093a,0x0b3a,0x0d3a,0x0f3a,
 
@@ -272,7 +272,7 @@ const static int masked_opcodes[] =
 	0xde3a,0xde7a,0xdeba,0xdefa,	0xdffa
 };
 
-static inline int final_decrypt(int i,int moreffff)
+static int final_decrypt(int i,int moreffff)
 {
 	int j;
 
@@ -307,14 +307,11 @@ static inline int final_decrypt(int i,int moreffff)
 	return dec;
 }
 
-static UINT8 global_key1,global_key2,global_key3;
-/* note: address is the word offset (physical address / 2) */
 
+static UINT8 global_key1,global_key2,global_key3;
+
+/* note: address is the word offset (physical address / 2) */
 int fd1094_decode(int address,int val,unsigned char *main_key,int vector_fetch)
-//{
-//	return decode(address,val,key,global_key1,global_key2,global_key3,vector_fetch);
-//}
-//static int decode(int address,int val,unsigned char *main_key,int global_key1,int global_key2,int global_key3,int vector_fetch)
 {
 	int mainkey,key_F,key_6a,key_7a,key_6b;
 	int key_0a,key_0b,key_0c;
@@ -322,9 +319,10 @@ int fd1094_decode(int address,int val,unsigned char *main_key,int vector_fetch)
 	int global_xor0,global_xor1;
 	int global_swap0a,global_swap1,global_swap2,global_swap3,global_swap4;
 	int global_swap0b;
-#ifdef DBG16FD
-// printf("fd1094 decode:%08x %08x\n",address,val);
-#endif
+
+    UINT8 gkey1 = global_key1;
+    UINT8 gkey2 = global_key2;
+    UINT8 gkey3 = global_key3;
 
 	/* for address xx0000-xx0006 (but only if >= 000008), use key xx2000-xx2006 */
 	if ((address & 0x0ffc) == 0 && address >= 4)
@@ -339,50 +337,52 @@ int fd1094_decode(int address,int val,unsigned char *main_key,int vector_fetch)
        from 0000-0006 than when fetching the inital SP and PC on reset. */
 	if (vector_fetch)
 	{
-		if (address <= 3) global_key3 = 0x00;	// supposed to always be the case
-		if (address <= 2) global_key2 = 0x00;
-		if (address <= 1) global_key1 = 0x00;
+		if (address <= 3) gkey3 = 0x00;	// supposed to always be the case
+		if (address <= 2) gkey2 = 0x00;
+		if (address <= 1) gkey1 = 0x00;
 		if (address <= 1) key_F = 0;
 	}
 
-	global_xor0         = 1^BIT(global_key1,5);	// could be bit 7
-	global_xor1         = 1^BIT(global_key1,2);
-	global_swap2        = 1^BIT(global_key1,0);
+	global_xor0         = 1^BIT(gkey1,5);	// could be bit 7
+	global_xor1         = 1^BIT(gkey1,2);
+	global_swap2        = 1^BIT(gkey1,0);
 
-	global_swap0a       = 1^BIT(global_key2,5);
-	global_swap0b       = 1^BIT(global_key2,2);
+	global_swap0a       = 1^BIT(gkey2,5);
+	global_swap0b       = 1^BIT(gkey2,2);
 
-	global_swap3        = 1^BIT(global_key3,6);
-	global_swap1        = 1^BIT(global_key3,4);
-	global_swap4        = 1^BIT(global_key3,2);
+	global_swap3        = 1^BIT(gkey3,6);
+	global_swap1        = 1^BIT(gkey3,4);
+	global_swap4        = 1^BIT(gkey3,2);
 
-	key_0a = BIT(mainkey,0) ^ BIT(global_key3,1);
-	key_0b = BIT(mainkey,0) ^ BIT(global_key1,7);	// could be bit 5
-	key_0c = BIT(mainkey,0) ^ BIT(global_key1,1);
+	key_0a = BIT(mainkey,0) ^ BIT(gkey3,1);
+	key_0b = BIT(mainkey,0) ^ BIT(gkey1,7);	// could be bit 5
+	key_0c = BIT(mainkey,0) ^ BIT(gkey1,1);
 
-	key_1a = BIT(mainkey,1) ^ BIT(global_key2,7);
-	key_1b = BIT(mainkey,1) ^ BIT(global_key1,3);
+	key_1a = BIT(mainkey,1) ^ BIT(gkey2,7);
+	key_1b = BIT(mainkey,1) ^ BIT(gkey1,3);
 
-	key_2a = BIT(mainkey,2) ^ BIT(global_key3,7);
-	key_2b = BIT(mainkey,2) ^ BIT(global_key1,4);
+	key_2a = BIT(mainkey,2) ^ BIT(gkey3,7);
+	key_2b = BIT(mainkey,2) ^ BIT(gkey1,4);
 
-	key_3a = BIT(mainkey,3) ^ BIT(global_key2,0);
-	key_3b = BIT(mainkey,3) ^ BIT(global_key3,3);
+	key_3a = BIT(mainkey,3) ^ BIT(gkey2,0);
+	key_3b = BIT(mainkey,3) ^ BIT(gkey3,3);
 
-	key_4a = BIT(mainkey,4) ^ BIT(global_key2,3);
-	key_4b = BIT(mainkey,4) ^ BIT(global_key3,0);
+	key_4a = BIT(mainkey,4) ^ BIT(gkey2,3);
+	key_4b = BIT(mainkey,4) ^ BIT(gkey3,0);
 
-	key_5a = BIT(mainkey,5) ^ BIT(global_key3,5);
-	key_5b = BIT(mainkey,5) ^ BIT(global_key1,6);
+	key_5a = BIT(mainkey,5) ^ BIT(gkey3,5);
+	key_5b = BIT(mainkey,5) ^ BIT(gkey1,6);
 
-	key_6a = BIT(mainkey,6) ^ BIT(global_key2,1);
-	key_6b = BIT(mainkey,6) ^ BIT(global_key2,6);
+	key_6a = BIT(mainkey,6) ^ BIT(gkey2,1);
+	key_6b = BIT(mainkey,6) ^ BIT(gkey2,6);
 
-	key_7a = BIT(mainkey,7) ^ BIT(global_key2,4);
+	key_7a = BIT(mainkey,7) ^ BIT(gkey2,4);
 
 
 	if ((val & 0xe000) == 0x0000)
+	{
 		val = BITSWAP16(val, 12,15,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+    }
 	else
 	{
 		if (val & 0x8000)
@@ -432,6 +432,7 @@ int fd1094_decode(int address,int val,unsigned char *main_key,int vector_fetch)
 
 	return final_decrypt(val,key_F);
 }
+
 
 int fd1094_set_state(unsigned char *key,int state)
 {
