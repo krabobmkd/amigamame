@@ -183,6 +183,7 @@ mame_file *mame_fopen_error(const char *gamename, const char *filename, int file
 		case FILETYPE_HISTORY:
 		case FILETYPE_LANGUAGE:
 		case FILETYPE_CTRLR:
+		case FILETYPE_SKIN_IMAGE:
 			if (openforwrite)
 			{
 				loginfo(2,"mame_fopen: type %02x write not supported\n", filetype);
@@ -236,8 +237,8 @@ mame_file *mame_fopen_error(const char *gamename, const char *filename, int file
 
 		/* cheat file */
 		case FILETYPE_CHEAT:
+		case FILETYPE_SKIN_IMAGE:
 			return generic_fopen(filetype, NULL, filename, 0, FILEFLAG_OPENREAD | (openforwrite ? FILEFLAG_OPENWRITE : 0), error);
-
 		/* disk images */
 		case FILETYPE_IMAGE:
 #ifndef MESS

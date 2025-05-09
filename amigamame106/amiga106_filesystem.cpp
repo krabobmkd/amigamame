@@ -70,12 +70,17 @@ enum
     AFT_ROM, // ROM and sample
     AFT_SAMPLE,
     AFT_USER, // writable, configs, ...
-    AFT_ABSOLUTE // to search for cheat file
+    AFT_ABSOLUTE, // to search for cheat file
+    AFT_SKINIMAGE
 };
 
 // shortlist this enum:
 int getAmigaFileType(int mameFileType)
 {
+    if(mameFileType == FILETYPE_SKIN_IMAGE )
+    {
+        return AFT_SKINIMAGE;
+    }
     if(mameFileType == FILETYPE_CHEAT )
     {
         return AFT_ABSOLUTE;
@@ -195,6 +200,7 @@ int osd_get_path_count(int pathtype)
 
     switch( getAmigaFileType(pathtype))
     {
+        case AFT_SKINIMAGE: return 1;
         case AFT_ABSOLUTE: return 1;
         case AFT_ROM: return 1;
         case AFT_SAMPLE: return 1;
@@ -222,6 +228,12 @@ void composeFilePath(int pathtype, int pathindex, const char *filename, std::str
             p = filename;
             return;
         }
+        case AFT_SKINIMAGE:
+        {
+            p = "PROGDIR:skin/";
+            p += filename;
+            return;
+        }
         default: p.clear(); break;
     }
     if(p.length()>0 && p.back() != ':' && p.back() != '/') p+= '/';
@@ -235,6 +247,7 @@ osd_file *osd_fopen(int pathtype, int pathindex, const char *filename, const cha
     string spath;
     composeFilePath(pathtype,pathindex,filename,spath);
 
+// printf("compose path:%s\n",spath.c_str());
     _osd_file *posd = new _osd_file();
     if(!posd) return NULL;
     if(! posd->open(spath.c_str(),mode))

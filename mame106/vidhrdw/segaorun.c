@@ -11,8 +11,8 @@
 #include "drawCtrl.h"
 
 //krb: draw optionnal control goodies
-static struct drawableExtra *_wheelgoody=NULL;
-static struct drawableExtra *_levergoody=NULL;
+static struct drawableExtra_steeringWheel *_wheelgoody=NULL;
+static struct drawableExtra_lever *_levergoody=NULL;
 
 /*************************************
  *
@@ -39,6 +39,15 @@ VIDEO_START( shangon )
 	return 0;
 }
 
+static void extraclean()
+{
+    if(_levergoody) drawextra_deleteLever(_levergoody);
+    _levergoody = NULL;
+    if(_wheelgoody) drawextra_deleteSteeringWheel(_wheelgoody);
+    _wheelgoody = NULL;
+}
+
+void add_exit_callback(void (*callback)(void));
 
 VIDEO_START( outrun )
 {
@@ -57,6 +66,11 @@ VIDEO_START( outrun )
 	if (segaic16_road_init(0, SEGAIC16_ROAD_OUTRUN, 0x400, 0x420, 0x780, 0))
 		return 1;
 
+    //krb
+    _levergoody = drawextra_createLever();
+    _wheelgoody = drawextra_createSteeringWheel();
+
+    add_exit_callback(extraclean);
 	return 0;
 }
 
@@ -134,7 +148,10 @@ VIDEO_UPDATE( outrun )
 	segaic16_sprites_draw(0, bitmap, cliprect);
 
 	//krb: draw optionnal control goodies
-    //TODO
-    //outrun_poorLever(bitmap,cliprect);
+	if(_levergoody)
+        drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
+	if(_wheelgoody)
+        drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]);
+
 
 }

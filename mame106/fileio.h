@@ -46,6 +46,7 @@ enum
 	FILETYPE_COMMENT,
 	FILETYPE_DEBUGLOG,
 	FILETYPE_HASH,	/* MESS-specific */
+	FILETYPE_SKIN_IMAGE,
 	FILETYPE_end 	/* dummy last entry */
 };
 
