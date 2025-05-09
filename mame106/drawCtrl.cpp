@@ -132,9 +132,10 @@ void drawextra_setpos(struct drawableExtra *p, int x,int y)
 
 
 extern rgb_t *game_palette;
+//extern rgb_t *adjusted_palette;
 // struct extraBitmap
 // for CLUT16 destination bitmaps :
-static void refreshRemapCLU16(mame_bitmap *bitmap,struct extraBitmap &bm)
+static void refreshRemapCLU16(mame_bitmap *bitmap,struct extraBitmap &bm, int indexStart)
 {
     int nbc = 16;
     if(bm._png.num_palette<nbc) nbc = bm._png.num_palette;
@@ -144,25 +145,29 @@ static void refreshRemapCLU16(mame_bitmap *bitmap,struct extraBitmap &bm)
         memset(&bm._colormap[0],0,sizeof(UINT16)*nbc);
         return;
     }
-	UINT8 *palette = bm._png.palette;
+	UINT8 *palette = bm._png.palette+3; // +3 because start 1
     for(int i=1;i<nbc;i++)
     {
-        UINT16 cr = (*palette++)>>4;
-        UINT16 cg = (*palette++)>>4;
-        UINT16 cb = (*palette++)>>4;
+        INT16 cr = (*palette++);
+        INT16 cg = (*palette++);
+        INT16 cb = (*palette++);
+  //  printf("c:%");
+        cr>>=2;
+        cg>>=2;
+        cb>>=2;
 
         UINT16 bestindex=0;
-        UINT32 besterror = 0xffffffff;
-        for(int j=0;j<32;j++)
+        INT32 besterror = 0x7fffffff;
+        for(int j=indexStart;j<indexStart+32;j++)
         {
             rgb_t c = game_palette[j];
-            UINT16 pb = (c>>4) & 0x0f;
-            UINT16 pg = (c>>12) & 0x0f;
-            UINT16 pr = (c>>20) & 0x0f;
-            UINT32 er_r = pr-cr;
-            UINT32 er_g = pg-cg;
-            UINT32 er_b = pb-cb;
-            UINT32 terr = er_r*er_r + er_g*er_g + er_b*er_b;
+            INT16 pb = (c>>2) & 0x3f;
+            INT16 pg = (c>>(8+2)) & 0x3f;
+            INT16 pr = (c>>(16+2)) & 0x3f;
+            INT16 er_r = pr-cr;
+            INT16 er_g = pg-cg;
+            INT16 er_b = pb-cb;
+            INT32 terr =( er_r*er_r )+ (er_g*er_g) + (er_b*er_b);
             if(terr == 0) {
                 bestindex = j;
                 break;
@@ -189,7 +194,7 @@ static void drawextra_simpleDrawCLUT16(mame_bitmap *bitmap, const rectangle *cli
     for(int y=y1 ; y<y2 ; y++)
     {
         UINT16 *pw = ((UINT16 *)bitmap->line[y]) + x;
-        UINT8 *pr = bm._png.image + (bm._png.rowbytes * (y-y1) ); // ->line[y];
+        UINT8 *pr = bm._png.image + (bm._png.rowbytes *2 * (y-y1) ); // ->line[y];
 
         for(int xx=0 ; xx<bm._png.width ; xx++)
         {
@@ -200,17 +205,22 @@ static void drawextra_simpleDrawCLUT16(mame_bitmap *bitmap, const rectangle *cli
     }
 }
 
-void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_lever *p, int value)
+void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_lever *p, int value, int remapIndexStart)
 {
+    if(!p) return;
     struct extraBitmap &bm = (value)?(p->_img_h):(p->_img_l);
 
-	refreshRemapCLU16(bitmap,bm);
+	refreshRemapCLU16(bitmap,bm,remapIndexStart);
     drawextra_simpleDrawCLUT16(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm);
 
 }
-void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *, int value)
+void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *p, int value, int remapIndexStart)
 {
+    if(!p) return;
 	// rotozoom !
 	//bitmap->
-	
+    struct extraBitmap &bm = p->_img;
+
+	refreshRemapCLU16(bitmap,bm,remapIndexStart);
+    drawextra_simpleDrawCLUT16(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm);
 }

@@ -14,7 +14,7 @@ extern "C" {
 
 struct CommonControlsValues {
     int _lever;
-    int _leverCount;
+   // int _leverCount;
     INT16 analogValues[8];
     UINT16 analogValuesReadCount[8];
 };
@@ -49,8 +49,8 @@ struct drawableExtra_steeringWheel *drawextra_createSteeringWheel();
 void drawextra_deleteSteeringWheel(struct drawableExtra_steeringWheel *);
 
 void drawextra_setpos(struct drawableExtra *, int x,int y);
-void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_lever *, int value);
-void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *, int value);
+void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_lever *, int value, int remapIndexStart);
+void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *, int value, int remapIndexStart);
 
 
 #ifdef __cplusplus

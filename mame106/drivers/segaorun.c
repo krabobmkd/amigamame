@@ -398,6 +398,35 @@ static WRITE16_HANDLER( misc_io_w )
 }
 //krb: remember analog values that were tested this frame.
 // 0,1,2 are steering, gas, brakes.
+/*
+
+static READ16_HANDLER( outrun_custom_io_r )
+{
+	offset &= 0x7f/2;
+	switch (offset & 0x70/2)
+	{
+		case 0x00/2:
+			return ppi8255_0_r(offset & 3);
+
+		case 0x10/2:
+			return readinputport(offset & 3);
+
+		case 0x30/2:
+		{
+			static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
+			return readinputportbytag_safe(ports[adc_select], 0x0010);
+		}
+
+		case 0x60/2:
+			return watchdog_reset_r(0);
+	}
+
+	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	return segaic16_open_bus_r(0,0);
+}
+
+*/
+// int levervt[4]={0};
 
 static READ16_HANDLER( outrun_custom_io_r )
 {
@@ -410,19 +439,25 @@ static READ16_HANDLER( outrun_custom_io_r )
 		case 0x10/2:
 		{
             UINT16 lv = readinputport(offset & 3);
-            if((offset & 3) == 3)
+            if((offset & 3) == 0)
             {
-                commonControlsValues._lever = (int) lv;
-                commonControlsValues._leverCount++;
+                // note: this is read all along game
+                commonControlsValues._lever = (int) (lv & 16); // this is the bit for the gear position
+               // commonControlsValues._leverCount++;
             }
 			return lv;
         }
 		case 0x30/2:
 		{
+            // krb note:
+            // adc_select=0 steering wheel, 2 -> 127(center) ->254
+            // pressing left right arrow then get back to middle, using mouse let at last pos.
+            // ADC1: brake. bt b -> 2 to 254 in like 0.4 sec
 			static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
 			UINT16 vread = readinputportbytag_safe(ports[adc_select], 0x0010);
 			commonControlsValues.analogValues[adc_select] = (INT16) vread;
 			commonControlsValues.analogValuesReadCount[adc_select]++;
+
 			return vread;
 		}
 
@@ -432,17 +467,41 @@ static READ16_HANDLER( outrun_custom_io_r )
 
 //	loginfo(2,"%06X:outrun_custom_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(0,0);
+
+	// offset &= 0x7f/2;
+	// switch (offset & 0x70/2)
+	// {
+	// 	case 0x00/2:
+	// 		return ppi8255_0_r(offset & 3);
+
+	// 	case 0x10/2:
+	// 		return readinputport(offset & 3);
+
+	// 	case 0x30/2:
+	// 	{
+	// 		static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
+	// 		return readinputportbytag_safe(ports[adc_select], 0x0010);
+	// 	}
+
+	// 	case 0x60/2:
+	// 		return watchdog_reset_r(0);
+	// }
+
+	// return segaic16_open_bus_r(0,0);
 }
 
 
 static WRITE16_HANDLER( outrun_custom_io_w )
 {
-	offset &= 0x7f/2;
+
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
 			if (ACCESSING_LSB)
+			{
+                offset &= 0x7f/2;
 				ppi8255_0_w(offset & 3, data);
+            }
 			return;
 
 		case 0x20/2:
@@ -465,7 +524,11 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 			return;
 
 		case 0x70/2:
+		{
+    		offset &= 0x7f/2;
+    		//TODO optim this horror
 			segaic16_sprites_draw_0_w(offset, data, mem_mask);
+		}
 			return;
 	}
 //	loginfo(2,"%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);

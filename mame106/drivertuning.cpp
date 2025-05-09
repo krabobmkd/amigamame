@@ -25,6 +25,7 @@ static map<string,sDriverTuning> _tunings={
 	{"neogeo",{50,DEFMINCPUC,0 /*MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD*/}}, //
 	{"sgemf",{8*60,DEFMINCPUC,0}},
 	{"chasehq",{5*60,DEFMINCPUC,0}},
+	{"ghouls",{22*60,DEFMINCPUC,0}},
 
 	{"outrun",{0,128,0}}, // for _minimumCpuCycles
 	{"bombjack",{12*60,0,0}},

@@ -487,10 +487,16 @@ mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)
   of full game speed.
 */
 static char perfo_line[28];
+/*extern "C" {
+extern int levervt[4];
+};*/
 const char *osd_get_fps_text(const performance_info *performance)
 {
-    snprintf(perfo_line,27,"speed:%.01f%% fps:%.03f",performance->game_speed_percent,
-             performance->frames_per_second);
+     snprintf(perfo_line,27,"speed:%.01f%% fps:%.03f",performance->game_speed_percent,
+              performance->frames_per_second);
+              // usefull for debug:
+   //      snprintf(perfo_line,27,"lv%d %d %d %d",levervt[0],levervt[1],levervt[2],levervt[3]);
+
     perfo_line[27]=0;
     return perfo_line;
 }

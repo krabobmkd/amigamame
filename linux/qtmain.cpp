@@ -170,8 +170,8 @@ void QProc::process()
     // test if just "mame romname".
     {
         int idriver = getMainConfig().driverIndex().index(
-       "nightstr"
-       // "outrun"
+       //"nightstr"
+        "outrun"
        //"thndrbld"
         );
         if(idriver>0)
@@ -421,12 +421,14 @@ const os_code_info *osd_get_code_list(void)
 {
     static os_code_info l[]={
         {"A",32,KEYCODE_A},
+        {"SPACE",65,KEYCODE_SPACE},
         {NULL,0,0},
     };
     return &l[0];
 }
 INT32 osd_get_code_value(os_code oscode)
 {
+
     return 0;
 }
 int osd_readkey_unicode(int flush)

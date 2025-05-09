@@ -2914,7 +2914,8 @@ void segaic16_sprites_set_shadow(int which, int shadow)
  *
  *************************************/
 
-static void segaic16_sprites_buffer(struct sprite_info *info)
+//OPTIM THAT
+static inline void segaic16_sprites_buffer(struct sprite_info *info)
 {
 	if (info->buffer)
 	{

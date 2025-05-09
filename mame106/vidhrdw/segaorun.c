@@ -68,8 +68,10 @@ VIDEO_START( outrun )
 
     //krb
     _levergoody = drawextra_createLever();
-    _wheelgoody = drawextra_createSteeringWheel();
+    if(_levergoody) drawextra_setpos(&_levergoody->_geo,320-12,224-24-64);
 
+    _wheelgoody = drawextra_createSteeringWheel();
+    if(_wheelgoody) drawextra_setpos(&_wheelgoody->_geo,320-32,224-20-32);
     add_exit_callback(extraclean);
 	return 0;
 }
@@ -112,8 +114,6 @@ VIDEO_UPDATE( shangon )
 
 }
 
-
-
 VIDEO_UPDATE( outrun )
 {
 	/* if no drawing is happening, fill with black and get out */
@@ -148,10 +148,17 @@ VIDEO_UPDATE( outrun )
 	segaic16_sprites_draw(0, bitmap, cliprect);
 
 	//krb: draw optionnal control goodies
-	if(_levergoody)
-        drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
-	if(_wheelgoody)
-        drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]);
-
+	// test a static hud pixel on the screen to check if we're into gameplay:
+	// very accurate because it's not yet color it's sprite private palette index
+	UINT16 pixval = ((UINT16*) bitmap->line[cliprect->min_y+215])[cliprect->min_x+298];
+	// 23 in demo mode, 356 music selection screen, 41 play mode .
+    if(pixval == 41)
+    {
+        int remapIndexStart=32;
+        if(_levergoody)
+            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever,remapIndexStart);
+        if(_wheelgoody)
+            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0],remapIndexStart);
+    }
 
 }
