@@ -325,6 +325,7 @@ void MameConfig::toDefault()
     _misc._useCheatCodeFile = false;
     _misc._cheatFilePath = "PROGDIR:cheat.dat";
     _misc._MiscFlags = 0;
+    _misc._Goodies =  GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR;
 
 
 }
@@ -529,6 +530,13 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
     //                 ,{
     //     "CD32 Pads uses AMEGA32 Adapter:\nSwitch 6 buttons to fit SF2."
     //     });
+
+    serializer("Display Goodies",_Goodies,
+          GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
+    ,{
+        "Steering Wheel"
+        ,"Gear Shift"
+      });
 
 
 }
@@ -915,5 +923,14 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     }
 #endif
 
+}
+
+extern "C"
+{
+unsigned int GetDisplayGoodiesFlags()
+{
+   MameConfig &c = getMainConfig();
+   return (unsigned int )c.misc()._Goodies;
+}
 }
 

@@ -776,7 +776,7 @@ J1100256A VIDEO PCB
 #include "vidhrdw/taitoic.h"
 #include "sndhrdw/taitosnd.h"
 #include "sound/2610intf.h"
-
+#include "drawCtrl.h"
 VIDEO_START( taitoz );
 VIDEO_START( spacegun );
 
@@ -1079,6 +1079,7 @@ static READ16_HANDLER( chasehq_input_bypass_r )
 			steer = 0x7f;
 		}
 	}
+    commonControlsValues.analogValues[0] = (INT16) steer;
 
 	switch (port)
 	{

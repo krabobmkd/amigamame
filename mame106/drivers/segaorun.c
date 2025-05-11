@@ -490,7 +490,8 @@ static READ16_HANDLER( outrun_custom_io_r )
 	// return segaic16_open_bus_r(0,0);
 }
 
-
+extern int outrun_use_firstspritemem;
+extern void segaic16_sprites_draw_0_w_fast();
 static WRITE16_HANDLER( outrun_custom_io_w )
 {
 
@@ -525,9 +526,13 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 
 		case 0x70/2:
 		{
-    		offset &= 0x7f/2;
-    		//TODO optim this horror
-			segaic16_sprites_draw_0_w(offset, data, mem_mask);
+    		//not used in that case: offset &= 0x7f/2;
+    		//optim this horror -> not much, copy 2kb each 2 frames.
+			//test
+			//segaic16_sprites_draw_0_w(offset, data, mem_mask);
+
+             segaic16_sprites_draw_0_w_fast();
+           // outrun_use_firstspritemem = 1;
 		}
 			return;
 	}

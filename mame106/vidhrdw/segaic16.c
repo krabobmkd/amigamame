@@ -468,8 +468,8 @@ UINT16 *segaic16_spriteram_1;
 UINT16 *segaic16_roadram_0;
 UINT16 *segaic16_rotateram_0;
 
-
-
+//krb
+int outrun_use_firstspritemem = 0;
 /*************************************
  *
  *  Statics
@@ -2401,7 +2401,191 @@ static void segaic16_sprites_yboard_16b_draw(struct sprite_info *info, mame_bitm
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+
+//extern int outrun_use_firstspritemem;
+//krb seach for optims
+void segaic16_sprites_outrun_draw2( mame_bitmap *bitmap, const rectangle *cliprect)
+{
+    struct sprite_info *info = &sprites[0];
+	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x40000;
+	const UINT32 *spritebase = (const UINT32 *)memory_region(REGION_GFX2);
+	UINT16 *data;
+
+    // krb note:
+    //  8 .w per sprite
+
+    // the 2 first kb would be in info->spriteram
+
+
+    UINT16 *p = info->buffer; // info->spriteram; //
+
+	/* first scan forward to find the end of the list */
+
+	for (data = p; data < p + info->ramsize/2; data += 8)
+		if (data[0] & 0x8000)
+			break;
+	// data = (outrun_use_firstspritemem)?(info->spriteram):(info->buffer);
+	// UINT16 *slot1End,slot1Start;
+	// UINT16 *slot2End,slot2Start;
+	// int endfound=0;
+	// int endIsSlot2=0;
+ //    for(int i=0;i<2;i++)
+ //    {
+ //        for (; data < data + info->ramsize/4; data += 8)
+ //         	if (data[0] & 0x8000)
+ //         	{   endfound = 1;
+ //         		break;
+ //            }
+ //        if(endfound==1) break;
+ //        endIsSlot2 = 1;
+ //        data = info->buffer + info->ramsize/4;
+
+ //    }
+	// for (data = info->spriteram; data < info->spriteram + info->ramsize/4; data += 8)
+	// 	if (data[0] & 0x8000)
+	// 		break;
+	// for (data = info->buffer; data < info->buffer + info->ramsize/4; data += 8)
+	// 	if (data[0] & 0x8000)
+	// 		break;
+	/* now scan backwards and render the sprites in order */
+    for(int i=0;i<2;i++)
+    {
+
+	for (data -= 8; data >= p; data -= 8)
+	{
+		int hide    = (data[0] & 0x5000);
+		int bank    = (data[0] >> 9) & 7;
+		int top     = (data[0] & 0x1ff) - 0x100;
+		UINT16 addr = data[1];
+		int pitch   = (INT16)((data[2] >> 1) | ((data[4] & 0x1000) << 3)) >> 8;
+		int xpos    = data[2] & 0x1ff;
+		int shadow  = (data[3] >> 14) & 1;
+		int sprpri  = 1 << ((data[3] >> 12) & 3);
+		int vzoom   = data[3] & 0x7ff;
+		int ydelta  = (data[4] & 0x8000) ? 1 : -1;
+		int flip    = (~data[4] >> 14) & 1;
+		int xdelta  = (data[4] & 0x2000) ? 1 : -1;
+		int hzoom   = data[4] & 0x7ff;
+		int height  = ((info->type == SEGAIC16_SPRITES_OUTRUN) ? (data[5] >> 8) : (data[5] & 0xfff)) + 1;
+		int color   = info->colorbase + (((info->type == SEGAIC16_SPRITES_OUTRUN) ? (data[5] & 0x7f) : (data[6] & 0xff)) << 4);
+		int x, y, ytarget, yacc = 0, pix;
+		const UINT32 *spritedata;
+
+		/* adjust X coordinate */
+		/* note: the threshhold below is a guess. If it is too high, rachero will draw garbage */
+		/* If it is too low, smgp won't draw the bottom part of the road */
+		if (xpos < 0x80 && xdelta < 0)
+			xpos += 0x200;
+		xpos -= 0xbe;
+
+		/* initialize the end address to the start address */
+		data[7] = addr;
+
+		/* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
+		if (hide || height == 0)
+			continue;
+
+		/* clamp to within the memory region size */
+		if (numbanks)
+			bank %= numbanks;
+		spritedata = spritebase + 0x10000 * bank;
+
+		/* clamp to a maximum of 8x (not 100% confirmed) */
+		if (vzoom < 0x40) vzoom = 0x40;
+		if (hzoom < 0x40) hzoom = 0x40;
+
+		/* loop from top to bottom */
+		ytarget = top + ydelta * height;
+		for (y = top; y != ytarget; y += ydelta)
+		{
+			/* skip drawing if not within the cliprect */
+			if (y >= cliprect->min_y && y <= cliprect->max_y)
+			{
+				UINT16 *dest = (UINT16 *)bitmap->line[y];
+				UINT8 *pri = (UINT8 *)priority_bitmap->line[y];
+				int xacc = 0;
+
+				/* non-flipped case */
+				if (!flip)
+				{
+					/* start at the word before because we preincrement below */
+					data[7] = addr - 1;
+					for (x = xpos; (xdelta > 0 && x <= cliprect->max_x) || (xdelta < 0 && x >= cliprect->min_x); )
+					{
+						UINT32 pixels = spritedata[++data[7]];
+
+						/* draw four pixels */
+						pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 20) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 16) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 12) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >>  8) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+
+						/* stop if the second-to-last pixel in the group was 0xf */
+						if ((pixels & 0x000000f0) == 0x000000f0)
+							break;
+					}
+				}
+
+				/* flipped case */
+				else
+				{
+					/* start at the word after because we predecrement below */
+					data[7] = addr + 1;
+					for (x = xpos; (xdelta > 0 && x <= cliprect->max_x) || (xdelta < 0 && x >= cliprect->min_x); )
+					{
+						UINT32 pixels = spritedata[--data[7]];
+
+						/* draw four pixels */
+						pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >>  8) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 12) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 16) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 20) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+
+						/* stop if the second-to-last pixel in the group was 0xf */
+						if ((pixels & 0x0f000000) == 0x0f000000)
+							break;
+					}
+				}
+			}
+
+			/* accumulate zoom factors; if we carry into the high bit, skip an extra row */
+			yacc += vzoom;
+			addr += pitch * (yacc >> 9);
+			yacc &= 0x1ff;
+		}
+	}
+
+	} // end 2 slot buffer 4kb -> 2kb
+
+	outrun_use_firstspritemem = 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x40000;
 	const UINT32 *spritebase = (const UINT32 *)memory_region(REGION_GFX2);
@@ -2798,6 +2982,11 @@ int segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
 			break;
 
 		case SEGAIC16_SPRITES_OUTRUN:
+			info->draw = NULL; // krb, use direct call segaic16_sprites_outrun_draw2;
+			info->ramsize = 0x1000;
+			buffer = 1;
+			break;
+
 		case SEGAIC16_SPRITES_XBOARD:
 			info->draw = segaic16_sprites_outrun_draw;
 			info->ramsize = 0x1000;
@@ -2914,36 +3103,86 @@ void segaic16_sprites_set_shadow(int which, int shadow)
  *
  *************************************/
 
-//OPTIM THAT
+//OPTIM THAT -> no, used once per 2 frames.
 static inline void segaic16_sprites_buffer(struct sprite_info *info)
 {
 	if (info->buffer)
 	{
+#ifdef DONTDOIT
+    // was  a test, doesn't update parts of sprite defs...
+        // test using pointer swap
+        UINT16 *p = info->spriteram;
+        info->spriteram = info->buffer;
+        info->buffer = p;
+        if(info->index == 0) segaic16_spriteram_0 = info->spriteram ;
+        if(info->index == 1) segaic16_spriteram_1 = info->spriteram ;
+#endif
+
 		UINT32 *src = (UINT32 *)info->spriteram;
 		UINT32 *dst = (UINT32 *)info->buffer;
 		int i;
 
+        // outrun info->ramsize 4096 , so copy 2kb each 2 frames... (per sprite slots)
+        // 8.w -> 16b per sprite -> 4.l
+// int endfound = 0;
 		/* swap the halves of the sprite RAM */
-		for (i = 0; i < info->ramsize/4; i++)
+		for (i = 0; i < info->ramsize/(2*2*4 ); i++) // 2 because half the buffer, 2 because .w->.l copy, 4 because per sprite slot
 		{
 			UINT32 temp = *src;
+			*src++ = *dst;
+			*dst++ = temp;
+			// krb note about this optimisation:
+			// well, would divide by 2 or 3 the copy length most of the time...
+			// let's consider it's a  good optimisation. Any byte read won is worth because of cache issues.
+			// no copy at all would be again better.
+#ifdef LSB_FIRST
+			if( temp & 0x00008000) { // krb optim, means end of sprite chain.
+			//endfound = 1;
+     			break;
+			 }
+#else
+			if( temp & 0x80000000) { // krb optim, means end of sprite chain.
+			//endfound = 1;
+     			break;
+			 }
+#endif
+			temp = *src;
+			*src++ = *dst;
+			*dst++ = temp;
+			temp = *src;
+			*src++ = *dst;
+			*dst++ = temp;
+			temp = *src;
 			*src++ = *dst;
 			*dst++ = temp;
 		}
 
 		/* hack for thunderblade */
 		*info->spriteram = 0xffff;
+
+        // if(endfound == 0)
+        // {
+        //  printf("no end found\n");
+        //  exit(0);
+        // }
 	}
 
 	/* we will render the sprites when the video update happens */
 }
 
 
+
+// krb note: on outrun it will only use segaic16_sprites_draw_0_w once each 2 frames.
+// the "double buffer" sprite bank swap is "per frame".
 WRITE16_HANDLER( segaic16_sprites_draw_0_w )
 {
 	segaic16_sprites_buffer(&sprites[0]);
 }
+void segaic16_sprites_draw_0_w_fast() // fast because takes no param.
+{
+	segaic16_sprites_buffer(&sprites[0]);
 
+}
 
 WRITE16_HANDLER( segaic16_sprites_draw_1_w )
 {

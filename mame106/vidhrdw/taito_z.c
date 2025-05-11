@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "vidhrdw/taitoic.h"
 #include "drawgfxn.h"
+#include "drawCtrl.h"
 #include <stdio.h>
 #define TC0100SCN_GFX_NUM 1
 #define TC0480SCP_GFX_NUM 1
@@ -36,9 +37,13 @@ static int taitoz_core_vh_start (int x_offs)
 
 	return 0;
 }
+void initGoodies();
 
 VIDEO_START( taitoz )
 {
+    // chasehq start here
+    initGoodies();
+
 	return (taitoz_core_vh_start(0));
 }
 
@@ -429,7 +434,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				dgpz1.sy = cury;
 				dgpz1.scalex = zx<<12;
 				dgpz1.scaley = zy<<12;
-				if(/*pen_usage == 128 &&*/ priority ==1)				
+				if(pen_usage == 128 && priority ==1)
                     drawgfxzoom_prio_write(&dgpz1);
 				else
                     drawgfxzoom_clut16_Src8_tr0_prio(&dgpz1);
@@ -487,7 +492,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				dgpz2.scaley = zy<<12;
 
                // drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
-				if(/*pen_usage == 128 &&*/ priority ==1)
+				if(pen_usage == 128 && priority ==1)
                     drawgfxzoom_prio_write(&dgpz2);
 				else
                     drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
@@ -546,7 +551,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 				//drawgfxzoom(&dgpz2);
 //				if(nbt != dbg_nbt)
 //				drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
-				if(/*pen_usage == 128 &&*/ priority ==1)
+				if(pen_usage == 128 && priority ==1)
                     drawgfxzoom_prio_write(&dgpz2);
 				else
                     drawgfxzoom_clut16_Src8_tr0_prio(&dgpz2);
@@ -1350,6 +1355,34 @@ VIDEO_UPDATE( contcirc )
 }
 
 
+
+//krb: draw optionnal control goodies
+static struct drawableExtra_steeringWheel *_wheelgoody=NULL;
+extern unsigned int GetDisplayGoodiesFlags();
+
+static void extraclean()
+{
+    if(_wheelgoody) drawextra_deleteSteeringWheel(_wheelgoody);
+    _wheelgoody = NULL;
+}
+
+void initGoodies()
+{
+    int dowheel = (strcmp(Machine->gamedrv->name,"chasehq")==0);
+    if(!dowheel) return;
+
+    unsigned int f = GetDisplayGoodiesFlags();
+    if(f&1 ==0) return;
+    if(_wheelgoody) return;
+
+    _wheelgoody = drawextra_createSteeringWheel();
+    if(_wheelgoody)
+    {
+     drawextra_setpos(&_wheelgoody->_geo,160+50,240-34);
+     add_exit_callback(extraclean);
+    }
+
+}
 /* Nightstr and ChaseHQ */
 
 VIDEO_UPDATE( chasehq )
@@ -1375,6 +1408,20 @@ VIDEO_UPDATE( chasehq )
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
 
 	chasehq_draw_sprites_16x16(bitmap,cliprect,7);
+
+	//krb: draw optionnal control goodies
+	// test a static hud pixel on the screen to check if we're into gameplay:
+	// very accurate because it's not yet color it's sprite private palette index
+	// cliprect->min_y can be not the right value.
+	//UINT16 pixval = ((UINT16*) bitmap->line[215])[cliprect->min_x+298];
+	// 23 in demo mode, 356 music selection screen, 41 play mode .
+    //if(pixval == 41)
+    {
+        int remapIndexStart=512+16;
+       if(_wheelgoody)
+            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody,
+            commonControlsValues.analogValues[0]+128,remapIndexStart);
+    }
 }
 
 VIDEO_UPDATE( nightstr )

@@ -39,6 +39,10 @@ struct drawableExtra_lever {
 struct drawableExtra_steeringWheel {
 	struct drawableExtra _geo;
 	struct extraBitmap _img;
+	// sinus table fixed <<14
+	INT16 _sincost[512];
+	//silhouette mask for a disk
+	UINT8 _sil[32*2];
 };
 
 // use auto_malloc, so deleted at game exit.

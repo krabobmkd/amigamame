@@ -7,6 +7,7 @@ extern "C" {
 #include "png.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 }
 
 
@@ -112,6 +113,37 @@ struct drawableExtra_steeringWheel *drawextra_createSteeringWheel()
     if(!p) return NULL; // should have jmp throwed anyway.
     int r = open_and_read_png("swheel.png",&p->_img._png );
 
+    // create sinus table
+    for(int i=0;i<512;i++)
+    {
+        p->_sincost[i] = (INT16)(16384.0f * sinf((float)i * (3.1415f*2.0f/512.0f)));
+    }
+    // create silhouette table
+    const int ir = 16;
+    const int ir2plus = (ir+1)*(ir+1);
+
+    // UINT8 _sil[32*2];
+    UINT8 *pSil = p->_sil;
+    for(int y=0;y<32;y++)
+    {
+        int idy = y-ir;
+        int ir2mdy2 = ir2plus - (idy*idy);
+        if(ir2mdy2<=0)
+        {
+            *pSil++ = 32; // jumped
+            *pSil++ = 0; // drawn
+            continue;
+        }
+        int distcen = (int) sqrtf((float)ir2mdy2);
+        int nbpixdrawn = distcen*2;
+        if(nbpixdrawn>32) nbpixdrawn = 32;
+        int nbjump = 32 - nbpixdrawn;
+        *pSil++ = nbjump>>1; // pixel jumps
+        *pSil++ =nbpixdrawn; // actual drawn.
+    }
+
+
+
     return p;
 }
 void drawextra_deleteSteeringWheel(struct drawableExtra_steeringWheel *p)
@@ -158,7 +190,7 @@ static void refreshRemapCLU16(mame_bitmap *bitmap,struct extraBitmap &bm, int in
 
         UINT16 bestindex=0;
         INT32 besterror = 0x7fffffff;
-        for(int j=indexStart;j<indexStart+32;j++)
+        for(int j=indexStart;j<indexStart+32+8;j++)
         {
             rgb_t c = game_palette[j];
             INT16 pb = (c>>2) & 0x3f;
@@ -217,10 +249,73 @@ void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct
 void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *p, int value, int remapIndexStart)
 {
     if(!p) return;
+    if( ! p->_img._png.image) return;
 	// rotozoom !
 	//bitmap->
     struct extraBitmap &bm = p->_img;
 
 	refreshRemapCLU16(bitmap,bm,remapIndexStart);
-    drawextra_simpleDrawCLUT16(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm);
+   // drawextra_simpleDrawCLUT16(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm);
+   //drawextra_drawRotate(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm,value,p->_sincost);
+    int x = p->_geo._xpos;
+    int y = p->_geo._ypos;
+
+    if(y<0) y=0;
+    int y1 = cliprect->min_y + y;
+    int y2 = y1 + bm._png.height;
+    if(y2>=cliprect->max_y) y2 = cliprect->max_y-1;
+
+    int bmcx = bm._png.width>>1;
+    int bmcy = bm._png.height>>1;
+
+//127 = center =
+    int angle = 0 - (( (value-127)*14)>>4  );
+
+ // static int itest=0;
+ // itest++;
+ //  angle = itest;
+
+    INT16 sina =  p->_sincost[angle & 511]; // <<14
+    INT16 cosa =  p->_sincost[(angle+128) & 511]; // <<14
+
+    int bprsrc = bm._png.rowbytes *2;
+
+    // projected point topleft, rotate inverted , <<16.
+    int lx = (bmcx<<16) + (((-bmcx) * cosa - (-bmcy) * sina )<<2); // * -1,  2 times
+    int ly = (bmcy<<16) + (((-bmcx) * sina + (-bmcy) * cosa )<<2);
+
+    // y deriv
+    int xdy = (( -sina )<<2);
+    int ydy = (( cosa )<<2);
+
+    // x deriv
+    int xdx = (( cosa )<<2);
+    int ydx = (( sina )<<2);
+
+    UINT8 *psil = p->_sil;
+    for(int yy=y1 ; yy<y2 ; yy++)
+    {
+        UINT16 *pw = ((UINT16 *)bitmap->line[yy]) + x;
+
+        int lx1 = lx;
+        int ly1 = ly;
+        // - -- follow silhouette
+        int pixeljumps = *psil++;
+        int pixeldrawns = *psil++;
+        lx1 += pixeljumps*xdx;
+        ly1 += pixeljumps*ydx;
+        pw += pixeljumps;
+
+        for(int xx=0 ; xx<pixeldrawns ; xx++)
+        {
+            UINT8 c = bm._png.image[bprsrc * ((ly1>>16) & 0x01f) + ((lx1>>16) & 0x01f)];
+            if(c) *pw = bm._colormap[c];
+            pw++;
+            lx1 += xdx;
+            ly1 += ydx;
+        }
+        lx += xdy;
+        ly += ydy;
+    }
+
 }

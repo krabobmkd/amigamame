@@ -1,6 +1,8 @@
-
+static READ16_HANDLER( chasehq_input_bypass_r )
 
 todo R1.3b
+ O le tunnel de Chasehq est niqué !!!
+ O tester si chasehq pour wheel taitoic.
 
  X multiple key selection whatever the sort + only when list panel.
  X revalider dispatcher list with "NO MUI5" version.

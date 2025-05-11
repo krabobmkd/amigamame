@@ -171,8 +171,9 @@ void QProc::process()
     {
         int idriver = getMainConfig().driverIndex().index(
        //"nightstr"
-        "outrun"
+      //  "outrun"
        //"thndrbld"
+       "chasehq"
         );
         if(idriver>0)
         {
@@ -212,6 +213,12 @@ QWin::QWin() : QLabel()
     show();
     setMouseTracking(true);
 
+}
+extern "C" {
+unsigned int GetDisplayGoodiesFlags()
+{
+ return 3;
+}
 }
 // extern "C" {
 // extern int dbg_nbt;

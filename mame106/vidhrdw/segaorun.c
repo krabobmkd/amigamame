@@ -14,6 +14,7 @@
 static struct drawableExtra_steeringWheel *_wheelgoody=NULL;
 static struct drawableExtra_lever *_levergoody=NULL;
 
+extern unsigned int GetDisplayGoodiesFlags();
 /*************************************
  *
  *  Video startup
@@ -67,12 +68,21 @@ VIDEO_START( outrun )
 		return 1;
 
     //krb
-    _levergoody = drawextra_createLever();
-    if(_levergoody) drawextra_setpos(&_levergoody->_geo,320-12,224-24-64);
-
-    _wheelgoody = drawextra_createSteeringWheel();
-    if(_wheelgoody) drawextra_setpos(&_wheelgoody->_geo,320-32,224-20-32);
-    add_exit_callback(extraclean);
+    unsigned int configGoodiesFlags = GetDisplayGoodiesFlags();
+    if(configGoodiesFlags & 3)
+    {
+        if(configGoodiesFlags & 2)
+        {
+            _levergoody = drawextra_createLever();
+            if(_levergoody) drawextra_setpos(&_levergoody->_geo,160+44+34,224-39);
+        }
+        if(configGoodiesFlags & 1)
+        {
+            _wheelgoody = drawextra_createSteeringWheel();
+            if(_wheelgoody) drawextra_setpos(&_wheelgoody->_geo,160+44,224-44);
+        }
+        add_exit_callback(extraclean);
+    }
 	return 0;
 }
 
@@ -113,6 +123,8 @@ VIDEO_UPDATE( shangon )
 	segaic16_sprites_draw(0, bitmap, cliprect);
 
 }
+// segaic16
+extern void segaic16_sprites_outrun_draw2( mame_bitmap *bitmap, const rectangle *cliprect);
 
 VIDEO_UPDATE( outrun )
 {
@@ -145,12 +157,14 @@ VIDEO_UPDATE( outrun )
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
 	/* draw the sprites */
-	segaic16_sprites_draw(0, bitmap, cliprect);
+	//segaic16_sprites_draw(0, bitmap, cliprect);
+    segaic16_sprites_outrun_draw2(bitmap, cliprect); // shorter call
 
 	//krb: draw optionnal control goodies
 	// test a static hud pixel on the screen to check if we're into gameplay:
 	// very accurate because it's not yet color it's sprite private palette index
-	UINT16 pixval = ((UINT16*) bitmap->line[cliprect->min_y+215])[cliprect->min_x+298];
+	// cliprect->min_y can be not the right value.
+	UINT16 pixval = ((UINT16*) bitmap->line[215])[cliprect->min_x+298];
 	// 23 in demo mode, 356 music selection screen, 41 play mode .
     if(pixval == 41)
     {
@@ -160,5 +174,7 @@ VIDEO_UPDATE( outrun )
         if(_wheelgoody)
             drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0],remapIndexStart);
     }
+
+
 
 }

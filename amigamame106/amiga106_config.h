@@ -240,6 +240,9 @@ public:
         int         _neogeo_bios = 0;
         ULONG_FLAGS  _MiscFlags = 0;
 
+    #define GOODIESFLAGS_WHEEL 1
+    #define GOODIESFLAGS_GEAR 2
+        ULONG_FLAGS  _Goodies = GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR;
         std::vector<std::string> _neogeoBiosList;
     };
     Misc &misc() { return _misc; }
