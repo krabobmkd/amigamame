@@ -124,7 +124,7 @@ VIDEO_UPDATE( shangon )
 
 }
 // segaic16
-extern void segaic16_sprites_outrun_draw2( mame_bitmap *bitmap, const rectangle *cliprect);
+//extern void segaic16_sprites_outrun_draw2( mame_bitmap *bitmap, const rectangle *cliprect);
 
 VIDEO_UPDATE( outrun )
 {
@@ -157,8 +157,8 @@ VIDEO_UPDATE( outrun )
 	segaic16_tilemap_draw( bitmap, cliprect, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
 	/* draw the sprites */
-	//segaic16_sprites_draw(0, bitmap, cliprect);
-    segaic16_sprites_outrun_draw2(bitmap, cliprect); // shorter call
+	segaic16_sprites_draw(0, bitmap, cliprect);
+//    segaic16_sprites_outrun_draw2(bitmap, cliprect); // shorter call
 
 	//krb: draw optionnal control goodies
 	// test a static hud pixel on the screen to check if we're into gameplay:

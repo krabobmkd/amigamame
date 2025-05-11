@@ -107,7 +107,9 @@ set(MAME_UNROLL_SRC  drawgfx.c  drawgfxn.cpp
 if(OPT_TAITO)
 	list(APPEND MAME_UNROLL_SRC vidhrdw/taitoicn.cpp  vidhrdw/taitoicn.h)
 endif()
-
+if(OPT_SEGA)
+	list(APPEND MAME_UNROLL_SRC vidhrdw/segaicn.cpp  vidhrdw/taitoicn.h)
+endif()
 # move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/neogeo.c")
 move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/segaic16.c")
 # ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}
