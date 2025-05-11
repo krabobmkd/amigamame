@@ -27,7 +27,7 @@ static map<string,sDriverTuning> _tunings={
 	{"chasehq",{5*60,DEFMINCPUC,0}},
 	{"ghouls",{22*60,DEFMINCPUC,0}},
 
-	{"outrun",{0,128,0}}, // for _minimumCpuCycles
+	{"outrun",{0,/*128*/ 256,0}}, // for _minimumCpuCycles
 	{"bombjack",{12*60,0,0}},
 
 	{"mk",{0,128,0}}, // mortal kombat insane interupt slicing

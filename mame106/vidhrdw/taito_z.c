@@ -37,7 +37,7 @@ static int taitoz_core_vh_start (int x_offs)
 
 	return 0;
 }
-void initGoodies();
+static void initGoodies();
 
 VIDEO_START( taitoz )
 {
@@ -1366,13 +1366,13 @@ static void extraclean()
     _wheelgoody = NULL;
 }
 
-void initGoodies()
+static void initGoodies()
 {
     int dowheel = (strcmp(Machine->gamedrv->name,"chasehq")==0);
     if(!dowheel) return;
 
     unsigned int f = GetDisplayGoodiesFlags();
-    if(f&1 ==0) return;
+    if((f&1) ==0) return;
     if(_wheelgoody) return;
 
     _wheelgoody = drawextra_createSteeringWheel();

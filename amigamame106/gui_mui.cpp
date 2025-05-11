@@ -268,6 +268,7 @@ extern STRPTR ShowCycleValues[];
                                                                            MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
                                                                            MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
                                                                            InputListFrame,
+                                                                            MUIA_CycleChain, TRUE,
                                                                            TAG_DONE)),
                                          TAG_END);
     } else
@@ -280,7 +281,7 @@ extern STRPTR ShowCycleValues[];
                                                                               MUIA_List_Format,(ULONG)ListFormat,
                                                                               MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
                                                                               MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
-
+                                                                                MUIA_CycleChain, TRUE,
                                                                               TAG_DONE)),
                                             TAG_DONE);
     }
@@ -974,7 +975,7 @@ static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2
       imsg = (struct IntuiMessage *) msg[1].MethodID;
 
       int diduseit = manageKeyInListMsgDispatcher(obj,data,imsg);
-      if(diduseit) return(MUI_EventHandlerRC_Eat);
+      //if(diduseit) return(MUI_EventHandlerRC_Eat);
     }
       break;
 
@@ -1080,7 +1081,7 @@ static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj RE
       imsg = (struct IntuiMessage *) msg[1].MethodID;
 
       int diduseit = manageKeyInListMsgDispatcher(obj,data,imsg);
-      if(diduseit) return(MUI_EventHandlerRC_Eat);
+      //if(diduseit) return(MUI_EventHandlerRC_Eat);
     }
       break;
   }

@@ -186,12 +186,12 @@ static void krb_outrun_patch_cpu_synchro()
     }
 
 
-	// UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
- //    if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
- //    {
- //        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
- //        pcodesub[0x00001182>>1] = 9;
- //    }
+	UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+    if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
+    {
+        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
+        pcodesub[0x00001182>>1] = 9;
+    }
 
 }
 

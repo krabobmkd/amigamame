@@ -531,7 +531,7 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
     //     "CD32 Pads uses AMEGA32 Adapter:\nSwitch 6 buttons to fit SF2."
     //     });
 
-    serializer("Display Goodies",_Goodies,
+    serializer("Display Controls",_Goodies,
           GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
     ,{
         "Steering Wheel"

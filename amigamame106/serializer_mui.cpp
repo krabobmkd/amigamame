@@ -369,8 +369,33 @@ void MUISerializer::Level::update()
 // - - - - - - - - - - - - - - -
 MUISerializer::LTabs::LTabs(MUISerializer &ser,ASerializable *pconf) : LGroup(ser,pconf,0)
 {
+    // _pageChangeHook.h_Entry =(RE_HOOKFUNC)&MUISerializer::LTabs::PageChangeNotify;
+    // _pageChangeHook.h_Data = this;
 
 }
+// ULONG MUISerializer::LTabs::PageChangeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
+// {
+//     if(!par || !hook) return 0;
+
+//     LTabs *plevel = (LTabs *)hook->h_Data;
+//    // (*plevel->_str) = *par;
+//  printf("clicked:%d\n",*par);
+//   if(*par == 0)
+//   { // very bad because not generic, if tab 0 clicked, give focus to fisrt element in subgroup
+//     struct Level *tab0l = plevel->_pFirstChild;
+//     if(tab0l)
+//     {
+//         if( tab0l->_Object)
+//         {
+//             Object *win =_win(obj);
+
+//             if(win) SetAttrs(win,MUIA_Window_ActiveObject,(ULONG)tab0l->_Object,NULL);
+//         }
+//     }
+//   }
+//     return 0;
+// }
+// MUIA_Group_ActivePage
 
 void MUISerializer::LTabs::compile()
 {
@@ -388,6 +413,7 @@ void MUISerializer::LTabs::compile()
     _registerTitles.push_back(NULL);
 
     std::vector<ULONG> tagitems={
+        MUIA_CycleChain, TRUE,
         MUIA_Register_Titles,(ULONG)_registerTitles.data()
     };
 
@@ -405,6 +431,16 @@ void MUISerializer::LTabs::compile()
 
     _Object = MUI_NewObjectA(MUIC_Register, (struct TagItem *) tagitems.data());
 
+    // if(_Object)
+    // {
+    //     // want a callback when page change
+    //     DoMethod(_Object,MUIM_Notify,
+    //                 MUIA_Group_ActivePage, // attribute that triggers the notification.
+    //                 MUIV_EveryTime, // TrigValue ,  every time when TrigAttr changes
+    //                 _Object, // object on which to perform the notification method. or MUIV_Notify_Self
+    //                 3, // FollowParams  number of following parameters (in hook ?)
+    //                 MUIM_CallHook,(ULONG) &_pageChangeHook,  MUIV_TriggerValue);
+    // }
 }
 // - - - - - - - - - - - - - - -
 MUISerializer::LGroup::LGroup(MUISerializer &ser,ASerializable *pconf,int flgs) : Level(ser), _flgs(flgs),

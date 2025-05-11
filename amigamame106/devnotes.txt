@@ -1,15 +1,17 @@
 static READ16_HANDLER( chasehq_input_bypass_r )
 
-todo R1.3b
- O le tunnel de Chasehq est niqué !!!
- O tester si chasehq pour wheel taitoic.
+todo R1.3b ->4?
+ X le tunnel de Chasehq est niqué !!!
+ X tester si chasehq pour wheel taitoic.
 
  X multiple key selection whatever the sort + only when list panel.
  X revalider dispatcher list with "NO MUI5" version.
- O MUIM_Window_SetCycleChain with serializer ?
+ X MUIM_Window_SetCycleChain with serializer ?
  X remove stream drivdispdbg in gui after its ok
  X thunderblade/outrun/wb3/shangon interblocking -> CORRECTED
  X nightstriker spriteprio
+
+ O optim sprite outrun ?
 
 
 --------------------------------------------------------------------------

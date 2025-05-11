@@ -30,17 +30,17 @@ static int open_and_read_png( const char *filename, png_info *png)
 	int result;
 	mame_file *file;
 
- printf("open %s\n",filename);
+// printf("open %s\n",filename);
 
 	/* open the file */
 	file = mame_fopen(NULL, filename, FILETYPE_SKIN_IMAGE, 0);
 	if (!file)
 	{
-        printf("file fail\n");
+       // printf("file fail\n");
 		return 0;
 	}
 
- printf("file ok\n");
+// printf("file ok\n");
 	/* read the PNG data */
 	result = png_read_file(file, png);
 	mame_fclose(file);
@@ -60,7 +60,7 @@ static int open_and_read_png( const char *filename, png_info *png)
 		closePng(png);
 		return 0;
 	}
- printf("before color type test\n");
+// printf("before color type test\n");
 
 	if (png->color_type != 0 && png->color_type != 3 && png->color_type != 2 && png->color_type != 6)
 	{
@@ -79,7 +79,7 @@ static int open_and_read_png( const char *filename, png_info *png)
 		return 0;
 	}
 
- printf("ok, width:%d height:%d nbc:%d\n",png->width,png->height,png->num_palette);
+// printf("ok, width:%d height:%d nbc:%d\n",png->width,png->height,png->num_palette);
 
 	return 1;
 }
@@ -98,12 +98,12 @@ struct drawableExtra_lever *drawextra_createLever()
 }
 void drawextra_deleteLever(struct drawableExtra_lever *p)
 {
-printf("drawextra_deleteLever\n");
+//printf("drawextra_deleteLever\n");
     if(!p) return;
 
     closePng(&p->_img_l._png);
     closePng(&p->_img_h._png);
-printf("drawextra_deleteLever end\n");
+//printf("drawextra_deleteLever end\n");
 }
 
 struct drawableExtra_steeringWheel *drawextra_createSteeringWheel()
@@ -112,6 +112,13 @@ struct drawableExtra_steeringWheel *drawextra_createSteeringWheel()
     (struct drawableExtra_steeringWheel *) auto_malloc(sizeof(struct drawableExtra_steeringWheel));
     if(!p) return NULL; // should have jmp throwed anyway.
     int r = open_and_read_png("swheel.png",&p->_img._png );
+    if(p->_img._png.image &&
+      (p->_img._png.width != 32 || p->_img._png.height != 32 ))
+      {
+        closePng(&p->_img._png);
+        fatalerror("wheel image must be 32x32 pixels, 16 or 8 colors, png format.");
+        return p;
+      }
 
     // create sinus table
     for(int i=0;i<512;i++)
@@ -148,10 +155,10 @@ struct drawableExtra_steeringWheel *drawextra_createSteeringWheel()
 }
 void drawextra_deleteSteeringWheel(struct drawableExtra_steeringWheel *p)
 {
-printf("drawextra_deleteSteeringWheel\n");
+//printf("drawextra_deleteSteeringWheel\n");
     if(!p) return;
     closePng(&p->_img._png);
-printf("drawextra_deleteSteeringWheel end\n");
+//printf("drawextra_deleteSteeringWheel end\n");
 }
 
 void drawextra_setpos(struct drawableExtra *p, int x,int y)
