@@ -91,6 +91,26 @@ extern struct palette_info palette;
 		pri[x] = 0xff;														\
 	}																		\
 
+// template<int shadow>
+//  void or_drpix(UINT16 *dest,UINT8 *pri,int sprpri, int x,   )
+// {
+// 	if (x >= cliprect->min_x && x <= cliprect->max_x && pix != 0 && pix != 15)
+// 	{
+// 		/* are we high enough priority to be visible? */
+// 		if (sprpri > pri[x])
+// 		{
+// 			/* shadow/hilight mode? */
+// 			if (shadow && pix == 0xa)
+// 				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;
+
+// 			/* regular draw */
+// 			else
+// 				dest[x] = pix | color;
+// 		}
+// 		/* always mark priority so no one else draws here */
+// 		pri[x] = 0xff;
+// 	}
+// }
 
 void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
 {
@@ -121,7 +141,7 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
 		int hzoom   = data[4] & 0x7ff;
 		int height  = ((info->type == SEGAIC16_SPRITES_OUTRUN) ? (data[5] >> 8) : (data[5] & 0xfff)) + 1;
 		int color   = info->colorbase + (((info->type == SEGAIC16_SPRITES_OUTRUN) ? (data[5] & 0x7f) : (data[6] & 0xff)) << 4);
-		int x, y, ytarget, yacc = 0, pix;
+		int x, y, ytarget, yacc = 0;
 		const UINT32 *spritedata;
 
 		/* adjust X coordinate */
@@ -163,23 +183,31 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
 				{
 					/* start at the word before because we preincrement below */
 					data[7] = addr - 1;
-					for (x = xpos; (xdelta > 0 && x <= cliprect->max_x) || (xdelta < 0 && x >= cliprect->min_x); )
+					for (x = xpos;
+                        (xdelta > 0 && x <= cliprect->max_x) ||
+                        (xdelta < 0 && x >= cliprect->min_x); )
 					{
 						UINT32 pixels = spritedata[++data[7]];
 
 						/* draw four pixels */
+						int pix;
 						pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 						pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 						pix = (pixels >> 20) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 						pix = (pixels >> 16) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 						pix = (pixels >> 12) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 						pix = (pixels >>  8) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >>  4) & 0xf;
+// if(pix == 0x0f) break;
+						while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+
+						pix = (pixels >>  0) & 0xf;
+ //if(pix == 0x0f) beak;
+						 while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 
 						/* stop if the second-to-last pixel in the group was 0xf */
 						if ((pixels & 0x000000f0) == 0x000000f0)
-							break;
+                            break;
 					}
 				}
 
@@ -191,7 +219,7 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
 					for (x = xpos; (xdelta > 0 && x <= cliprect->max_x) || (xdelta < 0 && x >= cliprect->min_x); )
 					{
 						UINT32 pixels = spritedata[--data[7]];
-
+                        int pix;
 						/* draw four pixels */
 						pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 						pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
@@ -199,12 +227,17 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
 						pix = (pixels >> 12) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 						pix = (pixels >> 16) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 						pix = (pixels >> 20) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+						pix = (pixels >> 24) & 0xf;
+           // if(pix == 0x0f) break;
+						while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
+
+						pix = (pixels >> 28) & 0xf;
+           // if(pix == 0x0f) break;
+						while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
 
 						/* stop if the second-to-last pixel in the group was 0xf */
 						if ((pixels & 0x0f000000) == 0x0f000000)
-							break;
+						 	break;
 					}
 				}
 			}

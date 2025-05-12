@@ -7,7 +7,7 @@ extern "C" {
 
     void bootlog_setromload(int i, int nbroms);
     void bootlog_setvideodecode(int i, int nbgfx);
-
+    void bootlog_setDecrypt(int  dec, int nbdec);
     typedef enum {
         ebStart=0,
         ebInput,
@@ -16,6 +16,7 @@ extern "C" {
         ebHighScoreSaveLoad,
         eDriver, //  decryption is done and memory maps altered
         eSoundVideo,
+        eCpuDecrypt,
         eCheat,
         eProgressEnd
 

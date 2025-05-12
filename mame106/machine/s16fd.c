@@ -11,7 +11,7 @@ make more configurable (select caches per game?)
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
-
+#include "bootlog.h"
 
 #define S16_NUMCACHE 8
 
@@ -76,12 +76,31 @@ void fd1094_setstate_and_decrypt(int state)
 	/* mark it as cached (because it will be once we decrypt it) */
 	fd1094_cached_states[fd1094_current_cacheposition]=state;
 
-	for (addr=0;addr<fd1094_cpuregionsize/2;addr++)
-	{
-		UINT16 dat;
-		dat = fd1094_decode(addr,fd1094_cpuregion[addr],fd1094_key,0);
-		fd1094_cacheregion[fd1094_current_cacheposition][addr]=dat;
-	}
+
+    if(fd1094_cpuregionsize>0)
+    {
+        bootlog_setDecrypt(0, fd1094_cpuregionsize/2);
+
+        for (addr=0;addr<fd1094_cpuregionsize/4;addr++)
+        {
+            UINT16 dat;
+            dat = fd1094_decode(addr,fd1094_cpuregion[addr],fd1094_key,0);
+            fd1094_cacheregion[fd1094_current_cacheposition][addr]=dat;
+        }
+
+        bootlog_setDecrypt(addr, fd1094_cpuregionsize/2);
+
+        for (;addr<fd1094_cpuregionsize/2;addr++)
+        {
+            UINT16 dat;
+            dat = fd1094_decode(addr,fd1094_cpuregion[addr],fd1094_key,0);
+            fd1094_cacheregion[fd1094_current_cacheposition][addr]=dat;
+        }
+
+        bootlog_setDecrypt(addr, fd1094_cpuregionsize/2);
+    }
+
+
 
 	/* copy newly decrypted data to user region */
 	fd1094_userregion=fd1094_cacheregion[fd1094_current_cacheposition];

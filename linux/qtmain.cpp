@@ -172,7 +172,7 @@ void QProc::process()
         int idriver = getMainConfig().driverIndex().index(
        //"nightstr"
         "outrun"
-       //"thndrbld"
+      // "thndrbld"
       // "chasehq"
         );
         if(idriver>0)
