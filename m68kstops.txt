@@ -1,0 +1,78 @@
+﻿
+- outrun X
+
+- Space Harrier
+ ----- cpu 0 -----
+ adr:00001386 nbr:0056a370 regir:000067f8 -> void m68k_op_beq_8(M68KOPT_PARAMS)  (opac)
+ adr:00001380 nbr:0056a370 regir:00004a79 -> m68k_op_tst_16_al LIKE outrun
+ adr:00005e1c nbr:001050dc regir:000051c9
+ adr:00005e18 nbr:001050dc regir:0000252a
+ adr:00005e0c nbr:00069148 regir:00006400
+ adr:00005e0a nbr:00069148 regir:0000b051
+ -------
+ ----- cpu 1 -----
+ adr:0000113a nbr:0074350f regir:000067f8
+ adr:00001134 nbr:0074350f regir:00004a79  -> void m68k_op_tst_16_al(M68KOPT_PARAMS) ALSO
+ adr:00001364 nbr:0008e795 regir:00002a01
+ adr:00001362 nbr:0008e795 regir:00002819
+ adr:00001388 nbr:0008e795 regir:00006a00
+ -------
+
+- shangon
+
+ ----- cpu 0 -----
+ adr:0000149c nbr:011c8a0a regir:00004a79 -> m68k_op_tst_16_al LIKE outrun
+ adr:000014a2 nbr:011c8a0a regir:000067f8 m68k_op_beq_8
+ adr:0000197e nbr:000bf160 regir:000051c8
+ adr:0000a6b8 nbr:00044402 regir:00003018
+ adr:0000a6b6 nbr:00044402 regir:000041d1
+ adr:0000a6ba nbr:00044402 regir:00006722
+ adr:0000a6de nbr:00044402 regir:000043e9
+ adr:0000a6e2 nbr:00044402 regir:000051ca
+ adr:000014f0 nbr:0003800f regir:00003018
+ adr:000014fa nbr:0003800f regir:000051ca
+ adr:000014f2 nbr:0003800f regir:00000240
+ adr:000014f6 nbr:0003800f regir:000032f2
+ -------
+ ----- cpu 1 -----
+ adr:000010d0 nbr:00cd718d regir:000067f8 m68k_op_beq_8
+ adr:000010ca nbr:00cd718d regir:00004a79 -> m68k_op_tst_16_al LIKE outrun
+ adr:000014ac nbr:000945c0 regir:0000e840 ->  m68k_op_asr_16_s 	opac
+ adr:000012e2 nbr:000945c0 regir:00006d1e ->  m68k_op_blt_8(M68KOPT_PARAMS) opac
+ adr:000012e4 nbr:000945c0 regir:00003981 -> m68k_op_move_16_ix_d
+ adr:000012e8 nbr:000945c0 regir:00005544 -> void m68k_op_subq_16_d(M68KOPT_PARAMS) -> superslow
+ adr:000012d2 nbr:000945c0 regir:0000d440 -> m68k_op_add_16_er_d(M68KOPT_PARAMS)
+ adr:000014aa nbr:000945c0 regir:00003020
+ adr:000014b2 nbr:000945c0 regir:0000dc45
+ adr:000014ae nbr:000945c0 regir:0000d046
+ adr:000012ea nbr:000945c0 regir:00006b16
+ adr:000014b0 nbr:000945c0 regir:00003300
+ -------
+
+- Thunderblade
+
+ ----- cpu 0 ----- 
+ adr:0000061c nbr:0012dc27 regir:000067f8 -> m68k_op_beq_8(M68KOPT_PARAMS) opac
+ adr:0000061c nbr:0012dc27 regir:000067f8-> m68k_op_beq_8(M68KOPT_PARAMS) opac
+ adr:00000616 nbr:0012dc27 regir:000008b8
+ adr:000011e4 nbr:0006ad55 regir:000008b8
+ adr:00005800 nbr:00030800 regir:00004258
+ adr:00005802 nbr:00030800 regir:000051c8
+ adr:00006d98 nbr:0002d9cd regir:000008b8
+
+ ------- 
+ ----- cpu 1 -----  812d
+ adr:00000752 nbr:0026ffd4 regir:000008ad  -> void m68k_op_bclr_8_s_di(M68KOPT_PARAMS)
+ adr:00000752 nbr:0026ffd4 regir:000008ad
+ adr:00000758 nbr:0026ffcd regir:000067f8 -> m68k_op_beq_8(M68KOPT_PARAMS) opac
+ adr:000014a2 nbr:0007dbe4 regir:0000082d
+ adr:000014a8 nbr:0007dbe3 regir:000067f8 -> m68k_op_beq_8(M68KOPT_PARAMS) opac
+ adr:000014d2 nbr:00028cff regir:000067f8 -> m68k_op_beq_8(M68KOPT_PARAMS) opac
+ adr:000014cc nbr:00028cff regir:0000082d
+ adr:0001643a nbr:0000a537 regir:00000c45
+ adr:00016438 nbr:0000a537 regir:00004845
+ adr:00016436 nbr:0000a537 regir:00004846
+ -------
+
+- ABCop
+ 

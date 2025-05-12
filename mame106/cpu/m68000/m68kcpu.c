@@ -21,7 +21,7 @@ static const char* copyright_notice =
 ;
 #endif
 
-//#define STATCPUINSTR 1
+#define STATCPUINSTR 1
 #ifdef STATCPUINSTR
     #include "cpustats.h"
 #endif
@@ -823,21 +823,24 @@ int m68k_execute(int num_cycles)
 			uint16 ir = m68ki_read_imm_16(p68k);
 
 #ifdef STATCPUINSTR
-        // if(REG_PPC == 0x00007dda)
-        // {
-        // printf("w");
-        // }
-        // if(REG_PPC == 0x00001182 && activecpu == 1)
-        // {
-        //  static int uu=0;
-        //  uu++;
-        // }
+//          if( ir == 0x000008b8)
+//         {
+//         printf("w");
+//         }
+//    if(activecpu == 0 && REG_PPC == 0x00000616)
+////    if(REG_PPC == 0x00001380 && activecpu == 0)
+//////sharriercpu1         if(REG_PPC == 0x00001134 && activecpu == 1)
+//         {
+//         printf("ir:%08x\n",(int)ir);
+//         exit(0);
+//          static int uu=0;
+//          uu++;
+//         }
 
 //    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
 #endif
 			m68ki_instruction_jump_table[ir](p68k,ir);
-			int icyc= CYC_INSTRUCTION[ir];
-            m68k_ICount -= icyc; // krb moved before exec
+            m68k_ICount -= CYC_INSTRUCTION[ir];
 		} while(m68k_ICount > 0);
 
         /* original:

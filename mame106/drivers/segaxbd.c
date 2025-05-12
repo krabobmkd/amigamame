@@ -22,7 +22,8 @@
 #include "machine/segaic16.h"
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
-
+#include <stdio.h>
+#include "cpu/m68000/m68kops.h"
 
 #define MASTER_CLOCK			50000000
 #define SOUND_CLOCK				16000000
@@ -2280,6 +2281,31 @@ ROM_START( gprider1 )
 ROM_END
 
 
+//void krb_thndrbld_m68k_op_bclr_8_s_di(M68KOPT_PARAMS);
+//void krb_thndrbld_m68k_op_bclr_8_s_aw(M68KOPT_PARAMS);
+
+
+//void krb_thndrbld_patch_cpu_synchro()
+//{
+////printf("krb_thndrbld_patch_cpu_synchro\n");
+//	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
+//    if(pcodemain[0x00000616>>1] == 0x08b8)
+//    {
+//        printf("do patch1\n");
+//        // replace that call by a patch, on an unused opcode.
+//        m68ki_instruction_jump_table[8] = krb_thndrbld_m68k_op_bclr_8_s_aw;
+//        pcodemain[0x00000616>>1] = 8;
+//    }
+
+//	 UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+//     if(pcodesub[0x00000752>>1] == 0x08ad)
+//     {
+//        printf("do patch2\n");
+//         m68ki_instruction_jump_table[9] = krb_thndrbld_m68k_op_bclr_8_s_di;
+//         pcodesub[0x00000752>>1] = 9;
+//     }
+
+//}
 
 /*************************************
  *
@@ -2290,6 +2316,7 @@ ROM_END
 static DRIVER_INIT( generic_xboard )
 {
 	xboard_generic_init();
+//moved    krb_thndrbld_patch_cpu_synchro();
 }
 
 
@@ -2330,6 +2357,7 @@ static DRIVER_INIT( gprider )
 	xboard_generic_init();
 	gprider_hack = 1;
 }
+
 
 
 
