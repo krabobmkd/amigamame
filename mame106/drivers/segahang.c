@@ -25,6 +25,7 @@
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
 
+#include "cpu/m68000/m68kops.h"
 
 /*************************************
  *
@@ -1543,6 +1544,27 @@ ROM_START( endurob2 )
 ROM_END
 
 
+void krb_outrun_m68k_op_tst_16_al(M68KOPT_PARAMS);
+//krb
+static void krb_sharrier_patch_cpu_synchro()
+{
+//    printf("krb_outrun_patch_cpu_synchro\n");
+	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
+    if(pcodemain[0x00001380>>1] == 0x4a79) // inst. 0x4a79 triggers m68k_op_tst_16_al()
+    {   // replace that tst.w call by a patch, on an unused opcode.
+        m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
+        pcodemain[0x00001380>>1] = 8;
+    }
+
+	 UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+     if(pcodesub[0x00001134>>1] == 0x4a79) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
+     {
+        // note: can use opcode 8 for the both in that case.
+         m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al; // &krb_outrun_m68k_op_tst_16_di;
+         pcodesub[0x00001134>>1] = 8;
+     }
+
+}
 
 /*************************************
  *
@@ -1560,6 +1582,7 @@ static DRIVER_INIT( sharrier )
 {
 	hangon_generic_init();
 	i8751_vblank_hook = sharrier_i8751_sim;
+	krb_sharrier_patch_cpu_synchro();
 }
 
 

@@ -27,11 +27,16 @@ static map<string,sDriverTuning> _tunings={
 	{"chasehq",{5*60,DEFMINCPUC,0}},
 	{"ghouls",{22*60,DEFMINCPUC,0}},
 
-	{"outrun",{0,128,0}}, // for _minimumCpuCycles
+	{"outrun",{0,384,0}}, // for _minimumCpuCycles
+	{"shangon",{0,384,0}}, // for _minimumCpuCycles
+	{"sharrier",{0,2048,0}}, // for _minimumCpuCycles
+//	{"thndrbld",{0,2048,0}},
+	{"thndrbld",{0,2,0}}, // thunderblade strange timer issues (test) need minimum slice
+
+
 	{"bombjack",{12*60,0,0}},
 
 	{"mk",{0,128,0}}, // mortal kombat insane interupt slicing
-	{"thndrbld",{0,2,0}}, // thunderblade strange timer issues (test) need minimum slice
 
 	{"gtmr",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},     // 1000 miglia
 	{"gtmr2",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},     // 1000 miglia

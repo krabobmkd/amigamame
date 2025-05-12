@@ -66,6 +66,7 @@ void cpustats_log(int icpu)
 
 void cpustats_log()
 {
+ printf("cpustats_log\n");
     map<int,cpustat>::iterator it = _stats.begin();
     while(it !=_stats.end())
     {

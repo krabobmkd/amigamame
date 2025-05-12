@@ -177,7 +177,6 @@ void krb_outrun_m68k_op_tst_16_di(M68KOPT_PARAMS);
 
 static void krb_outrun_patch_cpu_synchro()
 {
-//    printf("krb_outrun_patch_cpu_synchro\n");
 	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
     if(pcodemain[0x00007dda>>1] == 0x4a79) // inst. 0x4a79 triggers m68k_op_tst_16_al()
     {   // replace that tst.w call by a patch, on an unused opcode.
@@ -186,14 +185,32 @@ static void krb_outrun_patch_cpu_synchro()
     }
 
 
-	// UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
- //    if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
- //    {
- //        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
- //        pcodesub[0x00001182>>1] = 9;
- //    }
+	 UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+     if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
+     {
+         m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
+         pcodesub[0x00001182>>1] = 9;
+     }
 
 }
+static void krb_shangon_patch_cpu_synchro()
+{
+	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
+    if(pcodemain[0x0000149c>>1] == 0x4a79) // inst. 0x4a79 triggers m68k_op_tst_16_al()
+    {   // replace that tst.w call by a patch, on an unused opcode.
+        m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
+        pcodemain[0x0000149c>>1] = 8;
+    }
+
+	 UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+     if(pcodesub[0x000010ca>>1] == 0x4a79)
+     {
+         m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
+         pcodesub[0x000010ca>>1] = 8;
+     }
+
+}
+
 
 static void outrun_generic_init(void)
 {
@@ -1835,6 +1852,8 @@ static DRIVER_INIT( shangon )
 	outrun_generic_init();
 	custom_io_r = shangon_custom_io_r;
 	custom_io_w = shangon_custom_io_w;
+
+    krb_shangon_patch_cpu_synchro();
 }
 
 
@@ -1845,6 +1864,8 @@ static DRIVER_INIT( shangon3 )
 	fd1089_decrypt_0034();
 	custom_io_r = shangon_custom_io_r;
 	custom_io_w = shangon_custom_io_w;
+
+    krb_shangon_patch_cpu_synchro();
 }
 
 

@@ -170,7 +170,7 @@ void QProc::process()
     // test if just "mame romname".
     {
         int idriver = getMainConfig().driverIndex().index(
-       //"nightstr"
+      // "shangon"
       //  "outrun"
        //"thndrbld"
        "chasehq"
@@ -267,10 +267,10 @@ int main(int argc, char* argv[])
     QWin w;
         int r =  a.exec();
     isinexit = true;
-    logEntries();
+ //   logEntries();
 
 
-//    cpustats_log();
+    cpustats_log();
 
 	return r;
 }

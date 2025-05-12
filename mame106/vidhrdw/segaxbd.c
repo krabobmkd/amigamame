@@ -25,9 +25,11 @@ static UINT8 road_priority;
  *  Video startup
  *
  *************************************/
-
+// void krb_thndrbld_patch_cpu_synchro();
+//int thndrbldpatchdone;
 VIDEO_START( xboard )
 {
+    //thndrbldpatchdone=0;
 	/* compute palette info */
 	segaic16_palette_init(0x2000);
 
@@ -68,8 +70,16 @@ void xboard_set_road_priority(int priority)
  *
  *************************************/
 
+
+
 VIDEO_UPDATE( xboard )
 {
+//    if((thndrbldpatchdone & 3) == 0)
+//    {
+//// krb_thndrbld_patch_cpu_synchro();
+
+//     }
+//   thndrbldpatchdone++; // = 1;
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)
 	{

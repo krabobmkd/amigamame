@@ -162,8 +162,9 @@ void drawextra_setpos(struct drawableExtra *p, int x,int y)
 // quick index remap on 32 first and 32 last colors...
 
 
-
-extern rgb_t *game_palette;
+extern "C" {
+    extern rgb_t *game_palette;
+}
 //extern rgb_t *adjusted_palette;
 // struct extraBitmap
 // for CLUT16 destination bitmaps :
