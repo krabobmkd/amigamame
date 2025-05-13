@@ -24,6 +24,9 @@ static UINT16* fd1094_cacheregion[S16_NUMCACHE]; // a cache region where S16_NUM
 static int fd1094_cached_states[S16_NUMCACHE]; // array of cached state numbers
 static int fd1094_current_cacheposition; // current position in cache array
 
+int nbdecryptToBeDone=8;
+int nbdecryptDone=0;
+int postscreentoclean=0;
 
 void *fd1094_get_decrypted_base(void)
 {
@@ -39,6 +42,8 @@ void *fd1094_get_decrypted_base(void)
    if it is then it copies the cached data to the user region where code is
    executed from, if its not cached then it gets decrypted to the current
    cache position using the functions in fd1094.c */
+
+
 void fd1094_setstate_and_decrypt(int state)
 {
 	int i;
@@ -79,7 +84,7 @@ void fd1094_setstate_and_decrypt(int state)
 
     if(fd1094_cpuregionsize>0)
     {
-        bootlog_setDecrypt(0, fd1094_cpuregionsize/2);
+        bootlog_setDecrypt(nbdecryptDone*3, nbdecryptToBeDone*3);
 
         for (addr=0;addr<fd1094_cpuregionsize/4;addr++)
         {
@@ -88,7 +93,7 @@ void fd1094_setstate_and_decrypt(int state)
             fd1094_cacheregion[fd1094_current_cacheposition][addr]=dat;
         }
 
-        bootlog_setDecrypt(addr, fd1094_cpuregionsize/2);
+        bootlog_setDecrypt(nbdecryptDone*3+1, nbdecryptToBeDone*3);
 
         for (;addr<fd1094_cpuregionsize/2;addr++)
         {
@@ -97,9 +102,13 @@ void fd1094_setstate_and_decrypt(int state)
             fd1094_cacheregion[fd1094_current_cacheposition][addr]=dat;
         }
 
-        bootlog_setDecrypt(addr, fd1094_cpuregionsize/2);
-    }
+        bootlog_setDecrypt(nbdecryptDone*3+2, nbdecryptToBeDone*3);
 
+        nbdecryptDone++;
+        postscreentoclean++;
+    }
+   // printf("nbdecryptDone:%d\n",nbdecryptDone);
+    // abcop 3, thnderbld 6
 
 
 	/* copy newly decrypted data to user region */
@@ -210,5 +219,7 @@ void fd1094_krb_preclean(void) // need super early clean
 {
 	fd1094_key = NULL;
 	fd1094_userregion = NULL;
+	nbdecryptToBeDone = 8;
+	nbdecryptDone = 0;
 }
 

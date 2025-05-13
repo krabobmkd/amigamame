@@ -14,6 +14,7 @@
 #include "profiler.h"
 #include <time.h>
 #include <ctype.h>
+#include <stdio.h>
 
 
 
@@ -1241,6 +1242,7 @@ static int is_seq_valid(const input_seq *seq)
 
 void seq_read_async_start(int analog)
 {
+    //printf("seq_read_async_start: analog:%d\n",analog);
 	input_code codenum;
 
 	/* reset the recording count and the clock */

@@ -29,8 +29,8 @@ static map<string,sDriverTuning> _tunings={
 
 
 	{"outrun",{0,384,0}}, // for _minimumCpuCycles
-	{"shangon",{0,384,0}}, // for _minimumCpuCycles
-	{"sharrier",{0,2048,0}}, // for _minimumCpuCycles
+	{"shangon",{0,2,0}}, // for _minimumCpuCycles
+	{"sharrier",{0,384,0}}, // for _minimumCpuCycles
 //	{"thndrbld",{0,2048,0}},
 	{"thndrbld",{0,2,0}}, // thunderblade strange timer issues (test) need minimum slice
 

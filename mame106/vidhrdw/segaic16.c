@@ -2394,7 +2394,7 @@ static void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *
 
 //krb: moved to cpp
 void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
-
+void segaic16_sprites_thndrbld_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
 
 /*************************************
  *
@@ -2455,8 +2455,12 @@ int segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
 			break;
 
 		case SEGAIC16_SPRITES_OUTRUN:
-		case SEGAIC16_SPRITES_XBOARD:
 			info->draw = segaic16_sprites_outrun_draw;
+			info->ramsize = 0x1000;
+			buffer = 1;
+			break;
+		case SEGAIC16_SPRITES_XBOARD:
+			info->draw = segaic16_sprites_thndrbld_draw;
 			info->ramsize = 0x1000;
 			buffer = 1;
 			break;

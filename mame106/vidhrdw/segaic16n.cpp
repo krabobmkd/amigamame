@@ -20,6 +20,7 @@ extern "C"
 extern "C" {
 // publish C++ functions as "C"
 void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
+void segaic16_sprites_thndrbld_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
 void segaic16_sprites_sharrier_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
 extern struct palette_info palette;
 
@@ -121,7 +122,7 @@ struct yloopprms {
 
 };
 
-template<bool shadow,bool doclipx,int deltax> FINLINE
+template<bool shadow,bool doclipx,int deltax,bool doextra15> FINLINE
 void  outrun_sprite_loopy_noflip(
         mame_bitmap *bitmap,
         const rectangle *cliprect,
@@ -178,10 +179,10 @@ void  outrun_sprite_loopy_noflip(
                 int pix;
 
                 pix = (pixels >> 20) & 0xf; while (xacc < 0x200) {
-                        outrun_draw_pixelT<shadow,nohlight,notc15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
+                        outrun_draw_pixelT<shadow,nohlight,doextra15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
                          x+=deltax; xacc += hzoom; } xacc -= 0x200;
                 pix = (pixels >> 16) & 0xf; while (xacc < 0x200) {
-                        outrun_draw_pixelT<shadow,nohlight,notc15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
+                        outrun_draw_pixelT<shadow,nohlight,doextra15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
                           x+=deltax; xacc += hzoom; } xacc -= 0x200;
                 pix = (pixels >> 12) & 0xf; while (xacc < 0x200) {
                         outrun_draw_pixelT<shadow,nohlight,notc15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
@@ -222,7 +223,7 @@ void  outrun_sprite_loopy_noflip(
 }
 
 
-template<bool shadow,bool doclipx,int deltax> FINLINE
+template<bool shadow,bool doclipx,int deltax,bool doextra15> FINLINE
 void outrun_sprite_loopy_flip(
         mame_bitmap *bitmap,
         const rectangle *cliprect,
@@ -286,10 +287,10 @@ void outrun_sprite_loopy_flip(
                     outrun_draw_pixelT<shadow,nohlight,notc15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
                     x += deltax; xacc += hzoom; } xacc -= 0x200;
                 pix = (pixels >> 16) & 0xf; while (xacc < 0x200) {
-                    outrun_draw_pixelT<shadow,nohlight,notc15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
+                    outrun_draw_pixelT<shadow,nohlight,doextra15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
                     x += deltax; xacc += hzoom; } xacc -= 0x200;
                 pix = (pixels >> 20) & 0xf; while (xacc < 0x200) {
-                    outrun_draw_pixelT<shadow,nohlight,notc15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
+                    outrun_draw_pixelT<shadow,nohlight,doextra15,doclipx,doclipx>(dest,pri,sprpri,x,cliprect,pix,color);
                     x += deltax; xacc += hzoom; } xacc -= 0x200;
                 pix = (pixels >> 24) & 0xf;
     if(pix == 0x0f) break;  // stop if the second-to-last pixel in the group was 0xf
@@ -324,8 +325,10 @@ void outrun_sprite_loopy_flip(
 
 
 }
-
-void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+// thunderblade and outrun uses this, but some thbld sprites needs extra more color&5 test,
+// that we can avoid in all outrun sprites.
+template<bool doExtra15t>
+void segaic16_sprites_outrun_drawT(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x40000;
 	const UINT32 *spritebase = (const UINT32 *)memory_region(REGION_GFX2);
@@ -335,6 +338,7 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
 	for (data = info->buffer; data < info->buffer + info->ramsize/2; data += 8)
 		if (data[0] & 0x8000)
 			break;
+
 
  int numBankMask = 1;
   while(numBankMask<numbanks) numBankMask<<=1;
@@ -405,12 +409,12 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
                 bool needclipx = ((xpos<cliprect->min_x) || (xend>=cliprect->max_x));
                 if(needclipx)
                 {
-                 outrun_sprite_loopy_noflip<false,true,1>(
+                 outrun_sprite_loopy_noflip<false,true,1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 else
                 {
-                 outrun_sprite_loopy_noflip<false,false,1>(
+                 outrun_sprite_loopy_noflip<false,false,1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 // end if xdelta > 0
@@ -420,16 +424,18 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
                 bool needclipx = ((xend<cliprect->min_x) || (xpos>=cliprect->max_x));
                 if(needclipx)
                 {
-                 outrun_sprite_loopy_noflip<false,true,-1>(
+                 outrun_sprite_loopy_noflip<false,true,-1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 else
                 {
-                 outrun_sprite_loopy_noflip<false,false,-1>(
+                 outrun_sprite_loopy_noflip<false,false,-1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
 
             } // end if xdelta < 0
+
+
             // end if no flipx
         } else
         { // if flip
@@ -441,12 +447,12 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
                 bool needclipx = ((xpos<cliprect->min_x) || (xend>=cliprect->max_x));
                 if(needclipx)
                 {
-                 outrun_sprite_loopy_flip<false,true,1>(
+                 outrun_sprite_loopy_flip<false,true,1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 else
                 {
-                 outrun_sprite_loopy_flip<false,false,1>(
+                 outrun_sprite_loopy_flip<false,false,1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 // end if xdelta > 0
@@ -456,19 +462,16 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
                 bool needclipx = ((xend<cliprect->min_x) || (xpos>=cliprect->max_x));
                 if(needclipx)
                 {
-                 outrun_sprite_loopy_flip<false,true,-1>(
+                 outrun_sprite_loopy_flip<false,true,-1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 else
                 {
-                 outrun_sprite_loopy_flip<false,false,-1>(
+                 outrun_sprite_loopy_flip<false,false,-1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
 
             } // end if xdelta < 0
-
-
-
 
 
         } // end if flipx
@@ -484,12 +487,12 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
                 bool needclipx = ((xpos<cliprect->min_x) || (xend>=cliprect->max_x));
                 if(needclipx)
                 {
-                    outrun_sprite_loopy_noflip<true,true,1>(
+                    outrun_sprite_loopy_noflip<true,true,1,doExtra15t>(
                         bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 else
                 {
-                    outrun_sprite_loopy_noflip<true,false,1>(
+                    outrun_sprite_loopy_noflip<true,false,1,doExtra15t>(
                        bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
 
@@ -501,12 +504,12 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
                 bool needclipx = ((xend<cliprect->min_x) || (xpos>=cliprect->max_x));
                 if(needclipx)
                 {
-                 outrun_sprite_loopy_noflip<true,true,-1>(
+                 outrun_sprite_loopy_noflip<true,true,-1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 else
                 {
-                 outrun_sprite_loopy_noflip<true,false,-1>(
+                 outrun_sprite_loopy_noflip<true,false,-1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
 
@@ -522,12 +525,12 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
                 bool needclipx = ((xpos<cliprect->min_x) || (xend>=cliprect->max_x));
                 if(needclipx)
                 {
-                    outrun_sprite_loopy_flip<true,true,1>(
+                    outrun_sprite_loopy_flip<true,true,1,doExtra15t>(
                         bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 else
                 {
-                    outrun_sprite_loopy_flip<true,false,1>(
+                    outrun_sprite_loopy_flip<true,false,1,doExtra15t>(
                        bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
 
@@ -539,12 +542,12 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
                 bool needclipx = ((xend<cliprect->min_x) || (xpos>=cliprect->max_x));
                 if(needclipx)
                 {
-                 outrun_sprite_loopy_flip<true,true,-1>(
+                 outrun_sprite_loopy_flip<true,true,-1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
                 else
                 {
-                 outrun_sprite_loopy_flip<true,false,-1>(
+                 outrun_sprite_loopy_flip<true,false,-1,doExtra15t>(
                      bitmap,cliprect,spritedata,top,ytarget,ydelta,hzoom,vzoom,pitch,addr,xpos,sprpri,color );
                 }
 
@@ -558,7 +561,7 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
 
 
         } // end shadow
-/*
+/*oldemodel
 		for (y = top; y != ytarget; y += ydelta)
 		{
 			// skip drawing if not within the cliprect
@@ -640,6 +643,15 @@ void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap,
 */
 	} // end loop per sprites
 }
+void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+    segaic16_sprites_outrun_drawT<false>(info, bitmap,cliprect);
+}
+void segaic16_sprites_thndrbld_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+    segaic16_sprites_outrun_drawT<true>(info, bitmap,cliprect);
+}
+
 
 
 
@@ -819,15 +831,15 @@ void segaic16_sprites_sharrier_draw(struct sprite_info *info, mame_bitmap *bitma
 						int pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
                             if (x >= cliprect->min_x) sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,yestc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
                             if (x >= cliprect->min_x) sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x) sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
+                            if (x >= cliprect->min_x) sharrier_draw_pixelT<false,false,yestc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
                             if (x >= cliprect->min_x) sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x) sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
+                            if (x >= cliprect->min_x) sharrier_draw_pixelT<false,false,yestc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >>  0) & 0xf;
                 /* stop if the last pixel in the group was 0xf */
                 if (pix == 15)
@@ -854,17 +866,17 @@ void segaic16_sprites_sharrier_draw(struct sprite_info *info, mame_bitmap *bitma
 					{
 						/* draw 8 pixels */
 						int pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<false,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 28) & 0xf;
                         /* stop if the last pixel in the group was 0xf */
                 if (pix == 15)
@@ -915,19 +927,20 @@ void segaic16_sprites_sharrier_draw(struct sprite_info *info, mame_bitmap *bitma
 					UINT32 pixels = spritedata[++data[7] & 0x7fff];
 					for (x = xpos; x <= cliprect->max_x; )
 					{
+					//KRB optim: could clean sprite 15 values when unlikely, could remove tests with yestc15.
 						/* draw 8 pixels 7 +1 */
 						int pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
+                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
+                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
+                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
+                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color ); x++; }
+                            if (x >= cliprect->min_x) sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color ); x++; }
 						pix = (pixels >>  0) & 0xf;
                 /* stop if the last pixel in the group was 0xf */
                 if (pix == 15)
@@ -954,17 +967,17 @@ void segaic16_sprites_sharrier_draw(struct sprite_info *info, mame_bitmap *bitma
 					{
 						/* draw 8 pixels */
 						int pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) {
-                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,notc15>(dest,pri, sprpri,x, pix, color );  x++; }
+                            if (x >= cliprect->min_x)sharrier_draw_pixelT<true,false,yestc15>(dest,pri, sprpri,x, pix, color );  x++; }
 						pix = (pixels >> 28) & 0xf;
                         /* stop if the last pixel in the group was 0xf */
                 if (pix == 15)

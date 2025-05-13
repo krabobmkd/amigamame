@@ -40,6 +40,7 @@ void updateCrossHair(mame_bitmap *bitmap, const rectangle *cliprect,int screenx,
     {
         sincemove = _frame- ps->_lastMoveFrame;
     }
+//    printf("sincemove:%d\n",sincemove);
     if(sincemove<60*10)
         draw_crosshair(bitmap,screenx,screeny,cliprect,player);
 }

@@ -11,7 +11,10 @@ todo R1.3b ->4?
  X thunderblade/outrun/wb3/shangon interblocking -> CORRECTED
  X nightstriker spriteprio
 
- O optim sprite outrun ?
+ X car driving game: buton mouse 1 can accelerate and 2 brake, by default.
+
+ O guidon pour shangon
+ X optim sprite outrun 
 
 
 --------------------------------------------------------------------------
@@ -20,8 +23,8 @@ todo R1.3
  X checksum neogeo3d
 
  new feats:
- - O outrun lever & wheel gadgets
- - O outrun cpu sync optim.
+ - X outrun lever & wheel gadgets
+ - X outrun cpu sync optim.
  - X run vaporous neogeo demo + neogeo3d.
 
  big round of "let's make it better on native AGA and OCS".

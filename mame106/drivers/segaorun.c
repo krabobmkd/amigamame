@@ -41,7 +41,7 @@
 static UINT16 *workram;
 static UINT16 *cpu1ram, *cpu1rom;
 
-static UINT8 adc_select;
+static UINT8 adc_select=0;
 
 static UINT8 irq2_state;
 static UINT8 vblank_irq_state;
@@ -471,9 +471,11 @@ static READ16_HANDLER( outrun_custom_io_r )
             // ADC1: brake. bt b -> 2 to 254 in like 0.4 sec
 			static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
 			UINT16 vread = readinputportbytag_safe(ports[adc_select], 0x0010);
-			commonControlsValues.analogValues[adc_select] = (INT16) vread;
-			commonControlsValues.analogValuesReadCount[adc_select]++;
-
+			if(adc_select == 0)
+            {
+                commonControlsValues.analogValues[0] = (INT16) vread;
+               // commonControlsValues.analogValuesReadCount[0]++;
+            }
 			return vread;
 		}
 
@@ -506,7 +508,6 @@ static READ16_HANDLER( outrun_custom_io_r )
 	// return segaic16_open_bus_r(0,0);
 }
 
-extern int outrun_use_firstspritemem;
 extern void segaic16_sprites_draw_0_w_fast();
 static WRITE16_HANDLER( outrun_custom_io_w )
 {
@@ -548,7 +549,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 			//segaic16_sprites_draw_0_w(offset, data, mem_mask);
 
              segaic16_sprites_draw_0_w_fast();
-           // outrun_use_firstspritemem = 1;
+
 		}
 			return;
 	}

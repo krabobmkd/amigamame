@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "segaic16.h"
 #include "includes/system16.h"
-
+#include "bootlog.h"
 
 
 /*************************************
@@ -70,10 +70,16 @@ void xboard_set_road_priority(int priority)
  *
  *************************************/
 
-
+extern int postscreentoclean;
 
 VIDEO_UPDATE( xboard )
 {
+    if(postscreentoclean>0)
+    {
+        // need a last screen cleaning because onvasive bootprogress
+        bootlog_setprogress(eProgressEnd);
+        postscreentoclean = 0;
+    }
 //    if((thndrbldpatchdone & 3) == 0)
 //    {
 //// krb_thndrbld_patch_cpu_synchro();
