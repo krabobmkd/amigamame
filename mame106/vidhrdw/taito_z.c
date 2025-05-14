@@ -1375,7 +1375,7 @@ static void initGoodies()
     if((f&1) ==0) return;
     if(_wheelgoody) return;
 
-    _wheelgoody = drawextra_createSteeringWheel();
+    _wheelgoody = drawextra_createSteeringWheel(0);
     if(_wheelgoody)
     {
      drawextra_setpos(&_wheelgoody->_geo,160+50,240-34);

@@ -21,6 +21,36 @@ extern unsigned int GetDisplayGoodiesFlags();
  *
  *************************************/
 
+static void extraclean()
+{
+    if(_levergoody) drawextra_deleteLever(_levergoody);
+    _levergoody = NULL;
+    if(_wheelgoody) drawextra_deleteSteeringWheel(_wheelgoody);
+    _wheelgoody = NULL;
+}
+
+void add_exit_callback(void (*callback)(void));
+
+static void initGoodies(int shagon)
+{
+    //krb
+    unsigned int configGoodiesFlags = GetDisplayGoodiesFlags();
+    if(configGoodiesFlags & 3)
+    {
+        if((configGoodiesFlags & 2) && (shagon==0))
+        {
+            _levergoody = drawextra_createLever();
+            if(_levergoody) drawextra_setpos(&_levergoody->_geo,160+44+34,224-39);
+        }
+        if(configGoodiesFlags & 1)
+        {
+            _wheelgoody = drawextra_createSteeringWheel(shagon);
+            if(_wheelgoody) drawextra_setpos(&_wheelgoody->_geo,160+44,224-44);
+        }
+        add_exit_callback(extraclean);
+    }
+}
+
 VIDEO_START( shangon )
 {
 	/* compute palette info */
@@ -37,18 +67,10 @@ VIDEO_START( shangon )
 	/* initialize the road */
 	if (segaic16_road_init(0, SEGAIC16_ROAD_OUTRUN, 0x7f6, 0x7c0, 0x7c0, 0))
 		return 1;
+
+    initGoodies(1);
 	return 0;
 }
-
-static void extraclean()
-{
-    if(_levergoody) drawextra_deleteLever(_levergoody);
-    _levergoody = NULL;
-    if(_wheelgoody) drawextra_deleteSteeringWheel(_wheelgoody);
-    _wheelgoody = NULL;
-}
-
-void add_exit_callback(void (*callback)(void));
 
 VIDEO_START( outrun )
 {
@@ -67,22 +89,8 @@ VIDEO_START( outrun )
 	if (segaic16_road_init(0, SEGAIC16_ROAD_OUTRUN, 0x400, 0x420, 0x780, 0))
 		return 1;
 
-    //krb
-    unsigned int configGoodiesFlags = GetDisplayGoodiesFlags();
-    if(configGoodiesFlags & 3)
-    {
-        if(configGoodiesFlags & 2)
-        {
-            _levergoody = drawextra_createLever();
-            if(_levergoody) drawextra_setpos(&_levergoody->_geo,160+44+34,224-39);
-        }
-        if(configGoodiesFlags & 1)
-        {
-            _wheelgoody = drawextra_createSteeringWheel();
-            if(_wheelgoody) drawextra_setpos(&_wheelgoody->_geo,160+44,224-44);
-        }
-        add_exit_callback(extraclean);
-    }
+    initGoodies(0);
+
 	return 0;
 }
 
@@ -121,6 +129,11 @@ VIDEO_UPDATE( shangon )
 
 	/* draw the sprites */
 	segaic16_sprites_draw(0, bitmap, cliprect);
+
+    int remapIndexStart=32;
+    if(_wheelgoody)
+        drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0],remapIndexStart);
+
 
 }
 // segaic16

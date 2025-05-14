@@ -4,18 +4,19 @@ todo R1.3b ->4?
  X le tunnel de Chasehq est niqué !!!
  X tester si chasehq pour wheel taitoic.
 
- X multiple key selection whatever the sort + only when list panel.
+ X multiple keyboard selection whatever the sort + only when list panel.
  X revalider dispatcher list with "NO MUI5" version.
  X MUIM_Window_SetCycleChain with serializer ?
  X remove stream drivdispdbg in gui after its ok
  X thunderblade/outrun/wb3/shangon interblocking -> CORRECTED
  X nightstriker spriteprio
 
- X car driving game: buton mouse 1 can accelerate and 2 brake, by default.
+ X car driving game: buton mouse 1 can accelerate and 2 brake, so mouse/trackball can be used completely by default.
+ outrun gear shift is space or joystick bt3.
 
  O guidon pour shangon
  X optim sprite outrun 
-
+ O ChaseHQ has a gear shift
 
 --------------------------------------------------------------------------
 todo R1.3
