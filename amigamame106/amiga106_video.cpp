@@ -488,6 +488,7 @@ mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)
 */
 static char perfo_line[28];
 extern "C" {
+//extern int testvv;
 //extern int levervt[4];
 };
 const char *osd_get_fps_text(const performance_info *performance)
@@ -495,7 +496,7 @@ const char *osd_get_fps_text(const performance_info *performance)
      snprintf(perfo_line,27,"speed:%.01f%% fps:%.03f",performance->game_speed_percent,
               performance->frames_per_second);
               // usefull for debug:
-//        snprintf(perfo_line,27,"lv%d %d ",dbg_count_draw0,dbg_count_draw1);
+        // snprintf(perfo_line,27,"lv%d  ",testvv);
     perfo_line[27]=0;
     return perfo_line;
 }

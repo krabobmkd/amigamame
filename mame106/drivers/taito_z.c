@@ -1054,7 +1054,7 @@ static READ16_HANDLER( contcirc_input_bypass_r )
 	}
 }
 
-int testval=0;
+//int testval[4]={0};
 static READ16_HANDLER( chasehq_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for extra inputs */
@@ -1081,9 +1081,23 @@ static READ16_HANDLER( chasehq_input_bypass_r )
 	}
     commonControlsValues.analogValues[0] = (INT16) steer;
 
-    //krb get gear state...
-    UINT32 input1 =  readinputport(1);
-    testval = input1;
+    if(port == 3)
+    {
+        UINT16 v3 = readinputport(3);
+        commonControlsValues._lever = (INT16) ((v3&16)==0);
+        return v3;
+    }
+
+//     //krb get gear state...
+//     for(int i=0;i<16;i+=4)
+//     {
+//     int dec=0;
+//         UINT32 v=(readinputport(dec+i)<<24);
+//         v |=(readinputport(dec+i+1)<<16);
+//         v |=(readinputport(dec+i+2)<<8);
+//          v |=(readinputport(dec+i+3)<<0);
+// testval[i/4] = v;
+//     }
 
 	switch (port)
 	{

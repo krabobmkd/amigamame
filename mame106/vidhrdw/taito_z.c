@@ -1358,10 +1358,13 @@ VIDEO_UPDATE( contcirc )
 
 //krb: draw optionnal control goodies
 static struct drawableExtra_steeringWheel *_wheelgoody=NULL;
+static struct drawableExtra_lever *_levergoody=NULL;
 extern unsigned int GetDisplayGoodiesFlags();
 
 static void extraclean()
 {
+    if(_levergoody) drawextra_deleteLever(_levergoody);
+    _levergoody = NULL;
     if(_wheelgoody) drawextra_deleteSteeringWheel(_wheelgoody);
     _wheelgoody = NULL;
 }
@@ -1370,21 +1373,24 @@ static void initGoodies()
 {
     int dowheel = (strcmp(Machine->gamedrv->name,"chasehq")==0);
     if(!dowheel) return;
-
-    unsigned int f = GetDisplayGoodiesFlags();
-    if((f&1) ==0) return;
-    if(_wheelgoody) return;
-
-    _wheelgoody = drawextra_createSteeringWheel(0);
-    if(_wheelgoody)
+    unsigned int configGoodiesFlags = GetDisplayGoodiesFlags();
+    if((configGoodiesFlags & 3))
     {
-     drawextra_setpos(&_wheelgoody->_geo,160+50,240-34);
-     add_exit_callback(extraclean);
+        if((configGoodiesFlags & 2) )
+        {
+            _levergoody = drawextra_createLever();
+            if(_levergoody) drawextra_setpos(&_levergoody->_geo,160+44+34,224-39+8);
+        }
+        if(configGoodiesFlags & 1)
+        {
+            _wheelgoody = drawextra_createSteeringWheel(0);
+            if(_wheelgoody) drawextra_setpos(&_wheelgoody->_geo,160+44,224-44+8);
+        }
+        add_exit_callback(extraclean);
     }
 
 }
 /* Nightstr and ChaseHQ */
-
 VIDEO_UPDATE( chasehq )
 {
 	UINT8 layer[3];
@@ -1413,14 +1419,21 @@ VIDEO_UPDATE( chasehq )
 	// test a static hud pixel on the screen to check if we're into gameplay:
 	// very accurate because it's not yet color it's sprite private palette index
 	// cliprect->min_y can be not the right value.
-	//UINT16 pixval = ((UINT16*) bitmap->line[215])[cliprect->min_x+298];
-	// 23 in demo mode, 356 music selection screen, 41 play mode .
-    //if(pixval == 41)
-    {
-        int remapIndexStart=512+16;
-       if(_wheelgoody)
-            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody,
-            commonControlsValues.analogValues[0]+128,remapIndexStart);
+	if(_wheelgoody)
+	{
+        UINT16 pixval = ((UINT16*) bitmap->line[178])[cliprect->min_x+312];
+        // 23 in demo mode, 356 music selection screen, 41 play mode .
+        if(pixval == 2018)
+        {
+            int remapIndexStart=512+16;
+          // if(_wheelgoody)
+                drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody,
+                    commonControlsValues.analogValues[0]+128,remapIndexStart);
+
+            if(_levergoody)
+                drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever,512);
+
+        }
     }
 }
 
