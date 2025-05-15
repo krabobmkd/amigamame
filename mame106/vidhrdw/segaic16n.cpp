@@ -1051,6 +1051,13 @@ static inline void yboard_draw_pixel(int x,int minx, int maxx, int ind, int colo
     if (x >= minx && x <= maxx && ind < 0x01fe)
         dest[x] = ind | colorpri;
 }
+static inline void yboard_draw_pixel2l(int x,int minx, int maxx, int ind, int colorpri,UINT16 *dest,int bpr )
+{
+    if (x >= minx && x <= maxx && ind < 0x01fe)
+    {
+        dest[x] = dest[x+bpr] = ind | colorpri;
+    }
+}
 static inline void yboard_draw_pixelnt(int x, int ind, int colorpri,UINT16 *dest )
 {
     if ( ind < 0x01fe) dest[x] = ind | colorpri;
@@ -1067,7 +1074,7 @@ static inline void yboard_draw_pixelnt2(int x, int ind, int colorpri,UINT16 *des
 //       : // in
 //       : // trashed
 //       );
-template<bool doclipx,int xdelta> FINLINE
+template<int xdelta> FINLINE
 void ybd_sprite_loopy_noflip(
         mame_bitmap *bitmap,
         const rectangle *cliprect,
@@ -1078,7 +1085,7 @@ void ybd_sprite_loopy_noflip(
         const int zoom,const int pitch,int addr,int xpos,int startxacc, int colorpri)
 {
     int yacc = 0;
-
+    int bpr = bitmap->rowbytes>>1;
     for (int y = top; y != ytarget; y += ydelta)
     {
         /* skip drawing if not within the cliprect */
@@ -1087,7 +1094,6 @@ void ybd_sprite_loopy_noflip(
             UINT16 *dest = (UINT16 *)bitmap->line[y];
             int minx = rotatebase[y & ~1];
             int maxx = rotatebase[y |  1];
-
 
             /* bit 0x8000 from rotate RAM means that Y is above the top of the screen */
             if ((minx & 0x8000) && ydelta < 0)
@@ -1108,50 +1114,44 @@ void ybd_sprite_loopy_noflip(
                 if (maxx > cliprect->max_x)
                     maxx = cliprect->max_x;
 
-                /* non-flipped case */
-                // if (!flip)
-                // {
-                    /* start at the word before because we preincrement below */
-                    UINT16 offs = addr - 1;
+                /* start at the word before because we preincrement below */
+                UINT16 offs = addr ;
 
-                    UINT64 pixels = spritedata[++offs];
-                    int xacc =startxacc;
+                UINT64 pixels = spritedata[offs++];
+                int xacc =startxacc;
 
-                    for (int x = xpos;
-                        (xdelta > 0 && x <= maxx) || // tests hopefully crunched by template.
-                        (xdelta < 0 && x >= minx);
-                        )
-                    {
-                        int ind,pix;
+                 for (int x = xpos;
+                    (xdelta > 0 && x <= maxx) || // tests hopefully crunched by template.
+                    (xdelta < 0 && x >= minx);
+                    )
+                {
+                    int ind,pix;
+                        pix = (pixels >> 56) & 0xf; ind = indirect[pix]; while (xacc < 0x400) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 52) & 0xf; ind = indirect[pix]; while (xacc < 0x600) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 48) & 0xf; ind = indirect[pix]; while (xacc < 0x800) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 44) & 0xf; ind = indirect[pix]; while (xacc < 0xa00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 40) & 0xf; ind = indirect[pix]; while (xacc < 0xc00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 36) & 0xf; ind = indirect[pix]; while (xacc < 0xe00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 32) & 0xf; ind = indirect[pix]; while (xacc < 0x1000) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
 
-                    /* draw four pixels */
-                    //pix = (pixels >> 60) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-                    pix = (pixels >> 56) & 0xf; ind = indirect[pix]; while (xacc < 0x400) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 52) & 0xf; ind = indirect[pix]; while (xacc < 0x600) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 48) & 0xf; ind = indirect[pix]; while (xacc < 0x800) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 44) & 0xf; ind = indirect[pix]; while (xacc < 0xa00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 40) & 0xf; ind = indirect[pix]; while (xacc < 0xc00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 36) & 0xf; ind = indirect[pix]; while (xacc < 0xe00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 32) & 0xf; ind = indirect[pix]; while (xacc < 0x1000) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 28) & 0xf; ind = indirect[pix]; while (xacc < 0x1200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 24) & 0xf; ind = indirect[pix]; while (xacc < 0x1400) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 20) & 0xf; ind = indirect[pix]; while (xacc < 0x1600) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 16) & 0xf; ind = indirect[pix]; while (xacc < 0x1800) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >> 12) & 0xf; ind = indirect[pix]; while (xacc < 0x1a00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >>  8) & 0xf; ind = indirect[pix]; while (xacc < 0x1c00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >>  4) & 0xf; ind = indirect[pix]; while (xacc < 0x1e00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pix = (pixels >>  0) & 0xf;
 
-                    pix = (pixels >> 28) & 0xf; ind = indirect[pix]; while (xacc < 0x1200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 24) & 0xf; ind = indirect[pix]; while (xacc < 0x1400) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 20) & 0xf; ind = indirect[pix]; while (xacc < 0x1600) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 16) & 0xf; ind = indirect[pix]; while (xacc < 0x1800) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >> 12) & 0xf; ind = indirect[pix]; while (xacc < 0x1a00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >>  8) & 0xf; ind = indirect[pix]; while (xacc < 0x1c00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >>  4) & 0xf; ind = indirect[pix]; while (xacc < 0x1e00) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pix = (pixels >>  0) & 0xf;
+                        /* stop if the last pixel in the group was 0xf */
+                        if (pix == 0x0f)
+                            break;
+                        ind = indirect[pix]; while (xacc < 0x2000) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
+                        pixels = spritedata[offs++];
+                  xacc &= 0x01ff;
+                        pix = (pixels >> 60) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
 
-                    /* stop if the last pixel in the group was 0xf */
-                    if (pix == 0x0f)
-                        break;
-                    ind = indirect[pix]; while (xacc < 0x2000) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pixels = spritedata[++offs];
-              xacc &= 0x01ff;
-                    pix = (pixels >> 60) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-
-                }
+                }//endloopx
 
             }
         }
@@ -1163,9 +1163,7 @@ void ybd_sprite_loopy_noflip(
     }
 }
 
-
-
-template<bool doclipx,int xdelta> FINLINE
+template<int xdelta> FINLINE
 void ybd_sprite_loopy_flip(
         mame_bitmap *bitmap,
         const rectangle *cliprect,
@@ -1176,7 +1174,7 @@ void ybd_sprite_loopy_flip(
         const int zoom,const int pitch,int addr,int xpos,int startxacc, int colorpri)
 {
     int yacc = 0;
-
+    int bpr = bitmap->rowbytes>>1;
     for (int y = top; y != ytarget; y += ydelta)
     {
         /* skip drawing if not within the cliprect */
@@ -1207,8 +1205,8 @@ void ybd_sprite_loopy_flip(
                     maxx = cliprect->max_x;
 
                 /* start at the word after because we predecrement below */
-                UINT16 offs = addr + 1;
-                UINT64 pixels = spritedata[--offs];
+                UINT16 offs = addr ;
+                UINT64 pixels = spritedata[offs--];
                 int xacc = startxacc;
 
                 for (int x = xpos;
@@ -1217,7 +1215,6 @@ void ybd_sprite_loopy_flip(
                     )
                 {
                     int ind,pix;
-
                     pix = (pixels >>  4) & 0xf; ind = indirect[pix]; while (xacc < 0x400) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
                     pix = (pixels >>  8) & 0xf; ind = indirect[pix]; while (xacc < 0x600) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
                     pix = (pixels >> 12) & 0xf; ind = indirect[pix]; while (xacc < 0x800) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
@@ -1238,7 +1235,7 @@ void ybd_sprite_loopy_flip(
                     if (pix == 0x0f)
                         break;
                     ind = indirect[pix]; while (xacc < 0x2000) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
-                    pixels = spritedata[--offs];
+                    pixels = spritedata[offs--];
                     xacc &= 0x01ff;
                     pix = (pixels >>  0) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; }
 
@@ -1345,29 +1342,26 @@ void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *bitmap,
         /* non-flipped case */
         if (!flip)
         {
-
-            const bool docliptests=true;
             if(xdelta>0)
-                ybd_sprite_loopy_noflip<docliptests,1>(bitmap,cliprect,
+                ybd_sprite_loopy_noflip<1>(bitmap,cliprect,
                     rotatebase, spritedata, indirect,
                     top,ytarget,ydelta,
                     zoom,pitch,addr,xpos,startxacc,colorpri);
             else
-                ybd_sprite_loopy_noflip<docliptests,-1>(bitmap,cliprect,
+                ybd_sprite_loopy_noflip<-1>(bitmap,cliprect,
                     rotatebase,spritedata, indirect,
                     top,ytarget,ydelta,
                     zoom,pitch,addr,xpos,startxacc,colorpri);
             // end with no flipx
         } else
         {   // with flipx
-            const bool docliptests=true;
             if(xdelta>0)
-                ybd_sprite_loopy_flip<docliptests,1>(bitmap,cliprect,
+                ybd_sprite_loopy_flip<1>(bitmap,cliprect,
                     rotatebase, spritedata, indirect,
                     top,ytarget,ydelta,
                     zoom,pitch,addr,xpos,startxacc,colorpri);
             else
-                ybd_sprite_loopy_flip<docliptests,-1>(bitmap,cliprect,
+                ybd_sprite_loopy_flip<-1>(bitmap,cliprect,
                     rotatebase,spritedata, indirect,
                     top,ytarget,ydelta,
                     zoom,pitch,addr,xpos,startxacc,colorpri);
