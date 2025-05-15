@@ -113,4 +113,17 @@ struct palette_info
 	UINT8			hilight[32];					/* RGB translations for hilighted pixels */
 };
 
+
+struct rotate_info
+{
+	UINT8			index;							/* index of this structure */
+	UINT8			type;							/* type of rotate system (see segaic16.h for details) */
+	UINT16			colorbase;						/* base color index */
+	INT32			ramsize;						/* size of rotate RAM */
+	UINT16 *		rotateram;						/* pointer to rotateram pointer */
+	UINT16 *		buffer;							/* buffered data */
+};
+
+
+
 #endif

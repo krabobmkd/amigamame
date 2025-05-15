@@ -1054,6 +1054,12 @@ static READ16_HANDLER( contcirc_input_bypass_r )
 	}
 }
 
+//#define USE_LEVER_TOGGLE 1
+#define LEVERBIT 16
+#ifdef USE_LEVER_TOGGLE
+    static char lever_lastpos=0;
+    static char lever_currentpos=0;
+#endif
 //int testval[4]={0};
 static READ16_HANDLER( chasehq_input_bypass_r )
 {
@@ -1082,9 +1088,22 @@ static READ16_HANDLER( chasehq_input_bypass_r )
     commonControlsValues.analogValues[0] = (INT16) steer;
 
     if(port == 3)
-    {
+    {   // get lever
         UINT16 v3 = readinputport(3);
-        commonControlsValues._lever = (INT16) ((v3&16)==0);
+
+#ifdef USE_LEVER_TOGGLE
+        char btdown = ((v3&LEVERBIT)==0);
+        if(btdown != lever_lastpos)
+        {
+            if(btdown) lever_currentpos ^= 1; // toggle when change and down.
+            lever_lastpos = btdown;
+        }
+        v3 &= ~LEVERBIT; // remove push state
+        v3 |= (lever_currentpos<<4); // replace by toggle state
+        commonControlsValues._lever = lever_currentpos;
+#else
+        commonControlsValues._lever = (INT16) ((v3&LEVERBIT)==0);
+#endif
         return v3;
     }
 
@@ -2162,7 +2181,7 @@ INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* gear */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE PORT_PLAYER(1)	/* gear, krb added toggle */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )

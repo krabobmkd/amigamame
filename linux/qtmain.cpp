@@ -173,7 +173,8 @@ void QProc::process()
 
        //"nightstr"
       //  "outrun"
-      "sharrier"
+      //"sharrier"
+      "othunder"
       // "thndrbld"
       // "chasehq"
 
@@ -432,13 +433,20 @@ const os_code_info *osd_get_code_list(void)
     static os_code_info l[]={
         {"A",32,KEYCODE_A},
         {"SPACE",65,KEYCODE_SPACE},
+        {"M1AX",1024,MOUSECODE_1_ANALOG_X},
+        {"M1AY",1025,MOUSECODE_1_ANALOG_Y},
+        {"M1ABT1",1026,MOUSECODE_1_BUTTON1},
+        {"M1ABT2",1027,MOUSECODE_1_BUTTON2},
         {NULL,0,0},
     };
     return &l[0];
 }
 INT32 osd_get_code_value(os_code oscode)
 {
-
+    if(oscode==1024)
+    {
+        printf("woot\n");
+    }
     return 0;
 }
 int osd_readkey_unicode(int flush)
