@@ -574,7 +574,7 @@ static READ16_HANDLER( shangon_custom_io_r )
 			UINT16 vread = readinputportbytag_safe(ports[adc_select], 0x0010);
 			if(adc_select == 0)
             {
-                commonControlsValues.analogValues[0] = (INT16) vread;
+                commonControlsValues.analogValues[0] = 256-(INT16) vread;
                // commonControlsValues.analogValuesReadCount[0]++;
             }
 			return vread;
