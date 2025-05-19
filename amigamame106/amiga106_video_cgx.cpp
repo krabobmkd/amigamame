@@ -462,14 +462,8 @@ void Intuition_Window_CGX::draw(_mame_display *display)
     Layer *lr = _pWbWindow->RPort->Layer;
     if(lr) ObtainSemaphore(&(lr->Lock));
     bool rastPortComplete = isRastPortComplete(_pWbWindow->RPort,(WORD)_widthtarget,(UWORD)_heighttarget) ;
-
-     if(rastPortComplete &&
-        _pWbWindow->LeftEdge+_pWbWindow->BorderLeft>0 &&
-        _pWbWindow->TopEdge+_pWbWindow->BorderTop > 0 &&
-        (_pWbWindow->LeftEdge+_pWbWindow->BorderLeft+_widthtarget)<_widthphys &&
-        (_pWbWindow->TopEdge+_pWbWindow->BorderTop+_heighttarget)<_heightphys
-
-        )
+    if(_widthtarget<_widthphys || _heighttarget<_heightphys)  rastPortComplete = false; // because GZZ bug if window shorter
+     if(rastPortComplete)
      {
          // window is on top, we don't need layer library,
          // and can draw directly to wb rastport.
@@ -492,7 +486,9 @@ void Intuition_Window_CGX::draw(_mame_display *display)
      } else
 #endif
      {
+#ifdef USE_DIRECT_WB_RENDERING
         if(lr) ReleaseSemaphore(&(lr->Lock));
+#endif
         _screenshiftx = 0; // because rastport is inside window
         _screenshifty = 0;
         // will draw on friend bitmap _sWbWinSBitmap.

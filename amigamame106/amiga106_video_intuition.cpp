@@ -342,6 +342,8 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
     , _maxzoomfactor(1)
 {
 //   printf(" ***** ** Intuition_Window CREATE:%d %d %08x\n",params._width,params._height,params._flags);
+    // "windows can't use SVP double buffer"
+    _flags &= ~DISPFLAG_USEHEIGHTBUFFER;
 
     if(params._flags & ORIENTATION_SWAP_XY)
     {
@@ -697,36 +699,28 @@ WindowGeo IntuitionDisplay::getWindowGeometry()  // to save/reload
 }
 
 
-/* tool: test if RastPort currently need layer lib clippings.
- if it dosn't, it its not obscured at all, neither by other window or screen border.
- we can use direct pixel copy on workbench in the simple case.
+/* tool: test if RastPort currently need layer.library clippings, or not.
+ we can use direct pixel copy on workbench bitmap in the simple case.
+  **** This is considered dangerous code. ****
 */
 bool isRastPortComplete(RastPort *rp,WORD w, WORD h)
 {
     Layer *lr = rp->Layer;
-    if(!lr) return true;
+    if(!lr) return false; // actually happens a lot when moving/resizing/recreating and could mean windows is being reworked by OS.
     bool isComplete=false;
-    bool hasClipRect=false;
-    bool hasSuperClipRect=false;
-  // ObtainSemaphore(&(lr->Lock));
-
-//    if( (!lr->ClipRect) && (!lr->SuperClipRect))
-//    {   // should happen...
-//        //isComplete=true;
-//        isComplete = false;
-//    }
-    if(lr->ClipRect)
+  // ObtainSemaphore(&(lr->Lock)); // must be done by caller, because following direct draw must also keep lock.
+    ClipRect *cr = lr->ClipRect;
+    if(cr)
     {
-        ClipRect *cr = lr->ClipRect;
-        // to be complete, has
-         //  if just one
+        // to be complete, there must be a single rect. of the whole size.
+        // else it is obscured or cliped.
          if( (cr->Next == NULL) || (cr->Next == cr))
          {
             WORD crw = (cr->bounds.MaxX - cr->bounds.MinX)+1;
             WORD crh = (cr->bounds.MaxY - cr->bounds.MinY)+1;
             if(w == crw && h == crh) isComplete = true;
          } // end if just one cliprect
-    } else
+    } /*else -> our window is simple_refresh, no superbitmap use.
     if(lr->SuperClipRect)
     {
         ClipRect *cr = lr->SuperClipRect;
@@ -738,20 +732,7 @@ bool isRastPortComplete(RastPort *rp,WORD w, WORD h)
             WORD crh = (cr->bounds.MaxY - cr->bounds.MinY)+1;
             if(w == crw && h == crh) isComplete = true;
          } // end if just one cliprect
-    }
-//    if(lr->SuperClipRect)
-//    {
-//        ClipRect *cr = lr->SuperClipRect;
-//        // to be complete, has
-//         //  if just one
-//         if( cr->Next == NULL || cr->Next == lr)
-//         {
-//            WORD crw = cr->bounds.MaxX - cr->bounds.MinX;
-//            WORD crh = cr->bounds.MaxY - cr->bounds.MinY;
-//            if(w == crw && h == crh) isComplete = true;
-//         } // end if just one cliprect
-//    }
-
+    }*/
 
 //    ReleaseSemaphore(&(lr->Lock));
     return isComplete;
