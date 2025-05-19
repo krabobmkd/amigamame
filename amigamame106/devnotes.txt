@@ -12,6 +12,7 @@ todo R1.3b ->4?
  X MUIM_Window_SetCycleChain with serializer ?
  X remove stream drivdispdbg in gui after its ok
  X thunderblade/outrun/wb3/shangon interblocking -> CORRECTED
+ X Special progressbar for thunderblade long blocking boot
  X nightstriker spriteprio
 
  X car driving game: buton mouse 1 can accelerate and 2 brake, so mouse/trackball can be used completely by default.
@@ -20,8 +21,8 @@ todo R1.3b ->4?
  O bug othunder after outrun
  O guidon pour shangon
  X optim sprite outrun 
- O ChaseHQ has a gear shift
- O gforce2 speed cpu
+ X ChaseHQ has a gear shift
+ X gforce2 speed cpu
 
 --------------------------------------------------------------------------
 todo R1.3

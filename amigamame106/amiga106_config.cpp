@@ -324,9 +324,9 @@ void MameConfig::toDefault()
  //NOT THIS ONE !! decide where configs are written:  _misc._userPath = "PROGDIR:user";
     _misc._useCheatCodeFile = false;
     _misc._cheatFilePath = "PROGDIR:cheat.dat";
-    _misc._MiscFlags = 0;
+   // _misc._MiscFlags = 0;
     _misc._Goodies =  GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR;
-
+    _misc._Optims = OPTIMFLAGS_DIRECTWGXWIN;
 
 }
 MameConfig::Display_PerScreenMode::Display_PerScreenMode() : ASerializable() {
@@ -538,6 +538,11 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
         ,"Gear Shift"
       });
 
+    serializer("Optims",_Optims,
+          OPTIMFLAGS_DIRECTWGXWIN //def.
+    ,{
+        "Direct draw for RTG Windows"
+      });
 
 }
 MameConfig::Help::Help() : ASerializable() {

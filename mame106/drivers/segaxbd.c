@@ -355,8 +355,8 @@ static WRITE16_HANDLER( iochip_0_w )
 			return;
 	}
 
-	if (offset <= 4)
-		loginfo(2,"I/O chip 0, port %c write = %02X\n", 'A' + offset, data);
+	// if (offset <= 4)
+	// 	loginfo(2,"I/O chip 0, port %c write = %02X\n", 'A' + offset, data);
 }
 
 
@@ -404,8 +404,8 @@ static WRITE16_HANDLER( iochip_1_w )
 	oldval = iochip_regs[1][offset];
 	iochip_regs[1][offset] = data;
 
-	if (offset <= 4)
-		loginfo(2,"I/O chip 1, port %c write = %02X\n", 'A' + offset, data);
+	// if (offset <= 4)
+	// 	loginfo(2,"I/O chip 1, port %c write = %02X\n", 'A' + offset, data);
 }
 
 
@@ -413,7 +413,7 @@ static WRITE16_HANDLER( iocontrol_w )
 {
 	if (ACCESSING_LSB)
 	{
-		loginfo(2,"I/O chip force input = %d\n", data & 1);
+		//loginfo(2,"I/O chip force input = %d\n", data & 1);
 		/* Racing Hero and ABCop set this and fouls up their output ports */
 		/*iochip_force_input = data & 1;*/
 	}
@@ -457,14 +457,14 @@ static VIDEO_UPDATE( loffire )
 
 static READ16_HANDLER( smgp_excs_r )
 {
-	loginfo(2,"%06X:smgp_excs_r(%04X)\n", activecpu_get_pc(), offset*2);
+//	loginfo(2,"%06X:smgp_excs_r(%04X)\n", activecpu_get_pc(), offset*2);
 	return 0xffff;
 }
 
 
 static WRITE16_HANDLER( smgp_excs_w )
 {
-	loginfo(2,"%06X:smgp_excs_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+//	loginfo(2,"%06X:smgp_excs_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
 }
 
 
@@ -2281,31 +2281,31 @@ ROM_START( gprider1 )
 ROM_END
 
 
-//void krb_thndrbld_m68k_op_bclr_8_s_di(M68KOPT_PARAMS);
-//void krb_thndrbld_m68k_op_bclr_8_s_aw(M68KOPT_PARAMS);
+void krb_thndrbld_m68k_op_bclr_8_s_di(M68KOPT_PARAMS);
+void krb_thndrbld_m68k_op_bclr_8_s_aw(M68KOPT_PARAMS);
 
 
-//void krb_thndrbld_patch_cpu_synchro()
-//{
-////printf("krb_thndrbld_patch_cpu_synchro\n");
-//	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
-//    if(pcodemain[0x00000616>>1] == 0x08b8)
-//    {
-//        printf("do patch1\n");
-//        // replace that call by a patch, on an unused opcode.
-//        m68ki_instruction_jump_table[8] = krb_thndrbld_m68k_op_bclr_8_s_aw;
-//        pcodemain[0x00000616>>1] = 8;
-//    }
+void krb_thndrbld_patch_cpu_synchro()
+{
+//printf("krb_thndrbld_patch_cpu_synchro\n");
+	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
+   if(pcodemain[0x00000616>>1] == 0x08b8)
+   {    //NOt APPLIED !!!
+ //      printf("do patch1\n");
+       // replace that call by a patch, on an unused opcode.
+       m68ki_instruction_jump_table[8] = krb_thndrbld_m68k_op_bclr_8_s_aw;
+       pcodemain[0x00000616>>1] = 8;
+   }
 
-//	 UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
-//     if(pcodesub[0x00000752>>1] == 0x08ad)
-//     {
-//        printf("do patch2\n");
-//         m68ki_instruction_jump_table[9] = krb_thndrbld_m68k_op_bclr_8_s_di;
-//         pcodesub[0x00000752>>1] = 9;
-//     }
+	 UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+    if(pcodesub[0x00000752>>1] == 0x08ad)
+    {
+ //      printf("do patch2\n");
+        m68ki_instruction_jump_table[9] = krb_thndrbld_m68k_op_bclr_8_s_di;
+        pcodesub[0x00000752>>1] = 9;
+    }
 
-//}
+}
 
 /*************************************
  *

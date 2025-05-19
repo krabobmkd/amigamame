@@ -340,6 +340,7 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
     , _pWbWindow(NULL)
     , _machineWidth(params._width),_machineHeight(params._height)
     , _maxzoomfactor(1)
+    , _allowDirectDraw(0)
 {
 //   printf(" ***** ** Intuition_Window CREATE:%d %d %08x\n",params._width,params._height,params._flags);
     // "windows can't use SVP double buffer"
@@ -353,6 +354,11 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
   // this enable or disbale window sizing:
   _maxzoomfactor = 3;
   _useScale = 1;
+
+    MameConfig::Controls &configControls = getMainConfig().controls();
+    MameConfig::Misc &configMisc = getMainConfig().misc();
+
+    _allowDirectDraw = ((configMisc._Optims & OPTIMFLAGS_DIRECTWGXWIN) != 0);
 }
 Intuition_Window::~Intuition_Window()
 {

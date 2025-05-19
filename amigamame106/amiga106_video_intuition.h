@@ -138,6 +138,7 @@ protected:
 
     int _machineWidth,_machineHeight;
     int _maxzoomfactor;
+    int _allowDirectDraw;
 
 
 };

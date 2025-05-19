@@ -71,7 +71,8 @@ void xboard_set_road_priority(int priority)
  *************************************/
 
 extern int postscreentoclean;
-
+extern int 	nbdecryptDone;
+//extern void fd1094_krb_preclean();
 VIDEO_UPDATE( xboard )
 {
     if(postscreentoclean>0)
@@ -79,12 +80,11 @@ VIDEO_UPDATE( xboard )
         // need a last screen cleaning because onvasive bootprogress
         bootlog_setprogress(eProgressEnd);
         postscreentoclean = 0;
+        nbdecryptDone = 0;
+        //fd1094_krb_preclean();
+        krb_thndrbld_patch_cpu_synchro();
     }
-//    if((thndrbldpatchdone & 3) == 0)
-//    {
-//// krb_thndrbld_patch_cpu_synchro();
 
-//     }
 //   thndrbldpatchdone++; // = 1;
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)

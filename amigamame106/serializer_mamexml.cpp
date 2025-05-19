@@ -103,7 +103,6 @@ void XmlWriter::operator()(const char *sMemberName, bool &v)
 }
 void XmlWriter::operator()(const char *sMemberName, ULONG_FLAGS &v,ULONG_FLAGS valdef,const std::vector<std::string> &values)
 {
-    if(v == valdef) return; // no need.
     UINT32 ib=1;
     for(int i=0;i<values.size() ;i++)
     {

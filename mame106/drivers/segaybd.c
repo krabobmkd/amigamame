@@ -1656,10 +1656,9 @@ static DRIVER_INIT( generic_yboard )
 */
 void krb_gforce2_m68k_op_tst_8_aw(M68KOPT_PARAMS);
 void krb_gforce2_m68k_op_dbf_16(M68KOPT_PARAMS);
-
+// makes it 8% faster...
 static void krb_gforce2_patch_cpu_synchro()
 {
-printf("krb_gforce2_patch_cpu_synchro\n");
 	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
     if(pcodemain[0x00001f70>>1] == 0x4a38)
     {   // replace that tst call by a patch, on an unused opcode.

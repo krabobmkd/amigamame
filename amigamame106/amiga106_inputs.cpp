@@ -865,7 +865,7 @@ void RawKeyMap::init()
     };
     MameConfig::Controls &configControls = getMainConfig().controls();
     MameConfig::Misc &configMisc = getMainConfig().misc();
-    int amega32order = (int)((configMisc._MiscFlags & 1) != 0);
+ //   int amega32order = (int)((configMisc._MiscFlags & 1) != 0);
 
     // then add player to paddle according to conf.    
     // lowlevel send rawkeys for each CD32 pads.
@@ -884,8 +884,8 @@ void RawKeyMap::init()
                 int ipshft = iport<<8;
                 const int mamecodeshift =
                     ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *(iplayer-1) ;
-            if(amega32order == 0)
-            {
+            // if(amega32order == 0)
+            // {
               vector<os_code_info> kbi2={
                 {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
                 {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
@@ -900,22 +900,22 @@ void RawKeyMap::init()
                 {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
                 };
                 _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
-           } else {
-              vector<os_code_info> kbi2={
-                {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
-                {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
-                {padsbtnames[iport][5-1],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
-                {padsbtnames[iport][4-1],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
-                {padsbtnames[iport][3-1],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
-                {padsbtnames[iport][6-1],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
-                {padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
-                {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
-                {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
-                {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
-                {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
-                };
-                _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
-           }
+           // } else {
+           //    vector<os_code_info> kbi2={
+           //      {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
+           //      {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
+           //      {padsbtnames[iport][5-1],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
+           //      {padsbtnames[iport][4-1],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
+           //      {padsbtnames[iport][3-1],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
+           //      {padsbtnames[iport][6-1],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
+           //      {padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
+           //      {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
+           //      {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
+           //      {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
+           //      {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
+           //      };
+           //      _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
+           // }
 
 //            // if parralel port hacks as port 3 and 4.
 //           if(controlPort == cp::Para3 ||
