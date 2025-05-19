@@ -15,6 +15,7 @@
 #include "machine/segaic16.h"
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
+#include "cpu/m68000/m68kops.h"
 
 
 #define MASTER_CLOCK			50000000
@@ -1621,6 +1622,72 @@ static DRIVER_INIT( generic_yboard )
 	yboard_generic_init();
 }
 
+/*
+ gforce2
+ ----- cpu 0 -----
+ adr:00001f70 nbr:011b0a5e regir:00004a38 m68k_op_tst_8_aw
+ adr:00001f74 nbr:011b0a5e regir:00006cfa m68k_op_bge_8
+ adr:00001d34 nbr:0004c6c2 regir:00004e71
+ adr:00001d36 nbr:0004c6c2 regir:000051c8
+ adr:00001eba nbr:00013000 regir:00003340
+ adr:00001eb6 nbr:00013000 regir:00003340
+ adr:00001eb4 nbr:00013000 regir:00003280
+ -------
+ ----- cpu 1 -----
+ adr:00009fce nbr:00e94bcf regir:00004e71 -> nop
+ adr:00009fd0 nbr:00e94bcf regir:000051c9 -> dbf nop !!
+ adr:0000a0c4 nbr:005dd588 regir:00004a38
+ adr:0000a0c8 nbr:005dd588 regir:00006cfa
+ adr:00009fca nbr:000b20b6 regir:00006b0a
+ adr:00009fc4 nbr:000b20b6 regir:00004a39
+ -------
+ ----- cpu 2 -----  2 ->250
+ adr:0001406e nbr:00faf91d regir:00004a38 m68k_op_tst_8_aw
+ adr:00014072 nbr:00faf91d regir:00006cfa m68k_op_bge_8
+ adr:0000e03e nbr:000281c5 regir:000032c4
+ adr:0000e040 nbr:000281c5 regir:000051cb
+ adr:00013eec nbr:000260c0 regir:00005849
+ adr:00013eee nbr:000260c0 regir:000051c9
+ -------
+// 0x4a38  m68k_op_tst_8_aw opnz
+// 0x6cfa m68k_op_bge_8 opac
+// 0x4e71 m68k_op_nop
+// 0x51c9 m68k_op_dbf_16
+*/
+void krb_gforce2_m68k_op_tst_8_aw(M68KOPT_PARAMS);
+void krb_gforce2_m68k_op_dbf_16(M68KOPT_PARAMS);
+
+static void krb_gforce2_patch_cpu_synchro()
+{
+	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
+    if(pcodemain[0x00001f70>>1] == 0x4a38)
+    {   // replace that tst call by a patch, on an unused opcode.
+        m68ki_instruction_jump_table[8] = krb_gforce2_m68k_op_tst_8_aw;
+        pcodemain[0x00001f70>>1] = 8;
+    }
+
+    // nop dbf
+	UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+    if(pcodesub[0x00009fd0>>1] == 0x51c9)
+    {
+        m68ki_instruction_jump_table[9] = krb_gforce2_m68k_op_dbf_16;
+        pcodesub[0x00009fd0>>1] = 9;
+    }
+
+	UINT16 *pcodesub2 = (UINT16 *)memory_region(REGION_CPU3);
+    if(pcodesub2[0x0001406e>>1] == 0x4a38)
+    {
+        m68ki_instruction_jump_table[8] = krb_gforce2_m68k_op_tst_8_aw;
+        pcodesub2[0x0001406e>>1] = 8;
+    }
+
+}
+
+static DRIVER_INIT( gforce2 )
+{
+	yboard_generic_init();
+	krb_gforce2_patch_cpu_synchro();
+}
 
 
 /*************************************
@@ -1628,9 +1695,9 @@ static DRIVER_INIT( generic_yboard )
  *  Game driver(s)
  *
  *************************************/
-
-GAME( 1988, gforce2,  0,       yboard, gforce2,  generic_yboard, ROT0, "Sega", "Galaxy Force 2" , GAME_SUPPORTS_SAVE ,1)
-GAME( 1988, gforce2j, gforce2, yboard, gforce2,  generic_yboard, ROT0, "Sega", "Galaxy Force 2 (Japan)" , GAME_SUPPORTS_SAVE ,1)
+//YEAR,NAME,PARENT,MACHINE,INPUT,INIT,
+GAME( 1988, gforce2,  0,       yboard, gforce2,  gforce2, ROT0, "Sega", "Galaxy Force 2" , GAME_SUPPORTS_SAVE ,1)
+GAME( 1988, gforce2j, gforce2, yboard, gforce2,  gforce2, ROT0, "Sega", "Galaxy Force 2 (Japan)" , GAME_SUPPORTS_SAVE ,1)
 GAME( 1990, gloc,     0,       yboard, gloc,     generic_yboard, ROT0, "Sega", "G-LOC Air Battle (US)" , GAME_SUPPORTS_SAVE ,1)
 GAME( 1990, glocr360, gloc,    yboard, glocr360, generic_yboard, ROT0, "Sega", "G-LOC R360", GAME_SUPPORTS_SAVE ,1)
 GAME( 1988, pdrift,   0,       yboard, pdrift,   generic_yboard, ROT0, "Sega", "Power Drift (World Set 1)", GAME_SUPPORTS_SAVE ,1)

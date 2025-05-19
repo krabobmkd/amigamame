@@ -28,9 +28,11 @@ static map<string,sDriverTuning> _tunings={
 	{"ghouls",{22*60,DEFMINCPUC,0}},
 
 
-	{"outrun",{0,384,0}}, // for _minimumCpuCycles
+	{"outrun",{0,256,0}}, // for _minimumCpuCycles
 	{"shangon",{0,2,0}}, // for _minimumCpuCycles
 	{"sharrier",{0,384,0}}, // for _minimumCpuCycles
+
+	{"gforce2",{0,512+128,0}},
 //	{"thndrbld",{0,2048,0}},
 	{"thndrbld",{0,2,0}}, // thunderblade strange timer issues (test) need minimum slice
 

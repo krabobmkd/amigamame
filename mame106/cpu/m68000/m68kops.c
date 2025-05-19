@@ -2104,8 +2104,7 @@ void m68ki_build_opcode_table(void)
 //        }
 //	}
 //	printf("nb illegals:%d\n",nbillegleft);
-
-
+//    m68ki_instruction_jump_table[0x51c9](NULL,0);
 }
 
 

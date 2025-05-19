@@ -8530,6 +8530,22 @@ void m68k_op_tst_8_aw(M68KOPT_PARAMS)
 }
 
 
+void krb_gforce2_m68k_op_tst_8_aw(M68KOPT_PARAMS)
+{
+	uint res = OPER_AW_8(M68KOPT_PASSPARAMS);
+
+	FLAG_N = NFLAG_8(res);
+	FLAG_Z = res;
+	FLAG_V = VFLAG_CLEAR;
+	FLAG_C = CFLAG_CLEAR;
+
+    if(res == 0)
+    {
+    	SET_CYCLES(0); // means, qut CPU2 loop asap and go treat other CPU without busy loop that hogs.
+    }
+}
+
+
 void m68k_op_tst_8_al(M68KOPT_PARAMS)
 {
 	uint res = OPER_AL_8(M68KOPT_PASSPARAMS);

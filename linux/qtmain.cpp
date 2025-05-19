@@ -177,7 +177,7 @@ void QProc::process()
       "othunder"
       // "thndrbld"
       // "chasehq"
-
+//"gforce2"
         );
         if(idriver>0)
         {
@@ -445,7 +445,16 @@ INT32 osd_get_code_value(os_code oscode)
 {
     if(oscode==1024)
     {
-        printf("woot\n");
+        static int ttestcount=0;
+        ttestcount++;
+        if(ttestcount &128)
+        {
+            return 2<<10;
+        }else
+        {
+            return -(2<<10);
+        }
+       // return 1;
     }
     return 0;
 }

@@ -1138,6 +1138,24 @@ INT32 osd_get_code_value(os_code oscode)
         if(illport>=4) return 0;
         UINT8 shortcode = ((UINT8)oscode) & 7;
 
+static int ttestcount=0;
+ ttestcount++;
+
+        switch(shortcode)
+        {
+            case 0: // mouse x
+            case 1: // mouse y
+            {
+                if(ttestcount &128)
+                {
+                    return 2<<10;
+                }else
+                {
+                    return -2<<10;
+                }
+            } break;
+        }
+/*
         MameInputs::LLMouse &llm = g_pInputs->_mstate[illport]; // mousestate[illport];
         UINT32 state = llm._mousestate;
         const INT32 minswitch = 128;
@@ -1171,7 +1189,7 @@ INT32 osd_get_code_value(os_code oscode)
             return (state &JPF_BUTTON_PLAY)!=0 ;
 
         }
-
+*/
         //UBYTE isy = (UBYTE)oscode &1;
 
         // lowlevel only gives 8 low bits of mouse position.

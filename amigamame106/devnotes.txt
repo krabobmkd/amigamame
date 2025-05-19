@@ -1,10 +1,13 @@
 static READ16_HANDLER( chasehq_input_bypass_r )
 
 todo R1.3b ->4?
+
+ X added kangooroo
+
  X le tunnel de Chasehq est niqué !!!
  X tester si chasehq pour wheel taitoic.
 
- X multiple keyboard selection whatever the sort + only when list panel.
+ X MUI list multiple keyboard selection whatever the sort + only when list panel.
  X revalider dispatcher list with "NO MUI5" version.
  X MUIM_Window_SetCycleChain with serializer ?
  X remove stream drivdispdbg in gui after its ok
@@ -14,9 +17,11 @@ todo R1.3b ->4?
  X car driving game: buton mouse 1 can accelerate and 2 brake, so mouse/trackball can be used completely by default.
  outrun gear shift is space or joystick bt3.
 
+ O bug othunder after outrun
  O guidon pour shangon
  X optim sprite outrun 
  O ChaseHQ has a gear shift
+ O gforce2 speed cpu
 
 --------------------------------------------------------------------------
 todo R1.3
