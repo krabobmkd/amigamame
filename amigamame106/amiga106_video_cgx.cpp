@@ -449,6 +449,7 @@ Intuition_Window_CGX::Intuition_Window_CGX(const AbstractDisplay::params &params
 }
 //Intuition_Window_CGX::~Intuition_Window_CGX()
 //{}
+#define USE_DIRECT_WB_RENDERING 1
 void Intuition_Window_CGX::draw(_mame_display *display)
 {
      if(!_pWbWindow || !_sWbWinSBitmap) return;
@@ -456,9 +457,13 @@ void Intuition_Window_CGX::draw(_mame_display *display)
     // will draw to the current size.
     _widthtarget = (int)(_pWbWindow->GZZWidth);
     _heighttarget = (int)(_pWbWindow->GZZHeight);
-#ifdef USE_DIRECT_WB_RENDERING
-    // isOnTop doesnt work and this doesnt accelerate much.
-     if(isOnTop() &&
+
+#ifdef USE_DIRECT_WB_RENDERING   
+    Layer *lr = _pWbWindow->RPort->Layer;
+    if(lr) ObtainSemaphore(&(lr->Lock));
+    bool rastPortComplete = isRastPortComplete(_pWbWindow->RPort,(WORD)_widthtarget,(UWORD)_heighttarget) ;
+
+     if(rastPortComplete &&
         _pWbWindow->LeftEdge+_pWbWindow->BorderLeft>0 &&
         _pWbWindow->TopEdge+_pWbWindow->BorderTop > 0 &&
         (_pWbWindow->LeftEdge+_pWbWindow->BorderLeft+_widthtarget)<_widthphys &&
@@ -476,15 +481,18 @@ void Intuition_Window_CGX::draw(_mame_display *display)
         RastPort *pScreenRp = &(_pWbWindow->WScreen->RastPort);
         BitMap *pScreenBM = _pWbWindow->WScreen->RastPort.BitMap;
 
-        // use cpu direct copy
-        if(isSourceRGBA32())
-            drawCGX_DirectCPU32(pScreenBM,display);
-        else
-            drawCGX_DirectCPU16(pScreenRp,pScreenBM,display);
+            // use cpu direct copy
+            if(isSourceRGBA32())
+                drawCGX_DirectCPU32(pScreenBM,display);
+            else
+                drawCGX_DirectCPU16(pScreenRp,pScreenBM,display);
 
+
+        if(lr) ReleaseSemaphore(&(lr->Lock));
      } else
 #endif
      {
+        if(lr) ReleaseSemaphore(&(lr->Lock));
         _screenshiftx = 0; // because rastport is inside window
         _screenshifty = 0;
         // will draw on friend bitmap _sWbWinSBitmap.

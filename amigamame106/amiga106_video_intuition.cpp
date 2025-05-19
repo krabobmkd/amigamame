@@ -19,6 +19,8 @@ extern "C" {
     #include <graphics/modeid.h>
     #include <graphics/text.h>
     #include <hardware/blit.h>
+    // actual dreaded Layer struct
+    #include <graphics/clip.h>
 }
 
 extern "C" {
@@ -404,10 +406,10 @@ bool Intuition_Window::open()
         WA_Flags, /*WFLG_SIZEGADGET*/ /*| WFLG_SIZEBRIGHT | WFLG_SIZEBBOTTOM |
 
             */ WFLG_DRAGBAR | WFLG_DEPTHGADGET | WFLG_CLOSEGADGET | WFLG_ACTIVATE
-            //|WFLG_SUPER_BITMAP
+            //|WFLG_SUPER_BITMAP     // also use another layer cliprect mecanism.
            // | WFLG_NOCAREREFRESH
             // | WFLG_SMART_REFRESH
-            | WFLG_SIMPLE_REFRESH
+            | WFLG_SIMPLE_REFRESH // important for direct draw optimisation.
             | WFLG_GIMMEZEROZERO
              | ((_maxzoomfactor>1)?WFLG_SIZEGADGET:0)
             ,
@@ -692,4 +694,65 @@ WindowGeo IntuitionDisplay::getWindowGeometry()  // to save/reload
     syncWindowGeo();
 
     return _params._wingeo;
+}
+
+
+/* tool: test if RastPort currently need layer lib clippings.
+ if it dosn't, it its not obscured at all, neither by other window or screen border.
+ we can use direct pixel copy on workbench in the simple case.
+*/
+bool isRastPortComplete(RastPort *rp,WORD w, WORD h)
+{
+    Layer *lr = rp->Layer;
+    if(!lr) return true;
+    bool isComplete=false;
+    bool hasClipRect=false;
+    bool hasSuperClipRect=false;
+  // ObtainSemaphore(&(lr->Lock));
+
+//    if( (!lr->ClipRect) && (!lr->SuperClipRect))
+//    {   // should happen...
+//        //isComplete=true;
+//        isComplete = false;
+//    }
+    if(lr->ClipRect)
+    {
+        ClipRect *cr = lr->ClipRect;
+        // to be complete, has
+         //  if just one
+         if( (cr->Next == NULL) || (cr->Next == cr))
+         {
+            WORD crw = (cr->bounds.MaxX - cr->bounds.MinX)+1;
+            WORD crh = (cr->bounds.MaxY - cr->bounds.MinY)+1;
+            if(w == crw && h == crh) isComplete = true;
+         } // end if just one cliprect
+    } else
+    if(lr->SuperClipRect)
+    {
+        ClipRect *cr = lr->SuperClipRect;
+        // to be complete, has
+         //  if just one
+         if( (cr->Next == NULL) || (cr->Next == cr))
+         {
+            WORD crw = (cr->bounds.MaxX - cr->bounds.MinX)+1;
+            WORD crh = (cr->bounds.MaxY - cr->bounds.MinY)+1;
+            if(w == crw && h == crh) isComplete = true;
+         } // end if just one cliprect
+    }
+//    if(lr->SuperClipRect)
+//    {
+//        ClipRect *cr = lr->SuperClipRect;
+//        // to be complete, has
+//         //  if just one
+//         if( cr->Next == NULL || cr->Next == lr)
+//         {
+//            WORD crw = cr->bounds.MaxX - cr->bounds.MinX;
+//            WORD crh = cr->bounds.MaxY - cr->bounds.MinY;
+//            if(w == crw && h == crh) isComplete = true;
+//         } // end if just one cliprect
+//    }
+
+
+//    ReleaseSemaphore(&(lr->Lock));
+    return isComplete;
 }
