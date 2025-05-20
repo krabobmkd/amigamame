@@ -1,4 +1,3 @@
-static READ16_HANDLER( chasehq_input_bypass_r )
 
 todo R1.3b ->4?
 

@@ -114,7 +114,10 @@ void ui_get_bounds(int *width, int *height);
 void ui_draw_text(const char *buf, int x, int y);
 
 /* full-on text draw with all the options */
-void ui_draw_text_full(const char *buf, int x, int y, int wrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, int *totalwidth, int *totalheight);
+void ui_draw_text_full(const char *buf, int x, int y, int wrapwidth, int justify, int wrap, int draw,
+        //rgb_t fgcolor, rgb_t bgcolor,
+        int reverse,
+        int *totalwidth, int *totalheight);
 
 /* draw a multi-line message centered with a box around it */
 void ui_draw_message_window(const char *text);
