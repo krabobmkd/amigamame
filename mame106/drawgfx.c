@@ -938,7 +938,7 @@ void drawgfx(struct drawgfxParams *p DGREG(a0))
 
 	code %= p->gfx->total_elements;
 	if (!is_raw[transparency])
-		color %= p->gfx->total_colors+6;
+		color %= p->gfx->total_colors;
 
 	if (!(Machine->drv->video_attributes & VIDEO_RGB_DIRECT) &&
 		(transparency == TRANSPARENCY_ALPHAONE ||

@@ -139,7 +139,7 @@ static int show_profiler;
 static UINT8 ui_dirty;
 
 static gfx_element *uirotfont;
-static pen_t uirotfont_colortable[2*2];
+static pen_t uirotfont_colortable[8];
 
 static char popup_text[200];
 static int popup_text_counter;
@@ -1258,7 +1258,7 @@ static void create_font(void)
 	{
 		/* colortable will be set at run time */
 		uirotfont->colortable = uirotfont_colortable;
-		uirotfont->total_colors = 2;
+		uirotfont->total_colors = 8;
 	}
 }
 
@@ -4112,14 +4112,18 @@ static void add_filled_box(int x1, int y1, int x2, int y2)
     int ymid = y1+16;
 	add_fill(x1 , y1 , x2 , ymid , blue_pen);
 
+	add_fill(x1 , ymid+2 , x2 , ymid+3 , blue_pen);
+
+	add_fill(x1 , ymid+5 , x2 , ymid+5 , blue_pen);
+
 	add_line(x1+1, y1, x2, y1, white_pen);
 	add_line(x2, y1+1, x2, y2-1, white_pen);
 
 	add_line(x2-1, y2, x1+1, y2, black_pen);
 	add_line(x1, y2, x1, y1+1, black_pen);
 
-	add_line(x1+1, y1+2, x1+1, y2-3, white_pen);
-	add_line(x1+1, y2-2, x2-2, y2-2, white_pen);
+	add_line(x1+2, y1+2, x1+2, y2-3, white_pen);
+	add_line(x1+2, y2-2, x2-2, y2-2, white_pen);
 
 	add_line(x1+2, y1+2, x2-2, y1+2, black_pen);
 	add_line(x2-2, y1+2, x2-2, y2-2, black_pen);
@@ -4130,12 +4134,20 @@ static void render_ui(mame_bitmap *dest)
 {
 	int i;
 
-	uirotfont->colortable[0] = get_black_pen();
-	uirotfont->colortable[1] = get_white_pen();
-	uirotfont->colortable[2] = get_white_pen();
-	uirotfont->colortable[3] = get_black_pen();
+	uirotfont->colortable[1] = black_pen;
+	uirotfont->colortable[2] = white_pen;
+	uirotfont->colortable[3] = grey_pen;
+	uirotfont->colortable[4] = dblue_pen;
+	uirotfont->colortable[5] = blue_pen;
+	uirotfont->colortable[6] = red_pen;
+	uirotfont->colortable[7] = black_pen;
+	uirotfont->colortable[7] = black_pen;
 
+    int flipxy = (Machine->ui_orientation & ORIENTATION_SWAP_XY) ;
 
+    // krb, to better manage char colors
+    uirotfont->total_colors = red_pen + 1;
+    uirotfont->color_granularity = 1;
     struct drawgfxParams dgp={
            dest, // mame_bitmap *dest;
            uirotfont, // const gfx_element *gfx;
@@ -4190,33 +4202,64 @@ static void render_ui(mame_bitmap *dest)
 
                 dgp.code = elem->type;
                 if(elem->color == white_pen)
-                {
+                { // 0blanc 1 rouge
                     // draw shadow
-                    dgp.sx--; dgp.sy++;
-                    dgp.color = black_pen-1;
-                    drawgfx(&dgp);
-                    dgp.sx++; dgp.sy--;
+                    if(flipxy)
+                    {
+                        dgp.sx++; dgp.sy--;
+                        dgp.color = 0;
+                        drawgfx(&dgp);
+                        dgp.sx--; dgp.sy++;
 
-                    // draw up char
-                    rectangle rc = uirawbounds;
-                    dgp.clip = &rc;
+                        // draw up char
+                        rectangle rc = uirawbounds;
+                        dgp.clip = &rc;
 
-                    rc.min_y = dgp.sy;
-                    rc.max_y = dgp.sy+4;
+                        rc.min_x = dgp.sx;
+                        rc.max_x = dgp.sx+4;
 
-                    dgp.color = white_pen-1;
-                    drawgfx(&dgp);
+                        dgp.color = 1;
+                        drawgfx(&dgp);
 
-                    // draw down char
-                    rc.min_y = dgp.sy+5;
-                    rc.max_y = dgp.sy+10;
-                    dgp.color = grey_pen-1;
-                    drawgfx(&dgp);
+                        // draw down char
+                        rc.min_x = dgp.sx+5;
+                        rc.max_x = dgp.sx+10;
+                        dgp.color = 2;
+                        drawgfx(&dgp);
+
+                        // end if flipxy
+                    } else
+                    { // not flipx
+                        dgp.sx--; dgp.sy++;
+                        dgp.color = 0;
+                        drawgfx(&dgp);
+                        dgp.sx++; dgp.sy--;
+
+                        // draw up char
+                        rectangle rc = uirawbounds;
+                        dgp.clip = &rc;
+
+                        rc.min_y = dgp.sy;
+                        rc.max_y = dgp.sy+4;
+
+                        dgp.color = 1;
+                        drawgfx(&dgp);
+
+                        // draw down char
+                        rc.min_y = dgp.sy+5;
+                        rc.max_y = dgp.sy+10;
+                        dgp.color = 2;
+                        drawgfx(&dgp);
+
+                    } // else if not flipx
+
+
+
 
                     //dgp.clip = &uirawbounds;
 				} else
 				{
-                    dgp.color = elem->color-1;
+                    dgp.color = elem->color;
                     drawgfx(&dgp);
 				}
 				//drawgfx(dest, uirotfont, elem->type, elem->color ? 0 : 1, 0, 0, bounds.min_x, bounds.min_y, &uirawbounds, TRANSPARENCY_PEN, 0);

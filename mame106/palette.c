@@ -698,7 +698,7 @@ int palette_init(void)
 				game_palette[total_colors + 0] = adjusted_palette[total_colors + 0] = MAKE_RGB(0x00,0x00,0x00);
 				game_palette[total_colors + 1] = adjusted_palette[total_colors + 1] = MAKE_RGB(0xff,0xff,0xff);
 				//grey
-				game_palette[total_colors + 2] = adjusted_palette[total_colors + 2] = MAKE_RGB(0xaa,0x10,0x10);
+				game_palette[total_colors + 2] = adjusted_palette[total_colors + 2] = MAKE_RGB(0xaa,0xaa,0xaa);
 				game_palette[total_colors + 3] = adjusted_palette[total_colors + 3] = MAKE_RGB(0x28,0x40,0xaa);
 				game_palette[total_colors + 4] = adjusted_palette[total_colors + 4] = MAKE_RGB(0x38,0x50,0xcc);
 				game_palette[total_colors + 5] = adjusted_palette[total_colors + 5] = MAKE_RGB(0xaa,0x10,0x10);

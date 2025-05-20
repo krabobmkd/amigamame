@@ -432,6 +432,7 @@ const os_code_info *osd_get_code_list(void)
 {
     static os_code_info l[]={
         {"A",32,KEYCODE_A},
+        {"TAB",33,KEYCODE_TAB},
         {"SPACE",65,KEYCODE_SPACE},
         {"M1AX",1024,MOUSECODE_1_ANALOG_X},
         {"M1AY",1025,MOUSECODE_1_ANALOG_Y},
@@ -441,8 +442,18 @@ const os_code_info *osd_get_code_list(void)
     };
     return &l[0];
 }
+int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
+    if(oscode == 33 && nbframe>3*60)
+    {
+        if(opened==0)
+        {
+            opened++;
+            return 1;
+        }
+        return 0;
+    }
     if(oscode==1024)
     {
         static int ttestcount=0;
