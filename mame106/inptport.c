@@ -98,7 +98,6 @@
 #include "profiler.h"
 #include <math.h>
 
-#include <stdio.h>
 #ifdef MESS
 #include "inputx.h"
 #endif
@@ -1002,8 +1001,6 @@ int input_port_init(void (*construct_ipt)(input_port_init_params *))
 {
 	int ipnum, player;
 
- printf("input_port_init\n");
-
 	/* start with the raw defaults and ask the OSD to customize them in the backup array */
 	memcpy(default_ports_backup, default_ports_builtin, sizeof(default_ports_backup));
 	osd_customize_inputport_list(default_ports_backup);
@@ -1072,39 +1069,39 @@ int input_port_init(void (*construct_ipt)(input_port_init_params *))
  *************************************/
 
 
-void traceinputports()
-{
-    input_port_entry *port;
-    analog_port_info *	info;
-    printf("*** traceinputports\n");
-	/* loop over all analog ports in this port number */
-	for (int portnum=0;portnum<MAX_INPUT_PORTS;portnum++)
-	{
-        for (info = port_info[portnum].analoginfo; info != NULL; info = info->next)
-        {
-            input_port_entry *port = info->port;
-        printf("I m:%d def%d t%d p%d\n",(int)port->mask,(int)port->default_value,(int)port->type,(int)port->player);
-        printf("min%d max%d sens%d delta%d cend%d  rev%d res:%d\n",
-            (int)port->analog.min,(int)port->analog.max,(int)port->analog.sensitivity,
-            (int)port->analog.delta,(int)port->analog.centerdelta,(int)port->analog.reverse,(int)port->analog.reset
-        );
+// void traceinputports()
+// {
+//     input_port_entry *port;
+//     analog_port_info *	info;
 
-    //	struct
-    //	{
-    //		INT32	min;			/* minimum value for absolute axes */
-    //		INT32	max;			/* maximum value for absolute axes */
-    //		INT32	sensitivity;	/* sensitivity (100=normal) */
-    //		INT32	delta;			/* delta to apply each frame a digital inc/dec key is pressed */
-    //		INT32	centerdelta;	/* delta to apply each frame no digital inputs are pressed */
-    //		UINT8	reverse;		/* reverse the sense of the analog axis */
-    //		UINT8	reset;			/* always preload in->default for relative axes, returning only deltas */
-    //		input_seq incseq;		/* increment sequence */
-    //		input_seq decseq;		/* decrement sequence */
-    //	} analog;
-        }
-    }
+// 	/* loop over all analog ports in this port number */
+// 	for (int portnum=0;portnum<MAX_INPUT_PORTS;portnum++)
+// 	{
+//         for (info = port_info[portnum].analoginfo; info != NULL; info = info->next)
+//         {
+//             input_port_entry *port = info->port;
+//         printf("I m:%d def%d t%d p%d\n",(int)port->mask,(int)port->default_value,(int)port->type,(int)port->player);
+//         printf("min%d max%d sens%d delta%d cend%d  rev%d res:%d\n",
+//             (int)port->analog.min,(int)port->analog.max,(int)port->analog.sensitivity,
+//             (int)port->analog.delta,(int)port->analog.centerdelta,(int)port->analog.reverse,(int)port->analog.reset
+//         );
 
-}
+//     //	struct
+//     //	{
+//     //		INT32	min;			/* minimum value for absolute axes */
+//     //		INT32	max;			/* maximum value for absolute axes */
+//     //		INT32	sensitivity;	/* sensitivity (100=normal) */
+//     //		INT32	delta;			/* delta to apply each frame a digital inc/dec key is pressed */
+//     //		INT32	centerdelta;	/* delta to apply each frame no digital inputs are pressed */
+//     //		UINT8	reverse;		/* reverse the sense of the analog axis */
+//     //		UINT8	reset;			/* always preload in->default for relative axes, returning only deltas */
+//     //		input_seq incseq;		/* increment sequence */
+//     //		input_seq decseq;		/* decrement sequence */
+//     //	} analog;
+//         }
+//     }
+
+// }
 
 static void input_port_postload(void)
 {
@@ -1112,8 +1109,6 @@ static void input_port_postload(void)
 	int portnum, bitnum;
 	UINT32 mask;
 
-
- printf("input_port_postload\n");
 	/* reset the pointers */
 	memset(&joystick_info, 0, sizeof(joystick_info));
 
@@ -1274,10 +1269,7 @@ static void input_port_postload(void)
 		}
 	}
 
-
- printf("input_port_postload end\n");
-
-traceinputports();
+//traceinputports();
 	/* run an initial update */
 	input_port_vblank_start();
 }

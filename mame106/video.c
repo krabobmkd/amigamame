@@ -20,7 +20,10 @@
 #include "mamedbg.h"
 #endif
 
-
+//krb
+extern int soundMixerIsOn();
+extern UINT32 _bootframeskip;
+UINT32 _frame=0;
 
 /***************************************************************************
     CONSTANTS
@@ -107,6 +110,8 @@ static void recompute_fps(int skipped_it);
 //krb - open screen before loading roms
 int video_init_earlier()
 {
+    _frame = 0;
+
 	osd_create_params params;
 	artwork_callbacks *artcallbacks;
 
@@ -830,10 +835,7 @@ static void recompute_fps(int skipped_it)
 	}
 }
 
-//krb
-extern int soundMixerIsOn();
-extern UINT32 _bootframeskip;
-UINT32 _frame=0;
+
 /*-------------------------------------------------
     updatescreen - handle frameskipping and UI,
     plus updating the screen during normal

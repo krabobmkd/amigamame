@@ -160,6 +160,9 @@ bool m_bIs15b = false;
 int m_nbtest=0;
 QProc::QProc() : QObject()
 {}
+
+extern "C" { extern int isoth; }
+
 void QProc::process()
 {
     getMainConfig().init(0,nullptr);
@@ -172,9 +175,9 @@ void QProc::process()
         int idriver = getMainConfig().driverIndex().index(
 
        //"nightstr"
-      //  "outrun"
+        "outrun"
       //"sharrier"
-      "othunder"
+     // "othunder"
       // "thndrbld"
       // "chasehq"
 //"gforce2"
@@ -185,18 +188,19 @@ void QProc::process()
             StartGame(idriver);
         }
     }
-   //  nbframe = 0;
-   //  m_nbtest = 1;
-   //  {
-   //      int idriver = getMainConfig().driverIndex().index("outrun");
+    nbframe = 0;
+    m_nbtest = 1;
+    isoth =1;
+    {
+        int idriver = getMainConfig().driverIndex().index("othunder");
 
-   //      //  if game was explicit, no GUI
-   //      if(idriver>0)
-   //      {
-   //          getMainConfig().setActiveDriver(idriver);
-   //          StartGame(idriver);
-   //      }
-   // }
+        //  if game was explicit, no GUI
+        if(idriver>0)
+        {
+            getMainConfig().setActiveDriver(idriver);
+            StartGame(idriver);
+        }
+   }
 }
 
 QWin::QWin() : QLabel()
@@ -370,7 +374,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
         _image = image;
     _imageMutex.unlock();
 
-          // if(nbframe>300)
+          // if(nbframe>300)min0 max255 sens100 delta40 cend40  rev0 res:0
      //      QThread::msleep(1000/60);
 
 nbframe++;
@@ -387,7 +391,11 @@ nbframe++;
 
 //if(nbframe == 60*25) mame_pause(1);
 // if(nbframe==1200) exit(1);
-// if(nbframe==60*10)  mame_schedule_exit();
+ static int j=0;
+ if(nbframe==60*5 && j==0) {
+ j=1; mame_schedule_exit();
+
+ }
 //    m_mutex.lock();
 //    m_mutex.unlock();
 
@@ -456,16 +464,17 @@ INT32 osd_get_code_value(os_code oscode)
     }
     if(oscode==1024)
     {
-        static int ttestcount=0;
+        return 1<<10;
+/*        static int ttestcount=0;
         ttestcount++;
         if(ttestcount &128)
         {
-            return 2<<10;
+            return 1<<10;
         }else
         {
-            return -(2<<10);
+            return -(1<<10);
         }
-       // return 1;
+       // return 1*/;
     }
     return 0;
 }

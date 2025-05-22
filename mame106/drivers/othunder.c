@@ -374,24 +374,27 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 
 static READ16_HANDLER( othunder_lightgun_r )
 {
-	switch (offset)
-	{
-		case 0x00:
-			return input_port_5_word_r(0,mem_mask);	/* P1X */
+// krb tests
+    return readinputport(5+ (offset &3));
 
-		case 0x01:
-			return input_port_6_word_r(0,mem_mask);	/* P1Y */
+	// switch (offset)
+	// {
+	// 	case 0x00:
+	// 		return readinputport(5);	/* P1X */
 
-		case 0x02:
-			return input_port_7_word_r(0,mem_mask);	/* P2X */
+	// 	case 0x01:
+	// 		return readinputport(6);	/* P1Y */
 
-		case 0x03:
-			return input_port_8_word_r(0,mem_mask);	/* P2Y */
-	}
+	// 	case 0x02:
+	// 		return readinputport(7);	/* P2X */
+
+	// 	case 0x03:
+	// 		return readinputport(8);	/* P2Y */
+	// }
 
 //loginfo(2,"CPU #0 lightgun_r offset %06x: warning - read unmapped memory address %06x\n",activecpu_get_pc(),offset);
 
-	return 0x0;
+//	return 0x0;
 }
 
 static WRITE16_HANDLER( othunder_lightgun_w )
@@ -401,7 +404,13 @@ static WRITE16_HANDLER( othunder_lightgun_w )
        The ADC60808 clock is 512kHz. Conversion takes between 0 and 8 clock
        cycles, so would end in a maximum of 15.625us. We'll use 10. */
 
-	timer_set(TIME_IN_USEC(10),0, ad_interrupt);
+	//timer_set(TIME_IN_USEC(10),0, ad_interrupt);
+	mame_time tenmicrosec;
+	tenmicrosec.seconds = 0;
+	tenmicrosec.subseconds = (MAX_SUBSECONDSM/100000);
+
+
+	mame_timer_set(tenmicrosec, 0, ad_interrupt);
 }
 
 
