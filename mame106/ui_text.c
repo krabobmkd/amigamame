@@ -199,6 +199,14 @@ static const char *mame_default_text[] =
 	"Refresh rate",
 	"Decoding Graphics",
 
+    /*- - - krb Minimix added - - - - */
+    // default inputs
+    "Gear Shift",
+    "Steering Wheel",
+    "Turbo",
+
+    "Attack","Jump","Magic","Ninja Magic",
+
 	NULL
 };
 

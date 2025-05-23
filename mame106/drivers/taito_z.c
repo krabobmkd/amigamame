@@ -777,6 +777,8 @@ J1100256A VIDEO PCB
 #include "sndhrdw/taitosnd.h"
 #include "sound/2610intf.h"
 #include "drawCtrl.h"
+#include "ui_text.h"
+
 VIDEO_START( taitoz );
 VIDEO_START( spacegun );
 
@@ -2177,11 +2179,11 @@ INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* turbo */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)  PORT_NAME(ui_getstring(UI_Turbo))	/* turbo */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE PORT_PLAYER(1)	/* gear, krb added toggle */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE PORT_PLAYER(1)  PORT_NAME(ui_getstring(UI_GearShift))		/* gear, krb added toggle */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2230,6 +2232,7 @@ INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 
 	PORT_START      /* IN7, steering */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+    PORT_NAME(ui_getstring(UI_SteeringWheel))
 
 	PORT_START      /* IN8, fake allowing digital steer */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)

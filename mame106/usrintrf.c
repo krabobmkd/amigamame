@@ -387,8 +387,9 @@ static void render_ui(mame_bitmap *dest);
 int ui_init(int show_disclaimer, int show_warnings, int show_gameinfo)
 {
 	/* load the localization file */
-	if (uistring_init(options.language_file) != 0)
-		fatalerror("uistring_init failed");
+	/*krb: moved early before mchine */
+//	if (uistring_init(options.language_file) != 0)
+//		fatalerror("uistring_init failed");
 
     elemlist = auto_malloc(sizeof(render_element)*MAX_RENDER_ELEMENTS);
 

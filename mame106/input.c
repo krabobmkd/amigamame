@@ -531,6 +531,14 @@ int code_init(void)
 	input_code codenum;
 	int extras;
 
+    //krb clean
+    code_map = NULL;
+    code_count = 0;
+    memset(record_seq,0,sizeof(record_seq));
+    record_count = 0;
+    record_last = 0;
+    record_analog = 0;
+
 	/* go through and count how many non-standard inputs we have */
 	extras = 0;
 	for (info = codelist; info->name != NULL; info++)

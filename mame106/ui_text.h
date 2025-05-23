@@ -195,6 +195,17 @@ enum
 	UI_refresh_rate,
 	UI_decoding_gfx,
 
+    /*- - - krb Minimix added - - - - */
+    // default inputs
+    UI_GearShift,
+    UI_SteeringWheel,
+    UI_Turbo,
+
+    UI_Attack,
+    UI_Jump,
+    UI_Magic,
+    UI_NinjaMagic,
+
 	UI_last_mame_entry
 };
 

@@ -27,7 +27,7 @@
 #include "cpu/m68000/m68kops.h"
 
 #include "drawCtrl.h"
-
+#include "ui_text.h"
 #define MASTER_CLOCK			50000000
 #define SOUND_CLOCK				16000000
 
@@ -785,7 +785,8 @@ static INPUT_PORTS_START( outrun )
 	// OH ITS GEAR SHIFT !!
 //	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_CODE(KEYCODE_SPACE)
 // todo have  PORT_CODE(KEYCODE_SPACE) back and test it
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE PORT_NAME(ui_getstring(UI_GearShift))
+	// PORT_NAME("Gear Shift")
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Cabinet ) )
@@ -809,6 +810,8 @@ static INPUT_PORTS_START( outrun )
 
 	PORT_START_TAG("ADC0")	/* steering */
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+    //PORT_NAME("Steering Wheel")
+    PORT_NAME(ui_getstring(UI_SteeringWheel))
 
 	PORT_START_TAG("ADC1")	/* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)

@@ -13,6 +13,8 @@
     initialization and other such things, here it is, all spelled out
     as of February, 2006:
 
+(krb, 2025: moved ui_text init early
+
     main()
         - does platform-specific init
         - calls run_game() [mame.c]
@@ -83,6 +85,7 @@
 #if defined(MAME_DEBUG) && defined(NEW_DEBUGGER)
 #include "debug/debugcon.h"
 #endif
+#include "ui_text.h"
 
 #include <stdarg.h>
 #include <setjmp.h>
@@ -294,6 +297,10 @@ int run_game(int game)
 //			logerror_callback_list = NULL;
 //			if (options.logfile)
 //				add_logerror_callback(logfile_callback);
+
+
+	if (uistring_init(options.language_file) != 0)
+		fatalerror("uistring_init failed");
 
 			/* create the Machine structure and driver */
 //			printf("create_machine\n");

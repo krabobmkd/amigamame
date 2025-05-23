@@ -1138,23 +1138,6 @@ INT32 osd_get_code_value(os_code oscode)
         if(illport>=4) return 0;
         UINT8 shortcode = ((UINT8)oscode) & 7;
 
-// static int ttestcount=0;
-//  ttestcount++;
-
-//         switch(shortcode)
-//         {
-//             case 0: // mouse x
-//             case 1: // mouse y
-//             {
-//                 if(ttestcount &128)
-//                 {
-//                     return 2<<10;
-//                 }else
-//                 {
-//                     return -2<<10;
-//                 }
-//             } break;
-//         }
 
 /* note 21/05/2025
  MAME inptport.c management differenciates those emulated controls:
