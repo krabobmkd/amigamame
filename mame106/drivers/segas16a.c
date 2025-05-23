@@ -136,7 +136,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "cpu/i8039/i8039.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
-
+#include "ui_text.h"
 
 
 /*************************************
@@ -1260,6 +1260,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( shinobi )
 	PORT_INCLUDE( system16a_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME(ui_getstring(UI_Magic))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME(ui_getstring(UI_Attack))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME(ui_getstring(UI_Jump))
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME(ui_getstring(UI_Magic))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME(ui_getstring(UI_Attack))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME(ui_getstring(UI_Jump))
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )

@@ -4,6 +4,8 @@ todo R1.3b ->4?
  O finish hangon handlebars
  O pimp logo on menu ->hard
  O docs: add about tilde menu + arrows to boost volume
+ O Bigrun & cischeat: gear & wheel + try to have toggle shift with one button.
+ O sci also.
 
  X added kangooroo
 

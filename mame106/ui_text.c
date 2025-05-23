@@ -12,7 +12,7 @@
 
 #include "driver.h"
 #include "ui_text.h"
-
+#include <stdio.h>
 #ifdef MESS
 extern const char *mess_default_text[];
 #endif /* MESS */
@@ -206,7 +206,9 @@ static const char *mame_default_text[] =
     "Turbo",
 
     "Attack","Jump","Magic","Ninja Magic",
+    "Fire","Accel","Brake","Center",
 
+    "Select","Rock","Paper","Scissor","Hammer",
 	NULL
 };
 
@@ -351,5 +353,5 @@ int uistring_init (mame_file *langfile)
 
 const char * ui_getstring (int string_num)
 {
-		return trans_text[string_num];
+    return trans_text[string_num];
 }

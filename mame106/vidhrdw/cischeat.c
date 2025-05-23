@@ -56,6 +56,45 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 #include "driver.h"
 #include "megasys1.h"
 
+
+#include "drawCtrl.h"
+
+//krb: draw optionnal control goodies
+static struct drawableExtra_steeringWheel *_wheelgoody=NULL;
+static struct drawableExtra_lever *_levergoody=NULL;
+extern unsigned int GetDisplayGoodiesFlags();
+
+static void extraclean()
+{
+    if(_levergoody) drawextra_deleteLever(_levergoody);
+    _levergoody = NULL;
+    if(_wheelgoody) drawextra_deleteSteeringWheel(_wheelgoody);
+    _wheelgoody = NULL;
+}
+
+void add_exit_callback(void (*callback)(void));
+
+static void initGoodies(int shagon)
+{
+    //krb
+    unsigned int configGoodiesFlags = GetDisplayGoodiesFlags();
+    if(configGoodiesFlags & 3)
+    {
+        if((configGoodiesFlags & 2) && (shagon==0))
+        {
+            _levergoody = drawextra_createLever();
+            if(_levergoody) drawextra_setpos(&_levergoody->_geo,160+44+34,224-39);
+        }
+        if(configGoodiesFlags & 1)
+        {
+            _wheelgoody = drawextra_createSteeringWheel(shagon);
+            if(_wheelgoody) drawextra_setpos(&_wheelgoody->_geo,160+44,224-44);
+        }
+        add_exit_callback(extraclean);
+    }
+}
+
+
 /* Variables only used here: */
 
 static int cischeat_ip_select;
@@ -196,6 +235,7 @@ static int read_shift(void)
 		case 1 : ret = 1;	break;	// low  shift: button 3
 		case 2 : ret = 0;	break;	// high shift: button 4
 	}
+	commonControlsValues._lever = ret ^ 1;
 	return ret;
 }
 
@@ -235,7 +275,12 @@ READ16_HANDLER( bigrun_vregs_r )
 		case 0x0010/2 :
 			switch (cischeat_ip_select & 0x3)
 			{
-				case 0 : return readinputport(6);		// Driving Wheel
+				case 0 :
+				{
+                    UINT16 v = readinputport(6);		// Driving Wheel
+                    commonControlsValues.analogValues[0] = (int)v;
+                    return v;
+				}
 				case 1 : return 0xffff;					// Cockpit: Up / Down Position
 				case 2 : return 0xffff;					// Cockpit: Left / Right Position?
 				case 3 : return ~read_accelerator();	// Accelerator (Pedal)
@@ -1304,6 +1349,20 @@ VIDEO_UPDATE( bigrun )
 	cischeat_tmap_DRAW(2)
 
 	megasys1_active_layers = megasys1_active_layers1;
+
+    // -----------------------------
+	//UINT16 pixval = ((UINT16*) bitmap->line[215])[cliprect->min_x+298];
+	// 23 in demo mode, 356 music selection screen, 41 play mode .
+    //if(pixval == 41)
+    {
+        int remapIndexStart=32;
+        if(_levergoody)
+            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever,remapIndexStart);
+        if(_wheelgoody)
+            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0],remapIndexStart);
+    }
+
+
 }
 
 

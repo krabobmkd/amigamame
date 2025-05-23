@@ -206,6 +206,13 @@ enum
     UI_Magic,
     UI_NinjaMagic,
 
+    UI_Fire,
+    UI_Accel,
+    UI_Brake,
+    UI_Center, // dunno what it does, used in SCI.
+    UI_Select,
+    UI_Rock,UI_Paper,UI_Scissor,UI_Hammer,
+
 	UI_last_mame_entry
 };
 

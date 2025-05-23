@@ -165,7 +165,7 @@ To Do:
 #include "megasys1.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
+#include "ui_text.h"
 /* Variables only used here: */
 
 static UINT16 *rom_1, *rom_2, *rom_3;
@@ -531,7 +531,8 @@ WRITE16_HANDLER( scudhamm_motor_command_w )
 
 READ16_HANDLER( scudhamm_analog_r )
 {
-	return readinputport(1);
+    UINT16 v = readinputport(1);
+	return ;
 }
 
 
@@ -1105,6 +1106,7 @@ INPUT_PORTS_START( bigrun )
 
 	PORT_START_TAG("IN6")	// Driving Wheel - $80010.w(0)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+        PORT_NAME(ui_getstring(UI_SteeringWheel))
 INPUT_PORTS_END
 
 
@@ -1206,6 +1208,7 @@ INPUT_PORTS_START( cischeat )
 
 	PORT_START	// IN6 - Driving Wheel - $80010.w(0)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+        PORT_NAME(ui_getstring(UI_SteeringWheel))
 INPUT_PORTS_END
 
 
@@ -1449,13 +1452,14 @@ INPUT_PORTS_START( scudhamm )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW) 	// called "Test"
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_START1   )
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON4  ) // Select
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON4  )  PORT_NAME(ui_getstring(UI_Select)) // Select
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_BIT(  0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Gu
-	PORT_BIT(  0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Choki
-	PORT_BIT(  0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Pa
+// note from video original arcade order is rock/cscizir/paper , seen cizor rock paper
+	PORT_BIT(  0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME(ui_getstring(UI_Rock))  // Gu
+	PORT_BIT(  0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME(ui_getstring(UI_Paper))// Choki
+	PORT_BIT(  0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME(ui_getstring(UI_Scissor)) // Pa
 	PORT_BIT(  0x0800, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1463,7 +1467,12 @@ INPUT_PORTS_START( scudhamm )
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START_TAG("IN1")	// A/D
-	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(1) PORT_KEYDELTA(0)
+//original	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(1) PORT_KEYDELTA(0)
+	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(2) PORT_KEYDELTA(1)
+        PORT_NAME(ui_getstring(UI_Hammer))
+// wheel example:
+// 	PORT_BIT( 0x00ff, 0x0000, IPT_DIAL ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
 
 	PORT_START_TAG("IN2")	// DSW
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )

@@ -834,7 +834,7 @@ WW.B11    Object 5 - Even
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
-
+#include "ui_text.h"
 
 /*************************************
  *
@@ -2167,6 +2167,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( goldnaxe )
 	PORT_INCLUDE( system16b_generic )
 
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME(ui_getstring(UI_Magic))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME(ui_getstring(UI_Jump))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME(ui_getstring(UI_Attack))
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME(ui_getstring(UI_Magic))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME(ui_getstring(UI_Jump))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME(ui_getstring(UI_Attack))
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Credits needed" )
 	PORT_DIPSETTING(    0x01, "1 to start, 1 to continue" )
@@ -2496,6 +2506,17 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( shinobi )
 	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME(ui_getstring(UI_NinjaMagic))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME(ui_getstring(UI_Jump))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME(ui_getstring(UI_Attack))
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME(ui_getstring(UI_NinjaMagic))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME(ui_getstring(UI_Jump))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME(ui_getstring(UI_Attack))
+
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )

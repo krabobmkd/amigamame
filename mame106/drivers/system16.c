@@ -1376,10 +1376,11 @@ static DRIVER_INIT( goldnabl )
 }
 
 /***************************************************************************/
-
+//krb note:unused by goldnaxe, just by bootleg.
 INPUT_PORTS_START( goldnaxe )
-	SYS16_JOY1_N(UI_Attack,UI_Jump,UI_Magic)
-	SYS16_JOY2_N(UI_Attack,UI_Jump,UI_Magic)
+
+	SYS16_JOY1
+	SYS16_JOY2
 	SYS16_SERVICE
 	SYS16_COINAGE
 

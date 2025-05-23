@@ -1619,6 +1619,10 @@ static UINT32 menu_default_input(UINT32 state)
 					selected_seq = &in->defaultseq;
 					selected_defseq = &indef->defaultseq;
 				}
+
+				// krb
+
+
 				default_input_menu_add_item(&item_list[menu_items++], "%s", in->name, &in->defaultseq, &indef->defaultseq);
 			}
 
@@ -1716,11 +1720,11 @@ static UINT32 menu_default_input(UINT32 state)
  *
  *************************************/
 
-static inline void game_input_menu_add_item(ui_menu_item *item, const char *format, input_port_entry *in, void *ref, int which)
+static inline void game_input_menu_add_item(ui_menu_item *item, const char *format, input_port_entry *in, void *ref, int which, const char *pnum)
 {
 	/* set the item text using the formatting string provided */
 	item->text = &menu_string_pool[menu_string_pool_offset];
-	menu_string_pool_offset += sprintf(&menu_string_pool[menu_string_pool_offset], format, input_port_name(in)) + 1;
+	menu_string_pool_offset += sprintf(&menu_string_pool[menu_string_pool_offset], format,pnum ,input_port_name(in)) + 1;
 
 	/* set the subitem text from the sequence */
 	item->subtext = &menu_string_pool[menu_string_pool_offset];
@@ -1781,13 +1785,27 @@ static UINT32 menu_game_input(UINT32 state)
 #endif /* MESS */
 			((in->type == IPT_OTHER && in->name != IP_NAME_DEFAULT) || port_type_to_group(in->type, in->player) != IPG_INVALID))
 		{
+            char playnumstr[8]={0};
+            int donotformatnplayer=0;
+            if(in->name && (
+                (in->name[0]=='P' && in->name[1]==('0'+1+in->player) )||
+                (in->name[0]==('0'+1+in->player) )
+                            )) donotformatnplayer=1;
+            if(!in->name) donotformatnplayer=1;
+            if(in->name && !donotformatnplayer)
+            {
+                playnumstr[0] = 'P';
+                playnumstr[1] = '0'+1+in->player;
+                playnumstr[2] = ' ';
+                playnumstr[3] = 0;
+            }
 			/* if not analog, just add a standard entry for this item */
 			if (!port_type_is_analog(in->type))
 			{
 				item_data[menu_items].seq = &in->seq;
 				item_data[menu_items].sortorder = compute_port_sort_order(in);
 				item_data[menu_items].digital = TRUE;
-				game_input_menu_add_item(&item_list[menu_items], "%s", in, &item_data[menu_items], SEQ_TYPE_STANDARD);
+				game_input_menu_add_item(&item_list[menu_items], "%s%s", in, &item_data[menu_items], SEQ_TYPE_STANDARD,playnumstr);
 				menu_items++;
 			}
 
@@ -1797,19 +1815,19 @@ static UINT32 menu_game_input(UINT32 state)
 				item_data[menu_items].seq = &in->seq;
 				item_data[menu_items].sortorder = compute_port_sort_order(in);
 				item_data[menu_items].digital = FALSE;
-				game_input_menu_add_item(&item_list[menu_items], "%s Analog", in, &item_data[menu_items], SEQ_TYPE_STANDARD);
+				game_input_menu_add_item(&item_list[menu_items], "%s%s Analog", in, &item_data[menu_items], SEQ_TYPE_STANDARD,playnumstr);
 				menu_items++;
 
 				item_data[menu_items].seq = &in->analog.decseq;
 				item_data[menu_items].sortorder = compute_port_sort_order(in) | 1;
 				item_data[menu_items].digital = TRUE;
-				game_input_menu_add_item(&item_list[menu_items], "%s Dec", in, &item_data[menu_items], SEQ_TYPE_DECREMENT);
+				game_input_menu_add_item(&item_list[menu_items], "%s%s Dec", in, &item_data[menu_items], SEQ_TYPE_DECREMENT,playnumstr);
 				menu_items++;
 
 				item_data[menu_items].seq = &in->analog.incseq;
 				item_data[menu_items].sortorder = compute_port_sort_order(in) | 2;
 				item_data[menu_items].digital = TRUE;
-				game_input_menu_add_item(&item_list[menu_items], "%s Inc", in, &item_data[menu_items], SEQ_TYPE_INCREMENT);
+				game_input_menu_add_item(&item_list[menu_items], "%s%s Inc", in, &item_data[menu_items], SEQ_TYPE_INCREMENT,playnumstr);
 				menu_items++;
 			}
 		}
