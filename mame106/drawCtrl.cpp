@@ -106,12 +106,18 @@ void drawextra_deleteLever(struct drawableExtra_lever *p)
 //printf("drawextra_deleteLever end\n");
 }
 
-struct drawableExtra_steeringWheel *drawextra_createSteeringWheel(int isbike)
+struct drawableExtra_steeringWheel *drawextra_createSteeringWheel(int imageindex)
 {
     struct drawableExtra_steeringWheel *p =
     (struct drawableExtra_steeringWheel *) auto_malloc(sizeof(struct drawableExtra_steeringWheel));
     if(!p) return NULL; // should have jmp throwed anyway.
-    const char *imagename = (isbike)?"handlebars.png":"swheel.png";
+
+    if(imageindex>2) imageindex=2;
+    if(imageindex<0) imageindex=0;
+    const char *imgs[]={
+        "swheel.png","handlebars.png","hammer.png"
+    };
+    const char *imagename = imgs[imageindex];
     int r = open_and_read_png(imagename,&p->_img._png );
     if(p->_img._png.image &&
       (p->_img._png.width != 32 || p->_img._png.height != 32 ))

@@ -73,22 +73,23 @@ static void extraclean()
 }
 
 void add_exit_callback(void (*callback)(void));
-
-static void initGoodies(int shagon)
+// xb 256+44
+// 224
+static void initGoodies(int xb,int yb,int hammer)
 {
-    //krb
+
     unsigned int configGoodiesFlags = GetDisplayGoodiesFlags();
     if(configGoodiesFlags & 3)
     {
-        if((configGoodiesFlags & 2) && (shagon==0))
+        if((configGoodiesFlags & 2) && hammer==0 )
         {
             _levergoody = drawextra_createLever();
-            if(_levergoody) drawextra_setpos(&_levergoody->_geo,160+44+34,224-39);
+            if(_levergoody) drawextra_setpos(&_levergoody->_geo,xb+34,yb-39);
         }
         if(configGoodiesFlags & 1)
         {
-            _wheelgoody = drawextra_createSteeringWheel(shagon);
-            if(_wheelgoody) drawextra_setpos(&_wheelgoody->_geo,160+44,224-44);
+            _wheelgoody = drawextra_createSteeringWheel(hammer?2:0);
+            if(_wheelgoody) drawextra_setpos(&_wheelgoody->_geo,xb,yb-44);
         }
         add_exit_callback(extraclean);
     }
@@ -187,9 +188,10 @@ VIDEO_START( cischeat )
  	megasys1_bits_per_color_code = 5;
 
 	prepare_shadows();
-
+    initGoodies(128,224,0);
  	return 0;
 }
+
 
 /**************************************************************************
                             F1 GrandPrix Star
@@ -201,13 +203,23 @@ VIDEO_START( f1gpstar )
 	if (video_start_cischeat())	return 1;
 
  	megasys1_bits_per_color_code = 4;
+    //initGoodies();
+ 	return 0;
+}
 
+
+VIDEO_START( scudhamm )
+{
+    video_start_f1gpstar();
+    initGoodies(128+44,224,01);
  	return 0;
 }
 
 VIDEO_START( bigrun )
 {
-	return video_start_f1gpstar();
+    int r = video_start_f1gpstar();
+    initGoodies(128+16,224+8,00);
+	return r;
 }
 
 
@@ -229,14 +241,18 @@ VIDEO_START( bigrun )
 
 static int read_shift(void)
 {
-	static int ret = 1; /* start with low shift */
+/*orig
+	static int ret = 1; // start with low shift
 	switch ( (readinputport(0) >> 2) & 3 )
 	{
 		case 1 : ret = 1;	break;	// low  shift: button 3
 		case 2 : ret = 0;	break;	// high shift: button 4
 	}
-	commonControlsValues._lever = ret ^ 1;
-	return ret;
+	*/
+	// krb, no toggle anymore, and display shift
+	int r = ((readinputport(0) >> 2) & 3)!=0;
+	commonControlsValues._lever = r;
+	return r ^1;
 }
 
 
@@ -375,7 +391,11 @@ READ16_HANDLER( cischeat_vregs_r )
 		case 0x0010/2 :
 			switch (cischeat_ip_select & 0x3)
 			{
-				case 0 : return readinputport(6);	// Driving Wheel
+				case 0 :
+				{   UINT32 v = readinputport(6);	// Driving Wheel
+                    commonControlsValues.analogValues[0] = (int)v;
+                    return v;
+				}
 				case 1 : return ~0;					// Cockpit: Up / Down Position?
 				case 2 : return ~0;					// Cockpit: Left / Right Position?
 				default: return ~0;
@@ -1353,9 +1373,12 @@ VIDEO_UPDATE( bigrun )
     // -----------------------------
 	//UINT16 pixval = ((UINT16*) bitmap->line[215])[cliprect->min_x+298];
 	// 23 in demo mode, 356 music selection screen, 41 play mode .
-    //if(pixval == 41)
+	UINT16 pixval = ((UINT16*) bitmap->line[11])[cliprect->min_x+78-64];
+ //printf("pixval:%d\n",(int)pixval);
+
+//    if(pixval == 7680)
     {
-        int remapIndexStart=32;
+        int remapIndexStart=512+32;
         if(_levergoody)
             drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever,remapIndexStart);
         if(_wheelgoody)
@@ -1417,6 +1440,20 @@ VIDEO_UPDATE( cischeat )
 
 
 	megasys1_active_layers = megasys1_active_layers1;
+//275 14
+	//krb: draw optionnal control goodies
+	// test a static hud pixel on the screen to check if we're into gameplay:
+	// very accurate because it's not yet color it's sprite private palette index
+	// cliprect->min_y can be not the right value.
+	// UINT16 pixval = ((UINT16*) bitmap->line[14])[275-64];
+ // printf("pixval:%d\n",(int)pixval);
+    {
+        int remapIndexStart=512+32;
+        if(_levergoody)
+            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever,remapIndexStart);
+        if(_wheelgoody)
+            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0],remapIndexStart);
+    }
 }
 
 
@@ -1490,6 +1527,8 @@ extern UINT16 scudhamm_motor_command;
 	READ16_HANDLER( scudhamm_motor_status_r );
 	READ16_HANDLER( scudhamm_analog_r );
 
+extern UINT32 hammeraccum;
+
 VIDEO_UPDATE( scudhamm )
 {
 	int megasys1_active_layers1, flag;
@@ -1535,5 +1574,18 @@ if ( code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X) )
 	cischeat_tmap_DRAW(2)
 
 	megasys1_active_layers = megasys1_active_layers1;
+
+    {
+        int remapIndexStart=512+32;
+        if(_wheelgoody)
+            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]+48,remapIndexStart);
+    }
+  //  printf("hammeraccum:%d\n",hammeraccum);
+    if(hammeraccum>0)
+    {
+        hammeraccum -=  (hammeraccum>>1);
+    // hammeraccum -= (hammeraccum>>2);
+     if(hammeraccum>0) hammeraccum--;
+    }
 }
 

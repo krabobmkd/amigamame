@@ -182,6 +182,7 @@ static void krb_outrun_patch_cpu_synchro()
     {   // replace that tst.w call by a patch, on an unused opcode.
         m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
         pcodemain[0x00007dda>>1] = 8;
+        //printf("orp1 done\n");
     }
 
 	UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
@@ -189,6 +190,7 @@ static void krb_outrun_patch_cpu_synchro()
     {
         m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
         pcodesub[0x00001182>>1] = 9;
+        //printf("orp2 done\n");
     }
 
 }

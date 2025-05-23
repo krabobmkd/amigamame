@@ -49,7 +49,7 @@ struct drawableExtra_steeringWheel {
 struct drawableExtra_lever *drawextra_createLever();
 void drawextra_deleteLever(struct drawableExtra_lever *);
 
-struct drawableExtra_steeringWheel *drawextra_createSteeringWheel(int isbike);
+struct drawableExtra_steeringWheel *drawextra_createSteeringWheel(int imageindex);
 void drawextra_deleteSteeringWheel(struct drawableExtra_steeringWheel *);
 
 void drawextra_setpos(struct drawableExtra *, int x,int y);
