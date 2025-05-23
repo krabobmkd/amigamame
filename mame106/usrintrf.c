@@ -138,7 +138,7 @@ static int show_profiler;
 
 static UINT8 ui_dirty;
 
-static gfx_element *uirotfont;
+static gfx_element *uirotfont=NULL;
 static pen_t uirotfont_colortable[8];
 
 static char popup_text[200];
@@ -314,15 +314,15 @@ static const UINT8 uifontdata[] =
 #define MAX_UIFONT_SIZE 8 /* max(width,height) */
 static const gfx_layout uifontlayout =
 {
-	6,8,
-	256,
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	6,8, //.width and height (in pixels) of chars/sprites
+	256, //.total nb shapes codes
+	1, //.planes nb bitplanes
+	{ 0 }, // planesoffsets
+	{ 0, 1, 2, 3, 4, 5, 6, 7 }, // xoffsets
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 }, // yoffset
+	8*8 // .charincrement distance between two consecutive characters/sprites
+	//....
 };
-
 
 
 /*************************************
@@ -4202,7 +4202,7 @@ static void render_ui(mame_bitmap *dest)
 
                 dgp.code = elem->type;
                 if(elem->color == white_pen)
-                { // 0blanc 1 rouge
+                {
                     // draw shadow
                     if(flipxy)
                     {
@@ -4253,14 +4253,10 @@ static void render_ui(mame_bitmap *dest)
 
                     } // else if not flipx
 
-
-
-
-                    //dgp.clip = &uirawbounds;
 				} else
 				{
-                    dgp.color = elem->color;
-                    drawgfx(&dgp);
+                        dgp.color = elem->color;
+                        drawgfx(&dgp);
 				}
 				//drawgfx(dest, uirotfont, elem->type, elem->color ? 0 : 1, 0, 0, bounds.min_x, bounds.min_y, &uirawbounds, TRANSPARENCY_PEN, 0);
 				break;

@@ -1156,6 +1156,24 @@ INT32 osd_get_code_value(os_code oscode)
 //             } break;
 //         }
 
+/* note 21/05/2025
+ MAME inptport.c management differenciates those emulated controls:
+  - Analog relative inputs: (mouse,trackballs) which ask -+deltas.
+  - Analog Absolute inputs: (wheels,lightguns,...) which ask final value.
+
+ it allows to "plug to each of them" Analog relative or Analog Absolute, and adapt values.
+
+Amiga Hardware mouse send relative delta, but:
+intuition gives absolute values with pixel coords (reported to a rastport resolution)
+and lowlevel mouse/trackball (used here) send absolute values in a 8bit scale
+ (really not enough precision, but at least not reported to a resolution)
+
+ If now we imagine plugin a real wheel (USB?) that sends absolute rotation angle,
+ We can use the lowlevel mouse API because it already sends absolute.
+...  so we can either declare the lowlevel mouse to mame as analog/relative OR analog/absolute,
+ which may help plugin a real wheel.
+
+*/
         MameInputs::LLMouse &llm = g_pInputs->_mstate[illport]; // mousestate[illport];
         UINT32 state = llm._mousestate;
         const INT32 minswitch = 128;

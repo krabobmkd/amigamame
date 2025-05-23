@@ -106,8 +106,12 @@ void XmlWriter::operator()(const char *sMemberName, ULONG_FLAGS &v,ULONG_FLAGS v
     UINT32 ib=1;
     for(int i=0;i<values.size() ;i++)
     {
-        string name = checkXmlName(values[i].c_str());
-        if(ib & v) xml_add_child(_recursenode.back(),name.c_str(),NULL );
+        string name = checkXmlName(values[i].c_str());        
+        xml_data_node *pa = xml_add_child(_recursenode.back(),name.c_str(),NULL );
+        if(pa && (ib & v))
+        {
+            xml_set_attribute(pa,"v","on");
+        }
         ib<<=1;
     }
 }
@@ -250,8 +254,10 @@ void XmlReader::operator()(const char *sMemberName, ULONG_FLAGS &v,ULONG_FLAGS v
         string name = checkXmlName(values[i].c_str());
         xml_data_node *p = xml_get_sibling(_recursenode.back()->child, name.c_str());
         if(p)
-        {   // means on
-            fv |=ib;
+        {
+            xml_attribute_node *pa = xml_get_attribute(p,"v");
+            // means on
+            if(pa) fv |=ib;
         }
         ib<<=1;
     }
