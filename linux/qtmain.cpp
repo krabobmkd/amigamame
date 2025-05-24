@@ -175,7 +175,9 @@ void QProc::process()
         int idriver = getMainConfig().driverIndex().index(
 
        //"nightstr"
-        "outrun"
+      //  "bigrun"
+     // "cischeat"
+     "sci"
       //"sharrier"
      // "othunder"
       // "thndrbld"
@@ -188,19 +190,19 @@ void QProc::process()
             StartGame(idriver);
         }
     }
-    nbframe = 0;
-    m_nbtest = 1;
-    isoth =1;
-    {
-        int idriver = getMainConfig().driverIndex().index("othunder");
+   //  nbframe = 0;
+   //  m_nbtest = 1;
+   //  isoth =1;
+   //  {
+   //      int idriver = getMainConfig().driverIndex().index("othunder");
 
-        //  if game was explicit, no GUI
-        if(idriver>0)
-        {
-            getMainConfig().setActiveDriver(idriver);
-            StartGame(idriver);
-        }
-   }
+   //      //  if game was explicit, no GUI
+   //      if(idriver>0)
+   //      {
+   //          getMainConfig().setActiveDriver(idriver);
+   //          StartGame(idriver);
+   //      }
+   // }
 }
 
 QWin::QWin() : QLabel()
@@ -391,11 +393,11 @@ nbframe++;
 
 //if(nbframe == 60*25) mame_pause(1);
 // if(nbframe==1200) exit(1);
- static int j=0;
- if(nbframe==60*5 && j==0) {
- j=1; mame_schedule_exit();
+ // static int j=0;
+ // if(nbframe==60*5 && j==0) {
+ // j=1; mame_schedule_exit();
 
- }
+ // }
 //    m_mutex.lock();
 //    m_mutex.unlock();
 
@@ -439,6 +441,8 @@ void osd_sound_enable(int enable)
 const os_code_info *osd_get_code_list(void)
 {
     static os_code_info l[]={
+        {"5",34,KEYCODE_5},
+        {"1",35,KEYCODE_1},
         {"A",32,KEYCODE_A},
         {"TAB",33,KEYCODE_TAB},
         {"SPACE",65,KEYCODE_SPACE},
@@ -446,6 +450,7 @@ const os_code_info *osd_get_code_list(void)
         {"M1AY",1025,MOUSECODE_1_ANALOG_Y},
         {"M1ABT1",1026,MOUSECODE_1_BUTTON1},
         {"M1ABT2",1027,MOUSECODE_1_BUTTON2},
+        {"bt4",100,JOYCODE_1_BUTTON4},
         {NULL,0,0},
     };
     return &l[0];
@@ -453,14 +458,30 @@ const os_code_info *osd_get_code_list(void)
 int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
-    if(oscode == 33 && nbframe>3*60)
+// to open menu
+    if(oscode == 34 && nbframe>3*60)
     {
         if(opened==0)
         {
-            opened++;
+            opened=1;
             return 1;
         }
         return 0;
+    }
+    if(oscode == 35 && nbframe>4*60)
+    {
+        //if(opened>0)
+        {
+        opened++;
+            //opened ;
+            return (opened>>6)&1;
+        }
+        //return 0;
+    }
+    if(oscode == 100)
+    {   // bt4
+
+        return (opened>>6)&1;
     }
     if(oscode==1024)
     {

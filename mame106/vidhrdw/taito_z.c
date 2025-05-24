@@ -42,6 +42,7 @@ static void initGoodies();
 VIDEO_START( taitoz )
 {
     // chasehq start here
+   // printf("***initGoodies\n");
     initGoodies();
 
 	return (taitoz_core_vh_start(0));
@@ -1034,6 +1035,10 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 
 			if (code == 0xffff)	bad_chunks++;
 
+            UINT32 pen_usage = dgpz5.gfx->pen_usage[code];
+            if(pen_usage == 1) continue; // full transparent escape
+
+
 			curx = x + ((k*zoomx)/4);
 			cury = y + ((j*zoomy)/8);
 
@@ -1062,7 +1067,9 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 			dgpz5.scalex = zx<<12;
 			dgpz5.scaley = zy<<13;
 //			drawgfxzoom(&dgpz5);
-            if(/*pen_usage == 128 &&*/ priority ==1)
+
+
+            if(pen_usage == 128 && priority ==1)
                 drawgfxzoom_prio_write(&dgpz5);
             else
                 drawgfxzoom_clut16_Src8_tr0_prio(&dgpz5);
@@ -1371,7 +1378,14 @@ static void extraclean()
 
 static void initGoodies()
 {
-    int dowheel = (strcmp(Machine->gamedrv->name,"chasehq")==0);
+const char *pname = Machine->gamedrv->name;
+    int dowheel =
+        (strcmp(pname,"chasehq")==0) ||
+        (strcmp(pname,"chasehqj")==0) ||
+        (strcmp(pname,"sci")==0)||
+        (strcmp(pname,"scia")==0) ||
+        (strcmp(pname,"sciu")==0)
+        ;
     if(!dowheel) return;
     unsigned int configGoodiesFlags = GetDisplayGoodiesFlags();
     if((configGoodiesFlags & 3))
@@ -1425,13 +1439,12 @@ VIDEO_UPDATE( chasehq )
         // 23 in demo mode, 356 music selection screen, 41 play mode .
         if(pixval == 2018)
         {
-            int remapIndexStart=512+16;
-          // if(_wheelgoody)
+          if(_wheelgoody)
                 drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody,
-                    commonControlsValues.analogValues[0]+128,remapIndexStart);
+                    commonControlsValues.analogValues[0]+128);
 
             if(_levergoody)
-                drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever,512);
+                drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
 
         }
     }
@@ -1536,6 +1549,23 @@ VIDEO_UPDATE( sci )
 	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
 
 	sci_draw_sprites_16x8(bitmap,cliprect,6);
+
+	if(_wheelgoody)
+	{
+        UINT16 pixval = ((UINT16*) bitmap->line[16+190])[0+310];
+       // printf("pix:%d\n",pixval);
+        if(pixval == 2200)
+        {
+           if(_wheelgoody)
+                drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody,
+                    commonControlsValues.analogValues[0]+128);
+
+            if(_levergoody)
+                drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
+
+        }
+    }
+
 }
 
 

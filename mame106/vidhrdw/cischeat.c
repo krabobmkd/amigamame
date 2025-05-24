@@ -84,7 +84,7 @@ static void initGoodies(int xb,int yb,int hammer)
         if((configGoodiesFlags & 2) && hammer==0 )
         {
             _levergoody = drawextra_createLever();
-            if(_levergoody) drawextra_setpos(&_levergoody->_geo,xb+34,yb-39);
+            if(_levergoody) drawextra_setpos(&_levergoody->_geo,xb+34,yb-48);
         }
         if(configGoodiesFlags & 1)
         {
@@ -1373,16 +1373,15 @@ VIDEO_UPDATE( bigrun )
     // -----------------------------
 	//UINT16 pixval = ((UINT16*) bitmap->line[215])[cliprect->min_x+298];
 	// 23 in demo mode, 356 music selection screen, 41 play mode .
-	UINT16 pixval = ((UINT16*) bitmap->line[11])[cliprect->min_x+78-64];
+	UINT16 pixval = ((UINT16*) bitmap->line[16+11])[0+78-64];
  //printf("pixval:%d\n",(int)pixval);
-
-//    if(pixval == 7680)
+//3637c
+    if(pixval == 3637)
     {
-        int remapIndexStart=512+32;
         if(_levergoody)
-            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever,remapIndexStart);
+            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
         if(_wheelgoody)
-            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0],remapIndexStart);
+            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]);
     }
 
 
@@ -1445,14 +1444,14 @@ VIDEO_UPDATE( cischeat )
 	// test a static hud pixel on the screen to check if we're into gameplay:
 	// very accurate because it's not yet color it's sprite private palette index
 	// cliprect->min_y can be not the right value.
-	// UINT16 pixval = ((UINT16*) bitmap->line[14])[275-64];
+	 UINT16 pixval = ((UINT16*) bitmap->line[14+16])[0+275-64];
  // printf("pixval:%d\n",(int)pixval);
+    if(pixval == 1074)
     {
-        int remapIndexStart=512+32;
         if(_levergoody)
-            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever,remapIndexStart);
+            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
         if(_wheelgoody)
-            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0],remapIndexStart);
+            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]);
     }
 }
 
@@ -1575,16 +1574,15 @@ if ( code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X) )
 
 	megasys1_active_layers = megasys1_active_layers1;
 
-    {
-        int remapIndexStart=512+32;
-        if(_wheelgoody)
-            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]+48,remapIndexStart);
-    }
-  //  printf("hammeraccum:%d\n",hammeraccum);
+
+    if(_wheelgoody)
+        drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]+48);
+
+
+   //krb important for hammer cinematic, reduce damp force applied by frame.
     if(hammeraccum>0)
     {
         hammeraccum -=  (hammeraccum>>1);
-    // hammeraccum -= (hammeraccum>>2);
      if(hammeraccum>0) hammeraccum--;
     }
 }

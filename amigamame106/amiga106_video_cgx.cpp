@@ -108,7 +108,7 @@ void Drawable_CGX::initRemapTable()
             int privScreenNbColors = 1<<(pScreen->RastPort.BitMap->Depth);
             // printf("_colorsIndexLength:%d privScreenNbColors:%d\n",
             //     _colorsIndexLength,privScreenNbColors);
-            if(_colorsIndexLength<=(privScreenNbColors+6))
+            if(_colorsIndexLength<=(privScreenNbColors+10))
                      _pRemap = new Paletted_Screen8(pScreen);
             // force fixed palette and manage large index to this index at palette change.
             else

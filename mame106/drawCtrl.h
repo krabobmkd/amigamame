@@ -23,7 +23,7 @@ extern struct CommonControlsValues commonControlsValues;
 
 struct extraBitmap{
     png_info _png;
-    UINT16 _colormap[16]; // for clut.
+    //UINT16 _colormap[16]; // for clut.
 };
 
 struct drawableExtra {
@@ -53,8 +53,8 @@ struct drawableExtra_steeringWheel *drawextra_createSteeringWheel(int imageindex
 void drawextra_deleteSteeringWheel(struct drawableExtra_steeringWheel *);
 
 void drawextra_setpos(struct drawableExtra *, int x,int y);
-void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_lever *, int value, int remapIndexStart);
-void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *, int value, int remapIndexStart);
+void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_lever *, int value);
+void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *, int value);
 
 
 #ifdef __cplusplus

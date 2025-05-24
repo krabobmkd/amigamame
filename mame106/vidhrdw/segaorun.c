@@ -130,9 +130,8 @@ VIDEO_UPDATE( shangon )
 	/* draw the sprites */
 	segaic16_sprites_draw(0, bitmap, cliprect);
 
-    int remapIndexStart=32;
     if(_wheelgoody)
-        drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0],remapIndexStart);
+        drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]);
 
 
 }
@@ -181,11 +180,10 @@ VIDEO_UPDATE( outrun )
 	// 23 in demo mode, 356 music selection screen, 41 play mode .
     if(pixval == 41)
     {
-        int remapIndexStart=32;
         if(_levergoody)
-            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever,remapIndexStart);
+            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
         if(_wheelgoody)
-            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0],remapIndexStart);
+            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]);
     }
 
 

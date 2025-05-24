@@ -1498,6 +1498,8 @@ INPUT_PORTS_START( scudhamm )
 
 	PORT_START_TAG("IN1")	// A/D
 //original	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(1) PORT_KEYDELTA(0)
+// replaced bu IPT_TRACKBALL_X because relative has no clip.
+// finally not, more fun with clips
 	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE )  PORT_MINMAX(0,0xff) PORT_SENSITIVITY(40) PORT_KEYDELTA(30)
         PORT_NAME(ui_getstring(UI_Hammer))
 // no more min/max, use more movements

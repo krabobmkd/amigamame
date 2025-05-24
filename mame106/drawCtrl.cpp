@@ -3,13 +3,15 @@
 
 #include "fileio.h"
 extern "C" {
+#include "mame.h"
+#include "driver.h"
 #include <memory.h>
 #include "png.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 }
-
+extern pen_t black_pen;
 
 struct CommonControlsValues commonControlsValues={0};
 
@@ -182,53 +184,53 @@ extern "C" {
 //extern rgb_t *adjusted_palette;
 // struct extraBitmap
 // for CLUT16 destination bitmaps :
-static void refreshRemapCLU16(mame_bitmap *bitmap,struct extraBitmap &bm, int indexStart)
-{
-    int nbc = 16;
-    if(bm._png.num_palette<nbc) nbc = bm._png.num_palette;
+// static void refreshRemapCLU16(mame_bitmap *bitmap,struct extraBitmap &bm, int indexStart,int nbc)
+// {
 
-    if(bm._png.palette == NULL)
-    {
-        memset(&bm._colormap[0],0,sizeof(UINT16)*nbc);
-        return;
-    }
-	UINT8 *palette = bm._png.palette+3; // +3 because start 1
-    for(int i=1;i<nbc;i++)
-    {
-        INT16 cr = (*palette++);
-        INT16 cg = (*palette++);
-        INT16 cb = (*palette++);
-  //  printf("c:%");
-        cr>>=2;
-        cg>>=2;
-        cb>>=2;
+//     if(bm._png.num_palette<nbc) nbc = bm._png.num_palette;
 
-        UINT16 bestindex=0;
-        INT32 besterror = 0x7fffffff;
-        for(int j=indexStart;j<indexStart+32+8;j++)
-        {
-            rgb_t c = game_palette[j];
-            INT16 pb = (c>>2) & 0x3f;
-            INT16 pg = (c>>(8+2)) & 0x3f;
-            INT16 pr = (c>>(16+2)) & 0x3f;
-            INT16 er_r = pr-cr;
-            INT16 er_g = pg-cg;
-            INT16 er_b = pb-cb;
-            INT32 terr =( er_r*er_r )+ (er_g*er_g) + (er_b*er_b);
-            if(terr == 0) {
-                bestindex = j;
-                break;
-            }
-            if(terr<besterror)
-            {
-                besterror = terr;
-                bestindex = j;
-            }
-        }
-        bm._colormap[i] = bestindex;
-    }
+//     if(bm._png.palette == NULL)
+//     {
+//         memset(&bm._colormap[0],0,sizeof(UINT16)*nbc);
+//         return;
+//     }
+// 	UINT8 *palette = bm._png.palette+3; // +3 because start 1
+//     for(int i=1;i<nbc;i++)
+//     {
+//         INT16 cr = (*palette++);
+//         INT16 cg = (*palette++);
+//         INT16 cb = (*palette++);
+//   //  printf("c:%");
+//         cr>>=2;
+//         cg>>=2;
+//         cb>>=2;
 
-}
+//         UINT16 bestindex=0;
+//         INT32 besterror = 0x7fffffff;
+//         for(int j=indexStart;j<indexStart+32+8;j++)
+//         {
+//             rgb_t c = game_palette[j];
+//             INT16 pb = (c>>2) & 0x3f;
+//             INT16 pg = (c>>(8+2)) & 0x3f;
+//             INT16 pr = (c>>(16+2)) & 0x3f;
+//             INT16 er_r = pr-cr;
+//             INT16 er_g = pg-cg;
+//             INT16 er_b = pb-cb;
+//             INT32 terr =( er_r*er_r )+ (er_g*er_g) + (er_b*er_b);
+//             if(terr == 0) {
+//                 bestindex = j;
+//                 break;
+//             }
+//             if(terr<besterror)
+//             {
+//                 besterror = terr;
+//                 bestindex = j;
+//             }
+//         }
+//         bm._colormap[i] = bestindex;
+//     }
+
+// }
 
 static void drawextra_simpleDrawCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,int x, int y,struct extraBitmap &bm )
 {
@@ -238,6 +240,8 @@ static void drawextra_simpleDrawCLUT16(mame_bitmap *bitmap, const rectangle *cli
     int y2 = y1 + bm._png.height;
     if(y2>=cliprect->max_y) y2 = cliprect->max_y-1;
 
+    int colorstart = black_pen-1; // works because we know it's clut16 mode and colors are index.
+ //printf("colorstart:%d\n",colorstart);
     for(int y=y1 ; y<y2 ; y++)
     {
         UINT16 *pw = ((UINT16 *)bitmap->line[y]) + x;
@@ -246,22 +250,22 @@ static void drawextra_simpleDrawCLUT16(mame_bitmap *bitmap, const rectangle *cli
         for(int xx=0 ; xx<bm._png.width ; xx++)
         {
             UINT8 c = *pr++;
-            if(c) *pw = bm._colormap[c];
+            if(c) *pw = colorstart + c;
             pw++;
         }
     }
 }
 
-void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_lever *p, int value, int remapIndexStart)
+void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_lever *p, int value)
 {
     if(!p) return;
     struct extraBitmap &bm = (value)?(p->_img_h):(p->_img_l);
 
-	refreshRemapCLU16(bitmap,bm,remapIndexStart);
+//	refreshRemapCLU16(bitmap,bm,remapIndexStart,64);
     drawextra_simpleDrawCLUT16(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm);
 
 }
-void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *p, int value, int remapIndexStart)
+void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *p, int value)
 {
     if(!p) return;
     if( ! p->_img._png.image) return;
@@ -269,7 +273,11 @@ void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct
 	//bitmap->
     struct extraBitmap &bm = p->_img;
 
-	refreshRemapCLU16(bitmap,bm,remapIndexStart);
+// works because we know it's clut16 mode and colors are index.
+    int colorstart = black_pen-1;
+// printf("colorstart:%d\n",colorstart);
+
+//	refreshRemapCLU16(bitmap,bm,remapIndexStart,64);
    // drawextra_simpleDrawCLUT16(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm);
    //drawextra_drawRotate(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm,value,p->_sincost);
     int x = p->_geo._xpos;
@@ -324,7 +332,7 @@ void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct
         for(int xx=0 ; xx<pixeldrawns ; xx++)
         {
             UINT8 c = bm._png.image[bprsrc * ((ly1>>16) & 0x01f) + ((lx1>>16) & 0x01f)];
-            if(c) *pw = bm._colormap[c];
+            if(c) *pw = colorstart + c;
             pw++;
             lx1 += xdx;
             ly1 += ydx;
