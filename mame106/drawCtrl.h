@@ -57,6 +57,10 @@ void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct
 void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *, int value);
 
 
+// - - - -- - - - -
+void drawextra_simpleDraw(mame_bitmap *bitmap, const rectangle *cliprect,int x, int y,struct extraBitmap *bm,UINT32 video_attribs, UINT32 flags );
+
+
 #ifdef __cplusplus
 }
 #endif

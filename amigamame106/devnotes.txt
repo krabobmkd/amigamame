@@ -1,23 +1,25 @@
 
  Many bug corrections,a bit of optimization, and interface improvements.
 
- Big round of improvements around the "Sprite Scaling games" from Sega, Taito and Jaleco.
-  Outrun and Thunderblade gets 8% faster, some other Sega games also gain a little speed (Galaxy Force II). Also The inter-blocking sega games bugs are all resolved.
 
-  Special pimp-my-car treatments for games:
- Outrun, Super hang-On, Chase Hq, Criminal Special investigation (CSI), Night Striker, Big Run, Cisco Heat, and Scud Hammer.
+ Big round of improvements around the "Sprite Scaling games" from Sega, Taito and Jaleco.
+  Outrun and Thunderblade gets 8% faster, some other Sega games also gain a little speed (Galaxy Force II). The inter-blocking sega games bugs are all resolved.
  Glitch and sprite priority corrections for CSI, chasehq and Night Strikers.
-  The role of buttons and analog controls for these games were unclear, when not wrongly emulated: If a button was toggling gears, the current state was unknown. Also moving wheels with mouse or trackball couldn't work because you could not see the current Steering wheel position.
+  Special pimp-my-car treatments for those games:
+ Outrun, Super hang-On, Chase Hq, Criminal Special investigation (CSI), Night Striker, Big Run, Cisco Heat, and Scud Hammer.
+  The role of buttons and analog controls for these games were unclear, when not wrongly emulated:
+  Toggling gears and moving wheels with mouse couldn't work because you could not see the current gear and Steering wheel position.
   So now, for these games:
-   - A wheel and a Gear Shift are optionnaly displayed upon the screen, by default.
-     (it uses some png in directory skin/.)
+   - A wheel and a Gear Shift are optionnaly displayed upon the screen.
+     (it uses directory skin/.)
    - The exact buttons and analog controls roles are explicitly displayed in
      the "Tab Key Menu" affiliate panel: "Input (This Game)"
-	So now, CSI that uses 6 buttons will not display "Button1, Button 2, 3,4,5,6" , but "Accelerate,Brake,Fire,Gear Shit,Turbo,Center", (Seriously who could guess that ?) and of course this panel will let you change the default key/pad/mouse mapping as always.
+	Now, CSI will not display "Button1, Button 2,..." , but "Accelerate,Brake,Fire,Gear,Turbo,Center",
+	(Seriously who could guess that ?) and of course this panel will let you change the default key mapping as always.
 
  The immense "Scud Hammer" now also has explicit roles for buttons in the Input Panel,
-  and a hammer is now displayed upon the game, to reproduce movements of the said Hammer,
-  controllable with mouse or arrows. (Previously the hammer was wrongly emulated).
+  and a hammer is displayed upon the game, to reproduce its movements,
+  controllable with mouse or arrows. (before,the hammer input was bugged.).
 
  So factualy, all these games are now playable. (some may still need frameskip option).
 

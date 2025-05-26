@@ -15,7 +15,6 @@ extern pen_t black_pen;
 
 struct CommonControlsValues commonControlsValues={0};
 
-
 static void closePng( png_info *png)
 {
     if(!png) return;
@@ -231,7 +230,7 @@ extern "C" {
 //     }
 
 // }
-
+/*ok
 static void drawextra_simpleDrawCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,int x, int y,struct extraBitmap &bm )
 {
     if( ! bm._png.image) return;
@@ -255,6 +254,134 @@ static void drawextra_simpleDrawCLUT16(mame_bitmap *bitmap, const rectangle *cli
         }
     }
 }
+*/
+
+// - - - -
+
+// - - - - -
+class PixCLUT16
+{
+public:
+    PixCLUT16() : _colorstart(black_pen-1) {  }
+    UINT16 v(UINT8 c) { return _colorstart+c; }
+    int _colorstart;
+};
+static UINT16 rgb15pal[10];
+class PixRGB15
+{
+public:
+    PixRGB15() {}
+    UINT16 v(UINT8 c) { return rgbpal[c]; }
+    UINT16 rgbpal[16];
+};
+static UINT16 rgb32pal[10];
+class PixRGB32
+{
+public:
+    PixRGB32() {}
+    UINT32 v(UINT8 c) { return rgbpal[c]; }
+    UINT32 rgbpal[16];
+};
+//  -- - -
+template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
+
+template<class Pix>
+class BmDestCoord {
+public:
+
+    BmDestCoord(mame_bitmap *bitmap, const rectangle *cliprect,UINT32 flags)
+    : _bitmap(bitmap)
+    , _cliprect(cliprect)
+    ,x_app_x(1),x_app_y(0),x_offs(cliprect->min_x)
+    ,y_app_x(0),y_app_y(1),y_offs(cliprect->min_y)
+     {
+        if(flags & ORIENTATION_FLIP_X) flipx();
+        if(flags & ORIENTATION_FLIP_Y) flipy();
+        if(flags & ORIENTATION_SWAP_XY) swapxy();
+     }
+    mame_bitmap *_bitmap;
+    const rectangle *_cliprect;
+    int x_app_x,x_app_y,x_offs;
+    int y_app_x,y_app_y,y_offs;
+
+    void swapxy() {
+        doSwap(x_app_x,y_app_x);
+        doSwap(x_app_y,y_app_y);
+        doSwap(x_offs,y_offs);
+    }
+    void flipx() {
+        x_offs = _cliprect->max_x-1;
+        x_app_x = -x_app_x;
+        x_app_y = -x_app_y;
+    }
+    void flipy() {
+        y_offs = _cliprect->max_y-1;
+        y_app_x = -y_app_x;
+        y_app_y = -y_app_y;
+    }
+    int x(int x,int y) const { return x_offs + x*x_app_x + y*x_app_y;  }
+    int y(int x,int y) const { return y_offs + x*y_app_x + y*y_app_y;  }
+    int dx() const { return  x_app_x;  }
+    int dy() const { return  y_app_y;  }
+
+    Pix *pix(int xx,int yy) {
+                int px = x(xx,yy);
+                int py = y(xx,yy);
+                return ((Pix *)_bitmap->line[py]) + ( px * dx() );
+            }
+};
+
+template<class BmDst,class Pix,typename T>
+void drawextra_simpleDrawT(BmDst &bmdest,int x, int y,struct extraBitmap &bm )
+{
+    if( ! bm._png.image) return;
+//    if(y<0) y=0;
+//    int y1 =pix.y1() + y;
+//    int y2 = y1 + bm._png.height;
+//    if(y2>=pix.y2()) y2 = pix.y2();
+
+    Pix p;
+   // int colorstart = black_pen-1; // works because we know it's clut16 mode and colors are index.
+
+    for(int yy=0 ; yy<bm._png.height ; yy++)
+    {
+//        int yproj = bmdest.pix(x,y+yy);
+        T *pw = bmdest.pix(x,y+yy); //((UINT16 *)bitmap->line[ydest]) + (x * pix.xStride());
+        UINT8 *pr = bm._png.image + (bm._png.rowbytes *2 * yy ); // ->line[y];
+
+        for(int xx=0 ; xx<bm._png.width ; xx++)
+        {
+            UINT8 c = *pr++;
+            if(c) *pw = p.v(c);   //colorstart + c;
+            pw+=bmdest.dx();
+        }
+    }
+}
+
+//static void drawextra_simpleDrawCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,int x, int y,struct extraBitmap &bm )
+//{
+//    drawextra_simpleDrawT<PixCLUT16>(bitmap,cliprect,x,y,bm);
+//}
+
+void drawextra_simpleDraw(mame_bitmap *bitmap, const rectangle *cliprect,int x, int y,struct extraBitmap *bm,UINT32 video_attribs, UINT32 flags )
+{
+    if(video_attribs & VIDEO_RGB_DIRECT)
+    {
+        if(video_attribs & VIDEO_NEEDS_6BITS_PER_GUN)
+        {
+            BmDestCoord<UINT32> bmdc(bitmap,cliprect,flags);
+            drawextra_simpleDrawT<BmDestCoord<UINT32>,PixRGB32,UINT32>(bmdc,x,y,*bm);
+        } else
+        {
+            BmDestCoord<UINT16> bmdc(bitmap,cliprect,flags);
+            drawextra_simpleDrawT<BmDestCoord<UINT16>,PixRGB15,UINT16>(bmdc,x,y,*bm);
+        }
+    } else
+    {
+        BmDestCoord<UINT16> bmdc(bitmap,cliprect,flags);
+        drawextra_simpleDrawT<BmDestCoord<UINT16>,PixCLUT16,UINT16>(bmdc,x,y,*bm);
+    }
+}
 
 void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_lever *p, int value)
 {
@@ -262,8 +389,10 @@ void drawextra_leverCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct
     struct extraBitmap &bm = (value)?(p->_img_h):(p->_img_l);
 
 //	refreshRemapCLU16(bitmap,bm,remapIndexStart,64);
-    drawextra_simpleDrawCLUT16(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm);
-
+//    drawextra_simpleDrawCLUT16(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,bm);
+    UINT32 vid_attribs = Machine->drv->video_attributes;
+    UINT32 flags = Machine->ui_orientation;
+    drawextra_simpleDraw(bitmap,cliprect,p->_geo._xpos,p->_geo._ypos,&bm,vid_attribs,flags);
 }
 void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct drawableExtra_steeringWheel *p, int value)
 {
