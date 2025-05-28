@@ -35,6 +35,10 @@ struct drawableExtra_lever {
 	struct drawableExtra _geo;
 	struct extraBitmap _img_l,_img_h;
 };
+struct drawableExtra_Img {
+	struct drawableExtra _geo;
+	struct extraBitmap _img;
+};
 
 struct drawableExtra_steeringWheel {
 	struct drawableExtra _geo;
@@ -44,6 +48,9 @@ struct drawableExtra_steeringWheel {
 	//silhouette mask for a disk
 	UINT8 _sil[32*2];
 };
+
+struct drawableExtra_Img *drawextra_createLogo(const char *pfilename);
+void drawextra_deleteImg(struct drawableExtra_Img *p);
 
 // use auto_malloc, so deleted at game exit.
 struct drawableExtra_lever *drawextra_createLever();
@@ -58,7 +65,7 @@ void drawextra_wheelCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,struct
 
 
 // - - - -- - - - -
-void drawextra_simpleDraw(mame_bitmap *bitmap, const rectangle *cliprect,int x, int y,struct extraBitmap *bm,UINT32 video_attribs, UINT32 flags );
+void drawextra_simpleDraw(mame_bitmap *bitmap,int x, int y,struct extraBitmap *bm );
 
 
 #ifdef __cplusplus

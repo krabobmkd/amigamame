@@ -23,7 +23,7 @@ To do:
 #include <ctype.h>
 #include <stdarg.h>
 #include <math.h>
-
+#include <drawCtrl.h>
 #ifdef MESS
 #include "mess.h"
 #include "mesintrf.h"
@@ -33,8 +33,8 @@ To do:
 #include <stdio.h>
 
 extern pen_t black_pen, white_pen;
-extern pen_t grey_pen, dblue_pen,blue_pen,red_pen;
-
+extern pen_t grey_pen, dblue_pen,blue_pen,yellow_pen;
+extern pen_t orange_pen,mar1_pen,mar2_pen,red_pen;
 
 /*************************************
  *
@@ -139,7 +139,7 @@ static int show_profiler;
 static UINT8 ui_dirty;
 
 static gfx_element *uirotfont=NULL;
-static pen_t uirotfont_colortable[8];
+static pen_t uirotfont_colortable[16];
 
 static char popup_text[200];
 static int popup_text_counter;
@@ -370,6 +370,7 @@ static int sprintf_game_info(char *buf);
 static void ui_raw2rot_rect(rectangle *rect);
 static void ui_rot2raw_rect(rectangle *rect);
 static void add_line(int x1, int y1, int x2, int y2, rgb_t color);
+static void add_image(int x1, int y1,int il);
 static void add_fill(int left, int top, int right, int bottom, rgb_t color);
 static void add_char(int x, int y, UINT16 ch, int color);
 static void add_filled_box(int x1, int y1, int x2, int y2);
@@ -377,7 +378,13 @@ static void render_ui(mame_bitmap *dest);
 /* -- end this stuff will go away with the new rendering system */
 
 
+static struct drawableExtra_Img *_minilogo = NULL;
 
+static void deleteLogo()
+{
+    if(_minilogo) drawextra_deleteImg(_minilogo);
+    _minilogo = NULL;
+}
 /*************************************
  *
  *  Main initialization
@@ -392,6 +399,9 @@ int ui_init(int show_disclaimer, int show_warnings, int show_gameinfo)
 //		fatalerror("uistring_init failed");
 
     elemlist = auto_malloc(sizeof(render_element)*MAX_RENDER_ELEMENTS);
+
+    _minilogo = drawextra_createLogo("minilogo.png");
+    if(_minilogo) add_exit_callback(deleteLogo);
 
 	/* build up the font */
 	create_font();
@@ -934,10 +944,15 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 	visible_top = (ui_height - visible_height) / 2;
 
 	/* first add us a box */
-	add_filled_box(	visible_left - UI_BOX_LR_BORDER,
-					visible_top - UI_BOX_TB_BORDER,
+	int x1box = visible_left - UI_BOX_LR_BORDER;
+	int y1box = visible_top - UI_BOX_TB_BORDER;
+	add_filled_box(	x1box,
+					y1box,
 					visible_left + visible_width - 1 + UI_BOX_LR_BORDER,
 					visible_top + visible_height - 1 + UI_BOX_TB_BORDER);
+
+    add_image(x1box,y1box,0);
+
 
 	/* determine the first visible line based on the current selection */
 	top_line = selected - visible_lines / 2;
@@ -1259,7 +1274,7 @@ static void create_font(void)
 	{
 		/* colortable will be set at run time */
 		uirotfont->colortable = uirotfont_colortable;
-		uirotfont->total_colors = 8;
+		uirotfont->total_colors = 10;
 	}
 }
 
@@ -4096,6 +4111,18 @@ static void add_line(int x1, int y1, int x2, int y2, rgb_t color)
 	}
 }
 
+static void add_image(int x1, int y1,int il)
+{
+	if ( elemindex < MAX_RENDER_ELEMENTS )
+	{
+		elemlist[elemindex].x = x1 ;
+		elemlist[elemindex].y = y1 ;
+		elemlist[elemindex].x2 = il;
+		elemlist[elemindex].type = 0xfff0;
+		//elemlist[elemindex].color = color;
+		elemindex++;
+	}
+}
 
 static void add_fill(int left, int top, int right, int bottom, rgb_t color)
 {
@@ -4158,9 +4185,11 @@ static void render_ui(mame_bitmap *dest)
 	uirotfont->colortable[3] = grey_pen;
 	uirotfont->colortable[4] = dblue_pen;
 	uirotfont->colortable[5] = blue_pen;
-	uirotfont->colortable[6] = red_pen;
-	uirotfont->colortable[7] = black_pen;
-	uirotfont->colortable[7] = black_pen;
+	uirotfont->colortable[6] = yellow_pen;
+	uirotfont->colortable[7] = orange_pen;
+	uirotfont->colortable[8] = mar1_pen;
+	uirotfont->colortable[9] = mar2_pen;
+	uirotfont->colortable[10] = red_pen;
 
     int flipxy = (Machine->ui_orientation & ORIENTATION_SWAP_XY) ;
 
@@ -4207,7 +4236,20 @@ static void render_ui(mame_bitmap *dest)
 				artwork_mark_ui_dirty(bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y);
 				ui_dirty = 5;
 				break;
+            case 0xfff0:
+                // bitmaps
+               if(_minilogo)
+               {
+                    // bounds.min_x = uirotbounds.min_x + elem->x;
+                    // bounds.min_y = uirotbounds.min_y + elem->y + 1;
+                    // bounds.max_x = bounds.min_x + uirotcharwidth - 1;
+                    // bounds.max_y = bounds.min_y + uirotcharheight - 1;
+                    drawextra_simpleDraw(dest,
+                            elem->x,elem->y,
+                            &_minilogo->_img);
 
+               }
+                break;
 			default:
                 dgp.clip = &uirawbounds;
 				bounds.min_x = uirotbounds.min_x + elem->x;

@@ -177,9 +177,10 @@ void QProc::process()
        //"nightstr"
       //  "bigrun"
      // "cischeat"
-     "sci"
+    // "sci"
       //"sharrier"
-     // "othunder"
+      "arkanoid"
+ //     "othunder"
       // "thndrbld"
       // "chasehq"
 //"gforce2"
@@ -459,7 +460,7 @@ int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
 // to open menu
-    if(oscode == 34 && nbframe>3*60)
+    if(oscode == 33 && nbframe>3*60)
     {
         if(opened==0)
         {
@@ -468,21 +469,21 @@ INT32 osd_get_code_value(os_code oscode)
         }
         return 0;
     }
-    if(oscode == 35 && nbframe>4*60)
-    {
-        //if(opened>0)
-        {
-        opened++;
-            //opened ;
-            return (opened>>6)&1;
-        }
-        //return 0;
-    }
-    if(oscode == 100)
-    {   // bt4
+    // if(oscode == 35 && nbframe>4*60)
+    // {
+    //     //if(opened>0)
+    //     {
+    //     opened++;
+    //         //opened ;
+    //         return (opened>>6)&1;
+    //     }
+    //     //return 0;
+    // }
+    // if(oscode == 100)
+    // {   // bt4
 
-        return (opened>>6)&1;
-    }
+    //     return (opened>>6)&1;
+    // }
     if(oscode==1024)
     {
         return 1<<10;
