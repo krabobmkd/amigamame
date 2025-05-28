@@ -12,7 +12,8 @@ extern "C" {
 #include <math.h>
 }
 extern pen_t black_pen;
-
+extern pen_t black_pen;
+extern pen_t white_pen,grey_pen,dblue_pen,blue_pen,yellow_pen,orange_pen,mar1_pen,mar2_pen,red_pen;
 struct CommonControlsValues commonControlsValues={0};
 
 static void closePng( png_info *png)
@@ -193,82 +194,6 @@ extern "C" {
     extern rgb_t *game_palette;
 }
 //extern rgb_t *adjusted_palette;
-// struct extraBitmap
-// for CLUT16 destination bitmaps :
-// static void refreshRemapCLU16(mame_bitmap *bitmap,struct extraBitmap &bm, int indexStart,int nbc)
-// {
-
-//     if(bm._png.num_palette<nbc) nbc = bm._png.num_palette;
-
-//     if(bm._png.palette == NULL)
-//     {
-//         memset(&bm._colormap[0],0,sizeof(UINT16)*nbc);
-//         return;
-//     }
-// 	UINT8 *palette = bm._png.palette+3; // +3 because start 1
-//     for(int i=1;i<nbc;i++)
-//     {
-//         INT16 cr = (*palette++);
-//         INT16 cg = (*palette++);
-//         INT16 cb = (*palette++);
-//   //  printf("c:%");
-//         cr>>=2;
-//         cg>>=2;
-//         cb>>=2;
-
-//         UINT16 bestindex=0;
-//         INT32 besterror = 0x7fffffff;
-//         for(int j=indexStart;j<indexStart+32+8;j++)
-//         {
-//             rgb_t c = game_palette[j];
-//             INT16 pb = (c>>2) & 0x3f;
-//             INT16 pg = (c>>(8+2)) & 0x3f;
-//             INT16 pr = (c>>(16+2)) & 0x3f;
-//             INT16 er_r = pr-cr;
-//             INT16 er_g = pg-cg;
-//             INT16 er_b = pb-cb;
-//             INT32 terr =( er_r*er_r )+ (er_g*er_g) + (er_b*er_b);
-//             if(terr == 0) {
-//                 bestindex = j;
-//                 break;
-//             }
-//             if(terr<besterror)
-//             {
-//                 besterror = terr;
-//                 bestindex = j;
-//             }
-//         }
-//         bm._colormap[i] = bestindex;
-//     }
-
-// }
-/*ok
-static void drawextra_simpleDrawCLUT16(mame_bitmap *bitmap, const rectangle *cliprect,int x, int y,struct extraBitmap &bm )
-{
-    if( ! bm._png.image) return;
-    if(y<0) y=0;
-    int y1 = cliprect->min_y + y;
-    int y2 = y1 + bm._png.height;
-    if(y2>=cliprect->max_y) y2 = cliprect->max_y-1;
-
-    int colorstart = black_pen-1; // works because we know it's clut16 mode and colors are index.
- //printf("colorstart:%d\n",colorstart);
-    for(int y=y1 ; y<y2 ; y++)
-    {
-        UINT16 *pw = ((UINT16 *)bitmap->line[y]) + x;
-        UINT8 *pr = bm._png.image + (bm._png.rowbytes *2 * (y-y1) ); // ->line[y];
-
-        for(int xx=0 ; xx<bm._png.width ; xx++)
-        {
-            UINT8 c = *pr++;
-            if(c) *pw = colorstart + c;
-            pw++;
-        }
-    }
-}
-*/
-
-// - - - -
 
 // - - - - -
 class PixCLUT16
@@ -290,19 +215,42 @@ public:
 	uirotfont->colortable[9] = mar2_pen;
 	uirotfont->colortable[10] = red_pen;
 */
-static UINT16 rgb15pal[10];
 class PixRGB15
 {
 public:
-    PixRGB15() {}
+    PixRGB15() {
+        rgbpal[0] = black_pen;
+        rgbpal[1] = black_pen;
+        rgbpal[2] = white_pen;
+        rgbpal[3] = grey_pen;
+        rgbpal[4] = dblue_pen;
+        rgbpal[5] = blue_pen;
+        rgbpal[6] = yellow_pen;
+        rgbpal[7] = orange_pen;
+        rgbpal[8] = mar1_pen;
+        rgbpal[9] = mar2_pen;
+        rgbpal[10] = red_pen;
+    }
     UINT16 v(UINT8 c) { return rgbpal[c]; }
     UINT16 rgbpal[16];
 };
-static UINT16 rgb32pal[10];
+
 class PixRGB32
 {
 public:
-    PixRGB32() {}
+    PixRGB32() {
+       rgbpal[0] = black_pen;
+        rgbpal[1] = black_pen;
+        rgbpal[2] = white_pen;
+        rgbpal[3] = grey_pen;
+        rgbpal[4] = dblue_pen;
+        rgbpal[5] = blue_pen;
+        rgbpal[6] = yellow_pen;
+        rgbpal[7] = orange_pen;
+        rgbpal[8] = mar1_pen;
+        rgbpal[9] = mar2_pen;
+        rgbpal[10] = red_pen;
+    }
     UINT32 v(UINT8 c) { return rgbpal[c]; }
     UINT32 rgbpal[16];
 };
@@ -316,57 +264,65 @@ public:
     BmDestCoord(mame_bitmap *bitmap, const rectangle *visiblerect,UINT32 flags)
     : _bitmap(bitmap)
     , _visiblerect(visiblerect)
-    ,x_app_x(1),x_app_y(0),x_offs(visiblerect->min_x)
-    ,y_app_x(0),y_app_y(1),y_offs(visiblerect->min_y)
+    ,x_app_x(1),x_app_y(0),x_offs(0/*visiblerect->min_x*/)
+    ,y_app_x(0),y_app_y(1),y_offs(0/*visiblerect->min_y*/)
      {
-        // if(flags & ORIENTATION_FLIP_X) flipx();
-        // if(flags & ORIENTATION_FLIP_Y) flipy();
-        // if(flags & ORIENTATION_SWAP_XY) swapxy();
-        switch(flags)
-        {
-            case ORIENTATION_FLIP_X:
-                x_app_x = -1;
-                x_app_y = 0;
-                x_offs = _visiblerect->max_x ;
-            break;
-            case ORIENTATION_FLIP_Y:
-                y_app_x = 0;
-                y_app_y = -1;
-                y_offs = _visiblerect->max_y ;
-            break;
-            case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-                x_app_x = -1;
-                x_app_y = 0;
-                x_offs = _visiblerect->max_x ;
-                y_app_x = 0;
-                y_app_y = -1;
-                y_offs = _visiblerect->max_y ;
-            break;
-//---- swap
-           case ORIENTATION_SWAP_XY:
-                break;
-           case ORIENTATION_FLIP_X|ORIENTATION_SWAP_XY:
-                // x_app_x = -1;
-                // x_app_y = 0;
-                // x_offs = (_visiblerect->max_x-_visiblerect->min_x) ;
-                // y_app_x = 0;
-                // y_app_y = 1;
-                // y_offs = _visiblerect->min_y ;
-            break;
-            case ORIENTATION_FLIP_Y|ORIENTATION_SWAP_XY:
-            // arkanoid
-                x_app_x = 0;
-                x_app_y = 1;
-                x_offs = _visiblerect->min_x ;
-                y_app_x = -1;
-                y_app_y = 0;
-                y_offs = _visiblerect->max_y;
-            break;
-            case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y|ORIENTATION_SWAP_XY:
+        if(flags & ORIENTATION_SWAP_XY) swapxy();
+        if(flags & ORIENTATION_FLIP_X) flipx();
+        if(flags & ORIENTATION_FLIP_Y) flipy();
+        // then report offset 0/1 to screen size
+        if(x_offs==0) x_offs = visiblerect->min_x;
+        else x_offs = visiblerect->max_x;
+        if(y_offs==0) y_offs = visiblerect->min_y;
+        else y_offs = visiblerect->max_y;
+//         switch(flags)
+//         {
+//            // case 0: break;
+//             case ORIENTATION_FLIP_X:
+//             printf("case fx\n");
+//                 x_app_x = -1;
+//                 x_app_y = 0;
+//                 x_offs = _visiblerect->max_x ;
+//             break;
+//             case ORIENTATION_FLIP_Y:
+//             printf("case fy\n");
+//                 y_app_x = 0;
+//                 y_app_y = -1;
+//                 y_offs = _visiblerect->max_y ;
+//             break;
+//             case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+//                 x_app_x = -1;
+//                 x_app_y = 0;
+//                 x_offs = _visiblerect->max_x ;
+//                 y_app_x = 0;
+//                 y_app_y = -1;
+//                 y_offs = _visiblerect->max_y ;
+//             break;
+// //---- swap
+//            case ORIENTATION_SWAP_XY:
+//                 break;
+//            case ORIENTATION_FLIP_X|ORIENTATION_SWAP_XY:
+//                 // x_app_x = -1;
+//                 // x_app_y = 0;
+//                 // x_offs = (_visiblerect->max_x-_visiblerect->min_x) ;
+//                 // y_app_x = 0;
+//                 // y_app_y = 1;
+//                 // y_offs = _visiblerect->min_y ;
+//             break;
+//             case ORIENTATION_FLIP_Y|ORIENTATION_SWAP_XY:
+//             //OK arkanoid
+//                 x_app_x = 0;
+//                 x_app_y = 1;
+//                 x_offs = _visiblerect->min_x ;
+//                 y_app_x = -1;
+//                 y_app_y = 0;
+//                 y_offs = _visiblerect->max_y;
+//             break;
+//             case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y|ORIENTATION_SWAP_XY:
 
-            break;
+//             break;
 
-        }
+//         }
 
      }
     mame_bitmap *_bitmap;
@@ -374,21 +330,21 @@ public:
     int x_app_x,x_app_y,x_offs;
     int y_app_x,y_app_y,y_offs;
 
-    // void swapxy() {
-    //     doSwap(x_app_x,y_app_x);
-    //     doSwap(x_app_y,y_app_y);
-    //     doSwap(x_offs,y_offs);
-    // }
-    // void flipx() {
-    //     x_offs = (_visiblerect->max_x-_visiblerect->min_x) ;
-    //     x_app_x = -x_app_x;
-    //     x_app_y = -x_app_y;
-    // }
-    // void flipy() {
-    //     y_offs = (_visiblerect->max_y-_visiblerect->min_y);
-    //     y_app_x = -y_app_x;
-    //     y_app_y = -y_app_y;
-    // }
+    void swapxy() {
+        doSwap(x_app_x,y_app_x);
+        doSwap(x_app_y,y_app_y);
+        doSwap(x_offs,y_offs);
+    }
+    void flipx() {
+        x_offs = 1 ;
+        x_app_x = -x_app_x;
+        x_app_y = -x_app_y;
+    }
+    void flipy() {
+        y_offs = 1;
+        y_app_x = -y_app_x;
+        y_app_y = -y_app_y;
+    }
     int x(int x,int y) const { return x_offs + x*x_app_x + y*x_app_y;  }
     int y(int x,int y) const { return y_offs + x*y_app_x + y*y_app_y;  }
     int dx() const { return  x_app_x+(y_app_x*_bitmap->rowpixels);  }

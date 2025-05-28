@@ -951,8 +951,8 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 					visible_left + visible_width - 1 + UI_BOX_LR_BORDER,
 					visible_top + visible_height - 1 + UI_BOX_TB_BORDER);
 
-    add_image(x1box,y1box,0);
-
+    add_image(x1box,y1box-6,0);
+    //add_image(x1box,y1box,0);
 
 	/* determine the first visible line based on the current selection */
 	top_line = selected - visible_lines / 2;
