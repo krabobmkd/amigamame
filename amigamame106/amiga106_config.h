@@ -238,7 +238,14 @@ public:
         float     _speedlimit = 100.0f;
         ULONG_FLAGS  _skipflags = 0;       
         int         _neogeo_bios = 0;
-        ULONG_FLAGS  _MiscFlags = 0;
+//        ULONG_FLAGS  _MiscFlags = 0;
+
+    #define GOODIESFLAGS_WHEEL 1
+    #define GOODIESFLAGS_GEAR 2
+        ULONG_FLAGS  _Goodies = GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR;
+
+    #define OPTIMFLAGS_DIRECTWGXWIN 1
+        ULONG_FLAGS  _Optims = OPTIMFLAGS_DIRECTWGXWIN;
 
         std::vector<std::string> _neogeoBiosList;
     };

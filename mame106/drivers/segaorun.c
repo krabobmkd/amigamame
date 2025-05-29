@@ -27,7 +27,7 @@
 #include "cpu/m68000/m68kops.h"
 
 #include "drawCtrl.h"
-
+#include "ui_text.h"
 #define MASTER_CLOCK			50000000
 #define SOUND_CLOCK				16000000
 
@@ -41,7 +41,7 @@
 static UINT16 *workram;
 static UINT16 *cpu1ram, *cpu1rom;
 
-static UINT8 adc_select;
+static UINT8 adc_select=0;
 
 static UINT8 irq2_state;
 static UINT8 vblank_irq_state;
@@ -177,23 +177,41 @@ void krb_outrun_m68k_op_tst_16_di(M68KOPT_PARAMS);
 
 static void krb_outrun_patch_cpu_synchro()
 {
-//    printf("krb_outrun_patch_cpu_synchro\n");
 	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
     if(pcodemain[0x00007dda>>1] == 0x4a79) // inst. 0x4a79 triggers m68k_op_tst_16_al()
     {   // replace that tst.w call by a patch, on an unused opcode.
         m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
         pcodemain[0x00007dda>>1] = 8;
+        //printf("orp1 done\n");
     }
 
-
-	// UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
- //    if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
- //    {
- //        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
- //        pcodesub[0x00001182>>1] = 9;
- //    }
+	UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+    if(pcodesub[0x00001182>>1] == 0x4a6d) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
+    {
+        m68ki_instruction_jump_table[9] = krb_outrun_m68k_op_tst_16_di; // &krb_outrun_m68k_op_tst_16_di;
+        pcodesub[0x00001182>>1] = 9;
+        //printf("orp2 done\n");
+    }
 
 }
+static void krb_shangon_patch_cpu_synchro()
+{
+	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
+    if(pcodemain[0x0000149c>>1] == 0x4a79) // inst. 0x4a79 triggers m68k_op_tst_16_al()
+    {   // replace that tst.w call by a patch, on an unused opcode.
+        m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
+        pcodemain[0x0000149c>>1] = 8;
+    }
+
+	 UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+     if(pcodesub[0x000010ca>>1] == 0x4a79)
+     {
+         m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
+         pcodesub[0x000010ca>>1] = 8;
+     }
+
+}
+
 
 static void outrun_generic_init(void)
 {
@@ -313,6 +331,8 @@ static void scanline_callback(int scanline)
 static void outrun_reset(void)
 {
 	cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+	//krb test, copy from xbd
+	cpu_boost_interleave(0, TIME_IN_USEC(100));
 }
 
 
@@ -396,6 +416,35 @@ static WRITE16_HANDLER( misc_io_w )
 }
 //krb: remember analog values that were tested this frame.
 // 0,1,2 are steering, gas, brakes.
+/*
+
+static READ16_HANDLER( outrun_custom_io_r )
+{
+	offset &= 0x7f/2;
+	switch (offset & 0x70/2)
+	{
+		case 0x00/2:
+			return ppi8255_0_r(offset & 3);
+
+		case 0x10/2:
+			return readinputport(offset & 3);
+
+		case 0x30/2:
+		{
+			static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
+			return readinputportbytag_safe(ports[adc_select], 0x0010);
+		}
+
+		case 0x60/2:
+			return watchdog_reset_r(0);
+	}
+
+	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	return segaic16_open_bus_r(0,0);
+}
+
+*/
+// int levervt[4]={0};
 
 static READ16_HANDLER( outrun_custom_io_r )
 {
@@ -408,19 +457,27 @@ static READ16_HANDLER( outrun_custom_io_r )
 		case 0x10/2:
 		{
             UINT16 lv = readinputport(offset & 3);
-            if((offset & 3) == 3)
+            if((offset & 3) == 0)
             {
-                commonControlsValues._lever = (int) lv;
-                commonControlsValues._leverCount++;
+                // note: this is read all along game
+                commonControlsValues._lever = (int) (lv & 16); // this is the bit for the gear position
+               // commonControlsValues._leverCount++;
             }
 			return lv;
         }
 		case 0x30/2:
 		{
+            // krb note:
+            // adc_select=0 steering wheel, 2 -> 127(center) ->254
+            // pressing left right arrow then get back to middle, using mouse let at last pos.
+            // ADC1: brake. bt b -> 2 to 254 in like 0.4 sec
 			static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
 			UINT16 vread = readinputportbytag_safe(ports[adc_select], 0x0010);
-			commonControlsValues.analogValues[adc_select] = (INT16) vread;
-			commonControlsValues.analogValuesReadCount[adc_select]++;
+			if(adc_select == 0)
+            {
+                commonControlsValues.analogValues[0] = (INT16) vread;
+               // commonControlsValues.analogValuesReadCount[0]++;
+            }
 			return vread;
 		}
 
@@ -430,17 +487,41 @@ static READ16_HANDLER( outrun_custom_io_r )
 
 //	loginfo(2,"%06X:outrun_custom_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(0,0);
+
+	// offset &= 0x7f/2;
+	// switch (offset & 0x70/2)
+	// {
+	// 	case 0x00/2:
+	// 		return ppi8255_0_r(offset & 3);
+
+	// 	case 0x10/2:
+	// 		return readinputport(offset & 3);
+
+	// 	case 0x30/2:
+	// 	{
+	// 		static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
+	// 		return readinputportbytag_safe(ports[adc_select], 0x0010);
+	// 	}
+
+	// 	case 0x60/2:
+	// 		return watchdog_reset_r(0);
+	// }
+
+	// return segaic16_open_bus_r(0,0);
 }
 
-
+extern void segaic16_sprites_draw_0_w_fast();
 static WRITE16_HANDLER( outrun_custom_io_w )
 {
-	offset &= 0x7f/2;
+
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
 			if (ACCESSING_LSB)
+			{
+                offset &= 0x7f/2;
 				ppi8255_0_w(offset & 3, data);
+            }
 			return;
 
 		case 0x20/2:
@@ -463,7 +544,15 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 			return;
 
 		case 0x70/2:
-			segaic16_sprites_draw_0_w(offset, data, mem_mask);
+		{
+    		//not used in that case: offset &= 0x7f/2;
+    		//optim this horror -> not much, copy 2kb each 2 frames.
+			//test
+			//segaic16_sprites_draw_0_w(offset, data, mem_mask);
+
+             segaic16_sprites_draw_0_w_fast();
+
+		}
 			return;
 	}
 //	loginfo(2,"%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
@@ -484,7 +573,14 @@ static READ16_HANDLER( shangon_custom_io_r )
 		case 0x3020/2:
 		{
 			static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return readinputportbytag_safe(ports[adc_select], 0x0010);
+			UINT16 vread = readinputportbytag_safe(ports[adc_select], 0x0010);
+			if(adc_select == 0)
+            {
+                commonControlsValues.analogValues[0] = 256-(INT16) vread;
+               // commonControlsValues.analogValuesReadCount[0]++;
+            }
+			return vread;
+
 		}
 	}
 //	loginfo(2,"%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
@@ -688,7 +784,11 @@ static INPUT_PORTS_START( outrun )
 	PORT_INCLUDE( outrun_generic )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_CODE(KEYCODE_SPACE)
+	// OH ITS GEAR SHIFT !!
+//	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_CODE(KEYCODE_SPACE)
+// todo have  PORT_CODE(KEYCODE_SPACE) back and test it
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE PORT_NAME(ui_getstring(UI_GearShift))
+	// PORT_NAME("Gear Shift")
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Cabinet ) )
@@ -712,6 +812,8 @@ static INPUT_PORTS_START( outrun )
 
 	PORT_START_TAG("ADC0")	/* steering */
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+    //PORT_NAME("Steering Wheel")
+    PORT_NAME(ui_getstring(UI_SteeringWheel))
 
 	PORT_START_TAG("ADC1")	/* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
@@ -1765,6 +1867,8 @@ static DRIVER_INIT( shangon )
 	outrun_generic_init();
 	custom_io_r = shangon_custom_io_r;
 	custom_io_w = shangon_custom_io_w;
+
+    krb_shangon_patch_cpu_synchro();
 }
 
 
@@ -1775,6 +1879,8 @@ static DRIVER_INIT( shangon3 )
 	fd1089_decrypt_0034();
 	custom_io_r = shangon_custom_io_r;
 	custom_io_w = shangon_custom_io_w;
+
+    krb_shangon_patch_cpu_synchro();
 }
 
 

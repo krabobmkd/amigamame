@@ -783,7 +783,10 @@ void memory_set_decrypted_region(int cpunum, offs_t start, offs_t end, void *bas
 
 				/* if this is live, adjust now */
 				if (cpu_getactivecpu() >= 0 && cpunum == cur_context && opcode_entry == banknum)
+				{
+				 //printf("memory_set_decrypted_region -> memory_set_opbase\n");
 					memory_set_opbase(activecpu_get_physical_pc_byte());
+                }
 			}
 			else if (bdata->base < end && bdata->end > start)
 				fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for CPU %d", start, end, cpunum);

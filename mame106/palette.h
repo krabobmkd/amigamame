@@ -195,8 +195,9 @@ double palette_get_global_brightness(void);
 
 pen_t get_black_pen(void);
 pen_t get_white_pen(void);
-pen_t get_blue_pen(void);
-pen_t get_grey_pen(void);
+//pen_t get_dblue_pen(void);
+//pen_t get_blue_pen(void);
+//pen_t get_grey_pen(void);
 
 /***************************************************************************
     static inline FUNCTIONS

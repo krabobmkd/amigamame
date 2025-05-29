@@ -37,6 +37,10 @@ typedef struct {
 } ULONG_SCREENMODEID;
 // list of booleans
 typedef unsigned int ULONG_FLAGS;
+
+// just to have write file optimized
+typedef int boolDefFalse;
+
 struct ASerializer {
     ASerializer()
     {}

@@ -369,8 +369,33 @@ void MUISerializer::Level::update()
 // - - - - - - - - - - - - - - -
 MUISerializer::LTabs::LTabs(MUISerializer &ser,ASerializable *pconf) : LGroup(ser,pconf,0)
 {
+    // _pageChangeHook.h_Entry =(RE_HOOKFUNC)&MUISerializer::LTabs::PageChangeNotify;
+    // _pageChangeHook.h_Data = this;
 
 }
+// ULONG MUISerializer::LTabs::PageChangeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
+// {
+//     if(!par || !hook) return 0;
+
+//     LTabs *plevel = (LTabs *)hook->h_Data;
+//    // (*plevel->_str) = *par;
+//  printf("clicked:%d\n",*par);
+//   if(*par == 0)
+//   { // very bad because not generic, if tab 0 clicked, give focus to fisrt element in subgroup
+//     struct Level *tab0l = plevel->_pFirstChild;
+//     if(tab0l)
+//     {
+//         if( tab0l->_Object)
+//         {
+//             Object *win =_win(obj);
+
+//             if(win) SetAttrs(win,MUIA_Window_ActiveObject,(ULONG)tab0l->_Object,NULL);
+//         }
+//     }
+//   }
+//     return 0;
+// }
+// MUIA_Group_ActivePage
 
 void MUISerializer::LTabs::compile()
 {
@@ -388,6 +413,7 @@ void MUISerializer::LTabs::compile()
     _registerTitles.push_back(NULL);
 
     std::vector<ULONG> tagitems={
+        MUIA_CycleChain, TRUE,
         MUIA_Register_Titles,(ULONG)_registerTitles.data()
     };
 
@@ -405,6 +431,16 @@ void MUISerializer::LTabs::compile()
 
     _Object = MUI_NewObjectA(MUIC_Register, (struct TagItem *) tagitems.data());
 
+    // if(_Object)
+    // {
+    //     // want a callback when page change
+    //     DoMethod(_Object,MUIM_Notify,
+    //                 MUIA_Group_ActivePage, // attribute that triggers the notification.
+    //                 MUIV_EveryTime, // TrigValue ,  every time when TrigAttr changes
+    //                 _Object, // object on which to perform the notification method. or MUIV_Notify_Self
+    //                 3, // FollowParams  number of following parameters (in hook ?)
+    //                 MUIM_CallHook,(ULONG) &_pageChangeHook,  MUIV_TriggerValue);
+    // }
 }
 // - - - - - - - - - - - - - - -
 MUISerializer::LGroup::LGroup(MUISerializer &ser,ASerializable *pconf,int flgs) : Level(ser), _flgs(flgs),
@@ -547,6 +583,7 @@ void MUISerializer::LFlags::compile()
                                 MUIA_Selected         , (ULONG)((startval&ib)?1:0),
                                 MUIA_Background       , MUII_ButtonBack,
                                 MUIA_ShowSelState     , FALSE,
+                                MUIA_CycleChain, TRUE,
                                 TAG_DONE);
 
         tagitems.push_back(Child);
@@ -659,7 +696,7 @@ void MUISerializer::LSwitchGroup::setGroup(const char *pid)
 // - - - - - - - - - - - - - - -
 
 MUISerializer::LString::LString(MUISerializer &ser,std::string &str,int flgs): Level(ser)
- , _str(&str),_flgs(flgs),_STRING_Path(NULL),_notifyHook({})
+ , _str(&str),_flgs(flgs),_STRING_Path(NULL),_popBt(NULL),_notifyHook({})
 {
 
 }
@@ -679,9 +716,11 @@ void MUISerializer::LString::compile()
         // if manage path, have a requester and all.
         _Object = MUI_NewObject(MUIC_Popasl,
                   MUIA_Popstring_String,(ULONG)(_STRING_Path = OString(0, 2048)),
-                  MUIA_Popstring_Button, (ULONG)(PopButton(MUII_PopDrawer)),
+                  MUIA_Popstring_Button, (ULONG)(_popBt= PopButton(MUII_PopDrawer)),
                   ASLFR_DrawersOnly, ( _flgs & SERFLAG_STRING_ISPATH )?TRUE:FALSE,
+                  MUIA_CycleChain, TRUE,
                 TAG_DONE);
+        if(_popBt) { SetAttrs(_popBt,MUIA_CycleChain, TRUE,TAG_DONE); }
     } else
     {
         // if just a simple editable string
@@ -701,7 +740,6 @@ void MUISerializer::LString::compile()
             MUIM_CallHook,(ULONG) &_notifyHook,  MUIV_TriggerValue
            );
     }
-
 
 }
 void  MUISerializer::LString::update()
@@ -732,6 +770,7 @@ void MUISerializer::LSlider::compile()
     _Object = MUI_NewObject(MUIC_Slider,
               MUIA_Slider_Min,    _min,
               MUIA_Slider_Max,    _max,
+              MUIA_CycleChain, TRUE,
             TAG_DONE);
     if(_Object)
     {
@@ -799,11 +838,13 @@ void MUISerializer::LSliderF::compile()
               MUIA_Slider_Min, 0  /* _min*/,
               MUIA_Slider_Max,    _nbsteps,
               MUIA_Slider_Quiet, TRUE, // we don't display the int value.
+              MUIA_CycleChain, TRUE,
             TAG_DONE);
 
     _pValueLabel = Label((ULONG)"-");
 
-    _pDefBt = SimpleButton((ULONG)"Default");
+    _pDefBt =  SimpleButton((ULONG)"Default");
+    if(_pDefBt) { SetAttrs(_pDefBt,MUIA_CycleChain, TRUE,TAG_DONE); }
 
    _Object =MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
             Child,(ULONG)_Slider,
@@ -882,7 +923,9 @@ ULONG MUISerializer::LCycle::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2)
 
 void MUISerializer::LCycle::compile()
 {
-    _Object = MUI_NewObject(MUIC_Cycle,MUIA_Cycle_Entries,(ULONG)_valuesptr.data(),TAG_DONE);
+    _Object = MUI_NewObject(MUIC_Cycle,
+        MUIA_CycleChain, TRUE,
+        MUIA_Cycle_Entries,(ULONG)_valuesptr.data(),TAG_DONE);
     if(_Object)
     {
         _notifyHook.h_Entry =(RE_HOOKFUNC)&HNotify;
@@ -931,6 +974,7 @@ void MUISerializer::LCheckBox::compile()
                 MUIA_Selected         , (ULONG)(_value?1:0),
                 MUIA_Background       , MUII_ButtonBack,
                 MUIA_ShowSelState     , FALSE,
+                MUIA_CycleChain, TRUE,
                 TAG_DONE);
 
  _Object = MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
@@ -995,7 +1039,7 @@ void MUISerializer::LScreenModeReq::compile()
     _ScreenModeStopHook.h_Data = this;
 
      _Object = MUI_NewObject(MUIC_Popasl,
-
+              MUIA_CycleChain, TRUE,
               MUIA_Popstring_String,(ULONG)( _DisplayName = MUI_NewObject(MUIC_Text,
                     TextFrame,
                     MUIA_Background, MUII_TextBack,
@@ -1038,13 +1082,30 @@ ULONG MUISerializer::LScreenModeReq::PopupStop(struct Hook *hook REG(a0), APTR p
     if(!hook || !popasl || !hook->h_Data) return 1;
     MUISerializer::LScreenModeReq *plevel = (MUISerializer::LScreenModeReq *)hook->h_Data;
 
-    plevel->_ScreenModeTags[SMT_DISPLAYID].ti_Data = smreq->sm_DisplayID;
-    plevel->_ScreenModeTags[SMT_DEPTH].ti_Data   = smreq->sm_DisplayDepth;
+    ULONG modeid,depth;
+    plevel->_ScreenModeTags[SMT_DISPLAYID].ti_Data = modeid = smreq->sm_DisplayID;
+    depth = smreq->sm_DisplayDepth;
+
+    // and... there's an ASL or p96 bug that will not change previous depth if 16b or 24b...
+    if(modeid != INVALID_ID)
+    {
+        LONG v;
+        struct DimensionInfo dims;
+        v = GetDisplayInfoData(NULL, (UBYTE *) &dims, sizeof(struct DimensionInfo),
+                     DTAG_DIMS, modeid);
+        if(v>0)
+        {
+            int maxdepth = (int)dims.MaxDepth;
+            if(maxdepth>8) depth = maxdepth;
+        }
+
+    }
+    plevel->_ScreenModeTags[SMT_DEPTH].ti_Data  = depth;
 
     if(plevel->_value)
     {
-        plevel->_value->_modeId = smreq->sm_DisplayID;
-        plevel->_value->_depth = smreq->sm_DisplayDepth;
+        plevel->_value->_modeId = modeid;
+        plevel->_value->_depth = depth;
     }
     plevel->SetDisplayName(*(plevel->_value));
 
@@ -1072,7 +1133,7 @@ void MUISerializer::LScreenModeReq::SetDisplayName(ULONG_SCREENMODEID &displayid
         {
             int nbc=1<<displayid._depth;
             char t[8];
-            snprintf(&t[0],7," %dc",nbc);
+            snprintf(&t[0],7," %dc",nbc); //256c
             _strDisplay += t;
         }
 

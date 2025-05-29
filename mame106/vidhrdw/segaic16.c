@@ -368,14 +368,14 @@ Quick review of the system16 hardware:
  *  Type definitions
  *
  *************************************/
-
-struct palette_info
-{
-	INT32			entries;						/* number of entries (not counting shadows) */
-	UINT8			normal[32];						/* RGB translations for normal pixels */
-	UINT8			shadow[32];						/* RGB translations for shadowed pixels */
-	UINT8			hilight[32];					/* RGB translations for hilighted pixels */
-};
+//moved .h
+//struct palette_info
+//{
+//	INT32			entries;						/* number of entries (not counting shadows) */
+//	UINT8			normal[32];						/* RGB translations for normal pixels */
+//	UINT8			shadow[32];						/* RGB translations for shadowed pixels */
+//	UINT8			hilight[32];					/* RGB translations for hilighted pixels */
+//};
 
 
 struct tilemap_callback_info
@@ -409,21 +409,21 @@ struct tilemap_info
 	UINT16 *		tileram;						/* pointer to tileram pointer */
 };
 
-
-struct sprite_info
-{
-	UINT8			index;							/* index of this structure */
-	UINT8			type;							/* type of sprite system (see segaic16.h for details) */
-	UINT8			flip;							/* screen flip? */
-	UINT8			shadow;							/* shadow or hilight? */
-	UINT8			bank[16];						/* banking redirection */
-	UINT16			colorbase;						/* base color index */
-	INT32			ramsize;						/* size of sprite RAM */
-	INT32			xoffs;							/* X scroll offset */
-	void			(*draw)(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
-	UINT16 *		spriteram;						/* pointer to spriteram pointer */
-	UINT16 *		buffer;							/* buffered spriteram for those that use it */
-};
+//moved .h
+//struct sprite_info
+//{
+//	UINT8			index;							/* index of this structure */
+//	UINT8			type;							/* type of sprite system (see segaic16.h for details) */
+//	UINT8			flip;							/* screen flip? */
+//	UINT8			shadow;							/* shadow or hilight? */
+//	UINT8			bank[16];						/* banking redirection */
+//	UINT16			colorbase;						/* base color index */
+//	INT32			ramsize;						/* size of sprite RAM */
+//	INT32			xoffs;							/* X scroll offset */
+//	void			(*draw)(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
+//	UINT16 *		spriteram;						/* pointer to spriteram pointer */
+//	UINT16 *		buffer;							/* buffered spriteram for those that use it */
+//};
 
 
 struct road_info
@@ -442,17 +442,6 @@ struct road_info
 };
 
 
-struct rotate_info
-{
-	UINT8			index;							/* index of this structure */
-	UINT8			type;							/* type of rotate system (see segaic16.h for details) */
-	UINT16			colorbase;						/* base color index */
-	INT32			ramsize;						/* size of rotate RAM */
-	UINT16 *		rotateram;						/* pointer to rotateram pointer */
-	UINT16 *		buffer;							/* buffered data */
-};
-
-
 
 /*************************************
  *
@@ -468,19 +457,17 @@ UINT16 *segaic16_spriteram_1;
 UINT16 *segaic16_roadram_0;
 UINT16 *segaic16_rotateram_0;
 
-
-
 /*************************************
  *
  *  Statics
  *
  *************************************/
 
-static struct palette_info palette;
+struct palette_info palette;
 static struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
 static struct sprite_info sprites[SEGAIC16_MAX_SPRITES];
 static struct road_info road[SEGAIC16_MAX_ROADS];
-static struct rotate_info rotate[SEGAIC16_MAX_ROTATE];
+struct rotate_info segaic16_ybd_rotate[SEGAIC16_MAX_ROTATE];
 
 
 /*************************************
@@ -1688,178 +1675,8 @@ static void segaic16_sprites_hangon_draw(struct sprite_info *info, mame_bitmap *
 	}
 }
 
-
-
-/*******************************************************************************************
- *
- *  Space Harrier-style sprites
- *
- *      Offs  Bits               Usage
- *       +0   bbbbbbbb --------  Bottom scanline of sprite - 1
- *       +0   -------- tttttttt  Top scanline of sprite - 1
- *       +2   bbbb---- --------  Sprite bank
- *       +2   -------x xxxxxxxx  X position of sprite (position $BD is screen position 0)
- *       +4   s------- --------  Sprite shadow enable (0=enable, 1=disable)
- *       +4   -p------ --------  Sprite priority
- *       +4   --cccccc --------  Sprite color palette
- *       +4   -------- -ppppppp  Signed 7-bit pitch value between scanlines
- *       +6   f------- --------  Horizontal flip: read the data backwards if set
- *       +6   -ooooooo oooooooo  Offset within selected sprite bank
- *       +8   --zzzzzz --------  Horizontal zoom factor
- *       +8   -------- --zzzzzz  Vertical zoom factor
- *       +E   dddddddd dddddddd  Scratch space for current address
- *
- *  Special notes:
- *
- *      There is an interaction between the horizonal flip bit and the offset.
- *      The offset is maintained as a 16-bit value, even though only the lower
- *      15 bits are used for the address. The top bit is used to control flipping.
- *      This means that if the low 15 bits overflow during rendering, the sprite
- *      data will be read backwards after the overflow. This is important to
- *      emulate correctly as many games make use of this feature to render sprites
- *      at the beginning of a bank.
- *
- *******************************************************************************************/
-
-#define sharrier_draw_pixel()												\
-	/* only draw if onscreen, not 0 or 15 */								\
-	if (pix != 0 && pix != 15)												\
-	{																		\
-		/* are we high enough priority to be visible? */					\
-		if (sprpri > pri[x])												\
-		{																	\
-			/* shadow/hilight mode? */										\
-			if (shadow && pix == 0xa)										\
-				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
-																			\
-			/* regular draw */												\
-			else															\
-				dest[x] = pix | color;										\
-		}																	\
-																			\
-		/* always mark priority so no one else draws here */				\
-		pri[x] = 0xff;														\
-	}																		\
-
-static void segaic16_sprites_sharrier_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
-{
-	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x20000;
-	const UINT32 *spritebase = (const UINT32 *)memory_region(REGION_GFX2);
-	const UINT8 *zoom = (const UINT8 *)memory_region(REGION_PROMS);
-	UINT16 *data;
-
-	/* first scan forward to find the end of the list */
-	for (data = info->spriteram; data < info->spriteram + info->ramsize/2; data += 8)
-		if ((data[0] >> 8) > 0xf0)
-			break;
-
-	/* now scan backwards and render the sprites in order */
-	for (data -= 8; data >= info->spriteram; data -= 8)
-	{
-		int bottom  = (data[0] >> 8) + 1;
-		int top     = (data[0] & 0xff) + 1;
-		int bank    = info->bank[(data[1] >> 12) & 0x7];
-		int xpos    = (data[1] & 0x1ff) - 0xbd;
-		int shadow  = (~data[2] >> 15) & 1;
-		int sprpri  = ((data[2] >> 14) & 1) ? (1<<3) : (1<<1);
-		int color   = info->colorbase + (((data[2] >> 8) & 0x3f) << 4);
-		int pitch   = (INT16)(data[2] << 9) >> 9;
-		UINT16 addr = data[3];
-		int hzoom   = ((data[4] >> 8) & 0x3f) << 1;
-		int vzoom   = (data[4] >> 0) & 0x3f;
-		int x, y, pix, zaddr, zmask;
-		const UINT32 *spritedata;
-
-		/* initialize the end address to the start address */
-		data[7] = addr;
-
-		/* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
-		if ((top >= bottom) || bank == 255)
-			continue;
-
-		/* clamp to within the memory region size */
-		if (numbanks)
-			bank %= numbanks;
-		spritedata = spritebase + 0x8000 * bank;
-
-		/* determine the starting zoom address and mask */
-		zaddr = (vzoom & 0x38) << 5;
-		zmask = 1 << (vzoom & 7);
-
-		/* loop from top to bottom */
-		for (y = top; y < bottom; y++)
-		{
-			/* advance a row */
-			addr += pitch;
-
-			/* if the zoom bit says so, add pitch a second time */
-			if (zoom[zaddr++] & zmask)
-				addr += pitch;
-
-			/* skip drawing if not within the cliprect */
-			if (y >= cliprect->min_y && y <= cliprect->max_y)
-			{
-				UINT16 *dest = (UINT16 *)bitmap->line[y];
-				UINT8 *pri = (UINT8 *)priority_bitmap->line[y];
-				int xacc = 0x00;
-
-				/* note that the System 16A sprites have a design flaw that allows the address */
-				/* to carry into the flip flag, which is the topmost bit -- it is very important */
-				/* to emulate this as the games compensate for it */
-
-				/* non-flipped case */
-				if (!(addr & 0x8000))
-				{
-					/* start at the word before because we preincrement below */
-					data[7] = addr - 1;
-					for (x = xpos; x <= cliprect->max_x; )
-					{
-						UINT32 pixels = spritedata[++data[7] & 0x7fff];
-
-						/* draw 8 pixels */
-						pix = (pixels >> 28) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-
-						/* stop if the last pixel in the group was 0xf */
-						if (pix == 15)
-							break;
-					}
-				}
-
-				/* flipped case */
-				else
-				{
-					/* start at the word after because we predecrement below */
-					data[7] = addr + 1;
-					for (x = xpos; x <= cliprect->max_x; )
-					{
-						UINT32 pixels = spritedata[--data[7] & 0x7fff];
-
-						/* draw 8 pixels */
-						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-						pix = (pixels >> 28) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect->min_x) sharrier_draw_pixel(); x++; }
-
-						/* stop if the last pixel in the group was 0xf */
-						if (pix == 15)
-							break;
-					}
-				}
-			}
-		}
-	}
-}
+//moved
+void segaic16_sprites_sharrier_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
 
 
 
@@ -2350,394 +2167,10 @@ static void segaic16_sprites_yboard_16b_draw(struct sprite_info *info, mame_bitm
 
 
 
-/*******************************************************************************************
- *
- *  Out Run/X-Board-style sprites
- *
- *      Offs  Bits               Usage
- *       +0   e------- --------  Signify end of sprite list
- *       +0   -h-h---- --------  Hide this sprite if either bit is set
- *       +0   ----bbb- --------  Sprite bank
- *       +0   -------t tttttttt  Top scanline of sprite + 256
- *       +2   oooooooo oooooooo  Offset within selected sprite bank
- *       +4   ppppppp- --------  Signed 7-bit pitch value between scanlines
- *       +4   -------x xxxxxxxx  X position of sprite (position $BE is screen position 0)
- *       +6   -s------ --------  Enable shadows
- *       +6   --pp---- --------  Sprite priority, relative to tilemaps
- *       +6   ------vv vvvvvvvv  Vertical zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size)
- *       +8   y------- --------  Render from top-to-bottom (1) or bottom-to-top (0) on screen
- *       +8   -f------ --------  Horizontal flip: read the data backwards if set
- *       +8   --x----- --------  Render from left-to-right (1) or right-to-left (0) on screen
- *       +8   ------hh hhhhhhhh  Horizontal zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size)
- *       +E   dddddddd dddddddd  Scratch space for current address
- *
- *    Out Run only:
- *       +A   hhhhhhhh --------  Height in scanlines - 1
- *       +A   -------- -ccccccc  Sprite color palette
- *
- *    X-Board only:
- *       +A   ----hhhh hhhhhhhh  Height in scanlines - 1
- *       +C   -------- cccccccc  Sprite color palette
- *
- *******************************************************************************************/
-
-#define outrun_draw_pixel() 												\
-	/* only draw if onscreen, not 0 or 15 */								\
-	if (x >= cliprect->min_x && x <= cliprect->max_x && pix != 0 && pix != 15) \
-	{																		\
-		/* are we high enough priority to be visible? */					\
-		if (sprpri > pri[x])												\
-		{																	\
-			/* shadow/hilight mode? */										\
-			if (shadow && pix == 0xa)										\
-				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
-																			\
-			/* regular draw */												\
-			else															\
-				dest[x] = pix | color;										\
-		}																	\
-																			\
-		/* always mark priority so no one else draws here */				\
-		pri[x] = 0xff;														\
-	}																		\
-
-static void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
-{
-	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x40000;
-	const UINT32 *spritebase = (const UINT32 *)memory_region(REGION_GFX2);
-	UINT16 *data;
-
-	/* first scan forward to find the end of the list */
-	for (data = info->buffer; data < info->buffer + info->ramsize/2; data += 8)
-		if (data[0] & 0x8000)
-			break;
-
-	/* now scan backwards and render the sprites in order */
-	for (data -= 8; data >= info->buffer; data -= 8)
-	{
-		int hide    = (data[0] & 0x5000);
-		int bank    = (data[0] >> 9) & 7;
-		int top     = (data[0] & 0x1ff) - 0x100;
-		UINT16 addr = data[1];
-		int pitch   = (INT16)((data[2] >> 1) | ((data[4] & 0x1000) << 3)) >> 8;
-		int xpos    = data[2] & 0x1ff;
-		int shadow  = (data[3] >> 14) & 1;
-		int sprpri  = 1 << ((data[3] >> 12) & 3);
-		int vzoom   = data[3] & 0x7ff;
-		int ydelta  = (data[4] & 0x8000) ? 1 : -1;
-		int flip    = (~data[4] >> 14) & 1;
-		int xdelta  = (data[4] & 0x2000) ? 1 : -1;
-		int hzoom   = data[4] & 0x7ff;
-		int height  = ((info->type == SEGAIC16_SPRITES_OUTRUN) ? (data[5] >> 8) : (data[5] & 0xfff)) + 1;
-		int color   = info->colorbase + (((info->type == SEGAIC16_SPRITES_OUTRUN) ? (data[5] & 0x7f) : (data[6] & 0xff)) << 4);
-		int x, y, ytarget, yacc = 0, pix;
-		const UINT32 *spritedata;
-
-		/* adjust X coordinate */
-		/* note: the threshhold below is a guess. If it is too high, rachero will draw garbage */
-		/* If it is too low, smgp won't draw the bottom part of the road */
-		if (xpos < 0x80 && xdelta < 0)
-			xpos += 0x200;
-		xpos -= 0xbe;
-
-		/* initialize the end address to the start address */
-		data[7] = addr;
-
-		/* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
-		if (hide || height == 0)
-			continue;
-
-		/* clamp to within the memory region size */
-		if (numbanks)
-			bank %= numbanks;
-		spritedata = spritebase + 0x10000 * bank;
-
-		/* clamp to a maximum of 8x (not 100% confirmed) */
-		if (vzoom < 0x40) vzoom = 0x40;
-		if (hzoom < 0x40) hzoom = 0x40;
-
-		/* loop from top to bottom */
-		ytarget = top + ydelta * height;
-		for (y = top; y != ytarget; y += ydelta)
-		{
-			/* skip drawing if not within the cliprect */
-			if (y >= cliprect->min_y && y <= cliprect->max_y)
-			{
-				UINT16 *dest = (UINT16 *)bitmap->line[y];
-				UINT8 *pri = (UINT8 *)priority_bitmap->line[y];
-				int xacc = 0;
-
-				/* non-flipped case */
-				if (!flip)
-				{
-					/* start at the word before because we preincrement below */
-					data[7] = addr - 1;
-					for (x = xpos; (xdelta > 0 && x <= cliprect->max_x) || (xdelta < 0 && x >= cliprect->min_x); )
-					{
-						UINT32 pixels = spritedata[++data[7]];
-
-						/* draw four pixels */
-						pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 20) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 16) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 12) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  8) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-
-						/* stop if the second-to-last pixel in the group was 0xf */
-						if ((pixels & 0x000000f0) == 0x000000f0)
-							break;
-					}
-				}
-
-				/* flipped case */
-				else
-				{
-					/* start at the word after because we predecrement below */
-					data[7] = addr + 1;
-					for (x = xpos; (xdelta > 0 && x <= cliprect->max_x) || (xdelta < 0 && x >= cliprect->min_x); )
-					{
-						UINT32 pixels = spritedata[--data[7]];
-
-						/* draw four pixels */
-						pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  8) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 12) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 16) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 20) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { outrun_draw_pixel(); x += xdelta; xacc += hzoom; } xacc -= 0x200;
-
-						/* stop if the second-to-last pixel in the group was 0xf */
-						if ((pixels & 0x0f000000) == 0x0f000000)
-							break;
-					}
-				}
-			}
-
-			/* accumulate zoom factors; if we carry into the high bit, skip an extra row */
-			yacc += vzoom;
-			addr += pitch * (yacc >> 9);
-			yacc &= 0x1ff;
-		}
-	}
-}
-
-
-
-/*******************************************************************************************
- *
- *  Y-Board-style sprites
- *
- *      Offs  Bits               Usage
- *       +0   e------- --------  Signify end of sprite list
- *       +0   -----iii iiiiiiii  Address of indirection table (/16)
- *       +2   bbbb---- --------  Upper 4 bits of bank index
- *       +2   ----xxxx xxxxxxxx  X position of sprite (position $600 is screen position 0)
- *       +4   bbbb---- --------  Lower 4 bits of bank index
- *       +4   ----yyyy yyyyyyyy  Y position of sprite (position $600 is screen position 0)
- *       +6   oooooooo oooooooo  Offset within selected sprite bank
- *       +8   hhhhhhhh hhhhhhhh  Height of sprite
- *       +A   -y------ --------  Render from top-to-bottom (1) or bottom-to-top (0) on screen
- *       +A   --f----- --------  Horizontal flip: read the data backwards if set
- *       +A   ---x---- --------  Render from left-to-right (1) or right-to-left (0) on screen
- *       +A   -----zzz zzzzzzzz  Zoom factor
- *       +C   -ccc---- --------  Sprite color
- *       +C   ----rrrr --------  Sprite priority
- *       +C   -------- pppppppp  Signed 8-bit pitch value between scanlines
- *       +E   ----nnnn nnnnnnnn  Index of next sprite
- *
- *  In addition to these parameters, the sprite area is clipped using scanline extents
- *  stored for every pair of scanlines in the rotation RAM. It's a bit of a cheat for us
- *  to poke our nose into the rotation structure, but there are no known cases of Y-board
- *  sprites without rotation RAM.
- *
- *******************************************************************************************/
-
-
-static inline void yboard_draw_pixel(int x,int minx, int maxx, int ind, int colorpri,UINT16 *dest )
-{
-    if (x >= minx && x <= maxx && ind < 0x01fe)
-        dest[x] = ind | colorpri;
-}
-
-static void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
-{
-	UINT8 numbanks = (UINT8)(memory_region_length(REGION_GFX1) / 0x80000);
-	const UINT64 *spritebase = (const UINT64 *)memory_region(REGION_GFX1);
-	const UINT16 *rotatebase = rotate[0].buffer ? rotate[0].buffer : rotate[0].rotateram;
-	static UINT8 visited[0x1000];
-	UINT16 *data;
-	UINT32 next = 0;
-	int y;
-
-	/* reset the visited list */
-	memset(visited, 0, sizeof(visited));
-
-	/* clear out any scanlines we might be using */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		if (!(rotatebase[y & ~1] & 0xc000))
-			memset(&((UINT16 *)bitmap->line[y])[cliprect->min_x], 0xff, (cliprect->max_x - cliprect->min_x + 1) * sizeof(UINT16));
-
-	/* now scan backwards and render the sprites in order */
-	for (data = info->spriteram; !(data[0] & 0x8000) && !visited[next]; data = info->spriteram + (next<<3))
-	{
-		int hide    = (data[0] & 0x5000);
-		UINT16 *indirect = info->spriteram + ((data[0] & 0x7ff) << 4);
-		int bank    = ((data[1] >> 8) & 0x10) | ((data[2] >> 12) & 0x0f);
-		int xpos    = (data[1] & 0x0fff) - 0x600;
-		int top     = (data[2] & 0x0fff) - 0x600;
-		UINT16 addr = data[3];
-		int height  = data[4];
-		int ydelta  = (data[5] & 0x4000) ? 1 : -1;
-		int flip    = (~data[5] >> 13) & 1;
-		int xdelta  = (data[5] & 0x1000) ? 1 : -1;
-		int zoom    = data[5] & 0x7ff;
-		int colorpri= (data[6] << 1) & 0x0000fe00;
-		int pitch   = (INT8)data[6];
-		int x, y, ytarget, yacc = 0, pix, ind;
-		const UINT64 *spritedata;
-		UINT16 offs;
-
-//        if(dh)
-//        {
-//            fprintf(dh,"%04x ",(int)next);
-//            jj++;
-//                if(jj==32) {
-//                    fprintf(dh,"\n");
-//                    jj=0;
-//                }
-//         }
-
-		/* note that we've visited this entry and get the offset of the next one */
-		visited[next] = 1;
-		next = data[7] & 0x0fff;
-
-		/* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
-		if (hide || height == 0)
-			continue;
-
-		/* clamp to within the memory region size */
-		if (numbanks)
-			bank %= numbanks;
-		spritedata = spritebase + 0x10000 * bank;
-
-		/* clamp to a maximum of 8x (not 100% confirmed) */
-		if (zoom == 0) zoom = 1;
-
-		/* loop from top to bottom */
-		ytarget = top + ydelta * height;
-		for (y = top; y != ytarget; y += ydelta)
-		{
-			/* skip drawing if not within the cliprect */
-			if (y >= cliprect->min_y && y <= cliprect->max_y)
-			{
-				UINT16 *dest = (UINT16 *)bitmap->line[y];
-				int minx = rotatebase[y & ~1];
-				int maxx = rotatebase[y |  1];
-				int xacc = 0;
-
-				/* bit 0x8000 from rotate RAM means that Y is above the top of the screen */
-				if ((minx & 0x8000) && ydelta < 0)
-					break;
-
-				/* bit 0x4000 from rotate RAM means that Y is below the bottom of the screen */
-				if ((minx & 0x4000) && ydelta > 0)
-					break;
-
-				/* if either bit is set, skip the rest for this scanline */
-				if (!(minx & 0xc000))
-				{
-					/* clamp min/max to the cliprect */
-					minx -= 0x600;
-					maxx -= 0x600;
-					if (minx < cliprect->min_x)
-						minx = cliprect->min_x;
-					if (maxx > cliprect->max_x)
-						maxx = cliprect->max_x;
-
-					/* non-flipped case */
-					if (!flip)
-					{
-						/* start at the word before because we preincrement below */
-						offs = addr - 1;
-						for (x = xpos; (xdelta > 0 && x <= maxx) || (xdelta < 0 && x >= minx); )
-						{
-							UINT64 pixels = spritedata[++offs];
-
-							/* draw four pixels */
-							pix = (pixels >> 60) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 56) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 52) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 48) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 44) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 40) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 36) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 32) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 28) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 24) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 20) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 16) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 12) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  8) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  4) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  0) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-
-							/* stop if the second-to-last pixel in the group was 0xf */
-							if (pix == 0x0f)
-								break;
-						}
-					}
-
-					/* flipped case */
-					else
-					{
-						/* start at the word after because we predecrement below */
-						offs = addr + 1;
-						for (x = xpos; (xdelta > 0 && x <= maxx) || (xdelta < 0 && x >= minx); )
-						{
-							UINT64 pixels = spritedata[--offs];
-
-							/* draw four pixels */
-							pix = (pixels >>  0) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  4) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >>  8) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 12) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 16) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 20) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 24) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 28) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 32) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 36) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 40) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 44) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 48) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 52) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 56) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-							pix = (pixels >> 60) & 0xf; ind = indirect[pix]; while (xacc < 0x200) { yboard_draw_pixel(x,minx,maxx,ind,colorpri,dest); x += xdelta; xacc += zoom; } xacc -= 0x200;
-
-							/* stop if the second-to-last pixel in the group was 0xf */
-							if (pix == 0x0f)
-								break;
-						}
-					}
-				}
-			}
-
-			/* accumulate zoom factors; if we carry into the high bit, skip an extra row */
-			yacc += zoom;
-			addr += pitch * (yacc >> 9);
-			yacc &= 0x1ff;
-		}
-	//	nbi++;
-	}
-
-}
-
-
+//krb: moved to cpp
+void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
+void segaic16_sprites_thndrbld_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
+void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
 
 /*************************************
  *
@@ -2798,8 +2231,12 @@ int segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
 			break;
 
 		case SEGAIC16_SPRITES_OUTRUN:
-		case SEGAIC16_SPRITES_XBOARD:
 			info->draw = segaic16_sprites_outrun_draw;
+			info->ramsize = 0x1000;
+			buffer = 1;
+			break;
+		case SEGAIC16_SPRITES_XBOARD:
+			info->draw = segaic16_sprites_thndrbld_draw;
 			info->ramsize = 0x1000;
 			buffer = 1;
 			break;
@@ -2914,35 +2351,86 @@ void segaic16_sprites_set_shadow(int which, int shadow)
  *
  *************************************/
 
-static void segaic16_sprites_buffer(struct sprite_info *info)
+//OPTIM THAT -> no, used once per 2 frames.
+static inline void segaic16_sprites_buffer(struct sprite_info *info)
 {
 	if (info->buffer)
 	{
+#ifdef DONTDOIT
+    // was  a test, doesn't update parts of sprite defs...
+        // test using pointer swap
+        UINT16 *p = info->spriteram;
+        info->spriteram = info->buffer;
+        info->buffer = p;
+        if(info->index == 0) segaic16_spriteram_0 = info->spriteram ;
+        if(info->index == 1) segaic16_spriteram_1 = info->spriteram ;
+#endif
+
 		UINT32 *src = (UINT32 *)info->spriteram;
 		UINT32 *dst = (UINT32 *)info->buffer;
 		int i;
 
+        // outrun info->ramsize 4096 , so copy 2kb each 2 frames... (per sprite slots)
+        // 8.w -> 16b per sprite -> 4.l
+// int endfound = 0;
 		/* swap the halves of the sprite RAM */
-		for (i = 0; i < info->ramsize/4; i++)
+		for (i = 0; i < info->ramsize/(2*2*4 ); i++) // 2 because half the buffer, 2 because .w->.l copy, 4 because per sprite slot
 		{
 			UINT32 temp = *src;
+			*src++ = *dst;
+			*dst++ = temp;
+			// krb note about this optimisation:
+			// well, would divide by 2 or 3 the copy length most of the time...
+			// let's consider it's a  good optimisation. Any byte read won is worth because of cache issues.
+			// no copy at all would be again better.
+#ifdef LSB_FIRST
+			if( temp & 0x00008000) { // krb optim, means end of sprite chain.
+			//endfound = 1;
+     			break;
+			 }
+#else
+			if( temp & 0x80000000) { // krb optim, means end of sprite chain.
+			//endfound = 1;
+     			break;
+			 }
+#endif
+			temp = *src;
+			*src++ = *dst;
+			*dst++ = temp;
+			temp = *src;
+			*src++ = *dst;
+			*dst++ = temp;
+			temp = *src;
 			*src++ = *dst;
 			*dst++ = temp;
 		}
 
 		/* hack for thunderblade */
 		*info->spriteram = 0xffff;
+
+        // if(endfound == 0)
+        // {
+        //  printf("no end found\n");
+        //  exit(0);
+        // }
 	}
 
 	/* we will render the sprites when the video update happens */
 }
 
 
+
+// krb note: on outrun it will only use segaic16_sprites_draw_0_w once each 2 frames.
+// the "double buffer" sprite bank swap is "per frame".
 WRITE16_HANDLER( segaic16_sprites_draw_0_w )
 {
 	segaic16_sprites_buffer(&sprites[0]);
 }
+void segaic16_sprites_draw_0_w_fast() // fast because takes no param.
+{
+	segaic16_sprites_buffer(&sprites[0]);
 
+}
 
 WRITE16_HANDLER( segaic16_sprites_draw_1_w )
 {
@@ -3790,7 +3278,7 @@ WRITE16_HANDLER( segaic16_road_control_0_w )
 
 int segaic16_rotate_init(int which, int type, int colorbase)
 {
-	struct rotate_info *info = &rotate[which];
+	struct rotate_info *info = &segaic16_ybd_rotate[which];
 
 	/* reset the tilemap info */
 	memset(info, 0, sizeof(*info));
@@ -3839,7 +3327,7 @@ int segaic16_rotate_init(int which, int type, int colorbase)
 
 void segaic16_rotate_draw(int which, mame_bitmap *bitmap, const rectangle *cliprect, mame_bitmap *srcbitmap)
 {
-	struct rotate_info *info = &rotate[which];
+	struct rotate_info *info = &segaic16_ybd_rotate[which];
 	INT32 currx = (info->buffer[0x3f0] << 16) | info->buffer[0x3f1];
 	INT32 curry = (info->buffer[0x3f2] << 16) | info->buffer[0x3f3];
 	INT32 dyy = (info->buffer[0x3f4] << 16) | info->buffer[0x3f5];
@@ -3902,7 +3390,7 @@ void segaic16_rotate_draw(int which, mame_bitmap *bitmap, const rectangle *clipr
 
 READ16_HANDLER( segaic16_rotate_control_0_r )
 {
-	struct rotate_info *info = &rotate[0];
+	struct rotate_info *info = &segaic16_ybd_rotate[0];
 
 	if (info->buffer)
 	{

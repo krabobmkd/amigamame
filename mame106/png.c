@@ -131,6 +131,7 @@ int png_inflate_image (png_info *p)
 	{
 		loginfo(2,"Out of memory\n");
 		free (p->zimage);
+		p->zimage = NULL;
 		return 0;
 	}
 
@@ -141,6 +142,7 @@ int png_inflate_image (png_info *p)
 	}
 
 	free (p->zimage);
+	p->zimage = NULL;
 	return 1;
 }
 

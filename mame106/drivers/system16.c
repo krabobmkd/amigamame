@@ -155,6 +155,7 @@ Notes:
 #include "sound/msm5205.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
+#include "ui_text.h"
 
 void fd1094_machine_init(void);
 void fd1094_driver_init(void);
@@ -1375,8 +1376,9 @@ static DRIVER_INIT( goldnabl )
 }
 
 /***************************************************************************/
-
+//krb note:unused by goldnaxe, just by bootleg.
 INPUT_PORTS_START( goldnaxe )
+
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE
@@ -1768,8 +1770,8 @@ static DRIVER_INIT( shinobi )
 /***************************************************************************/
 
 INPUT_PORTS_START( shinobi )
-	SYS16_JOY1
-	SYS16_JOY2
+	SYS16_JOY1_N(UI_Attack,UI_Jump,UI_NinjaMagic)
+	SYS16_JOY2_N(UI_Attack,UI_Jump,UI_NinjaMagic)
 	SYS16_SERVICE
 	SYS16_COINAGE
 

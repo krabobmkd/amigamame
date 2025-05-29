@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "segaic16.h"
 #include "includes/system16.h"
-
+#include "bootlog.h"
 
 
 /*************************************
@@ -25,9 +25,11 @@ static UINT8 road_priority;
  *  Video startup
  *
  *************************************/
-
+// void krb_thndrbld_patch_cpu_synchro();
+//int thndrbldpatchdone;
 VIDEO_START( xboard )
 {
+    //thndrbldpatchdone=0;
 	/* compute palette info */
 	segaic16_palette_init(0x2000);
 
@@ -68,8 +70,22 @@ void xboard_set_road_priority(int priority)
  *
  *************************************/
 
+extern int postscreentoclean;
+extern int 	nbdecryptDone;
+//extern void fd1094_krb_preclean();
 VIDEO_UPDATE( xboard )
 {
+    if(postscreentoclean>0)
+    {
+        // need a last screen cleaning because onvasive bootprogress
+        bootlog_setprogress(eProgressEnd);
+        postscreentoclean = 0;
+        nbdecryptDone = 0;
+        //fd1094_krb_preclean();
+        krb_thndrbld_patch_cpu_synchro();
+    }
+
+//   thndrbldpatchdone++; // = 1;
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)
 	{

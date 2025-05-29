@@ -160,6 +160,9 @@ bool m_bIs15b = false;
 int m_nbtest=0;
 QProc::QProc() : QObject()
 {}
+
+extern "C" { extern int isoth; }
+
 void QProc::process()
 {
     getMainConfig().init(0,nullptr);
@@ -169,7 +172,19 @@ void QProc::process()
     m_nbtest = 0;
     // test if just "mame romname".
     {
-        int idriver = getMainConfig().driverIndex().index("outrun");
+        int idriver = getMainConfig().driverIndex().index(
+
+       //"nightstr"
+      //  "bigrun"
+     // "cischeat"
+    // "sci"
+      //"sharrier"
+      "arkanoid"
+ //     "othunder"
+      // "thndrbld"
+      // "chasehq"
+//"gforce2"
+        );
         if(idriver>0)
         {
             getMainConfig().setActiveDriver(idriver);
@@ -178,8 +193,9 @@ void QProc::process()
     }
    //  nbframe = 0;
    //  m_nbtest = 1;
+   //  isoth =1;
    //  {
-   //      int idriver = getMainConfig().driverIndex().index("outrun");
+   //      int idriver = getMainConfig().driverIndex().index("othunder");
 
    //      //  if game was explicit, no GUI
    //      if(idriver>0)
@@ -209,6 +225,12 @@ QWin::QWin() : QLabel()
     setMouseTracking(true);
 
 }
+extern "C" {
+unsigned int GetDisplayGoodiesFlags()
+{
+ return 3;
+}
+}
 // extern "C" {
 // extern int dbg_nbt;
 // }
@@ -236,8 +258,8 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*2,h*2)) );
-        this->setFixedSize(w*2,h*2);
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
+        this->setFixedSize(w*3,h*3);
     _imageMutex.unlock();
 
 	//lbl.show();
@@ -256,7 +278,7 @@ int main(int argc, char* argv[])
     QWin w;
         int r =  a.exec();
     isinexit = true;
-    logEntries();
+ //   logEntries();
 
 
     cpustats_log();
@@ -355,7 +377,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
         _image = image;
     _imageMutex.unlock();
 
-          // if(nbframe>300)
+          // if(nbframe>300)min0 max255 sens100 delta40 cend40  rev0 res:0
      //      QThread::msleep(1000/60);
 
 nbframe++;
@@ -363,16 +385,20 @@ nbframe++;
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 
 // chasehq sprite prio bug:
-if(nbframe == 60*100 && m_nbtest == 0)
-{
- mame_schedule_exit();
-}
+// if(nbframe == 60*100 && m_nbtest == 0)
+// {
+//  mame_schedule_exit();
+// }
 //if(nbframe == 658) mame_pause(1); // ninjaw scene
 //if(nbframe == 950) mame_pause(1);
 
 //if(nbframe == 60*25) mame_pause(1);
 // if(nbframe==1200) exit(1);
-// if(nbframe==60*10)  mame_schedule_exit();
+ // static int j=0;
+ // if(nbframe==60*5 && j==0) {
+ // j=1; mame_schedule_exit();
+
+ // }
 //    m_mutex.lock();
 //    m_mutex.unlock();
 
@@ -416,13 +442,62 @@ void osd_sound_enable(int enable)
 const os_code_info *osd_get_code_list(void)
 {
     static os_code_info l[]={
+        {"5",34,KEYCODE_5},
+        {"1",35,KEYCODE_1},
         {"A",32,KEYCODE_A},
+        {"TAB",33,KEYCODE_TAB},
+        {"SPACE",65,KEYCODE_SPACE},
+        {"M1AX",1024,MOUSECODE_1_ANALOG_X},
+        {"M1AY",1025,MOUSECODE_1_ANALOG_Y},
+        {"M1ABT1",1026,MOUSECODE_1_BUTTON1},
+        {"M1ABT2",1027,MOUSECODE_1_BUTTON2},
+        {"bt4",100,JOYCODE_1_BUTTON4},
         {NULL,0,0},
     };
     return &l[0];
 }
+int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
+// to open menu
+    if(oscode == 33 && nbframe>3*60)
+    {
+        if(opened==0)
+        {
+            opened=1;
+            return 1;
+        }
+        return 0;
+    }
+    // if(oscode == 35 && nbframe>4*60)
+    // {
+    //     //if(opened>0)
+    //     {
+    //     opened++;
+    //         //opened ;
+    //         return (opened>>6)&1;
+    //     }
+    //     //return 0;
+    // }
+    // if(oscode == 100)
+    // {   // bt4
+
+    //     return (opened>>6)&1;
+    // }
+    if(oscode==1024)
+    {
+        return 1<<10;
+/*        static int ttestcount=0;
+        ttestcount++;
+        if(ttestcount &128)
+        {
+            return 1<<10;
+        }else
+        {
+            return -(1<<10);
+        }
+       // return 1*/;
+    }
     return 0;
 }
 int osd_readkey_unicode(int flush)

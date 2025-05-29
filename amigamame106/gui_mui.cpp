@@ -20,6 +20,7 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <sstream>
 #ifdef __GNUC__
 #define REG(r) __asm(#r)
 #else
@@ -42,6 +43,7 @@ extern "C" {
     #include <../../MUI50/include/mui/Guigfx_mcc.h>
     #include <../../MUI50/include/mui/GIFAnim_mcc.h>
 
+    #include <devices/timer.h>
 }
 extern "C" {
     #include "driver.h"
@@ -67,11 +69,15 @@ inline Object * MUINewObject(CONST_STRPTR cl, Tag tags, ...)
 
 struct DriverData
 {
-  struct MUI_EventHandlerNode EventHandler;
-  ULONG           CurrentEntry;
-  ULONG           CharIndex;
-  ULONG           Seconds;
-  ULONG           Micros;
+    struct MUI_EventHandlerNode EventHandler;
+
+    char    typedAccum[8];
+    UWORD   nbTypedAccum;
+
+    // last typed time
+    ULONG           Seconds;
+    ULONG           Micros;
+
   APTR            List;
 };
 
@@ -262,6 +268,7 @@ extern STRPTR ShowCycleValues[];
                                                                            MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
                                                                            MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
                                                                            InputListFrame,
+                                                                            MUIA_CycleChain, TRUE,
                                                                            TAG_DONE)),
                                          TAG_END);
     } else
@@ -274,7 +281,7 @@ extern STRPTR ShowCycleValues[];
                                                                               MUIA_List_Format,(ULONG)ListFormat,
                                                                               MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
                                                                               MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
-
+                                                                                MUIA_CycleChain, TRUE,
                                                                               TAG_DONE)),
                                             TAG_DONE);
     }
@@ -308,6 +315,9 @@ ULONG MameUI::createOptionTabGroup()
 
     return (ULONG)RE_Options;
 }
+
+//trick to send debug string from interuptions
+//std::stringstream drivdispdbg;
 
 int MameUI::MainGUI(void)
 {
@@ -408,8 +418,11 @@ int MameUI::MainGUI(void)
                     //        printf("after MUINewObject():%08x\n",(int)MainWin);
                     // MUIA_Disabled
 
-                    if(MainWin)
+                if(MainWin)
                 {
+                    //SetAttrs(LV_Driver,MUIA_CycleChain, TRUE,TAG_DONE);
+                    //SetAttrs(BU_Start,MUIA_CycleChain, TRUE,TAG_DONE);
+
                     DoMethod(App, OM_ADDMEMBER, MainWin);
 
                     DoMethod(LV_Driver, MUIM_Notify,  MUIA_Listview_DoubleClick, TRUE,
@@ -448,25 +461,6 @@ int MameUI::MainGUI(void)
                     DoMethod(BU_Scan, MUIM_Notify, MUIA_Pressed, FALSE,
                              App, 2, MUIM_Application_ReturnID, RID_Scan);
 
-
-
-
-                    //re, todo but do that better please.
-
-                    //          DoMethod(MainWin,  MUIM_Window_SetCycleChain,  LV_Driver,
-
-                        //                   /*CM_UseDefaults,*/ CY_Show, BU_Scan,
-
-                        //                   BU_Start, BU_Quit, CM_Allow16Bit, CM_FlipX, CM_FlipY, CM_DirtyLines, CM_AutoFrameSkip,
-                        //                   CM_Antialiasing, CM_Translucency, SL_BeamWidth, SL_VectorFlicker, SL_FrameSkip,
-                        //                   ST_Width, ST_Height, CY_ScreenType, CY_DirectMode, CY_Buffering, CY_Rotation,
-                        //                   PU_ScreenMode, CY_Sound, SL_AudioChannel[0], SL_AudioChannel[1], SL_AudioChannel[2],
-                        //                   SL_AudioChannel[3], SL_MinFreeChip, CY_Joy1Type, SL_Joy1ButtonBTime, SL_Joy1AutoFireRate,
-                        //                   CY_Joy2Type, SL_Joy2ButtonBTime, SL_Joy2AutoFireRate, ST_RomPath, PA_RomPath,
-                        //                   ST_SamplePath,/* PA_SamplePath,*/ RE_Options, NULL);
-
-                        //        printf("before UpdateUIToConfig\n");
-
                         UpdateUIToConfig();
 
                     log_setCallback(muilog);
@@ -488,7 +482,12 @@ int MameUI::MainGUI(void)
 
                // printf("before MUI loop\n");
                 do
-                {
+                {          
+                    // trick to receive debug strings from interuptions:
+                    // std::string strdbg = drivdispdbg.str();
+                    // drivdispdbg = std::stringstream();
+                    // if(strdbg.size()>0) printf("%s",strdbg.c_str());
+
                     rid = DoMethod(App,MUIM_Application_NewInput,&signals);
                     switch(rid)
                     {
@@ -796,6 +795,137 @@ pColumns->_players = players;
    pColumns->_comment = (char *)strComment.c_str(); //comment;
   return(0);
 }
+
+
+//  Else is in timer device SubTime().
+static inline timeval subtime( const timeval &a,const timeval &b)
+{
+    timeval dest = a;
+
+    if (dest.tv_micro < b.tv_micro)
+    {
+        dest.tv_micro += 1000000;
+        dest.tv_secs--;
+    }
+    dest.tv_micro -= b.tv_micro;
+    dest.tv_secs  -= b.tv_secs;
+    return dest;
+}
+static inline int nbcharOk(const char *pphrase,const char *ppattern)
+{
+    int i=0;
+    while(*pphrase != 0 && *ppattern != 0)
+    {
+        char a = *pphrase;
+        if(a>='A' && a<='Z') a+=32;
+
+        if(a == *ppattern) i++;
+        pphrase++;
+        ppattern++;
+    }
+    return i;
+}
+
+// called from dispatcher, interupt-like context.
+int manageKeyInListMsgDispatcher( Object * obj, struct DriverData   *data, struct IntuiMessage *imsg)
+{
+    APTR  active_obj;
+    Object  *list;
+    int nbvisisbles;
+
+   if(imsg->Class != IDCMP_RAWKEY)  return 0;
+
+    get(obj, MUIA_List_Visible, &nbvisisbles);
+    // -1 means list not visible at all (not the right panel ?).
+    // do not accaparate keyboard in that case
+    if(nbvisisbles<=0) return 0;
+
+//             char temp[64];
+//             snprintf(temp,63,"nbvisisbles:%d\n",nbvisisbles);
+//             drivdispdbg << temp;
+
+    get(_win(obj), MUIA_Window_ActiveObject, &active_obj);
+    get(obj, MUIA_Listview_List, &list);
+    if(!list) return 0;
+
+    if(obj != active_obj && list != active_obj) return 0;
+
+    struct InputEvent   ie;
+    ie.ie_Class   = IECLASS_RAWKEY;
+    ie.ie_SubClass  = 0;
+    ie.ie_Code    = imsg->Code;
+    ie.ie_Qualifier = 0;
+
+    char key[8];
+    //  MapRawKey( CONST struct InputEvent *event, STRPTR buffer, LONG length, CONST struct KeyMap *keyMap );
+    if(!MapRawKey(&ie,(STRPTR)&key[0], 4, NULL) || !isalnum(key[0])) return 0;
+
+    timeval diftime = subtime({imsg->Seconds,imsg->Micros},{data->Seconds,data->Micros});
+
+
+    // addchar if time dif less than 0.8 sec, else restart.
+    int doAddChar=( diftime.tv_sec==0 && diftime.tv_micro< (1000000) );
+
+// {
+//     char temp[64];
+//     snprintf(temp,63,"diftime:%d . %d   doadd:%d\n", diftime.tv_sec,diftime.tv_micro,doAddChar);
+//     drivdispdbg << temp;
+// }
+
+    data->Seconds = imsg->Seconds;
+    data->Micros = imsg->Micros;
+
+    if(doAddChar)
+    {
+        if(data->nbTypedAccum<4)
+        {
+            data->typedAccum[data->nbTypedAccum] = key[0];
+            data->nbTypedAccum++;
+            data->typedAccum[data->nbTypedAccum] = 0;
+        }
+    } else
+    {
+        data->typedAccum[0] = key[0];
+        data->typedAccum[1] = 0;
+        data->nbTypedAccum = 1;
+    }
+
+                // char temp[64];
+                // snprintf(temp,63,"key:%c  acc:%s\n",(char)key[0],&data->typedAccum[0]);
+                // drivdispdbg << temp;
+
+    int i = 0;
+    int bestIndex = -1;
+    int bestIndexScore = 0;
+    // really loop anything (posibly 2000 items). It's one by key stroke anyway.
+    // list items can be sorted in any manner.
+    do
+    {
+       struct _game_driver   **drv_indirect;
+
+      DoMethod(list, MUIM_List_GetEntry, i, &drv_indirect);
+      if(! drv_indirect) break;
+
+      struct _game_driver   *drv = *drv_indirect;
+      int nbcharok = nbcharOk(drv->description,data->typedAccum);
+      if(nbcharok>bestIndexScore)
+      {
+        bestIndexScore = nbcharok;
+        bestIndex = i;
+      }
+
+      i++;
+
+    } while(1);
+
+    if(bestIndex>=0)
+    {
+       set(list, MUIA_List_Active, bestIndex);
+       return(1);
+    }
+    return 0;
+}
+
 // extend list class
 static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1))
 {
@@ -840,77 +970,15 @@ static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2
       break;
 
     case MUIM_HandleEvent:
+    {
       data =  (struct DriverData *) INST_DATA(cclass, obj);
       imsg = (struct IntuiMessage *) msg[1].MethodID;
 
-// printf("MUIM_HandleEvent\n");
+      int diduseit = manageKeyInListMsgDispatcher(obj,data,imsg);
+      //if(diduseit) return(MUI_EventHandlerRC_Eat);
+    }
+      break;
 
-      get(_win(obj), MUIA_Window_ActiveObject, &active_obj);
-
-      if(obj == active_obj)
-      {
-        if(imsg->Class == IDCMP_RAWKEY)
-        {
-          ie.ie_Class   = IECLASS_RAWKEY;
-          ie.ie_SubClass  = 0;
-          ie.ie_Code    = imsg->Code;
-          ie.ie_Qualifier = 0;
-
-//  MapRawKey( CONST struct InputEvent *event, STRPTR buffer, LONG length, CONST struct KeyMap *keyMap );
-          if(MapRawKey(&ie,(STRPTR)&key, 1, NULL) && isalnum(key))
-          {
-            i = imsg->Seconds - data->Seconds;
-
-            if(imsg->Micros < data->Micros)
-              i--;
-
-            if(i < 1)
-            {
-              data->CharIndex++;
-              i = data->CurrentEntry;
-            }
-            else
-            {
-              data->CharIndex = 0;
-              i = 0;
-            }
-
-            data->Seconds = imsg->Seconds;
-            data->Micros  = imsg->Micros;
-
-            get(obj, MUIA_Listview_List, &list);
-
-            do
-            {
-              DoMethod(list, MUIM_List_GetEntry, i, &drv_indirect);
-
-              if(drv_indirect)
-              {
-                drv = *drv_indirect;
-
-                if(data->CharIndex < strlen(drv->description))
-                {
-                  if(key <= tolower(drv->description[data->CharIndex]))
-                  {
-                    data->CurrentEntry = i;
-
-                    set(list, MUIA_List_Active, i);
-
-                    break;
-                  }
-                }
-              }
-
-              i++;
-
-            } while(drv_indirect);
-
-            return(MUI_EventHandlerRC_Eat);
-          }
-        }
-      }
-      return(0);
-      //break;
       case MUIM_HandleInput: // krb added
         {
 	#define _between(a,x,b) ((x)>=(a) && (x)<=(b))
@@ -965,18 +1033,17 @@ static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2
   return(DoSuperMethodA(cclass, obj, msg));
 }
 
+// DriverDispatcherMUI5 does not patch column sorting , it lets MUI5 list do it.
 static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1))
 {
   struct DriverData   *data;
   struct IntuiMessage *imsg;
-  struct _game_driver   **drv_indirect;
-  struct _game_driver   *drv;
   struct InputEvent   ie;
 
   Object  *list;
   APTR  active_obj;
   ULONG i;
-  UBYTE key;
+
 
 //printf("msg->MethodID:%08x\n",msg->MethodID);
   switch(msg->MethodID)
@@ -988,6 +1055,7 @@ static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj RE
       {
         data->Seconds = 0;
         data->Micros  = 0;
+        data->nbTypedAccum = 0;
 
         data->EventHandler.ehn_Priority = 0;
         data->EventHandler.ehn_Flags    = 0;
@@ -1008,79 +1076,15 @@ static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj RE
       break;
 
     case MUIM_HandleEvent:
+    {
       data =  (struct DriverData *) INST_DATA(cclass, obj);
       imsg = (struct IntuiMessage *) msg[1].MethodID;
 
-// printf("MUIM_HandleEvent\n");
-
-      get(_win(obj), MUIA_Window_ActiveObject, &active_obj);
-
-      if(obj == active_obj)
-      {
-        if(imsg->Class == IDCMP_RAWKEY)
-        {
-          ie.ie_Class   = IECLASS_RAWKEY;
-          ie.ie_SubClass  = 0;
-          ie.ie_Code    = imsg->Code;
-          ie.ie_Qualifier = 0;
-
-//  MapRawKey( CONST struct InputEvent *event, STRPTR buffer, LONG length, CONST struct KeyMap *keyMap );
-          if(MapRawKey(&ie,(STRPTR)&key, 1, NULL) && isalnum(key))
-          {
-            i = imsg->Seconds - data->Seconds;
-
-            if(imsg->Micros < data->Micros)
-              i--;
-
-            if(i < 1)
-            {
-              data->CharIndex++;
-              i = data->CurrentEntry;
-            }
-            else
-            {
-              data->CharIndex = 0;
-              i = 0;
-            }
-
-            data->Seconds = imsg->Seconds;
-            data->Micros  = imsg->Micros;
-
-            get(obj, MUIA_Listview_List, &list);
-
-            do
-            {
-              DoMethod(list, MUIM_List_GetEntry, i, &drv_indirect);
-
-              if(drv_indirect)
-              {
-                drv = *drv_indirect;
-
-                if(data->CharIndex < strlen(drv->description))
-                {
-                  if(key <= tolower(drv->description[data->CharIndex]))
-                  {
-                    data->CurrentEntry = i;
-
-                    set(list, MUIA_List_Active, i);
-
-                    break;
-                  }
-                }
-              }
-
-              i++;
-
-            } while(drv_indirect);
-
-            return(MUI_EventHandlerRC_Eat);
-          }
-        }
-      }
-    //  return(0);
+      int diduseit = manageKeyInListMsgDispatcher(obj,data,imsg);
+      //if(diduseit) return(MUI_EventHandlerRC_Eat);
+    }
       break;
   }
-
   return(DoSuperMethodA(cclass, obj, msg));
 }
 

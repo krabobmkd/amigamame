@@ -108,7 +108,7 @@ void Drawable_CGX::initRemapTable()
             int privScreenNbColors = 1<<(pScreen->RastPort.BitMap->Depth);
             // printf("_colorsIndexLength:%d privScreenNbColors:%d\n",
             //     _colorsIndexLength,privScreenNbColors);
-            if(_colorsIndexLength<=(privScreenNbColors+6))
+            if(_colorsIndexLength<=(privScreenNbColors+10))
                      _pRemap = new Paletted_Screen8(pScreen);
             // force fixed palette and manage large index to this index at palette change.
             else
@@ -449,6 +449,7 @@ Intuition_Window_CGX::Intuition_Window_CGX(const AbstractDisplay::params &params
 }
 //Intuition_Window_CGX::~Intuition_Window_CGX()
 //{}
+#define USE_DIRECT_WB_RENDERING 1
 void Intuition_Window_CGX::draw(_mame_display *display)
 {
      if(!_pWbWindow || !_sWbWinSBitmap) return;
@@ -456,15 +457,27 @@ void Intuition_Window_CGX::draw(_mame_display *display)
     // will draw to the current size.
     _widthtarget = (int)(_pWbWindow->GZZWidth);
     _heighttarget = (int)(_pWbWindow->GZZHeight);
-#ifdef USE_DIRECT_WB_RENDERING
-    // isOnTop doesnt work and this doesnt accelerate much.
-     if(isOnTop() &&
-        _pWbWindow->LeftEdge+_pWbWindow->BorderLeft>0 &&
-        _pWbWindow->TopEdge+_pWbWindow->BorderTop > 0 &&
-        (_pWbWindow->LeftEdge+_pWbWindow->BorderLeft+_widthtarget)<_widthphys &&
-        (_pWbWindow->TopEdge+_pWbWindow->BorderTop+_heighttarget)<_heightphys
 
-        )
+#ifdef USE_DIRECT_WB_RENDERING
+    Layer *lockedRastPort = NULL;
+    bool rastPortComplete = false;
+    if(_allowDirectDraw)
+    {
+        // we can draw directly to wb window in full mode if window is not clipped...
+        // also we have to lock layers for the whole draw.
+        lockedRastPort = _pWbWindow->RPort->Layer;
+        if(lockedRastPort) ObtainSemaphore(&(lockedRastPort->Lock));
+        rastPortComplete = isRastPortComplete(_pWbWindow->RPort,(WORD)_widthtarget,(UWORD)_heighttarget) ;
+
+        { // just to bypass "gzz" bug when window small and directdraw...
+            // same thing as in .getGeometry()
+            int sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
+            int sourceheight =( display->game_visible_area.max_y - display->game_visible_area.min_y)+1;
+            if(_flags & ORIENTATION_SWAP_XY)  doSwap(sourcewidth,sourceheight);
+            if(_widthtarget<sourcewidth || _heighttarget<sourceheight)  rastPortComplete = false; // because GZZ bug if window shorter
+        }
+    }
+     if(rastPortComplete)
      {
          // window is on top, we don't need layer library,
          // and can draw directly to wb rastport.
@@ -476,15 +489,20 @@ void Intuition_Window_CGX::draw(_mame_display *display)
         RastPort *pScreenRp = &(_pWbWindow->WScreen->RastPort);
         BitMap *pScreenBM = _pWbWindow->WScreen->RastPort.BitMap;
 
-        // use cpu direct copy
-        if(isSourceRGBA32())
-            drawCGX_DirectCPU32(pScreenBM,display);
-        else
-            drawCGX_DirectCPU16(pScreenRp,pScreenBM,display);
+            // use cpu direct copy
+            if(isSourceRGBA32())
+                drawCGX_DirectCPU32(pScreenBM,display);
+            else
+                drawCGX_DirectCPU16(pScreenRp,pScreenBM,display);
 
+
+        if(lockedRastPort) ReleaseSemaphore(&(lockedRastPort->Lock));
      } else
 #endif
      {
+#ifdef USE_DIRECT_WB_RENDERING
+        if(lockedRastPort) ReleaseSemaphore(&(lockedRastPort->Lock));
+#endif
         _screenshiftx = 0; // because rastport is inside window
         _screenshifty = 0;
         // will draw on friend bitmap _sWbWinSBitmap.
@@ -503,7 +521,6 @@ void Intuition_Window_CGX::draw(_mame_display *display)
                0x00c0//ULONG minterm  -> copy minterm.
                );
      }
-
 }
 bool Intuition_Window_CGX::open()
 {

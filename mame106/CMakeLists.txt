@@ -53,7 +53,9 @@ set(MAME_CORE_SRC
 	cheat.c    hash.c      mamedriv.c  sndintrf.c  usrintrf.c
 	config.c   hiscore.c   md5.c            validity.c
 	cpuexec.cpp  info.c      memory.c memoryn.cpp   state.c     version.c
-#re	cpustats.cpp
+
+	cpustats.cpp
+
  debugger.h   jedparse.h            png.h        ui_text.h
  audit.h
 
@@ -107,7 +109,9 @@ set(MAME_UNROLL_SRC  drawgfx.c  drawgfxn.cpp
 if(OPT_TAITO)
 	list(APPEND MAME_UNROLL_SRC vidhrdw/taitoicn.cpp  vidhrdw/taitoicn.h)
 endif()
-
+if(OPT_SEGA)
+	list(APPEND MAME_UNROLL_SRC vidhrdw/segaic16n.cpp )
+endif()
 # move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/neogeo.c")
 move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/segaic16.c")
 # ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}
@@ -122,8 +126,7 @@ set(MAME_INCLUDE_DIRS "src" "../amigamame106" "." "./includes" ${EXPATPATH})
 
 # force specific implementation of drivers like this:
 replace_list_item(MAME_CPU_SRC "cpu/tms32010/tms32010.c" "cpu/tms32010/tms32010.cpp")
-#replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaic16.c" "vidhrdw/segaic16_krb.c")
-#replace_list_item(MAME_DRIVERS_SRC "vidhrdw/segaorun.c" "vidhrdw/segaorun_krb.c")
+
 #replace_list_item(MAME_CORE_SRC "usrintrf.c" "usrintrf_krb.c")
 #replace_list_item(MAME_CORE_SRC "palette.c" "palette_krb.c")
 #replace_list_item(MAME_CORE_SRC "mame.c" "mame_krb.c")

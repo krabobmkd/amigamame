@@ -19,6 +19,8 @@ extern "C" {
     #include <graphics/modeid.h>
     #include <graphics/text.h>
     #include <hardware/blit.h>
+    // actual dreaded Layer struct
+    #include <graphics/clip.h>
 }
 
 extern "C" {
@@ -338,8 +340,11 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
     , _pWbWindow(NULL)
     , _machineWidth(params._width),_machineHeight(params._height)
     , _maxzoomfactor(1)
+    , _allowDirectDraw(0)
 {
 //   printf(" ***** ** Intuition_Window CREATE:%d %d %08x\n",params._width,params._height,params._flags);
+    // "windows can't use SVP double buffer"
+    _flags &= ~DISPFLAG_USEHEIGHTBUFFER;
 
     if(params._flags & ORIENTATION_SWAP_XY)
     {
@@ -349,6 +354,11 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
   // this enable or disbale window sizing:
   _maxzoomfactor = 3;
   _useScale = 1;
+
+    MameConfig::Controls &configControls = getMainConfig().controls();
+    MameConfig::Misc &configMisc = getMainConfig().misc();
+
+    _allowDirectDraw = ((configMisc._Optims & OPTIMFLAGS_DIRECTWGXWIN) != 0);
 }
 Intuition_Window::~Intuition_Window()
 {
@@ -404,10 +414,10 @@ bool Intuition_Window::open()
         WA_Flags, /*WFLG_SIZEGADGET*/ /*| WFLG_SIZEBRIGHT | WFLG_SIZEBBOTTOM |
 
             */ WFLG_DRAGBAR | WFLG_DEPTHGADGET | WFLG_CLOSEGADGET | WFLG_ACTIVATE
-            //|WFLG_SUPER_BITMAP
+            //|WFLG_SUPER_BITMAP     // also use another layer cliprect mecanism.
            // | WFLG_NOCAREREFRESH
             // | WFLG_SMART_REFRESH
-            | WFLG_SIMPLE_REFRESH
+            | WFLG_SIMPLE_REFRESH // important for direct draw optimisation.
             | WFLG_GIMMEZEROZERO
              | ((_maxzoomfactor>1)?WFLG_SIZEGADGET:0)
             ,
@@ -692,4 +702,44 @@ WindowGeo IntuitionDisplay::getWindowGeometry()  // to save/reload
     syncWindowGeo();
 
     return _params._wingeo;
+}
+
+
+/* tool: test if RastPort currently need layer.library clippings, or not.
+ we can use direct pixel copy on workbench bitmap in the simple case.
+  **** This is considered dangerous code. ****
+*/
+bool isRastPortComplete(RastPort *rp,WORD w, WORD h)
+{
+    Layer *lr = rp->Layer;
+    if(!lr) return false; // actually happens a lot when moving/resizing/recreating and could mean windows is being reworked by OS.
+    bool isComplete=false;
+  // ObtainSemaphore(&(lr->Lock)); // must be done by caller, because following direct draw must also keep lock.
+    ClipRect *cr = lr->ClipRect;
+    if(cr)
+    {
+        // to be complete, there must be a single rect. of the whole size.
+        // else it is obscured or cliped.
+         if( (cr->Next == NULL) || (cr->Next == cr))
+         {
+            WORD crw = (cr->bounds.MaxX - cr->bounds.MinX)+1;
+            WORD crh = (cr->bounds.MaxY - cr->bounds.MinY)+1;
+            if(w == crw && h == crh) isComplete = true;
+         } // end if just one cliprect
+    } /*else -> our window is simple_refresh, no superbitmap use.
+    if(lr->SuperClipRect)
+    {
+        ClipRect *cr = lr->SuperClipRect;
+        // to be complete, has
+         //  if just one
+         if( (cr->Next == NULL) || (cr->Next == cr))
+         {
+            WORD crw = (cr->bounds.MaxX - cr->bounds.MinX)+1;
+            WORD crh = (cr->bounds.MaxY - cr->bounds.MinY)+1;
+            if(w == crw && h == crh) isComplete = true;
+         } // end if just one cliprect
+    }*/
+
+//    ReleaseSemaphore(&(lr->Lock));
+    return isComplete;
 }

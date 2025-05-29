@@ -165,7 +165,9 @@ To Do:
 #include "megasys1.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
+#include <stdio.h>
+#include "ui_text.h"
+#include "drawCtrl.h"
 /* Variables only used here: */
 
 static UINT16 *rom_1, *rom_2, *rom_3;
@@ -193,6 +195,7 @@ WRITE16_HANDLER( scudhamm_vregs_w );
 VIDEO_START( bigrun );
 VIDEO_START( cischeat );
 VIDEO_START( f1gpstar );
+VIDEO_START( scudhamm );
 
 VIDEO_UPDATE( bigrun );
 VIDEO_UPDATE( cischeat );
@@ -529,9 +532,27 @@ WRITE16_HANDLER( scudhamm_motor_command_w )
 }
 
 
+// - - - -krb 2025: apply a coherent force from mouse move as hammer blow. - - - -
+static INT32 lasthammer=0;
+UINT32 hammeraccum=0;
+
 READ16_HANDLER( scudhamm_analog_r )
 {
-	return readinputport(1);
+    UINT16 v = readinputport(1);
+    int delta = (int)v - (int)lasthammer ;
+    lasthammer = (int)v;
+    if(delta<0) hammeraccum += (-delta); // accumulate right to left moves.
+
+    if(hammeraccum>1024) hammeraccum=1024;
+    // 0,8:no react, 64: boom , 255->only need one blow !.
+    //v = 255;
+    UINT32 force = hammeraccum;
+    if(force>255) force = 255;
+    commonControlsValues.analogValues[0] = v;
+  //  printf("force applied:%d\n",(int)force);
+    // hammeraccum decays with frames in frame update !
+
+	return (UINT16)force;
 }
 
 
@@ -996,8 +1017,12 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( bigrun )
 	PORT_START_TAG("FAKE")	// IN0 - Fake input port - Buttons status
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator")\
+/* original
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")\
+*/
+//krb
+    PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE PORT_NAME("Gear Shift")
 
 	PORT_START_TAG("IN1")	// Coins - $80000.w
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -1017,7 +1042,9 @@ INPUT_PORTS_START( bigrun )
 	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Horn")	// Horn
+//orig.	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Horn")	// Horn
+//krb:
+    PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Horn")	// Horn
 
 	PORT_START_TAG("IN3")	// Motor Control? - $80004.w
 	PORT_DIPNAME( 0x01, 0x01, "Up Limit SW"  	)	// Limit the Cockpit movements?
@@ -1105,6 +1132,7 @@ INPUT_PORTS_START( bigrun )
 
 	PORT_START_TAG("IN6")	// Driving Wheel - $80010.w(0)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+        PORT_NAME(ui_getstring(UI_SteeringWheel))
 INPUT_PORTS_END
 
 
@@ -1118,8 +1146,12 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( cischeat )
 	PORT_START_TAG("IN0")	// Fake input port - Buttons status
+/*old
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")\
+*/
+   PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE PORT_NAME("Gear Shift")
+
 
 	PORT_START_TAG("IN1")	// Coins - $80000.w
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -1139,7 +1171,7 @@ INPUT_PORTS_START( cischeat )
 	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator")	// Accel
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Horn")	// Horn
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Horn")	// Horn
 
 	PORT_START_TAG("IN3")	// Motor Control? - $80004.w
 	PORT_DIPNAME( 0x01, 0x01, "Up Limit SW"  	)	// Limit the Cockpit movements?
@@ -1206,6 +1238,7 @@ INPUT_PORTS_START( cischeat )
 
 	PORT_START	// IN6 - Driving Wheel - $80010.w(0)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+        PORT_NAME(ui_getstring(UI_SteeringWheel))
 INPUT_PORTS_END
 
 
@@ -1449,13 +1482,14 @@ INPUT_PORTS_START( scudhamm )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW) 	// called "Test"
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_START1   )
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON4  ) // Select
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON4  )  PORT_NAME(ui_getstring(UI_Select)) // Select
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_BIT(  0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Gu
-	PORT_BIT(  0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Choki
-	PORT_BIT(  0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Pa
+// note from video original arcade order is rock/cscizir/paper , seen cizor rock paper
+	PORT_BIT(  0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME(ui_getstring(UI_Rock))  // Gu
+	PORT_BIT(  0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME(ui_getstring(UI_Paper))// Choki
+	PORT_BIT(  0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME(ui_getstring(UI_Scissor)) // Pa
 	PORT_BIT(  0x0800, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1463,7 +1497,15 @@ INPUT_PORTS_START( scudhamm )
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START_TAG("IN1")	// A/D
-	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(1) PORT_KEYDELTA(0)
+//original	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(1) PORT_KEYDELTA(0)
+// replaced bu IPT_TRACKBALL_X because relative has no clip.
+// finally not, more fun with clips
+	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE )  PORT_MINMAX(0,0xff) PORT_SENSITIVITY(40) PORT_KEYDELTA(30)
+        PORT_NAME(ui_getstring(UI_Hammer))
+// no more min/max, use more movements
+// wheel example:
+// 	PORT_BIT( 0x00ff, 0x0000, IPT_DIAL ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
 
 	PORT_START_TAG("IN2")	// DSW
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
@@ -1907,7 +1949,7 @@ static MACHINE_DRIVER_START( scudhamm )
 	MDRV_GFXDECODE(gfxdecodeinfo_scudhamm)
 	MDRV_PALETTE_LENGTH(16*16+16*16+128*16)
 
-	MDRV_VIDEO_START(f1gpstar)
+	MDRV_VIDEO_START(scudhamm)
 	MDRV_VIDEO_UPDATE(scudhamm)
 
 	/* sound hardware */

@@ -776,12 +776,15 @@ J1100256A VIDEO PCB
 #include "vidhrdw/taitoic.h"
 #include "sndhrdw/taitosnd.h"
 #include "sound/2610intf.h"
+#include "drawCtrl.h"
+#include "ui_text.h"
 
 VIDEO_START( taitoz );
 VIDEO_START( spacegun );
 
 VIDEO_UPDATE( contcirc );
 VIDEO_UPDATE( chasehq );
+VIDEO_UPDATE( nightstr );
 VIDEO_UPDATE( bshark );
 VIDEO_UPDATE( sci );
 VIDEO_UPDATE( aquajack );
@@ -1053,7 +1056,13 @@ static READ16_HANDLER( contcirc_input_bypass_r )
 	}
 }
 
-
+//#define USE_LEVER_TOGGLE 1
+#define LEVERBIT 16
+#ifdef USE_LEVER_TOGGLE
+    static char lever_lastpos=0;
+    static char lever_currentpos=0;
+#endif
+//int testval[4]={0};
 static READ16_HANDLER( chasehq_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for extra inputs */
@@ -1078,6 +1087,38 @@ static READ16_HANDLER( chasehq_input_bypass_r )
 			steer = 0x7f;
 		}
 	}
+    commonControlsValues.analogValues[0] = (INT16) steer;
+
+    if(port == 3)
+    {   // get lever
+        UINT16 v3 = readinputport(3);
+
+#ifdef USE_LEVER_TOGGLE
+        char btdown = ((v3&LEVERBIT)==0);
+        if(btdown != lever_lastpos)
+        {
+            if(btdown) lever_currentpos ^= 1; // toggle when change and down.
+            lever_lastpos = btdown;
+        }
+        v3 &= ~LEVERBIT; // remove push state
+        v3 |= (lever_currentpos<<4); // replace by toggle state
+        commonControlsValues._lever = lever_currentpos;
+#else
+        commonControlsValues._lever = (INT16) ((v3&LEVERBIT)==0);
+#endif
+        return v3;
+    }
+
+//     //krb get gear state...
+//     for(int i=0;i<16;i+=4)
+//     {
+//     int dec=0;
+//         UINT32 v=(readinputport(dec+i)<<24);
+//         v |=(readinputport(dec+i+1)<<16);
+//         v |=(readinputport(dec+i+2)<<8);
+//          v |=(readinputport(dec+i+3)<<0);
+// testval[i/4] = v;
+//     }
 
 	switch (port)
 	{
@@ -1170,7 +1211,16 @@ static WRITE16_HANDLER( bshark_stick_w )
 
 	timer_set(TIME_IN_CYCLES(10000,0),0, taitoz_interrupt6);
 }
-
+//krb added just to get the lever to be displayed !
+static READ16_HANDLER( sci_input_bypass_r )
+{
+    UINT16 v =  TC0220IOC_r( offset );	/* might be a 510NIO ! */
+    if(offset == 3)
+    {
+        commonControlsValues._lever = ((v&16)==0);
+    }
+    return v;
+}
 
 static READ16_HANDLER( sci_steer_input_r )
 {
@@ -1193,7 +1243,7 @@ static READ16_HANDLER( sci_steer_input_r )
 			steer = 0x5f;
 		}
 	}
-
+    commonControlsValues.analogValues[0] = (INT16) steer;
 	switch (offset)
 	{
 		case 0x04:
@@ -1604,7 +1654,7 @@ static ADDRESS_MAP_START( sci_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x107fff) AM_READ(MRA16_RAM)	/* main CPUA ram */
 	AM_RANGE(0x108000, 0x10bfff) AM_READ(sharedram_r)	/* extent ?? */
 	AM_RANGE(0x10c000, 0x10ffff) AM_READ(MRA16_RAM)	/* extra CPUA ram */
-	AM_RANGE(0x200000, 0x20000f) AM_READ(TC0220IOC_halfword_r)
+	AM_RANGE(0x200000, 0x20000f) AM_READ(sci_input_bypass_r)
 	AM_RANGE(0x200010, 0x20001f) AM_READ(sci_steer_input_r)
 	AM_RANGE(0x420000, 0x420003) AM_READ(taitoz_sound_r)
 	AM_RANGE(0x800000, 0x801fff) AM_READ(paletteram16_word_r)
@@ -2133,17 +2183,17 @@ INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Brake))	/* brake */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* turbo */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)  PORT_NAME(ui_getstring(UI_Turbo))	/* turbo */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* gear */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE PORT_PLAYER(1)  PORT_NAME(ui_getstring(UI_GearShift))		/* gear, krb added toggle */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Accel))	/* accel */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2191,6 +2241,7 @@ INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 
 	PORT_START      /* IN7, steering */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+        PORT_NAME(ui_getstring(UI_SteeringWheel))
 
 	PORT_START      /* IN8, fake allowing digital steer */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
@@ -2239,17 +2290,17 @@ INPUT_PORTS_START( chasehqj )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Brake))	/* brake */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* turbo */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)  PORT_NAME(ui_getstring(UI_Turbo))	/* turbo */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* gear */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE PORT_PLAYER(1)  PORT_NAME(ui_getstring(UI_GearShift))		/* gear, krb added toggle */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Accel))	/* accel */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2297,6 +2348,7 @@ INPUT_PORTS_START( chasehqj )	// IN3-6 perhaps used with cockpit setup? //
 
 	PORT_START      /* IN7, steering */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+       PORT_NAME(ui_getstring(UI_SteeringWheel))
 
 	PORT_START      /* IN8, fake allowing digital steer */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
@@ -2536,28 +2588,28 @@ INPUT_PORTS_START( sci )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* fire */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME(ui_getstring(UI_Fire)) PORT_PLAYER(1)	/* fire */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Brake))	/* brake */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* turbo */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Turbo))	/* turbo */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON6 ) PORT_PLAYER(1)	/* "center" */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Center))	/* "center" */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* gear */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_TOGGLE PORT_NAME(ui_getstring(UI_GearShift))	/* gear */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Accel))	/* accel */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START      /* IN2, unused */
 
 	PORT_START      /* IN3, steering */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_SteeringWheel))
 
 	PORT_START      /* IN4, fake allowing digital steer */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
@@ -2603,21 +2655,21 @@ INPUT_PORTS_START( sciu )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* fire */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME(ui_getstring(UI_Fire)) PORT_PLAYER(1)	/* fire */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Brake))	/* brake */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* turbo */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Turbo))	/* turbo */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON6 ) PORT_PLAYER(1)	/* "center" */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Center))	/* "center" */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* gear */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_TOGGLE PORT_NAME(ui_getstring(UI_GearShift))	/* gear */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Accel))	/* accel */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2625,6 +2677,7 @@ INPUT_PORTS_START( sciu )
 
 	PORT_START      /* IN3, steering */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+        PORT_NAME(ui_getstring(UI_SteeringWheel))
 
 	PORT_START      /* IN4, fake allowing digital steer */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
@@ -2686,8 +2739,8 @@ INPUT_PORTS_START( nightstr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Fire))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME(ui_getstring(UI_Fire))
 
 	PORT_START
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(60) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -3478,7 +3531,7 @@ static MACHINE_DRIVER_START( nightstr )
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
-	MDRV_VIDEO_UPDATE(chasehq)
+	MDRV_VIDEO_UPDATE(nightstr)
 
 	/* sound hardware */
 #ifndef CHASEHQ_MONO

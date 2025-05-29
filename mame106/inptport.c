@@ -454,7 +454,7 @@ static const input_port_default_entry default_ports_builtin[] =
 // MODIFIED KRB for Amiga keyboard
 INPUT_PORT_DIGITAL_DEF( 1, IPG_PLAYER1,	BUTTON1,			"P1 Button 1",			SEQ_DEF_5(KEYCODE_RWIN, CODE_OR, JOYCODE_1_BUTTON1, CODE_OR, MOUSECODE_1_BUTTON1) )
 INPUT_PORT_DIGITAL_DEF( 1, IPG_PLAYER1,	BUTTON2,			"P1 Button 2",			SEQ_DEF_5(KEYCODE_RALT, CODE_OR, JOYCODE_1_BUTTON2, CODE_OR, MOUSECODE_1_BUTTON2) )
-INPUT_PORT_DIGITAL_DEF( 1, IPG_PLAYER1,	BUTTON3,			"P1 Button 3",			SEQ_DEF_5(AMIGA_SPECIAL_RAWKEY_3A, CODE_OR, JOYCODE_1_BUTTON3, CODE_OR, MOUSECODE_1_BUTTON3) )
+INPUT_PORT_DIGITAL_DEF( 1, IPG_PLAYER1,	BUTTON3,			"P1 Button 3",			SEQ_DEF_3(AMIGA_SPECIAL_RAWKEY_3A, CODE_OR, JOYCODE_1_BUTTON3 ) )
 INPUT_PORT_DIGITAL_DEF( 1, IPG_PLAYER1,	BUTTON4,			"P1 Button 4",			SEQ_DEF_3(KEYCODE_RSHIFT, CODE_OR, JOYCODE_1_BUTTON4) )
 INPUT_PORT_DIGITAL_DEF( 1, IPG_PLAYER1,	BUTTON5,			"P1 Button 5",			SEQ_DEF_3(AMIGA_SPECIAL_RAWKEY_2A, CODE_OR, JOYCODE_1_BUTTON5) )
 INPUT_PORT_DIGITAL_DEF( 1, IPG_PLAYER1,	BUTTON6,			"P1 Button 6",			SEQ_DEF_3(AMIGA_SPECIAL_RAWKEY_2B, CODE_OR, JOYCODE_1_BUTTON6) )
@@ -751,7 +751,11 @@ INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON6,			"P2 Button 6",			SEQ_DEF_1(JO
 	INPUT_PORT_DIGITAL_DEF( 0, IPG_OTHER,   VOLUME_DOWN,		"Volume Down",     		SEQ_DEF_1(KEYCODE_MINUS) )
 	INPUT_PORT_DIGITAL_DEF( 0, IPG_OTHER,   VOLUME_UP,			"Volume Up",     		SEQ_DEF_1(KEYCODE_EQUALS) )
 
-	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL,				"P1 Pedal 1",     		SEQ_DEF_3(JOYCODE_1_ANALOG_PEDAL1, CODE_OR, JOYCODE_1_ANALOG_Y), SEQ_DEF_3(KEYCODE_LCONTROL, CODE_OR, JOYCODE_1_BUTTON1), SEQ_DEF_0 )
+//	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL,				"P1 Pedal 1",     		SEQ_DEF_3(JOYCODE_1_ANALOG_PEDAL1, CODE_OR, JOYCODE_1_ANALOG_Y), SEQ_DEF_3(KEYCODE_LCONTROL, CODE_OR, JOYCODE_1_BUTTON1), SEQ_DEF_0 )
+// krb
+	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL,				"P1 Pedal 1",     		SEQ_DEF_3(JOYCODE_1_ANALOG_PEDAL1, CODE_OR, JOYCODE_1_ANALOG_Y), SEQ_DEF_5(KEYCODE_LCONTROL, CODE_OR, JOYCODE_1_BUTTON1, CODE_OR, MOUSECODE_1_BUTTON1), SEQ_DEF_0 )
+
+
 	INPUT_PORT_ANALOG_DEF ( 2, IPG_PLAYER2,	PEDAL,				"P2 Pedal 1", 			SEQ_DEF_3(JOYCODE_2_ANALOG_PEDAL1, CODE_OR, JOYCODE_2_ANALOG_Y), SEQ_DEF_3(KEYCODE_A, CODE_OR, JOYCODE_2_BUTTON1), SEQ_DEF_0 )
 	INPUT_PORT_ANALOG_DEF ( 3, IPG_PLAYER3,	PEDAL,				"P3 Pedal 1",			SEQ_DEF_3(JOYCODE_3_ANALOG_PEDAL1, CODE_OR, JOYCODE_3_ANALOG_Y), SEQ_DEF_3(KEYCODE_RCONTROL, CODE_OR, JOYCODE_3_BUTTON1), SEQ_DEF_0 )
 	INPUT_PORT_ANALOG_DEF ( 4, IPG_PLAYER4,	PEDAL,				"P4 Pedal 1",			SEQ_DEF_3(JOYCODE_4_ANALOG_PEDAL1, CODE_OR, JOYCODE_4_ANALOG_Y), SEQ_DEF_3(KEYCODE_0_PAD, CODE_OR, JOYCODE_4_BUTTON1), SEQ_DEF_0 )
@@ -760,7 +764,10 @@ INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON6,			"P2 Button 6",			SEQ_DEF_1(JO
 	INPUT_PORT_ANALOG_DEF ( 7, IPG_PLAYER7,	PEDAL,				"P7 Pedal 1",			SEQ_DEF_3(JOYCODE_7_ANALOG_PEDAL1, CODE_OR, JOYCODE_7_ANALOG_Y), SEQ_DEF_1(JOYCODE_7_BUTTON1), SEQ_DEF_0 )
 	INPUT_PORT_ANALOG_DEF ( 8, IPG_PLAYER8,	PEDAL,				"P8 Pedal 1",			SEQ_DEF_3(JOYCODE_8_ANALOG_PEDAL1, CODE_OR, JOYCODE_8_ANALOG_Y), SEQ_DEF_1(JOYCODE_8_BUTTON1), SEQ_DEF_0 )
 
-	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL2,				"P1 Pedal 2",			SEQ_DEF_1(JOYCODE_1_ANALOG_PEDAL2), SEQ_DEF_3(KEYCODE_LALT, CODE_OR, JOYCODE_1_BUTTON2), SEQ_DEF_0 )
+//	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL2,				"P1 Pedal 2",			SEQ_DEF_1(JOYCODE_1_ANALOG_PEDAL2), SEQ_DEF_3(KEYCODE_LALT, CODE_OR, JOYCODE_1_BUTTON2), SEQ_DEF_0 )
+//krb
+INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL2,				"P1 Pedal 2",			SEQ_DEF_1(JOYCODE_1_ANALOG_PEDAL2), SEQ_DEF_5(KEYCODE_LALT, CODE_OR, JOYCODE_1_BUTTON2, CODE_OR, MOUSECODE_1_BUTTON2), SEQ_DEF_0 )
+
 	INPUT_PORT_ANALOG_DEF ( 2, IPG_PLAYER2,	PEDAL2,				"P2 Pedal 2",			SEQ_DEF_1(JOYCODE_2_ANALOG_PEDAL2), SEQ_DEF_3(KEYCODE_S, CODE_OR, JOYCODE_2_BUTTON2), SEQ_DEF_0 )
 	INPUT_PORT_ANALOG_DEF ( 3, IPG_PLAYER3,	PEDAL2,				"P3 Pedal 2",			SEQ_DEF_1(JOYCODE_3_ANALOG_PEDAL2), SEQ_DEF_3(KEYCODE_RSHIFT, CODE_OR, JOYCODE_3_BUTTON2), SEQ_DEF_0 )
 	INPUT_PORT_ANALOG_DEF ( 4, IPG_PLAYER4,	PEDAL2,				"P4 Pedal 2",			SEQ_DEF_1(JOYCODE_4_ANALOG_PEDAL2), SEQ_DEF_3(KEYCODE_DEL_PAD, CODE_OR, JOYCODE_4_BUTTON2), SEQ_DEF_0 )
@@ -1000,6 +1007,11 @@ int input_port_init(void (*construct_ipt)(input_port_init_params *))
 
 	/* propogate these changes forward to the final input list */
 	memcpy(default_ports, default_ports_backup, sizeof(default_ports));
+    //krb clean
+    input_ports_default = NULL;
+	memset(joystick_info, 0, sizeof(joystick_info));
+	memset(ui_memory, 0, sizeof(ui_memory));
+	//memset(default_ports_lookup, 0, sizeof(default_ports_lookup));
 
 	/* make a lookup table mapping type/player to the default port list entry */
 	for (ipnum = 0; ipnum < __ipt_max; ipnum++)
@@ -1050,74 +1062,46 @@ int input_port_init(void (*construct_ipt)(input_port_init_params *))
 	return 0;
 }
 
-
-// just to get nbplayers
-int input_port_init_KRB(void (*construct_ipt)(input_port_init_params *))
-{
-	int ipnum, player;
-
-	/* start with the raw defaults and ask the OSD to customize them in the backup array */
-	memcpy(default_ports_backup, default_ports_builtin, sizeof(default_ports_backup));
-	osd_customize_inputport_list(default_ports_backup);
-
-	/* propogate these changes forward to the final input list */
-	memcpy(default_ports, default_ports_backup, sizeof(default_ports));
-
-	/* make a lookup table mapping type/player to the default port list entry */
-	for (ipnum = 0; ipnum < __ipt_max; ipnum++)
-		for (player = 0; player < MAX_PLAYERS; player++)
-			default_ports_lookup[ipnum][player] = -1;
-	for (ipnum = 0; default_ports[ipnum].type != IPT_END; ipnum++)
-		default_ports_lookup[default_ports[ipnum].type][default_ports[ipnum].player] = ipnum;
-
-	/* reset the port info */
-	memset(port_info, 0, sizeof(port_info));
-
-	/* if we have inputs, process them now */
-	if (construct_ipt)
-	{
-		input_port_entry *port;
-		int portnum;
-
-		/* allocate input ports */
-		Machine->input_ports = input_port_allocate(construct_ipt, NULL);
-		if (!Machine->input_ports)
-			return 1;
-
-		/* allocate default input ports */
-		input_ports_default = input_port_allocate(construct_ipt, NULL);
-		if (!input_ports_default)
-			return 1;
-
-		/* identify all the tagged ports up front so the memory system can access them */
-		portnum = 0;
-		for (port = Machine->input_ports; port->type != IPT_END; port++)
-			if (port->type == IPT_PORT)
-				port_info[portnum++].tag = port->start.tag;
-
-		/* look up all the tags referenced in conditions */
-		for (port = Machine->input_ports; port->type != IPT_END; port++)
-			if (port->condition.tag)
-			{
-				int tag = port_tag_to_index(port->condition.tag);
-				if (tag == -1)
-					fatalerror("Conditional port references invalid tag '%s'", port->condition.tag);
-				port->condition.portnum = tag;
-			}
-	}
-
-	/* register callbacks for when we load configurations */
-//	config_register("input", input_port_load, input_port_save);
-
-	return 0;
-}
-
-
 /*************************************
  *
  *  Input port initialization
  *
  *************************************/
+
+
+// void traceinputports()
+// {
+//     input_port_entry *port;
+//     analog_port_info *	info;
+
+// 	/* loop over all analog ports in this port number */
+// 	for (int portnum=0;portnum<MAX_INPUT_PORTS;portnum++)
+// 	{
+//         for (info = port_info[portnum].analoginfo; info != NULL; info = info->next)
+//         {
+//             input_port_entry *port = info->port;
+//         printf("I m:%d def%d t%d p%d\n",(int)port->mask,(int)port->default_value,(int)port->type,(int)port->player);
+//         printf("min%d max%d sens%d delta%d cend%d  rev%d res:%d\n",
+//             (int)port->analog.min,(int)port->analog.max,(int)port->analog.sensitivity,
+//             (int)port->analog.delta,(int)port->analog.centerdelta,(int)port->analog.reverse,(int)port->analog.reset
+//         );
+
+//     //	struct
+//     //	{
+//     //		INT32	min;			/* minimum value for absolute axes */
+//     //		INT32	max;			/* maximum value for absolute axes */
+//     //		INT32	sensitivity;	/* sensitivity (100=normal) */
+//     //		INT32	delta;			/* delta to apply each frame a digital inc/dec key is pressed */
+//     //		INT32	centerdelta;	/* delta to apply each frame no digital inputs are pressed */
+//     //		UINT8	reverse;		/* reverse the sense of the analog axis */
+//     //		UINT8	reset;			/* always preload in->default for relative axes, returning only deltas */
+//     //		input_seq incseq;		/* increment sequence */
+//     //		input_seq decseq;		/* decrement sequence */
+//     //	} analog;
+//         }
+//     }
+
+// }
 
 static void input_port_postload(void)
 {
@@ -1285,6 +1269,7 @@ static void input_port_postload(void)
 		}
 	}
 
+//traceinputports();
 	/* run an initial update */
 	input_port_vblank_start();
 }

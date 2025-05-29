@@ -41,6 +41,24 @@ void m68k_op_dbf_16(M68KOPT_PARAMS)
 	USE_CYCLES(CYC_DBCC_F_EXP);
 }
 
+void krb_gforce2_m68k_op_dbf_16(M68KOPT_PARAMS)
+{
+    regir = 0x51c9;
+#ifdef LSB_FIRST
+	uint* r_dst = &DY;
+	uint res = 0xffff; // MASK_OUT_ABOVE_16(*r_dst - 1);
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+#else
+    uint16 * r_dst = ((uint16 *)&DY)+1; //krb:  just shift to get value, no mask needed.
+    uint16 res =  0xffff;
+    *r_dst = res;
+#endif
+    SET_CYCLES(0);
+
+	REG_PC += 2;
+	USE_CYCLES(CYC_DBCC_F_EXP);
+}
+
 
 void m68k_op_dbhi_16(M68KOPT_PARAMS)
 {

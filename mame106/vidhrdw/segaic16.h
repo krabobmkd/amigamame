@@ -3,7 +3,8 @@
     Sega 16-bit common hardware
 
 ***************************************************************************/
-
+#ifndef _SEGAIC16_H_
+#define _SEGAIC16_H_
 /* globals */
 extern UINT8 segaic16_display_enable;
 extern UINT16 *segaic16_tileram_0;
@@ -87,3 +88,42 @@ WRITE16_HANDLER( segaic16_road_control_0_w );
 int segaic16_rotate_init(int which, int type, int colorbase);
 void segaic16_rotate_draw(int which, mame_bitmap *bitmap, const rectangle *cliprect, mame_bitmap *srcbitmap);
 READ16_HANDLER( segaic16_rotate_control_0_r );
+
+
+struct sprite_info
+{
+	UINT8			index;							/* index of this structure */
+	UINT8			type;							/* type of sprite system (see segaic16.h for details) */
+	UINT8			flip;							/* screen flip? */
+	UINT8			shadow;							/* shadow or hilight? */
+	UINT8			bank[16];						/* banking redirection */
+	UINT16			colorbase;						/* base color index */
+	INT32			ramsize;						/* size of sprite RAM */
+	INT32			xoffs;							/* X scroll offset */
+	void			(*draw)(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
+	UINT16 *		spriteram;						/* pointer to spriteram pointer */
+	UINT16 *		buffer;							/* buffered spriteram for those that use it */
+};
+
+struct palette_info
+{
+	INT32			entries;						/* number of entries (not counting shadows) */
+	UINT8			normal[32];						/* RGB translations for normal pixels */
+	UINT8			shadow[32];						/* RGB translations for shadowed pixels */
+	UINT8			hilight[32];					/* RGB translations for hilighted pixels */
+};
+
+
+struct rotate_info
+{
+	UINT8			index;							/* index of this structure */
+	UINT8			type;							/* type of rotate system (see segaic16.h for details) */
+	UINT16			colorbase;						/* base color index */
+	INT32			ramsize;						/* size of rotate RAM */
+	UINT16 *		rotateram;						/* pointer to rotateram pointer */
+	UINT16 *		buffer;							/* buffered data */
+};
+
+
+
+#endif

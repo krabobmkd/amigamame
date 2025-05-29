@@ -324,8 +324,9 @@ void MameConfig::toDefault()
  //NOT THIS ONE !! decide where configs are written:  _misc._userPath = "PROGDIR:user";
     _misc._useCheatCodeFile = false;
     _misc._cheatFilePath = "PROGDIR:cheat.dat";
-    _misc._MiscFlags = 0;
-
+   // _misc._MiscFlags = 0;
+    _misc._Goodies =  GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR;
+    _misc._Optims = OPTIMFLAGS_DIRECTWGXWIN;
 
 }
 MameConfig::Display_PerScreenMode::Display_PerScreenMode() : ASerializable() {
@@ -524,12 +525,24 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
     serializer("Skip",_skipflags,0,{"Disclaimer","Game Info"});
     serializer("NeoGeo Bios",_neogeo_bios,_neogeoBiosList);
 
-    serializer("Also...",_MiscFlags,
-                        0 | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
-                    ,{
-        "CD32 Pads uses AMEGA32 Adapter:\nSwitch 6 buttons to fit SF2."
-        });
+    // serializer("Also...",_MiscFlags,
+    //                     0 | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
+    //                 ,{
+    //     "CD32 Pads uses AMEGA32 Adapter:\nSwitch 6 buttons to fit SF2."
+    //     });
 
+    serializer("Display Controls",_Goodies,
+          GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR | SERFLAG_GROUP_FLAGINT2COLUMS // this field both used for default values and UI preference .
+    ,{
+        "Steering Wheel"
+        ,"Gear Shift"
+      });
+
+    serializer("Optims",_Optims,
+          OPTIMFLAGS_DIRECTWGXWIN //def.
+    ,{
+        "Direct draw for RTG Windows"
+      });
 
 }
 MameConfig::Help::Help() : ASerializable() {
@@ -915,5 +928,14 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     }
 #endif
 
+}
+
+extern "C"
+{
+unsigned int GetDisplayGoodiesFlags()
+{
+   MameConfig &c = getMainConfig();
+   return (unsigned int )c.misc()._Goodies;
+}
 }
 

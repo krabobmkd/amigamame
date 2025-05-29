@@ -5315,6 +5315,23 @@ void m68k_op_bclr_8_s_di(M68KOPT_PARAMS)
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
 }
+//krb patch
+void krb_thndrbld_m68k_op_bclr_8_s_di(M68KOPT_PARAMS)
+{
+// regir = 0x08ad;
+	uint mask = 1 << (OPER_I_8(p68k) & 7);
+	uint ea = EA_AY_DI_8();
+	uint src = p68k->mem.read8(ea);
+
+	FLAG_Z = src & mask;
+	m68ki_write_8(ea, src & ~mask);
+	// don't hog and pass to other cpu
+	if(!FLAG_Z)
+	{
+    	SET_CYCLES(0);
+	}
+}
+
 
 
 void m68k_op_bclr_8_s_ix(M68KOPT_PARAMS)
@@ -5337,7 +5354,22 @@ void m68k_op_bclr_8_s_aw(M68KOPT_PARAMS)
 	FLAG_Z = src & mask;
 	m68ki_write_8(ea, src & ~mask);
 }
+//krb patch
+void krb_thndrbld_m68k_op_bclr_8_s_aw(M68KOPT_PARAMS)
+{
+ //   regir = 0x08b8;
+	uint mask = 1 << (OPER_I_8(p68k) & 7);
+	uint ea = EA_AW_8();
+	uint src = p68k->mem.read8(ea);
 
+	FLAG_Z = src & mask;
+	m68ki_write_8(ea, src & ~mask);
+	// don't hog and pass to other cpu
+	if(!FLAG_Z)
+	{
+    	SET_CYCLES(0);
+	}
+}
 
 void m68k_op_bclr_8_s_al(M68KOPT_PARAMS)
 {

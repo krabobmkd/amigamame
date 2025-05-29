@@ -119,6 +119,43 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 
 	profiler_mark(PROFILER_VIDEO);
 
+
+
+    struct drawgfxParams dgp0={
+        rawbitmap, 	// dest
+        Machine->gfx[0], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        NULL, 	// clip
+        TRANSPARENCY_PEN, 	// transparency
+        15, 	// transparent_color
+        0, 	// scalex
+        0, 	// scaley
+        NULL, 	// pri_buffer
+        0 	// priority_mask
+      };
+    struct drawgfxParams dgpz0={
+        rawbitmap, 	// dest
+        Machine->gfx[0], 	// gfx
+        0, 	// code
+        0, 	// color
+        0, 	// flipx
+        0, 	// flipy
+        0, 	// sx
+        0, 	// sy
+        NULL, 	// clip
+        shangha3_do_shadows ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, // , 	// transparency
+        15, 	// transparent_color
+        0x00010000, 	// scalex
+        0x00010000, 	// scaley
+        NULL, 	// pri_buffer
+        0 	// priority_mask
+      };
+
 	for (offs = gfxlist_addr << 3;offs < shangha3_ram_size/2;offs += 16)
 	{
 		int sx,sy,x,y,code,color,flipx,flipy,sizex,sizey,zoomx,zoomy;
@@ -150,7 +187,8 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 && sizex < 512 && sizey < 256 && zoomx < 0x1f0 && zoomy < 0x1f0)
 		{
 			rectangle myclip;
-
+            dgp0.clip = &myclip;
+            dgpz0.clip = &myclip;
 //if (shangha3_ram[offs+11] || shangha3_ram[offs+12])
 //logerror("offs %04x: sx %04x sy %04x zoom %04x %04x %04x %04x fx %d fy %d\n",offs,sx,sy,zoomx,shangha3_ram[offs+11]),shangha3_ram[offs+12],zoomy,flipx,flipy);
 
@@ -186,42 +224,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 					srcy /= 16;
 				}
 
-				
-				{ 
-				struct drawgfxParams dgp0={
-					rawbitmap, 	// dest
-					Machine->gfx[0], 	// gfx
-					0, 	// code
-					0, 	// color
-					0, 	// flipx
-					0, 	// flipy
-					0, 	// sx
-					0, 	// sy
-					&myclip, 	// clip
-					TRANSPARENCY_PEN, 	// transparency
-					15, 	// transparent_color
-					0, 	// scalex
-					0, 	// scaley
-					NULL, 	// pri_buffer
-					0 	// priority_mask
-				  };
-                struct drawgfxParams dgpz0={
-                    rawbitmap, 	// dest
-                    Machine->gfx[0], 	// gfx
-                    0, 	// code
-                    0, 	// color
-                    0, 	// flipx
-                    0, 	// flipy
-                    0, 	// sx
-                    0, 	// sy
-                    &myclip, 	// clip
-                    shangha3_do_shadows ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN, 	// transparency
-                    15, 	// transparent_color
-                    0x00010000, 	// scalex
-                    0x00010000, 	// scaley
-                    NULL, 	// pri_buffer
-                    0 	// priority_mask
-                  };
+
 				for (y = 0;y < h;y++)
 				{
 					for (x = 0;x < w;x++)
@@ -261,7 +264,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 						drawgfx(&dgp0);
 					}
 				}
-				} // end of patch paragraph
+
 
 			}
 			else	/* sprite */
@@ -275,6 +278,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
                     dgpz0.flipy = flipy;
                     dgpz0.sx = sx;
                     dgpz0.sy = sy;
+
                     dgpz0.scalex = 0x1000000;
                     dgpz0.scaley = 0x1000000;
                     drawgfxzoom(&dgpz0);

@@ -8530,6 +8530,22 @@ void m68k_op_tst_8_aw(M68KOPT_PARAMS)
 }
 
 
+void krb_gforce2_m68k_op_tst_8_aw(M68KOPT_PARAMS)
+{
+	uint res = OPER_AW_8(M68KOPT_PASSPARAMS);
+
+	FLAG_N = NFLAG_8(res);
+	FLAG_Z = res;
+	FLAG_V = VFLAG_CLEAR;
+	FLAG_C = CFLAG_CLEAR;
+
+    if(res == 0)
+    {
+    	SET_CYCLES(0); // means, qut CPU2 loop asap and go treat other CPU without busy loop that hogs.
+    }
+}
+
+
 void m68k_op_tst_8_al(M68KOPT_PARAMS)
 {
 	uint res = OPER_AL_8(M68KOPT_PASSPARAMS);
@@ -8660,12 +8676,15 @@ void m68k_op_tst_16_di(M68KOPT_PARAMS)
 }
 void krb_outrun_m68k_op_tst_16_di(M68KOPT_PARAMS)
 {
+    // original opcode for this call, have been redirected to other free opcode for patch.
+    // so "regir" is fake, need to retablish right value.
+    regir = 0x4a6d;
 	uint res = OPER_AY_DI_16(M68KOPT_PASSPARAMS);
     if(res == 0)
     {
         // means busy wait, other cpu should work asap, force quitting execute loop just next.
    		//CPU_INT_CYCLES = m68k_ICount;
-    	SET_CYCLES(0);
+    	SET_CYCLES(0); // means, qut CPU2 loop asap and go treat other CPU without busy loop that hogs.
     }
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -8713,7 +8732,6 @@ void krb_outrun_m68k_op_tst_16_al(M68KOPT_PARAMS)
     if(res == 0)
     {
         // means busy wait, other cpu should work asap, force quitting execute loop just next.
-
     	SET_CYCLES(0);
     	//m68k_ICount = 0;
     }

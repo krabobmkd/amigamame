@@ -8,6 +8,7 @@
 #include "m68kkrbopt.h"
 #include "m68kcpu.h"
 #include "drivertuning.h"
+#include <stdio.h>
 /* global access */
 
 //struct m68k_memory_interface m68k_memory_intf;
@@ -17,6 +18,7 @@ offs_t m68k_encrypted_opcode_end[MAX_CPU];
 
 void m68k_set_encrypted_opcode_range(int cpunum, offs_t start, offs_t end)
 {
+// printf("m68k_set_encrypted_opcode_range: cpu:%d start:%d end:%d\n",cpunum,start,end);
 	m68k_encrypted_opcode_start[cpunum] = start;
 	m68k_encrypted_opcode_end[cpunum] = end;
 }

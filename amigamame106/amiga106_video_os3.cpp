@@ -240,7 +240,7 @@ void Drawable_OS3::initRemapTable()
             // use exact palette index and update if nb color fits.
             Screen *pScreen = _drawable.screen();
             int privScreenNbColors = 1<<(pScreen->RastPort.BitMap->Depth);
-            if(_colorsIndexLength<=(privScreenNbColors+6))
+            if(_colorsIndexLength<=(privScreenNbColors+10))
                      _pRemap = new Paletted_Screen8(pScreen);
             // force fixed palette and manage large index to this index at palette change.
             else _pRemap = new Paletted_Screen8ForcePalette(pScreen);
@@ -369,8 +369,9 @@ void Intuition_Screen_OS3::draw(_mame_display *display)
     // WritePixelArrays is OS3.0, We could use WriteChunkyPixels which is OS3.1.
     // note: all (even OS3.2.x) AGA/ECS versions are damn slow, must use patch blazewcp (not new WPA)
 
-    ULONG destflags = GetBitMapAttr(_pScreen->RastPort.BitMap,BMA_FLAGS);
+
 #ifdef ACTIVATE_OWN_C2P
+    ULONG destflags = GetBitMapAttr(_pScreen->RastPort.BitMap,BMA_FLAGS);
     if( (destflags & BMF_STANDARD) != 0 )
     {   // would mean it's OCS/AGA
         Drawable_OS3::draw_c2p(display);

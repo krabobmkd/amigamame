@@ -12,7 +12,7 @@
 extern void *fd1089_get_decrypted_base(void);
 extern void fd1094_machine_init(void);
 extern void *fd1094_get_decrypted_base(void);
-
+extern void fd1094_krb_preclean(void); // need super early clean
 
 /*************************************
  *
@@ -135,7 +135,13 @@ void segaic16_memory_mapper_init(int cpunum, const struct segaic16_memory_map_en
         memset(&multiply[0],0,sizeof(struct multiply_chip)*3);
         memset(&divide[0],0,sizeof(struct divide_chip)*3);
         memset(&compare_timer[0],0,sizeof(struct compare_timer_chip)*2);
+
+        // krb 8/05/2025:
+        // this corrects the thunderblade/WB3/outrun/shagon in-same-session interblocking !!!
+        // we've been searching that for a long time, fiestaaaaa tonight !
+        fd1094_krb_preclean();
     }
+
 	struct memory_mapper_chip *chip = &memory_mapper;
 
 	/* reset the chip structure */

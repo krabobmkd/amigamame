@@ -114,6 +114,8 @@ protected:
         LTabs(MUISerializer &ser,ASerializable *pconf);
         void compile() override;
         std::vector<const char *> _registerTitles;
+        //struct Hook _pageChangeHook;
+        //static ULONG PageChangeNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1));
 	};
 
     struct LString : public Level {
@@ -124,6 +126,7 @@ protected:
         std::string *_str;
         int _flgs;
         Object *_STRING_Path;
+        Object *_popBt;
         struct Hook _notifyHook;
 	};
     struct LSlider : public Level {

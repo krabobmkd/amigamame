@@ -63,7 +63,10 @@ static UINT8 colormode, highlight_method;
 static pen_t total_colors;
 static pen_t total_colors_with_ui;
 
-static pen_t black_pen, white_pen;
+pen_t black_pen, white_pen;
+pen_t grey_pen, dblue_pen,blue_pen,yellow_pen;
+pen_t orange_pen,mar1_pen,mar2_pen,red_pen;
+
 
 UINT8 color_correct_table[(MAX_PEN_BRIGHTNESS * MAX_PEN_BRIGHTNESS) >> PEN_BRIGHTNESS_BITS];
 
@@ -508,7 +511,7 @@ void palette_set_highlight_method(int method)
 
 static int palette_alloc(void)
 {
-	int max_total_colors = total_colors + 2;
+	int max_total_colors = total_colors + 10;
 	int i;
 
 	/* allocate memory for the raw game palette */
@@ -691,12 +694,35 @@ int palette_init(void)
 				palette_set_color(i, RGB_RED(game_palette[i]), RGB_GREEN(game_palette[i]), RGB_BLUE(game_palette[i]));
 
 			/* map the UI pens */
-			if (total_colors_with_ui <= 65534)
+			if (total_colors_with_ui <= (65536-(2+4)) )
 			{
 				game_palette[total_colors + 0] = adjusted_palette[total_colors + 0] = MAKE_RGB(0x00,0x00,0x00);
 				game_palette[total_colors + 1] = adjusted_palette[total_colors + 1] = MAKE_RGB(0xff,0xff,0xff);
+				//grey
+				game_palette[total_colors + 2] = adjusted_palette[total_colors + 2] = MAKE_RGB(0xaa,0xaa,0xaa);
+				//dblue
+				game_palette[total_colors + 3] = adjusted_palette[total_colors + 3] = MAKE_RGB(0x28,0x40,0xaa);
+				//blue
+				game_palette[total_colors + 4] = adjusted_palette[total_colors + 4] = MAKE_RGB(0x38,0x50,0xcc);
+				//yellow
+				game_palette[total_colors + 5] = adjusted_palette[total_colors + 5] = MAKE_RGB(252,191,0);
+                // orange
+				game_palette[total_colors + 6] = adjusted_palette[total_colors + 6] = MAKE_RGB(254,104,0);
+                game_palette[total_colors + 7] = adjusted_palette[total_colors + 7] = MAKE_RGB(136,57,28);
+                game_palette[total_colors + 8] = adjusted_palette[total_colors + 8] = MAKE_RGB(81,34,28);
+                //red
+                game_palette[total_colors + 9] = adjusted_palette[total_colors + 9] = MAKE_RGB(243,40,17);
+
 				black_pen = total_colors_with_ui++;
 				white_pen = total_colors_with_ui++;
+				grey_pen = total_colors_with_ui++;
+				dblue_pen = total_colors_with_ui++;
+				blue_pen = total_colors_with_ui++;
+				yellow_pen = total_colors_with_ui++;
+				orange_pen = total_colors_with_ui++;
+				mar1_pen = total_colors_with_ui++;
+				mar2_pen = total_colors_with_ui++;
+                red_pen = total_colors_with_ui++;
 			}
 			else
 			{
@@ -704,6 +730,8 @@ int palette_init(void)
 				game_palette[65535] = adjusted_palette[65535] = MAKE_RGB(0xff,0xff,0xff);
 				black_pen = 0;
 				white_pen = 65535;
+				yellow_pen = red_pen = grey_pen = white_pen;
+				mar2_pen = mar1_pen = orange_pen = dblue_pen = blue_pen = black_pen;
 			}
 			break;
 		}
@@ -718,6 +746,17 @@ int palette_init(void)
 			/* map the UI pens */
 			black_pen = rgb_to_direct15(MAKE_RGB(0x00,0x00,0x00));
 			white_pen = rgb_to_direct15(MAKE_RGB(0xff,0xff,0xff));
+			grey_pen = rgb_to_direct15(MAKE_RGB(0xaa,0xaa,0xaa));
+			dblue_pen = rgb_to_direct15(MAKE_RGB(0x28,0x40,0xaa));
+			blue_pen = rgb_to_direct15(MAKE_RGB(0x38,0x50,0xcc));
+			yellow_pen = rgb_to_direct15(MAKE_RGB(252,191,0));
+
+			orange_pen = rgb_to_direct15(MAKE_RGB(254,104,0));
+			mar1_pen = rgb_to_direct15(MAKE_RGB(136,57,28));
+			mar2_pen = rgb_to_direct15(MAKE_RGB(81,34,28));
+			red_pen = rgb_to_direct15(MAKE_RGB(243,40,17));
+
+
 			break;
 		}
 
@@ -730,6 +769,16 @@ int palette_init(void)
 			/* map the UI pens */
 			black_pen = rgb_to_direct32(MAKE_RGB(0x00,0x00,0x00));
 			white_pen = rgb_to_direct32(MAKE_RGB(0xff,0xff,0xff));
+			grey_pen = rgb_to_direct32(MAKE_RGB(0xaa,0xaa,0xaa));
+			dblue_pen = rgb_to_direct32(MAKE_RGB(0x28,0x40,0xaa));
+			blue_pen = rgb_to_direct32(MAKE_RGB(0x38,0x50,0xcc));
+
+			yellow_pen = rgb_to_direct32(MAKE_RGB(252,191,0));
+			orange_pen = rgb_to_direct32(MAKE_RGB(254,104,0));
+			mar1_pen = rgb_to_direct32(MAKE_RGB(136,57,28));
+			mar2_pen = rgb_to_direct32(MAKE_RGB(81,34,28));
+			red_pen = rgb_to_direct32(MAKE_RGB(243,40,17));
+
 			break;
 		}
 	}
@@ -1230,3 +1279,4 @@ pen_t get_white_pen(void)
 {
 	return white_pen;
 }
+

@@ -1,12 +1,7 @@
 /**************************************************************************
  *
- * Copyright (C) 1999 Mats Eirik Hansen (mats.hansen@triumph.no)
+ * Copyright (C) 2025 Krb
  *
- * $Id: main.c,v 1.1 1999/04/28 18:54:28 meh Exp meh $
- *
- * $Log: main.c,v $
- * Revision 1.1  1999/04/28 18:54:28  meh
- * Initial revision
  *
  *
  *************************************************************************/
@@ -23,7 +18,12 @@ extern "C" {
     #include "unzip.h"
 
 }
-
+//#define STATCPUINSTR 1
+#ifdef STATCPUINSTR
+extern "C" {
+    #include "cpustats.h"
+}
+#endif
 #include <stdio.h>
 #include <strings.h>
 //#include <locale.h>
@@ -146,6 +146,10 @@ void mameExitCleanCtrlC(void);
 // exit code that is called from any exit() and ctrl-c breaks:
 void main_close()
 {
+#ifdef STATCPUINSTR
+    cpustats_log();
+#endif
+
    // printf("does main_close\n");
 
     mameExitCleanCtrlC(); // flush game allocs, ahcked from mame.c, in case stopped during game.

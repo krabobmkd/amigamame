@@ -14,6 +14,7 @@
 #include "profiler.h"
 #include <time.h>
 #include <ctype.h>
+#include <stdio.h>
 
 
 
@@ -529,6 +530,14 @@ int code_init(void)
 	const os_code_info *info;
 	input_code codenum;
 	int extras;
+
+    //krb clean
+    code_map = NULL;
+    code_count = 0;
+    memset(record_seq,0,sizeof(record_seq));
+    record_count = 0;
+    record_last = 0;
+    record_analog = 0;
 
 	/* go through and count how many non-standard inputs we have */
 	extras = 0;
@@ -1241,6 +1250,7 @@ static int is_seq_valid(const input_seq *seq)
 
 void seq_read_async_start(int analog)
 {
+    //printf("seq_read_async_start: analog:%d\n",analog);
 	input_code codenum;
 
 	/* reset the recording count and the clock */

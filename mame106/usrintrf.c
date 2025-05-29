@@ -23,7 +23,7 @@ To do:
 #include <ctype.h>
 #include <stdarg.h>
 #include <math.h>
-
+#include <drawCtrl.h>
 #ifdef MESS
 #include "mess.h"
 #include "mesintrf.h"
@@ -32,6 +32,9 @@ To do:
 
 #include <stdio.h>
 
+extern pen_t black_pen, white_pen;
+extern pen_t grey_pen, dblue_pen,blue_pen,yellow_pen;
+extern pen_t orange_pen,mar1_pen,mar2_pen,red_pen;
 
 /*************************************
  *
@@ -91,8 +94,8 @@ struct _input_item_data
  *
  *************************************/
 
-#define UI_BOX_LR_BORDER		(ui_get_char_width(' ') / 2)
-#define UI_BOX_TB_BORDER		(ui_get_char_width(' ') / 2)
+#define UI_BOX_LR_BORDER		((ui_get_char_width(' ') / 2)+6)
+#define UI_BOX_TB_BORDER		((ui_get_char_width(' ') / 2)+4)
 
 
 
@@ -135,8 +138,8 @@ static int show_profiler;
 
 static UINT8 ui_dirty;
 
-static gfx_element *uirotfont;
-static pen_t uirotfont_colortable[2*2];
+static gfx_element *uirotfont=NULL;
+static pen_t uirotfont_colortable[16];
 
 static char popup_text[200];
 static int popup_text_counter;
@@ -158,12 +161,13 @@ struct _render_element
 {
 	int x, y;
 	int x2, y2;
-	UINT16 type;
+	UINT32 type;
 	rgb_t color;
 };
 typedef struct _render_element render_element;
 
-static render_element elemlist[MAX_RENDER_ELEMENTS];
+//static render_element elemlist[MAX_RENDER_ELEMENTS];
+static render_element *elemlist=NULL;
 static int elemindex;
 /* -- end this stuff will go away with the new rendering system */
 
@@ -310,15 +314,15 @@ static const UINT8 uifontdata[] =
 #define MAX_UIFONT_SIZE 8 /* max(width,height) */
 static const gfx_layout uifontlayout =
 {
-	6,8,
-	256,
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	6,8, //.width and height (in pixels) of chars/sprites
+	256, //.total nb shapes codes
+	1, //.planes nb bitplanes
+	{ 0 }, // planesoffsets
+	{ 0, 1, 2, 3, 4, 5, 6, 7 }, // xoffsets
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 }, // yoffset
+	8*8 // .charincrement distance between two consecutive characters/sprites
+	//....
 };
-
 
 
 /*************************************
@@ -366,6 +370,7 @@ static int sprintf_game_info(char *buf);
 static void ui_raw2rot_rect(rectangle *rect);
 static void ui_rot2raw_rect(rectangle *rect);
 static void add_line(int x1, int y1, int x2, int y2, rgb_t color);
+static void add_image(int x1, int y1,int il);
 static void add_fill(int left, int top, int right, int bottom, rgb_t color);
 static void add_char(int x, int y, UINT16 ch, int color);
 static void add_filled_box(int x1, int y1, int x2, int y2);
@@ -373,7 +378,15 @@ static void render_ui(mame_bitmap *dest);
 /* -- end this stuff will go away with the new rendering system */
 
 
-
+static struct drawableExtra_Img *_minilogo = NULL;
+static struct drawableExtra_Img *_minilogo2 = NULL;
+static void deleteLogo()
+{
+    if(_minilogo) drawextra_deleteImg(_minilogo);
+    _minilogo = NULL;
+    if(_minilogo2) drawextra_deleteImg(_minilogo2);
+    _minilogo2 = NULL;
+}
 /*************************************
  *
  *  Main initialization
@@ -383,8 +396,18 @@ static void render_ui(mame_bitmap *dest);
 int ui_init(int show_disclaimer, int show_warnings, int show_gameinfo)
 {
 	/* load the localization file */
-	if (uistring_init(options.language_file) != 0)
-		fatalerror("uistring_init failed");
+	/*krb: moved early before mchine */
+//	if (uistring_init(options.language_file) != 0)
+//		fatalerror("uistring_init failed");
+
+    elemlist = auto_malloc(sizeof(render_element)*MAX_RENDER_ELEMENTS);
+
+    _minilogo = drawextra_createLogo("minilogo.png");
+    _minilogo2 = drawextra_createLogo("minilogo2.png");
+// printf("_minilogo2:%08x\n",(int)_minilogo2);
+
+    //if(_minilogo)
+    add_exit_callback(deleteLogo);
 
 	/* build up the font */
 	create_font();
@@ -695,7 +718,7 @@ void ui_draw_text(const char *buf, int x, int y)
 {
 	int ui_width, ui_height;
 	ui_get_bounds(&ui_width, &ui_height);
-	ui_draw_text_full(buf, x, y, ui_width - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, RGB_WHITE, RGB_BLACK, NULL, NULL);
+	ui_draw_text_full(buf, x, y, ui_width - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE,0, NULL, NULL);
 }
 
 
@@ -706,12 +729,21 @@ void ui_draw_text(const char *buf, int x, int y)
  *
  *************************************/
 
-void ui_draw_text_full(const char *s, int x, int y, int wrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, int *totalwidth, int *totalheight)
+void ui_draw_text_full(const char *s, int x, int y, int wrapwidth, int justify, int wrap, int draw,
+        int reversecolors,
+        //rgb_t fgcolor, rgb_t bgcolor,
+        int *totalwidth, int *totalheight)
 {
 	const char *linestart;
 	int cury = y;
 	int maxwidth = 0;
 
+    rgb_t fgcolor=white_pen;
+    rgb_t bgcolor=dblue_pen;
+    if(reversecolors) {
+        fgcolor=dblue_pen;
+        bgcolor=white_pen;
+    }
 	/* if we don't want wrapping, guarantee a huge wrapwidth */
 	if (wrap == WRAP_NEVER)
 		wrapwidth = 1 << 30;
@@ -855,7 +887,7 @@ void ui_draw_text_full(const char *s, int x, int y, int wrapwidth, int justify, 
  *
  *************************************/
 
-void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
+void ui_draw_menu(const ui_menu_item *items, int numitems, int selected,int doicons)
 {
 	const char *up_arrow = ui_getstring(UI_uparrow);
 	const char *down_arrow = ui_getstring(UI_downarrow);
@@ -906,10 +938,13 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 	}
 
 	/* if we are too wide or too tall, clamp it down */
+	int iUI_BOX_TB_BORDER= UI_BOX_TB_BORDER;
+	if(doicons) iUI_BOX_TB_BORDER +=8;
+
 	if (visible_width + 2 * UI_BOX_LR_BORDER > ui_width)
 		visible_width = ui_width - 2 * UI_BOX_LR_BORDER;
-	if (visible_height + 2 * UI_BOX_TB_BORDER > ui_height)
-		visible_height = ui_height - 2 * UI_BOX_TB_BORDER;
+	if (visible_height + 2 * iUI_BOX_TB_BORDER > ui_height)
+		visible_height = ui_height - 2 * iUI_BOX_TB_BORDER;
 	visible_lines = visible_height / line_height;
 	visible_height = visible_lines * line_height;
 
@@ -918,11 +953,21 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 	visible_top = (ui_height - visible_height) / 2;
 
 	/* first add us a box */
-	add_filled_box(	visible_left - UI_BOX_LR_BORDER,
-					visible_top - UI_BOX_TB_BORDER,
-					visible_left + visible_width - 1 + UI_BOX_LR_BORDER,
-					visible_top + visible_height - 1 + UI_BOX_TB_BORDER);
+	int x1box = visible_left - UI_BOX_LR_BORDER;
+	int y1box = visible_top - UI_BOX_TB_BORDER;
+	int x2box = visible_left + visible_width - 1 + UI_BOX_LR_BORDER;
+	int y2box = visible_top + visible_height - 1 + iUI_BOX_TB_BORDER;
+	add_filled_box(	x1box,
+					y1box,
+					x2box,
+					y2box);
 
+    if(doicons)
+    {
+        add_image(x1box,y1box-6,0);
+        add_image(x2box-20,y2box-16,1);
+        //add_image(x1box,y1box,0);
+    }
 	/* determine the first visible line based on the current selection */
 	top_line = selected - visible_lines / 2;
 	if (top_line < 0)
@@ -944,17 +989,17 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 		/* if we're on the top line, display the up arrow */
 		if (linenum == 0 && top_line != 0)
 			ui_draw_text_full(up_arrow, effective_left, line_y, effective_width,
-						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, NULL);
+						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, 0, NULL, NULL);
 
 		/* if we're on the bottom line, display the down arrow */
 		else if (linenum == visible_lines - 1 && itemnum != numitems - 1)
 			ui_draw_text_full(down_arrow, effective_left, line_y, effective_width,
-						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, NULL);
+						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, 0, NULL, NULL);
 
 		/* if we don't have a subitem, just draw the string centered */
 		else if (!item->subtext)
 			ui_draw_text_full(item->text, effective_left, line_y, effective_width,
-						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, NULL);
+						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, 0, NULL, NULL);
 
 		/* otherwise, draw the item on the left and the subitem text on the right */
 		else
@@ -965,7 +1010,7 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 
 			/* draw the left-side text */
 			ui_draw_text_full(item->text, effective_left, line_y, effective_width,
-						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, &item_width, NULL);
+						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, 0, &item_width, NULL);
 
 			/* give 2 spaces worth of padding */
 			item_width += 2 * space_width;
@@ -980,25 +1025,25 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 
 			/* draw the subitem right-justified */
 			ui_draw_text_full(subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-						JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_OPAQUE, subitem_invert ? RGB_BLACK : RGB_WHITE, subitem_invert ? RGB_WHITE : RGB_BLACK, &subitem_width, NULL);
+						JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_OPAQUE, subitem_invert, &subitem_width, NULL);
 
 			/* apply arrows */
 			if (itemnum == selected && (item->flags & MENU_FLAG_LEFT_ARROW))
 				ui_draw_text_full(left_arrow, effective_left + effective_width - subitem_width - left_arrow_width, line_y, left_arrow_width,
-							JUSTIFY_LEFT, WRAP_NEVER, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, NULL);
+							JUSTIFY_LEFT, WRAP_NEVER, DRAW_NORMAL,0, NULL, NULL);
 			if (itemnum == selected && (item->flags & MENU_FLAG_RIGHT_ARROW))
 				ui_draw_text_full(right_arrow, visible_left, line_y, visible_width,
-							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, NULL);
+							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL,0, NULL, NULL);
 		}
 
 		/* draw the arrows for selected items */
 		if (itemnum == selected)
 		{
 			ui_draw_text_full(left_hilight, visible_left, line_y, visible_width,
-						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, NULL);
+						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL,0, NULL, NULL);
 			if (!(item->flags & (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW)))
 				ui_draw_text_full(right_hilight, visible_left, line_y, visible_width,
-							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, NULL);
+							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, 0, NULL, NULL);
 		}
 	}
 
@@ -1013,7 +1058,7 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 
 		/* compute the multi-line target width/height */
 		ui_draw_text_full(item->subtext, 0, 0, visible_width * 3 / 4,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NONE, RGB_WHITE, RGB_BLACK, &target_width, &target_height);
+					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NONE, 0, &target_width, &target_height);
 
 		/* determine the target location */
 		target_x = visible_left + visible_width - target_width - UI_BOX_LR_BORDER;
@@ -1027,7 +1072,7 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 						target_x + target_width - 1 + UI_BOX_LR_BORDER,
 						target_y + target_height - 1 + UI_BOX_TB_BORDER);
 		ui_draw_text_full(item->subtext, target_x, target_y, target_width,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, NULL);
+					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, 0, NULL, NULL);
 	}
 }
 
@@ -1137,7 +1182,7 @@ static void draw_multiline_text_box(const char *text, int justify, float xpos, f
 
 	/* compute the multi-line target width/height */
 	ui_draw_text_full(text, 0, 0, ui_width - 2 * UI_BOX_LR_BORDER,
-				justify, WRAP_WORD, DRAW_NONE, RGB_WHITE, RGB_BLACK, &target_width, &target_height);
+				justify, WRAP_WORD, DRAW_NONE, 0, &target_width, &target_height);
 	if (target_height > ui_height - 2 * UI_BOX_TB_BORDER)
 		target_height = ((ui_height - 2 * UI_BOX_TB_BORDER) / ui_get_line_height()) * ui_get_line_height();
 
@@ -1161,7 +1206,7 @@ static void draw_multiline_text_box(const char *text, int justify, float xpos, f
 					target_x + target_width - 1 + UI_BOX_LR_BORDER,
 					target_y + target_height - 1 + UI_BOX_TB_BORDER);
 	ui_draw_text_full(text, target_x, target_y, target_width,
-				justify, WRAP_WORD, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, NULL);
+				justify, WRAP_WORD, DRAW_NORMAL, 0, NULL, NULL);
 }
 
 
@@ -1243,7 +1288,7 @@ static void create_font(void)
 	{
 		/* colortable will be set at run time */
 		uirotfont->colortable = uirotfont_colortable;
-		uirotfont->total_colors = 2;
+		uirotfont->total_colors = 10;
 	}
 }
 
@@ -1453,7 +1498,7 @@ do { \
 	ADD_MENU(UI_returntogame, NULL, 0);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, state);
+	ui_draw_menu(item_list, menu_items, state,1);
 
 	/* handle the keys */
 	if (ui_menu_generic_keys((int *) &state, menu_items))
@@ -1490,7 +1535,7 @@ static UINT32 menu_default_input_groups(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, state);
+	ui_draw_menu(item_list, menu_items, state,0);
 
 	/* handle the keys */
 	if (ui_menu_generic_keys((int *) &state, menu_items))
@@ -1603,6 +1648,10 @@ static UINT32 menu_default_input(UINT32 state)
 					selected_seq = &in->defaultseq;
 					selected_defseq = &indef->defaultseq;
 				}
+
+				// krb
+
+
 				default_input_menu_add_item(&item_list[menu_items++], "%s", in->name, &in->defaultseq, &indef->defaultseq);
 			}
 
@@ -1644,7 +1693,7 @@ static UINT32 menu_default_input(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntogroup);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, selected);
+	ui_draw_menu(item_list, menu_items, selected,0);
 
 	/* if we're polling, read the sequence */
 	if (polling)
@@ -1700,11 +1749,11 @@ static UINT32 menu_default_input(UINT32 state)
  *
  *************************************/
 
-static inline void game_input_menu_add_item(ui_menu_item *item, const char *format, input_port_entry *in, void *ref, int which)
+static inline void game_input_menu_add_item(ui_menu_item *item, const char *format, input_port_entry *in, void *ref, int which, const char *pnum)
 {
 	/* set the item text using the formatting string provided */
 	item->text = &menu_string_pool[menu_string_pool_offset];
-	menu_string_pool_offset += sprintf(&menu_string_pool[menu_string_pool_offset], format, input_port_name(in)) + 1;
+	menu_string_pool_offset += sprintf(&menu_string_pool[menu_string_pool_offset], format,pnum ,input_port_name(in)) + 1;
 
 	/* set the subitem text from the sequence */
 	item->subtext = &menu_string_pool[menu_string_pool_offset];
@@ -1765,13 +1814,27 @@ static UINT32 menu_game_input(UINT32 state)
 #endif /* MESS */
 			((in->type == IPT_OTHER && in->name != IP_NAME_DEFAULT) || port_type_to_group(in->type, in->player) != IPG_INVALID))
 		{
+            char playnumstr[8]={0};
+            int donotformatnplayer=0;
+            if(in->name && (
+                (in->name[0]=='P' && in->name[1]==('0'+1+in->player) )||
+                (in->name[0]==('0'+1+in->player) )
+                            )) donotformatnplayer=1;
+            if(!in->name) donotformatnplayer=1;
+            if(in->name && !donotformatnplayer)
+            {
+                playnumstr[0] = 'P';
+                playnumstr[1] = '0'+1+in->player;
+                playnumstr[2] = ' ';
+                playnumstr[3] = 0;
+            }
 			/* if not analog, just add a standard entry for this item */
 			if (!port_type_is_analog(in->type))
 			{
 				item_data[menu_items].seq = &in->seq;
 				item_data[menu_items].sortorder = compute_port_sort_order(in);
 				item_data[menu_items].digital = TRUE;
-				game_input_menu_add_item(&item_list[menu_items], "%s", in, &item_data[menu_items], SEQ_TYPE_STANDARD);
+				game_input_menu_add_item(&item_list[menu_items], "%s%s", in, &item_data[menu_items], SEQ_TYPE_STANDARD,playnumstr);
 				menu_items++;
 			}
 
@@ -1781,19 +1844,19 @@ static UINT32 menu_game_input(UINT32 state)
 				item_data[menu_items].seq = &in->seq;
 				item_data[menu_items].sortorder = compute_port_sort_order(in);
 				item_data[menu_items].digital = FALSE;
-				game_input_menu_add_item(&item_list[menu_items], "%s Analog", in, &item_data[menu_items], SEQ_TYPE_STANDARD);
+				game_input_menu_add_item(&item_list[menu_items], "%s%s Analog", in, &item_data[menu_items], SEQ_TYPE_STANDARD,playnumstr);
 				menu_items++;
 
 				item_data[menu_items].seq = &in->analog.decseq;
 				item_data[menu_items].sortorder = compute_port_sort_order(in) | 1;
 				item_data[menu_items].digital = TRUE;
-				game_input_menu_add_item(&item_list[menu_items], "%s Dec", in, &item_data[menu_items], SEQ_TYPE_DECREMENT);
+				game_input_menu_add_item(&item_list[menu_items], "%s%s Dec", in, &item_data[menu_items], SEQ_TYPE_DECREMENT,playnumstr);
 				menu_items++;
 
 				item_data[menu_items].seq = &in->analog.incseq;
 				item_data[menu_items].sortorder = compute_port_sort_order(in) | 2;
 				item_data[menu_items].digital = TRUE;
-				game_input_menu_add_item(&item_list[menu_items], "%s Inc", in, &item_data[menu_items], SEQ_TYPE_INCREMENT);
+				game_input_menu_add_item(&item_list[menu_items], "%s%s Inc", in, &item_data[menu_items], SEQ_TYPE_INCREMENT,playnumstr);
 				menu_items++;
 			}
 		}
@@ -1812,7 +1875,7 @@ static UINT32 menu_game_input(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, selected);
+	ui_draw_menu(item_list, menu_items, selected,0);
 
 	/* if we're polling, read the sequence */
 	selected_item_data = item_list[selected].ref;
@@ -1982,7 +2045,7 @@ static UINT32 menu_switches(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, selected);
+	ui_draw_menu(item_list, menu_items, selected,0);
 
 	/* handle generic menu keys */
 	if (ui_menu_generic_keys(&selected, menu_items))
@@ -2110,7 +2173,7 @@ static UINT32 menu_analog(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, state);
+	ui_draw_menu(item_list, menu_items, state,0);
 
 	/* handle generic menu keys */
 	if (ui_menu_generic_keys((int *) &state, menu_items))
@@ -2325,7 +2388,7 @@ static UINT32 menu_memory_card(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, selected);
+	ui_draw_menu(item_list, menu_items, selected,0);
 
 	/* handle the keys */
 	if (ui_menu_generic_keys(&selected, menu_items))
@@ -3422,15 +3485,15 @@ static void drawbar(int leftx, int topy, int width, int height, int percentage, 
 	current_x = leftx + (width - 1) * percentage / 100;
 
 	/* draw the top and bottom lines */
-	add_line(leftx, bar_top, leftx + width - 1, bar_top, RGB_WHITE);
-	add_line(leftx, bar_bottom, leftx + width - 1, bar_bottom, RGB_WHITE);
+	add_line(leftx, bar_top, leftx + width - 1, bar_top, white_pen);
+	add_line(leftx, bar_bottom, leftx + width - 1, bar_bottom, white_pen);
 
 	/* draw default marker */
-	add_line(default_x, topy, default_x, bar_top, RGB_WHITE);
-	add_line(default_x, bar_bottom, default_x, topy + height - 1, RGB_WHITE);
+	add_line(default_x, topy, default_x, bar_top, white_pen);
+	add_line(default_x, bar_bottom, default_x, topy + height - 1, white_pen);
 
 	/* fill in the percentage */
-	add_fill(leftx, bar_top + 1, current_x, bar_bottom - 1, RGB_WHITE);
+	add_fill(leftx, bar_top + 1, current_x, bar_bottom - 1, white_pen);
 }
 
 
@@ -3442,6 +3505,9 @@ static void displayosd(const char *text,int percentage,int default_percentage)
 	int ui_width, ui_height;
 	int text_height;
 
+    int textbg = dblue_pen;
+    int textpen = white_pen;
+
 	/* get our UI bounds */
 	ui_get_bounds(&ui_width, &ui_height);
 
@@ -3451,7 +3517,7 @@ static void displayosd(const char *text,int percentage,int default_percentage)
 
 	/* determine the text height */
 	ui_draw_text_full(text, 0, 0, ui_width - 2 * UI_BOX_LR_BORDER,
-				JUSTIFY_CENTER, WRAP_WORD, DRAW_NONE, RGB_WHITE, RGB_BLACK, NULL, &text_height);
+				JUSTIFY_CENTER, WRAP_WORD, DRAW_NONE,0, NULL, &text_height);
 
 	/* add a box around the whole area */
 	add_filled_box(	space_width,
@@ -3465,7 +3531,7 @@ static void displayosd(const char *text,int percentage,int default_percentage)
 
 	/* draw the actual text */
 	ui_draw_text_full(text, space_width + UI_BOX_LR_BORDER, line_height + ui_height - UI_BOX_TB_BORDER - text_height, ui_width - 2 * UI_BOX_LR_BORDER,
-				JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, RGB_WHITE, RGB_BLACK, NULL, &text_height);
+				JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, 0, NULL, &text_height);
 }
 
 static void onscrd_adjuster(int increment,int arg)
@@ -3922,6 +3988,9 @@ void ui_display_fps(void)
 {
 	int ui_width, ui_height;
 
+    int textbg = dblue_pen;
+    int textpen = white_pen;
+
 	/* if we're not currently displaying, skip it */
 	if (!showfps && !showfpstemp)
 		return;
@@ -3930,7 +3999,7 @@ void ui_display_fps(void)
 
 	/* get the current FPS text */
 	ui_draw_text_full(osd_get_fps_text(mame_get_performance_info()), 0, 0, ui_width,
-				JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, RGB_WHITE, RGB_BLACK, NULL, NULL);
+				JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, 0, NULL, NULL);
 
 	/* update the temporary FPS display state */
 	if (showfpstemp)
@@ -3945,10 +4014,13 @@ static void ui_display_profiler(void)
 {
 	int ui_width, ui_height;
 
+    int textbg = dblue_pen;
+    int textpen = white_pen;
+
 	if (show_profiler)
 	{
 		ui_get_bounds(&ui_width, &ui_height);
-		ui_draw_text_full(profiler_get_text(), 0, 0, ui_width, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, RGB_WHITE, RGB_BLACK, NULL, NULL);
+		ui_draw_text_full(profiler_get_text(), 0, 0, ui_width, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, 0, NULL, NULL);
 	}
 }
 
@@ -4041,7 +4113,7 @@ static void ui_rot2raw_rect(rectangle *rect)
 
 static void add_line(int x1, int y1, int x2, int y2, rgb_t color)
 {
-	if (elemindex < ARRAY_LENGTH(elemlist))
+	if ( elemindex < MAX_RENDER_ELEMENTS )
 	{
 		elemlist[elemindex].x = (x1 < x2) ? x1 : x2;
 		elemlist[elemindex].y = (y1 < y2) ? y1 : y2;
@@ -4053,6 +4125,18 @@ static void add_line(int x1, int y1, int x2, int y2, rgb_t color)
 	}
 }
 
+static void add_image(int x1, int y1,int il)
+{
+	if ( elemindex < MAX_RENDER_ELEMENTS )
+	{
+		elemlist[elemindex].x = x1 ;
+		elemlist[elemindex].y = y1 ;
+		elemlist[elemindex].x2 = il;
+		elemlist[elemindex].type = 0xfff0;
+		//elemlist[elemindex].color = color;
+		elemindex++;
+	}
+}
 
 static void add_fill(int left, int top, int right, int bottom, rgb_t color)
 {
@@ -4062,7 +4146,7 @@ static void add_fill(int left, int top, int right, int bottom, rgb_t color)
 
 static void add_char(int x, int y, UINT16 ch, int color)
 {
-	if (elemindex < ARRAY_LENGTH(elemlist))
+	if (elemindex < MAX_RENDER_ELEMENTS )
 	{
 		elemlist[elemindex].x = x;
 		elemlist[elemindex].y = y;
@@ -4075,12 +4159,34 @@ static void add_char(int x, int y, UINT16 ch, int color)
 
 static void add_filled_box(int x1, int y1, int x2, int y2)
 {
+/*orig
 	add_fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, RGB_BLACK);
 
 	add_line(x1, y1, x2, y1, RGB_WHITE);
 	add_line(x2, y1, x2, y2, RGB_WHITE);
 	add_line(x2, y2, x1, y2, RGB_WHITE);
 	add_line(x1, y2, x1, y1, RGB_WHITE);
+	*/
+	add_fill(x1 , y1 , x2 , y2 , dblue_pen);
+
+    int ymid = y1+16;
+	add_fill(x1 , y1 , x2 , ymid , blue_pen);
+
+	add_fill(x1 , ymid+2 , x2 , ymid+3 , blue_pen);
+
+	add_fill(x1 , ymid+5 , x2 , ymid+5 , blue_pen);
+
+	add_line(x1+1, y1, x2, y1, white_pen);
+	add_line(x2, y1+1, x2, y2-1, white_pen);
+
+	add_line(x2-1, y2, x1+1, y2, black_pen);
+	add_line(x1, y2, x1, y1+1, black_pen);
+
+	add_line(x1+2, y1+2, x1+2, y2-3, white_pen);
+	add_line(x1+2, y2-2, x2-2, y2-2, white_pen);
+
+	add_line(x1+2, y1+2, x2-2, y1+2, black_pen);
+	add_line(x2-2, y1+2, x2-2, y2-2, black_pen);
 }
 
 
@@ -4088,11 +4194,22 @@ static void render_ui(mame_bitmap *dest)
 {
 	int i;
 
-	uirotfont->colortable[0] = get_black_pen();
-	uirotfont->colortable[1] = get_white_pen();
-	uirotfont->colortable[2] = get_white_pen();
-	uirotfont->colortable[3] = get_black_pen();
+	uirotfont->colortable[1] = black_pen;
+	uirotfont->colortable[2] = white_pen;
+	uirotfont->colortable[3] = grey_pen;
+	uirotfont->colortable[4] = dblue_pen;
+	uirotfont->colortable[5] = blue_pen;
+	uirotfont->colortable[6] = yellow_pen;
+	uirotfont->colortable[7] = orange_pen;
+	uirotfont->colortable[8] = mar1_pen;
+	uirotfont->colortable[9] = mar2_pen;
+	uirotfont->colortable[10] = red_pen;
 
+    int flipxy = (Machine->ui_orientation & ORIENTATION_SWAP_XY) ;
+
+    // krb, to better manage char colors
+    uirotfont->total_colors = red_pen + 1;
+    uirotfont->color_granularity = 1;
     struct drawgfxParams dgp={
            dest, // mame_bitmap *dest;
            uirotfont, // const gfx_element *gfx;
@@ -4129,23 +4246,101 @@ static void render_ui(mame_bitmap *dest)
 				bounds.max_y = uirotbounds.min_y + elem->y2;
 				ui_rot2raw_rect(&bounds);
 				sect_rect(&bounds, &uirawbounds);
-				fillbitmap(dest, elem->color ? get_white_pen() : get_black_pen(), &bounds);
+				fillbitmap(dest, elem->color, &bounds);
 				artwork_mark_ui_dirty(bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y);
 				ui_dirty = 5;
 				break;
+            case 0xfff0:
+                // bitmaps               
+               {
+                    // bounds.min_x = uirotbounds.min_x + elem->x;
+                    // bounds.min_y = uirotbounds.min_y + elem->y + 1;
+                    // bounds.max_x = bounds.min_x + uirotcharwidth - 1;
+                    // bounds.max_y = bounds.min_y + uirotcharheight - 1;
+                    if(elem->x2 ==0)
+                    {
+                        if(_minilogo) drawextra_simpleDraw(dest,
+                            elem->x,elem->y,
+                            &_minilogo->_img);
+                    }else
+                    {
+                        if(_minilogo2)
+                            drawextra_simpleDraw(dest,
+                            elem->x,elem->y,
+                            &_minilogo2->_img);
+                    }
 
+               }
+                break;
 			default:
+                dgp.clip = &uirawbounds;
 				bounds.min_x = uirotbounds.min_x + elem->x;
 				bounds.min_y = uirotbounds.min_y + elem->y + 1;
 				bounds.max_x = bounds.min_x + uirotcharwidth - 1;
 				bounds.max_y = bounds.min_y + uirotcharheight - 1;
 				ui_rot2raw_rect(&bounds);
 
-                dgp.code = elem->type;
-                dgp.color = elem->color ? 0 : 1;
                 dgp.sx = bounds.min_x; // start x
                 dgp.sy = bounds.min_y;
-				drawgfx(&dgp);
+
+                dgp.code = elem->type;
+                if(elem->color == white_pen)
+                {
+                    // draw shadow
+                    if(flipxy)
+                    {
+                        dgp.sx++; dgp.sy--;
+                        dgp.color = 0;
+                        drawgfx(&dgp);
+                        dgp.sx--; dgp.sy++;
+
+                        // draw up char
+                        rectangle rc = uirawbounds;
+                        dgp.clip = &rc;
+
+                        rc.min_x = dgp.sx;
+                        rc.max_x = dgp.sx+4;
+
+                        dgp.color = 1;
+                        drawgfx(&dgp);
+
+                        // draw down char
+                        rc.min_x = dgp.sx+5;
+                        rc.max_x = dgp.sx+10;
+                        dgp.color = 2;
+                        drawgfx(&dgp);
+
+                        // end if flipxy
+                    } else
+                    { // not flipx
+                        dgp.sx--; dgp.sy++;
+                        dgp.color = 0;
+                        drawgfx(&dgp);
+                        dgp.sx++; dgp.sy--;
+
+                        // draw up char
+                        rectangle rc = uirawbounds;
+                        dgp.clip = &rc;
+
+                        rc.min_y = dgp.sy;
+                        rc.max_y = dgp.sy+4;
+
+                        dgp.color = 1;
+                        drawgfx(&dgp);
+
+                        // draw down char
+                        rc.min_y = dgp.sy+5;
+                        rc.max_y = dgp.sy+10;
+                        dgp.color = 2;
+                        drawgfx(&dgp);
+
+                    } // else if not flipx
+
+				} else
+				{
+                        dgp.color = elem->color;
+                        drawgfx(&dgp);
+				}
 				//drawgfx(dest, uirotfont, elem->type, elem->color ? 0 : 1, 0, 0, bounds.min_x, bounds.min_y, &uirawbounds, TRANSPARENCY_PEN, 0);
 				break;
 		}

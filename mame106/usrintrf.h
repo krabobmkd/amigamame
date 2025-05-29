@@ -114,13 +114,16 @@ void ui_get_bounds(int *width, int *height);
 void ui_draw_text(const char *buf, int x, int y);
 
 /* full-on text draw with all the options */
-void ui_draw_text_full(const char *buf, int x, int y, int wrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, int *totalwidth, int *totalheight);
+void ui_draw_text_full(const char *buf, int x, int y, int wrapwidth, int justify, int wrap, int draw,
+        //rgb_t fgcolor, rgb_t bgcolor,
+        int reverse,
+        int *totalwidth, int *totalheight);
 
 /* draw a multi-line message centered with a box around it */
 void ui_draw_message_window(const char *text);
 
 /* menu rendering system */
-void ui_draw_menu(const ui_menu_item *items, int numitems, int selected);
+void ui_draw_menu(const ui_menu_item *items, int numitems, int selected,int doicons);
 
 /* menu keyboard handling */
 int ui_menu_generic_keys(int *selected, int num_items);

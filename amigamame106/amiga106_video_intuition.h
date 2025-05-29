@@ -21,6 +21,10 @@ struct ScreenBuffer;
 #define VIDEO_RGB_DIRECT	 			0x0004
 #define VIDEO_NEEDS_6BITS_PER_GUN		0x0008
 
+
+// tool: test if RastPort currently need layer lib clippings.
+bool isRastPortComplete(RastPort *rp,WORD w, WORD h);
+
 /** \class IntuitionDrawable
  * this differenciates Screen and Windows
  */
@@ -134,6 +138,7 @@ protected:
 
     int _machineWidth,_machineHeight;
     int _maxzoomfactor;
+    int _allowDirectDraw;
 
 
 };

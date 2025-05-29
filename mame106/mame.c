@@ -13,6 +13,8 @@
     initialization and other such things, here it is, all spelled out
     as of February, 2006:
 
+(krb, 2025: moved ui_text init early
+
     main()
         - does platform-specific init
         - calls run_game() [mame.c]
@@ -83,6 +85,7 @@
 #if defined(MAME_DEBUG) && defined(NEW_DEBUGGER)
 #include "debug/debugcon.h"
 #endif
+#include "ui_text.h"
 
 #include <stdarg.h>
 #include <setjmp.h>
@@ -294,6 +297,10 @@ int run_game(int game)
 //			logerror_callback_list = NULL;
 //			if (options.logfile)
 //				add_logerror_callback(logfile_callback);
+
+
+	if (uistring_init(options.language_file) != 0)
+		fatalerror("uistring_init failed");
 
 			/* create the Machine structure and driver */
 //			printf("create_machine\n");
@@ -856,12 +863,25 @@ void *_auto_malloc(size_t size, const char *file, int line)
 {
 	void *result;
 
+#ifdef __AMIGA__
+
+    // should test 32b pointer arch instead...
+//krb also add 32b align for cache efficiency here:
+	/* fail horribly if it doesn't work */
+	result = _malloc_or_die(size+32, file, line);
+
+	/* track this item in our list */
+	auto_malloc_add(result,file,line); // keep the unaligned for auto free.
+	return (void *)((UINT32)(result+31) & 0xffffffe0);
+#else
 	/* fail horribly if it doesn't work */
 	result = _malloc_or_die(size, file, line);
 
 	/* track this item in our list */
 	auto_malloc_add(result,file,line);
 	return result;
+#endif
+
 }
 
 
@@ -951,8 +971,11 @@ void *_malloc_or_die(size_t size, const char *file, int line)
 	/* allocate and return if we succeeded */
 //krb	result = malloc(size);
     // krb: add 4*16 because of silly m68k movem optimisation
+    // then also +32 for 32b align that can have effect on cache. ->eslewhere
     // should be removed for valgrind tests
     result = calloc(size+(4*16),1);
+
+    //amiga alloc align 4b, not more: printf("alloc low:%02x\n",((int)result) & 0x01f);
 	if (result != NULL)
 	{
 		return result;

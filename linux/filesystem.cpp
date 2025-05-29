@@ -75,12 +75,17 @@ enum
     AFT_ROM, // ROM and sample
     AFT_SAMPLE,
     AFT_USER, // writable, configs, ...
-    AFT_ABSOLUTE // to search for cheat file
+    AFT_ABSOLUTE, // to search for cheat file
+    AFT_SKINIMAGE
 };
 
 // shortlist this enum:
 int getAmigaFileType(int mameFileType)
 {
+    if(mameFileType == FILETYPE_SKIN_IMAGE )
+    {
+        return AFT_SKINIMAGE;
+    }
     if(mameFileType == FILETYPE_CHEAT )
     {
         return AFT_ABSOLUTE;
@@ -213,6 +218,7 @@ int osd_get_path_count(int pathtype)
 
     switch( getAmigaFileType(pathtype))
     {
+        case AFT_SKINIMAGE: return 1;
         case AFT_ABSOLUTE: return 1;
         case AFT_ROM: return 1;
         case AFT_SAMPLE: return 1;
@@ -221,12 +227,14 @@ int osd_get_path_count(int pathtype)
     }
 }
 
+
 void composeFilePath(int pathtype, int pathindex, const char *filename, std::string &p)
 {
+    //MameConfig &conf = getMainConfig();
 
     switch( getAmigaFileType(pathtype))
     {
-        case AFT_ROM: p ="roms"; break;
+       case AFT_ROM: p ="roms"; break;
         case AFT_SAMPLE: p ="samples"; break;
         case AFT_USER:
         {
@@ -237,6 +245,13 @@ void composeFilePath(int pathtype, int pathindex, const char *filename, std::str
         case AFT_ABSOLUTE:
         {
             p = filename;
+            return;
+        }
+
+        case AFT_SKINIMAGE:
+        {
+            p = "skin/";
+            p += filename;
             return;
         }
         default: p.clear(); break;

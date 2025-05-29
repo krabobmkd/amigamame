@@ -1522,7 +1522,7 @@ static void old_style_menu(const char **items, const char **subitems, char *flag
 				item_list[menu_items].flags |= MENU_FLAG_RIGHT_ARROW;
 		}
 	}
-	ui_draw_menu(item_list, menu_items, selected);
+	ui_draw_menu(item_list, menu_items, selected,0);
 }
 
 
@@ -1955,7 +1955,7 @@ int cheat_menu(int selection)
 	menu_item[total++].text = ui_getstring(UI_options);
 	menu_item[total++].text = ui_getstring(UI_returntomain);
 
-	ui_draw_menu(menu_item, total, sel);
+	ui_draw_menu(menu_item, total, sel,0);
 
 	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{

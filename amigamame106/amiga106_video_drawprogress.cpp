@@ -31,58 +31,6 @@ static const unsigned char tlogomamebm[(128/8)*36]={
 };
 
 }
-/*
-struct RastPortData
-{
-   struct RastPort *rp;
-   struct Layer_Info *li;
-   struct Layer *l;
-};
-
-struct RastPortData *CreateRastPort(int width, int height, struct BitMap *friend_bitmap, BOOL displayable)
-{
-   struct RastPortData *rpd = AllocMem(sizeof(*rpd), MEMF_ANY);
-
-   if (rpd)
-   {
-      int depth = GetBitMapAttr(friend_bitmap, BMA_DEPTH);
-      struct BitMap *bm = AllocBitMap(width, height, depth, BMF_MINPLANES | displayable ? BMF_DISPLAYABLE : 0);
-
-      if (bm)
-      {
-         rpd->li = NewLayerInfo();
-
-         if (rpd->li)
-         {
-            rpd->l = CreateUpfrontLayer(rpd->li, bm, 0, 0 width - 1, height - 1, 0, NULL);
-
-            if (rpd->l)
-            {
-               rpd->rp = rpd->l->rp;
-               return rpd;
-            }
-
-            DisposeLayerInfo(rpd->li);
-         }
-
-         FreeBitMap(bm);
-      }
-
-      FreeMem(rpd, sizeof(*rpd);
-   }
-
-   return NULL;
-}
-
-void DeleteRastPort(struct RastPortData *rpd)
-{
-   FreeBitMap(rpd->rp->BitMap);
-   DeleteLayer (0, rpd->l);
-   DisposeLayerInfo(rpd->li);
-   FreeMem(rpd, sizeof(*rpd));
-}
-*/
-
 
 IntuiBufferedDrawing::IntuiBufferedDrawing()
 : _clearedscreenw(0),_clearedscreenh(0)
@@ -299,6 +247,7 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         "Hi Score load.",
         "Rebuild machine...",
         "Decode graphics...",
+        "Delithiuminization...",
         "Load cheats...",
         ""
     };

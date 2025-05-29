@@ -203,13 +203,14 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         params._flags ^= reportFlags;
         params._flags &= ORIENTATION_MASK;
 
-        if(screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose)
+        if( screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose
+            && screenModeConf._modeid._modeId != INVALID_ID )
         {
             params._forcedModeID = (ULONG) screenModeConf._modeid._modeId;
             params._forcedDepth = (ULONG) screenModeConf._modeid._depth; // only used in AGA/OCS
            // printf("screenModeConf._modeid._depth:%d\n",params._forcedDepth);
         }
-         else
+        else
         {
            params._forcedModeID = ~0; // undefined.
            params._forcedDepth = 24;
@@ -486,10 +487,16 @@ mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)
   of full game speed.
 */
 static char perfo_line[28];
+extern "C" {
+//extern int testvv;
+//extern int levervt[4];
+};
 const char *osd_get_fps_text(const performance_info *performance)
 {
-    snprintf(perfo_line,27,"speed:%.01f%% fps:%.03f",performance->game_speed_percent,
-             performance->frames_per_second);
+     snprintf(perfo_line,27,"speed:%.01f%% fps:%.03f",performance->game_speed_percent,
+              performance->frames_per_second);
+              // usefull for debug:
+        // snprintf(perfo_line,27,"lv%d  ",testvv);
     perfo_line[27]=0;
     return perfo_line;
 }
