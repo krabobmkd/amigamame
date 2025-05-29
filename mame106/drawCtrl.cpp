@@ -92,6 +92,8 @@ struct drawableExtra_Img *drawextra_createLogo(const char *pfilename)
     (struct drawableExtra_Img *) auto_malloc(sizeof(struct drawableExtra_Img));
     if(!p) return NULL; // should have jmp throwed anyway.
     int r = open_and_read_png(pfilename,&p->_img._png );
+//    printf("%s:%d w:%d h:%d\n",pfilename,r,p->_img._png.width,p->_img._png.height );
+
     return p;
 }
 void drawextra_deleteImg(struct drawableExtra_Img *p)
@@ -203,18 +205,7 @@ public:
     UINT16 v(UINT8 c) { return _colorstart+c; }
     int _colorstart;
 };
-/*
-	uirotfont->colortable[1] = black_pen;
-	uirotfont->colortable[2] = white_pen;
-	uirotfont->colortable[3] = grey_pen;
-	uirotfont->colortable[4] = dblue_pen;
-	uirotfont->colortable[5] = blue_pen;
-	uirotfont->colortable[6] = yellow_pen;
-	uirotfont->colortable[7] = orange_pen;
-	uirotfont->colortable[8] = mar1_pen;
-	uirotfont->colortable[9] = mar2_pen;
-	uirotfont->colortable[10] = red_pen;
-*/
+
 class PixRGB15
 {
 public:
@@ -257,15 +248,20 @@ public:
 //  -- - -
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
+// manage destination screen geometry with transformations
+// so we can follow the actual driver roattion/flip mode when drawing.
+// note menus are drawn upon game bitmap so with "inverted" transformation.
 template<class Pix>
 class BmDestCoord {
 public:
 
     BmDestCoord(mame_bitmap *bitmap, const rectangle *visiblerect,UINT32 flags)
     : _bitmap(bitmap)
-    , _visiblerect(visiblerect)
+//    , _visiblerect(visiblerect)
+    , _cliprect(*visiblerect)
     ,x_app_x(1),x_app_y(0),x_offs(0/*visiblerect->min_x*/)
     ,y_app_x(0),y_app_y(1),y_offs(0/*visiblerect->min_y*/)
+    //todo add ciprect with transformations applied
      {
         if(flags & ORIENTATION_SWAP_XY) swapxy();
         if(flags & ORIENTATION_FLIP_X) flipx();
@@ -275,60 +271,14 @@ public:
         else x_offs = visiblerect->max_x;
         if(y_offs==0) y_offs = visiblerect->min_y;
         else y_offs = visiblerect->max_y;
-//         switch(flags)
-//         {
-//            // case 0: break;
-//             case ORIENTATION_FLIP_X:
-//             printf("case fx\n");
-//                 x_app_x = -1;
-//                 x_app_y = 0;
-//                 x_offs = _visiblerect->max_x ;
-//             break;
-//             case ORIENTATION_FLIP_Y:
-//             printf("case fy\n");
-//                 y_app_x = 0;
-//                 y_app_y = -1;
-//                 y_offs = _visiblerect->max_y ;
-//             break;
-//             case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-//                 x_app_x = -1;
-//                 x_app_y = 0;
-//                 x_offs = _visiblerect->max_x ;
-//                 y_app_x = 0;
-//                 y_app_y = -1;
-//                 y_offs = _visiblerect->max_y ;
-//             break;
-// //---- swap
-//            case ORIENTATION_SWAP_XY:
-//                 break;
-//            case ORIENTATION_FLIP_X|ORIENTATION_SWAP_XY:
-//                 // x_app_x = -1;
-//                 // x_app_y = 0;
-//                 // x_offs = (_visiblerect->max_x-_visiblerect->min_x) ;
-//                 // y_app_x = 0;
-//                 // y_app_y = 1;
-//                 // y_offs = _visiblerect->min_y ;
-//             break;
-//             case ORIENTATION_FLIP_Y|ORIENTATION_SWAP_XY:
-//             //OK arkanoid
-//                 x_app_x = 0;
-//                 x_app_y = 1;
-//                 x_offs = _visiblerect->min_x ;
-//                 y_app_x = -1;
-//                 y_app_y = 0;
-//                 y_offs = _visiblerect->max_y;
-//             break;
-//             case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y|ORIENTATION_SWAP_XY:
-
-//             break;
-
-//         }
 
      }
     mame_bitmap *_bitmap;
-    const rectangle *_visiblerect;
+   // const rectangle *_visiblerect;
     int x_app_x,x_app_y,x_offs;
     int y_app_x,y_app_y,y_offs;
+
+    rectangle _cliprect;
 
     void swapxy() {
         doSwap(x_app_x,y_app_x);
@@ -347,14 +297,47 @@ public:
     }
     int x(int x,int y) const { return x_offs + x*x_app_x + y*x_app_y;  }
     int y(int x,int y) const { return y_offs + x*y_app_x + y*y_app_y;  }
+    // actually more the stride than de dx.
     int dx() const { return  x_app_x+(y_app_x*_bitmap->rowpixels);  }
     int dy() const { return  y_app_y;  }
 
     Pix *pix(int xx,int yy) {
                 int px = x(xx,yy);
                 int py = y(xx,yy);
+                if(py<_cliprect.min_y || py>_cliprect.max_y) return NULL; // means clipped.
                 return ((Pix *)_bitmap->line[py]) +  px ;
             }
+    // shitfunction.
+    // void getClipx(int xmin,int xmax, int &fminx,int &fmaxx) {
+    //     if(x_app_x==0)
+    //     {
+    //         fminx = xmin;
+    //         fmaxx = xmax;
+    //         // if swapxy
+    //         int py1 = y(xmin,0);
+    //         int py2 = y(xmax,0);
+    //         if(py1<py2)
+    //         {
+    //             if(py1<_cliprect.min_y) fminx += (_cliprect.min_y-py1);
+    //             if(py2>_cliprect.max_y) fmaxx -= (py2-_cliprect.min_y);
+    //         } else
+    //         {
+    //             // flipy
+    //             if(py1>_cliprect.max_y) fminx -= (py1-_cliprect.max_y);
+    //             if(py2<_cliprect.max_y) fmaxx -= (py2-_cliprect.min_y);
+    //         }
+    //     } else
+    //     {
+    //         // normal
+    //         int px1 = x(xmin,0);
+    //         int px2 = x(xmax,0);
+
+    //     }
+
+    // }
+    // for clipping
+     const rectangle &clip() const { return _cliprect; }
+
 };
 
 template<class BmDst,class Pix,typename T>
@@ -369,17 +352,20 @@ void drawextra_simpleDrawT(BmDst &bmdest,int x, int y,struct extraBitmap &bm )
     Pix p;
    // int colorstart = black_pen-1; // works because we know it's clut16 mode and colors are index.
 
+    int minx,maxx;
+
+
     for(int yy=0 ; yy<bm._png.height ; yy++)
     {
-//        int yproj = bmdest.pix(x,y+yy);
-        T *pw = bmdest.pix(x,y+yy); //((UINT16 *)bitmap->line[ydest]) + (x * pix.xStride());
+        T *pw = bmdest.pix(x,y+yy);
+        if(!pw) continue; //clipping
         UINT8 *pr = bm._png.image + (bm._png.rowbytes *2 * yy ); // ->line[y];
 
         for(int xx=0 ; xx<bm._png.width ; xx++)
         {
             UINT8 c = *pr++;
-            if(c) *pw = p.v(c);   //colorstart + c;
-            pw+=bmdest.dx();  // * stride
+            if(c) *pw = p.v(c);
+            pw+=bmdest.dx();
         }
     }
 }

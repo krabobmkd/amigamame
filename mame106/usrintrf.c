@@ -379,11 +379,13 @@ static void render_ui(mame_bitmap *dest);
 
 
 static struct drawableExtra_Img *_minilogo = NULL;
-
+static struct drawableExtra_Img *_minilogo2 = NULL;
 static void deleteLogo()
 {
     if(_minilogo) drawextra_deleteImg(_minilogo);
     _minilogo = NULL;
+    if(_minilogo2) drawextra_deleteImg(_minilogo2);
+    _minilogo2 = NULL;
 }
 /*************************************
  *
@@ -401,7 +403,11 @@ int ui_init(int show_disclaimer, int show_warnings, int show_gameinfo)
     elemlist = auto_malloc(sizeof(render_element)*MAX_RENDER_ELEMENTS);
 
     _minilogo = drawextra_createLogo("minilogo.png");
-    if(_minilogo) add_exit_callback(deleteLogo);
+    _minilogo2 = drawextra_createLogo("minilogo2.png");
+// printf("_minilogo2:%08x\n",(int)_minilogo2);
+
+    //if(_minilogo)
+    add_exit_callback(deleteLogo);
 
 	/* build up the font */
 	create_font();
@@ -881,7 +887,7 @@ void ui_draw_text_full(const char *s, int x, int y, int wrapwidth, int justify, 
  *
  *************************************/
 
-void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
+void ui_draw_menu(const ui_menu_item *items, int numitems, int selected,int doicons)
 {
 	const char *up_arrow = ui_getstring(UI_uparrow);
 	const char *down_arrow = ui_getstring(UI_downarrow);
@@ -932,10 +938,13 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 	}
 
 	/* if we are too wide or too tall, clamp it down */
+	int iUI_BOX_TB_BORDER= UI_BOX_TB_BORDER;
+	if(doicons) iUI_BOX_TB_BORDER +=8;
+
 	if (visible_width + 2 * UI_BOX_LR_BORDER > ui_width)
 		visible_width = ui_width - 2 * UI_BOX_LR_BORDER;
-	if (visible_height + 2 * UI_BOX_TB_BORDER > ui_height)
-		visible_height = ui_height - 2 * UI_BOX_TB_BORDER;
+	if (visible_height + 2 * iUI_BOX_TB_BORDER > ui_height)
+		visible_height = ui_height - 2 * iUI_BOX_TB_BORDER;
 	visible_lines = visible_height / line_height;
 	visible_height = visible_lines * line_height;
 
@@ -946,14 +955,19 @@ void ui_draw_menu(const ui_menu_item *items, int numitems, int selected)
 	/* first add us a box */
 	int x1box = visible_left - UI_BOX_LR_BORDER;
 	int y1box = visible_top - UI_BOX_TB_BORDER;
+	int x2box = visible_left + visible_width - 1 + UI_BOX_LR_BORDER;
+	int y2box = visible_top + visible_height - 1 + iUI_BOX_TB_BORDER;
 	add_filled_box(	x1box,
 					y1box,
-					visible_left + visible_width - 1 + UI_BOX_LR_BORDER,
-					visible_top + visible_height - 1 + UI_BOX_TB_BORDER);
+					x2box,
+					y2box);
 
-    add_image(x1box,y1box-6,0);
-    //add_image(x1box,y1box,0);
-
+    if(doicons)
+    {
+        add_image(x1box,y1box-6,0);
+        add_image(x2box-20,y2box-16,1);
+        //add_image(x1box,y1box,0);
+    }
 	/* determine the first visible line based on the current selection */
 	top_line = selected - visible_lines / 2;
 	if (top_line < 0)
@@ -1484,7 +1498,7 @@ do { \
 	ADD_MENU(UI_returntogame, NULL, 0);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, state);
+	ui_draw_menu(item_list, menu_items, state,1);
 
 	/* handle the keys */
 	if (ui_menu_generic_keys((int *) &state, menu_items))
@@ -1521,7 +1535,7 @@ static UINT32 menu_default_input_groups(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, state);
+	ui_draw_menu(item_list, menu_items, state,0);
 
 	/* handle the keys */
 	if (ui_menu_generic_keys((int *) &state, menu_items))
@@ -1679,7 +1693,7 @@ static UINT32 menu_default_input(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntogroup);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, selected);
+	ui_draw_menu(item_list, menu_items, selected,0);
 
 	/* if we're polling, read the sequence */
 	if (polling)
@@ -1861,7 +1875,7 @@ static UINT32 menu_game_input(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, selected);
+	ui_draw_menu(item_list, menu_items, selected,0);
 
 	/* if we're polling, read the sequence */
 	selected_item_data = item_list[selected].ref;
@@ -2031,7 +2045,7 @@ static UINT32 menu_switches(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, selected);
+	ui_draw_menu(item_list, menu_items, selected,0);
 
 	/* handle generic menu keys */
 	if (ui_menu_generic_keys(&selected, menu_items))
@@ -2159,7 +2173,7 @@ static UINT32 menu_analog(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, state);
+	ui_draw_menu(item_list, menu_items, state,0);
 
 	/* handle generic menu keys */
 	if (ui_menu_generic_keys((int *) &state, menu_items))
@@ -2374,7 +2388,7 @@ static UINT32 menu_memory_card(UINT32 state)
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
 	/* draw the menu */
-	ui_draw_menu(item_list, menu_items, selected);
+	ui_draw_menu(item_list, menu_items, selected,0);
 
 	/* handle the keys */
 	if (ui_menu_generic_keys(&selected, menu_items))
@@ -4237,16 +4251,24 @@ static void render_ui(mame_bitmap *dest)
 				ui_dirty = 5;
 				break;
             case 0xfff0:
-                // bitmaps
-               if(_minilogo)
+                // bitmaps               
                {
                     // bounds.min_x = uirotbounds.min_x + elem->x;
                     // bounds.min_y = uirotbounds.min_y + elem->y + 1;
                     // bounds.max_x = bounds.min_x + uirotcharwidth - 1;
                     // bounds.max_y = bounds.min_y + uirotcharheight - 1;
-                    drawextra_simpleDraw(dest,
+                    if(elem->x2 ==0)
+                    {
+                        if(_minilogo) drawextra_simpleDraw(dest,
                             elem->x,elem->y,
                             &_minilogo->_img);
+                    }else
+                    {
+                        if(_minilogo2)
+                            drawextra_simpleDraw(dest,
+                            elem->x,elem->y,
+                            &_minilogo2->_img);
+                    }
 
                }
                 break;

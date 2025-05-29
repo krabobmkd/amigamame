@@ -123,7 +123,7 @@ void ui_draw_text_full(const char *buf, int x, int y, int wrapwidth, int justify
 void ui_draw_message_window(const char *text);
 
 /* menu rendering system */
-void ui_draw_menu(const ui_menu_item *items, int numitems, int selected);
+void ui_draw_menu(const ui_menu_item *items, int numitems, int selected,int doicons);
 
 /* menu keyboard handling */
 int ui_menu_generic_keys(int *selected, int num_items);
