@@ -341,6 +341,7 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
     , _machineWidth(params._width),_machineHeight(params._height)
     , _maxzoomfactor(1)
     , _allowDirectDraw(0)
+    , _useLastPosition(0)
 {
 //   printf(" ***** ** Intuition_Window CREATE:%d %d %08x\n",params._width,params._height,params._flags);
     // "windows can't use SVP double buffer"
@@ -364,6 +365,20 @@ Intuition_Window::~Intuition_Window()
 {
     close();
 }
+
+inline void WindowLimitsGZZ(struct Window *window, LONG widthMin, LONG heightMin, ULONG widthMax, ULONG heightMax)
+{
+    LONG bordertotalwidth = window->BorderLeft + window->BorderRight;
+    LONG bordertotalheight = window->BorderTop + window->BorderBottom;
+
+    WindowLimits(window,
+                widthMin+bordertotalwidth,
+                heightMin+bordertotalheight,
+                widthMax+bordertotalwidth, //max
+                heightMax+bordertotalheight
+                );
+}
+
 bool Intuition_Window::open()
 {
     if(_pWbWindow) return true; // already ok
@@ -391,21 +406,41 @@ bool Intuition_Window::open()
     xcen>>=1;
     if(ycen<0) ycen=0;
     ycen>>=1;
+
+    int iwidth = _machineWidth;
+    int iheight = _machineHeight;
+
+    if(_useLastPosition)
+    {
+        xcen = _lastx;
+        ycen = _lasty;
+        iwidth = _lastWidth;
+        iheight = _lastHeight;
+    }
 //    printf("openWindow:_machineWidth:%d _machineHeight:%d xcen:%d ycen:%d \n",_machineWidth,_machineHeight,xcen,ycen);
 
     _pWbWindow = (Window *)OpenWindowTags(NULL,
         WA_Left,xcen,
         WA_Top,ycen,
-     //   WA_Width, _machineWidth,
-     //   WA_Height, _machineHeight,
-        WA_InnerWidth, _machineWidth,
-        WA_InnerHeight, _machineHeight,
-        WA_MaxWidth,  _machineWidth*_maxzoomfactor,
-        WA_MaxHeight, _machineHeight*_maxzoomfactor,
-        WA_MinWidth, _machineWidth,
-        WA_MinHeight, _machineHeight,
+        // just so you know intuition code,
+        // when WFLG_GIMMEZEROZERO flag is not set, window size
+        // are given in full size including borders. Borders size can change
+        // with intuition prefs and font size, so then you basically don't know
+        // the inner size.  n this case size is given with this: (...)
+        // WA_Width, _machineWidth,
+        // WA_Height, _machineHeight,
+        // WA_MaxWidth,  _machineWidth*_maxzoomfactor,
+        // WA_MaxHeight, _machineHeight*_maxzoomfactor,
+        // WA_MinWidth, _machineWidth,
+        // WA_MinHeight, _machineHeight,
+        // ... When WFLG_GIMMEZEROZERO (GZZ) flag is set,
+        // the coords must be given with WA_InnerWidth WA_InnerHeight
+        WA_InnerWidth, iwidth, // because WFLG_GIMMEZEROZERO .
+        WA_InnerHeight, iheight,
+        // ... then with GZZ, Min/Max must be set after window creation with WindowLimits(),
+        // and like the window is created, we know the borders size.
         WA_RptQueue,0, // no rawkey repeat messages
-        WA_RMBTrap,TRUE,
+        WA_RMBTrap,TRUE, // allow second mouse button for our usage, not menu, when window is focus.
         WA_IDCMP,/* IDCMP_GADGETUP | IDCMP_GADGETDOWN |*/
             IDCMP_MOUSEBUTTONS |  IDCMP_RAWKEY | IDCMP_CHANGEWINDOW |
             IDCMP_NEWSIZE /*| IDCMP_INTUITICKS*/ | IDCMP_CLOSEWINDOW
@@ -428,6 +463,15 @@ bool Intuition_Window::open()
 //    } // end if sbm ok
     UnlockPubScreen(NULL,pWbScreen);
     if(_pWbWindow == NULL) return false;
+
+    // have to set the min/max size after creation
+    // thanks people at https://developer.amigaos3.net/forum .
+    WindowLimitsGZZ(_pWbWindow,
+                _machineWidth,//widthmin
+                _machineHeight,//heightmin
+                _machineWidth*_maxzoomfactor, //max
+                _machineHeight*_maxzoomfactor
+                );
 
     return true;
 
@@ -493,15 +537,30 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
     {
         // type of window depends of the WB nature.
         bool useCgxForWB = Intuition_Window_CGX::useForWbWindow();
-        if(useCgxForWB)
+        Intuition_Window *piwin=NULL;
+        if(useCgxForWB)        
         {
             if(_params._flags & DISPFLAG_USESCALEPIXARRAY)
-                _drawable =(IntuitionDrawable *)new Intuition_Window_CGXScale(pparams);
+                piwin =(Intuition_Window *)new Intuition_Window_CGXScale(pparams);
             else
-                _drawable =(IntuitionDrawable *)new Intuition_Window_CGX(pparams);
+                piwin =(Intuition_Window *)new Intuition_Window_CGX(pparams);
         } else
         {
-            _drawable =(IntuitionDrawable *)new Intuition_Window_OS3(pparams);
+            piwin =(Intuition_Window *)new Intuition_Window_OS3(pparams);
+        }          
+        _drawable = (IntuitionDrawable *)piwin;
+        if(!_drawable) return false;
+        // to avoid a little glicth when repositioning, restart window with known position.
+        // before it is opened.
+        if(_params._flags & DISPFLAG_STARTWITHWINDOW && _params._wingeo._valid) // if set
+        {
+            WORD wwidth = _params._wingeo._window_width;
+            WORD wheight = _params._wingeo._window_height;
+            if(_params._flags & ORIENTATION_SWAP_XY) doSwap(wwidth,wheight);
+
+            piwin->presetBox(_params._wingeo._window_posx,
+                            _params._wingeo._window_posy,
+                            wwidth,wheight);
         }
 
     } else
@@ -527,25 +586,6 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
     {
         close();
         return false;
-    }
-    // re-apply size/pos when window
-    if(_params._flags & DISPFLAG_STARTWITHWINDOW && _params._wingeo._valid) // if set
-    {
-        Window *pwin = _drawable->window();
-        if(pwin)
-        {
-            WORD wwidth = _params._wingeo._window_width;
-            WORD wheight = _params._wingeo._window_height;
-            if(_params._flags & ORIENTATION_SWAP_XY)
-            {
-                doSwap(wwidth,wheight);
-            }
-           // printf("ChangeWindowBox: %d\n",(int)_params._wingeo._window_posx);
-            ChangeWindowBox( pwin,
-                            _params._wingeo._window_posx,
-                            _params._wingeo._window_posy,
-                           wwidth,wheight );
-        }
     }
 
     return true;
@@ -616,8 +656,8 @@ void IntuitionDisplay::syncWindowGeo()
         Window *pwin = _drawable->window();
         _params._wingeo._window_posx = pwin->LeftEdge;
         _params._wingeo._window_posy = pwin->TopEdge;
-        _params._wingeo._window_width = pwin->Width;
-        _params._wingeo._window_height = pwin->Height;
+        _params._wingeo._window_width = pwin->Width -(pwin->BorderLeft+pwin->BorderRight);
+        _params._wingeo._window_height = pwin->Height -(pwin->BorderTop+pwin->BorderBottom);
         if(_params._flags & ORIENTATION_SWAP_XY)
         {
             doSwap(_params._wingeo._window_width,_params._wingeo._window_height);
