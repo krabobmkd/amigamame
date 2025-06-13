@@ -1336,11 +1336,8 @@ Object *ins2 = MUINewObject(MUIC_Text,
       WindowContents, (ULONG)objout2, // end group
     TAG_DONE,0);
 
-// read the .info
-dobj = GetDiskObject("PROGDIR:Mame106");
-// GetDiskObjectNew
-//
-const char *pguidepath =  (SysBase->SoftVer>=47)?"PROGDIR:MameMinimixOS32.guide":"PROGDIR:MameMinimix.guide";
+
+const char *pguidepath =  (SysBase->LibNode.lib_Version>=47)?"PROGDIR:MameMinimixOS32.guide":"PROGDIR:MameMinimix.guide";
 
 ULONG diskObjOrEnd = (AppDiskObject)? MUIA_Application_DiskObject : TAG_DONE;
 
