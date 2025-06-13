@@ -4,9 +4,9 @@
 
 ****************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
+//#include "deprecat.h"
 #include "profiler.h"
-#include "render.h"
+//#include "render.h"
 #include "cpu/i86/i86.h"
 #include "tx1.h"
 
@@ -89,7 +89,8 @@ size_t tx1_objram_size;
 
 static tilemap *tx1_tilemap;
 static mame_bitmap *tx1_bitmap;
-static render_texture *tx1_texture;
+//v123 static render_texture *tx1_texture;
+
 
 WRITE16_HANDLER( tx1_vram_w )
 {
@@ -97,15 +98,15 @@ WRITE16_HANDLER( tx1_vram_w )
 	tilemap_mark_tile_dirty(tx1_tilemap, offset);
 }
 
-static TILE_GET_INFO( get_tx1_tile_info )
-{
-	int tilenum, color;
+//static TILE_GET_INFO( get_tx1_tile_info )
+//{
+//	int tilenum, color;
 
-	color = (tx1_vram[tile_index] >> 10) & 0x3f;
-	tilenum = (tx1_vram[tile_index]&0x03ff) | ((tx1_vram[tile_index] & 0x8000) >> 5);
+//	color = (tx1_vram[tile_index] >> 10) & 0x3f;
+//	tilenum = (tx1_vram[tile_index]&0x03ff) | ((tx1_vram[tile_index] & 0x8000) >> 5);
 
-	SET_TILE_INFO(0, tilenum, color, 0);
-}
+//	SET_TILE_INFO(0, tilenum, color, 0);
+//}
 
 /***************************************************************************
 
@@ -146,7 +147,7 @@ PALETTE_INIT( tx1 )
 		bit3 = BIT(color_prom[i + 0x200], 3);
 		b = 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		//TODO palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
 	/* TODO */
@@ -472,45 +473,6 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 			y_scale += y_step;
 		} /* for (y) */
 	}/* for (offs) */
-}
-
-
-VIDEO_START( tx1 )
-{
-	tx1_tilemap = tilemap_create(get_tx1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 128, 64);
-	tilemap_set_transparent_pen(tx1_tilemap, 0xff);
-
-	/* Allocate a large bitmap that covers the three screens */
-	tx1_bitmap = auto_bitmap_alloc(768, 256, BITMAP_FORMAT_INDEXED16);
-	tx1_texture = render_texture_alloc(NULL, NULL);
-}
-
-VIDEO_EOF( tx1 )
-{
-	/* /VSYNC: Update TZ113 */
-	tx1_vregs.slin_val += tx1_vregs.slin_inc;
-}
-
-
-/* Experimental :) */
-VIDEO_UPDATE( tx1 )
-{
-	int y;
-
-	if ( screen == 0 )
-	{
-		rectangle rect = { 0, 768 - 1, 0, 240 - 1 };
-
-//      tilemap_set_scrollx(tx1_tilemap, 0, scroll);
-		tilemap_draw(tx1_bitmap, &rect, tx1_tilemap, 0, 0);
-//      tx1_draw_road(tx1_bitmap, &rect);
-		tx1_draw_objects(tx1_bitmap, &rect);
-	}
-
-	for (y = 0; y < 240; ++y)
-		memcpy(BITMAP_ADDR16(bitmap, y, 0), BITMAP_ADDR16(tx1_bitmap, y, screen * 256), sizeof(UINT16) * 256);
-
-	return 0;
 }
 
 

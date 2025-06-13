@@ -8,7 +8,8 @@
 #include "debugger.h"
 #include "machine/8255ppi.h"
 #include "tx1.h"
-
+#include "cpuexec.h"
+#include "timer.h"
 /*
     6845 cursor output is connected to the main CPU interrupt pin.
     The CRTC is programmed to provide a rudimentary VBLANK interrupt.
@@ -62,10 +63,34 @@ INLINE UINT8 reverse_nibble(UINT8 nibble)
 /*
     TODO: Check interrupt timing from CRT config. Probably different between games.
 */
-static TIMER_CALLBACK( interrupt_callback )
+//static TIMER_CALLBACK( interrupt_callback )
+static void interrupt_callback(int param)
 {
+/* v123 orig code
 	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xff);
 	timer_set(video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
+*/
+
+//v123
+/* Set the logical state (ASSERT_LINE/CLEAR_LINE) of the an input line on a CPU and its associated vector */
+//void cpunum_set_input_line_and_vector(running_machine *machine, int cpunum, int line, int state, int vector);
+
+//v123
+//#define timer_alloc(c,ptr)				_timer_alloc_internal(c, ptr, __FILE__, __LINE__, #c)
+//#define timer_pulse(e,ptr,p,c)			_timer_pulse_internal(e, ptr, p, c, __FILE__, __LINE__, #c)
+//#define timer_set(d,ptr,p,c)			_timer_set_internal(d, ptr, p, c, __FILE__, __LINE__, #c)
+//#define timer_call_after_resynch(ptr,p,c) _timer_set_internal(attotime_zero, ptr, p, c, __FILE__, __LINE__, #c)
+
+// v106
+// void cpunum_set_input_line_and_vector(int cpunum, int line, int state, int vector)
+
+// v106
+// #define timer_set(d,p,c)				mame_timer_set(double_to_mame_time(d), p, c)
+
+    cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xff);
+//	timer_set(video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), 0, interrupt_callback);
+    mame_time vbltime = cpu_getscanlinetime_mt(CURSOR_YPOS);
+    mame_timer_set(vbltime,  0, interrupt_callback);
 }
 
 /*
@@ -1466,5 +1491,8 @@ MACHINE_START( buggybjr )
 	prom = (UINT16*)memory_region(REGION_USER1) + (0x8000 >> 1);
 
 	/* /CUDISP CRTC interrupt */
-	timer_set(video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
+//	timer_set(video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
+    // krb
+    mame_time vbltime = cpu_getscanlinetime_mt(CURSOR_YPOS);
+    mame_timer_set(vbltime,  0, interrupt_callback);
 }

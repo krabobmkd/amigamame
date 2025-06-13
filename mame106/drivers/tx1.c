@@ -68,29 +68,29 @@ static UINT32 ts;
 /* Main CPU and Z80 synchronisation */
 static WRITE16_HANDLER( z80_busreq_w )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line( 2, INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( resume_math_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_TEST, ASSERT_LINE);
+	cpunum_set_input_line( 1, INPUT_LINE_TEST, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( halt_math_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_TEST, CLEAR_LINE);
+	cpunum_set_input_line( 1, INPUT_LINE_TEST, CLEAR_LINE);
 }
 
 /* Z80 can trigger an interrupt itself */
 static WRITE8_HANDLER( z80_intreq_w )
 {
-	cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
+	cpunum_set_input_line( 2, 0, HOLD_LINE);
 }
 
 /* Periodic Z80 interrupt */
 static INTERRUPT_GEN( z80_irq )
 {
-	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
+	cpunum_set_input_line( 2, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( z80_shared_r )
@@ -607,14 +607,6 @@ static const gfx_layout char_layout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
 };
-
-static GFXDECODE_START( buggyboy )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0, 256 )
-GFXDECODE_END
-
-static GFXDECODE_START( tx1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0, 16 )
-GFXDECODE_END
 
 
 /*************************************
@@ -1242,4 +1234,4 @@ GAME( 1983, tx1,      0,        tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1", 
 GAME( 1983, tx1a,     tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1985, buggyboy, buggybjr, buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (Cockpit)",        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 #endif
-GAME( 1986, buggybjr, 0,        buggybjr, buggybjr, 0, ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (Upright)", 0 )
+GAME( 1986, buggybjr, 0,        buggybjr, buggybjr, 0, ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (Upright)", 0, 1 )
