@@ -185,7 +185,7 @@ float vector_get_intensity(void)
 VIDEO_START( vector )
 {
 	int i;
-    printf("VIDEO_START( vector )\n");
+
 	/* Grab the settings for this session */
 	antialias = options.antialias;
 	translucency = options.translucency;
@@ -218,23 +218,23 @@ VIDEO_START( vector )
 		return 1;
 		break;
 	}
-    printf("VIDEO_START( vector ) 2\n");
+
 	/* allocate memory for tables */
 	pTcosin = auto_malloc ( (2048+1) * sizeof(pTcosin[0]));   /* yes! 2049 is correct */
 	pixel = auto_malloc (MAX_PIXELS * sizeof (pixel[0]));
 	vector_dirty_list = auto_malloc (MAX_DIRTY_PIXELS * sizeof (vector_dirty_list[0]));
 	old_list = auto_malloc (MAX_POINTS * sizeof (old_list[0]));
 	new_list = auto_malloc (MAX_POINTS * sizeof (new_list[0]));
-    printf("VIDEO_START( vector ) 3\n");
+
 	/* build cosine table for fixing line width in antialias */
 	for (i=0; i<=2048; i++)
 	{
 		Tcosin(i) = (int)((double)(1.0/cos(atan((double)(i)/2048.0)))*0x10000000 + 0.5);
 	}
-    printf("VIDEO_START( vector ) 4\n");
+
 	/* build gamma correction table */
 	vector_set_gamma (gamma_correction);
-    printf("VIDEO_START( vector ) 5\n");
+
 	/* make sure we reset the list */
 	vector_dirty_list[0] = VECTOR_PIXEL_END;
 

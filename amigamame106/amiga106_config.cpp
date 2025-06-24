@@ -925,12 +925,13 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     options.skip_warnings = (_misc._skipflags & 2) != 0;
 
     // vector things
-    options.beam = 2<<16;               /* vector beam width */
+    options.beam = 0x00018000; //1.75 //2<<16;               /* vector beam width */
     options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
     options.vector_intensity = 1.5f;  /* float vector beam intensity 1.5f defaulty */
     options.translucency = 1;  /* 1 to enable translucency on vectors */
-    options.antialias = 0;  /* 1 to enable antialias on vectors */
+    options.antialias = 1;  /* 1 to enable antialias on vectors */
 
+    if(options.beam<(1<<16)) options.beam = 1<<16;
 
 #ifdef LINK_NEOGEO
     // if machine points neogeo rom list, then it's neogeo.
