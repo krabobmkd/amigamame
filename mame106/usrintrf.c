@@ -4286,6 +4286,7 @@ static void render_ui(mame_bitmap *dest)
                 dgp.code = elem->type;
                 if(elem->color == white_pen)
                 {
+                    int midychar = uirotcharheight>>1;
                     // draw shadow
                     if(flipxy)
                     {
@@ -4299,20 +4300,22 @@ static void render_ui(mame_bitmap *dest)
                         dgp.clip = &rc;
 
                         rc.min_x = dgp.sx;
-                        rc.max_x = dgp.sx+4;
+                        rc.max_x = dgp.sx+midychar;
 
                         dgp.color = 1;
                         drawgfx(&dgp);
 
                         // draw down char
-                        rc.min_x = dgp.sx+5;
-                        rc.max_x = dgp.sx+10;
+                        rc.min_x = dgp.sx+midychar+1;
+                        rc.max_x = dgp.sx+uirotcharheight+1;
                         dgp.color = 2;
                         drawgfx(&dgp);
 
                         // end if flipxy
                     } else
-                    { // not flipx
+                    { // not flipxy
+
+
                         dgp.sx--; dgp.sy++;
                         dgp.color = 0;
                         drawgfx(&dgp);
@@ -4323,14 +4326,14 @@ static void render_ui(mame_bitmap *dest)
                         dgp.clip = &rc;
 
                         rc.min_y = dgp.sy;
-                        rc.max_y = dgp.sy+4;
+                        rc.max_y = dgp.sy+midychar;
 
                         dgp.color = 1;
                         drawgfx(&dgp);
 
                         // draw down char
-                        rc.min_y = dgp.sy+5;
-                        rc.max_y = dgp.sy+10;
+                        rc.min_y = dgp.sy+midychar+1;
+                        rc.max_y = dgp.sy+uirotcharheight+1;
                         dgp.color = 2;
                         drawgfx(&dgp);
 

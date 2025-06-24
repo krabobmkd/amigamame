@@ -77,5 +77,7 @@ float vector_get_flicker(void);
 void vector_set_gamma(float _gamma);
 float vector_get_gamma(void);
 
+void krb_dim_rgb32(void);
+
 #endif
 

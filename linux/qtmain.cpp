@@ -122,12 +122,20 @@ void StartGame(int idriver)
 
     // done here
 //    if(drivers[idriver])
-options.ui_orientation = uiapplied & ORIENTATION_MASK;  // uiorientation;
-options.skip_disclaimer = 1;
-options.skip_gameinfo = 1;
-options.skip_warnings = 1;
-options.use_samples = 1;
-options.pause_bright = 1.0f;
+    options.ui_orientation = uiapplied & ORIENTATION_MASK;  // uiorientation;
+    options.skip_disclaimer = 1;
+    options.skip_gameinfo = 1;
+    options.skip_warnings = 1;
+    options.use_samples = 1;
+    options.pause_bright = 1.0f;
+
+    // vector things
+    options.beam = 2;               /* vector beam width */
+    options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
+    options.vector_intensity = 1.5f;  /* float vector beam intensity 1.5f defaulty */
+    options.translucency = 1;  /* 1 to enable translucency on vectors */
+    options.antialias = 0;  /* 1 to enable antialias on vectors */
+
     /* Clear the zip filename caches. */
 
     osd_set_mastervolume(0);
@@ -157,6 +165,7 @@ QMutex _imageMutex;
 bool isinexit=false;
 QMutex m_mutex;
 bool m_bIs15b = false;
+bool m_bIs32b = false;
 int m_nbtest=0;
 QProc::QProc() : QObject()
 {}
@@ -259,8 +268,9 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
-        this->setFixedSize(w*3,h*3);
+        int izoom = 1;
+        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*izoom,h*izoom)) );
+        this->setFixedSize(w*izoom,h*izoom);
     _imageMutex.unlock();
 
 	//lbl.show();
@@ -297,13 +307,20 @@ int osd_create_display(const osd_create_params *params, UINT32 *rgb_components)
 {
     if((params->video_attributes & VIDEO_RGB_DIRECT) && (rgb_components))
     {
-//        rgb_components[0] = 0x00ff0000;
-//        rgb_components[1] = 0x0000ff00;
-//        rgb_components[2] = 0x000000ff;
-        rgb_components[0] = 0x00007c00;
-        rgb_components[1] = 0x000003e0;
-        rgb_components[2] = 0x0000001f;
         m_bIs15b = true;
+        if (params->video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)
+        {
+            rgb_components[0] = 0x00ff0000;
+            rgb_components[1] = 0x0000ff00;
+            rgb_components[2] = 0x000000ff;
+            m_bIs32b = true;
+        }
+        else
+        {
+            rgb_components[0] = 0x00007c00;
+            rgb_components[1] = 0x000003e0;
+            rgb_components[2] = 0x0000001f;
+        }
     }
 
 
@@ -334,6 +351,23 @@ void osd_update_video_and_audio(struct _mame_display *display)
         bm.resize(w*h*3);
     }
 
+    if (m_bIs32b)
+    {
+        for (int y = 0; y < realHeight; y++)
+        {
+            uint32_t* pline = (uint32_t*)display->game_bitmap->line[y + y1];
+            pline += x1;
+            for (int x = 0; x < _display->game_bitmap->width; x++)
+            {
+                uint32_t rgb = *pline++;
+
+                int i = (x + y * w) * 3;
+                bm[i] = (rgb >> 16)  & 0xff;
+                bm[i + 1] = (rgb >> 8) & 0xff;
+                bm[i + 2] = (rgb) & 0xff;
+            }
+        }
+    } else
     if(m_bIs15b)
     {
 
@@ -352,7 +386,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
             }
         }
-    } else
+    } 
 
     for(int y=0;y<realHeight;y++)
     {
@@ -461,15 +495,15 @@ int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
 // to open menu
-    if(oscode == 33 && nbframe>3*60)
-    {
-        if(opened==0)
-        {
-            opened=1;
-            return 1;
-        }
-        return 0;
-    }
+    //if(oscode == 33 && nbframe>2*60)
+    //{
+    //    if(opened==0)
+    //    {
+    //        opened=1;
+    //        return 1;
+    //    }
+    //    return 0;
+    //}
     // if(oscode == 35 && nbframe>4*60)
     // {
     //     //if(opened>0)
@@ -485,20 +519,11 @@ INT32 osd_get_code_value(os_code oscode)
 
     //     return (opened>>6)&1;
     // }
-    if(oscode==1024)
-    {
-        return 1<<10;
-/*        static int ttestcount=0;
-        ttestcount++;
-        if(ttestcount &128)
-        {
-            return 1<<10;
-        }else
-        {
-            return -(1<<10);
-        }
-       // return 1*/;
-    }
+
+//    if(oscode==1024)
+//    {
+//        return 1<<10;
+//    }
     return 0;
 }
 int osd_readkey_unicode(int flush)

@@ -35,6 +35,7 @@
 #include "driver.h"
 #include "vector.h"
 #include "artwork.h"
+#include <stdio.h>
 
 #define MAX_DIRTY_PIXELS (2*MAX_PIXELS)
 
@@ -184,7 +185,7 @@ float vector_get_intensity(void)
 VIDEO_START( vector )
 {
 	int i;
-
+    printf("VIDEO_START( vector )\n");
 	/* Grab the settings for this session */
 	antialias = options.antialias;
 	translucency = options.translucency;
@@ -217,23 +218,23 @@ VIDEO_START( vector )
 		return 1;
 		break;
 	}
-
+    printf("VIDEO_START( vector ) 2\n");
 	/* allocate memory for tables */
 	pTcosin = auto_malloc ( (2048+1) * sizeof(pTcosin[0]));   /* yes! 2049 is correct */
 	pixel = auto_malloc (MAX_PIXELS * sizeof (pixel[0]));
 	vector_dirty_list = auto_malloc (MAX_DIRTY_PIXELS * sizeof (vector_dirty_list[0]));
 	old_list = auto_malloc (MAX_POINTS * sizeof (old_list[0]));
 	new_list = auto_malloc (MAX_POINTS * sizeof (new_list[0]));
-
+    printf("VIDEO_START( vector ) 3\n");
 	/* build cosine table for fixing line width in antialias */
 	for (i=0; i<=2048; i++)
 	{
 		Tcosin(i) = (int)((double)(1.0/cos(atan((double)(i)/2048.0)))*0x10000000 + 0.5);
 	}
-
+    printf("VIDEO_START( vector ) 4\n");
 	/* build gamma correction table */
 	vector_set_gamma (gamma_correction);
-
+    printf("VIDEO_START( vector ) 5\n");
 	/* make sure we reset the list */
 	vector_dirty_list[0] = VECTOR_PIXEL_END;
 
@@ -268,13 +269,39 @@ static void vector_clear_pixels (void)
 	p_index=0;
 }
 
+void vector_krb_dim(void)
+{
+	vector_pixel_t coords;
+	int i;
+
+	if (Machine->color_depth == 32)
+	{
+		for (UINT32 y = ymin; y <= ymax; y++)
+		{
+			UINT32* prgb = ((UINT32*)vecbitmap->line[y])+xmin;
+			for (UINT32 x = xmin; x <= xmax; x++)
+			{
+				UINT32 c = *prgb;
+//				*prgb++ = (c >> 2) & 0x3f3f3f3f;
+				*prgb++ = (c >> 1) & 0x7f7f7f7f;
+			}
+		}
+	}
+	else
+	{
+
+	}
+	p_index = 0;
+}
+
+
 /*
  * draws an anti-aliased pixel (blends pixel with background)
  */
 #define LIMIT5(x) ((x < 0x1f)? x : 0x1f)
 #define LIMIT8(x) ((x < 0xff)? x : 0xff)
 
-static void vector_draw_aa_pixel_15 (int x, int y, rgb_t col, int dirty)
+void vector_draw_aa_pixel_15 (int x, int y, rgb_t col, int dirty)
 {
 	vector_pixel_t coords;
 	UINT32 dst;
@@ -424,7 +451,9 @@ void vector_draw_to(int x2, int y2, rgb_t col, int intensity, int dirty, rgb_t (
 				a1 = Tgamma[(dy >> 8) & 0xff];   /* remainder pixel */
 				dy >>= 16;                   /* adjust to pixel (solid) count */
 				while (dy--)                 /* plot rest of pixels */
+				{
 					vector_draw_aa_pixel(dx++, yy1, col, dirty);
+				}
 				vector_draw_aa_pixel(dx, yy1, Tinten(a1, col), dirty);
 				if (yy1 == yy) break;
 				yy1 += sy;
@@ -757,8 +786,8 @@ VIDEO_UPDATE( vector )
 	clever_mark_dirty();
 
 	/* clear ALL pixels in the hidden map */
-	vector_clear_pixels();
-
+	//vector_clear_pixels();
+	vector_krb_dim();
 	/* Draw ALL lines into the hidden map. Mark only those lines with */
 	/* new->dirty = 1 as dirty. Remember the pixel start/end indices  */
 	curpoint = new_list;
@@ -772,6 +801,7 @@ VIDEO_UPDATE( vector )
 		else
 		{
 			curpoint->arg1 = p_index;
+			//printf("i:%d Ti:%d\n",(int)curpoint->intensity,(int) Tgamma[curpoint->intensity]);
 			vector_draw_to(curpoint->x, curpoint->y, curpoint->col, Tgamma[curpoint->intensity], curpoint->status, curpoint->callback);
 
 			curpoint->arg2 = p_index;
