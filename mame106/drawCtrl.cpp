@@ -343,6 +343,7 @@ public:
 template<class BmDst,class Pix,typename T>
 void drawextra_simpleDrawT(BmDst &bmdest,int x, int y,struct extraBitmap &bm )
 {
+return; //TODO startrek
     if( ! bm._png.image) return;
 //    if(y<0) y=0;
 //    int y1 =pix.y1() + y;

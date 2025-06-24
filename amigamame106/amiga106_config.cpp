@@ -614,17 +614,28 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
     drv->drv(&machine);
     video_attribs = machine.video_attributes;
 
-    int width = (machine.default_visible_area.max_x - machine.default_visible_area.min_x)+1;
-    int height = (machine.default_visible_area.max_y - machine.default_visible_area.min_y)+1;
+    int width = machine.screen_width;
+    int height = machine.screen_height;
+
+//    int width = (machine.default_visible_area.max_x - machine.default_visible_area.min_x)+1;
+//    int height = (machine.default_visible_area.max_y - machine.default_visible_area.min_y)+1;
+
     if(drv->flags & ORIENTATION_SWAP_XY) {
         std::swap(width,height);
     }
 
   std::stringstream ss;
-  ss <<width<<"x"<<height<<" ";
-  if(machine.video_attributes &VIDEO_RGB_DIRECT) ss<<"15b";
-  else if(machine.total_colors<=256) ss<<"8b";
-  else  ss<<"16b";
+  if(video_attribs & VIDEO_TYPE_VECTOR)
+  {
+    ss << "vec"<<width<<"x"<<height;
+  } else
+  {
+      ss <<width<<"x"<<height<<" ";
+      if(machine.video_attributes &VIDEO_RGB_DIRECT) ss<<"15b";
+      else if(machine.total_colors<=256) ss<<"8b";
+      else  ss<<"16b";
+  }
+
 
     screenid = ss.str();
 }

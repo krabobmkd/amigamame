@@ -184,7 +184,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
 
     MameConfig::Display_PerScreenMode &screenModeConf = config.getActiveMode();
 
-    if((pparams->video_attributes &VIDEO_TYPE_VECTOR)==0) // means not vector,= bitmap
+  //  if((pparams->video_attributes &VIDEO_TYPE_VECTOR)==0) // means not vector,= bitmap
     {
         // keep the 3 orientation bits
         AbstractDisplay::params params={0};
