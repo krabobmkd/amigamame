@@ -561,7 +561,15 @@ int patchMiniMachines(
             "machine/atari_vg.c",
             "machine/atarigen.c",  "machine/atarigen.h",
             "machine/atari_vg.c",
-            "sndhrdw/atarijsa.c","sndhrdw/atarijsa.h"
+            "sndhrdw/atarijsa.c","sndhrdw/atarijsa.h",
+
+            // vectors
+            "drivers/starwars.c","machine/starwars.c", "sndhrdw/starwars.c",
+            "drivers/bzone.c","sndhrdw/bzone.c",
+            "drivers/tempest.c",
+            "machine/mathbox.h","machine/mathbox.c",
+            "sndhrdw/redbaron.c"
+
 
         };
         copyDrivers(m,src,{
@@ -590,7 +598,13 @@ int patchMiniMachines(
         "ssprint","ssprint3","ssprint1","ssprintg",
         "csprint","csprint2","csprintf","csprints","csprintg",
 
-        "apb","apb6","apbg","apbf"
+        "apb","apb6","apbg","apbf",
+
+        //vectors
+        "starwars","starwar1","esb",
+        "bzone","bzone2","bzonec","bradley","redbaron",
+        "tempest","tempest1","tempest2","tempest3","temptube"
+
     });
 
         m._cpu_defs["M68010"]=1; // gauntlet + hardwrivin stun runner
@@ -1179,6 +1193,8 @@ int createCmake(map<string,TMachine> machinetargets,
 //        if(upname == "IREM" ) onShouldBeDefault = true;
 //        if(upname == "DATAEAST" ) onShouldBeDefault = true; -> too big/shitty
         if(upname == "MINIDTEA" ) onShouldBeDefault = true;
+
+        if(upname == "CINEMAT" ) onShouldBeDefault = true;
 
         // because Q*BERT ! ->doesnt work
         if(upname == "GOTTLIEB" ) onShouldBeDefault = true;
