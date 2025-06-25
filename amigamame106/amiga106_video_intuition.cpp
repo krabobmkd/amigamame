@@ -84,8 +84,10 @@ void IntuitionDrawable::getGeometry(_mame_display *display,int &cenx,int &ceny,i
     // +1 because goes 0,319
     sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
     sourceheight =( display->game_visible_area.max_y - display->game_visible_area.min_y)+1;
+    //printf("IntuitionDrawable::getGeometry :%d %d\n",sourcewidth,sourceheight);
     if(_flags & ORIENTATION_SWAP_XY)
     {
+      //  printf("swap\n");
         doSwap(sourcewidth,sourceheight);
     }
 
