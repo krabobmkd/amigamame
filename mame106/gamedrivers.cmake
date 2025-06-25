@@ -1114,7 +1114,7 @@ if(OPT_MINIATARI)
 		machine/atari_vg.c sndhrdw/atarijsa.c sndhrdw/atarijsa.h drivers/starwars.c 
 		machine/starwars.c sndhrdw/starwars.c drivers/bzone.c sndhrdw/bzone.c 
 		drivers/tempest.c machine/mathbox.h machine/mathbox.c sndhrdw/redbaron.c 
-	)
+		drivers/asteroid.c machine/asteroid.c sndhrdw/asteroid.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
 	set(MSND_OKIM6295 ON)

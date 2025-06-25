@@ -927,7 +927,7 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     // vector things
     options.beam = 0x00018000; //1.75 //2<<16;               /* vector beam width */
     options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
-    options.vector_intensity = 1.5f;  /* float vector beam intensity 1.5f defaulty */
+    options.vector_intensity = 1.0f;  /* float vector beam intensity 1.5f defaulty */
     options.translucency = 1;  /* 1 to enable translucency on vectors */
     options.antialias = 1;  /* 1 to enable antialias on vectors */
 

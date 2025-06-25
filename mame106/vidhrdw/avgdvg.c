@@ -1091,7 +1091,7 @@ PALETTE_INIT( avg_white )
 {
 	int i;
 	for (i = 0; i < 32; i++)
-		vcolorram[i] = MAKE_RGB(0xff, 0xff, 0xff);
+		vcolorram[i] = MAKE_RGB(0x66, 0xdd, 0x88);
 }
 
 
@@ -1100,7 +1100,8 @@ PALETTE_INIT( avg_multi )
 {
 	int i;
 	for (i = 0; i < 32; i++)
-		vcolorram[i] = VECTOR_COLOR111(i);
+		//vcolorram[i] = VECTOR_COLOR111(i);
+		vcolorram[i] = VECTOR_COLOR111dim(i);
 }
 
 

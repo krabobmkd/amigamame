@@ -58,11 +58,15 @@ static float intensity_correction = 1.5f;
 
 static int (*vector_aux_renderer)(point *start, int num_points) = NULL;
 
+
+static UINT32 *glowtemp;
+
 static point *new_list;
 static point *old_list;
 static int new_index;
 static int old_index;
 
+static int remanence=1;
 /* coordinates of pixels are stored here for faster removal */
 vector_pixel_t *vector_dirty_list;
 static int dirty_index;
@@ -226,6 +230,7 @@ VIDEO_START( vector )
 	old_list = auto_malloc (MAX_POINTS * sizeof (old_list[0]));
 	new_list = auto_malloc (MAX_POINTS * sizeof (new_list[0]));
 
+
 	/* build cosine table for fixing line width in antialias */
 	for (i=0; i<=2048; i++)
 	{
@@ -237,6 +242,14 @@ VIDEO_START( vector )
 
 	/* make sure we reset the list */
 	vector_dirty_list[0] = VECTOR_PIXEL_END;
+
+    // - -- - -mini buffer for glow
+    UINT32 nbpixglowtemp = (xmax-xmin);
+    if((ymax-ymin)>nbpixglowtemp) nbpixglowtemp = (ymax-ymin);
+    nbpixglowtemp += 4;
+
+    glowtemp = auto_malloc (nbpixglowtemp * sizeof (UINT32));
+
 
 	return 0;
 }
@@ -271,30 +284,270 @@ static void vector_clear_pixels (void)
 
 void vector_krb_dim(void)
 {
-	vector_pixel_t coords;
 	int i;
 
-	if (Machine->color_depth == 32)
-	{
-		for (UINT32 y = ymin; y <= ymax; y++)
-		{
-			UINT32* prgb = ((UINT32*)vecbitmap->line[y])+xmin;
-			for (UINT32 x = xmin; x <= xmax; x++)
-			{
-				UINT32 c = *prgb;
-//				*prgb++ = (c >> 2) & 0x3f3f3f3f;
-				*prgb++ = (c >> 1) & 0x7f7f7f7f;
-			}
-		}
-	}
-	else
-	{
+    if(remanence < 1 || Machine->color_depth != 32)
+    {
+        if(Machine->color_depth == 32)
+        for (UINT32 y = ymin; y <= ymax; y++)
+        {
+            UINT32* prgb = ((UINT32*)vecbitmap->line[y])+xmin;
+            for (UINT32 x = xmin; x <= xmax; x++)
+            {
+                *prgb++ = 0;
+            }
+        }
+        else if(Machine->color_depth == 15 || Machine->color_depth == 16)
+        {
+           for (UINT32 y = ymin; y <= ymax; y++)
+            {
+                UINT16* prgb = ((UINT16*)vecbitmap->line[y])+xmin;
+                for (UINT32 x = xmin; x <= xmax; x++)
+                {
+                    *prgb++ = 0;
+                }
+            }
+        }
+    } else if(remanence ==1)
+    {
+        // div 2
+        for (UINT32 y = ymin; y <= ymax; y++)
+        {
+            UINT32* prgb = ((UINT32*)vecbitmap->line[y])+xmin;
+            for (UINT32 x = xmin; x <= xmax; x++)
+            {
+                UINT32 c = *prgb;
+                *prgb++ = (c >> 1) & 0x7f7f7f7f;
+            }
+        }
+    }else
+    {
+        // * 3/4
+        for (UINT32 y = ymin; y <= ymax; y++)
+        {
+            UINT32* prgb = ((UINT32*)vecbitmap->line[y])+xmin;
+            for (UINT32 x = xmin; x <= xmax; x++)
+            {
+                UINT32 c = *prgb;
+                UINT32 c1 = (c >> 1) & 0x7f7f7f7f;
+                UINT32 c2 = (c >> 2) & 0x3f3f3f3f;
+                *prgb++ = c1+c2;
+            }
+        }
+    }
 
-	}
 	p_index = 0;
 }
 
+void vector_krb_hglow(void)
+{
+    if( Machine->color_depth != 32) return;
 
+    UINT32 cl=32; // means stock 64 .
+#define hgdivser 7
+
+    for (UINT32 y = ymin; y <= ymax; y++)
+    {
+        UINT32* prgb = ((UINT32*)vecbitmap->line[y])+xmin;
+        UINT32* glowbuf = glowtemp;
+        INT32 r_ac=0;
+        INT32 g_ac=0;
+        INT32 b_ac=0;
+
+        // accum nextread before screen
+        for (UINT32 x = 0; x < cl; x++)
+        {
+            UINT32 cnext = prgb[x];
+            r_ac += (cnext>>16) & 0x0ff;
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
+        }
+
+        UINT32 x = 0;
+        // left case, only accum next
+        for (; x < cl; x++)
+        {
+            UINT32 cnext = prgb[x+cl];
+            r_ac += (cnext>>16) & 0x0ff;
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
+
+            UINT32 cr = (r_ac>>hgdivser);
+            UINT32 cg = (g_ac>>hgdivser) ;
+            UINT32 cb = (b_ac>>hgdivser) ;
+            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
+        }
+        // center case,
+        UINT32 xend = (xmax-xmin-cl);
+        for (; x <= xend; x++)
+        {
+            UINT32 cnext = prgb[x+cl];
+            r_ac += (cnext>>16)& 0x0ff;
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
+
+            UINT32 cprev = prgb[x-cl];
+            r_ac -= (cprev>>16)& 0x0ff;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
+
+            UINT32 cr = (r_ac>>hgdivser);
+            UINT32 cg = (g_ac>>hgdivser) ;
+            UINT32 cb = (b_ac>>hgdivser) ;
+            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
+        }
+        // right case,
+        xend = (xmax-xmin);
+        for (; x <= xend; x++)
+        {
+            UINT32 cprev = prgb[x-cl];
+            r_ac -= (cprev>>16)& 0x0ff;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
+
+            UINT32 cr = (r_ac>>hgdivser);
+            UINT32 cg = (g_ac>>hgdivser) ;
+            UINT32 cb = (b_ac>>hgdivser) ;
+            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
+        }
+        // then compose
+         glowbuf = glowtemp;
+        for (x = xmin; x <=xmax ; x++)
+        {
+            UINT32 chere = *prgb;
+            UINT32 cglow = *glowbuf++;
+
+            UINT32 cr = (cglow>>16)& 0x0ff;
+            UINT32 rh = (chere>>16)& 0x0ff;
+            if(cr>rh) rh=cr;
+
+            UINT32 gh = (chere>>8) & 0x0ff;
+            UINT32 cg = (cglow>>8) & 0x0ff;
+            if(cg>gh) gh=cg;
+
+            UINT32 bh = (chere) & 0x0ff;
+            UINT32 cb = (cglow) & 0x0ff;
+            if(cb>bh) bh=cb;
+
+            *prgb++=(rh<<16)|(gh<<8)|bh;
+        }
+    }
+
+}
+
+void vector_krb_vglow(void)
+{
+    if( Machine->color_depth != 32) return;
+
+    UINT32 cl=32; // means stock 64 .
+#define vgdivser 7
+
+    UINT32* prgb_l = ((UINT32*)vecbitmap->line[ymin])+xmin;
+
+    for (UINT32 x = xmin; x <= xmax; x++)
+    {
+        UINT32* prgb = prgb_l;
+        UINT32* glowbuf = glowtemp;
+        INT32 r_ac=0;
+        INT32 g_ac=0;
+        INT32 b_ac=0;
+
+TODO
+        for (UINT32 y = 0; y < cl; y++)
+        {
+            UINT32 cnext = prgb[x*];
+            r_ac += (cnext>>16) & 0x0ff;
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
+        }
+
+
+        prgb_l++; //= vecbitmap->rowpixels;
+    }
+
+       // UINT32* prgb = ((UINT32*)vecbitmap->line[y])+xmin;
+
+
+        // accum nextread before screen
+        for (UINT32 x = 0; x < cl; x++)
+        {
+            UINT32 cnext = prgb[x];
+            r_ac += (cnext>>16) & 0x0ff;
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
+        }
+
+        UINT32 x = 0;
+        // left case, only accum next
+        for (; x < cl; x++)
+        {
+            UINT32 cnext = prgb[x+cl];
+            r_ac += (cnext>>16) & 0x0ff;
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
+
+            UINT32 cr = (r_ac>>hgdivser);
+            UINT32 cg = (g_ac>>hgdivser) ;
+            UINT32 cb = (b_ac>>hgdivser) ;
+            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
+        }
+        // center case,
+        UINT32 xend = (xmax-xmin-cl);
+        for (; x <= xend; x++)
+        {
+            UINT32 cnext = prgb[x+cl];
+            r_ac += (cnext>>16)& 0x0ff;
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
+
+            UINT32 cprev = prgb[x-cl];
+            r_ac -= (cprev>>16)& 0x0ff;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
+
+            UINT32 cr = (r_ac>>hgdivser);
+            UINT32 cg = (g_ac>>hgdivser) ;
+            UINT32 cb = (b_ac>>hgdivser) ;
+            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
+        }
+        // right case,
+        xend = (xmax-xmin);
+        for (; x <= xend; x++)
+        {
+            UINT32 cprev = prgb[x-cl];
+            r_ac -= (cprev>>16)& 0x0ff;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
+
+            UINT32 cr = (r_ac>>hgdivser);
+            UINT32 cg = (g_ac>>hgdivser) ;
+            UINT32 cb = (b_ac>>hgdivser) ;
+            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
+        }
+        // then compose
+         glowbuf = glowtemp;
+        for (x = xmin; x <=xmax ; x++)
+        {
+            UINT32 chere = *prgb;
+            UINT32 cglow = *glowbuf++;
+
+            UINT32 cr = (cglow>>16)& 0x0ff;
+            UINT32 rh = (chere>>16)& 0x0ff;
+            if(cr>rh) rh=cr;
+
+            UINT32 gh = (chere>>8) & 0x0ff;
+            UINT32 cg = (cglow>>8) & 0x0ff;
+            if(cg>gh) gh=cg;
+
+            UINT32 bh = (chere) & 0x0ff;
+            UINT32 cb = (cglow) & 0x0ff;
+            if(cb>bh) bh=cb;
+
+            *prgb++=(rh<<16)|(gh<<8)|bh;
+        }
+    }
+
+}
 /*
  * draws an anti-aliased pixel (blends pixel with background)
  */
@@ -810,4 +1063,7 @@ VIDEO_UPDATE( vector )
 	}
 
 	vector_dirty_list[dirty_index] = VECTOR_PIXEL_END;
+
+
+	vector_krb_hglow();
 }
