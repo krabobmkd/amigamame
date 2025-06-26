@@ -135,6 +135,7 @@ void StartGame(int idriver)
     options.vector_intensity = 1.5f;  /* float vector beam intensity 1.5f defaulty */
     options.translucency = 1;  /* 1 to enable translucency on vectors */
     options.antialias = 1;  /* 1 to enable antialias on vectors */
+//    vector_width 
 
     /* Clear the zip filename caches. */
 
@@ -271,10 +272,15 @@ void QWin::updateWin()
         int w = _image.width();
         int h = _image.height();
         int izoom = 1;
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*izoom,h*izoom)) );
-        this->setFixedSize(w*izoom,h*izoom);
-    _imageMutex.unlock();
+        static bool resizedone = false;
+        if (!resizedone && w > 0 && h > 0)
+        {
+            this->setFixedSize(w * izoom, h * izoom);
+        }
+        this->setPixmap(QPixmap::fromImage(_image)/*.scaled(QSize(w * izoom, h * izoom))*/);
 
+    _imageMutex.unlock();
+    QThread::msleep(10);
 	//lbl.show();
 //    m_mutex.unlock();
 //    m_mutex.lock();
