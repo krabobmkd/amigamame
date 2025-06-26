@@ -267,7 +267,7 @@ VIDEO_START( vector )
 }
 void allocGlowTemp()
 {
-	UINT32 nbpixglowtemp = (xmax-xmin) * (ymax-ymin);
+	UINT32 nbpixglowtemp = (xmax-xmin) * ((ymax-ymin)+1);
 	glowtemp = auto_malloc(nbpixglowtemp * sizeof(UINT32));
 	glowtempv = auto_malloc(nbpixglowtemp * sizeof(UINT32));
 
@@ -518,9 +518,10 @@ void vector_krb_fullglow(void)
 
     // - - - - composition
     glowbuf = glowtempv;
-
+	 
     for (UINT32 y = ymin; y < ymax; y++)
     {
+		if (vecbitmap->line[y] == NULL) continue;
         UINT32* prgb = ((UINT32*)vecbitmap->line[y])+xmin;
         for (UINT32 x = xmin; x < xmax; x++)
         {
