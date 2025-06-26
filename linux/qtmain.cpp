@@ -130,11 +130,11 @@ void StartGame(int idriver)
     options.pause_bright = 1.0f;
 
     // vector things
-    options.beam = 2;               /* vector beam width */
+    options.beam = 0x0001c000;               /* vector beam width */
     options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
     options.vector_intensity = 1.5f;  /* float vector beam intensity 1.5f defaulty */
     options.translucency = 1;  /* 1 to enable translucency on vectors */
-    options.antialias = 0;  /* 1 to enable antialias on vectors */
+    options.antialias = 1;  /* 1 to enable antialias on vectors */
 
     /* Clear the zip filename caches. */
 
@@ -189,7 +189,9 @@ void QProc::process()
     // "sci"
       //"sharrier"
 //      "arkanoid"
-"startrek"
+ "starwars"
+//"startrek"
+//"tacscan"
  //     "othunder"
       // "thndrbld"
       // "chasehq"
@@ -338,7 +340,9 @@ int osd_skip_this_frame(void)
 void osd_update_video_and_audio(struct _mame_display *display)
 {
     if(isinexit) return;
+
     _display = display;
+
     uint16_t *p = (uint16_t *) _display->game_bitmap->base;
     int x1 = _display->game_visible_area.min_x;
     int y1 = _display->game_visible_area.min_y;
@@ -406,9 +410,9 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
         }
     }
-
+    _imageMutex.lock();
 	QImage image(bm.data(), w, h, QImage::Format_RGB888);
-        _imageMutex.lock();
+
         _image = image;
     _imageMutex.unlock();
 
@@ -495,15 +499,15 @@ int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
 // to open menu
-    //if(oscode == 33 && nbframe>2*60)
-    //{
-    //    if(opened==0)
-    //    {
-    //        opened=1;
-    //        return 1;
-    //    }
-    //    return 0;
-    //}
+    if(oscode == 33 && nbframe>2*60)
+    {
+        if(opened==0)
+        {
+            opened=1;
+            return 1;
+        }
+        return 0;
+    }
     // if(oscode == 35 && nbframe>4*60)
     // {
     //     //if(opened>0)

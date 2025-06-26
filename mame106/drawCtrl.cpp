@@ -386,7 +386,10 @@ void drawextra_simpleDrawT(BmDst &bmdest,int x, int y,struct extraBitmap &bm )
 
 void drawextra_simpleDraw(mame_bitmap *bitmap,int x, int y,struct extraBitmap *bm )
 {
-  const rectangle *cliprect = &Machine->visible_area;
+// for vector games, cliprect is not visible_area
+ // const rectangle *cliprect = &Machine->visible_area;
+    const rectangle *cliprect = &Machine->absolute_visible_area;
+
     UINT32 video_attribs = Machine->drv->video_attributes;
     UINT32 flags = Machine->ui_orientation;
     if(video_attribs & VIDEO_RGB_DIRECT)

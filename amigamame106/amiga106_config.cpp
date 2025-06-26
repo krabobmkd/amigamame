@@ -617,9 +617,6 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
     int width = machine.screen_width;
     int height = machine.screen_height;
 
-//    int width = (machine.default_visible_area.max_x - machine.default_visible_area.min_x)+1;
-//    int height = (machine.default_visible_area.max_y - machine.default_visible_area.min_y)+1;
-
     if(drv->flags & ORIENTATION_SWAP_XY) {
         std::swap(width,height);
     }
