@@ -216,6 +216,9 @@ struct _global_options
 	int		translucency;	/* 1 to enable translucency on vectors */
 	int 	antialias;		/* 1 to enable antialiasing on vectors */
 
+    // krb add
+    int     vector_remanence,vector_glow;
+
 	int		use_artwork;	/* bitfield indicating which artwork pieces to use */
 	int		artwork_res;	/* 1 for 1x game scaling, 2 for 2x */
 	int		artwork_crop;	/* 1 to crop artwork to the game screen */

@@ -399,6 +399,29 @@ bool MameConfig::Display_PerGame::isDefault()
     return (!_frameSkip);
 }
 
+// - - - - --
+MameConfig::Display_Vector::Display_Vector() : ASerializable() {
+}
+void MameConfig::Display_Vector::serialize(ASerializer &serializer)
+{
+    serializer("Resolution",(int&)_resolution,{"320x240","400x300","480x360","640x480" });
+    serializer("Glow Mode",(int&)_glow,{"None","Horizontal","Full"});
+    serializer("Remanence",(int&)_remanence,{"None","Low","High"});
+    serializer("Antialias",_antialias);
+     // min,max,step, default
+    serializer("Intensity",_intensity,0.75f,1.5f,0.05f,1.0f);
+
+}
+bool MameConfig::Display_Vector::isDefault()
+{   // will not be written if is default.
+    return (_resolution == VectorResolution::e480x360 &&
+            _glow == GlowMode::None &&
+            _remanence == Remanence::Low &&
+            _antialias == true &&
+            _intensity == 1.0f);
+
+}
+
 // - - - - - - -
 MameConfig::Display::Display() : ASerializable()
     ,_perScreenModeS(_perScreenMode)
@@ -421,6 +444,8 @@ void MameConfig::Display::serialize(ASerializer &serializer)
 
     serializer("Per Screen Mode",_perScreenModeS);
     serializer("Per Game",_perGameS);
+
+    serializer("Vector Screen",_vector);
 }
 MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
 {
@@ -624,7 +649,7 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
   std::stringstream ss;
   if(video_attribs & VIDEO_TYPE_VECTOR)
   {
-    ss << "vec"<<width<<"x"<<height;
+    ss << "vector";
   } else
   {
       ss <<width<<"x"<<height<<" ";
@@ -922,13 +947,41 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     options.skip_warnings = (_misc._skipflags & 2) != 0;
 
     // vector things
-    options.beam = 0x00018000; //1.75 //2<<16;               /* vector beam width */
-    options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
-    options.vector_intensity = 1.0f;  /* float vector beam intensity 1.5f defaulty */
-    options.translucency = 1;  /* 1 to enable translucency on vectors */
-    options.antialias = 1;  /* 1 to enable antialias on vectors */
+    Display_Vector &vectorconf = _display._vector;
 
-    if(options.beam<(1<<16)) options.beam = 1<<16;
+    // value is pixel line width <<16.
+    switch(vectorconf._resolution)
+    {
+        case VectorResolution::e320x240:
+            options.beam = 0x00012000;
+            options.vector_width = 320;
+            options.vector_height = 240;
+            break;
+        case VectorResolution::e400x300:
+            options.beam = 0x00012000;
+            options.vector_width = 400;
+            options.vector_height = 300;
+            break;
+        default:
+        case VectorResolution::e480x360:
+            options.beam = 0x00014000;
+            options.vector_width = 480;
+            options.vector_height = 360;
+            break;
+        case VectorResolution::e640x480:
+            options.beam = 0x00020000;
+            options.vector_width = 640;
+            options.vector_height = 480;
+            break;
+    }
+    if(options.beam<(1<<16)) options.beam = 1<<16; // or crash !
+
+    options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
+    options.vector_intensity = vectorconf._intensity;  /* float vector beam intensity 1.5f defaulty */
+    options.translucency = 1;  /* 1 to enable translucency on vectors */
+    options.antialias = (int)vectorconf._antialias;  /* 1 to enable antialias on vectors */
+    options.vector_remanence = (int)vectorconf._remanence;
+    options.vector_glow = (int)vectorconf._glow;
 
 #ifdef LINK_NEOGEO
     // if machine points neogeo rom list, then it's neogeo.
