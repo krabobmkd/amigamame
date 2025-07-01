@@ -758,7 +758,7 @@ static int avg_generate_vector_list(void)
 						vector_add_clip(xmin << 16, newymin << 16,
 										xmax << 16, ymax << 16);
 					}
-
+				 
 				/* debugging */
 				VGLOG(("bin: %d, lin: ", b));
 				if (l > 0x80)

@@ -79,7 +79,7 @@ set(MAME_CORE_SRC
   drawCtrl.cpp
   drawCtrl.h
 	# minimal common driver needs:
-	vidhrdw/generic.c vidhrdw/vector.c
+	vidhrdw/generic.c vidhrdw/vector.c vidhrdw/vector.cpp
 
 	machine/generic.c
 	machine/generic.h

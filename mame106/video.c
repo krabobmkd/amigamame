@@ -754,7 +754,9 @@ void update_video_and_audio(void)
 	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
 		if (!full_refresh_pending && !ui_is_dirty() && !skipped_it)
 		{
+#if USE_DIRTYPIXXELS
 			current_display.vector_dirty_pixels = vector_dirty_list;
+#endif
 			current_display.changed_flags |= VECTOR_PIXELS_CHANGED;
 		}
 

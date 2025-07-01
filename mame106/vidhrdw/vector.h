@@ -1,6 +1,8 @@
 #ifndef __VECTOR__
 #define __VECTOR__
 
+#define USE_DIRTYPIXXELS 0
+
 #include "artwork.h"
 
 #define VECTOR_TEAM \
@@ -40,9 +42,9 @@ typedef UINT32 vector_pixel_t;
 #define VECTOR_PIXEL(x,y)	((x) | ((y) << 16))
 #define VECTOR_PIXEL_X(p)	((p) & 0xffff)
 #define VECTOR_PIXEL_Y(p)	((p) >> 16)
-
-extern vector_pixel_t *vector_dirty_list;
-
+#if USE_DIRTYPIXXELS
+	extern vector_pixel_t *vector_dirty_list;
+#endif
 extern int translucency;  /* translucent vectors  */
 
 extern unsigned char *vectorram;
@@ -61,7 +63,10 @@ typedef struct
 	int x; int y;
 	rgb_t col;
 	int intensity;
+//#if USE_DIRTYPIXXELS
+	// "battlezone clipping circuit" uses that
 	int arg1; int arg2; /* start/end in pixel array or clipping info */
+//#endif
 	int status;         /* for dirty and clipping handling */
 	rgb_t (*callback)(void);
 } point;
@@ -69,7 +74,13 @@ typedef struct
 void vector_register_aux_renderer(int (*aux_renderer)(point *start, int num_points));
 
 void vector_clear_list (void);
-void vector_draw_to (int x2, int y2, rgb_t col, int intensity, int dirty, rgb_t (*color_callback)(void));
+//void vector_draw_to (int x2, int y2, rgb_t col, int intensity, int dirty, rgb_t (*color_callback)(void));
+//void vector_draw_to(point * curpoint);
+void vector_draw_to15(point* curpoint);
+void vector_draw_to32(point* curpoint);
+void vector_draw_to15aa(point* curpoint);
+void vector_draw_to32aa(point* curpoint);
+
 void vector_add_point (int x, int y, rgb_t color, int intensity);
 void vector_add_point_callback (int x, int y, rgb_t (*color_callback)(void), int intensity);
 void vector_add_clip (int minx, int miny, int maxx, int maxy);
@@ -77,8 +88,8 @@ void vector_set_intensity(float _intensity);
 float vector_get_intensity(void);
 void vector_set_flicker(float _flicker);
 float vector_get_flicker(void);
-void vector_set_gamma(float _gamma);
-float vector_get_gamma(void);
+//void vector_set_gamma(float _gamma);
+//float vector_get_gamma(void);
 
 void krb_dim_rgb32(void);
 
