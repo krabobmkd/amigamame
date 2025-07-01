@@ -674,14 +674,17 @@ void vector_krb_fullglow(void)
 static inline int vec_multbeam(UINT32 parm2)
 {
     int result;
-
+    /*
     result = vecbeamconst_low * ((UINT16)parm2);
     result >>= 16;
     result += vecbeamconst_low * (parm2 >> 16);
     result += vecbeamconst_high * ((UINT16)parm2);
     result >>= 16;
     result += vecbeamconst_high * (parm2 >> 16);
-
+    */
+    result = vecbeamconst_high * ((UINT16)parm2);
+    result >>= 16;
+    result += vecbeamconst_high * (parm2 >> 16);
     return(result);
 }
 
@@ -709,9 +712,9 @@ public:
         _r(RGB_RED(col)>>3), _g(RGB_GREEN(col)>>3), _b(RGB_BLUE(col)>>3)
     {}
 
-    UINT8 _r, _g, _b;
-    UINT8 _rt, _gt, _bt;
-    void tint(UINT16 t) {
+    UINT16 _r, _g, _b;
+    UINT16 _rt, _gt, _bt;
+    void tint(UINT8 t) {
         _rt = (_r * t) >> 8;
         _gt = (_g * t) >> 8;
         _bt = (_b * t) >> 8;
@@ -724,9 +727,9 @@ public:
             return;
         if (y < vector_ymin || y >= vector_ymax)
             return;
-
-        dst = ((UINT16*)vecbitmap->line[y])[x];
-        ((UINT16*)vecbitmap->line[y])[x] = LIMIT5(_b + (dst & 0x1f))
+        UINT16* pdst = ((UINT16*)vecbitmap->line[y]) + x;
+        dst = *pdst;
+        *pdst = LIMIT5(_b + (dst & 0x1f))
             | (LIMIT5(_g + ((dst >> 5) & 0x1f)) << 5)
             | (LIMIT5(_r + (dst >> 10)) << 10);
 
@@ -739,9 +742,9 @@ public:
             return;
         if (y < vector_ymin || y >= vector_ymax)
             return;
-
-        dst = ((UINT16*)vecbitmap->line[y])[x];
-        ((UINT16*)vecbitmap->line[y])[x] = LIMIT5(_bt + (dst & 0x1f))
+        UINT16* pdst = ((UINT16*)vecbitmap->line[y]) + x;
+        dst = *pdst;
+        *pdst = LIMIT5(_bt + (dst & 0x1f))
             | (LIMIT5(_gt + ((dst >> 5) & 0x1f)) << 5)
             | (LIMIT5(_rt + (dst >> 10)) << 10);
 
@@ -753,9 +756,9 @@ public:
     Pix32(rgb_t col) :
     _r(RGB_RED(col)), _g(RGB_GREEN(col)), _b(RGB_BLUE(col))
     {}
-    UINT8 _r, _g, _b;
-    UINT8 _rt, _gt, _bt;
-    void tint(UINT16 t) {
+    UINT16 _r, _g, _b;
+    UINT16 _rt, _gt, _bt;
+    void tint(UINT8 t) {
         _rt = (_r * t) >> 8;
         _gt = (_g * t) >> 8;
         _bt = (_b * t) >> 8;
@@ -769,9 +772,9 @@ public:
             return;
         if (y < vector_ymin || y >= vector_ymax)
             return;
-
-        dst = ((UINT32*)vecbitmap->line[y])[x];
-        ((UINT32*)vecbitmap->line[y])[x] = LIMIT8(_b + (dst & 0xff))
+        UINT32* pdst = ((UINT32*)vecbitmap->line[y]) + x;
+        dst = *pdst;
+        *pdst = LIMIT8(_b + (dst & 0xff))
             | (LIMIT8(_g + ((dst >> 8) & 0xff)) << 8)
             | (LIMIT8(_r + (dst >> 16)) << 16);
 
@@ -785,9 +788,9 @@ public:
             return;
         if (y < vector_ymin || y >= vector_ymax)
             return;
-
-        dst = ((UINT32*)vecbitmap->line[y])[x];
-        ((UINT32*)vecbitmap->line[y])[x] = LIMIT8(_bt + (dst & 0xff))
+        UINT32* pdst = ((UINT32*)vecbitmap->line[y]) + x;
+        dst = *pdst;
+        *pdst = LIMIT8(_bt + (dst & 0xff))
             | (LIMIT8(_gt + ((dst >> 8) & 0xff)) << 8)
             | (LIMIT8(_rt + (dst >> 16)) << 16);
 
@@ -849,11 +852,8 @@ void vector_draw_toT(pixel &pix, point* curpoint)
             {
                // if (color_callback) col = Tinten(intensity, (*color_callback)());
                 dx = width;    /* init diameter of beam */
-                if (dx < 0x10000) {
-
-                }
                 dy = yy1 >> 16;
-                pix.tint(0xff - (yy1 >> 8));
+                pix.tint(0xff - ((UINT8)(yy1 >> 8)));
                 pix.aa_pixeltint(x1, dy++);
                 dx -= 0x10000 - (0xffff & yy1); /* take off amount plotted */
                 a1 = (dx >> 8);   /* calc remainder pixel */
@@ -883,7 +883,7 @@ void vector_draw_toT(pixel &pix, point* curpoint)
               //  if (color_callback) col = Tinten(intensity, (*color_callback)());
                 dy = width;    /* calc diameter of beam */
                 dx = x1 >> 16;
-                pix.tint(0xff - (x1 >> 8));
+                pix.tint(0x00ff - ((UINT8)(x1 >> 8)));
                 pix.aa_pixeltint(dx++, yy1);
                 dy -= 0x10000 - (0xffff & x1); /* take off amount plotted */
                 a1 = (dy >> 8);   /* remainder pixel */

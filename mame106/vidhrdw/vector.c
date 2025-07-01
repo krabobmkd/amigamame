@@ -688,6 +688,7 @@ static void clever_mark_dirty (void)
 
 void vector_krb_hglow(void);
 void vector_krb_fullglow(void);
+void save_screen_snapshot(mame_bitmap* bitmap);
 
 VIDEO_UPDATE( vector )
 {
@@ -768,4 +769,12 @@ VIDEO_UPDATE( vector )
 #endif
     if(options.vector_glow==1) vector_krb_hglow();
     else if(options.vector_glow==2) vector_krb_fullglow();
+
+
+	//static int framuuu = 0;
+	//framuuu++;
+	//if (framuuu == 150)
+	//{
+	//	save_screen_snapshot(bitmap);
+	//}
 }
