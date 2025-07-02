@@ -95,6 +95,7 @@ UINT32 *pTcosin;            /* adjust line width */
 mame_bitmap *vecbitmap;
 static int vecwidth, vecheight;
 int vector_xmin, vector_ymin, vector_xmax, vector_ymax; /* clipping area */
+int vector_xminfp, vector_yminfp, vector_xmaxfp, vector_ymaxfp; /* clipping area */
 
 static int vector_runs;	/* vector runs per refresh */
 
@@ -310,62 +311,101 @@ static void vector_clear_pixels (void)
 	p_index=0;
 }
 #endif
+void vector_krb_dim32(void)
+{
+	if (options.vector_remanence < 1 )
+	{
+		for (INT32 y = vector_ymin; y < vector_ymax; y++)
+		{
+			UINT32* prgb = ((UINT32*)vecbitmap->line[y]) + vector_xmin;
+			for (INT32 x = vector_xmin; x < vector_xmax; x++)
+			{
+				*prgb++ = 0;
+			}
+		}
+		return;
+	}
+
+	if (options.vector_remanence == 1)
+	{
+		// div 2
+		for (INT32 y = vector_ymin; y < vector_ymax; y++)
+		{
+			UINT32* prgb = ((UINT32*)vecbitmap->line[y]) + vector_xmin;
+			for (INT32 x = vector_xmin; x < vector_xmax; x++)
+			{
+				UINT32 c = *prgb;
+				*prgb++ = (c >> 1) & 0x7f7f7f7f;
+			}
+		}
+		return;
+	}
+
+	
+	// * 3/4
+	for (INT32 y = vector_ymin; y < vector_ymax; y++)
+	{
+		UINT32* prgb = ((UINT32*)vecbitmap->line[y]) + vector_xmin;
+		for (INT32 x = vector_xmin; x < vector_xmax; x++)
+		{
+			UINT32 c = *prgb;
+			UINT32 c1 = (c >> 1) & 0x7f7f7f7f;
+			UINT32 c2 = (c >> 2) & 0x3f3f3f3f;
+			*prgb++ = c1 + c2;
+		}
+	}
+	
+}
+void vector_krb_dim15(void)
+{
+	INT32 xmaxdiv2 = vector_xmax >> 1;
+	if (options.vector_remanence < 1 )
+	{
+		for (INT32 y = vector_ymin; y < vector_ymax; y++)
+		{
+			UINT32* prgb = (UINT32*)(((UINT16*)vecbitmap->line[y]) + vector_xmin);
+			for (INT32 x = vector_xmin; x < xmaxdiv2; x++)
+			{
+				*prgb++ = 0;
+			}
+		}
+		return;
+	}
+	
+	if (options.vector_remanence == 1)
+	{
+		
+		for (INT32 y = vector_ymin; y < vector_ymax; y++)
+		{
+			UINT32* prgb = (UINT32*)(((UINT16*)vecbitmap->line[y]) + vector_xmin);
+
+			for (INT32 x = vector_xmin; x < xmaxdiv2 ; x++)
+			{
+				UINT32 c = *prgb;
+				*prgb++ = (c >> 1) & 0x3def3def; // treat 2 pixels at once.
+			}
+		}
+		return;
+	}
+
+	// * 3/4
+	for (INT32 y = vector_ymin; y < vector_ymax; y++)
+	{
+		UINT32* prgb = (UINT32*)(((UINT16*)vecbitmap->line[y]) + vector_xmin);
+		for (INT32 x = vector_xmin; x < xmaxdiv2; x++)
+		{
+			UINT32 c = *prgb;
+			UINT32 c1 = (c >> 1) & 0x3def3def;
+			UINT32 c2 = (c >> 2) & 0x1ce71ce7;
+			*prgb++ = c1 + c2;  // treat 2 pixels at once.
+		}
+	}
+	
+}
 void vector_krb_dim(void)
 {
-	int i;
-
-    if(options.vector_remanence < 1 || Machine->color_depth != 32)
-    {
-        if(Machine->color_depth == 32)
-        for (UINT32 y = vector_ymin; y < vector_ymax; y++)
-        {
-            UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-            for (UINT32 x = vector_xmin; x < vector_xmax; x++)
-            {
-                *prgb++ = 0;
-            }
-        }
-        else if(Machine->color_depth == 15 || Machine->color_depth == 16)
-        {
-           for (UINT32 y = vector_ymin; y < vector_ymax; y++)
-            {
-                UINT16* prgb = ((UINT16*)vecbitmap->line[y])+vector_xmin;
-                for (UINT32 x = vector_xmin; x < vector_xmax; x++)
-                {
-                    *prgb++ = 0;
-                }
-            }
-        }
-    } else if(options.vector_remanence ==1)
-    {
-        // div 2
-        for (UINT32 y = vector_ymin; y < vector_ymax; y++)
-        {
-            UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-            for (UINT32 x = vector_xmin; x < vector_xmax; x++)
-            {
-                UINT32 c = *prgb;
-                *prgb++ = (c >> 1) & 0x7f7f7f7f;
-            }
-        }
-    }else // options.vector_remanence ==2
-    {
-        // * 3/4
-        for (UINT32 y = vector_ymin; y < vector_ymax; y++)
-        {
-            UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-            for (UINT32 x = vector_xmin; x < vector_xmax; x++)
-            {
-                UINT32 c = *prgb;
-                UINT32 c1 = (c >> 1) & 0x7f7f7f7f;
-                UINT32 c2 = (c >> 2) & 0x3f3f3f3f;
-                *prgb++ = c1+c2;
-            }
-        }
-    }
-#if USE_DIRTYPIXXELS
-	p_index = 0;
-#endif
+	if (Machine->color_depth == 32) vector_krb_dim32();
+	else if(Machine->color_depth == 15) vector_krb_dim15();	
 }
 
 /*
@@ -558,6 +598,11 @@ static inline void vector_set_clip (point* curpoint)
 		vector_ymin = 0;
 		vector_xmax = vecwidth;
 		vector_ymax = vecheight;
+
+		vector_xminfp = 0;
+		vector_yminfp = 0;
+		vector_xmaxfp = vecwidth<<16;
+		vector_ymaxfp = vecheight<<16;
 		return;
 	}
 
@@ -577,6 +622,11 @@ static inline void vector_set_clip (point* curpoint)
 	if (vector_ymin < 0) vector_ymin = 0;
 	if (vector_xmax > vecwidth) vector_xmax = vecwidth;
 	if (vector_ymax > vecheight) vector_ymax = vecheight;
+
+	vector_xminfp = vector_xmin << 16;
+	vector_yminfp = vector_ymin << 16;
+	vector_xmaxfp = vector_xmax << 16;
+	vector_ymaxfp = vector_ymax << 16;
 }
 
 
@@ -723,6 +773,11 @@ VIDEO_UPDATE( vector )
 	vector_ymin = 0;
 	vector_ymax = vecheight;
 
+	vector_xminfp = 0;
+	vector_xmaxfp = vecwidth<<16;
+	vector_yminfp = 0;
+	vector_ymaxfp = vecheight<<16;
+
 	/* setup scaling */
 	vector_scale_x = ((float)vecwidth)/(Machine->visible_area.max_x - Machine->visible_area.min_x);
 	vector_scale_y = ((float)vecheight)/(Machine->visible_area.max_y - Machine->visible_area.min_y);
@@ -752,15 +807,7 @@ VIDEO_UPDATE( vector )
 		}
 		else
 		{
-#if USE_DIRTYPIXXELS
-			curpoint->arg1 = p_index;
-#endif
-			//printf("i:%d Ti:%d\n",(int)curpoint->intensity,(int) Tgamma[curpoint->intensity]);
 			vector_draw_to(curpoint);
-			// curpoint->x, curpoint->y, curpoint->col, curpoint->intensity, curpoint->status, curpoint->callback
-#if USE_DIRTYPIXXELS
-			curpoint->arg2 = p_index;
-#endif
 		}
 		curpoint++;
 	} 
@@ -769,7 +816,6 @@ VIDEO_UPDATE( vector )
 #endif
     if(options.vector_glow==1) vector_krb_hglow();
     else if(options.vector_glow==2) vector_krb_fullglow();
-
 
 	//static int framuuu = 0;
 	//framuuu++;

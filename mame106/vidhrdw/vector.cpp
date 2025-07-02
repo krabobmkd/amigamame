@@ -17,6 +17,7 @@ void vector_krb_fullglow(void);
  
 extern int alloc_glowtemps_later;
 extern int vector_xmin, vector_ymin, vector_xmax, vector_ymax; /* clipping area */
+extern int vector_xminfp, vector_yminfp, vector_xmaxfp, vector_ymaxfp; /* clipping area */
 extern float vector_scale_x;              /* scaling to screen */
 extern float vector_scale_y;              /* scaling to screen */
 extern int antialias;
@@ -29,7 +30,7 @@ extern UINT32* pTcosin;            /* adjust line width */
 }
 static UINT32 *glowtemp,* glowtempv;
 
-
+static int prev_x1=0, prev_yy1=0, clipbits1=0;
 
 void allocGlowTemp()
 {
@@ -174,7 +175,7 @@ void vector_krb_hglow(void)
 
     // hpass
 
-    for (UINT32 y = vector_ymin; y < vector_ymax; y++)
+    for (INT32 y = vector_ymin; y < vector_ymax; y++)
     {
         UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
         //UINT32* glowbuf = glowtemp;
@@ -242,7 +243,7 @@ void vector_krb_hglow(void)
         // compose line
         glowbuf = glowtemp;
         prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-        for (UINT32 x = vector_xmin; x < vector_xmax; x++)
+        for (INT32 x = vector_xmin; x < vector_xmax; x++)
         {
             UINT32 chere = *prgb;
             UINT32 cglow = *glowbuf++;
@@ -282,7 +283,7 @@ void vector_krb_fullglow(void)
 
     // hpass
     UINT32* glowbuf = glowtemp;
-    for (UINT32 y = vector_ymin; y < vector_ymax; y++)
+    for (INT32 y = vector_ymin; y < vector_ymax; y++)
     {
         UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
         //UINT32* glowbuf = glowtemp;
@@ -357,7 +358,7 @@ void vector_krb_fullglow(void)
 	// dest is glowtempv , same size
 	UINT32* prgb_l = glowtemp; // ((UINT32*)vecbitmap->line[ymin]) + xmin;
 	UINT32* pdest_l = glowtempv;
-	for (UINT32 x = vector_xmin; x < vector_xmax; x++)
+	for (INT32 x = vector_xmin; x < vector_xmax; x++)
 	{
 		UINT32* prgb = prgb_l;
 		UINT32* glowbuf = pdest_l;
@@ -428,11 +429,11 @@ void vector_krb_fullglow(void)
     // - - - - composition
     glowbuf = glowtempv;
 
-    for (UINT32 y = vector_ymin; y < vector_ymax; y++)
+    for (INT32 y = vector_ymin; y < vector_ymax; y++)
     {
 		if (vecbitmap->line[y] == NULL) continue;
         UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-        for (UINT32 x = vector_xmin; x < vector_xmax; x++)
+        for (INT32 x = vector_xmin; x < vector_xmax; x++)
         {
             UINT32 chere = *prgb;
             UINT32 cglow = *glowbuf++;
@@ -708,12 +709,13 @@ static inline int vec_div(int parm1, int parm2)
 
 class Pix15 {
 public:
-    Pix15(rgb_t col) :
-        _r(RGB_RED(col)>>3), _g(RGB_GREEN(col)>>3), _b(RGB_BLUE(col)>>3)
-    {}
-
     UINT16 _r, _g, _b;
     UINT16 _rt, _gt, _bt;
+    void setcol(rgb_t col) {
+        _r = RGB_RED(col);
+        _g = RGB_GREEN(col);
+        _b = RGB_BLUE(col);
+    }
     void tint(UINT8 t) {
         _rt = (_r * t) >> 8;
         _gt = (_g * t) >> 8;
@@ -721,14 +723,8 @@ public:
     }
     void aa_pixel(int x, int y)
     {
-        UINT32 dst;
-
-        if (x < vector_xmin || x >= vector_xmax)
-            return;
-        if (y < vector_ymin || y >= vector_ymax)
-            return;
         UINT16* pdst = ((UINT16*)vecbitmap->line[y]) + x;
-        dst = *pdst;
+        UINT32 dst = *pdst;
         *pdst = LIMIT5(_b + (dst & 0x1f))
             | (LIMIT5(_g + ((dst >> 5) & 0x1f)) << 5)
             | (LIMIT5(_r + (dst >> 10)) << 10);
@@ -736,14 +732,8 @@ public:
     }
     void aa_pixeltint(int x, int y)
     {
-        UINT32 dst;
-
-        if (x < vector_xmin || x >= vector_xmax)
-            return;
-        if (y < vector_ymin || y >= vector_ymax)
-            return;
         UINT16* pdst = ((UINT16*)vecbitmap->line[y]) + x;
-        dst = *pdst;
+        UINT32 dst = *pdst;
         *pdst = LIMIT5(_bt + (dst & 0x1f))
             | (LIMIT5(_gt + ((dst >> 5) & 0x1f)) << 5)
             | (LIMIT5(_rt + (dst >> 10)) << 10);
@@ -753,11 +743,13 @@ public:
 };
 class Pix32 {
 public:
-    Pix32(rgb_t col) :
-    _r(RGB_RED(col)), _g(RGB_GREEN(col)), _b(RGB_BLUE(col))
-    {}
     UINT16 _r, _g, _b;
     UINT16 _rt, _gt, _bt;
+    void setcol(rgb_t col) {
+        _r = RGB_RED(col);
+        _g = RGB_GREEN(col);
+        _b = RGB_BLUE(col);
+    }
     void tint(UINT8 t) {
         _rt = (_r * t) >> 8;
         _gt = (_g * t) >> 8;
@@ -765,15 +757,8 @@ public:
     }
     void aa_pixel(int x, int y)
     {
-        vector_pixel_t coords;
-        UINT32 dst;
-        //TODO wtf clip outside !
-        if (x < vector_xmin || x >= vector_xmax)
-            return;
-        if (y < vector_ymin || y >= vector_ymax)
-            return;
         UINT32* pdst = ((UINT32*)vecbitmap->line[y]) + x;
-        dst = *pdst;
+        UINT32 dst = *pdst;
         *pdst = LIMIT8(_b + (dst & 0xff))
             | (LIMIT8(_g + ((dst >> 8) & 0xff)) << 8)
             | (LIMIT8(_r + (dst >> 16)) << 16);
@@ -781,15 +766,8 @@ public:
     }
     void aa_pixeltint(int x, int y)
     {
-        vector_pixel_t coords;
-        UINT32 dst;
-        //TODO wtf clip outside !
-        if (x < vector_xmin || x >= vector_xmax)
-            return;
-        if (y < vector_ymin || y >= vector_ymax)
-            return;
         UINT32* pdst = ((UINT32*)vecbitmap->line[y]) + x;
-        dst = *pdst;
+        UINT32 dst = *pdst;
         *pdst = LIMIT8(_bt + (dst & 0xff))
             | (LIMIT8(_gt + ((dst >> 8) & 0xff)) << 8)
             | (LIMIT8(_rt + (dst >> 16)) << 16);
@@ -798,36 +776,110 @@ public:
 
 };
 
+// only to be used when: 1 is in, 2 is out.
+static inline void clipxmin(int &x1,int &y1,int & clipbits1, 
+                            int& x2, int& y2, int& clipbits2 )
+{
+    int dx = ((x1 - x2) >> 16);
+    if (dx < 1) dx = 1;
+    y2 = y1 + (((x1 - vector_xminfp) >> 8) * ((y2 - y1) >> 8)) / dx;
+    x2 = vector_xminfp;
+    clipbits2 &= ~1;
+}
+static inline void clipxmax(int& x1, int& y1, int& clipbits1,
+    int& x2, int& y2, int& clipbits2)
+{
+    int xmax = vector_xmaxfp - (1 << 16);
+
+    int dx = ((x1 - x2) >> 16);
+    if (dx < 1) dx = 1;
+    y2 = y1 + (((x1 - xmax) >> 8) * ((y2 - y1) >> 8)) / dx;
+    x2 = xmax;
+    clipbits2 &= ~2;
+}
+static inline void clipymin(int& x1, int& y1, int& clipbits1,
+    int& x2, int& y2, int& clipbits2)
+{
+    int dy = ((y1 - y2) >> 16);
+    if (dy < 1) dy = 1;
+    x2 = x1 + (((y1 - vector_yminfp) >> 8) * ((x2 - x1) >> 8)) / dy;
+    y2 = vector_yminfp;
+    clipbits2 &= ~4;
+}
+static inline void clipymax(int& x1, int& y1, int& clipbits1,
+    int& x2, int& y2, int& clipbits2)
+{
+    int ymax = vector_ymaxfp - (1 << 16);
+
+    int dy = ((y1 - y2) >> 16);
+    if (dy == 0) dy = -1;
+    x2 = x1 + (((y1 - ymax) >> 8) * ((x2 - x1) >> 8)) / dy;
+    y2 = ymax;
+    clipbits2 &= ~8;
+}
 template<class pixel,bool b_antialias>
 void vector_draw_toT(pixel &pix, point* curpoint)
 {
     int x2 = curpoint->x;
     int y2 = curpoint->y;
-    rgb_t col = curpoint->col;
     int intensity = curpoint->intensity;
     rgb_t(*color_callback)(void) = curpoint->callback;
 
     unsigned char a1;
     int dx, dy, sx, sy, cx, cy, width;
-    static int x1, yy1;
+    int x1= prev_x1, yy1= prev_yy1;
     int xx, yy;
 
     x2 = (int)(vector_scale_x * x2);
     y2 = (int)(vector_scale_y * y2);
 
-    /* [2] adjust cords if needed */
-
     if (!b_antialias)
-    {
-        x2 = (x2 + 0x8000) >> 16;
-        y2 = (y2 + 0x8000) >> 16;
+    {    /* [2] adjust cords if needed */
+        x2 = (x2 + 0x8000);
+        y2 = (y2 + 0x8000);
     }
+   // note max is excluded
+    int clipbits2 =
+        (int)(x2 < vector_xminfp)
+        | ((x2 >= vector_xmaxfp) ? 2 : 0)
+        | ((y2 < vector_yminfp) ? 4 : 0)
+        | ((y2 >= vector_ymaxfp) ? 8 : 0)
+        ;
 
+    int x2_preclip = x2;
+    int y2_preclip = y2;
+    int cb2_preclip = clipbits2;
     /* [3] handle color and intensity */
 
     if (intensity == 0) goto end_draw;
+    // fast clip 
+    if ((clipbits2 & clipbits1) != 0) goto end_draw; // means 2 points outside of one of the border.
 
-    col = Tinten(intensity, col);
+    int oredcb = (clipbits2 | clipbits1);
+    if ( oredcb != 0 )
+    {
+        //TO TEST, REMOVE
+        goto end_draw;
+        //TO VALIDATE:
+        // means one of the 2 points outside.
+        if (clipbits1 & 4) clipymin(x2, y2, clipbits2, prev_x1, prev_yy1, clipbits1);
+        else if (clipbits2 & 4) clipymin(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
+
+        if (clipbits1 & 8) clipymax(x2, y2, clipbits2, prev_x1, prev_yy1, clipbits1);
+        else if (clipbits2 & 8) clipymax(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
+        // can happens at that level
+        if ((clipbits2 & clipbits1) != 0) goto end_draw; // means 2 points outside of one of the border.
+
+        if (clipbits1 & 1) clipxmin(x2, y2, clipbits2, prev_x1, prev_yy1, clipbits1);
+        else if (clipbits2 & 1) clipxmin(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
+
+        if (clipbits1 & 2) clipxmax(x2, y2, clipbits2, prev_x1, prev_yy1, clipbits1);
+        else if (clipbits2 & 2) clipxmax(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
+
+        if ((clipbits2 | clipbits1) != 0) goto end_draw;
+    }
+
+    pix.setcol(Tinten(intensity, curpoint->col)); 
 
     /* [4] draw line */
 
@@ -902,10 +954,16 @@ void vector_draw_toT(pixel &pix, point* curpoint)
     }
     else /* use good old Bresenham for non-antialiasing 980317 BW */
     {
-        dx = abs(x1 - x2);
-        dy = abs(yy1 - y2);
-        sx = (x1 <= x2) ? 1 : -1;
-        sy = (yy1 <= y2) ? 1 : -1;
+        // now we consider x2 x1 are <<16 even without aa.
+        int bx2 = x2>>16;
+        int by2 = y2>>16;
+        int bx1 = x1 >> 16;
+        int by1 = yy1 >> 16;
+
+        dx = abs(bx1 - bx2);
+        dy = abs(by1 - by2);
+        sx = (bx1 <= bx2) ? 1 : -1;
+        sy = (by1 <= by2) ? 1 : -1;
         cx = dx / 2;
         cy = dy / 2;
 
@@ -914,13 +972,13 @@ void vector_draw_toT(pixel &pix, point* curpoint)
             for (;;)
             {
                // if (color_callback) col = Tinten(intensity, (*color_callback)());
-                pix.aa_pixel(x1, yy1);
-                if (x1 == x2) break;
-                x1 += sx;
+                pix.aa_pixel(bx1, by1);
+                if (bx1 == bx2) break;
+                bx1 += sx;
                 cx -= dy;
                 if (cx < 0)
                 {
-                    yy1 += sy;
+                    by1 += sy;
                     cx += dx;
                 }
             }
@@ -930,13 +988,13 @@ void vector_draw_toT(pixel &pix, point* curpoint)
             for (;;)
             {
                // if (color_callback) col = Tinten(intensity, (*color_callback)());
-                pix.aa_pixel(x1, yy1);
-                if (yy1 == y2) break;
-                yy1 += sy;
+                pix.aa_pixel(bx1, by1);
+                if (by1 == by2) break;
+                by1 += sy;
                 cy -= dx;
                 if (cy < 0)
                 {
-                    x1 += sx;
+                    bx1 += sx;
                     cy += dy;
                 }
             }
@@ -945,29 +1003,31 @@ void vector_draw_toT(pixel &pix, point* curpoint)
 
 end_draw:
 
-    x1 = x2;
-    yy1 = y2;
-    
+    prev_x1 = x2_preclip;
+    prev_yy1 = y2_preclip;
+    clipbits1 = cb2_preclip;
+    return;
 
+    
 }
 
 void vector_draw_to15(point* curpoint)
 {
-    Pix15 pix(curpoint->col);
+    Pix15 pix;
     vector_draw_toT<Pix15,false>(pix,curpoint);
 }
 void vector_draw_to32(point* curpoint)
 {
-    Pix32 pix(curpoint->col);
+    Pix32 pix;
     vector_draw_toT<Pix32, false>(pix, curpoint);    
 }
 void vector_draw_to15aa(point* curpoint)
 {
-    Pix15 pix(curpoint->col);
+    Pix15 pix;
     vector_draw_toT<Pix15, true>(pix, curpoint);
 }
 void vector_draw_to32aa(point* curpoint)
 {
-    Pix32 pix(curpoint->col);
+    Pix32 pix;
     vector_draw_toT<Pix32, true>(pix, curpoint);
 }

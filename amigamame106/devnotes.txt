@@ -4,16 +4,20 @@
 
   X Appicon support
   X corrected some screen rotation axis on some fliped screen games cases
-  O windows overlap OS4 -> no optim for >v50
+  O windows overlap OS4 -> no-optim for >v50
   O vector games
-        O cchasm+starwars
-        O rotate bug shiftRotationBits tacscan
-        O +opt_cinematic
-  O developer notes todo
-
+        X cchasm+starwars
+        X rotate bug shiftRotationBits tacscan
+        X +opt_cinematic
+        X optim aa
+        O re-optim glow
+        O redo clipping
+        O implement full 15b mode
+  O docs for OS4 petunia
   O f1gp wheel+lever
   O tells about keyb & tab menu on inputs panel
 
+  O developer notes todo
 ------------
 todo R1.3b ->4?
 
@@ -51,7 +55,7 @@ todo R1.3b ->4?
  outrun gear shift is space or joystick bt3.
 
  X bug othunder after outrun
- O guidon pour shangon
+ X guidon pour shangon
  X optim sprite outrun 
  X ChaseHQ has a gear shift
  X gforce2 speed cpu
