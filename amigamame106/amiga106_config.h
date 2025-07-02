@@ -187,8 +187,10 @@ public:
         VectorResolution _resolution = VectorResolution::e480x360;
         GlowMode        _glow = GlowMode::None;
         Remanence       _remanence=Remanence::Low;
+#define VDISPLAYFLAGS_ANTIALIAS 1
+#define VDISPLAYFLAGS_FORCE32B 2
+        ULONG_FLAGS _flags = VDISPLAYFLAGS_ANTIALIAS;
 
-        bool            _antialias=true;
         float           _intensity=1.0f;
 
     };

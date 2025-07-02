@@ -208,6 +208,7 @@ struct _global_options
 //removed because pow() has problems	float	gamma;			/* gamma correction of the display */
 	int		vector_width;	/* requested width for vector games; 0 means default (640) */
 	int		vector_height;	/* requested height for vector games; 0 means default (480) */
+	int     vector_force32b;
 	int		ui_orientation;	/* orientation of the UI relative to the video */
 
 	int		beam;			/* vector beam width */

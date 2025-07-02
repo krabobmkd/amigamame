@@ -92,6 +92,7 @@ float vector_get_flicker(void);
 //float vector_get_gamma(void);
 
 void vector_krb_dim(void);
+void vector_krb_fullglow2();
 
 #endif
 

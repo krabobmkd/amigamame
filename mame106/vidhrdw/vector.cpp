@@ -457,220 +457,272 @@ void vector_krb_fullglow(void)
 
 }
 
-// - - -
-// omre cache-pleasing approch, by tiles, with border stacking for accumulators.
-//void vector_krb_dreadfullglow(void)
-//{
-//    if( Machine->color_depth != 32) return;
+void vector_krb_fullglow2(void)
+{
+    if( Machine->color_depth != 32) return;
 
-//#define HgSubW 16
-//#define HgSubH 8
+	if (alloc_glowtemps_later) allocGlowTemp();
 
+    UINT32 cl=32; // means stock 64 pixels.
+	// 32+32 64 -> div6
+#define hgdivser 6
 
-//	if (alloc_glowtemps_later) allocGlowTemp();
+    // apply H & V glow on temp buffer without composition
+    // do composition at the end.
 
-//    UINT32 cl=32; // means stock 64 pixels.
-//	// 32+32 64 -> div6
-//#define hgdivser 6
+    // hpass
+    UINT32* glowbuf = glowtemp;
+    for (INT32 y = vector_ymin; y < vector_ymax; y+=2)
+    {
+        UINT32* prgbh = ((UINT32*)vecbitmap->line[y])+vector_xmin;
+        UINT32* prgbl = ((UINT32*)vecbitmap->line[y+1])+vector_xmin;
+        //UINT32* glowbuf = glowtemp;
+        INT32 r_ac=0;
+        INT32 g_ac=0;
+        INT32 b_ac=0;
 
-//    // apply H & V glow on temp buffer without composition
-//    // do composition at the end.
+        // accum nextread before screen
+        for (UINT32 x = 0; x < cl; x+=2)
+        {
+            UINT32 cnext = prgbh[x];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
-//    // vertical pre-accumulation to
-//    for (UINT32 mx = vector_xmin; mx < vector_xmax; mx+=HgSubW)
-//    {
-//    }
+            cnext = prgbh[x+1];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
-//    // hpass
-//    UINT32* glowbuf = glowtemp;
-//    for (UINT32 my = vector_ymin; my < vector_ymax; my+=HgSubH)
-//    {
-//        UINT16 Haccums[HgSubH * 3]; // for 3 for RGB.
-//        // pre-accumulation
+            cnext = prgbl[x];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
-//        for (UINT32 mx = vector_xmin; mx < vector_xmax; mx+=HgSubW)
-//        {
+            cnext = prgbl[x+1];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
+        }
 
-//            // pre accum
+        UINT32 x = 0;
+        // left case, only accum next
+        for (; x < cl; x+=2)
+        {
+            UINT32 cnext = prgbh[x+cl];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
+            cnext = prgbh[x+cl+1];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
-//            for (UINT32 y = my; y < vector_ymax; y++)
-//            {
-//            }
-//        } // end main x
-//    } //end main y
+            cnext = prgbl[x+cl];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
+            cnext = prgbl[x+cl+1];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
-//        UINT8* prgb = (UINT8 *)(((UINT32*)vecbitmap->line[y])+vector_xmin);
-//        //UINT32* glowbuf = glowtemp;
-//        INT16 r_ac=0;
-//        INT16 g_ac=0;
-//        INT16 b_ac=0;
+            UINT32 cr = (r_ac>>(hgdivser+2));
+            UINT32 cg = (g_ac>>(hgdivser+2));
+            UINT32 cb = (b_ac>>(hgdivser+2));
+            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
+        }
+        // center case,
+        UINT32 xend = (vector_xmax-vector_xmin-cl);
+        for (; x < xend; x+=2)
+        {
+            UINT32 cnext = prgbh[x+cl];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
-//        // accum nextread before screen
-//        for (UINT32 x = 0; x < cl*4; x+=4)
-//        {
-//            r_ac += prgb[x+RCDX];
-//            g_ac += prgb[x+GCDX];
-//            b_ac += prgb[x+BCDX];
-//        }
+            cnext = prgbh[x+cl+1];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
-//        UINT32 x = 0;
-//        // left case, only accum next
-//        for (; x < cl*4; x+=4)
-//        {
-//            r_ac += prgb[x+cl*4+RCDX];
-//            g_ac += prgb[x+cl*4+GCDX];
-//            b_ac += prgb[x+cl*4+BCDX];
+            cnext = prgbl[x+cl];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
-//            UINT32 cr = (r_ac>>hgdivser);
-//            UINT32 cg = (g_ac>>hgdivser) ;
-//            UINT32 cb = (b_ac>>hgdivser) ;
-//            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
-//        }
-//        // center case,
-//        UINT32 xend = (vector_xmax-vector_xmin-cl);
-//        for (; x < xend; x++)
-//        {
-//            UINT32 cnext = prgb[x+cl];
-//            r_ac += cnext>>16;
-//            g_ac += (cnext>>8) & 0x0ff;
-//            b_ac += (cnext) & 0x0ff;
+            cnext = prgbl[x+cl+1];
+            r_ac += (cnext>>16);
+            g_ac += (cnext>>8) & 0x0ff;
+            b_ac += (cnext) & 0x0ff;
 
-//            UINT32 cprev = prgb[x-cl];
-//            r_ac -= cprev>>16;
-//            g_ac -= (cprev>>8) & 0x0ff;
-//            b_ac -= (cprev) & 0x0ff;
+            UINT32 cprev = prgbh[x-cl];
+            r_ac -= cprev>>16;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
 
-//            UINT32 cr = (r_ac>>hgdivser);
-//            UINT32 cg = (g_ac>>hgdivser) ;
-//            UINT32 cb = (b_ac>>hgdivser) ;
-//            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
-//        }
-//        // right case,
-//        xend = (vector_xmax-vector_xmin);
-//        for (; x < xend; x++)
-//        {
-//            UINT32 cprev = prgb[x-cl];
-//            r_ac -= cprev>>16;
-//            g_ac -= (cprev>>8) & 0x0ff;
-//            b_ac -= (cprev) & 0x0ff;
+            cprev = prgbh[x-cl+1];
+            r_ac -= cprev>>16;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
 
-//            UINT32 cr = (r_ac>>hgdivser);
-//            UINT32 cg = (g_ac>>hgdivser) ;
-//            UINT32 cb = (b_ac>>hgdivser) ;
-//            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
-//        }
-//    } // end H pass
-//    // - - - -  - - - - -  -  V pass
+            cprev = prgbl[x-cl];
+            r_ac -= cprev>>16;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
 
-//	const UINT32 lb = vector_xmax- vector_xmin;
-//	const UINT32 cly = cl * lb;
-//#define vgdivser 6
+            cprev = prgbl[x-cl+1];
+            r_ac -= cprev>>16;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
 
-//	// source is glowtemp
-//	// dest is glowtempv , same size
-//	UINT32* prgb_l = glowtemp; // ((UINT32*)vecbitmap->line[ymin]) + xmin;
-//	UINT32* pdest_l = glowtempv;
-//	for (UINT32 x = vector_xmin; x < vector_xmax; x++)
-//	{
-//		UINT32* prgb = prgb_l;
-//		UINT32* glowbuf = pdest_l;
-//		INT32 r_ac = 0;
-//		INT32 g_ac = 0;
-//		INT32 b_ac = 0;
-//		// - - - -
-//		// accum nextread before screen
-//		for (UINT32 y = 0; y < cly; y += lb)
-//		{
-//			UINT32 cnext = prgb[y];
-//			r_ac += (cnext >> 16);
-//			g_ac += (cnext >> 8) & 0x0ff;
-//			b_ac += (cnext) & 0x0ff;
-//		}
-//		UINT32 y = 0;
-//		// up case, only accum next
-//		for (; y < cly; y += lb)
-//		{
-//			UINT32 cnext = prgb[y + cly];
-//			r_ac += cnext >> 16;
-//			g_ac += (cnext >> 8) & 0x0ff;
-//			b_ac += (cnext) & 0x0ff;
+            UINT32 cr = (r_ac>>(hgdivser>>2));
+            UINT32 cg = (g_ac>>(hgdivser>>2));
+            UINT32 cb = (b_ac>>(hgdivser>>2));
+            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
+        }
+        // right case,
+        xend = (vector_xmax-vector_xmin);
+        for (; x < xend; x+=2)
+        {
+            UINT32 cprev = prgbh[x-cl];
+            r_ac -= cprev>>16;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
 
-//			UINT32 cr = (r_ac >> vgdivser);
-//			UINT32 cg = (g_ac >> vgdivser);
-//			UINT32 cb = (b_ac >> vgdivser);
-//			glowbuf[y] = (cr << 16) | (cg << 8) | cb;
-//		}
-//		// center case,
-//		UINT32 yend = ((vector_ymax - vector_ymin) - cl) * lb;
-//		for (; y <= yend; y += lb)
-//		{
-//			UINT32 cnext = prgb[y + cly];
-//			r_ac += cnext >> 16;
-//			g_ac += (cnext >> 8) & 0x0ff;
-//			b_ac += (cnext) & 0x0ff;
+            cprev = prgbh[x-cl+1];
+            r_ac -= cprev>>16;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
 
-//			UINT32 cprev = prgb[y - cly];
-//			r_ac -= cprev >> 16;
-//			g_ac -= (cprev >> 8) & 0x0ff;
-//			b_ac -= (cprev) & 0x0ff;
+            cprev = prgbl[x-cl];
+            r_ac -= cprev>>16;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
 
-//			UINT32 cr = (r_ac >> vgdivser);
-//			UINT32 cg = (g_ac >> vgdivser);
-//			UINT32 cb = (b_ac >> vgdivser);
-//			glowbuf[y] = (cr << 16) | (cg << 8) | cb;
-//		}
-//		// down case,
-//		yend = (vector_ymax - vector_ymin) * lb;
-//		for (; y <= yend; y += lb)
-//		{
-//			UINT32 cprev = prgb[y - cly];
-//			r_ac -= cprev >> 16;
-//			g_ac -= (cprev >> 8) & 0x0ff;
-//			b_ac -= (cprev) & 0x0ff;
+            cprev = prgbl[x-cl+1];
+            r_ac -= cprev>>16;
+            g_ac -= (cprev>>8) & 0x0ff;
+            b_ac -= (cprev) & 0x0ff;
 
-//			UINT32 cr = (r_ac >> vgdivser);
-//			UINT32 cg = (g_ac >> vgdivser);
-//			UINT32 cb = (b_ac >> vgdivser);
-//			glowbuf[y] = (cr << 16) | (cg << 8) | cb;
-//		}
-//		// - - -
-//		prgb_l++;
-//		pdest_l++;
-//	}
+            UINT32 cr = (r_ac>>(hgdivser+2));
+            UINT32 cg = (g_ac>>(hgdivser+2));
+            UINT32 cb = (b_ac>>(hgdivser+2));
+            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
+        }
+    } // end H pass
+    // - - - -  - - - - -  -  V pass & composition
+ TODO
+	const UINT32 lb = vector_xmax- vector_xmin;
+	const UINT32 cly = cl * lb;
+#define vgdivser 6
 
-//    // - - - - composition
-//    glowbuf = glowtempv;
+	// source is glowtemp
+	// dest is glowtempv , same size
+	UINT32* prgb_l = glowtemp; // ((UINT32*)vecbitmap->line[ymin]) + xmin;
+	UINT32* pdest_l = glowtempv;
+	for (INT32 x = vector_xmin; x < vector_xmax; x++)
+	{
+		UINT32* prgb = prgb_l;
+		UINT32* glowbuf = pdest_l;
+		INT32 r_ac = 0;
+		INT32 g_ac = 0;
+		INT32 b_ac = 0;
+		// - - - -
+		// accum nextread before screen
+		for (UINT32 y = 0; y < cly; y += lb)
+		{
+			UINT32 cnext = prgb[y];
+			r_ac += (cnext >> 16);
+			g_ac += (cnext >> 8) & 0x0ff;
+			b_ac += (cnext) & 0x0ff;
+		}
+		UINT32 y = 0;
+		// up case, only accum next
+		for (; y < cly; y += lb)
+		{
+			UINT32 cnext = prgb[y + cly];
+			r_ac += cnext >> 16;
+			g_ac += (cnext >> 8) & 0x0ff;
+			b_ac += (cnext) & 0x0ff;
 
-//    for (UINT32 y = vector_ymin; y < vector_ymax; y++)
-//    {
-//		if (vecbitmap->line[y] == NULL) continue;
-//        UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-//        for (UINT32 x = vector_xmin; x < vector_xmax; x++)
-//        {
-//            UINT32 chere = *prgb;
-//            UINT32 cglow = *glowbuf++;
+			UINT32 cr = (r_ac >> vgdivser);
+			UINT32 cg = (g_ac >> vgdivser);
+			UINT32 cb = (b_ac >> vgdivser);
+			glowbuf[y] = (cr << 16) | (cg << 8) | cb;
+		}
+		// center case,
+		UINT32 yend = ((vector_ymax - vector_ymin) - cl) * lb;
+		for (; y <= yend; y += lb)
+		{
+			UINT32 cnext = prgb[y + cly];
+			r_ac += cnext >> 16;
+			g_ac += (cnext >> 8) & 0x0ff;
+			b_ac += (cnext) & 0x0ff;
 
-//            UINT32 cr = cglow>>16;
-//            UINT32 rh = chere>>16;
-//            if(cr>rh) rh=cr;
+			UINT32 cprev = prgb[y - cly];
+			r_ac -= cprev >> 16;
+			g_ac -= (cprev >> 8) & 0x0ff;
+			b_ac -= (cprev) & 0x0ff;
 
-//            UINT32 gh = (chere>>8) & 0x0ff;
-//            UINT32 cg = (cglow>>8) & 0x0ff;
-//            if(cg>gh) gh=cg;
+			UINT32 cr = (r_ac >> vgdivser);
+			UINT32 cg = (g_ac >> vgdivser);
+			UINT32 cb = (b_ac >> vgdivser);
+			glowbuf[y] = (cr << 16) | (cg << 8) | cb;
+		}
+		// down case,
+		yend = (vector_ymax - vector_ymin) * lb;
+		for (; y <= yend; y += lb)
+		{
+			UINT32 cprev = prgb[y - cly];
+			r_ac -= cprev >> 16;
+			g_ac -= (cprev >> 8) & 0x0ff;
+			b_ac -= (cprev) & 0x0ff;
 
-//            UINT32 bh = (chere) & 0x0ff;
-//            UINT32 cb = (cglow) & 0x0ff;
-//            if(cb>bh) bh=cb;
+			UINT32 cr = (r_ac >> vgdivser);
+			UINT32 cg = (g_ac >> vgdivser);
+			UINT32 cb = (b_ac >> vgdivser);
+			glowbuf[y] = (cr << 16) | (cg << 8) | cb;
+		}
+		// - - -
+		prgb_l++;
+		pdest_l++;
+	}
 
-//            *prgb++=(rh<<16)|(gh<<8)|bh;
+    // - - - - composition
+  //   glowbuf = glowtempv;
 
-//        }
-//    }
+  //   for (INT32 y = vector_ymin; y < vector_ymax; y++)
+  //   {
+		// if (vecbitmap->line[y] == NULL) continue;
+  //       UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
+  //       for (INT32 x = vector_xmin; x < vector_xmax; x++)
+  //       {
+  //           UINT32 chere = *prgb;
+  //           UINT32 cglow = *glowbuf++;
 
-//}
+  //           UINT32 cr = cglow>>16;
+  //           UINT32 rh = chere>>16;
+  //           if(cr>rh) rh=cr;
+
+  //           UINT32 gh = (chere>>8) & 0x0ff;
+  //           UINT32 cg = (cglow>>8) & 0x0ff;
+  //           if(cg>gh) gh=cg;
+
+  //           UINT32 bh = (chere) & 0x0ff;
+  //           UINT32 cb = (cglow) & 0x0ff;
+  //           if(cb>bh) bh=cb;
+
+  //           *prgb++=(rh<<16)|(gh<<8)|bh;
+
+  //       }
+  //   }
+
+}
+
 
 static inline int vec_multbeam(UINT32 parm2)
 {
@@ -829,6 +881,7 @@ void vector_draw_toT(pixel &pix, point* curpoint)
     int dx, dy, sx, sy, cx, cy, width;
     int x1= prev_x1, yy1= prev_yy1;
     int xx, yy;
+     int oredcb;
 
     x2 = (int)(vector_scale_x * x2);
     y2 = (int)(vector_scale_y * y2);
@@ -855,7 +908,7 @@ void vector_draw_toT(pixel &pix, point* curpoint)
     // fast clip 
     if ((clipbits2 & clipbits1) != 0) goto end_draw; // means 2 points outside of one of the border.
 
-    int oredcb = (clipbits2 | clipbits1);
+    oredcb = (clipbits2 | clipbits1);
     if ( oredcb != 0 )
     {
         //TO TEST, REMOVE

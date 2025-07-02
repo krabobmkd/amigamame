@@ -289,6 +289,13 @@ void MameConfig::toDefault()
     _display._flags = 0;
     _display._buffering = ScreenBufferMode::Single;
 
+    _display._vector._resolution = VectorResolution::e480x360;
+    _display._vector._glow = GlowMode::None;
+    _display._vector._remanence = Remanence::Low;
+    _display._vector._flags = VDISPLAYFLAGS_ANTIALIAS;
+    _display._vector._intensity = 1.0f;
+    _display._vector._flags = VDISPLAYFLAGS_ANTIALIAS;
+
     _audio._mode = AudioMode::AHI;
     _audio._freq = 22050;
     _audio._forceMono = true;
@@ -407,7 +414,8 @@ void MameConfig::Display_Vector::serialize(ASerializer &serializer)
     serializer("Resolution",(int&)_resolution,{"320x240","400x300","480x360","640x480" });
     serializer("Glow Mode",(int&)_glow,{"None","Horizontal","Full"});
     serializer("Remanence",(int&)_remanence,{"None","Low","High"});
-    serializer("Antialias",_antialias);
+
+    serializer(" ",_flags,VDISPLAYFLAGS_ANTIALIAS,{"Antialias","High Color"});
      // min,max,step, default
     serializer("Intensity",_intensity,0.75f,1.5f,0.05f,1.0f);
 
@@ -417,7 +425,7 @@ bool MameConfig::Display_Vector::isDefault()
     return (_resolution == VectorResolution::e480x360 &&
             _glow == GlowMode::None &&
             _remanence == Remanence::Low &&
-            _antialias == true &&
+            (_flags == (VDISPLAYFLAGS_ANTIALIAS)) &&
             _intensity == 1.0f);
 
 }
@@ -979,7 +987,7 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
     options.vector_intensity = vectorconf._intensity;  /* float vector beam intensity 1.5f defaulty */
     options.translucency = 1;  /* 1 to enable translucency on vectors */
-    options.antialias = (int)vectorconf._antialias;  /* 1 to enable antialias on vectors */
+    options.antialias = (int)((vectorconf._flags & VDISPLAYFLAGS_ANTIALIAS)!=0);  /* 1 to enable antialias on vectors */
     options.vector_remanence = (int)vectorconf._remanence;
     options.vector_glow = (int)vectorconf._glow;
 

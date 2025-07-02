@@ -119,8 +119,14 @@ int video_init_earlier()
 	int bmheight = Machine->drv->screen_height;
 
 	/* if we're a vector game, override the screen width and height */
-	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
+	int vidattribs = Machine->drv->video_attributes;
+
+	if (vidattribs & VIDEO_TYPE_VECTOR)
+	{
 		scale_vectorgames(options.vector_width, options.vector_height, &bmwidth, &bmheight);
+		if( (vidattribs & VIDEO_RGB_DIRECT) != 0 &&
+             options.vector_force32b ) vidattribs |= VIDEO_NEEDS_6BITS_PER_GUN;
+    }
 
 	// compute the visible area for raster games
 	if (!(Machine->drv->video_attributes & VIDEO_TYPE_VECTOR))
@@ -139,8 +145,9 @@ int video_init_earlier()
 	params.depth = Machine->color_depth;
 	params.colors = palette_get_total_colors_with_ui();
 	params.fps = Machine->drv->frames_per_second;
-	params.video_attributes = Machine->drv->video_attributes;
 
+	params.video_attributes = vidattribs;
+// vector_force32b
 #ifdef MESS
 	artcallbacks = &mess_artwork_callbacks;
 #else
