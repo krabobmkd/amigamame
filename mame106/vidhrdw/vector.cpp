@@ -477,15 +477,41 @@ struct ColAcc {
         UINT32 cb = (b >> shift);
         return (cr << 16) | (cg << 8) | cb;
     }
-};
+    //UINT16 divtorgb(const int shift) {
+    //    //TODO
+    //    UINT32 cr = (r >> shift);
+    //    //UINT32 cg = (g >> shift);
+    //    //UINT32 cb = (b >> shift);
+    //    c = (cr << 16); //| (cg << 8) | cb;
+    //}
 
+};
 class GlowPix32 {
 public:
+    GlowPix32(UINT32 cglow) {
+    }
+    void compose(UINT32 cglow)
+    {
+        UINT32 cr = cglow >> 16;
+        UINT32 rh = _p >> 16;
+        if (cr > rh) rh = cr;
 
+        UINT32 gh = (_p >> 8) & 0x0ff;
+        UINT32 cg = (cglow >> 8) & 0x0ff;
+        if (cg > gh) gh = cg;
+
+        UINT32 bh = (_p) & 0x0ff;
+        UINT32 cb = (cglow) & 0x0ff;
+        if (cb > bh) bh = cb;
+
+        _p = (rh << 16) | (gh << 8) | bh;
+    }
+
+    UINT32 _p;
 };
-
-template<class  GlowPix>
-void vector_krb_fullglow2(void)
+// ColT screen pixel type UINT32 UINT16 
+template<typename ColT,typename TU>
+void vector_krb_fullglow2T(void)
 {
     if( Machine->color_depth != 32) return;
 
@@ -499,11 +525,11 @@ void vector_krb_fullglow2(void)
     // do composition at the end.
 
     // hpass
-    UINT32* glowbuf = glowtemp;
+    ColT* glowbuf = (ColT*)glowtemp;
     for (INT32 y = vector_ymin; y < vector_ymax; y+=2)
     {
-        UINT32* prgbh = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-        UINT32* prgbl = ((UINT32*)vecbitmap->line[y+1])+vector_xmin;
+        ColT* prgbh = ((ColT*)vecbitmap->line[y])+vector_xmin;
+        ColT* prgbl = ((ColT*)vecbitmap->line[y+1])+vector_xmin;
         //UINT32* glowbuf = glowtemp;
         ColAcc acc;
 
@@ -525,7 +551,8 @@ void vector_krb_fullglow2(void)
             acc.add(prgbl[x+cl]);
             acc.add(prgbl[x+cl + 1]);
 
-            *glowbuf++ = accdivtorgb(hgdivser + 2);
+            *glowbuf = acc.divtorgb(hgdivser + 2);
+            glowbuf++;
         }
         // center case,
         UINT32 xend = (vector_xmax-vector_xmin-cl);
@@ -541,7 +568,8 @@ void vector_krb_fullglow2(void)
             acc.sub(prgbl[x - cl]);
             acc.sub(prgbl[x - cl + 1]);
 
-            *glowbuf++ = accdivtorgb(hgdivser + 2);
+            *glowbuf = acc.divtorgb( hgdivser + 2);
+            glowbuf++;
         }
         // right case,
         xend = (vector_xmax-vector_xmin);
@@ -552,7 +580,8 @@ void vector_krb_fullglow2(void)
             acc.sub(prgbl[x - cl]);
             acc.sub(prgbl[x - cl + 1]);
 
-            *glowbuf++ = accdivtorgb(hgdivser + 2);
+            *glowbuf = acc.divtorgb( hgdivser + 2);
+            glowbuf++;
         }
     } // end H pass
     // - - - -  - - - - -  -  V pass & composition
@@ -568,7 +597,7 @@ void vector_krb_fullglow2(void)
     ColAcc*pVacc = (ColAcc*)glowtempv;
     UINT32 yl= (vector_ymax - vector_ymin);
 
-    UINT32* prgb_l = glowtemp; // ((UINT32*)vecbitmap->line[ymin]) + xmin;
+    ColT* prgb_l = (ColT *)glowtemp; // ((UINT32*)vecbitmap->line[ymin]) + xmin;
     INT32 glowmod = (vector_xmax - vector_xmin) >> 1;
     //init preacc start line
     for (INT32 x = 0; x < glowmod; x++)
@@ -584,27 +613,42 @@ void vector_krb_fullglow2(void)
     }
     // - - - B: up pass
     const int clm = cl * glowmod;
-
+    const int vbmmod = vecbitmap->rowpixels;
     // up pass, just add again
     for (INT32 by = vector_ymin; by < vector_ymax; by += gsubh)
     {
         ColAcc* pVacc = (ColAcc*)glowtempv;
+
+        // final screen to compose
+        ColT* pvecbm_c = ((ColT*)vecbitmap->line[by]) + vector_xmin;
         for (INT32 bx = vector_xmin; bx < vector_xmax; bx += 2)
         {
+            //const ColT* glowh = (const ColAcc*)glowtemp;
+            //glowh += by;
             ColAcc acc= *pVacc;
-            const int subidx = -clm;
-            const int addidx = clm:
+            ColT* pvecbm = pvecbm_c;
+           // const int subidx = by* vbmmod +  -clm;
+            const int addidx = (by * glowmod) + bx;
             for (INT32 y = 0; y < gsubh; y += 2)
             {
-                acc.add(prgbh[y + clm]);
-                acc.add(prgbh[y + clm + 1]);
+                acc.add(prgb_l[addidx]);
+                acc.add(prgb_l[addidx+ glowmod]);
+                addidx += glowmod*2;
 
-                UINT32 argb = accdivtorgb(vgdivser + 1);
+                TU argb = acc.divtorgb(vgdivser + 1);
+                pvecbm[0].compose(argb);
+                pvecbm[1].compose(argb);
+                pvecbm[vbmmod].compose(argb);
+                pvecbm[vbmmod+1].compose(argb);
                 // compose 4 pixels to final bitmap
+                //UINT32* prgb = ((UINT32*)vecbitmap->line[y]) + vector_xmin;
+                pvecbm += vbmmod;
 
             }
             *pVacc++ = acc;
+            pvecbm_c+=2;
         } // end bigx
+        
 
     } // end bigy
 
@@ -716,6 +760,10 @@ void vector_krb_fullglow2(void)
 
 }
 
+void vector_krb_fullglow2(void)
+{
+    vector_krb_fullglow2T<GlowPix32,UINT32>();
+}
 
 static inline int vec_multbeam(UINT32 parm2)
 {
