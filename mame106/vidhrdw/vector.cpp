@@ -462,12 +462,12 @@ struct ColAcc {
     INT16 g = 0;
     INT16 b = 0;
     void add(UINT32 argb) {
-        r += (argb >> 16)& 0x0ff;
+        r += (argb >> 16)/*& 0x0ff*/;
         g += (argb >> 8) & 0x0ff;
         b += (argb) & 0x0ff;
     }
     void sub(UINT32 argb) {
-        r -= (argb >> 16)& 0x0ff;
+        r -= (argb >> 16)/*& 0x0ff*/;
        // if(r<0) r=0;
         g -= (argb >> 8) & 0x0ff;
        // if(g<0) g=0;
@@ -595,7 +595,7 @@ void vector_krb_fullglow2T(void)
 #define vgdivser 4
 
 #define gsubw 8
-#define gsubh 8
+#define gsubh 16
 
     // - - - A: preaccum
     ColAcc*pVacc = (ColAcc*)glowtempv;
@@ -620,7 +620,7 @@ void vector_krb_fullglow2T(void)
     const int vbmmod = vecbitmap->rowpixels;
     // up pass, just add again
     INT32 by;
-    for (by = 0; by < clh/*vector_ymax*/; by += gsubh)
+    for (by = 0; by < (clh<<1)/*vector_ymax*/; by += gsubh)
     {
         ColAcc* pVacc = (ColAcc*)glowtempv;
 
@@ -638,9 +638,6 @@ void vector_krb_fullglow2T(void)
                 addidx += glowmod;
 
                 TU argb = acc.divtorgb(vgdivser );
-
-             // TU argb = prgb_hg[addidx];
-             //  addidx += glowmod;
 
                 pvecbm[0].compose(argb);
                 pvecbm[1].compose(argb);
@@ -679,9 +676,6 @@ void vector_krb_fullglow2T(void)
                 addidx += glowmod;
 
                 TU argb = acc.divtorgb(vgdivser);
-
-                 // TU argb =prgb_hg[addidx];
-                 //  addidx += glowmod;
 
                 pvecbm[0].compose(argb);
                 pvecbm[1].compose(argb);
