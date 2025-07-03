@@ -458,18 +458,21 @@ void vector_krb_fullglow(void)
 }
 
 struct ColAcc {
-    UINT16 r = 0;
-    UINT16 g = 0;
-    UINT16 b = 0;
+    INT16 r = 0;
+    INT16 g = 0;
+    INT16 b = 0;
     void add(UINT32 argb) {
-        r += (argb >> 16);
+        r += (argb >> 16)& 0x0ff;
         g += (argb >> 8) & 0x0ff;
         b += (argb) & 0x0ff;
     }
     void sub(UINT32 argb) {
-        r -= (argb >> 16);
+        r -= (argb >> 16)& 0x0ff;
+       // if(r<0) r=0;
         g -= (argb >> 8) & 0x0ff;
+       // if(g<0) g=0;
         b -= (argb) & 0x0ff;
+       // if(b<0) b=0;
     }
     UINT32 divtorgb(const int shift) {
         UINT32 cr = (r >> shift);
@@ -519,17 +522,17 @@ void vector_krb_fullglow2T(void)
 
     UINT32 cl=32; // means stock 64 pixels.
 	// 32+32 64 -> div6
-#define hgdivser 6
+#define hgdivser (6+2)
 
     // apply H & V glow on temp buffer without composition
     // do composition at the end.
 
     // hpass
-    ColT* glowbuf = (ColT*)glowtemp;
+    TU* glowbuf = (TU*)glowtemp;
     for (INT32 y = vector_ymin; y < vector_ymax; y+=2)
     {
-        ColT* prgbh = ((ColT*)vecbitmap->line[y])+vector_xmin;
-        ColT* prgbl = ((ColT*)vecbitmap->line[y+1])+vector_xmin;
+        TU* prgbh = ((TU*)vecbitmap->line[y])+vector_xmin;
+        TU* prgbl = ((TU*)vecbitmap->line[y+1])+vector_xmin;
         //UINT32* glowbuf = glowtemp;
         ColAcc acc;
 
@@ -551,7 +554,7 @@ void vector_krb_fullglow2T(void)
             acc.add(prgbl[x+cl]);
             acc.add(prgbl[x+cl + 1]);
 
-            *glowbuf = acc.divtorgb(hgdivser + 2);
+            *glowbuf = acc.divtorgb(hgdivser);
             glowbuf++;
         }
         // center case,
@@ -568,7 +571,7 @@ void vector_krb_fullglow2T(void)
             acc.sub(prgbl[x - cl]);
             acc.sub(prgbl[x - cl + 1]);
 
-            *glowbuf = acc.divtorgb( hgdivser + 2);
+            *glowbuf = acc.divtorgb( hgdivser );
             glowbuf++;
         }
         // right case,
@@ -580,15 +583,16 @@ void vector_krb_fullglow2T(void)
             acc.sub(prgbl[x - cl]);
             acc.sub(prgbl[x - cl + 1]);
 
-            *glowbuf = acc.divtorgb( hgdivser + 2);
+            *glowbuf = acc.divtorgb( hgdivser );
             glowbuf++;
         }
     } // end H pass
     // - - - -  - - - - -  -  V pass & composition
  
-	const UINT32 lb = vector_xmax- vector_xmin;
-	const UINT32 cly = cl * lb;
-#define vgdivser 6
+//	const UINT32 lb = vector_xmax- vector_xmin;
+	const UINT32 clh = cl>>1;
+	//const UINT32 clh = cl * lb;
+#define vgdivser 4
 
 #define gsubw 8
 #define gsubh 8
@@ -597,166 +601,104 @@ void vector_krb_fullglow2T(void)
     ColAcc*pVacc = (ColAcc*)glowtempv;
     UINT32 yl= (vector_ymax - vector_ymin);
 
-    ColT* prgb_l = (ColT *)glowtemp; // ((UINT32*)vecbitmap->line[ymin]) + xmin;
+    TU* prgb_hg = (TU *)glowtemp; // ((UINT32*)vecbitmap->line[ymin]) + xmin;
     INT32 glowmod = (vector_xmax - vector_xmin) >> 1;
     //init preacc start line
     for (INT32 x = 0; x < glowmod; x++)
     {
         ColAcc acc;
         int idx = x;
-        for (UINT32 y = 0; y < cl; y ++)
+        for (UINT32 y = 0; y < clh; y++)
         {
-            acc.add(prgb_l[idx]);
+            acc.add(prgb_hg[idx]);
             idx += glowmod;
         } // end preaccum V
         *pVacc++ = acc;
     }
     // - - - B: up pass
-    const int clm = cl * glowmod;
+    const int clm = clh * glowmod;
     const int vbmmod = vecbitmap->rowpixels;
     // up pass, just add again
-    for (INT32 by = vector_ymin; by < vector_ymax; by += gsubh)
+    INT32 by;
+    for (by = 0; by < clh/*vector_ymax*/; by += gsubh)
     {
         ColAcc* pVacc = (ColAcc*)glowtempv;
 
         // final screen to compose
         ColT* pvecbm_c = ((ColT*)vecbitmap->line[by]) + vector_xmin;
-        for (INT32 bx = vector_xmin; bx < vector_xmax; bx += 2)
+        for (INT32 bx = vector_xmin; bx < glowmod; bx++)
         {
-            //const ColT* glowh = (const ColAcc*)glowtemp;
-            //glowh += by;
             ColAcc acc= *pVacc;
             ColT* pvecbm = pvecbm_c;
-           // const int subidx = by* vbmmod +  -clm;
-            const int addidx = (by * glowmod) + bx;
-            for (INT32 y = 0; y < gsubh; y += 2)
-            {
-                acc.add(prgb_l[addidx]);
-                acc.add(prgb_l[addidx+ glowmod]);
-                addidx += glowmod*2;
 
-                TU argb = acc.divtorgb(vgdivser + 1);
+            int addidx = ((by>>1) * glowmod)+clm + bx;
+            for (INT32 y = 0; y < gsubh; y += 2)
+            {            
+                acc.add(prgb_hg[addidx]);
+                addidx += glowmod;
+
+                TU argb = acc.divtorgb(vgdivser );
+
+             // TU argb = prgb_hg[addidx];
+             //  addidx += glowmod;
+
                 pvecbm[0].compose(argb);
                 pvecbm[1].compose(argb);
                 pvecbm[vbmmod].compose(argb);
                 pvecbm[vbmmod+1].compose(argb);
-                // compose 4 pixels to final bitmap
-                //UINT32* prgb = ((UINT32*)vecbitmap->line[y]) + vector_xmin;
-                pvecbm += vbmmod;
+
+                pvecbm += vbmmod*2;
 
             }
             *pVacc++ = acc;
             pvecbm_c+=2;
         } // end bigx
         
-
     } // end bigy
 
     // - - - C: center pass
+    for (; by < (vector_ymax-clh); by += gsubh)
+    {
+        ColAcc* pVacc = (ColAcc*)glowtempv;
 
+        // final screen to compose
+        ColT* pvecbm_c = ((ColT*)vecbitmap->line[by]) + vector_xmin;
+        for (INT32 bx = 0; bx < glowmod; bx++)
+        {
+
+            ColAcc acc= *pVacc;
+            ColT* pvecbm = pvecbm_c;
+            int subidx = ((by>>1)* glowmod) -clm + bx;
+            int addidx = ((by>>1) * glowmod)+clm + bx;
+            for (INT32 y = 0; y < gsubh; y += 2)
+            {
+                acc.sub(prgb_hg[subidx]);
+                subidx += glowmod;
+
+                acc.add(prgb_hg[addidx]);
+                addidx += glowmod;
+
+                TU argb = acc.divtorgb(vgdivser);
+
+                 // TU argb =prgb_hg[addidx];
+                 //  addidx += glowmod;
+
+                pvecbm[0].compose(argb);
+                pvecbm[1].compose(argb);
+                pvecbm[vbmmod].compose(argb);
+                pvecbm[vbmmod+1].compose(argb);
+
+                pvecbm += vbmmod*2;
+
+            }
+            *pVacc++ = acc;
+            pvecbm_c+=2;
+        } // end bigx
+
+    } // end bigy
     // - - - D: down pass
 
-//
-//	// source is glowtemp
-//	// dest is glowtempv , same size
-//
-////	UINT32* pdest_l = glowtempv;
-//	for (INT32 x = vector_xmin; x < vector_xmax; x++)
-//	{
-//		UINT32* prgb = prgb_l;
-//		UINT32* glowbuf = pdest_l;
-//		INT32 r_ac = 0;
-//		INT32 g_ac = 0;
-//		INT32 b_ac = 0;
-//		// - - - -
-//		// accum nextread before screen
-//		for (UINT32 y = 0; y < cly; y += lb)
-//		{
-//			UINT32 cnext = prgb[y];
-//			r_ac += (cnext >> 16);
-//			g_ac += (cnext >> 8) & 0x0ff;
-//			b_ac += (cnext) & 0x0ff;
-//		}
-//		UINT32 y = 0;
-//		// up case, only accum next
-//		for (; y < cly; y += lb)
-//		{
-//			UINT32 cnext = prgb[y + cly];
-//			r_ac += cnext >> 16;
-//			g_ac += (cnext >> 8) & 0x0ff;
-//			b_ac += (cnext) & 0x0ff;
-//
-//			UINT32 cr = (r_ac >> vgdivser);
-//			UINT32 cg = (g_ac >> vgdivser);
-//			UINT32 cb = (b_ac >> vgdivser);
-//			glowbuf[y] = (cr << 16) | (cg << 8) | cb;
-//		}
-//		// center case,
-//		UINT32 yend = ((vector_ymax - vector_ymin) - cl) * lb;
-//		for (; y <= yend; y += lb)
-//		{
-//			UINT32 cnext = prgb[y + cly];
-//			r_ac += cnext >> 16;
-//			g_ac += (cnext >> 8) & 0x0ff;
-//			b_ac += (cnext) & 0x0ff;
-//
-//			UINT32 cprev = prgb[y - cly];
-//			r_ac -= cprev >> 16;
-//			g_ac -= (cprev >> 8) & 0x0ff;
-//			b_ac -= (cprev) & 0x0ff;
-//
-//			UINT32 cr = (r_ac >> vgdivser);
-//			UINT32 cg = (g_ac >> vgdivser);
-//			UINT32 cb = (b_ac >> vgdivser);
-//			glowbuf[y] = (cr << 16) | (cg << 8) | cb;
-//		}
-//		// down case,
-//		yend = (vector_ymax - vector_ymin) * lb;
-//		for (; y <= yend; y += lb)
-//		{
-//			UINT32 cprev = prgb[y - cly];
-//			r_ac -= cprev >> 16;
-//			g_ac -= (cprev >> 8) & 0x0ff;
-//			b_ac -= (cprev) & 0x0ff;
-//
-//			UINT32 cr = (r_ac >> vgdivser);
-//			UINT32 cg = (g_ac >> vgdivser);
-//			UINT32 cb = (b_ac >> vgdivser);
-//			glowbuf[y] = (cr << 16) | (cg << 8) | cb;
-//		}
-//		// - - -
-//		prgb_l++;
-//		pdest_l++;
-//	}
 
-    // - - - - composition
-  //   glowbuf = glowtempv;
-
-  //   for (INT32 y = vector_ymin; y < vector_ymax; y++)
-  //   {
-		// if (vecbitmap->line[y] == NULL) continue;
-  //       UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-  //       for (INT32 x = vector_xmin; x < vector_xmax; x++)
-  //       {
-  //           UINT32 chere = *prgb;
-  //           UINT32 cglow = *glowbuf++;
-
-  //           UINT32 cr = cglow>>16;
-  //           UINT32 rh = chere>>16;
-  //           if(cr>rh) rh=cr;
-
-  //           UINT32 gh = (chere>>8) & 0x0ff;
-  //           UINT32 cg = (cglow>>8) & 0x0ff;
-  //           if(cg>gh) gh=cg;
-
-  //           UINT32 bh = (chere) & 0x0ff;
-  //           UINT32 cb = (cglow) & 0x0ff;
-  //           if(cb>bh) bh=cb;
-
-  //           *prgb++=(rh<<16)|(gh<<8)|bh;
-
-  //       }
-  //   }
 
 }
 

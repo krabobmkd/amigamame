@@ -135,7 +135,8 @@ void StartGame(int idriver)
     options.vector_intensity = 1.5f;  /* float vector beam intensity 1.5f defaulty */
     options.translucency = 1;  /* 1 to enable translucency on vectors */
     options.antialias = 1;  /* 1 to enable antialias on vectors */
-//    vector_width 
+//    vector_width
+    options.vector_glow = 2;
 
     /* Clear the zip filename caches. */
 
@@ -163,6 +164,7 @@ QThread *qthread = nullptr;
 struct _mame_display *_display=nullptr;
 QImage _image; //(bm.data(), w, h, QImage::Format_RGB888);
 QMutex _imageMutex;
+bool imageok=false;
 bool isinexit=false;
 QMutex m_mutex;
 bool m_bIs15b = false;
@@ -233,7 +235,7 @@ QWin::QWin() : QLabel()
     emit startproc();
     connect(&m_timer,&QTimer::timeout,this,&QWin::updateWin);
     m_timer.setSingleShot(false);
-    m_timer.start(1000/60);
+    m_timer.start(1000/40);
     show();
     setMouseTracking(true);
 
@@ -268,19 +270,29 @@ void QWin::updateWin()
     if(!_display || !_display->game_bitmap ) return;
    // struct _mame_display *display=_display;
 
+    if(imageok)
+    {
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        int izoom = 1;
+        int izoom = 2;
+    QPixmap qpx = QPixmap::fromImage(_image).scaled(QSize(w * izoom, h * izoom));
+    _imageMutex.unlock();
+
+
+
         static bool resizedone = false;
         if (!resizedone && w > 0 && h > 0)
         {
             this->setFixedSize(w * izoom, h * izoom);
+            resizedone = true;
         }
-        this->setPixmap(QPixmap::fromImage(_image)/*.scaled(QSize(w * izoom, h * izoom))*/);
+        this->setPixmap(qpx);
+        imageok = false;
+    }
+   // QThread::msleep(40);
 
-    _imageMutex.unlock();
-    QThread::msleep(10);
+
 	//lbl.show();
 //    m_mutex.unlock();
 //    m_mutex.lock();
@@ -346,19 +358,21 @@ int osd_skip_this_frame(void)
 void osd_update_video_and_audio(struct _mame_display *display)
 {
     if(isinexit) return;
-
     _display = display;
+
+
 
     uint16_t *p = (uint16_t *) _display->game_bitmap->base;
     int x1 = _display->game_visible_area.min_x;
     int y1 = _display->game_visible_area.min_y;
     int realHeight = (_display->game_visible_area.max_y - _display->game_visible_area.min_y)+1;
+    int realWidth = (_display->game_visible_area.max_x - _display->game_visible_area.min_x)+1;
 
-    if(w != _display->game_bitmap->width || h != realHeight)
+    if(w != realWidth || h != realHeight)
     {
-        w = _display->game_bitmap->width;
+        w = realWidth;
         h = realHeight;
-        bm.resize(w*h*3);
+        bm.resize(w*h*4);
     }
 
     if (m_bIs32b)
@@ -367,7 +381,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
         {
             uint32_t* pline = (uint32_t*)display->game_bitmap->line[y + y1];
             pline += x1;
-            for (int x = 0; x < _display->game_bitmap->width; x++)
+            for (int x = 0; x < realWidth; x++)
             {
                 uint32_t rgb = *pline++;
 
@@ -385,7 +399,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
         {
             uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
             pline += x1;
-            for(int x=0;x<_display->game_bitmap->width;x++)
+            for(int x=0;x<realWidth;x++)
             {
                 uint16_t rgb = *pline++;
 
@@ -402,7 +416,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
     {
         uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
         pline += x1;
-        for(int x=0;x<display->game_bitmap->width;x++)
+        for(int x=0;x<realWidth;x++)
         {
             uint16_t c = *pline++;
             uint32_t rgb=0;
@@ -416,14 +430,21 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
         }
     }
-    _imageMutex.lock();
+
+   _imageMutex.lock();
+
 	QImage image(bm.data(), w, h, QImage::Format_RGB888);
 
         _image = image;
+        imageok = true;
+
     _imageMutex.unlock();
 
           // if(nbframe>300)min0 max255 sens100 delta40 cend40  rev0 res:0
-     //      QThread::msleep(1000/60);
+    //  while(imageok)
+    //  {
+       //  QThread::msleep(40);
+    // }
 
 nbframe++;
     // logo

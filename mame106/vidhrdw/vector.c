@@ -814,8 +814,8 @@ VIDEO_UPDATE( vector )
 #if USE_DIRTYPIXXELS
 	vector_dirty_list[dirty_index] = VECTOR_PIXEL_END;
 #endif
-    if(options.vector_glow==1) vector_krb_hglow();
-    else if(options.vector_glow==2) vector_krb_fullglow2();
+     if(options.vector_glow==1) vector_krb_hglow();
+     else if(options.vector_glow==2) vector_krb_fullglow2();
 
 	//static int framuuu = 0;
 	//framuuu++;
