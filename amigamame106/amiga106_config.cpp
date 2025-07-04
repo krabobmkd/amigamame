@@ -274,7 +274,7 @@ error:
 void MameConfig::serialize(ASerializer &serializer)
 {
     // defines what is loaded/saved/gui edited.
-    serializer("Display",   (ASerializable&)_display,0);
+    serializer("Display",   (ASerializable&)_display,SERFLAG_GROUP_SCROLLER);
     serializer("Audio",     (ASerializable&)_audio,0);
     serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS);
     serializer("Misc",     (ASerializable&)_misc,0);
@@ -417,7 +417,7 @@ void MameConfig::Display_Vector::serialize(ASerializer &serializer)
 
     serializer(" ",_flags,VDISPLAYFLAGS_ANTIALIAS,{"Antialias","High Color"});
      // min,max,step, default
-    serializer("Intensity",_intensity,0.75f,1.5f,0.05f,1.0f);
+    serializer("Intensity",_intensity,0.5f,1.5f,0.05f,1.0f);
 
 }
 bool MameConfig::Display_Vector::isDefault()
@@ -453,7 +453,7 @@ void MameConfig::Display::serialize(ASerializer &serializer)
     serializer("Per Screen Mode",_perScreenModeS);
     serializer("Per Game",_perGameS);
 
-    serializer("Vector Screen",_vector);
+    serializer("Vector Screen",_vector,SERFLAG_GROUP_SUB);
 }
 MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
 {

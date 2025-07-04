@@ -14,7 +14,7 @@ struct ASerializer;
 #define SERFLAG_GROUP_2COLUMS 2
 #define SERFLAG_GROUP_FLAGINT2COLUMS (1<<24)
 #define SERFLAG_GROUP_SCROLLER 4
-
+#define SERFLAG_GROUP_SUB       8
 struct ASerializable {
     ASerializable() {}
     virtual ~ASerializable() {}

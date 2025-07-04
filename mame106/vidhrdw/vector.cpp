@@ -355,39 +355,40 @@ void vector_krb_fullglow(void)
 
 // color accumulator
 struct ColAcc {
-    INT16 r = 0;
-    INT16 g = 0;
-    INT16 b = 0;
-    void add(UINT16 argb) {
+    ColAcc(INT16 startval) {
+        r=g=b=startval;
+    }
+    INT16 r,g,b;
+    inline void add(UINT16 argb) {
         r += (argb >> 10);
         g += (argb >> 5) & 0x01f;
         b += (argb) & 0x01f;
     }
-    void sub(UINT16 argb) {
+    inline void sub(UINT16 argb) {
         r -= (argb >> 10);
         g -= (argb >> 5) & 0x01f;
         b -= (argb) & 0x01f;
     }
-    void add(UINT32 argb) {
+    inline void add(UINT32 argb) {
         r += (argb >> 16)/*& 0x0ff*/;
         g += (argb >> 8) & 0x0ff;
         b += (argb) & 0x0ff;
     }
-    void sub(UINT32 argb) {
+    inline void sub(UINT32 argb) {
         r -= (argb >> 16)/*& 0x0ff*/;
         g -= (argb >> 8) & 0x0ff;
         b -= (argb) & 0x0ff;
     }
-    void divtorgb(UINT32 &o, const int shift) {
+    inline void divtorgb(UINT32 &o, const int shift) {
         UINT32 cr = (r >> shift);
         UINT32 cg = (g >> shift);
         UINT32 cb = (b >> shift);
         o = (cr << 16) | (cg << 8) | cb;
     }
-    void divtorgb(UINT16& o, const int shift) {
-        UINT32 cr = (r >> shift);
-        UINT32 cg = (g >> shift);
-        UINT32 cb = (b >> shift);
+    inline void divtorgb(UINT16& o, const int shift) {
+        UINT32 cr = ((r) >> shift);
+        UINT32 cg = ((g) >> shift);
+        UINT32 cb = ((b) >> shift);
         o = (UINT16)((cr << 10) | (cg << 5) | cb);
     }
 };
@@ -436,7 +437,7 @@ public:
     UINT16 _p;
 };
 // ColT screen pixel type UINT32 UINT16 
-template<typename ColT,typename TU,int shiftH,int shiftV>
+template<typename ColT,typename TU,int shiftH,int shiftV,int startacc>
 void vector_krb_fullglow2T(void)
 {
 	if (alloc_glowtemps_later) allocGlowTemp();
@@ -452,7 +453,7 @@ void vector_krb_fullglow2T(void)
         TU* prgbh = ((TU*)vecbitmap->line[y])+vector_xmin;
         TU* prgbl = ((TU*)vecbitmap->line[y+1])+vector_xmin;
         //UINT32* glowbuf = glowtemp;
-        ColAcc acc;
+        ColAcc acc(startacc);
 
         // accum nextread before screen
         for (UINT32 x = 0; x < cl; x+=2)
@@ -522,7 +523,7 @@ void vector_krb_fullglow2T(void)
     //init preacc start line
     for (INT32 x = 0; x < glowmod; x++)
     {
-        ColAcc acc;
+        ColAcc acc(startacc);
         int idx = x;
         for (INT32 y = 0; y < clh; y++)
         {
@@ -651,8 +652,8 @@ void vector_krb_fullglow2T(void)
 
 void vector_krb_fullglow2(void)
 {
-    if (Machine->color_depth == 32) vector_krb_fullglow2T<GlowPix32,UINT32,6+2,4>();
-    else if (Machine->color_depth == 15) vector_krb_fullglow2T<GlowPix15, UINT16, 6 + 2, 3>();
+    if (Machine->color_depth == 32) vector_krb_fullglow2T<GlowPix32,UINT32,6+2,4,3>();
+    else if (Machine->color_depth == 15) vector_krb_fullglow2T<GlowPix15, UINT16, 6 + 2, 4,13>();
 
 }
 
@@ -769,7 +770,7 @@ static inline void clipxmin(int &x1,int &y1,int & clipbits1,
     y2 = y1 + (((y2 - y1) >> 8) * ((x1 -vector_xminfp ) >> 8)) / c;
 
     x2 = vector_xminfp;
-//    clipbits2 &= ~1;
+
 }
 static inline void clipxmax(int& x1, int& y1, int& clipbits1,
     int& x2, int& y2, int& clipbits2)
@@ -781,7 +782,7 @@ static inline void clipxmax(int& x1, int& y1, int& clipbits1,
     y2 = y1 + (((y2 - y1) >> 8) * (( xmax -x1) >> 8)) / c;
 
     x2 = xmax;
-//    clipbits2 &= ~2;
+
 }
 static inline void clipymin(int& x1, int& y1, int& clipbits1,
     int& x2, int& y2, int& clipbits2)
@@ -869,7 +870,6 @@ void vector_draw_toT(pixel &pix, point* curpoint)
         if (clipbits1 & 2) clipxmax(x2, y2, clipbits2, x1, yy1, clipbits1);
         else if (clipbits2 & 2) clipxmax(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
 
-        if ((clipbits2 | clipbits1) != 0) goto end_draw;
     }
 
     pix.setcol(Tinten(intensity, curpoint->col)); 

@@ -391,9 +391,13 @@ void drawextra_simpleDraw(mame_bitmap *bitmap,int x, int y,struct extraBitmap *b
     const rectangle *cliprect = &Machine->absolute_visible_area;
 
     UINT32 video_attribs = Machine->drv->video_attributes;
+
     UINT32 flags = Machine->ui_orientation;
     if(video_attribs & VIDEO_RGB_DIRECT)
     {
+        if((video_attribs & VIDEO_TYPE_VECTOR) &&
+                options.vector_force32b) video_attribs |=VIDEO_NEEDS_6BITS_PER_GUN;
+
         if(video_attribs & VIDEO_NEEDS_6BITS_PER_GUN)
         {
             BmDestCoord<UINT32> bmdc(bitmap,cliprect,flags);

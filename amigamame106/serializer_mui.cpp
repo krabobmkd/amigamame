@@ -510,6 +510,27 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
             TAG_DONE);
         return scrollgroup;
     }
+    if(_flgs & SERFLAG_GROUP_SUB)
+    {
+        return MUI_NewObject(MUIC_Group,
+            GroupFrameT((ULONG)""),
+              Child, (ULONG)HVSpace,
+              Child, (ULONG)MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+                                    Child, (ULONG)HSpace(0),
+                                    Child,(ULONG)pinnerGroup,
+                                    Child, (ULONG)HSpace(0),
+                                    TAG_DONE
+                                    ),
+              Child, (ULONG)HVSpace,
+              TAG_DONE
+              );
+    }
+
+/*
+            GroupFrameT((ULONG)_displayName.c_str()),
+            MUIA_Disabled, TRUE,
+*/
+
    return MUI_NewObject(MUIC_Group,
                   Child, (ULONG)HVSpace,
                   Child, (ULONG)MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,

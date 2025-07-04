@@ -1054,7 +1054,7 @@ static void create_machine(int game)
 
 		Machine->color_depth = (vidattribs & VIDEO_NEEDS_6BITS_PER_GUN) ? 32 : 15;
 	}
- printf("Machine->color_depth:%d\n",Machine->color_depth);
+// printf("Machine->color_depth:%d\n",Machine->color_depth);
 	/* update the vector width/height with defaults */
 	if (options.vector_width == 0)
 		options.vector_width = 640;
