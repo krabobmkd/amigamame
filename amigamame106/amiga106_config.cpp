@@ -990,6 +990,7 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     options.antialias = (int)((vectorconf._flags & VDISPLAYFLAGS_ANTIALIAS)!=0);  /* 1 to enable antialias on vectors */
     options.vector_remanence = (int)vectorconf._remanence;
     options.vector_glow = (int)vectorconf._glow;
+    options.vector_force32b = (int)((vectorconf._flags & VDISPLAYFLAGS_FORCE32B)!=0);
 
 #ifdef LINK_NEOGEO
     // if machine points neogeo rom list, then it's neogeo.

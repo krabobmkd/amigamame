@@ -41,6 +41,7 @@ void allocGlowTemp()
 	alloc_glowtemps_later = 0;
 }
 
+// something for RGB  byte access
 #ifdef LSB_FIRST
     #define RCDX 2
     #define GCDX 1
@@ -52,114 +53,7 @@ void allocGlowTemp()
     #define BCDX 3
 #endif
 
-
-
-//#define GLOWPERBYTE 1
-#ifdef GLOWPERBYTE
-void vector_krb_hglow(void)
-{
-    if( Machine->color_depth != 32) return;
-
-	if (alloc_glowtemps_later) allocGlowTemp();
-
-    UINT32 cl=32; // means stock 64 pixels.
-	// 32+32 64 -> div6
-#define hhgdivser 7
-
-    // apply H & V glow on temp buffer without composition
-    // do composition at the end.
-
-    // hpass
-
-    for (UINT32 y = vector_ymin; y < vector_ymax; y++)
-    {
-        UINT8* prgb = ((UINT8*)vecbitmap->line[y])+vector_xmin;
-        INT32 r_ac=0;
-        INT32 g_ac=0;
-        INT32 b_ac=0;
-        UINT8* glowbuf = (UINT8* )glowtemp;
-        // accum nextread before screen
-        for (UINT32 x = 0; x < cl*4; x+=4)
-        {
-            r_ac += prgb[x+RCDX];
-            g_ac += prgb[x+GCDX];
-            b_ac += prgb[x+BCDX];
-        }
-
-        UINT32 x = 0;
-        // left case, only accum next
-        for (; x < cl*4; x+=4)
-        {
-            r_ac += prgb[x+cl*4+RCDX];
-            g_ac += prgb[x+cl*4+GCDX];
-            b_ac += prgb[x+cl*4+BCDX];
-
-            *glowbuf++ = (r_ac>>hhgdivser);
-            *glowbuf++ = (g_ac>>hhgdivser);
-            *glowbuf++ = (b_ac>>hhgdivser);
-        }
-        // center case,
-        UINT32 xend = (vector_xmax-vector_xmin-cl);
-        for (; x < xend; x++)
-        {
-//            UINT32 cnext = prgb[x+cl];
-//            r_ac += cnext>>16;
-//            g_ac += (cnext>>8) & 0x0ff;
-//            b_ac += (cnext) & 0x0ff;
-
-//            UINT32 cprev = prgb[x-cl];
-//            r_ac -= cprev>>16;
-//            g_ac -= (cprev>>8) & 0x0ff;
-//            b_ac -= (cprev) & 0x0ff;
-
-//            UINT32 cr = (r_ac>>hhgdivser);
-//            UINT32 cg = (g_ac>>hhgdivser) ;
-//            UINT32 cb = (b_ac>>hhgdivser) ;
-//            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
-        }
-        // right case,
-        xend = (vector_xmax-vector_xmin);
-        for (; x < xend; x++)
-        {
-            UINT32 cprev = prgb[x-cl];
-            r_ac -= cprev>>16;
-            g_ac -= (cprev>>8) & 0x0ff;
-            b_ac -= (cprev) & 0x0ff;
-
-            UINT32 cr = (r_ac>>hhgdivser);
-            UINT32 cg = (g_ac>>hhgdivser) ;
-            UINT32 cb = (b_ac>>hhgdivser) ;
-            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
-        }
-
-        // compose line
-        glowbuf = (UINT8 *)glowtemp;
-        prgb = (UINT8*)(((UINT32*)vecbitmap->line[y])+vector_xmin);
-        for (UINT32 x = vector_xmin; x < vector_xmax; x++)
-        {
-            UINT32 chere = *prgb;
-            UINT32 cglow = *glowbuf++;
-
-            UINT32 cr = cglow;
-            UINT32 rh = chere;
-            if(cr>rh) rh=cr;
-            rh >>=16;
-
-            UINT32 gh = (chere>>8) & 0x0ff;
-            UINT32 cg = (cglow>>8) & 0x0ff;
-            if(cg>gh) gh=cg;
-
-            UINT32 bh = (chere) & 0x0ff;
-            UINT32 cb = (cglow) & 0x0ff;
-            if(cb>bh) bh=cb;
-
-            *prgb++=(rh<<16)|(gh<<8)|bh;
-        }
-
-
-    } // y loop
-}
-#else
+// very early test version
 void vector_krb_hglow(void)
 {
     if( Machine->color_depth != 32) return;
@@ -267,7 +161,7 @@ void vector_krb_hglow(void)
 
     } // y loop
 }
-#endif
+/* very accurate but slow version 
 void vector_krb_fullglow(void)
 {
     if( Machine->color_depth != 32) return;
@@ -456,11 +350,24 @@ void vector_krb_fullglow(void)
     }
 
 }
+*/
+// pixel types for template and cache-like full glow version
 
+// color accumulator
 struct ColAcc {
     INT16 r = 0;
     INT16 g = 0;
     INT16 b = 0;
+    void add(UINT16 argb) {
+        r += (argb >> 10);
+        g += (argb >> 5) & 0x01f;
+        b += (argb) & 0x01f;
+    }
+    void sub(UINT16 argb) {
+        r -= (argb >> 10);
+        g -= (argb >> 5) & 0x01f;
+        b -= (argb) & 0x01f;
+    }
     void add(UINT32 argb) {
         r += (argb >> 16)/*& 0x0ff*/;
         g += (argb >> 8) & 0x0ff;
@@ -468,31 +375,25 @@ struct ColAcc {
     }
     void sub(UINT32 argb) {
         r -= (argb >> 16)/*& 0x0ff*/;
-       // if(r<0) r=0;
         g -= (argb >> 8) & 0x0ff;
-       // if(g<0) g=0;
         b -= (argb) & 0x0ff;
-       // if(b<0) b=0;
     }
-    UINT32 divtorgb(const int shift) {
+    void divtorgb(UINT32 &o, const int shift) {
         UINT32 cr = (r >> shift);
         UINT32 cg = (g >> shift);
         UINT32 cb = (b >> shift);
-        return (cr << 16) | (cg << 8) | cb;
+        o = (cr << 16) | (cg << 8) | cb;
     }
-    //UINT16 divtorgb(const int shift) {
-    //    //TODO
-    //    UINT32 cr = (r >> shift);
-    //    //UINT32 cg = (g >> shift);
-    //    //UINT32 cb = (b >> shift);
-    //    c = (cr << 16); //| (cg << 8) | cb;
-    //}
-
+    void divtorgb(UINT16& o, const int shift) {
+        UINT32 cr = (r >> shift);
+        UINT32 cg = (g >> shift);
+        UINT32 cb = (b >> shift);
+        o = (UINT16)((cr << 10) | (cg << 5) | cb);
+    }
 };
 class GlowPix32 {
 public:
-    GlowPix32(UINT32 cglow) {
-    }
+    // get highest RGB
     void compose(UINT32 cglow)
     {
         UINT32 cr = cglow >> 16;
@@ -512,20 +413,37 @@ public:
 
     UINT32 _p;
 };
+class GlowPix15 {
+public:
+    // get highest RGB
+    void compose(UINT16 cglow)
+    {
+        UINT16 cr = cglow >> 10;
+        UINT16 rh = _p >> 10;
+        if (cr > rh) rh = cr;
+
+        UINT16 gh = (_p >> 5) & 0x01f;
+        UINT16 cg = (cglow >> 5) & 0x01f;
+        if (cg > gh) gh = cg;
+
+        UINT16 bh = (_p) & 0x01f;
+        UINT16 cb = (cglow) & 0x01f;
+        if (cb > bh) bh = cb;
+
+        _p = (rh << 10) | (gh << 5) | bh;
+    }
+
+    UINT16 _p;
+};
 // ColT screen pixel type UINT32 UINT16 
-template<typename ColT,typename TU>
+template<typename ColT,typename TU,int shiftH,int shiftV>
 void vector_krb_fullglow2T(void)
 {
-    if( Machine->color_depth != 32) return;
-
 	if (alloc_glowtemps_later) allocGlowTemp();
 
     UINT32 cl=32; // means stock 64 pixels.
-	// 32+32 64 -> div6
-#define hgdivser (6+2)
 
-    // apply H & V glow on temp buffer without composition
-    // do composition at the end.
+    // pass1: H , pass 2:  V +composition in cache order
 
     // hpass
     TU* glowbuf = (TU*)glowtemp;
@@ -554,7 +472,7 @@ void vector_krb_fullglow2T(void)
             acc.add(prgbl[x+cl]);
             acc.add(prgbl[x+cl + 1]);
 
-            *glowbuf = acc.divtorgb(hgdivser);
+            acc.divtorgb(*glowbuf, shiftH);
             glowbuf++;
         }
         // center case,
@@ -571,7 +489,7 @@ void vector_krb_fullglow2T(void)
             acc.sub(prgbl[x - cl]);
             acc.sub(prgbl[x - cl + 1]);
 
-            *glowbuf = acc.divtorgb( hgdivser );
+            acc.divtorgb(*glowbuf, shiftH);
             glowbuf++;
         }
         // right case,
@@ -583,32 +501,30 @@ void vector_krb_fullglow2T(void)
             acc.sub(prgbl[x - cl]);
             acc.sub(prgbl[x - cl + 1]);
 
-            *glowbuf = acc.divtorgb( hgdivser );
+            acc.divtorgb(*glowbuf, shiftH);
             glowbuf++;
         }
     } // end H pass
     // - - - -  - - - - -  -  V pass & composition
  
-//	const UINT32 lb = vector_xmax- vector_xmin;
-	const UINT32 clh = cl>>1;
-	//const UINT32 clh = cl * lb;
-#define vgdivser 4
+	const INT32 clh = cl>>1;
 
 #define gsubw 8
 #define gsubh 16
 
+#define GLOWONLYH 0
     // - - - A: preaccum
     ColAcc*pVacc = (ColAcc*)glowtempv;
     UINT32 yl= (vector_ymax - vector_ymin);
 
-    TU* prgb_hg = (TU *)glowtemp; // ((UINT32*)vecbitmap->line[ymin]) + xmin;
+    TU* prgb_hg = (TU *)glowtemp; 
     INT32 glowmod = (vector_xmax - vector_xmin) >> 1;
     //init preacc start line
     for (INT32 x = 0; x < glowmod; x++)
     {
         ColAcc acc;
         int idx = x;
-        for (UINT32 y = 0; y < clh; y++)
+        for (INT32 y = 0; y < clh; y++)
         {
             acc.add(prgb_hg[idx]);
             idx += glowmod;
@@ -634,11 +550,16 @@ void vector_krb_fullglow2T(void)
             int addidx = ((by>>1) * glowmod)+clm + bx;
             for (INT32 y = 0; y < gsubh; y += 2)
             {            
+#if GLOWONLYH
+                TU argb = prgb_hg[addidx- clm];
+                addidx += glowmod;
+#else
                 acc.add(prgb_hg[addidx]);
                 addidx += glowmod;
 
-                TU argb = acc.divtorgb(vgdivser );
-
+                TU argb;
+                acc.divtorgb(argb, shiftV);
+#endif
                 pvecbm[0].compose(argb);
                 pvecbm[1].compose(argb);
                 pvecbm[vbmmod].compose(argb);
@@ -656,26 +577,29 @@ void vector_krb_fullglow2T(void)
     // - - - C: center pass
     for (; by < (vector_ymax-clh); by += gsubh)
     {
-        ColAcc* pVacc = (ColAcc*)glowtempv;
-
-        // final screen to compose
-        ColT* pvecbm_c = ((ColT*)vecbitmap->line[by]) + vector_xmin;
+        ColAcc* pVacc = (ColAcc*)glowtempv;        
+        ColT* pvecbm_c = ((ColT*)vecbitmap->line[by]) + vector_xmin; // final screen to compose
         for (INT32 bx = 0; bx < glowmod; bx++)
         {
-
             ColAcc acc= *pVacc;
             ColT* pvecbm = pvecbm_c;
             int subidx = ((by>>1)* glowmod) -clm + bx;
             int addidx = ((by>>1) * glowmod)+clm + bx;
             for (INT32 y = 0; y < gsubh; y += 2)
             {
+#if GLOWONLYH
+                TU argb = prgb_hg[addidx - clm];
+                addidx += glowmod;
+#else
                 acc.sub(prgb_hg[subidx]);
                 subidx += glowmod;
 
                 acc.add(prgb_hg[addidx]);
                 addidx += glowmod;
+                TU argb;
+                acc.divtorgb(argb, shiftV);
+#endif
 
-                TU argb = acc.divtorgb(vgdivser);
 
                 pvecbm[0].compose(argb);
                 pvecbm[1].compose(argb);
@@ -683,22 +607,53 @@ void vector_krb_fullglow2T(void)
                 pvecbm[vbmmod+1].compose(argb);
 
                 pvecbm += vbmmod*2;
-
             }
             *pVacc++ = acc;
             pvecbm_c+=2;
         } // end bigx
-
     } // end bigy
     // - - - D: down pass
+    for (; by < vector_ymax ; by += gsubh)
+    {
+        ColAcc* pVacc = (ColAcc*)glowtempv;
+        ColT* pvecbm_c = ((ColT*)vecbitmap->line[by]) + vector_xmin;        // final screen to compose
+        for (INT32 bx = 0; bx < glowmod; bx++)
+        {
+            ColAcc acc = *pVacc;
+            ColT* pvecbm = pvecbm_c;
+            int subidx = ((by >> 1) * glowmod) - clm + bx;
+            for (INT32 y = 0; y < gsubh; y += 2)
+            {
+#if GLOWONLYH
+                TU argb = prgb_hg[subidx + clm];
+                subidx += glowmod;
+#else
+                acc.sub(prgb_hg[subidx]);
+                subidx += glowmod;
 
+                TU argb;
+                acc.divtorgb(argb, shiftV);
+#endif
+                pvecbm[0].compose(argb);
+                pvecbm[1].compose(argb);
+                pvecbm[vbmmod].compose(argb);
+                pvecbm[vbmmod + 1].compose(argb);
+
+                pvecbm += vbmmod * 2;
+            }
+            *pVacc++ = acc;
+            pvecbm_c += 2;
+        } // end bigx
+    } // end bigy
 
 
 }
 
 void vector_krb_fullglow2(void)
 {
-    vector_krb_fullglow2T<GlowPix32,UINT32>();
+    if (Machine->color_depth == 32) vector_krb_fullglow2T<GlowPix32,UINT32,6+2,4>();
+    else if (Machine->color_depth == 15) vector_krb_fullglow2T<GlowPix15, UINT16, 6 + 2, 3>();
+
 }
 
 static inline int vec_multbeam(UINT32 parm2)
@@ -741,9 +696,9 @@ public:
     UINT16 _r, _g, _b;
     UINT16 _rt, _gt, _bt;
     void setcol(rgb_t col) {
-        _r = RGB_RED(col);
-        _g = RGB_GREEN(col);
-        _b = RGB_BLUE(col);
+        _r = ((col >>(16+3)));
+        _g = ((col >>(8+3)) & 0x1f);
+        _b = ((col >>(3)) & 0x1f);
     }
     void tint(UINT8 t) {
         _rt = (_r * t) >> 8;
@@ -809,42 +764,53 @@ public:
 static inline void clipxmin(int &x1,int &y1,int & clipbits1, 
                             int& x2, int& y2, int& clipbits2 )
 {
-    int dx = ((x1 - x2) >> 16);
-    if (dx < 1) dx = 1;
-    y2 = y1 + (((x1 - vector_xminfp) >> 8) * ((y2 - y1) >> 8)) / dx;
+    int c = (x1 - x2) >> 16;
+    if (c < 1) c = 1;
+    y2 = y1 + (((y2 - y1) >> 8) * ((x1 -vector_xminfp ) >> 8)) / c;
+
     x2 = vector_xminfp;
-    clipbits2 &= ~1;
+//    clipbits2 &= ~1;
 }
 static inline void clipxmax(int& x1, int& y1, int& clipbits1,
     int& x2, int& y2, int& clipbits2)
 {
     int xmax = vector_xmaxfp - (1 << 16);
+     
+    int c = (x2 - x1) >> 16;
+    if (c < 1) c = 1;
+    y2 = y1 + (((y2 - y1) >> 8) * (( xmax -x1) >> 8)) / c;
 
-    int dx = ((x1 - x2) >> 16);
-    if (dx < 1) dx = 1;
-    y2 = y1 + (((x1 - xmax) >> 8) * ((y2 - y1) >> 8)) / dx;
     x2 = xmax;
-    clipbits2 &= ~2;
+//    clipbits2 &= ~2;
 }
 static inline void clipymin(int& x1, int& y1, int& clipbits1,
     int& x2, int& y2, int& clipbits2)
 {
-    int dy = ((y1 - y2) >> 16);
-    if (dy < 1) dy = 1;
-    x2 = x1 + (((y1 - vector_yminfp) >> 8) * ((x2 - x1) >> 8)) / dy;
+    int c = (y1 - y2) >> 16;
+    if (c <1) c = 1;
+    x2 -=  (((x2-x1)>>8)*((vector_yminfp -y2)>>8)) / c;
     y2 = vector_yminfp;
-    clipbits2 &= ~4;
+    clipbits2 &= ~(4|1|2); // 4 remove ymin + recheck both x
+    // y done before xclip, recheck x clipbits
+    clipbits2 |= (int)(x2 < vector_xminfp)
+        | ((x2 >= vector_xmaxfp) ? 2 : 0);
 }
 static inline void clipymax(int& x1, int& y1, int& clipbits1,
     int& x2, int& y2, int& clipbits2)
 {
     int ymax = vector_ymaxfp - (1 << 16);
 
-    int dy = ((y1 - y2) >> 16);
-    if (dy == 0) dy = -1;
-    x2 = x1 + (((y1 - ymax) >> 8) * ((x2 - x1) >> 8)) / dy;
+    int c = (y2 - y1) >> 16;
+    if (c < 1) c = 1;
+    x2 -= (((x2 - x1) >> 8) * ((y2 -ymax) >> 8)) / c;
+
     y2 = ymax;
-    clipbits2 &= ~8;
+
+    clipbits2 &= ~(8|1|2);
+
+    // y done before xclip, recheck x clipbits
+    clipbits2 |= (int)(x2 < vector_xminfp)
+        | ((x2 >= vector_xmaxfp) ? 2 : 0);
 }
 template<class pixel,bool b_antialias>
 void vector_draw_toT(pixel &pix, point* curpoint)
@@ -888,22 +854,19 @@ void vector_draw_toT(pixel &pix, point* curpoint)
     oredcb = (clipbits2 | clipbits1);
     if ( oredcb != 0 )
     {
-        //TO TEST, REMOVE
-        goto end_draw;
-        //TO VALIDATE:
         // means one of the 2 points outside.
-        if (clipbits1 & 4) clipymin(x2, y2, clipbits2, prev_x1, prev_yy1, clipbits1);
+        if (clipbits1 & 4) clipymin(x2, y2, clipbits2, x1, yy1, clipbits1);
         else if (clipbits2 & 4) clipymin(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
 
-        if (clipbits1 & 8) clipymax(x2, y2, clipbits2, prev_x1, prev_yy1, clipbits1);
+        if (clipbits1 & 8) clipymax(x2, y2, clipbits2, x1, yy1, clipbits1);
         else if (clipbits2 & 8) clipymax(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
         // can happens at that level
         if ((clipbits2 & clipbits1) != 0) goto end_draw; // means 2 points outside of one of the border.
 
-        if (clipbits1 & 1) clipxmin(x2, y2, clipbits2, prev_x1, prev_yy1, clipbits1);
+        if (clipbits1 & 1) clipxmin(x2, y2, clipbits2, x1, yy1, clipbits1);
         else if (clipbits2 & 1) clipxmin(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
 
-        if (clipbits1 & 2) clipxmax(x2, y2, clipbits2, prev_x1, prev_yy1, clipbits1);
+        if (clipbits1 & 2) clipxmax(x2, y2, clipbits2, x1, yy1, clipbits1);
         else if (clipbits2 & 2) clipxmax(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
 
         if ((clipbits2 | clipbits1) != 0) goto end_draw;

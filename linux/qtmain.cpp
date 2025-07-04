@@ -192,7 +192,8 @@ void QProc::process()
     // "sci"
       //"sharrier"
 //      "arkanoid"
- "starwars"
+// "starwars"
+"cchasm"
 //"startrek"
 //"tacscan"
  //     "othunder"
@@ -275,7 +276,7 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        int izoom = 2;
+        int izoom = 1;
     QPixmap qpx = QPixmap::fromImage(_image).scaled(QSize(w * izoom, h * izoom));
     _imageMutex.unlock();
 
@@ -526,15 +527,15 @@ int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
 // to open menu
-    if(oscode == 33 && nbframe>2*60)
-    {
-        if(opened==0)
-        {
-            opened=1;
-            return 1;
-        }
-        return 0;
-    }
+    //if(oscode == 33 && nbframe>2*60)
+    //{
+    //    if(opened==0)
+    //    {
+    //        opened=1;
+    //        return 1;
+    //    }
+    //    return 0;
+    //}
     // if(oscode == 35 && nbframe>4*60)
     // {
     //     //if(opened>0)

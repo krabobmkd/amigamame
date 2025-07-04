@@ -10,14 +10,16 @@
         X rotate bug shiftRotationBits tacscan
         X +opt_cinematic
         X optim aa
-        O re-optim glow
+        X re-optim glow
         O redo clipping
         O implement full 15b mode
+        O grey vector prefs, improve UI for vector settings
   O docs for OS4 petunia
   O f1gp wheel+lever
   O tells about keyb & tab menu on inputs panel
 
   O developer notes todo
+
 ------------
 todo R1.3b ->4?
 
