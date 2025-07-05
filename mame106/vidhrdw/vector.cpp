@@ -53,114 +53,6 @@ void allocGlowTemp()
     #define BCDX 3
 #endif
 
-// very early test version
-void vector_krb_hglow(void)
-{
-    if( Machine->color_depth != 32) return;
-
-	if (alloc_glowtemps_later) allocGlowTemp();
-
-    UINT32 cl=32; // means stock 64 pixels.
-	// 32+32 64 -> div6
-#define hhgdivser 7
-
-    // apply H & V glow on temp buffer without composition
-    // do composition at the end.
-
-    // hpass
-
-    for (INT32 y = vector_ymin; y < vector_ymax; y++)
-    {
-        UINT32* prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-        //UINT32* glowbuf = glowtemp;
-        INT32 r_ac=0;
-        INT32 g_ac=0;
-        INT32 b_ac=0;
-        UINT32* glowbuf = glowtemp;
-        // accum nextread before screen
-        for (UINT32 x = 0; x < cl; x++)
-        {
-            UINT32 cnext = prgb[x];
-            r_ac += (cnext>>16);
-            g_ac += (cnext>>8) & 0x0ff;
-            b_ac += (cnext) & 0x0ff;
-        }
-
-        UINT32 x = 0;
-        // left case, only accum next
-        for (; x < cl; x++)
-        {
-            UINT32 cnext = prgb[x+cl];
-            r_ac += cnext>>16;
-            g_ac += (cnext>>8) & 0x0ff;
-            b_ac += (cnext) & 0x0ff;
-
-            UINT32 cr = (r_ac>>hhgdivser);
-            UINT32 cg = (g_ac>>hhgdivser) ;
-            UINT32 cb = (b_ac>>hhgdivser) ;
-            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
-        }
-        // center case,
-        UINT32 xend = (vector_xmax-vector_xmin-cl);
-        for (; x < xend; x++)
-        {
-            UINT32 cnext = prgb[x+cl];
-            r_ac += cnext>>16;
-            g_ac += (cnext>>8) & 0x0ff;
-            b_ac += (cnext) & 0x0ff;
-
-            UINT32 cprev = prgb[x-cl];
-            r_ac -= cprev>>16;
-            g_ac -= (cprev>>8) & 0x0ff;
-            b_ac -= (cprev) & 0x0ff;
-
-            UINT32 cr = (r_ac>>hhgdivser);
-            UINT32 cg = (g_ac>>hhgdivser) ;
-            UINT32 cb = (b_ac>>hhgdivser) ;
-            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
-        }
-        // right case,
-        xend = (vector_xmax-vector_xmin);
-        for (; x < xend; x++)
-        {
-            UINT32 cprev = prgb[x-cl];
-            r_ac -= cprev>>16;
-            g_ac -= (cprev>>8) & 0x0ff;
-            b_ac -= (cprev) & 0x0ff;
-
-            UINT32 cr = (r_ac>>hhgdivser);
-            UINT32 cg = (g_ac>>hhgdivser) ;
-            UINT32 cb = (b_ac>>hhgdivser) ;
-            *glowbuf++ = (cr<<16)|(cg<<8)|cb;
-        }
-
-        // compose line
-        glowbuf = glowtemp;
-        prgb = ((UINT32*)vecbitmap->line[y])+vector_xmin;
-        for (INT32 x = vector_xmin; x < vector_xmax; x++)
-        {
-            UINT32 chere = *prgb;
-            UINT32 cglow = *glowbuf++;
-
-            UINT32 cr = cglow;
-            UINT32 rh = chere;
-            if(cr>rh) rh=cr;
-            rh >>=16;
-
-            UINT32 gh = (chere>>8) & 0x0ff;
-            UINT32 cg = (cglow>>8) & 0x0ff;
-            if(cg>gh) gh=cg;
-
-            UINT32 bh = (chere) & 0x0ff;
-            UINT32 cb = (cglow) & 0x0ff;
-            if(cb>bh) bh=cb;
-
-            *prgb++=(rh<<16)|(gh<<8)|bh;
-        }
-
-
-    } // y loop
-}
 /* very accurate but slow version 
 void vector_krb_fullglow(void)
 {
@@ -657,6 +549,77 @@ void vector_krb_fullglow2(void)
 
 }
 
+// just horizontal, much simpler
+template<typename ColT,typename TU,int startacc>
+void vector_krb_hglowT(void)
+{
+	if (alloc_glowtemps_later) allocGlowTemp();
+
+    const UINT32 cl=32; // means stock 64 pixels.
+	// 32+32 64 -> div6
+#define hhgdivser 7
+
+    // hpass
+
+    for (INT32 y = vector_ymin; y < vector_ymax; y++)
+    {
+        TU* prgb = ((TU*)vecbitmap->line[y])+vector_xmin;
+        ColAcc acc(startacc);
+
+        TU* glowbuf = (TU *)glowtemp;
+        // accum nextread before screen
+        for (UINT32 x = 0; x < cl; x++)
+        {
+            TU cnext = prgb[x];
+            acc.add(cnext);
+        }
+
+        UINT32 x = 0;
+        // left case, only accum next
+        for (; x < cl; x++)
+        {
+            acc.add(prgb[x+cl]);
+            acc.divtorgb(*glowbuf,hhgdivser);
+            glowbuf++;
+        }
+        // center case,
+        UINT32 xend = (vector_xmax-vector_xmin-cl);
+        for (; x < xend; x++)
+        {
+            acc.add(prgb[x+cl]);
+            acc.sub(prgb[x-cl]);
+            acc.divtorgb(*glowbuf,hhgdivser);
+            glowbuf++;
+
+        }
+        // right case,
+        xend = (vector_xmax-vector_xmin);
+        for (; x < xend; x++)
+        {
+            acc.sub(prgb[x-cl]);
+            acc.divtorgb(*glowbuf,hhgdivser);
+            glowbuf++;
+        }
+
+        // compose line
+        glowbuf = (TU *)glowtemp;
+        ColT *pscreen = ((ColT*)vecbitmap->line[y])+vector_xmin;
+        for (INT32 x = vector_xmin; x < vector_xmax; x++)
+        {
+            // TU chere = *prgb;
+            pscreen->compose(*glowbuf++);
+            pscreen++;
+        }
+
+
+    } // y loop
+}
+void vector_krb_hglow(void)
+{
+    if (Machine->color_depth == 32) vector_krb_hglowT<GlowPix32,UINT32,1>();
+    else if (Machine->color_depth == 15) vector_krb_hglowT<GlowPix15, UINT16,13>();
+
+}
 static inline int vec_multbeam(UINT32 parm2)
 {
     int result;

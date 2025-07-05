@@ -1,7 +1,7 @@
 
  Todo r1.5
 
-
+  O do again icon chibichun menu
   X Appicon support
   X corrected some screen rotation axis on some fliped screen games cases
   O windows overlap OS4 -> no-optim for >v50
@@ -11,13 +11,18 @@
         X +opt_cinematic
         X optim aa
         X re-optim glow
-        O redo clipping
-        O implement full 15b mode
-        O grey vector prefs, improve UI for vector settings
+        X redo clipping
+        X implement full 15b mode
+        O optim , search div64
   O docs for OS4 petunia
   O f1gp wheel+lever
-  O tells about keyb & tab menu on inputs panel
 
+  O integrate: defender
+
+  O MUI:
+      O grey vector prefs, improve UI for vector settings
+	  O tells about keyb & tab menu on inputs panel
+ - - - - --
   O developer notes todo
 
 ------------
