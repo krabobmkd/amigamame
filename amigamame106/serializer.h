@@ -15,6 +15,7 @@ struct ASerializer;
 #define SERFLAG_GROUP_FLAGINT2COLUMS (1<<24)
 #define SERFLAG_GROUP_SCROLLER 4
 #define SERFLAG_GROUP_SUB       8
+#define SERFLAG_GROUP_HASCOMMENT 16
 struct ASerializable {
     ASerializable() {}
     virtual ~ASerializable() {}
@@ -69,6 +70,8 @@ struct ASerializer {
 
     // - - - -rules
     virtual void listenChange(const char *sMemberName,std::function<void(ASerializer &serializer, void *p)> condition) {}
+    virtual void setEnableIfSelected(std::string memberUrl,std::string rule) {};
+    virtual void setComment(std::string memberUrl,std::string comment) {};
     virtual void enable(std::string memberUrl, int enable) {}
     virtual void update(std::string memberUrl) {}
     virtual ASerializable *getObject(std::string memberUrl) { return NULL; }

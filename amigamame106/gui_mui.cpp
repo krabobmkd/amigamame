@@ -620,6 +620,12 @@ static int DriverCompareNames(const struct _game_driver **drv1,const  struct _ga
 {
   return(stricmp((*drv1)->description, (*drv2)->description));
 }
+static int DriverCompareScreenMode(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+    MameConfig &config = getMainConfig();
+    // the resolution mode string versions is cached in the config.
+    return config.DriverCompareScreenMode(drv1,drv2);
+}
 static int DriverCompareNbPlayers(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
   int a = (*drv1)->nbplayers;
@@ -663,7 +669,7 @@ static ULONG DriverSort(
     {
         case 0: return DriverCompareNames(drva,drvb);
         case 1: return DriverCompareNbPlayers(drva,drvb);
-        case 2: return DriverCompareNames(drva,drvb); // screens TODO ?
+        case 2: return DriverCompareScreenMode(drva,drvb); // screens TODO ?
         case 3: return DriverCompareYear(drva,drvb);
         case 4: return DriverCompareArchive(drva,drvb);
         case 5: return DriverCompareParent(drva,drvb);
@@ -1125,6 +1131,7 @@ static ULONG DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG *par
             config.getDriverScreenModestring(ppdrv, screenconf,videoAttribs);
 
             muiConfigCreator.selectGroup("Display.Per Screen Mode",screenconf);
+            muiConfigCreator.selectGroup("Display.Vector Screen",screenconf);
             muiConfigCreator.selectGroup("Display.Per Game",(*ppdrv)->name);
 
             set(ui->BU_Start,  MUIA_Disabled, FALSE);

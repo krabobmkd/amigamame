@@ -1,10 +1,12 @@
 
  Todo r1.5
 
-  O do again icon chibichun menu
+  O the key selction in dynablaster vid mod ecan be full white
+  X driver can sort by screen mode (sort was missing)
+  X do again icon chibichun menu
   X Appicon support
   X corrected some screen rotation axis on some fliped screen games cases
-  O windows overlap OS4 -> no-optim for >v50
+  X windows overlap OS4 -> no-optim for >v50
   O vector games
         X cchasm+starwars
         X rotate bug shiftRotationBits tacscan
@@ -17,11 +19,11 @@
   O docs for OS4 petunia
   O f1gp wheel+lever
 
-  O integrate: defender
+  O integrate: defender (w), super cobra (ko), scramble, galaxian
 
   O MUI:
-      O grey vector prefs, improve UI for vector settings
-	  O tells about keyb & tab menu on inputs panel
+      X grey vector prefs, improve UI for vector settings
+	  X tells about keyb & tab menu on inputs panel
  - - - - --
   O developer notes todo
 

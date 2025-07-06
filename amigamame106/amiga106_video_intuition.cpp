@@ -10,6 +10,7 @@
 #include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
+#include <proto/layers.h>
 #include "version.h"
 #include <string>
 // Amiga
@@ -362,6 +363,13 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
     MameConfig::Misc &configMisc = getMainConfig().misc();
 
     _allowDirectDraw = ((configMisc._Optims & OPTIMFLAGS_DIRECTWGXWIN) != 0);
+    // this optimisation does not work with OS4 layers.library
+    // very specifically, the test to know is window
+    // is partly occluded in Intuition_Window_CGX::draw() does not work.
+    // well OS3 docs tells not to do this.
+    if(LayersBase->lib_Version>=50) { // if OS4 (petunia emulation).
+        _allowDirectDraw = false;
+    }
 }
 Intuition_Window::~Intuition_Window()
 {

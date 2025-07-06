@@ -379,13 +379,16 @@ static void render_ui(mame_bitmap *dest);
 
 
 static struct drawableExtra_Img *_minilogo = NULL;
-static struct drawableExtra_Img *_minilogo2 = NULL;
+static struct drawableExtra_Img *_minilogo_br1 = NULL;
+static struct drawableExtra_Img *_minilogo_br2 = NULL;
 static void deleteLogo()
 {
     if(_minilogo) drawextra_deleteImg(_minilogo);
     _minilogo = NULL;
-    if(_minilogo2) drawextra_deleteImg(_minilogo2);
-    _minilogo2 = NULL;
+    if(_minilogo_br1) drawextra_deleteImg(_minilogo_br1);
+    _minilogo_br1 = NULL;
+    if(_minilogo_br2) drawextra_deleteImg(_minilogo_br2);
+    _minilogo_br2 = NULL;
 }
 /*************************************
  *
@@ -403,7 +406,8 @@ int ui_init(int show_disclaimer, int show_warnings, int show_gameinfo)
     elemlist = auto_malloc(sizeof(render_element)*MAX_RENDER_ELEMENTS);
 
     _minilogo = drawextra_createLogo("minilogo.png");
-    _minilogo2 = drawextra_createLogo("minilogo2.png");
+    _minilogo_br1 = drawextra_createLogo("chibi1.png");
+    _minilogo_br2 = drawextra_createLogo("chibi2.png");
 // printf("_minilogo2:%08x\n",(int)_minilogo2);
 
     //if(_minilogo)
@@ -4263,11 +4267,24 @@ static void render_ui(mame_bitmap *dest)
                             elem->x,elem->y,
                             &_minilogo->_img);
                     }else
-                    {
-                        if(_minilogo2)
+                    {                        
+                        if(_minilogo_br2 && _minilogo_br1)
+                        {
+                            static int c=0;
+                            c++;
+                            struct drawableExtra_Img *pl = (((c>>7)&3)==3)?
+                                    _minilogo_br2:_minilogo_br1;
+
                             drawextra_simpleDraw(dest,
                             elem->x,elem->y,
-                            &_minilogo2->_img);
+                            &pl->_img);
+
+                        } else
+                        if(_minilogo_br1)
+                            drawextra_simpleDraw(dest,
+                            elem->x,elem->y,
+                            &_minilogo_br1->_img);
+
                     }
 
                }

@@ -1220,7 +1220,7 @@ static DRIVER_INIT( bomblord )
 
 
 GAME( 1991, hasamu,   0,        m90,      hasamu,   hasamu,   ROT0, "Irem", "Hasamu (Japan)", GAME_NO_COCKTAIL ,0)
-GAME( 1991, dynablst, 0,        bombrman, dynablst, bombrman, ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL ,0)
+GAME( 1991, dynablst, 0,        bombrman, dynablst, bombrman, ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL ,4)
 GAME( 1991, bombrman, dynablst, bombrman, bombrman, bombrman, ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL ,0)
 GAME( 1991, atompunk, dynablst, bombrman, atompunk, bombrman, ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL ,0)
 GAME( 1991, dynablsb, dynablst, bootleg,  bombrman, 0,        ROT0, "bootleg", "Dynablaster (bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL ,0)

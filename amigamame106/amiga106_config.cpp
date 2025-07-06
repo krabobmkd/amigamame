@@ -276,7 +276,11 @@ void MameConfig::serialize(ASerializer &serializer)
     // defines what is loaded/saved/gui edited.
     serializer("Display",   (ASerializable&)_display,SERFLAG_GROUP_SCROLLER);
     serializer("Audio",     (ASerializable&)_audio,0);
-    serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS);
+    serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS|SERFLAG_GROUP_HASCOMMENT);
+    serializer.setComment("Controls",
+        "Describe what is plugged (Joystick,Pads,Mouses)\n and to which player it belongs.\n"
+        "Keyboard is configured during game with Tab Key menu.");
+
     serializer("Misc",     (ASerializable&)_misc,0);
     serializer("Help",     (ASerializable&)_help,SERFLAG_GROUP_SCROLLER);
 }
@@ -447,13 +451,15 @@ void MameConfig::Display::serialize(ASerializer &serializer)
                "Force Depth 16"
                });
 
-                                 // min,max,step, default
+    // min,max,step, default
     serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
 
     serializer("Per Screen Mode",_perScreenModeS);
     serializer("Per Game",_perGameS);
 
     serializer("Vector Screen",_vector,SERFLAG_GROUP_SUB);
+    serializer.setEnableIfSelected("Vector Screen","vector");
+    serializer.enable("Display.Vector Screen",FALSE);
 }
 MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
 {
@@ -647,25 +653,23 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
     drv->drv(&machine);
     video_attribs = machine.video_attributes;
 
-    int width = machine.screen_width;
-    int height = machine.screen_height;
+    if(video_attribs & VIDEO_TYPE_VECTOR)
+    {
+        screenid = "vector"; // resolution is computed from vector config.
+        return;
+    }
+
+    int width = machine.default_visible_area.max_x - machine.default_visible_area.min_x + 1;
+    int height = machine.default_visible_area.max_y - machine.default_visible_area.min_y + 1;
 
     if(drv->flags & ORIENTATION_SWAP_XY) {
         std::swap(width,height);
     }
-
-  std::stringstream ss;
-  if(video_attribs & VIDEO_TYPE_VECTOR)
-  {
-    ss << "vector";
-  } else
-  {
-      ss <<width<<"x"<<height<<" ";
-      if(machine.video_attributes &VIDEO_RGB_DIRECT) ss<<"15b";
-      else if(machine.total_colors<=256) ss<<"8b";
-      else  ss<<"16b";
-  }
-
+    std::stringstream ss;
+    ss <<width<<"x"<<height<<" ";
+    if(machine.video_attributes &VIDEO_RGB_DIRECT) ss<<"15b";
+    else if(machine.total_colors<=256) ss<<"8b";
+    else  ss<<"16b";
 
     screenid = ss.str();
 }
@@ -782,6 +786,27 @@ void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string
     screenid = _resolutionStrings[idriver];
     video_attribs = _videoAttribs[idriver];
 //    nbp = (int)_players[idriver];
+}
+int MameConfig::DriverCompareScreenMode(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+   int idriver1 = ((int)drv1-(int)&drivers[0])/sizeof(const _game_driver *);
+   int idriver2 = ((int)drv2-(int)&drivers[0])/sizeof(const _game_driver *);
+    if(idriver1<0 || idriver1>=_NumDrivers ||
+        idriver2<0 || idriver2>=_NumDrivers
+    )return 0;
+    string &s1 = _resolutionStrings[idriver1];
+    string &s2 = _resolutionStrings[idriver2];
+    /* works but would take 1 and 1024 close.
+    return strcmp(s1.c_str(),s2.c_str());
+    */
+    // let's sort with: vectors are last
+    if(s1[0]=='v' || s2[0]=='v') {
+      return (int)s2[0] - (int)s1[0];
+    }
+    // then shape is 640x480 nb
+    int width1 = atoi(s1.c_str());
+    int width2 = atoi(s2.c_str());
+    return width2-width1;
 }
 
 

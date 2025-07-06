@@ -32,6 +32,7 @@ static UINT32 *glowtemp,* glowtempv;
 
 static int prev_x1=0, prev_yy1=0, clipbits1=0;
 
+
 void allocGlowTemp()
 {
 	UINT32 nbpixglowtemp = (vector_xmax-vector_xmin) * ((vector_ymax-vector_ymin)+1);

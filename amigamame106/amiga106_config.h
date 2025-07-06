@@ -103,6 +103,7 @@ public:
     // have an optimized version
     void getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs/*, int &nbp*/);
     static void getDriverScreenModestringP(const _game_driver *drv, std::string &screenid,int &video_attribs/*, int *nbPlayers=NULL*/);
+    int DriverCompareScreenMode(const struct _game_driver **drv1,const  struct _game_driver **drv2);
 
     void serialize(ASerializer &serializer) override;
 
