@@ -1,11 +1,15 @@
 
- Vector graphics games are implemented (star wars, star trek, cosmic chasm, battle zone, Tac/Scan,...)
- and have specific configurations.
- corrections for special screen rotation cases that were wrong order,new goodies bitmap in menu
- were crashing a few high resolution (corrected).
- MUI supports dedicated appicon and opening amigaguide from help key.
- driver list can be correctly sorted by screen mode, also useful to sort vector games.
- Documentation updated.
+ - Vector graphics games are implemented (star wars,Asteroid, star trek, cosmic chasm, battle zone, TacScan,(20 games).)
+ - vector screens have specific configurations to finetune resolution, remanance, and
+   surprise: the mandatory hypnoglow effect, specially coded for this version.
+ - corrections for some screen rotation cases.
+ - the recent little bitmaps in menu does not crash on big resolution anymore.
+ - StarWars, Gauntlet and games using the PoKey sound chip get 30% accelerated because
+   it was wrongly configured (in original source). StarWars is absolutely fabulous on pistorm+rpi4.
+
+ - MUI supports dedicated appicon (skin/appicon.info) and amigaguide can be opened from help key.
+ - driver list can now be correctly sorted by screen mode, it's useful to sort vector games.
+ - Amigaguide Documentation updated.
 
  Todo r1.5
   O regenerate amigaguide
@@ -22,7 +26,7 @@
         X re-optim glow
         X redo clipping
         X implement full 15b mode
-        O optim , search div64
+        X optim , search div64 -> was pokey
   X docs for OS4 petunia
   O f1gp, turbo orun wheel+lever
 
