@@ -208,7 +208,7 @@ static const char *mame_default_text[] =
     "Attack","Jump","Magic","Ninja Magic",
     "Fire","Accel","Brake","Center",
 
-    "Select","Rock","Paper","Scissor","Hammer",
+    "Select","Rock","Paper","Scissor","Hammer","Shield",
 	NULL
 };
 

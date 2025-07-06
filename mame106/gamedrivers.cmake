@@ -321,7 +321,7 @@ if(OPT_CAPCOM)
 		HAS_M68000=1 HAS_M6809=1 HAS_PSXCPU=1 HAS_SH2=1 
 		HAS_Z80=1 	)
 endif()
-if(OPT_CINEMAT) 
+if(OPT_CINEMAT)
 	add_compile_definitions(LINK_CINEMAT=1)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/ataxx.c drivers/cinemat.c sndhrdw/cinemat.c vidhrdw/cinemat.c 
@@ -1114,7 +1114,8 @@ if(OPT_MINIATARI)
 		machine/atari_vg.c sndhrdw/atarijsa.c sndhrdw/atarijsa.h drivers/starwars.c 
 		machine/starwars.c sndhrdw/starwars.c drivers/bzone.c sndhrdw/bzone.c 
 		drivers/tempest.c machine/mathbox.h machine/mathbox.c sndhrdw/redbaron.c 
-		drivers/asteroid.c machine/asteroid.c sndhrdw/asteroid.c 	)
+		sndhrdw/llander.c drivers/asteroid.c machine/asteroid.c sndhrdw/asteroid.c 
+		drivers/bwidow.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
 	set(MSND_OKIM6295 ON)

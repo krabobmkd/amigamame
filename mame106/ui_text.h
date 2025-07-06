@@ -212,6 +212,7 @@ enum
     UI_Center, // dunno what it does, used in SCI.
     UI_Select,
     UI_Rock,UI_Paper,UI_Scissor,UI_Hammer,
+    UI_Shield,
 
 	UI_last_mame_entry
 };

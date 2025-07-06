@@ -451,7 +451,9 @@ int patchMiniMachines(
 "bosco","boscoo","boscoo2","boscomd","boscomdo",
 "galaga","galagao","galagamw","galagamk","gallag","gatsbee",
 "xevious","xeviousa","xeviousb","xeviousc","xevios","battles","sxevious",
-"digdug","digdugb","digdugat","digduga1","dzigzag"
+"digdug","digdugb","digdugat","digduga1","dzigzag",
+
+
 });
         m._sources={
             "drivers/galaga.c","vidhrdw/galaga.c",
@@ -568,8 +570,9 @@ int patchMiniMachines(
             "drivers/bzone.c","sndhrdw/bzone.c",
             "drivers/tempest.c",
             "machine/mathbox.h","machine/mathbox.c",
-            "sndhrdw/redbaron.c",
-            "drivers/asteroid.c","machine/asteroid.c","sndhrdw/asteroid.c"
+            "sndhrdw/redbaron.c","sndhrdw/llander.c",
+            "drivers/asteroid.c","machine/asteroid.c","sndhrdw/asteroid.c",
+            "drivers/bwidow.c"
 
 
         };
@@ -604,8 +607,11 @@ int patchMiniMachines(
         //vectors
         "starwars","starwar1","esb",
         "bzone","bzone2","bzonec","bradley","redbaron",
-        "tempest","tempest1","tempest2","tempest3","temptube"
-
+        "tempest","tempest1","tempest2","tempest3","temptube",
+        // vectors bwidow
+        "spacduel","bwidow","gravitar","gravitr2","gravp","lunarbat","lunarba1",
+        // vector asteroids
+        "asteroid","asteroi1","asteroib","asterock","meteorts","astdelux","astdelu1","llander","llander1"
     });
 
         m._cpu_defs["M68010"]=1; // gauntlet + hardwrivin stun runner

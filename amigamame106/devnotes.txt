@@ -1,7 +1,14 @@
 
- Todo r1.5
+ Vector graphics games are implemented (star wars, star trek, cosmic chasm, battle zone, Tac/Scan,...)
+ and have specific configurations.
+ corrections for special screen rotation cases that were wrong order,new goodies bitmap in menu
+ were crashing a few high resolution (corrected).
+ MUI supports dedicated appicon and opening amigaguide from help key.
+ driver list can be correctly sorted by screen mode, also useful to sort vector games.
+ Documentation updated.
 
-  O the key selction in dynablaster vid mod ecan be full white
+ Todo r1.5
+  O regenerate amigaguide
   X driver can sort by screen mode (sort was missing)
   X do again icon chibichun menu
   X Appicon support
@@ -16,17 +23,16 @@
         X redo clipping
         X implement full 15b mode
         O optim , search div64
-  O docs for OS4 petunia
-  O f1gp wheel+lever
+  X docs for OS4 petunia
+  O f1gp, turbo orun wheel+lever
 
-  O integrate: defender (w), super cobra (ko), scramble, galaxian
 
-  O MUI:
+  X MUI:
       X grey vector prefs, improve UI for vector settings
 	  X tells about keyb & tab menu on inputs panel
  - - - - --
   O developer notes todo
-
+  O the key selction in dynablaster vid mod ecan be full white -> not reproduced.
 ------------
 todo R1.3b ->4?
 
