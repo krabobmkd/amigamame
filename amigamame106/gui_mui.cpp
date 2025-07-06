@@ -14,6 +14,7 @@ extern "C" {
 #include <proto/dos.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
+#include <proto/icon.h>
 #include "intuiuncollide.h"
 #include <proto/keymap.h>
 
@@ -49,6 +50,8 @@ extern "C" {
     #include "driver.h"
     #include "mamecore.h"
     #include "version.h"
+
+    extern struct DiskObject *AppDiskObject;
 }
 #include "amiga106_config.h"
 #include "serializer_mui.h"
@@ -1340,12 +1343,21 @@ Object *ins2 = MUINewObject(MUIC_Text,
       WindowContents, (ULONG)objout2, // end group
     TAG_DONE,0);
 
+
+const char *pguidepath =  (SysBase->LibNode.lib_Version>=47)?"PROGDIR:MameMinimixOS32.guide":"PROGDIR:MameMinimix.guide";
+
+ULONG diskObjOrEnd = (AppDiskObject)? MUIA_Application_DiskObject : TAG_DONE;
+
   App = MUINewObject(MUIC_Application,
     MUIA_Application_Title      , (ULONG)APPNAME,
     //MUIA_Application_Version    , (ULONG)("$VER: " APPNAME " (" REVDATE ")"),
     MUIA_Application_Author     , (ULONG)AUTHOR,
     MUIA_Application_Base       , (ULONG)staticGuiAppId,
+    // for appicon
+    MUIA_Application_DiskObject,AppDiskObject,
     SubWindow, (ULONG)AboutWin,
+    MUIA_Application_HelpFile, pguidepath,
+    diskObjOrEnd,AppDiskObject,
   TAG_DONE,0);
 
   if(App)

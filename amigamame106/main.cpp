@@ -37,6 +37,7 @@ extern "C" {
 #include <proto/graphics.h>
 #include <proto/layers.h>
 #include <proto/intuition.h>
+#include <proto/icon.h>
 #include <proto/timer.h>
 #include <proto/misc.h>
 
@@ -89,10 +90,11 @@ struct Library      *LayersBase    = NULL;
 struct Library      *KeymapBase   = NULL;
 struct Library      *UtilityBase  = NULL;
 struct Library      *CyberGfxBase = NULL;
-
+struct Library      *IconBase = NULL;
 // will only work on Amiga Classic and must be optional. Library opened by OpenResource(), not OpenLibrary
 struct Library    *MiscBase=NULL;
 
+struct DiskObject *AppDiskObject = NULL;
 //struct Library      *P96Base = NULL;
 
 }
@@ -124,6 +126,8 @@ int libs_init()
     if(!(KeymapBase = OpenLibrary("keymap.library", 36))) return(1);
     if(!(AslBase = OpenLibrary("asl.library", 36))) return(1);
     if(!(LayersBase = OpenLibrary("layers.library", 39))) return(1);   
+    if(!(IconBase = OpenLibrary("icon.library", 39))) return(1);
+
     InitLowLevelLib();
     // optional:
     CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
@@ -164,11 +168,15 @@ void main_close()
 
     FreeGUI();
 
+    if(AppDiskObject) FreeDiskObject(AppDiskObject);
+
     CloseLowLevelLib();
 
 //    if(P96Base) CloseLibrary(P96Base);
 
     if(CyberGfxBase) CloseLibrary(CyberGfxBase);
+
+    if(IconBase) CloseLibrary(IconBase);
 
     if(KeymapBase) CloseLibrary(KeymapBase);
 
@@ -337,6 +345,9 @@ int main(int argc, char **argv)
         StartGame();
         return 0;
     }
+
+    AppDiskObject = GetDiskObject("skin/AppIcon"); // can be null or not.
+    if(!AppDiskObject) AppDiskObject = GetDiskObjectNew("Mame106"); // can be null or not.
 
     AllocGUI();
 
