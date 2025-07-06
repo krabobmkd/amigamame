@@ -44,7 +44,7 @@ using namespace std;
 
 extern "C" {
 int soundMixerIsOn() {
-    return 0;
+    return 1;
 }
 
 }
@@ -128,6 +128,7 @@ void StartGame(int idriver)
     options.skip_warnings = 1;
     options.use_samples = 1;
     options.pause_bright = 1.0f;
+options.samplerate = 22050;
 
     // vector things
     options.beam = 0x0001c000;               /* vector beam width */
@@ -136,7 +137,7 @@ void StartGame(int idriver)
     options.translucency = 1;  /* 1 to enable translucency on vectors */
     options.antialias = 1;  /* 1 to enable antialias on vectors */
 //    vector_width
-    options.vector_glow = 2;
+    options.vector_glow = 0;
 
     /* Clear the zip filename caches. */
 
@@ -192,8 +193,8 @@ void QProc::process()
     // "sci"
       //"sharrier"
 //      "arkanoid"
-// "starwars"
-"cchasm"
+ "starwars"
+//"cchasm"
 //"startrek"
 //"tacscan"
  //     "othunder"
