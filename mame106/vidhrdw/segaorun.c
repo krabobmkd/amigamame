@@ -137,7 +137,7 @@ VIDEO_UPDATE( shangon )
 }
 // segaic16
 //extern void segaic16_sprites_outrun_draw2( mame_bitmap *bitmap, const rectangle *cliprect);
-
+// also used by toutrun !!
 VIDEO_UPDATE( outrun )
 {
 	/* if no drawing is happening, fill with black and get out */
@@ -176,9 +176,16 @@ VIDEO_UPDATE( outrun )
 	// test a static hud pixel on the screen to check if we're into gameplay:
 	// very accurate because it's not yet color it's sprite private palette index
 	// cliprect->min_y can be not the right value.
-	UINT16 pixval = ((UINT16*) bitmap->line[215])[cliprect->min_x+298];
+	UINT16 pixval_outrun = ((UINT16*) bitmap->line[215])[cliprect->min_x+298];
+	UINT16 pixval_toutrun = ((UINT16*) bitmap->line[12])[cliprect->min_x+110];
+static int n=0;
+n++;
+    if(n==60) {
+    	printf("pixval_turbo:%d\n",pixval_toutrun);
+        n=0;
+	}
 	// 23 in demo mode, 356 music selection screen, 41 play mode .
-    if(pixval == 41)
+    // if(pixval_outrun == 41)
     {
         if(_levergoody)
             drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
