@@ -2,14 +2,10 @@
  - Vector graphics games are implemented (starwars,Asteroid,startrek, cosmic chasm, battle zone, TacScan, (more or less 20 games).
  - vector screens have specific configuration to finetune resolution, remanance,...
  - surprise: a special glow effect for vector Screens, specially coded for MAME Minimix.
- - StarWars, Gauntlet and games using the PoKey sound chip (Atari) got 30% accelerated because
-   of an original source correction.
-
+ - StarWars, Gauntlet, 720, and all games using the "PoKey" sound chip (Atari) got 30% or 40% accelerated
+	because of an original MAME source correction.
  - "Turbo OutRun" and "F1GP Star 1&2" gets the same treatment as outrun and chasehq:
-     input panel has more explicit controls, buton 1 and 2 accelerate and brakes,
-      gear shift and Turbo use button 3 and 4, most of all a wheel and a gear shift are
-      optionnaly display on screen to allow better control with mouse and trackballs.
-
+     input panel with -more explicit controls, a wheel and a gear shift are optionnaly displayed.
  - MUI supports dedicated appicon (skin/appicon.info) and amigaguide can be opened from help key.
  - driver list can now be correctly sorted by screen mode, it's useful to sort vector games.
  - Amigaguide Documentation updated.
