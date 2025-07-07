@@ -1520,14 +1520,13 @@ VIDEO_UPDATE( f1gpstar )
 
 	megasys1_active_layers = megasys1_active_layers1;
 
-
-//TODO	UINT16 pixval = ((UINT16*) bitmap->line[16+11])[0+78-64];
- //printf("pixval:%d\n",(int)pixval);
-//3637c
-  //  if(pixval == 3637)
+    // get a pixel on the layout to check if HUD of ingame screen.
+    UINT16 pixval = ((UINT16*) bitmap->line[46])[109]; // for F1GPStar 2
+    UINT16 pixval2 = ((UINT16*) bitmap->line[44+16])[304-65]; // for F1GPStar 1
+    if(pixval == 664 || pixval2 == 551)
     {
-        if(_levergoody)
-            drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
+         if(_levergoody)
+             drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
         if(_wheelgoody)
             drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]);
     }

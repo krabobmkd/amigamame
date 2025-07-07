@@ -1,15 +1,23 @@
 
- - Vector graphics games are implemented (star wars,Asteroid, star trek, cosmic chasm, battle zone, TacScan,(20 games).)
- - vector screens have specific configurations to finetune resolution, remanance, and
-   surprise: the mandatory hypnoglow effect, specially coded for this version.
- - corrections for some screen rotation cases.
- - the recent little bitmaps in menu does not crash on big resolution anymore.
- - StarWars, Gauntlet and games using the PoKey sound chip get 30% accelerated because
-   it was wrongly configured (in original source). StarWars is absolutely fabulous on pistorm+rpi4.
+ - Vector graphics games are implemented (starwars,Asteroid,startrek, cosmic chasm, battle zone, TacScan, (more or less 20 games).
+ - vector screens have specific configuration to finetune resolution, remanance,...
+ - surprise: a special glow effect for vector Screens, specially coded for MAME Minimix.
+ - StarWars, Gauntlet and games using the PoKey sound chip (Atari) got 30% accelerated because
+   of an original source correction.
+
+ - "Turbo OutRun" and "F1GP Star 1&2" gets the same treatment as outrun and chasehq:
+     input panel has more explicit controls, buton 1 and 2 accelerate and brakes,
+      gear shift and Turbo use button 3 and 4, most of all a wheel and a gear shift are
+      optionnaly display on screen to allow better control with mouse and trackballs.
 
  - MUI supports dedicated appicon (skin/appicon.info) and amigaguide can be opened from help key.
  - driver list can now be correctly sorted by screen mode, it's useful to sort vector games.
  - Amigaguide Documentation updated.
+
+ - corrections for some screen rotation cases.
+ - the little bitmaps recently added in menu does not crash on big resolution anymore.
+
+
 
  Todo r1.5
   O regenerate amigaguide

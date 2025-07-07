@@ -1254,9 +1254,12 @@ INPUT_PORTS_END
 INPUT_PORTS_START( f1gpstar )
 	PORT_START_TAG("IN0")	// Fake input port - Buttons status
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator")\
+    PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE PORT_NAME(ui_getstring(UI_GearShift))
+
+    /*
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")\
-
+*/
 /*  [Country]
     Japan       "race together" in Test Mode, Always Choose Race
                 Japanese, Km/h, "handle shock"  , "(c)1991",
@@ -3205,7 +3208,7 @@ ROM_END
 
 GAME( 1989, bigrun,   0, bigrun,   bigrun,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", GAME_IMPERFECT_GRAPHICS ,1)	// there's a 13th Rallye version (1991)
 GAME( 1990, cischeat, 0, cischeat, cischeat, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1991, f1gpstar, 0, f1gpstar, f1gpstar, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               GAME_IMPERFECT_GRAPHICS ,2)
+GAME( 1991, f1gpstar, 0, f1gpstar, f1gpstar, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star",               GAME_IMPERFECT_GRAPHICS ,2)
 GAME( 1992, armchmp2, 0, armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II",                 GAME_IMPERFECT_GRAPHICS ,0)
 GAME( 1992, wildplt,  0, f1gpstr2, wildplt,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    GAME_IMPERFECT_GRAPHICS ,0)
 GAME( 1993, f1gpstr2, 0, f1gpstr2, f1gpstar, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        GAME_IMPERFECT_GRAPHICS ,0)
