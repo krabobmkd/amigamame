@@ -103,6 +103,7 @@ public:
     // have an optimized version
     void getDriverScreenModestring(const _game_driver **drv, std::string &screenid,int &video_attribs/*, int &nbp*/);
     static void getDriverScreenModestringP(const _game_driver *drv, std::string &screenid,int &video_attribs/*, int *nbPlayers=NULL*/);
+    int DriverCompareScreenMode(const struct _game_driver **drv1,const  struct _game_driver **drv2);
 
     void serialize(ASerializer &serializer) override;
 
@@ -158,6 +159,43 @@ public:
         bool isDefault() override;
         bool _frameSkip = false;
     };
+    enum class VectorResolution :  int
+    {
+        e320x240=0,
+        e400x300,
+        e480x360,
+        e640x480,
+    };
+    enum class GlowMode :  int
+    {
+        None=0,
+        Horizontal,
+        Full,
+    };
+    enum class Remanence :  int
+    {
+        None=0,
+        Low,
+        High,
+    };
+    struct Display_Vector : public ASerializable
+    {
+    public:
+        Display_Vector();
+        void serialize(ASerializer &serializer) override;
+        bool isDefault() override;
+
+        VectorResolution _resolution = VectorResolution::e480x360;
+        GlowMode        _glow = GlowMode::None;
+        Remanence       _remanence=Remanence::Low;
+#define VDISPLAYFLAGS_ANTIALIAS 1
+#define VDISPLAYFLAGS_FORCE32B 2
+        ULONG_FLAGS _flags = VDISPLAYFLAGS_ANTIALIAS;
+
+        float           _intensity=1.0f;
+
+    };
+
     struct Display : public ASerializable
     {
         Display();
@@ -181,6 +219,8 @@ public:
         std::map<std::string,Display_PerGame> _perGame;
         ASerializer::StringMap<Display_PerGame> _perGameS;
         float _color_brightness=1.0f;
+
+        Display_Vector _vector;
 
         friend class MameConfig;
     };

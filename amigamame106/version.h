@@ -4,8 +4,8 @@
 
 #include "mame_ver.h"
 
-#define APPNAMEA  "Mame 0.106 MiniMix 2025 1.4"
+#define APPNAMEA  "Mame 0.106 MiniMix 2025 1.5"
 
-#define APPVERNUM  "a1.4"
+#define APPVERNUM  "a1.5"
 
 #endif

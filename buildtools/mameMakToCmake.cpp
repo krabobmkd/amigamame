@@ -9,8 +9,8 @@
 #include <filesystem>
 using namespace std;
 
-//string sourcebase("../../../mame106/");
-string sourcebase("../mame106/");
+string sourcebase("../../../mame106/");
+//string sourcebase("../mame106/");
 
 class TGameDriver {
     public:
@@ -451,7 +451,9 @@ int patchMiniMachines(
 "bosco","boscoo","boscoo2","boscomd","boscomdo",
 "galaga","galagao","galagamw","galagamk","gallag","gatsbee",
 "xevious","xeviousa","xeviousb","xeviousc","xevios","battles","sxevious",
-"digdug","digdugb","digdugat","digduga1","dzigzag"
+"digdug","digdugb","digdugat","digduga1","dzigzag",
+
+
 });
         m._sources={
             "drivers/galaga.c","vidhrdw/galaga.c",
@@ -561,7 +563,17 @@ int patchMiniMachines(
             "machine/atari_vg.c",
             "machine/atarigen.c",  "machine/atarigen.h",
             "machine/atari_vg.c",
-            "sndhrdw/atarijsa.c","sndhrdw/atarijsa.h"
+            "sndhrdw/atarijsa.c","sndhrdw/atarijsa.h",
+
+            // vectors
+            "drivers/starwars.c","machine/starwars.c", "sndhrdw/starwars.c",
+            "drivers/bzone.c","sndhrdw/bzone.c",
+            "drivers/tempest.c",
+            "machine/mathbox.h","machine/mathbox.c",
+            "sndhrdw/redbaron.c","sndhrdw/llander.c",
+            "drivers/asteroid.c","machine/asteroid.c","sndhrdw/asteroid.c",
+            "drivers/bwidow.c"
+
 
         };
         copyDrivers(m,src,{
@@ -590,7 +602,16 @@ int patchMiniMachines(
         "ssprint","ssprint3","ssprint1","ssprintg",
         "csprint","csprint2","csprintf","csprints","csprintg",
 
-        "apb","apb6","apbg","apbf"
+        "apb","apb6","apbg","apbf",
+
+        //vectors
+        "starwars","starwar1","esb",
+        "bzone","bzone2","bzonec","bradley","redbaron",
+        "tempest","tempest1","tempest2","tempest3","temptube",
+        // vectors bwidow
+        "spacduel","bwidow","gravitar","gravitr2","gravp","lunarbat","lunarba1",
+        // vector asteroids
+        "asteroid","asteroi1","asteroib","asterock","meteorts","astdelux","astdelu1","llander","llander1"
     });
 
         m._cpu_defs["M68010"]=1; // gauntlet + hardwrivin stun runner
@@ -1179,6 +1200,8 @@ int createCmake(map<string,TMachine> machinetargets,
 //        if(upname == "IREM" ) onShouldBeDefault = true;
 //        if(upname == "DATAEAST" ) onShouldBeDefault = true; -> too big/shitty
         if(upname == "MINIDTEA" ) onShouldBeDefault = true;
+
+        if(upname == "CINEMAT" ) onShouldBeDefault = true;
 
         // because Q*BERT ! ->doesnt work
         if(upname == "GOTTLIEB" ) onShouldBeDefault = true;

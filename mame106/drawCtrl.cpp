@@ -10,10 +10,12 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-}
+
 extern pen_t black_pen;
 extern pen_t black_pen;
 extern pen_t white_pen,grey_pen,dblue_pen,blue_pen,yellow_pen,orange_pen,mar1_pen,mar2_pen,red_pen;
+}
+
 struct CommonControlsValues commonControlsValues={0};
 
 static void closePng( png_info *png)
@@ -304,8 +306,13 @@ public:
     Pix *pix(int xx,int yy) {
                 int px = x(xx,yy);
                 int py = y(xx,yy);
+                static int lastpx = px;
+                static int lastpy = py;
+
                 if(py<_cliprect.min_y || py>_cliprect.max_y) return NULL; // means clipped.
-                return ((Pix *)_bitmap->line[py]) +  px ;
+                Pix* p = ((Pix*)_bitmap->line[py]);
+                if (p == NULL) return NULL;
+                return  p +  px ;
             }
     // shitfunction.
     // void getClipx(int xmin,int xmax, int &fminx,int &fmaxx) {
@@ -343,6 +350,7 @@ public:
 template<class BmDst,class Pix,typename T>
 void drawextra_simpleDrawT(BmDst &bmdest,int x, int y,struct extraBitmap &bm )
 {
+
     if( ! bm._png.image) return;
 //    if(y<0) y=0;
 //    int y1 =pix.y1() + y;
@@ -358,7 +366,8 @@ void drawextra_simpleDrawT(BmDst &bmdest,int x, int y,struct extraBitmap &bm )
     for(int yy=0 ; yy<bm._png.height ; yy++)
     {
         T *pw = bmdest.pix(x,y+yy);
-        if(!pw) continue; //clipping
+        if (!pw) continue; //clipping
+
         UINT8 *pr = bm._png.image + (bm._png.rowbytes *2 * yy ); // ->line[y];
 
         for(int xx=0 ; xx<bm._png.width ; xx++)
@@ -377,11 +386,18 @@ void drawextra_simpleDrawT(BmDst &bmdest,int x, int y,struct extraBitmap &bm )
 
 void drawextra_simpleDraw(mame_bitmap *bitmap,int x, int y,struct extraBitmap *bm )
 {
-  const rectangle *cliprect = &Machine->visible_area;
+// for vector games, cliprect is not visible_area
+ // const rectangle *cliprect = &Machine->visible_area;
+    const rectangle *cliprect = &Machine->absolute_visible_area;
+
     UINT32 video_attribs = Machine->drv->video_attributes;
+
     UINT32 flags = Machine->ui_orientation;
     if(video_attribs & VIDEO_RGB_DIRECT)
     {
+        if((video_attribs & VIDEO_TYPE_VECTOR) &&
+                options.vector_force32b) video_attribs |=VIDEO_NEEDS_6BITS_PER_GUN;
+
         if(video_attribs & VIDEO_NEEDS_6BITS_PER_GUN)
         {
             BmDestCoord<UINT32> bmdc(bitmap,cliprect,flags);

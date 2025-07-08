@@ -901,7 +901,9 @@ void artwork_update_video_and_audio(mame_display *display)
 		if (artwork_changed || ui_changed || ui_visible)
 		{
 			display->changed_flags &= ~VECTOR_PIXELS_CHANGED;
+#if USE_DIRTYPIXXELS
 			display->vector_dirty_pixels = NULL;
+#endif
 		}
 	}
 	profiler_mark(PROFILER_END);
@@ -1440,6 +1442,7 @@ static void render_game_bitmap(mame_bitmap *bitmap, const rgb_t *palette, mame_d
 	dstbase = (UINT8 *)final->base + gamerect.min_y * final->rowbytes + gamerect.min_x * sizeof(UINT32);
 
 	/* vector case */
+#if USE_DIRTYPIXXELS
 	if (display->changed_flags & VECTOR_PIXELS_CHANGED)
 	{
 		vector_pixel_t offset = VECTOR_PIXEL(gamerect.min_x, gamerect.min_y);
@@ -1471,9 +1474,10 @@ static void render_game_bitmap(mame_bitmap *bitmap, const rgb_t *palette, mame_d
 			}
 		}
 	}
-
+	else
+#endif
 	/* 1x scale */
-	else if (gamescale == 1)
+	 if (gamescale == 1)
 	{
 		/* 16/15bpp case */
 		if (bitmap->depth != 32)
@@ -1566,6 +1570,7 @@ static void render_game_bitmap_underlay(mame_bitmap *bitmap, const rgb_t *palett
 	undbase = (UINT8 *)underlay->base + gamerect.min_y * underlay->rowbytes + gamerect.min_x * sizeof(UINT32);
 
 	/* vector case */
+#if USE_DIRTYPIXXELS
 	if (display->changed_flags & VECTOR_PIXELS_CHANGED)
 	{
 		vector_pixel_t offset = VECTOR_PIXEL(gamerect.min_x, gamerect.min_y);
@@ -1597,9 +1602,10 @@ static void render_game_bitmap_underlay(mame_bitmap *bitmap, const rgb_t *palett
 			}
 		}
 	}
-
+	else
+#endif
 	/* 1x scale */
-	else if (gamescale == 1)
+	 if (gamescale == 1)
 	{
 		/* 16/15bpp case */
 		if (bitmap->depth != 32)
@@ -1699,6 +1705,7 @@ static void render_game_bitmap_overlay(mame_bitmap *bitmap, const rgb_t *palette
 	overyrgbbase = (UINT8 *)overlay_yrgb->base + gamerect.min_y * overlay_yrgb->rowbytes + gamerect.min_x * sizeof(UINT32);
 
 	/* vector case */
+#if USE_DIRTYPIXXELS
 	if (display->changed_flags & VECTOR_PIXELS_CHANGED)
 	{
 		vector_pixel_t offset = VECTOR_PIXEL(gamerect.min_x, gamerect.min_y);
@@ -1730,9 +1737,10 @@ static void render_game_bitmap_overlay(mame_bitmap *bitmap, const rgb_t *palette
 			}
 		}
 	}
-
-	/* 1x scale */
-	else if (gamescale == 1)
+	else 
+#endif	
+		/* 1x scale */
+	if (gamescale == 1)
 	{
 		/* 16/15bpp case */
 		if (bitmap->depth != 32)
@@ -1840,6 +1848,7 @@ static void render_game_bitmap_underlay_overlay(mame_bitmap *bitmap, const rgb_t
 	overyrgbbase = (UINT8 *)overlay_yrgb->base + gamerect.min_y * overlay_yrgb->rowbytes + gamerect.min_x * sizeof(UINT32);
 
 	/* vector case */
+#if USE_DIRTYPIXXELS
 	if (display->changed_flags & VECTOR_PIXELS_CHANGED)
 	{
 		vector_pixel_t offset = VECTOR_PIXEL(gamerect.min_x, gamerect.min_y);
@@ -1871,9 +1880,10 @@ static void render_game_bitmap_underlay_overlay(mame_bitmap *bitmap, const rgb_t
 			}
 		}
 	}
-
+	else
+#endif
 	/* 1x scale */
-	else if (gamescale == 1)
+	 if (gamescale == 1)
 	{
 		/* 16/15bpp case */
 		if (bitmap->depth != 32)

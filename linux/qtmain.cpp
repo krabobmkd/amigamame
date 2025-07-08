@@ -44,7 +44,7 @@ using namespace std;
 
 extern "C" {
 int soundMixerIsOn() {
-    return 0;
+    return 1;
 }
 
 }
@@ -122,12 +122,23 @@ void StartGame(int idriver)
 
     // done here
 //    if(drivers[idriver])
-options.ui_orientation = uiapplied & ORIENTATION_MASK;  // uiorientation;
-options.skip_disclaimer = 1;
-options.skip_gameinfo = 1;
-options.skip_warnings = 1;
-options.use_samples = 1;
-options.pause_bright = 1.0f;
+    options.ui_orientation = uiapplied & ORIENTATION_MASK;  // uiorientation;
+    options.skip_disclaimer = 1;
+    options.skip_gameinfo = 1;
+    options.skip_warnings = 1;
+    options.use_samples = 1;
+    options.pause_bright = 1.0f;
+options.samplerate = 22050;
+
+    // vector things
+    options.beam = 0x0001c000;               /* vector beam width */
+    options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
+    options.vector_intensity = 1.5f;  /* float vector beam intensity 1.5f defaulty */
+    options.translucency = 1;  /* 1 to enable translucency on vectors */
+    options.antialias = 1;  /* 1 to enable antialias on vectors */
+//    vector_width
+    options.vector_glow = 0;
+
     /* Clear the zip filename caches. */
 
     osd_set_mastervolume(0);
@@ -154,9 +165,11 @@ QThread *qthread = nullptr;
 struct _mame_display *_display=nullptr;
 QImage _image; //(bm.data(), w, h, QImage::Format_RGB888);
 QMutex _imageMutex;
+bool imageok=false;
 bool isinexit=false;
 QMutex m_mutex;
 bool m_bIs15b = false;
+bool m_bIs32b = false;
 int m_nbtest=0;
 QProc::QProc() : QObject()
 {}
@@ -179,7 +192,11 @@ void QProc::process()
      // "cischeat"
     // "sci"
       //"sharrier"
-      "arkanoid"
+//      "arkanoid"
+ "starwars"
+//"cchasm"
+//"startrek"
+//"tacscan"
  //     "othunder"
       // "thndrbld"
       // "chasehq"
@@ -220,7 +237,7 @@ QWin::QWin() : QLabel()
     emit startproc();
     connect(&m_timer,&QTimer::timeout,this,&QWin::updateWin);
     m_timer.setSingleShot(false);
-    m_timer.start(1000/60);
+    m_timer.start(1000/40);
     show();
     setMouseTracking(true);
 
@@ -255,12 +272,28 @@ void QWin::updateWin()
     if(!_display || !_display->game_bitmap ) return;
    // struct _mame_display *display=_display;
 
+    if(imageok)
+    {
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        this->setPixmap(QPixmap::fromImage(_image).scaled(QSize(w*3,h*3)) );
-        this->setFixedSize(w*3,h*3);
+        int izoom = 1;
+    QPixmap qpx = QPixmap::fromImage(_image).scaled(QSize(w * izoom, h * izoom));
     _imageMutex.unlock();
+
+
+
+        static bool resizedone = false;
+        if (!resizedone && w > 0 && h > 0)
+        {
+            this->setFixedSize(w * izoom, h * izoom);
+            resizedone = true;
+        }
+        this->setPixmap(qpx);
+        imageok = false;
+    }
+   // QThread::msleep(40);
+
 
 	//lbl.show();
 //    m_mutex.unlock();
@@ -296,13 +329,20 @@ int osd_create_display(const osd_create_params *params, UINT32 *rgb_components)
 {
     if((params->video_attributes & VIDEO_RGB_DIRECT) && (rgb_components))
     {
-//        rgb_components[0] = 0x00ff0000;
-//        rgb_components[1] = 0x0000ff00;
-//        rgb_components[2] = 0x000000ff;
-        rgb_components[0] = 0x00007c00;
-        rgb_components[1] = 0x000003e0;
-        rgb_components[2] = 0x0000001f;
         m_bIs15b = true;
+        if (params->video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)
+        {
+            rgb_components[0] = 0x00ff0000;
+            rgb_components[1] = 0x0000ff00;
+            rgb_components[2] = 0x000000ff;
+            m_bIs32b = true;
+        }
+        else
+        {
+            rgb_components[0] = 0x00007c00;
+            rgb_components[1] = 0x000003e0;
+            rgb_components[2] = 0x0000001f;
+        }
     }
 
 
@@ -321,18 +361,39 @@ void osd_update_video_and_audio(struct _mame_display *display)
 {
     if(isinexit) return;
     _display = display;
+
+
+
     uint16_t *p = (uint16_t *) _display->game_bitmap->base;
     int x1 = _display->game_visible_area.min_x;
     int y1 = _display->game_visible_area.min_y;
     int realHeight = (_display->game_visible_area.max_y - _display->game_visible_area.min_y)+1;
+    int realWidth = (_display->game_visible_area.max_x - _display->game_visible_area.min_x)+1;
 
-    if(w != _display->game_bitmap->width || h != realHeight)
+    if(w != realWidth || h != realHeight)
     {
-        w = _display->game_bitmap->width;
+        w = realWidth;
         h = realHeight;
-        bm.resize(w*h*3);
+        bm.resize(w*h*4);
     }
 
+    if (m_bIs32b)
+    {
+        for (int y = 0; y < realHeight; y++)
+        {
+            uint32_t* pline = (uint32_t*)display->game_bitmap->line[y + y1];
+            pline += x1;
+            for (int x = 0; x < realWidth; x++)
+            {
+                uint32_t rgb = *pline++;
+
+                int i = (x + y * w) * 3;
+                bm[i] = (rgb >> 16)  & 0xff;
+                bm[i + 1] = (rgb >> 8) & 0xff;
+                bm[i + 2] = (rgb) & 0xff;
+            }
+        }
+    } else
     if(m_bIs15b)
     {
 
@@ -340,7 +401,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
         {
             uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
             pline += x1;
-            for(int x=0;x<_display->game_bitmap->width;x++)
+            for(int x=0;x<realWidth;x++)
             {
                 uint16_t rgb = *pline++;
 
@@ -351,13 +412,13 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
             }
         }
-    } else
+    } 
 
     for(int y=0;y<realHeight;y++)
     {
         uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
         pline += x1;
-        for(int x=0;x<display->game_bitmap->width;x++)
+        for(int x=0;x<realWidth;x++)
         {
             uint16_t c = *pline++;
             uint32_t rgb=0;
@@ -372,13 +433,20 @@ void osd_update_video_and_audio(struct _mame_display *display)
         }
     }
 
+   _imageMutex.lock();
+
 	QImage image(bm.data(), w, h, QImage::Format_RGB888);
-        _imageMutex.lock();
+
         _image = image;
+        imageok = true;
+
     _imageMutex.unlock();
 
           // if(nbframe>300)min0 max255 sens100 delta40 cend40  rev0 res:0
-     //      QThread::msleep(1000/60);
+    //  while(imageok)
+    //  {
+       //  QThread::msleep(40);
+    // }
 
 nbframe++;
     // logo
@@ -460,15 +528,15 @@ int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
 // to open menu
-    if(oscode == 33 && nbframe>3*60)
-    {
-        if(opened==0)
-        {
-            opened=1;
-            return 1;
-        }
-        return 0;
-    }
+    //if(oscode == 33 && nbframe>2*60)
+    //{
+    //    if(opened==0)
+    //    {
+    //        opened=1;
+    //        return 1;
+    //    }
+    //    return 0;
+    //}
     // if(oscode == 35 && nbframe>4*60)
     // {
     //     //if(opened>0)
@@ -484,20 +552,11 @@ INT32 osd_get_code_value(os_code oscode)
 
     //     return (opened>>6)&1;
     // }
-    if(oscode==1024)
-    {
-        return 1<<10;
-/*        static int ttestcount=0;
-        ttestcount++;
-        if(ttestcount &128)
-        {
-            return 1<<10;
-        }else
-        {
-            return -(1<<10);
-        }
-       // return 1*/;
-    }
+
+//    if(oscode==1024)
+//    {
+//        return 1<<10;
+//    }
     return 0;
 }
 int osd_readkey_unicode(int flush)

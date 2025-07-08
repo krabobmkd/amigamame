@@ -203,7 +203,7 @@ VIDEO_START( f1gpstar )
 	if (video_start_cischeat())	return 1;
 
  	megasys1_bits_per_color_code = 4;
-    //initGoodies();
+    initGoodies(128+16,224+8,00);
  	return 0;
 }
 
@@ -497,7 +497,14 @@ READ16_HANDLER( f1gpstar_vregs_r )
 		case 0x000c/2 :	return readinputport(4);	// DSW 3
 
 		case 0x0010/2 :	// Accel + Driving Wheel
-			return (read_accelerator()&0xff) + ((readinputport(5)&0xff)<<8);
+		{
+            // Driving Wheel
+            UINT16 w = (readinputport(5)&0xff);
+            commonControlsValues.analogValues[0] = (int)w;
+
+    		UINT16 v = (read_accelerator()&0xff) + (w<<8);
+			return v;
+		}
 
 		default:		SHOW_READ_ERROR("vreg %04X read!",offset*2);
 						return megasys1_vregs[offset];
@@ -1512,6 +1519,18 @@ VIDEO_UPDATE( f1gpstar )
 
 
 	megasys1_active_layers = megasys1_active_layers1;
+
+    // get a pixel on the layout to check if HUD of ingame screen.
+    UINT16 pixval = ((UINT16*) bitmap->line[46])[109]; // for F1GPStar 2
+    UINT16 pixval2 = ((UINT16*) bitmap->line[44+16])[304-65]; // for F1GPStar 1
+    if(pixval == 664 || pixval2 == 551)
+    {
+         if(_levergoody)
+             drawextra_leverCLUT16(bitmap,cliprect,_levergoody, commonControlsValues._lever);
+        if(_wheelgoody)
+            drawextra_wheelCLUT16(bitmap,cliprect,_wheelgoody, commonControlsValues.analogValues[0]);
+    }
+
 }
 
 

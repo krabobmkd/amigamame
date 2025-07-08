@@ -274,9 +274,13 @@ error:
 void MameConfig::serialize(ASerializer &serializer)
 {
     // defines what is loaded/saved/gui edited.
-    serializer("Display",   (ASerializable&)_display,0);
+    serializer("Display",   (ASerializable&)_display,SERFLAG_GROUP_SCROLLER);
     serializer("Audio",     (ASerializable&)_audio,0);
-    serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS);
+    serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS|SERFLAG_GROUP_HASCOMMENT);
+    serializer.setComment("Controls",
+        "Describe what is plugged (Joystick,Pads,Mouses)\n and to which player it belongs.\n"
+        "Keyboard is configured during game with Tab Key menu.");
+
     serializer("Misc",     (ASerializable&)_misc,0);
     serializer("Help",     (ASerializable&)_help,SERFLAG_GROUP_SCROLLER);
 }
@@ -288,6 +292,13 @@ void MameConfig::toDefault()
     //old_display._color_gamma = 1.0f;
     _display._flags = 0;
     _display._buffering = ScreenBufferMode::Single;
+
+    _display._vector._resolution = VectorResolution::e480x360;
+    _display._vector._glow = GlowMode::None;
+    _display._vector._remanence = Remanence::Low;
+    _display._vector._flags = VDISPLAYFLAGS_ANTIALIAS;
+    _display._vector._intensity = 1.0f;
+    _display._vector._flags = VDISPLAYFLAGS_ANTIALIAS;
 
     _audio._mode = AudioMode::AHI;
     _audio._freq = 22050;
@@ -399,6 +410,30 @@ bool MameConfig::Display_PerGame::isDefault()
     return (!_frameSkip);
 }
 
+// - - - - --
+MameConfig::Display_Vector::Display_Vector() : ASerializable() {
+}
+void MameConfig::Display_Vector::serialize(ASerializer &serializer)
+{
+    serializer("Resolution",(int&)_resolution,{"320x240","400x300","480x360","640x480" });
+    serializer("Glow Mode",(int&)_glow,{"None","Horizontal","Full"});
+    serializer("Remanence",(int&)_remanence,{"None","Low","High"});
+
+    serializer(" ",_flags,VDISPLAYFLAGS_ANTIALIAS,{"Antialias","High Color"});
+     // min,max,step, default
+    serializer("Intensity",_intensity,0.5f,1.5f,0.05f,1.0f);
+
+}
+bool MameConfig::Display_Vector::isDefault()
+{   // will not be written if is default.
+    return (_resolution == VectorResolution::e480x360 &&
+            _glow == GlowMode::None &&
+            _remanence == Remanence::Low &&
+            (_flags == (VDISPLAYFLAGS_ANTIALIAS)) &&
+            _intensity == 1.0f);
+
+}
+
 // - - - - - - -
 MameConfig::Display::Display() : ASerializable()
     ,_perScreenModeS(_perScreenMode)
@@ -416,11 +451,15 @@ void MameConfig::Display::serialize(ASerializer &serializer)
                "Force Depth 16"
                });
 
-                                 // min,max,step, default
+    // min,max,step, default
     serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
 
     serializer("Per Screen Mode",_perScreenModeS);
     serializer("Per Game",_perGameS);
+
+    serializer("Vector Screen",_vector,SERFLAG_GROUP_SUB);
+    serializer.setEnableIfSelected("Vector Screen","vector");
+    serializer.enable("Display.Vector Screen",FALSE);
 }
 MameConfig::Display_PerScreenMode &MameConfig::Display::getActiveMode()
 {
@@ -614,17 +653,23 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
     drv->drv(&machine);
     video_attribs = machine.video_attributes;
 
-    int width = (machine.default_visible_area.max_x - machine.default_visible_area.min_x)+1;
-    int height = (machine.default_visible_area.max_y - machine.default_visible_area.min_y)+1;
+    if(video_attribs & VIDEO_TYPE_VECTOR)
+    {
+        screenid = "vector"; // resolution is computed from vector config.
+        return;
+    }
+
+    int width = machine.default_visible_area.max_x - machine.default_visible_area.min_x + 1;
+    int height = machine.default_visible_area.max_y - machine.default_visible_area.min_y + 1;
+
     if(drv->flags & ORIENTATION_SWAP_XY) {
         std::swap(width,height);
     }
-
-  std::stringstream ss;
-  ss <<width<<"x"<<height<<" ";
-  if(machine.video_attributes &VIDEO_RGB_DIRECT) ss<<"15b";
-  else if(machine.total_colors<=256) ss<<"8b";
-  else  ss<<"16b";
+    std::stringstream ss;
+    ss <<width<<"x"<<height<<" ";
+    if(machine.video_attributes &VIDEO_RGB_DIRECT) ss<<"15b";
+    else if(machine.total_colors<=256) ss<<"8b";
+    else  ss<<"16b";
 
     screenid = ss.str();
 }
@@ -741,6 +786,27 @@ void MameConfig::getDriverScreenModestring(const _game_driver **drv, std::string
     screenid = _resolutionStrings[idriver];
     video_attribs = _videoAttribs[idriver];
 //    nbp = (int)_players[idriver];
+}
+int MameConfig::DriverCompareScreenMode(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+   int idriver1 = ((int)drv1-(int)&drivers[0])/sizeof(const _game_driver *);
+   int idriver2 = ((int)drv2-(int)&drivers[0])/sizeof(const _game_driver *);
+    if(idriver1<0 || idriver1>=_NumDrivers ||
+        idriver2<0 || idriver2>=_NumDrivers
+    )return 0;
+    string &s1 = _resolutionStrings[idriver1];
+    string &s2 = _resolutionStrings[idriver2];
+    /* works but would take 1 and 1024 close.
+    return strcmp(s1.c_str(),s2.c_str());
+    */
+    // let's sort with: vectors are last
+    if(s1[0]=='v' || s2[0]=='v') {
+      return (int)s2[0] - (int)s1[0];
+    }
+    // then shape is 640x480 nb
+    int width1 = atoi(s1.c_str());
+    int width2 = atoi(s2.c_str());
+    return width2-width1;
 }
 
 
@@ -912,6 +978,44 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     options.skip_disclaimer = (_misc._skipflags & 1) != 0;
     options.skip_gameinfo =
     options.skip_warnings = (_misc._skipflags & 2) != 0;
+
+    // vector things
+    Display_Vector &vectorconf = _display._vector;
+
+    // value is pixel line width <<16.
+    switch(vectorconf._resolution)
+    {
+        case VectorResolution::e320x240:
+            options.beam = 0x00012000;
+            options.vector_width = 320;
+            options.vector_height = 240;
+            break;
+        case VectorResolution::e400x300:
+            options.beam = 0x00012000;
+            options.vector_width = 400;
+            options.vector_height = 300;
+            break;
+        default:
+        case VectorResolution::e480x360:
+            options.beam = 0x00014000;
+            options.vector_width = 480;
+            options.vector_height = 360;
+            break;
+        case VectorResolution::e640x480:
+            options.beam = 0x00020000;
+            options.vector_width = 640;
+            options.vector_height = 480;
+            break;
+    }
+    if(options.beam<(1<<16)) options.beam = 1<<16; // or crash !
+
+    options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
+    options.vector_intensity = vectorconf._intensity;  /* float vector beam intensity 1.5f defaulty */
+    options.translucency = 1;  /* 1 to enable translucency on vectors */
+    options.antialias = (int)((vectorconf._flags & VDISPLAYFLAGS_ANTIALIAS)!=0);  /* 1 to enable antialias on vectors */
+    options.vector_remanence = (int)vectorconf._remanence;
+    options.vector_glow = (int)vectorconf._glow;
+    options.vector_force32b = (int)((vectorconf._flags & VDISPLAYFLAGS_FORCE32B)!=0);
 
 #ifdef LINK_NEOGEO
     // if machine points neogeo rom list, then it's neogeo.

@@ -208,6 +208,7 @@ struct _global_options
 //removed because pow() has problems	float	gamma;			/* gamma correction of the display */
 	int		vector_width;	/* requested width for vector games; 0 means default (640) */
 	int		vector_height;	/* requested height for vector games; 0 means default (480) */
+	int     vector_force32b;
 	int		ui_orientation;	/* orientation of the UI relative to the video */
 
 	int		beam;			/* vector beam width */
@@ -215,6 +216,9 @@ struct _global_options
 	float	vector_intensity;/* vector beam intensity */
 	int		translucency;	/* 1 to enable translucency on vectors */
 	int 	antialias;		/* 1 to enable antialiasing on vectors */
+
+    // krb add
+    int     vector_remanence,vector_glow;
 
 	int		use_artwork;	/* bitfield indicating which artwork pieces to use */
 	int		artwork_res;	/* 1 for 1x game scaling, 2 for 2x */

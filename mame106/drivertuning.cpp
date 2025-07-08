@@ -63,7 +63,7 @@ static map<string,sDriverTuning> _tunings={
 	{"batrider",{18*60,DEFMINCPUC,0}},
 
     {"wb32",{9*60,DEFMINCPUC,0}},
-    {"gauntlet",{9*60,DEFMINCPUC,0}},
+    {"gauntlet",{6*60,DEFMINCPUC,0}},
     {"gaunt2",{9*60,DEFMINCPUC,0}},
 
    	{"sgemf",{8*60,DEFMINCPUC,0}},

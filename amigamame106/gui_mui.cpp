@@ -14,6 +14,7 @@ extern "C" {
 #include <proto/dos.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
+#include <proto/icon.h>
 #include "intuiuncollide.h"
 #include <proto/keymap.h>
 
@@ -49,6 +50,8 @@ extern "C" {
     #include "driver.h"
     #include "mamecore.h"
     #include "version.h"
+
+    extern struct DiskObject *AppDiskObject;
 }
 #include "amiga106_config.h"
 #include "serializer_mui.h"
@@ -620,6 +623,12 @@ static int DriverCompareNames(const struct _game_driver **drv1,const  struct _ga
 {
   return(stricmp((*drv1)->description, (*drv2)->description));
 }
+static int DriverCompareScreenMode(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+    MameConfig &config = getMainConfig();
+    // the resolution mode string versions is cached in the config.
+    return config.DriverCompareScreenMode(drv1,drv2);
+}
 static int DriverCompareNbPlayers(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
   int a = (*drv1)->nbplayers;
@@ -663,7 +672,7 @@ static ULONG DriverSort(
     {
         case 0: return DriverCompareNames(drva,drvb);
         case 1: return DriverCompareNbPlayers(drva,drvb);
-        case 2: return DriverCompareNames(drva,drvb); // screens TODO ?
+        case 2: return DriverCompareScreenMode(drva,drvb); // screens TODO ?
         case 3: return DriverCompareYear(drva,drvb);
         case 4: return DriverCompareArchive(drva,drvb);
         case 5: return DriverCompareParent(drva,drvb);
@@ -1125,6 +1134,7 @@ static ULONG DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG *par
             config.getDriverScreenModestring(ppdrv, screenconf,videoAttribs);
 
             muiConfigCreator.selectGroup("Display.Per Screen Mode",screenconf);
+            muiConfigCreator.selectGroup("Display.Vector Screen",screenconf);
             muiConfigCreator.selectGroup("Display.Per Game",(*ppdrv)->name);
 
             set(ui->BU_Start,  MUIA_Disabled, FALSE);
@@ -1333,12 +1343,21 @@ Object *ins2 = MUINewObject(MUIC_Text,
       WindowContents, (ULONG)objout2, // end group
     TAG_DONE,0);
 
+
+const char *pguidepath =  (SysBase->LibNode.lib_Version>=47)?"PROGDIR:MameMinimixOS32.guide":"PROGDIR:MameMinimix.guide";
+
+ULONG diskObjOrEnd = (AppDiskObject)? MUIA_Application_DiskObject : TAG_DONE;
+
   App = MUINewObject(MUIC_Application,
     MUIA_Application_Title      , (ULONG)APPNAME,
     //MUIA_Application_Version    , (ULONG)("$VER: " APPNAME " (" REVDATE ")"),
     MUIA_Application_Author     , (ULONG)AUTHOR,
     MUIA_Application_Base       , (ULONG)staticGuiAppId,
+    // for appicon
+    MUIA_Application_DiskObject,AppDiskObject,
     SubWindow, (ULONG)AboutWin,
+    MUIA_Application_HelpFile, pguidepath,
+    diskObjOrEnd,AppDiskObject,
   TAG_DONE,0);
 
   if(App)

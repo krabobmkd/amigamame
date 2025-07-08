@@ -350,8 +350,8 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
            _ScreenModeId == INVALID_ID)
         {
             struct TagItem cgxtags[]={
-                    CYBRBIDTG_NominalWidth,width,
                     CYBRBIDTG_NominalHeight,height,
+                    CYBRBIDTG_NominalWidth,width,
                     CYBRBIDTG_Depth,depthsToTest[idepth],
                     TAG_DONE,0 };
             _ScreenModeId = BestCModeIDTagList(cgxtags);

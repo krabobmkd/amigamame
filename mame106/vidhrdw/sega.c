@@ -9,7 +9,7 @@
 #include "vector.h"
 #include "includes/sega.h"
 #include <math.h>
-
+#include <stdio.h>
 #define VECTOR_CLOCK		15468480			/* master clock */
 #define U34_CLOCK			(VECTOR_CLOCK/3)	/* clock for interrupt chain */
 #define VCL_CLOCK			(U34_CLOCK/2)		/* clock for vector generator */
@@ -287,11 +287,14 @@ void sega_generate_vector_list(void)
 					{
 						/* if we're just becoming unclipped, add an empty point */
 						if (!newclip)
+						{
 							vector_add_point(adjx, adjy, 0, 0);
-
+						}
 						/* otherwise, add a colored point */
 						else
+						{
 							vector_add_point(adjx, adjy, color, intensity);
+						}
 					}
 					clipped = newclip;
 
@@ -301,7 +304,9 @@ void sega_generate_vector_list(void)
 
 				/* We're done; if we are not clipped, add a final point. */
 				if (!clipped)
+				{
 					vector_add_point(adjx, adjy, color, intensity);
+				}
 
 				/* if the high bit of the attribute is set, we break out of   */
 				/* this loop and fetch another symbol */
