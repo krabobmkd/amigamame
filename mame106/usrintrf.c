@@ -1251,6 +1251,15 @@ static void create_font(void)
 	//		layout.yoffset[i*2+0] = layout.yoffset[i*2+1] = uifontlayout.yoffset[i];
 	//	layout.height *= 2;
 	//}
+	if (uirotwidth >= 420 && uirotheight >= 420)
+	{
+		for (i = 0; i < layout.width; i++)
+			layout.xoffset[i*2+0] = layout.xoffset[i*2+1] = uifontlayout.xoffset[i];
+		layout.width *= 2;
+		for (i = 0; i < layout.height; i++)
+			layout.yoffset[i*2+0] = layout.yoffset[i*2+1] = uifontlayout.yoffset[i];
+		layout.height *= 2;
+	}
 
 	/* apply swappage */
 	if (Machine->ui_orientation & ORIENTATION_SWAP_XY)
