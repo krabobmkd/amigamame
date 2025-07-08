@@ -23,7 +23,8 @@
 #define BB_VTOTAL			288
 
 /* Buggy Boy PCBs could use 8086s or V30s */
-#define BUGGYBOY_CPU_TYPE	I8086
+//orig #define BUGGYBOY_CPU_TYPE	CPU_I8086
+#define BUGGYBOY_CPU_TYPE	I86
 #define BUGGYBOY_ZCLK		7500000
 
 

@@ -5644,10 +5644,12 @@ const game_driver * const drivers[] =
 	DRIVER( zookeep3 ) /* 1982 "Taito America Corporation" "Zoo Keeper (set 3)" */
 #endif
 #ifdef LINK_TATSUMI
-	DRIVER( apache3 ) /* 1988 "Tatsumi" "Apache 3" */
-	DRIVER( buggyb1 ) /* 1986 "Tatsumi" "Buggy Boy (Single Monitor)" */
-	DRIVER( cyclwarr ) /* 1991 "Tatsumi" "Cycle Warriors" */
-	DRIVER( roundup5 ) /* 1989 "Tatsumi" "Round Up 5 - Super Delta Force" */
+	DRIVER(buggybjr)
+		
+	//DRIVER( apache3 ) /* 1988 "Tatsumi" "Apache 3" */
+	//DRIVER( buggyb1 ) /* 1986 "Tatsumi" "Buggy Boy (Single Monitor)" */
+	//DRIVER( cyclwarr ) /* 1991 "Tatsumi" "Cycle Warriors" */
+	//DRIVER( roundup5 ) /* 1989 "Tatsumi" "Round Up 5 - Super Delta Force" */
 #endif
 #ifdef LINK_TCH
 	DRIVER( actionhw ) /* 1995 "TCH" "Action Hollywood" */

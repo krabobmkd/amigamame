@@ -8,7 +8,14 @@
 #include "profiler.h"
 //#include "render.h"
 #include "cpu/i86/i86.h"
+#include "tilemap.h" 
 #include "tx1.h"
+
+/* Macros for accessing bitmap pixels */
+#define BITMAP_ADDR(bitmap, type, y, x)	\
+	((type *)(bitmap)->base + (y) * (bitmap)->rowpixels + (x))
+
+#define BITMAP_ADDR16(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT16, y, x)
 
 #define PRINT_CRTC_DATA 1
 
@@ -582,7 +589,8 @@ PALETTE_INIT( buggyboy )
 		bit4 = BIT(color_prom[i + 0x300], 0);
 		b = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+		//palette_set_color(machine, i, MAKE_RGB(r,g,b));
+		palette_set_color( i,r, g, b);
 	}
 
 	/* Characters use colours 192-255 */
@@ -603,7 +611,8 @@ WRITE16_HANDLER( buggybjr_vram_w )
 	COMBINE_DATA(&buggybjr_vram[offset]);
 }
 
-static TILE_GET_INFO( get_buggyboy_tile_info )
+//static TILE_GET_INFO( get_buggyboy_tile_info )
+static void get_buggyboy_tile_info(int tile_index)
 {
 	int color, tilenum;
 
@@ -1528,19 +1537,26 @@ WRITE16_HANDLER( buggyboy_scolst_w )
 
 VIDEO_START( buggyboy )
 {
-	buggyboy_tilemap = tilemap_create(get_buggyboy_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 128, 64);
+	buggyboy_tilemap = tilemap_create(get_buggyboy_tile_info, tilemap_scan_rows, 
+			/*TILEMAP_TYPE_PEN*/ 
+		TILEMAP_OPAQUE
+		, 8, 8, 128, 64);
 	tilemap_set_transparent_pen(buggyboy_tilemap, 0);
 }
 
 
-
+ 
 VIDEO_UPDATE( buggyboy )
 {
 	/* The video hardware seems to use one large tilemap, scroll it to the right position for each screen */
 	int xscrollamount = screen * 256;
 	tilemap_set_scrollx(buggyboy_tilemap, 0, xscrollamount);
 
-	tilemap_draw(bitmap, cliprect, buggyboy_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	//v106 tilemap_draw( mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority )
+	//v144 tilemap_draw(bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap, UINT32 flags, UINT8 priority)
+
+	//orig. tilemap_draw(bitmap, cliprect, buggyboy_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	tilemap_draw(bitmap, cliprect, buggyboy_tilemap, TILEMAP_OPAQUE, 0);
 	return 0;
 }
 

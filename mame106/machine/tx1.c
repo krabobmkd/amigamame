@@ -1473,10 +1473,19 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
  *  Machine Reset
  *
  *************************************/
+const ppi8255_interface buggyboy_ppi8255_intf;
 MACHINE_RESET( buggybjr )
 {
 	/* TODO */
 	memset(&math, 0, sizeof(math));
+
+//krb move, is in cpu init in v144
+//	MACHINE_RESET(homerun)
+	{
+		ppi8255_init(&buggyboy_ppi8255_intf); // used for inputs
+	//	ppi8255_init(&tx1_ppi8255_intf);
+	}
+
 }
 
 /*************************************
