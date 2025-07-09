@@ -11,6 +11,8 @@
  - Amigaguide Documentation updated.
  - corrections for some screen rotation cases.
  - the little bitmaps recently added in menu does not crash on big resolution anymore.
+ - some colors trashed in 8bit screens corrected. Now >240c <=256c screen will use 16bit screen, because there
+ is more colors in menu. (Should also have been the case when menu was 2 colors)
  - Numberous little corrections here and there.
 
  Todo r1.5
