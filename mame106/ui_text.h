@@ -194,7 +194,7 @@ enum
 	/* refresh rate */
 	UI_refresh_rate,
 	UI_decoding_gfx,
-
+	UI_MappedTo_gfx,
     /*- - - krb Minimix added - - - - */
     // default inputs
     UI_GearShift,
@@ -212,6 +212,7 @@ enum
     UI_Center, // dunno what it does, used in SCI.
     UI_Select,
     UI_Rock,UI_Paper,UI_Scissor,UI_Hammer,
+    UI_Shield,
 
 	UI_last_mame_entry
 };

@@ -379,13 +379,16 @@ static void render_ui(mame_bitmap *dest);
 
 
 static struct drawableExtra_Img *_minilogo = NULL;
-static struct drawableExtra_Img *_minilogo2 = NULL;
+static struct drawableExtra_Img *_minilogo_br1 = NULL;
+static struct drawableExtra_Img *_minilogo_br2 = NULL;
 static void deleteLogo()
 {
     if(_minilogo) drawextra_deleteImg(_minilogo);
     _minilogo = NULL;
-    if(_minilogo2) drawextra_deleteImg(_minilogo2);
-    _minilogo2 = NULL;
+    if(_minilogo_br1) drawextra_deleteImg(_minilogo_br1);
+    _minilogo_br1 = NULL;
+    if(_minilogo_br2) drawextra_deleteImg(_minilogo_br2);
+    _minilogo_br2 = NULL;
 }
 /*************************************
  *
@@ -403,7 +406,8 @@ int ui_init(int show_disclaimer, int show_warnings, int show_gameinfo)
     elemlist = auto_malloc(sizeof(render_element)*MAX_RENDER_ELEMENTS);
 
     _minilogo = drawextra_createLogo("minilogo.png");
-    _minilogo2 = drawextra_createLogo("minilogo2.png");
+    _minilogo_br1 = drawextra_createLogo("chibi1.png");
+    _minilogo_br2 = drawextra_createLogo("chibi2.png");
 // printf("_minilogo2:%08x\n",(int)_minilogo2);
 
     //if(_minilogo)
@@ -1233,16 +1237,25 @@ static void create_font(void)
 		freegfx(uirotfont);
 
 	/* pixel double horizontally */
-	if (uirotwidth >= 420)
+	//if (uirotwidth >= 420)
+	//{
+	//	for (i = 0; i < layout.width; i++)
+	//		layout.xoffset[i*2+0] = layout.xoffset[i*2+1] = uifontlayout.xoffset[i];
+	//	layout.width *= 2;
+	//}
+
+	/* pixel double vertically */
+	//if (uirotheight >= 420)
+	//{
+	//	for (i = 0; i < layout.height; i++)
+	//		layout.yoffset[i*2+0] = layout.yoffset[i*2+1] = uifontlayout.yoffset[i];
+	//	layout.height *= 2;
+	//}
+	if (uirotwidth >= 420 && uirotheight >= 420)
 	{
 		for (i = 0; i < layout.width; i++)
 			layout.xoffset[i*2+0] = layout.xoffset[i*2+1] = uifontlayout.xoffset[i];
 		layout.width *= 2;
-	}
-
-	/* pixel double vertically */
-	if (uirotheight >= 420)
-	{
 		for (i = 0; i < layout.height; i++)
 			layout.yoffset[i*2+0] = layout.yoffset[i*2+1] = uifontlayout.yoffset[i];
 		layout.height *= 2;
@@ -2483,8 +2496,10 @@ static UINT32 menu_tape_control(UINT32 state)
 
 
 
-
-
+#ifdef __AMIGA__
+extern const char *g_pCurrentModeIDName;
+extern unsigned int       g_CurrentScreenModeId;
+#endif
 
 static int sprintf_game_info(char *buf)
 {
@@ -2560,6 +2575,16 @@ static int sprintf_game_info(char *buf)
 				Machine->visible_area.max_y - Machine->visible_area.min_y + 1,
 				(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
 				Machine->refresh_rate);
+// krb amiga
+#ifdef __AMIGA__
+    if(g_pCurrentModeIDName)
+    {
+        bufptr += sprintf(bufptr, "%s:",ui_getstring(UI_MappedTo_gfx) );
+        if(g_CurrentScreenModeId != ~0)  bufptr += sprintf(bufptr, " Mode $%08x",g_CurrentScreenModeId );
+        bufptr += sprintf(bufptr, "\n %s\n",g_pCurrentModeIDName);
+    }
+#endif
+
 	return bufptr - buf;
 }
 
@@ -4263,11 +4288,24 @@ static void render_ui(mame_bitmap *dest)
                             elem->x,elem->y,
                             &_minilogo->_img);
                     }else
-                    {
-                        if(_minilogo2)
+                    {                        
+                        if(_minilogo_br2 && _minilogo_br1)
+                        {
+                            static int c=0;
+                            c++;
+                            struct drawableExtra_Img *pl = (((c>>7)&3)==3)?
+                                    _minilogo_br2:_minilogo_br1;
+
                             drawextra_simpleDraw(dest,
                             elem->x,elem->y,
-                            &_minilogo2->_img);
+                            &pl->_img);
+
+                        } else
+                        if(_minilogo_br1)
+                            drawextra_simpleDraw(dest,
+                            elem->x,elem->y,
+                            &_minilogo_br1->_img);
+
                     }
 
                }
@@ -4286,6 +4324,7 @@ static void render_ui(mame_bitmap *dest)
                 dgp.code = elem->type;
                 if(elem->color == white_pen)
                 {
+                    int midychar = uirotcharheight>>1;
                     // draw shadow
                     if(flipxy)
                     {
@@ -4299,20 +4338,22 @@ static void render_ui(mame_bitmap *dest)
                         dgp.clip = &rc;
 
                         rc.min_x = dgp.sx;
-                        rc.max_x = dgp.sx+4;
+                        rc.max_x = dgp.sx+midychar;
 
                         dgp.color = 1;
                         drawgfx(&dgp);
 
                         // draw down char
-                        rc.min_x = dgp.sx+5;
-                        rc.max_x = dgp.sx+10;
+                        rc.min_x = dgp.sx+midychar+1;
+                        rc.max_x = dgp.sx+uirotcharheight+1;
                         dgp.color = 2;
                         drawgfx(&dgp);
 
                         // end if flipxy
                     } else
-                    { // not flipx
+                    { // not flipxy
+
+
                         dgp.sx--; dgp.sy++;
                         dgp.color = 0;
                         drawgfx(&dgp);
@@ -4323,14 +4364,14 @@ static void render_ui(mame_bitmap *dest)
                         dgp.clip = &rc;
 
                         rc.min_y = dgp.sy;
-                        rc.max_y = dgp.sy+4;
+                        rc.max_y = dgp.sy+midychar;
 
                         dgp.color = 1;
                         drawgfx(&dgp);
 
                         // draw down char
-                        rc.min_y = dgp.sy+5;
-                        rc.max_y = dgp.sy+10;
+                        rc.min_y = dgp.sy+midychar+1;
+                        rc.max_y = dgp.sy+uirotcharheight+1;
                         dgp.color = 2;
                         drawgfx(&dgp);
 

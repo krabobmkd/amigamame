@@ -199,6 +199,9 @@ static const char *mame_default_text[] =
 	"Refresh rate",
 	"Decoding Graphics",
 
+    //krb
+	"Mapped To",
+
     /*- - - krb Minimix added - - - - */
     // default inputs
     "Gear Shift",
@@ -208,7 +211,7 @@ static const char *mame_default_text[] =
     "Attack","Jump","Magic","Ninja Magic",
     "Fire","Accel","Brake","Center",
 
-    "Select","Rock","Paper","Scissor","Hammer",
+    "Select","Rock","Paper","Scissor","Hammer","Shield",
 	NULL
 };
 

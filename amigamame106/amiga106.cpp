@@ -54,17 +54,22 @@ void StartGame(void)
     // silly isn't it ?
     int gameorientation = drivers[idriver]->flags & ORIENTATION_MASK;
 
-    UINT32 uiapplied = 0;
-//    int uiorientation = ROT0;
-    if(gameorientation == ROT90) uiapplied=ROT270;
-    if(gameorientation == ROT270) uiapplied=ROT90;
-    if(gameorientation == ROT180) uiapplied=ROT180;
-    if(gameorientation == ORIENTATION_FLIP_X) uiapplied =ORIENTATION_FLIP_X;
-    if(gameorientation == ORIENTATION_FLIP_Y) uiapplied =ORIENTATION_FLIP_Y;
+    static const UBYTE invrsetransform[8]={
+        0,  // no transform, no transform
+        ORIENTATION_FLIP_X,  // flipx
+        ORIENTATION_FLIP_Y,  // flipy
+        ROT180,  // ROT180
+
+        ORIENTATION_SWAP_XY, // no game known, but obvious.
+        ROT270, // ROT90
+        ROT90, // ROT270
+        ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y|ORIENTATION_SWAP_XY,
+    }; // so basically its 0,1,2,3,4,6,5,7 with just 5 6 inverted
+    UINT32 uiapplied = (UINT32)invrsetransform[gameorientation];
 
     // done here
 //    if(drivers[idriver])
-        options.ui_orientation = uiapplied &ORIENTATION_MASK;  // uiorientation;
+        options.ui_orientation = uiapplied; // &ORIENTATION_MASK;  // uiorientation;
 
     /* Clear the zip filename caches. */
 

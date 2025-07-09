@@ -50,6 +50,8 @@ struct MUISerializer : public ASerializer {
 
     // - - - -rules
     void listenChange(const char *sMemberName,std::function<void(ASerializer &serializer, void *p)> condition) override;
+    void setEnableIfSelected(std::string memberUrl,std::string comment) override;
+    void setComment(std::string memberUrl,std::string rule) override;
     void enable(std::string memberUrl, int enable) override;
     void update(std::string memberUrl) override;
     ASerializable *getObject(std::string memberUrl) override;
@@ -74,15 +76,18 @@ protected:
         struct Level *_pFirstChild;
         struct Level *_pNextBrother;
         virtual void compile() {}
+        virtual void setGroup(const char *pid) {}
         virtual void update();
         Level *getChild(const char *pMemberName);
         // rules to apply at update.
         std::vector<std::function<void(ASerializer &serializer, void *p)>> _rules;
+        std::string _enableIfSelected,_comment;
 	};
     struct LGroup : public Level {
         LGroup(MUISerializer &ser,ASerializable *pconf,int flgs);
         void compile() override;
         void update() override;
+        void setGroup(const char *pid) override;
         virtual Object *compileOuterFrame(Object *pinnerGroup);
         int _flgs;
         // dangerous, keep it to apply rules
@@ -103,7 +108,7 @@ protected:
     struct LSwitchGroup : public LGroup {
         LSwitchGroup(MUISerializer &ser,ASerializable *pconf,int flgs,AStringMap &map);
         Object *compileOuterFrame(Object *pinnerGroup) override;
-        void setGroup(const char *pid);
+        void setGroup(const char *pid) override;
         AStringMap *_map;
         std::string _displayName;
 #ifndef USEGROUPTITLE

@@ -16,7 +16,7 @@ macro(replace_list_item LIST OLD_VALUE NEW_VALUE)
         list(INSERT ${LIST} ${OLD_VALUE_INDEX} ${NEW_VALUE})
     endif()
 endmacro()
-
+ 
 macro(move_list_item LIST NLIST OLD_VALUE )
     list(FIND ${LIST} ${OLD_VALUE} OLD_VALUE_INDEX)
     if(OLD_VALUE_INDEX GREATER_EQUAL 0)
@@ -36,6 +36,8 @@ add_subdirectory(${EXPATPATH} libexpat)
 set(MAME_CORE_SRC
 # chdman.c is an external tool !
 # romcmp.c  is an external tool !
+# jedutil.c  is an external tool !
+#  xml2info.c is an external tool !
  mamelog.cpp
  mamelog.h
  bootlog.h
@@ -46,8 +48,8 @@ set(MAME_CORE_SRC
  artwork.c
    cpuint.c    inptport.c  palette.c   streams_krb.c   video.c
 	cpuintrf.c  input.c     png.c
-	cdrom.c      jedparse.c  timer.c     xml2info.c
-	chd.c      driver.c    jedutil.c   xmlfile.c
+	cdrom.c      jedparse.c  timer.c
+	chd.c      driver.c       xmlfile.c
 	chdcd.c    mame.c      romload.c   ui_text.c
 	  harddisk.c  mamecore.c  sha1.c      unzip.c
 	cheat.c    hash.c      mamedriv.c  sndintrf.c  usrintrf.c
@@ -79,7 +81,7 @@ set(MAME_CORE_SRC
   drawCtrl.cpp
   drawCtrl.h
 	# minimal common driver needs:
-	vidhrdw/generic.c vidhrdw/vector.c
+	vidhrdw/generic.c
 
 	machine/generic.c
 	machine/generic.h
@@ -104,6 +106,8 @@ set(MAME_UNROLL_SRC  drawgfx.c  drawgfxn.cpp
 				 sound_krb.c
 				 sound/wavwrite.c
 				 sound/wavwrite.h
+				 vidhrdw/vector.cpp
+				  vidhrdw/vector.c 
 					)
 
 if(OPT_TAITO)
@@ -114,6 +118,7 @@ if(OPT_SEGA)
 endif()
 # move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/neogeo.c")
 move_list_item(MAME_DRIVERS_SRC MAME_UNROLL_SRC "vidhrdw/segaic16.c")
+
 # ${MAME_CORE_SRC} ${MAME_DRIVERS_SRC} ${MAME_SOUND_SRC} ${MAME_CPU_SRC}
 
 if(AMIGA)

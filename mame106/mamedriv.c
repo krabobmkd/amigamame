@@ -2751,7 +2751,18 @@ const game_driver * const drivers[] =
 	DRIVER( apb6 ) /* 1987 "Atari Games" "APB - All Points Bulletin (rev 6)" */
 	DRIVER( apbf ) /* 1987 "Atari Games" "APB - All Points Bulletin (French)" */
 	DRIVER( apbg ) /* 1987 "Atari Games" "APB - All Points Bulletin (German)" */
+	DRIVER( astdelu1 ) /* 1980 "Atari" "Asteroids Deluxe (rev 1)" */
+	DRIVER( astdelux ) /* 1980 "Atari" "Asteroids Deluxe (rev 2)" */
+	DRIVER( asterock ) /* 1979 "Sidam" "Asterock" */
+	DRIVER( asteroi1 ) /* 1979 "Atari" "Asteroids (rev 1)" */
+	DRIVER( asteroib ) /* 1979 "bootleg" "Asteroids (bootleg on Lunar Lander hardware)" */
+	DRIVER( asteroid ) /* 1979 "Atari" "Asteroids (rev 2)" */
+	DRIVER( bradley ) /* 1980 "Atari" "Bradley Trainer" */
 	DRIVER( bullsdrt ) /* 1985 "Shinkai Inc. (Magic Eletronics Inc. licence)" "Bulls Eye Darts" */
+	DRIVER( bwidow ) /* 1982 "Atari" "Black Widow" */
+	DRIVER( bzone ) /* 1980 "Atari" "Battle Zone (set 1)" */
+	DRIVER( bzone2 ) /* 1980 "Atari" "Battle Zone (set 2)" */
+	DRIVER( bzonec ) /* 1980 "Atari" "Battle Zone (cocktail)" */
 	DRIVER( ccastle2 ) /* 1983 "Atari" "Crystal Castles (version 2)" */
 	DRIVER( ccastle3 ) /* 1983 "Atari" "Crystal Castles (version 3)" */
 	DRIVER( ccastles ) /* 1983 "Atari" "Crystal Castles (version 4)" */
@@ -2763,12 +2774,16 @@ const game_driver * const drivers[] =
 	DRIVER( csprintf ) /* 1986 "Atari Games" "Championship Sprint (French)" */
 	DRIVER( csprintg ) /* 1986 "Atari Games" "Championship Sprint (German */
 	DRIVER( csprints ) /* 1986 "Atari Games" "Championship Sprint (Spanish */
+	DRIVER( esb ) /* 1985 "Atari Games" "The Empire Strikes Back" */
 	DRIVER( gaunt2 ) /* 1986 "Atari Games" "Gauntlet II" */
 	DRIVER( gaunt2g ) /* 1986 "Atari Games" "Gauntlet II (German)" */
 	DRIVER( gauntg ) /* 1985 "Atari Games" "Gauntlet (German */
 	DRIVER( gauntj ) /* 1985 "Atari Games" "Gauntlet (Japanese */
 	DRIVER( gauntlet ) /* 1985 "Atari Games" "Gauntlet (rev 14)" */
 	DRIVER( gaunts ) /* 1985 "Atari Games" "Gauntlet (Spanish */
+	DRIVER( gravitar ) /* 1982 "Atari" "Gravitar (version 3)" */
+	DRIVER( gravitr2 ) /* 1982 "Atari" "Gravitar (version 2)" */
+	DRIVER( gravp ) /* 1982 "Atari" "Gravitar (prototype)" */
 	DRIVER( indytem2 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 2)" */
 	DRIVER( indytem3 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 3)" */
 	DRIVER( indytem4 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 4)" */
@@ -2777,10 +2792,15 @@ const game_driver * const drivers[] =
 	DRIVER( klax ) /* 1989 "Atari Games" "Klax (set 1)" */
 	DRIVER( klaxd ) /* 1989 "Atari Games" "Klax (Germany)" */
 	DRIVER( klaxj ) /* 1989 "Atari Games" "Klax (Japan)" */
+	DRIVER( llander ) /* 1979 "Atari" "Lunar Lander (rev 2)" */
+	DRIVER( llander1 ) /* 1979 "Atari" "Lunar Lander (rev 1)" */
+	DRIVER( lunarba1 ) /* 1982 "Atari" "Lunar Battle (prototype */
+	DRIVER( lunarbat ) /* 1982 "Atari" "Lunar Battle (prototype */
 	DRIVER( marble ) /* 1984 "Atari Games" "Marble Madness (set 1)" */
 	DRIVER( marble2 ) /* 1984 "Atari Games" "Marble Madness (set 2)" */
 	DRIVER( marble3 ) /* 1984 "Atari Games" "Marble Madness (set 3)" */
 	DRIVER( marble4 ) /* 1984 "Atari Games" "Marble Madness (set 4)" */
+	DRIVER( meteorts ) /* 1979 "VGG" "Meteorites" */
 	DRIVER( milliped ) /* 1982 "Atari" "Millipede" */
 	DRIVER( paperboy ) /* 1984 "Atari Games" "Paperboy (rev 3)" */
 	DRIVER( paperbr1 ) /* 1984 "Atari Games" "Paperboy (rev 1)" */
@@ -2789,6 +2809,7 @@ const game_driver * const drivers[] =
 	DRIVER( rampart ) /* 1990 "Atari Games" "Rampart (Trackball)" */
 	DRIVER( rampartj ) /* 1990 "Atari Games" "Rampart (Japan */
 	DRIVER( ramprt2p ) /* 1990 "Atari Games" "Rampart (Joystick)" */
+	DRIVER( redbaron ) /* 1980 "Atari" "Red Baron" */
 	DRIVER( roadblc1 ) /* 1987 "Atari Games" "Road Blasters (cockpit */
 	DRIVER( roadblcg ) /* 1987 "Atari Games" "Road Blasters (cockpit */
 	DRIVER( roadblsc ) /* 1987 "Atari Games" "Road Blasters (cockpit */
@@ -2797,10 +2818,18 @@ const game_driver * const drivers[] =
 	DRIVER( roadrun1 ) /* 1985 "Atari Games" "Road Runner (rev 1)" */
 	DRIVER( roadrun2 ) /* 1985 "Atari Games" "Road Runner (rev 1+)" */
 	DRIVER( roadrunn ) /* 1985 "Atari Games" "Road Runner (rev 2)" */
+	DRIVER( spacduel ) /* 1980 "Atari" "Space Duel" */
 	DRIVER( ssprint ) /* 1986 "Atari Games" "Super Sprint (rev 4)" */
 	DRIVER( ssprint1 ) /* 1986 "Atari Games" "Super Sprint (rev 1)" */
 	DRIVER( ssprint3 ) /* 1986 "Atari Games" "Super Sprint (rev 3)" */
 	DRIVER( ssprintg ) /* 1986 "Atari Games" "Super Sprint (German */
+	DRIVER( starwar1 ) /* 1983 "Atari" "Star Wars (rev 1)" */
+	DRIVER( starwars ) /* 1983 "Atari" "Star Wars (rev 2)" */
+	DRIVER( tempest ) /* 1980 "Atari" "Tempest (rev 3)" */
+	DRIVER( tempest1 ) /* 1980 "Atari" "Tempest (rev 1)" */
+	DRIVER( tempest2 ) /* 1980 "Atari" "Tempest (rev 2)" */
+	DRIVER( tempest3 ) /* 1980 "Atari" "Tempest (rev ?)" */
+	DRIVER( temptube ) /* 1980 "hack" "Tempest Tubes" */
 	DRIVER( vindctr2 ) /* 1988 "Atari Games" "Vindicators Part II (rev 3)" */
 	DRIVER( warlords ) /* 1980 "Atari" "Warlords" */
 #endif
@@ -3699,7 +3728,7 @@ const game_driver * const drivers[] =
 	DRIVER( neocup98 ) /* 1998 "SNK" "Neo-Geo Cup '98 - The Road to the Victory" */
 	DRIVER( neodrift ) /* 1996 "Visco" "Neo Drift Out - New Technology" */
 	DRIVER( neogeo ) /* 1990 "SNK" "Neo-Geo" */
-	DRIVER( neogeo3d ) /* 2012 "Oxygene" "NeoGeo 3D ! - ( W0rld )" */
+	DRIVER( neogeo3d ) /* 2012 "Oxygene" "NeoGeo 3D ! - ( Oxygene */
 	DRIVER( neomrdo ) /* 1996 "Visco" "Neo Mr. Do!" */
 	DRIVER( ninjamas ) /* 1996 "ADK / SNK" "Ninja Master's - haoh-ninpo-cho" */
 	DRIVER( nitd ) /* 2000 "Eleven / Gavaking" "Nightmare in the Dark" */
@@ -3775,7 +3804,7 @@ const game_driver * const drivers[] =
 	DRIVER( turfmast ) /* 1996 "Nazca" "Neo Turf Masters / Big Tournament Golf" */
 	DRIVER( twinspri ) /* 1996 "ADK" "Twinkle Star Sprites" */
 	DRIVER( tws96 ) /* 1996 "Tecmo" "Tecmo World Soccer '96" */
-	DRIVER( vaporous ) /* 2025 "The Twitch Elite" "Vaporous Demo - ( Revision */
+	DRIVER( vaporous ) /* 2025 "The Twitch Elite" "Vaporous Demo - ( TTE */
 	DRIVER( viewpoin ) /* 1992 "Sammy" "Viewpoint" */
 	DRIVER( vliner ) /* 2001 "Dyna / BreezaSoft" "V-Liner (set 1)" */
 	DRIVER( vlinero ) /* 2001 "Dyna / BreezaSoft" "V-Liner (set 2)" */

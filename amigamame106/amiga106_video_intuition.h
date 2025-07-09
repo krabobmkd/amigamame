@@ -33,7 +33,7 @@ public:
     IntuitionDrawable(int flags);
     virtual ~IntuitionDrawable();
     virtual bool open() = 0;
-    virtual void close() {}
+    virtual void close();
     virtual void draw(_mame_display *display) = 0;
     //virtual MsgPort *userPort() = 0;
     virtual Window *window() = 0;
@@ -130,6 +130,12 @@ public:
     Screen *screen() override;
     Window *window() override;
     RastPort *rastPort() override;
+    // may know dimension when opening.
+    void presetBox(int lastx,int lasty,int lastWidth,int lastHeight) {
+        _useLastPosition = 1;
+        _lastx = lastx; _lasty = lasty;
+        _lastWidth = lastWidth; _lastHeight = lastHeight;
+    }
 #ifdef USE_DIRECT_WB_RENDERING
     bool isOnTop();
 #endif
@@ -140,6 +146,10 @@ protected:
     int _maxzoomfactor;
     int _allowDirectDraw;
 
+    // know window geometry before opening
+    // - could be params to open.
+    int _useLastPosition;
+    int _lastx,_lasty,_lastWidth,_lastHeight;
 
 };
 

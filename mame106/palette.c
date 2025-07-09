@@ -813,7 +813,7 @@ int palette_get_total_colors_with_ui(void)
 	if (Machine->drv->video_attributes & VIDEO_HAS_HIGHLIGHTS && !(colormode & DIRECT_RGB))
 		result += Machine->drv->total_colors;
 	if (result <= 65534)
-		result += 2;
+		result += 10;
 	return result;
 }
 

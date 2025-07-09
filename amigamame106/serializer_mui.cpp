@@ -217,6 +217,32 @@ void MUISerializer::listenChange(const char *sMemberName,std::function<void(ASer
         }
     }
 }
+void MUISerializer::setEnableIfSelected(std::string memberUrl,std::string rule)
+{
+    std::list<Level *>::reverse_iterator rit = _stack.rbegin();
+    while(rit != _stack.rend())
+    {
+        Level *pl = *rit++;
+        if(pl && pl->_pMemberName && strcmp(memberUrl.c_str(), pl->_pMemberName)==0) {
+            pl->_enableIfSelected = rule ;
+            break;
+        }
+    }
+}
+
+void MUISerializer::setComment(std::string memberUrl,std::string comment)
+{
+    std::list<Level *>::reverse_iterator rit = _stack.rbegin();
+    while(rit != _stack.rend())
+    {
+        Level *pl = *rit++;
+        if(pl && pl->_pMemberName && strcmp(memberUrl.c_str(), pl->_pMemberName)==0) {
+            pl->_comment = comment ;
+            break;
+        }
+    }
+}
+
 void MUISerializer::enable(std::string memberUrl, int enable)
 {
     Level *p = getByUrl(memberUrl);
@@ -329,7 +355,7 @@ void MUISerializer::selectGroup(std::string groupurl,std::string selection)
         else i=j;
     }
     if(!p) return;
-    LSwitchGroup *pGroup = (LSwitchGroup *)p;
+    LGroup *pGroup = (LGroup *)p;
   //  printf("got from url::%s \n",pGroup->_pMemberName);
     pGroup->setGroup(selection.c_str());
 
@@ -427,6 +453,7 @@ void MUISerializer::LTabs::compile()
         }
         plevel = plevel->_pNextBrother;
     }
+
     tagitems.push_back(TAG_DONE);
 
     _Object = MUI_NewObjectA(MUIC_Register, (struct TagItem *) tagitems.data());
@@ -474,6 +501,8 @@ void MUISerializer::LGroup::compile()
         tagitems.push_back(Child);
         tagitems.push_back((ULONG)Label((ULONG)"-"));
     }
+
+
     tagitems.push_back(TAG_DONE);
 
     Object *InnerGroup = MUI_NewObjectA(MUIC_Group,(struct TagItem *) tagitems.data());
@@ -510,6 +539,46 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
             TAG_DONE);
         return scrollgroup;
     }
+    if(_flgs & SERFLAG_GROUP_SUB)
+    {
+        return MUI_NewObject(MUIC_Group,
+            GroupFrameT((ULONG)""),
+              MUIA_Disabled, TRUE,
+              Child, (ULONG)HVSpace,
+              Child, (ULONG)MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+                                    Child, (ULONG)HSpace(0),
+                                    Child,(ULONG)pinnerGroup,
+                                    Child, (ULONG)HSpace(0),
+                                    TAG_DONE
+                                    ),
+              Child, (ULONG)HVSpace,
+              TAG_DONE
+              );
+    }
+
+/*
+            GroupFrameT((ULONG)_displayName.c_str()),
+            MUIA_Disabled, TRUE,
+*/
+    ULONG lastitem = TAG_DONE;
+    ULONG lastitemp = TAG_DONE;
+    if(_flgs & SERFLAG_GROUP_HASCOMMENT)
+    {
+        Object *commentObj = MUI_NewObject(MUIC_Text,
+                    MUIA_Text_Contents,(ULONG)_comment.c_str(),
+                  TAG_DONE);
+
+        Object *hgroup = MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+                  Child, (ULONG)HSpace(0),
+                  Child, (ULONG)commentObj,
+                  Child, (ULONG)HSpace(0),
+                  TAG_DONE
+                  );
+
+        lastitem = Child;
+        lastitemp = (ULONG)hgroup;
+    }
+
    return MUI_NewObject(MUIC_Group,
                   Child, (ULONG)HVSpace,
                   Child, (ULONG)MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
@@ -519,6 +588,7 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
                                         TAG_DONE
                                         ),
                   Child, (ULONG)HVSpace,
+                  lastitem, lastitemp,
                   TAG_DONE
                   );
 
@@ -532,6 +602,16 @@ void MUISerializer::LGroup::update()
         plevel->update();
         plevel = plevel->_pNextBrother;
     }
+}
+void MUISerializer::LGroup::setGroup(const char *pid)
+{
+    if(!_Object) return;
+    if(_enableIfSelected.length()>0)
+    {
+        int disab = (_enableIfSelected != string(pid) );
+        SetAttrs(_Object, MUIA_Disabled,disab,TAG_DONE);
+    }
+    //update();
 }
 // - - - - - - - - - - - - - - -
 ULONG MUISerializer::LFlags::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))

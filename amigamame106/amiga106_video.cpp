@@ -133,19 +133,38 @@ void ResetWatchTimer()
     GetStartTime = 1;
 }
 
-
-
-
+// get a swapxy/flipx/flipy bits configuration and return rotated versions.
 static ULONG shiftRotationBits(ULONG orientation, int rotationShift)
 {
-    static const int rots[4]={ ROT0,ROT90,ROT180,ROT270};
+    const int nbrots=4;
+    const int nborigconfigs=8;
+    // the killer table !
+    static const UBYTE rots[nborigconfigs][nbrots]={
+        //                                      -> ROT0
+        {ROT0,ROT90,ROT180,ROT270},
+        // ORIENTATION_FLIP_X (used on othunder)->VALIDATED
+        {1,ROT90^2,ORIENTATION_FLIP_Y,ROT270^2},
+        // ORIENTATION_FLIP_Y (used on startrek)->VALIDATED
+        {2,ROT270^2,ROT180^2, ROT90^2},
+        // ORIENTATION_FLIP_X ORIENTATION_FLIP_Y -> ROT180
+        {ROT180,ROT270,ROT0,ROT90},
+
+        // ORIENTATION_SWAP_XY
+        {4,0,ORIENTATION_SWAP_XY,0}, // **** TODO ****   -> no game known ???
+        // ORIENTATION_SWAP_XY ORIENTATION_FLIP_X -> ROT90
+        {ROT90,ROT180,ROT270,ROT0},
+        // ORIENTATION_SWAP_XY ORIENTATION_FLIP_Y -> ROT270
+        {ROT270,ROT0,ROT90,ROT180},
+        // ORIENTATION_SWAP_XY ORIENTATION_FLIP_X ORIENTATION_FLIP_Y
+        // used on: tacscan ->VALIDATED
+        {7,ORIENTATION_FLIP_Y ,ORIENTATION_SWAP_XY ,ORIENTATION_FLIP_X}
+    };
+
     orientation &= ORIENTATION_MASK;
-    int i = 0;
-    if(orientation ==ROT90) i=1;
-     if(orientation ==ROT180) i=2;
-      if(orientation ==ROT270) i=3;
-    i = (i+rotationShift)&3;
-    return rots[i];
+    rotationShift &= 3;
+    ULONG rotated = (ULONG)rots[orientation][rotationShift];
+    return rotated;
+
 }
 
 
@@ -184,24 +203,11 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
 
     MameConfig::Display_PerScreenMode &screenModeConf = config.getActiveMode();
 
-    if((pparams->video_attributes &VIDEO_TYPE_VECTOR)==0) // means not vector,= bitmap
     {
-        // keep the 3 orientation bits
         AbstractDisplay::params params={0};
 
-
-        // if just flip and no rot at start, special case
-        UINT32 startflags = Machine->gamedrv->flags & 7;
-        UINT32 reportFlags = 0;  // swaps that are not rotation must be reported
-        UINT32 actualRotation = 0;
-        if(startflags == ORIENTATION_FLIP_X || startflags == ORIENTATION_FLIP_Y )
-        {
-            reportFlags = startflags;
-            actualRotation = 0;
-        }
+        // get the 3 swapxy/flipx/flipy screen bits, and may apply rotation from config.
         params._flags = shiftRotationBits(Machine->gamedrv->flags,(int)screenModeConf._rotateMode);
-        params._flags ^= reportFlags;
-        params._flags &= ORIENTATION_MASK;
 
         if( screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose
             && screenModeConf._modeid._modeId != INVALID_ID )
