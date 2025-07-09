@@ -668,7 +668,7 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
     std::stringstream ss;
     ss <<width<<"x"<<height<<" ";
     if(machine.video_attributes &VIDEO_RGB_DIRECT) ss<<"15b";
-    else if((machine.total_colors+10)<=256) ss<<"8b"; // +10 for UI colors
+    else if((machine.total_colors)<=256) ss<<"8b"; // +10 for UI colors
     else  ss<<"16b";
 
     screenid = ss.str();
