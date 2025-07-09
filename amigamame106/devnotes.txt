@@ -1,22 +1,25 @@
 
  - Vector graphics games are implemented (starwars,Asteroid,startrek, cosmic chasm, battle zone, TacScan, (more or less 20 games).
  - vector screens have specific configuration to finetune resolution, remanance,...
- - surprise: a special glow effect for vector Screens, specially coded for MAME Minimix.
- - StarWars, Gauntlet, 720, and all games using the "PoKey" sound chip (Atari) got 30% or 40% accelerated
-	because of an original MAME source correction.
+ - .. and surprise: a special glow effect for vector Screens, specially coded for MAME Minimix.
+ - StarWars, Gauntlet, 720 degree, and all games using the "PoKey" sound chip (Atari) got 30% or 40% accelerated.
  - "Turbo OutRun" and "F1GP Star 1&2" gets the same treatment as outrun and chasehq:
-     input panel with -more explicit controls, a wheel and a gear shift are optionnaly displayed.
+     input menu panel with more explicit controls, wheel and gear optionnaly displayed.
  - MUI supports dedicated appicon (skin/appicon.info) and amigaguide can be opened from help key.
- - driver list can now be correctly sorted by screen mode, it's useful to sort vector games.
+ - driver list can now be correctly sorted by screen mode, it's useful to sort vector games. 
+ - In-game menu "Game Information" now tells the actual Intuition Screen Mode found.
  - Amigaguide Documentation updated.
-
  - corrections for some screen rotation cases.
  - the little bitmaps recently added in menu does not crash on big resolution anymore.
-
-
+ - some colors trashed in 8bit screens corrected. Now >240c <=256c screen will use 16bit screen, because there
+ is more colors in menu. (Should also have been the case when menu was 2 colors)
+ - Numberous little corrections here and there.
 
  Todo r1.5
-  O regenerate amigaguide
+  O battlezon check commands
+  O test mischevious atoi() calls.
+  X mapped modeid to screen panel
+  X regenerate amigaguide
   X driver can sort by screen mode (sort was missing)
   X do again icon chibichun menu
   X Appicon support

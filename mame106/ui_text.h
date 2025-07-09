@@ -194,7 +194,7 @@ enum
 	/* refresh rate */
 	UI_refresh_rate,
 	UI_decoding_gfx,
-
+	UI_MappedTo_gfx,
     /*- - - krb Minimix added - - - - */
     // default inputs
     UI_GearShift,

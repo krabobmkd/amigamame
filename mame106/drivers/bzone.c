@@ -559,7 +559,6 @@ static struct CustomSound_interface bzone_custom_interface =
 	bzone_sh_start
 };
 
-
 static struct POKEYinterface redbaron_pokey_interface =
 {
 	{ 0 },
