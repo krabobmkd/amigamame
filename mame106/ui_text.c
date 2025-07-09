@@ -199,6 +199,9 @@ static const char *mame_default_text[] =
 	"Refresh rate",
 	"Decoding Graphics",
 
+    //krb
+	"Mapped To",
+
     /*- - - krb Minimix added - - - - */
     // default inputs
     "Gear Shift",

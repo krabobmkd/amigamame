@@ -36,6 +36,8 @@ add_subdirectory(${EXPATPATH} libexpat)
 set(MAME_CORE_SRC
 # chdman.c is an external tool !
 # romcmp.c  is an external tool !
+# jedutil.c  is an external tool !
+#  xml2info.c is an external tool !
  mamelog.cpp
  mamelog.h
  bootlog.h
@@ -46,8 +48,8 @@ set(MAME_CORE_SRC
  artwork.c
    cpuint.c    inptport.c  palette.c   streams_krb.c   video.c
 	cpuintrf.c  input.c     png.c
-	cdrom.c      jedparse.c  timer.c     xml2info.c
-	chd.c      driver.c    jedutil.c   xmlfile.c
+	cdrom.c      jedparse.c  timer.c
+	chd.c      driver.c       xmlfile.c
 	chdcd.c    mame.c      romload.c   ui_text.c
 	  harddisk.c  mamecore.c  sha1.c      unzip.c
 	cheat.c    hash.c      mamedriv.c  sndintrf.c  usrintrf.c

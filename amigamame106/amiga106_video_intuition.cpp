@@ -189,6 +189,12 @@ Intuition_Screen::Intuition_Screen(const AbstractDisplay::params &params)
 {
 }
 
+extern "C" {
+    const char *g_pCurrentModeIDName=NULL; // points _pCurrentModeIDName, to be used in C.
+    ULONG       g_CurrentScreenModeId=INVALID_ID;
+}
+static std::string _currentModeIdString; // retain _pCurrentModeIDName
+
 bool Intuition_Screen::open()
 {
      if(_pScreenWindow) return true; // already open.
@@ -224,7 +230,6 @@ bool Intuition_Screen::open()
         appliedHeight*=2;
     }
 
-
  	_pScreen = OpenScreenTags( NULL,
 			SA_DisplayID,_ScreenModeId,
                         SA_Title, (ULONG)"MAME", // used as ID by promotion tools and else ?
@@ -238,7 +243,29 @@ bool Intuition_Screen::open()
 			SA_Colors,(ULONG)&colspec[0],
                         0 );
 
-	if( _pScreen == NULL ) return false;
+	if( _pScreen == NULL )
+	{
+        return false;
+	}
+
+    // tells usrint.c what is the screen mode
+    {
+        g_CurrentScreenModeId = _ScreenModeId;
+        _currentModeIdString = "?";
+        g_pCurrentModeIDName = _currentModeIdString.c_str();
+
+        ULONG v;
+        struct NameInfo DisplayNameInfo;
+        v =GetDisplayInfoData(NULL, (UBYTE *) &DisplayNameInfo, sizeof(DisplayNameInfo),
+                             DTAG_NAME, _ScreenModeId);
+        if(v)
+        {
+            _currentModeIdString = (char *)&DisplayNameInfo.Name[0];
+            g_pCurrentModeIDName = _currentModeIdString.c_str();
+        }
+    }
+
+
 
 	// --------- open intuition fullscreen window for this screen:
 
@@ -282,7 +309,12 @@ bool Intuition_Screen::open()
 
     return true;
 }
-
+void IntuitionDrawable::close()
+{
+    g_pCurrentModeIDName = NULL;
+    _currentModeIdString.clear();
+    g_CurrentScreenModeId=INVALID_ID;
+}
 void Intuition_Screen::close()
 {
     IntuitionDrawable::close();
@@ -398,6 +430,12 @@ bool Intuition_Window::open()
             ) return false;
     _widthphys = pWbScreen->Width;
     _heightphys = pWbScreen->Height;
+
+    {
+        _currentModeIdString = "Window";
+        g_pCurrentModeIDName = _currentModeIdString.c_str();
+        g_CurrentScreenModeId=INVALID_ID;
+    }
 
     // window title
     static std::string windowTitle;

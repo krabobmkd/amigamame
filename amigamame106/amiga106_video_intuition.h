@@ -33,7 +33,7 @@ public:
     IntuitionDrawable(int flags);
     virtual ~IntuitionDrawable();
     virtual bool open() = 0;
-    virtual void close() {}
+    virtual void close();
     virtual void draw(_mame_display *display) = 0;
     //virtual MsgPort *userPort() = 0;
     virtual Window *window() = 0;

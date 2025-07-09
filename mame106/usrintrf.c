@@ -2487,8 +2487,10 @@ static UINT32 menu_tape_control(UINT32 state)
 
 
 
-
-
+#ifdef __AMIGA__
+extern const char *g_pCurrentModeIDName;
+extern unsigned int       g_CurrentScreenModeId;
+#endif
 
 static int sprintf_game_info(char *buf)
 {
@@ -2564,6 +2566,16 @@ static int sprintf_game_info(char *buf)
 				Machine->visible_area.max_y - Machine->visible_area.min_y + 1,
 				(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
 				Machine->refresh_rate);
+// krb amiga
+#ifdef __AMIGA__
+    if(g_pCurrentModeIDName)
+    {
+        bufptr += sprintf(bufptr, "%s:",ui_getstring(UI_MappedTo_gfx) );
+        if(g_CurrentScreenModeId != ~0)  bufptr += sprintf(bufptr, " Mode $%08x",g_CurrentScreenModeId );
+        bufptr += sprintf(bufptr, "\n %s\n",g_pCurrentModeIDName);
+    }
+#endif
+
 	return bufptr - buf;
 }
 

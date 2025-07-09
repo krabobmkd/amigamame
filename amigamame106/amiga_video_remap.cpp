@@ -271,14 +271,14 @@ void Paletted_Screen8::updatePaletteRemap(_mame_display *display)
     USHORT nbc = (USHORT)display->game_palette_entries;
     UINT32 *pdirtrybf =	display->game_palette_dirty;
     bool ignominiousColorTrick = false;
-    if(nbc==258)
-    {
-        // ignomous trick to add 2 colors for interface :( (slap fight, ...)
-        ignominiousColorTrick = true;
-        rgb_t *g  =const_cast<rgb_t *>(gpal1);
-        g[1] = 0x00ffffff;
-        nbc = 256;
-    }
+//    if(nbc==256)
+//    {
+//        // ignomous trick to add 2 colors for interface :( (slap fight, ...)
+//        ignominiousColorTrick = true;
+//        rgb_t *g  =const_cast<rgb_t *>(gpal1);
+//        g[1] = 0x00ffffff;
+//        nbc = 256;
+//    }
 
     if(_needFirstRemap)
     {
