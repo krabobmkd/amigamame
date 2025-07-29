@@ -480,7 +480,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
         case IDCMP_CHANGEWINDOW:
             // after system bloqued everything for an amount of time (moving windows,...),
 
-            // need to not upset a timer.
+            // need to not upset a timer when window moves block app.
             extern void ResetWatchTimer();
             ResetWatchTimer();
             break;
@@ -618,6 +618,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
         int prport3_player = configControls._parallelPort_Player[0];
         int prport4_player = configControls._parallelPort_Player[1];
 
+        // bit are hardware regs ((ciaaprb<<8) | ciabpra)
+        // ciaaprb: parallel port data, used as (joy3 RightLeftDownUp, joy4 LeftRightUpDown)
+        // ciabpra:
         UWORD changed = g_pParallelPads->_ppidata->_last_checked_changes;
         const UWORD state = g_pParallelPads->_ppidata->_last_checked;
 
@@ -627,7 +630,10 @@ void UpdateInputs(struct MsgPort *pMsgPort)
             RAWKEY_PORT0_JOY_RIGHT,RAWKEY_PORT0_JOY_LEFT,
             RAWKEY_PORT0_JOY_DOWN,RAWKEY_PORT0_JOY_UP,
         };
+
         static const UWORD prportDirectionsBits[]={0x0800,0x8000};
+        // ciabpra is parralel portcontrol bits, used for joystick buttons.
+        // commodore official SDK defines
         static const UWORD prportFireBits[]={0x0004,0x0001};
 
         for(int iparallelportJoystick=0 ; iparallelportJoystick<2 ; iparallelportJoystick++)
@@ -724,57 +730,57 @@ inline unsigned int nameToMameKeyEnum(std::string &s)
 // strings kept static, more easy and safe to refer.
 static const char * const padsbtnames[4][11]={
     {
-        "PAD0 BLUE",
-        "PAD0 RED",
-        "PAD0 YELLOW",
-        "PAD0 GREEN",
-        "PAD0 FORWARD",
-        "PAD0 REVERSE",
-        "PAD0 PLAY",
-        "PAD0 UP",
-        "PAD0 DOWN",
-        "PAD0 LEFT",
-        "PAD0 RIGHT"
+        "Pad1 Blue",
+        "Pad1 Red",
+        "Pad1 Yellow",
+        "Pad1 Green",
+        "Pad1 Forward",
+        "Pad1 Reverse",
+        "Pad1 Play",
+        "Pad1 UP",
+        "Pad1 DOWN",
+        "Pad1 LEFT",
+        "Pad1 RIGHT"
     },
     {
-        "PAD1 BLUE",
-        "PAD1 RED",
-        "PAD1 YELLOW",
-        "PAD1 GREEN",
-        "PAD1 FORWARD",
-        "PAD1 REVERSE",
-        "PAD1 PLAY",
-        "PAD1 UP",
-        "PAD1 DOWN",
-        "PAD1 LEFT",
-        "PAD1 RIGHT"
+        "Pad2 Blue",
+        "Pad2 Red",
+        "Pad2 Yellow",
+        "Pad2 Green",
+        "Pad2 Forward",
+        "Pad2 Reverse",
+        "Pad2 Play",
+        "Pad2 UP",
+        "Pad2 DOWN",
+        "Pad2 LEFT",
+        "Pad2 RIGHT"
     },
     {
-        "PAD2 BLUE",
-        "PAD2 RED",
-        "PAD2 YELLOW",
-        "PAD2 GREEN",
-        "PAD2 FORWARD",
-        "PAD2 REVERSE",
-        "PAD2 PLAY",
-        "PAD2 UP",
-        "PAD2 DOWN",
-        "PAD2 LEFT",
-        "PAD2 RIGHT"
+        "Pad3 Blue",
+        "Pad3 Red",
+        "Pad3 Yellow",
+        "Pad3 Green",
+        "Pad3 Forward",
+        "Pad3 Reverse",
+        "Pad3 Play",
+        "Pad3 UP",
+        "Pad3 DOWN",
+        "Pad3 LEFT",
+        "Pad3 RIGHT"
     },
     {
-        "PAD3 BLUE",
-        "PAD3 RED",
-        "PAD3 YELLOW",
-        "PAD3 GREEN",
-        "PAD3 FORWARD",
-        "PAD3 REVERSE",
-        "PAD3 PLAY",
-        "PAD3 UP",
-        "PAD3 DOWN",
-        "PAD3 LEFT",
-        "PAD3 RIGHT"
-    }
+        "Pad4 Blue",
+        "Pad4 Red",
+        "Pad4 Yellow",
+        "Pad4 Green",
+        "Pad4 Forward",
+        "Pad4 Reverse",
+        "Pad4 Play",
+        "Pad4 UP",
+        "Pad4 DOWN",
+        "Pad4 LEFT",
+        "Pad4 RIGHT"
+    },
 };
 
 // - - - keyboard keymap management
@@ -876,7 +882,10 @@ void RawKeyMap::init()
             int iplayer = configControls._llPort_Player[iLLPort];
             if(iplayer == 0) continue;
             int itype = configControls._llPort_Type[iLLPort];
-            if(itype == 0) continue; //still not inited
+            //old bug ! if(itype == 0) continue; //still not inited
+            // here we treat only CD32Pads and 1/2Bt joysticks...
+            // do not declare pads if it is mouse !!!
+            if((itype != SJA_TYPE_GAMECTLR) && (itype != SJA_TYPE_JOYSTK) ) continue;
 //            cp controlPort = configControls._PlayerPort[iplayer];
 //            int lowlevelState = (int) configControls._PlayerPortType[iLLPort];
 

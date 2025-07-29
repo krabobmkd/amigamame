@@ -65,7 +65,7 @@ extern struct Library    *MiscBase;
 
 int hasParallelPort()
 {
-    return (MiscBase != NULL);
+    return (MiscBase != NULL); // false on OS4 and not-amiga-classic things...
 }
 
 void closeParallelPads(struct ParallelPads *parpads);

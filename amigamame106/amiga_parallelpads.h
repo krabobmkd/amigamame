@@ -9,14 +9,16 @@ extern "C" {
 #endif
 
 #include <exec/types.h>
+#include <hardware/cia.h>
 
 struct Task;
 struct Interrupt;
 
 struct ParPadsInteruptData {
-    UWORD   _last_cia;
-    UWORD   _last_checked;
-    UWORD   _last_checked_changes;
+    // values written by interuption and read by main thread
+    UWORD   _last_cia; // contains actual parrallel port joystick bits, last value read.
+    UWORD   _last_checked; // contains actual parrallel port joystick bits.
+    UWORD   _last_checked_changes; // xor from last check, 0 if no change.
     UWORD _d;
     // to signal out
     struct Task *_Task;
@@ -24,7 +26,7 @@ struct ParPadsInteruptData {
 
 };
 
-
+// keep what's to open and close.
 struct ParallelPads // : public AParallelPads
 {
     UWORD _parallelResOK;
@@ -40,13 +42,23 @@ struct ParallelPads // : public AParallelPads
     struct ParPadsInteruptData *_ppidata;
 };
 
-
+// some hardware has no parallel port at all (everything not amiga classic).
 int hasParallelPort();
 
 struct ParallelPads *createParallelPads();
 void checkParallelPads();
 //void readParallelPads(struct ParallelPads *parpads);
 void closeParallelPads(struct ParallelPads *parpads);
+/* ciabpra parallel control bits....
+#define CIAF_COMDTR	(1L<<7)     Data Terminal Ready
+#define CIAF_COMRTS	(1L<<6)     Request To send
+#define CIAF_COMCD	(1L<<5)     Carrier Detect
+#define CIAF_COMCTS	(1L<<4)     Clear To send ---> Commodore officialy defined as Joy4 Fire Bt1
+#define CIAF_COMDSR	(1L<<3)     DataSetReady
+#define CIAF_PRTRSEL	(1L<<2)  Select
+#define CIAF_PRTRPOUT	(1L<<1)  Printer Out
+#define CIAF_PRTRBUSY	(1L<<0) Busy        ---> Commodore officialy defined as Joy3 Fire Bt1
+*/
 
 #ifdef __cplusplus
 }

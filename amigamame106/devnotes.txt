@@ -1,4 +1,13 @@
 
+ Todo r1.6
+
+ O Repair bug mouse1-p2 + mouse2-p1
+ O implement analog/proportional amiga joysticks with potgo.h
+ O also implement mouse as analog absolute
+ O defender+joust + atetris
+
+-----------------
+
  - Vector graphics games are implemented (starwars,Asteroid,startrek, cosmic chasm, battle zone, TacScan, (more or less 20 games).
  - vector screens have specific configuration to finetune resolution, remanance,...
  - .. and surprise: a special glow effect for vector Screens, specially coded for MAME Minimix.
@@ -16,7 +25,7 @@
  - Numberous little corrections here and there.
 
  Todo r1.5
-  O battlezon check commands
+  O battlezone check commands
   O test mischevious atoi() calls.
   X mapped modeid to screen panel
   X regenerate amigaguide
@@ -25,7 +34,7 @@
   X Appicon support
   X corrected some screen rotation axis on some fliped screen games cases
   X windows overlap OS4 -> no-optim for >v50
-  O vector games
+  X vector games
         X cchasm+starwars
         X rotate bug shiftRotationBits tacscan
         X +opt_cinematic
@@ -35,7 +44,7 @@
         X implement full 15b mode
         X optim , search div64 -> was pokey
   X docs for OS4 petunia
-  O f1gp, turbo orun wheel+lever
+  X f1gp, turbo orun wheel+lever
 
 
   X MUI:
