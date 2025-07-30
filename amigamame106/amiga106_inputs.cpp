@@ -634,7 +634,11 @@ void UpdateInputs(struct MsgPort *pMsgPort)
         static const UWORD prportDirectionsBits[]={0x0800,0x8000};
         // ciabpra is parralel portcontrol bits, used for joystick buttons.
         // commodore official SDK defines
+//#define CIAF_PRTRSEL	(1L<<2)
+//#define CIAF_PRTRPOUT	(1L<<1)  -> should work ok
+//#define CIAF_PRTRBUSY	(1L<<0)
         static const UWORD prportFireBits[]={0x0004,0x0001};
+        static const UWORD prportFire2Bits[]={0x0002,0x0000};
 
         for(int iparallelportJoystick=0 ; iparallelportJoystick<2 ; iparallelportJoystick++)
         {
@@ -654,6 +658,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 }
                 // fire bt
                 g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+iPlayer_rkshift] =
+                    (BYTE)((prportFireBits[iparallelportJoystick] & state)!=0); // down
+                // r1.6: may have second button on parallel port jstick
+                g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_BLUE+iPlayer_rkshift] =
                     (BYTE)((prportFireBits[iparallelportJoystick] & state)!=0); // down
             }
         }

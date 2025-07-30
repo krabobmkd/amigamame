@@ -245,13 +245,13 @@ public:
     Audio &audio() { return _audio; }
 
 
-    enum class ControlPortPrl :  int
-    {
-        None,
-        Para3,
-        Para4,
-        Para3Bt4
-    };
+//    enum class ControlPortPrl :  int
+//    {
+//        None,
+//        Para3,
+//        Para4,
+//        Para3Bt4
+//    };
 
 
     struct Controls : public ASerializable
@@ -259,7 +259,7 @@ public:
         Controls();
         void serialize(ASerializer &serializer) override;
         int _llPort_Player[4]; // value 1-4
-        int _llPort_Type[4];
+        int _llPort_Type[4];    // LowLevel enum + proportional
         int _parallelPort_Player[2]; // value 1-4
         int _parallel_type[2];
 

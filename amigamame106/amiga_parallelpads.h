@@ -50,13 +50,15 @@ void checkParallelPads();
 //void readParallelPads(struct ParallelPads *parpads);
 void closeParallelPads(struct ParallelPads *parpads);
 /* ciabpra parallel control bits....
+ * nooo these are serial port.
 #define CIAF_COMDTR	(1L<<7)     Data Terminal Ready
 #define CIAF_COMRTS	(1L<<6)     Request To send
 #define CIAF_COMCD	(1L<<5)     Carrier Detect
-#define CIAF_COMCTS	(1L<<4)     Clear To send ---> Commodore officialy defined as Joy4 Fire Bt1
+#define CIAF_COMCTS	(1L<<4)     Clear To send
 #define CIAF_COMDSR	(1L<<3)     DataSetReady
-#define CIAF_PRTRSEL	(1L<<2)  Select
-#define CIAF_PRTRPOUT	(1L<<1)  Printer Out
+
+#define CIAF_PRTRSEL	(1L<<2)  Select ---> Commodore officialy defined as Joy4 Fire Bt1
+#define CIAF_PRTRPOUT	(1L<<1)  Printer Out --> let's say it's Joy3 Bt2. winwin.
 #define CIAF_PRTRBUSY	(1L<<0) Busy        ---> Commodore officialy defined as Joy3 Fire Bt1
 */
 

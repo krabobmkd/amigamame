@@ -483,8 +483,11 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
    //finaly not serializer("Flags",_Flags,1,{"Use Samples"});
 }
 extern "C" {
-     int hasParallelPort();
-}MameConfig::Controls::Controls() : ASerializable() {
+    int hasParallelPort();
+    int hasProportionalStickResource();
+}
+
+MameConfig::Controls::Controls() : ASerializable() {
 }
 
 void MameConfig::Controls::serialize(ASerializer &serializer)
@@ -496,23 +499,32 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         "Player 3",
         "Player 4"
     };
+    // these are the bare lowlevel managed enum types of controllers
     static const vector<string> strLLTypes={
         "None", //"Auto Sense",  now ask explicit config.
         "CD32 7bt Pad",
         "Mouse",
-        "Joystick(2bt)",
+        "Joystick(2bt)"
     };
-    static const vector<string> strPrlTypes={
+    // this is the same, plus proportional analog controllers not managed by LL.
+    // also Amiga Prop.Stick and C64/Atari 8bits paddles are same, but with potentiometer X/Y inverted.
+    static const vector<string> strLLTypesPlusProp={
         "None",
-        "Joystick(1bt)",
+        "CD32 7bt Pad",
+        "Mouse",
+        "Joystick(2bt)",
+        "Analog Joystick(2bt)",
+        "C64/Atari Paddles(2bt)"
     };
+
+
+    int hasPots = hasProportionalStickResource(); // some not-classic hardware will not.
 
     serializer("Mouse Port 1", (int&)_llPort_Player[0],strPlayers);
-    serializer("Types P1", (int&)_llPort_Type[0],strLLTypes);
+    serializer("Types P1", (int&)_llPort_Type[0],(hasPots)?strLLTypesPlusProp:strLLTypes);
 
     serializer("Joy Port 2", (int&)_llPort_Player[1],strPlayers);
-    serializer("Types P2", (int&)_llPort_Type[1],strLLTypes);
-
+    serializer("Types P2", (int&)_llPort_Type[1],(hasPots)?strLLTypesPlusProp:strLLTypes);
 
     serializer("Lowlevel Port 3", (int&)_llPort_Player[2],strPlayers);
     serializer("Types P3", (int&)_llPort_Type[2],strLLTypes);
@@ -522,8 +534,13 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
 
     // - - - -
 
-    if(hasParallelPort())
+    if(hasParallelPort())  // some not-classic hardware will not.
     {
+        static const vector<string> strPrlTypes={
+            "None",
+            "Joystick(1or2 bt)",
+        };
+
         serializer("Parallel Port 3", (int&)_parallelPort_Player[0],strPlayers);
         serializer("Types Pr3", (int&)_parallel_type[0],strPrlTypes);
         serializer("Parallel Port 4", (int&)_parallelPort_Player[1],strPlayers);

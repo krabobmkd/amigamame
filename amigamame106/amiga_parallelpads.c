@@ -183,7 +183,7 @@ struct ParallelPads *createParallelPads()
         // the parallel port, and all the lines we want to use are
         // set up.
     //Enable();
-    // - - - - -
+    // - - - - - alloc signal so interuption send change notification to main process.
     pparpads->_signr = signr = AllocSignal(-1);
     if(signr == -1) goto error;
 
