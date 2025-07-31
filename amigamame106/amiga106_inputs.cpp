@@ -18,7 +18,7 @@
 #include <proto/lowlevel.h>
 #include <proto/keymap.h>
 #include <proto/alib.h>
-
+#include "mamelog.h"
 #include "intuiuncollide.h"
 
 extern "C" {
@@ -327,7 +327,7 @@ void ConfigureLowLevelLib()
 
         if(result != PROPJOYRET_OK)
         {
-
+            logerror(getProportionalStickErrorMessage(result));
             /*
 #define PROPJOYRET_OK 0
 #define PROPJOYRET_NOHARDWARE 1

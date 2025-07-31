@@ -134,7 +134,7 @@ static inline ULONG getProportionalStickValues(struct ProportionalSticks *prop,U
 
     return (ULONG)v;
 }
-const char *getProportionalStickErrorMessage(ULONG errcode)
+static inline const char *getProportionalStickErrorMessage(ULONG errcode)
 {
     if(errcode == PROPJOYRET_NOHARDWARE) return "Harware is not proportionnal joystick capable";
     if(errcode == PROPJOYRET_ALLOC) return "prop. joystick: can't alloc";

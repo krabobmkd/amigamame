@@ -76,7 +76,6 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG *preturnc
 printf("createProportionalSticks:%08x\n",flags);
     if((flags &3)==0) return NULL; // need port1 or/and port2
 
-printf("create PJSTCK\n");
     initPotgoIfNotDone();
 
     if(PotgoBase == NULL) {
@@ -106,15 +105,16 @@ printf("create PJSTCK\n");
     AddPort(&(pprops->_gameportPort));
     pprops->_portAdded = 1;
 
-    int portmask = PROPJOYFLAGS_PORT1;
-    for(int iportunit=0 ;iportunit<2 ; iportunit++)
+    for(int iportunit=0 ;iportunit<2 ; iportunit++ )
     {
+        int portmask = PROPJOYFLAGS_PORT1<<iportunit;
+printf("portmask:%d flag:%d\n",portmask,flags);
         if((flags & portmask)!=0)
         {
             // - - -- - - - -allocjoyport - - - - -
             struct PStickDevice *ppsd = &(pprops->_ports[iportunit]);
                // OpenDevice( CONST_STRPTR devName, ULONG unit, struct IORequest *ioRequest, ULONG flags );
-
+printf("OpenDevice:%d\n",iportunit);
             BYTE res = OpenDevice("gameport.device",
                             iportunit,
                             &(ppsd->_gameportIOReq),0);
@@ -134,6 +134,7 @@ printf("create PJSTCK\n");
                 /*BYTE resdoio =*/ DoIO(&(ppsd->_gameportIOReq));
                 if(ppsd->_portType != GPCT_NOCONTROLLER) // GPCT_NOCONTROLLER 0
                 {
+                  printf("device state:%d\n",ppsd->_portType);
                     Permit();
                     ppsd->_deviceresult = 1;
                     continue;
@@ -153,7 +154,7 @@ printf("create PJSTCK\n");
             // - - --  -- end allocjoyport - - - - --
 
         } // end if open one device unit
-        portmask<<=1; // -> PROPJOYFLAGS_PORT2
+
     }
     // here if both ports are !=0 means total fail.
     if(pprops->_ports[0]._deviceresult != 0 &&
