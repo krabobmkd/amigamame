@@ -34,7 +34,7 @@ https://github.com/niklasekstrom/amiga-par-to-spi-adapter/blob/master/spi-lib/sp
 
 
 #ifdef USE_CIA_INTERUPT
-#include "proto/cia.h"
+#include <proto/cia.h>
 struct Library *ciaabase=NULL;
 #endif
 
@@ -48,8 +48,8 @@ struct Library *ciaabase=NULL;
 
 //#define USE_CIA_INTERUPT 1
 
-
-static struct Interrupt flag_interrupt;
+//olde test thing
+//static struct Interrupt flag_interrupt;
 
 // - - - - -
 
