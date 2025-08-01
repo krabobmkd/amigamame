@@ -43,19 +43,19 @@ struct PPSticksInteruptData {
 
 // this should be public to be configured.
 // could be used
-//struct ProportionalStickCalibration
-//{
-//    LONG _xstart,_xcenter,_xend;
-//    LONG _ystart,_ycenter,_yend;
-//};
+struct PropStickCalibration
+{
+    WORD _xmin,_xmax,_xcenter;
+    WORD _ymin,_ymax,_ycenter;
+};
 
 // internal use
 struct PStickDevice {
     struct IOStdReq _gameportIOReq;
     UBYTE _deviceresult;
     UBYTE _portType;
+    WORD _d;
 
-   // struct ProportionalStickCalibration _calibration;
 };
 
 // keep what's to open and close. internal use
@@ -72,8 +72,9 @@ struct ProportionalSticks
     UWORD _allocatedBits;
 
     struct PStickDevice _ports[2];
-
+    struct PropStickCalibration _calibration[2];
     APTR _potgobase;
+
 
     // - - - -
 //    BYTE _signr;
@@ -104,8 +105,11 @@ int hasProportionalStickResource();
 #define PROPJOYRET_NOANALOGPINS 5
 //#define PROPJOYRET_NOSIGNAL 6
 
+typedef void (*PPStickInitLogFunc)(int elevel,const char *pMessage);
+
 // public. use that.  PROPJOYFLAGS_PORT1|PROPJOYFLAGS_PORT2 for both ports.
-struct ProportionalSticks *createProportionalSticks(ULONG flag, ULONG *preturncode);
+// preturncode and logFunc can be null.
+struct ProportionalSticks *createProportionalSticks(ULONG flag, ULONG *preturncode, PPStickInitLogFunc logFunc);
 
 void closeProportionalSticks(struct ProportionalSticks *prop);
 

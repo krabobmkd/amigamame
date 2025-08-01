@@ -421,7 +421,7 @@ void MameConfig::Display_Vector::serialize(ASerializer &serializer)
 
     serializer(" ",_flags,VDISPLAYFLAGS_ANTIALIAS,{"Antialias","High Color"});
      // min,max,step, default
-    serializer("Intensity",_intensity,0.5f,1.5f,0.05f,1.0f);
+   serializer("Intensity",_intensity,0.5f,1.5f,0.05f,1.0f);
 
 }
 bool MameConfig::Display_Vector::isDefault()

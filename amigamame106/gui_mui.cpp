@@ -466,7 +466,7 @@ int MameUI::MainGUI(void)
 
                         UpdateUIToConfig();
 
-                    log_setCallback(muilog);
+                    log_addCallback(muilog);
 
                     //        printf("after UpdateUIToConfig\n");
 

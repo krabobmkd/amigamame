@@ -323,7 +323,7 @@ void ConfigureLowLevelLib()
     if(!g_PropsSticks && propJoysticksFlags != 0)
     {
         ULONG result=PROPJOYRET_OK;
-        g_PropsSticks = createProportionalSticks(propJoysticksFlags,&result); // could fail.
+        g_PropsSticks = createProportionalSticks(propJoysticksFlags,&result,loginfo2); // could fail.
 
         if(result != PROPJOYRET_OK)
         {

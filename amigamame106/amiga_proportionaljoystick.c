@@ -71,7 +71,7 @@ static void interuptfunc( register struct PPSticksInteruptData *ppi __asm("a1") 
 
 }
 
-struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG *preturncode)
+struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG *preturncode, PPStickInitLogFunc logFunc)
 {
 printf("createProportionalSticks:%08x\n",flags);
     if((flags &3)==0) return NULL; // need port1 or/and port2
@@ -208,13 +208,15 @@ printf("OpenDevice:%d\n",iportunit);
 printf("try allocate bits:%08x\n",(int)potsBitsToAlloc);
     pprops->_allocatedBits = AllocPotBits(potsBitsToAlloc); // #0b0101 0000 00000001
 
-printf("allcoateed bits:%08x\n",(int)pprops->_allocatedBits);
+printf("allocated bits:%08x\n",(int)pprops->_allocatedBits);
     if(pprops->_allocatedBits != potsBitsToAlloc)
     {
-        //error
-        closeProportionalSticks(pprops);
-        if(preturncode) *preturncode = PROPJOYRET_NOANALOGPINS;
-        return NULL;
+        if(logFunc) logFunc(1,"Analog Pins allocated on LL side.");
+        //error -> no warning.
+
+//        closeProportionalSticks(pprops);
+//        if(preturncode) *preturncode = PROPJOYRET_NOANALOGPINS;
+//        return NULL;
     }
     // note: it's to allow further calls to WritePotgo()
 

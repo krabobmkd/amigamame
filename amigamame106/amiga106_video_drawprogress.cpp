@@ -7,6 +7,8 @@
 #include <proto/diskfont.h>
 
 #include <stdio.h>
+#include <string>
+#include "mamelog.h"
 //
 extern "C" {
 static const unsigned char tlogomamebm[(128/8)*36]={
@@ -30,6 +32,13 @@ static const unsigned char tlogomamebm[(128/8)*36]={
     0,0,1,255,128,0,0,0,0,0,0,0,0,0,0,0,0,0,3,255,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
+}
+
+static std::string lastmessage;
+static void logmess(int el,const char *pmess)
+{
+    while(*pmess == ' ' || *pmess == '\t') pmess++;
+    lastmessage = pmess;
 }
 
 IntuiBufferedDrawing::IntuiBufferedDrawing()
@@ -167,7 +176,12 @@ IntuiProgressBar::~IntuiProgressBar()
 }
 void IntuiProgressBar::drawProgress(int per256, int enm)
 {
-
+    static int logison=0;
+    if(logison == 0)
+    {
+        log_addCallback(&logmess);
+        logison = 1;
+    }
     Window *win = _drawable->window();
     if(!win) return;
 
@@ -207,6 +221,8 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         // means final pass before game screen , must clean again and quit.
         SetAPen(rp,blackpen); // that time 0, not blackpen, for the case of galaga 0 white
         RectFill(rp,0,0,w,h);
+        log_removeCallback(&logmess);
+        logison = 0;
         return;
     }
     // - - - - our quick solution to avoid draw glitch
@@ -217,7 +233,7 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
 
     // this set or reuse the temp bitmap
     int dry1 = y1-37+10; // top of logo
-    int dry2 = y2+8; // down of text
+    int dry2 = y2+8+9; // down of text -> 2 lines now
     setUpdatableArea(rp,0,dry1,w,dry2-dry1);
 
     // clean at temp buffer level
@@ -280,6 +296,8 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         drawTextTmp(_font,xt+1,yb2+6,blackpen,p);
         drawTextTmp(_font,xt+1,yb2+7,whitepen,p);
 
+        if(lastmessage.length()>0)
+            drawTextTmp(_font,xt+1,yb2+7+8,greypen,lastmessage.c_str());
     }
 
      // - - - logo !

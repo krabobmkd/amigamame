@@ -8,11 +8,16 @@ extern "C" {
 #include <stdlib.h>
 #include <stdarg.h>
 // make it simple....
-void log_enableStdOut(int e);
-typedef void (*logCallbcack)(int i_w_e,const char *);
-void log_setCallback(logCallbcack cb);
 
+// for verbose option
+void log_enableStdOut(int e);
+// to receive
+typedef void (*logCallbcack)(int i_w_e,const char *);
+void log_addCallback(logCallbcack cb);
+void log_removeCallback(logCallbcack cb);
+// to send
 void loginfo(int i_w_e, const char *format, ...);
+void loginfo2(int i_w_e, const char *format);
 void logerror( const char *format, ...);
 void vloginfo(int i_w_e, const char * format, va_list args );
 
