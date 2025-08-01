@@ -34,7 +34,9 @@ struct Interrupt;
 struct PPSticksInteruptData {
 
     UWORD _last_potxdat[2];
-    ULONG _nbcalls; // should only be valid after 2.
+    UWORD _last_joyxdat[2];
+    UWORD _allocatedbits;
+    UWORD _nbcalls; // should only be valid after 2.
     // to signal out
     //struct Task *_Task;
     //ULONG _Signal;
@@ -117,6 +119,7 @@ void closeProportionalSticks(struct ProportionalSticks *prop);
 // if error or still not ready, return ~0 (invalid). Do WaitTOF() twice after init and retry.
 // Bits 15-8   POT0Y value or POT1Y value
 // Bits 7-0    POT0X value or POT1X value
+// bit 16: bt1, bit 17: bt2.
 static inline ULONG getProportionalStickValues(struct ProportionalSticks *prop,ULONG iport)
 {
     if((!prop->_pintdata) || (iport>1) ||
@@ -125,16 +128,20 @@ static inline ULONG getProportionalStickValues(struct ProportionalSticks *prop,U
     ) return 0xffffffffUL;
 
     // cast ulong so ~0 is an error.
-    UWORD v = (UWORD) prop->_pintdata->_last_potxdat[iport];
-
+    ULONG v = (ULONG) prop->_pintdata->_last_potxdat[iport];
+    ULONG joydat = (ULONG) prop->_pintdata->_last_joyxdat[iport];
     // C64 / Atari Pads has XY inverted ? ... ok.
     if((iport == 0) && (prop->_flags & PROPJOYFLAGS_PORT1_INVERTXY))
     {
-        v = ((v>>8)&0x00ff) | (v<<8);
+        v = (ULONG)((v>>8)&0x00ff) | (ULONG)(v<<8) | (((ULONG)(joydat&1))<<(17-1))| (((ULONG)(joydat&1))<<(16-9));
     } else if((iport == 1) && (prop->_flags & PROPJOYFLAGS_PORT2_INVERTXY))
     {
-        v = ((v>>8)&0x00ff) | (v<<8);
+        v = (ULONG)((v>>8)&0x00ff) | (ULONG)(v<<8) | (((ULONG)(joydat&1))<<(17-1))| (((ULONG)(joydat&1))<<(16-9)) ;
+    } else
+    {   // buttons, not inverted
+        v |= (((ULONG)(joydat&1))<<(16-1)) | (((ULONG)(joydat&1))<<(17-9));
     }
+
 
     return (ULONG)v;
 }

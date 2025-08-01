@@ -64,8 +64,12 @@ static void interuptfunc( register struct PPSticksInteruptData *ppi __asm("a1") 
     // also if pin not allocated could not work (other app ?).
     ppi->_last_potxdat[1] = custom.pot1dat; // could be  = ((UWORD *)0x00dff014); ((UWORD *)0x00dff012);
     ppi->_last_potxdat[0] = custom.pot0dat;
+    // as fast as possible.
+    WritePotgo(1,ppi->_allocatedbits); // value, mask of what is to write.
 
-    WritePotgo(1,1); // value, mask of what is to write.
+    ppi->_last_joyxdat[0] = custom.joy0dat; // port1 JOY1DAT $DFF00C
+    ppi->_last_joyxdat[1] = custom.joy1dat; // port1
+    // for propjoy it's then bit 1 and 9, unlike standard joy.
 
     if(ppi->_nbcalls<2) ppi->_nbcalls++; // valid if ==2
 
@@ -179,7 +183,7 @@ printf("OpenDevice:%d\n",iportunit);
 #define PGBIT_OUTRX (1<<13)
 #define PGBIT_DATRY (1<<14)
 #define PGBIT_OUTRY (1<<15)
-    UWORD potsBitsToAlloc = PGBIT_START ;
+    UWORD potsBitsToAlloc = 0 ;
     // we only need to alloc start, then for each pots,DAT, not OUT bits (If I get it well) !!
     if(pprops->_ports[0]._deviceresult == 0)
     {
@@ -204,14 +208,24 @@ printf("OpenDevice:%d\n",iportunit);
     it should FreePotgoBits the bits it has and re-AllocPotBits if
     it is trying to change an allocation involving the start bit.
     */
-// #%0101000000000001,d0
+
+    // Krb note: lowlevel block all "DAT" bits as soon as opened.
+    // this is totally OS breaking, but let's free them !
+    // sad because gameport device unit are free or locked according
+    // to current lowlevel use.
+    // In  all cases, configuration would make either DB9 ports managed
+    // by lowlevel or by "potgo", but not both.
+    // in all case ports are either selected by lowlevel
+    FreePotBits(potsBitsToAlloc);
+
 printf("try allocate bits:%08x\n",(int)potsBitsToAlloc);
-    pprops->_allocatedBits = AllocPotBits(potsBitsToAlloc); // #0b0101 0000 00000001
+    pprops->_allocatedBits = AllocPotBits(potsBitsToAlloc | PGBIT_START); // #0b0101 0000 00000001
 
 printf("allocated bits:%08x\n",(int)pprops->_allocatedBits);
     if(pprops->_allocatedBits != potsBitsToAlloc)
     {
-        if(logFunc) logFunc(1,"Analog Pins allocated on LL side.");
+        if(logFunc) logFunc(1,"Prop.Joy: Analog pins already used by lowlevel or else.");
+
         //error -> no warning.
 
 //        closeProportionalSticks(pprops);
@@ -258,6 +272,7 @@ VOID  __stdargs WritePotgo( ULONG word, ULONG mask );
         if(preturncode) *preturncode = PROPJOYRET_ALLOC;
         return NULL;
     }
+    pintdata->_allocatedbits = pprops->_allocatedBits;
 
     struct Interrupt *rbfint;
     pprops->_rbfint = rbfint = AllocVec(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR);
@@ -271,7 +286,7 @@ VOID  __stdargs WritePotgo( ULONG word, ULONG mask );
 //    pintdata->_Task = pprops->_Task;
 //    pintdata->_Signal = 1L << signr;
 
-    rbfint->is_Node.ln_Name = (char *)"mamepotgo";
+    rbfint->is_Node.ln_Name = (char *)"MAMEpotgo";
     rbfint->is_Data = (APTR)pintdata;
     rbfint->is_Code = &interuptfunc;
 

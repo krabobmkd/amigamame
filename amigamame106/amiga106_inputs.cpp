@@ -1208,8 +1208,9 @@ INT32 osd_get_code_value(os_code oscode)
 
         if(shortcode ==0) return (v & 0x00ff)<<10;
         if(shortcode ==1) return ((v>>8) & 0x00ff)<<10;
-        //TODO buttons
-
+        // buttons
+        if(shortcode ==2) return ((v & 0x10000)!=0);
+        if(shortcode ==3) return ((v & 0x20000)!=0);
         return 0;
     } else // ANALOG_CODESTART
     {

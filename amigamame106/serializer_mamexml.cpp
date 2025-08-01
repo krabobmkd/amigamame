@@ -75,6 +75,7 @@ void XmlWriter::operator()(const char *sMemberName, float &v, float min, float m
     string name = checkXmlName(sMemberName);
     xml_data_node *p = xml_add_child(_recursenode.back(),name.c_str(),  NULL );
     // beta4: float read write problematic with gcc bebbo locale mess. -> cast to int.
+   // printf("write:%f %d\n",v,(int)(v*1024.0f));
     if(p) xml_set_attribute_int(p,"vi",(int)(v*1024.0f));
 }
 
@@ -200,8 +201,10 @@ void XmlReader::operator()(const char *sMemberName,  float &v, float min, float 
     if(p)
     {
         // now cast int to float because locale are problematics
-        int iv =  xml_get_attribute_int(p,"vi",defval);
-        float vv = (float)iv * (1.0f/1024.0f);
+        int iv =  xml_get_attribute_int(p,"vi",(int)(defval*1024.0f));
+       // printf("XmlReader int:%d def:%f\n",iv,defval);
+        float vv = (((float)iv) * (1.0f/1024.0f))+0.001f;
+       // printf("XmlReader int:%d def:%f final:%f\n",iv,defval,vv);
         if(vv<min) vv=min;
         if(vv>max) vv=max;
         v = vv;
