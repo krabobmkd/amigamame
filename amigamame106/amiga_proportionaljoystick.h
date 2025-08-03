@@ -30,26 +30,43 @@ extern "C" {
 struct Task;
 struct Interrupt;
 
-// internal use
+// final, public, interpolated data after calibration, per player, per frame.
+// just do
+struct PPSticksValues {
+    WORD valid; // if !=0 , valid.
+    WORD x,y; // coord
+    WORD bt; // 1 & 2
+};
+
+
+// internal use, just the data exchanged between interupt and process.
 struct PPSticksInteruptData {
 
     UWORD _last_potxdat[2];
     UWORD _last_joyxdat[2];
     UWORD _allocatedbits;
     UWORD _nbcalls; // should only be valid after 2.
-    // to signal out
+    // to signal out - not needed imo.
     //struct Task *_Task;
     //ULONG _Signal;
 
 };
 
-// this should be public to be configured.
-// could be used
-struct PropStickCalibration
+// private, for calibration, let's just use min/max of the known valid movements.
+struct PStickCalib
 {
-    WORD _xmin,_xmax,_xcenter;
-    WORD _ymin,_ymax,_ycenter;
+    WORD min,max/*,_center*/;
 };
+struct PStickCalibXY
+{
+    struct PStickCalib x,y;
+};
+
+// struct PropStickCalibration
+// {
+//     WORD _xmin,_xmax,_xcenter;
+//     WORD _ymin,_ymax,_ycenter;
+// };
 
 // internal use
 struct PStickDevice {
@@ -63,6 +80,9 @@ struct PStickDevice {
 // keep what's to open and close. internal use
 struct ProportionalSticks
 {
+    // final values for each hardware ports... each may be inited or not.
+    struct PPSticksValues _values[2];
+
     struct MsgPort _gameportPort;
     // to signal out
     struct Task *_Task;
@@ -74,11 +94,11 @@ struct ProportionalSticks
     UWORD _allocatedBits;
 
     struct PStickDevice _ports[2];
-    struct PropStickCalibration _calibration[2];
+    struct PStickCalibXY _calibration[2];
     APTR _potgobase;
 
 
-    // - - - -
+    // - - - - messaging, no use atm.
 //    BYTE _signr;
 //    BYTE _d;
 //    WORD _dd;
@@ -115,49 +135,12 @@ struct ProportionalSticks *createProportionalSticks(ULONG flag, ULONG *preturnco
 
 void closeProportionalSticks(struct ProportionalSticks *prop);
 
-// should be asked once per frame by ports.
-// if error or still not ready, return ~0 (invalid). Do WaitTOF() twice after init and retry.
-// Bits 15-8   POT0Y value or POT1Y value
-// Bits 7-0    POT0X value or POT1X value
-// bit 16: bt1, bit 17: bt2.
-static inline ULONG getProportionalStickValues(struct ProportionalSticks *prop,ULONG iport)
-{
-    if((!prop->_pintdata) || (iport>1) ||
-     (!prop->_ports[iport]._deviceresult !=0) ||
-       (prop->_pintdata->_nbcalls<2)
-    ) return 0xffffffffUL;
+//olde ULONG getProportionalStickValues(struct ProportionalSticks *prop,ULONG iport);
+// call once per frame or so, then read prop->_values and check if valid.
+void ProportionalSticksUpdate(struct ProportionalSticks *prop);
 
-    // cast ulong so ~0 is an error.
-    ULONG v = (ULONG) prop->_pintdata->_last_potxdat[iport];
-    ULONG joydat = (ULONG) prop->_pintdata->_last_joyxdat[iport];
-    // C64 / Atari Pads has XY inverted ? ... ok.
-    if((iport == 0) && (prop->_flags & PROPJOYFLAGS_PORT1_INVERTXY))
-    {
-        v = (ULONG)((v>>8)&0x00ff) | (ULONG)(v<<8) | (((ULONG)(joydat&1))<<(17-1))| (((ULONG)(joydat&1))<<(16-9));
-    } else if((iport == 1) && (prop->_flags & PROPJOYFLAGS_PORT2_INVERTXY))
-    {
-        v = (ULONG)((v>>8)&0x00ff) | (ULONG)(v<<8) | (((ULONG)(joydat&1))<<(17-1))| (((ULONG)(joydat&1))<<(16-9)) ;
-    } else
-    {   // buttons, not inverted
-        v |= (((ULONG)(joydat&1))<<(16-1)) | (((ULONG)(joydat&1))<<(17-9));
-    }
-
-
-    return (ULONG)v;
-}
-static inline const char *getProportionalStickErrorMessage(ULONG errcode)
-{
-    if(errcode == PROPJOYRET_NOHARDWARE) return "Harware is not proportionnal joystick capable";
-    if(errcode == PROPJOYRET_ALLOC) return "prop. joystick: can't alloc";
-    if(errcode == PROPJOYRET_DEVICEFAIL) return "prop. joystick: can't open gameport device.";
-    if(errcode == PROPJOYRET_DEVICEUSED) return "prop. joystick: gameport device locked.";
-    if(errcode == PROPJOYRET_NOANALOGPINS) return "prop. joystick: can't reserve analog pins.";
- //   if(errcode == PROPJOYRET_NOSIGNAL) return "prop. joystick: can't find signal.";
-    return "";
-}
-
-//
-//void startCalibration(int iPort, int iCalibration)
+// if any after createProportionalSticks()
+const char *getProportionalStickErrorMessage(ULONG errcode);
 
 #ifdef __cplusplus
 }

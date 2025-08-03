@@ -128,7 +128,7 @@ int libs_init()
     if(!(LayersBase = OpenLibrary("layers.library", 39))) return(1);   
     if(!(IconBase = OpenLibrary("icon.library", 39))) return(1);
 
-    InitLowLevelLib();
+//    InitLowLevelLib();
     // optional:
     CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
 //    P96Base  = OpenLibrary("Picasso96API.library", 0);

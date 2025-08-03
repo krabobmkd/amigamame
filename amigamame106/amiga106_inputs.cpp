@@ -71,6 +71,9 @@ struct KeyboardMatrix {
 };
 #endif
 
+static int cnt=0;
+
+
 // we don't even need to publish it:
 struct MameInputs
 {
@@ -203,55 +206,34 @@ static void mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1
 
 } // end extern c
 
-void InitLowLevelLib()
-{
-    if(!LowLevelBase)
-    {
-        LowLevelBase = OpenLibrary("lowlevel.library", 0);
-    }
-}
+// void InitLowLevelLib()
+// {
+//     if(!LowLevelBase)
+//     {
+//         LowLevelBase = OpenLibrary("lowlevel.library", 0);
+//     }
+// }
 // when effective;y asked, to further close.
 static USHORT askedPadsRawKey = 0;
 static USHORT useAnyMouse = 0;
 static USHORT usePropJoysticks = 0;
+static USHORT useAnyLowLevelControl = 0;
 #ifdef RJP_OPTION
 static USHORT useReadJoyPortForPads = 0; // else rawkeys, added for NewLowlevel patch for A2000.
 #endif
 void ConfigureLowLevelLib()
 {
 //printf(" ***** ConfigureLowLevelLib\n");
-    if(!LowLevelBase) return;
-
-    /*
-#define JP_TYPE_NOTAVAIL  (00<<28)	   port data unavailable
-#define JP_TYPE_GAMECTLR  (01<<28)	   port has game controller
-#define JP_TYPE_MOUSE	  (02<<28)	   port has mouse
-#define JP_TYPE_JOYSTK	  (03<<28)	   port has joystick
-#define JP_TYPE_UNKNOWN   (04<<28)	   port has unknown device
-#define JP_TYPE_MASK	  (15<<28)	   controller type
-*/
-//#define SJA_TYPE_AUTOSENSE 0
-//#define SJA_TYPE_GAMECTLR  1
-//#define SJA_TYPE_MOUSE	   2
-//#define SJA_TYPE_JOYSTK    3
-
-//    printf("configure lowlevel\n");
-
     MameConfig::Controls &configControls = getMainConfig().controls();
     MameConfig::Misc &configMisc = getMainConfig().misc();
-#ifdef RJP_OPTION
-    useReadJoyPortForPads = ((configMisc._MiscFlags & MISCFLAG_USEREADJOYPORT) != 0);
-#endif
-    // for correct autosense,
-    for(int itest=0;itest<2;itest++)
-    {
-        for(int iport=0;iport<4;iport++) ReadJoyPort(iport);
-        WaitTOF();
-        WaitTOF();
-    }
-
+    // 1 - - - - stats what's needed.
+    //r1.6 only open lowlevel if some lowlevel type asked, and open/close each time.
     useAnyMouse=0;
-    for(int iLLPort=0;iLLPort<4;iLLPort++) // actually 2
+    usePropJoysticks = 0;
+    useAnyLowLevelControl = 0;
+    bool useParallelExtension=false;
+
+    for(int iLLPort=0;iLLPort<4;iLLPort++) // 2 hardware DB9 port, +the elusive mysterious 3&4 lowlevel ports.
     {
         int iPlayer = configControls._llPort_Player[iLLPort] ;
         if( iPlayer == 0) continue;
@@ -262,84 +244,100 @@ void ConfigureLowLevelLib()
             lowlevelState == PORT_TYPE_C64PADDLE
         ) usePropJoysticks++;
 
-        if(lowlevelState<0 || lowlevelState>3) continue; // shouldnt -> now we have values >3 for propjoy
-
-
-        if(lowlevelState != SJA_TYPE_AUTOSENSE)
+        // lowlevel only, code 0 (autosense) is now used as "no controller"
+        if(lowlevelState>0 && lowlevelState<=3) // shouldnt -> now we have values >3 for propjoy
         {
+            useAnyLowLevelControl++;
             if(lowlevelState == SJA_TYPE_MOUSE) useAnyMouse = 1;
-            SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
         }
+
     } // loop by ll port
 
-    ULONG propJoysticksFlags=0;
-    if( configControls._llPort_Type[0] == PORT_TYPE_PROPORTIONALJOYSTICK ||
-        configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE)
+    // 2 - - - - - open lowlevel.library if needed so far
+    if(useAnyLowLevelControl>0)
     {
-        propJoysticksFlags |= PROPJOYFLAGS_PORT1 ;
-        if(configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERTXY;
-    }
-    if( configControls._llPort_Type[1] == PORT_TYPE_PROPORTIONALJOYSTICK ||
-        configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE)
-    {
-        propJoysticksFlags |= PROPJOYFLAGS_PORT2 ;
-       if(configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERTXY;
+       //re LowLevelBase = OpenLibrary("lowlevel.library", 0);
+        if(!LowLevelBase)
+        {
+            loginfo2(1,"can't open lowlevel.library needed by some controller.");
+        }
+        // r1.6: let's accept the case where LL not there when null.
     }
 
-
-    bool useParallelExtension=false;
-
-    // loop for parallel port
-    for(int ipar=0 ; ipar<2 ;ipar++)
+    // 3 - - - -configure lowlevel
+    #ifdef RJP_OPTION
+        useReadJoyPortForPads = ((configMisc._MiscFlags & MISCFLAG_USEREADJOYPORT) != 0);
+    #endif
+    if(LowLevelBase)
     {
-        int iPlayer = configControls._parallelPort_Player[ipar] ;
-        if( iPlayer == 0 ) continue;
-        int type = configControls._parallel_type[ipar];
-        if(type == 0 ) continue;
+        // for correct autosense, (we don't use flappy LL autosenese, but ll docs says to do it..)
+        for(int itest=0;itest<2;itest++)
+        {
+            for(int iport=0;iport<4;iport++) ReadJoyPort(iport);
+            WaitTOF();
+            WaitTOF();
+        }
 
-        useParallelExtension = true;
-    }
+        if(askedPadsRawKey==0
+        #ifdef RJP_OPTION
+             && useReadJoyPortForPads==0
+        #endif
+         )
+        {
+            SystemControl(
+                SCON_AddCreateKeys,0,
+                SCON_AddCreateKeys,1,
+                TAG_END,0);
+            askedPadsRawKey = 1;
+        }
 
+        for(int iLLPort=0;iLLPort<4;iLLPort++) // 2 hardware DB9 port, +the elusive mysterious 3&4 lowlevel ports.
+        {
+            int iPlayer = configControls._llPort_Player[iLLPort] ;
+            if( iPlayer == 0) continue;
 
-    if(askedPadsRawKey==0
-#ifdef RJP_OPTION
-     && useReadJoyPortForPads==0
-#endif
-     )
-    {
-        SystemControl(
-            SCON_AddCreateKeys,0,
-            SCON_AddCreateKeys,1,
-            TAG_END,0);
-        askedPadsRawKey = 1;
-    }
-    // note: if needed
-    //printf("input init: useParallelExtension:%d\n",(int)useParallelExtension);
+            int lowlevelState = configControls._llPort_Type[iLLPort];
+            if(lowlevelState>0 && lowlevelState<=3)
+            {   // configure port as mouse,jostick or CD32 pads...
+                SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
+            }
+        } // loop by ll port
+
+    } // end of LL configuration
+
+    // 4 - - - - parralel port 3&4 joystick extension: init if needed.
     if(!g_pParallelPads && useParallelExtension)
     {
         g_pParallelPads = createParallelPads(); // could fail.
     }
-    // if something has been asked for proportional joysticks/8bits paddle
-    if(!g_PropsSticks && propJoysticksFlags != 0)
+
+    // 5 - - - - proportionnal joystick: init if needed.
     {
-        ULONG result=PROPJOYRET_OK;
-        g_PropsSticks = createProportionalSticks(propJoysticksFlags,&result,loginfo2); // could fail.
-
-        if(result != PROPJOYRET_OK)
+        ULONG propJoysticksFlags=0;
+        if( configControls._llPort_Type[0] == PORT_TYPE_PROPORTIONALJOYSTICK ||
+            configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE)
         {
-            logerror(getProportionalStickErrorMessage(result));
-            /*
-#define PROPJOYRET_OK 0
-#define PROPJOYRET_NOHARDWARE 1
-#define PROPJOYRET_ALLOC 2
-#define PROPJOYRET_DEVICEFAIL 3
-#define PROPJOYRET_DEVICEUSED 4
-#define PROPJOYRET_NOANALOGPINS 5
-#define PROPJOYRET_NOSIGNAL 6*/
+            propJoysticksFlags |= PROPJOYFLAGS_PORT1 ;
+            if(configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERTXY;
         }
-        // if null, super fail
-        printf("propstick error:%d\n",result);
+        if( configControls._llPort_Type[1] == PORT_TYPE_PROPORTIONALJOYSTICK ||
+            configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE)
+        {
+            propJoysticksFlags |= PROPJOYFLAGS_PORT2 ;
+           if(configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERTXY;
+        }
+        printf("propJoysticksFlags:%08x\n",(int)propJoysticksFlags);
+        // if something has been asked for proportional joysticks/8bits paddle
+        if(!g_PropsSticks && propJoysticksFlags != 0)
+        {
+            ULONG result=PROPJOYRET_OK;
+            g_PropsSticks = createProportionalSticks(propJoysticksFlags,&result,loginfo2); // could fail.
 
+            if(result != PROPJOYRET_OK)
+            {
+                logerror(getProportionalStickErrorMessage(result));
+            }
+        }
     }
 
 
@@ -415,9 +413,11 @@ void AllocInputs()
 
 void FreeInputs()
 {
-    if(LowLevelBase)
-    {   // back to mouse ?
-        SetJoyPortAttrs(0,SJA_Type,SJA_TYPE_MOUSE,TAG_DONE);
+    // better in inverse order of init: (propjoy & ll can collide on gameport device units.)
+    if(g_PropsSticks)
+    {
+        closeProportionalSticks(g_PropsSticks);
+        g_PropsSticks = NULL;
     }
 
     if(g_pParallelPads)
@@ -426,10 +426,10 @@ void FreeInputs()
         g_pParallelPads = NULL;
     }
 
-    if(g_PropsSticks)
-    {
-        closeProportionalSticks(g_PropsSticks);
-        g_PropsSticks = NULL;
+    if(LowLevelBase)
+    {   // back to mouse ? -> apparently wb mouse is not lowlevel managed, no need for that.
+        //SetJoyPortAttrs(0,SJA_Type,SJA_TYPE_MOUSE,TAG_DONE);
+        CloseLowLevelLib(); // r1.6: now close at each end of game.
     }
 
     if(g_pInputs)
@@ -466,6 +466,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     fcounter++;
     if(fcounter==255) fcounter=1; // we just need it to be different from previous frame.
 
+cnt++;
  //printf("UpdateInputs: %08x\n",(int)g_pInputs);
     if(!pMsgPort || !g_pInputs) return;
 
@@ -592,10 +593,11 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     }
     // if any mouse (or anything that needs direct joyport ?)
     // no rawkey for this
-    if(useAnyMouse
+    if(LowLevelBase && (useAnyMouse
 #ifdef RJP_OPTION
     || useReadJoyPortForPads
 #endif
+    )
     )
     {
         MameConfig::Controls &configControls = getMainConfig().controls();
@@ -731,6 +733,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
 
         g_pParallelPads->_ppidata->_last_checked = 0;
         g_pParallelPads->_ppidata->_last_checked_changes = 0;
+    }
+    if(g_PropsSticks) {
+        ProportionalSticksUpdate(g_PropsSticks);
     }
 
     if(doSwitchFS) SwitchWindowFullscreen();
@@ -1066,11 +1071,8 @@ void RawKeyMap::init()
                 int buttonmamecodeshift = ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT)*(iplayer-1);
                 int ipshft = iport<<8; // still use Lowlevel keycodes for buttons
 
-                // invent some rawkey code for analog x,y. suit fine the current system.
-//#define NRAWKEY_PORT0_JOY_ANALOGX  (RAWKEY_PORT0_JOY_RIGHT +1 )
-//#define NRAWKEY_PORT0_JOY_ANALOGY  (RAWKEY_PORT0_JOY_RIGHT +2 )
-// pjoy/pad , port1/2 , X/Y
-//static const char * const _AnalogNames[2][2][2]=
+
+        //static const char * const _AnalogNames[2][2][4]=
         // still prop joy buttons are told mame they bare regular joystick buttons... (not same reading code!)
         // importent thing here is JOYCODE_1_ANALOG_X/Y that tells mame we are an analog joystick
         // and so games with analog inputs will by default use it. (theorically)
@@ -1199,18 +1201,32 @@ INT32 osd_get_code_value(os_code oscode)
         if(!g_PropsSticks) return 0;
 
         oscode -= PROPJOY_CODESTART;
+    //printf("oscode:%08x\n",(int)oscode);
+    // a ,8   8+2 ark.
         int illport = oscode>>3; // /8
         if(illport>=2) return 0;
         UINT8 shortcode = ((UINT8)oscode) & 7; // analog X,Y ,bt1,bt2
 
-        ULONG v = getProportionalStickValues(g_PropsSticks,illport);
-        if(v ==~0) return 0;
 
-        if(shortcode ==0) return (v & 0x00ff)<<10;
-        if(shortcode ==1) return ((v>>8) & 0x00ff)<<10;
-        // buttons
-        if(shortcode ==2) return ((v & 0x10000)!=0);
-        if(shortcode ==3) return ((v & 0x20000)!=0);
+        if( g_PropsSticks->_values[illport].valid)
+        {
+            // validated with outrun wheel
+            if(shortcode ==0)
+            {
+                if((cnt & 63)==0) printf("pps x:%08x\n",(int)g_PropsSticks->_values[illport].x);
+
+                return  (128-g_PropsSticks->_values[illport].x)<<9; // already calibrated
+            }
+            if(shortcode ==1)
+            {
+                if((cnt & 63)==0) printf("pps y:%08x\n",(int)g_PropsSticks->_values[illport].y);
+
+                return  (128-g_PropsSticks->_values[illport].y)<<9; // already calibrated
+            }
+            // buttons
+            if(shortcode ==2) return ((g_PropsSticks->_values[illport].bt & 1)!=0);
+            if(shortcode ==3) return ((g_PropsSticks->_values[illport].bt & 2)!=0);
+        }
         return 0;
     } else // ANALOG_CODESTART
     {

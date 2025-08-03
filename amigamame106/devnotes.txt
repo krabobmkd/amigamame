@@ -8,6 +8,12 @@
 
  O add defender+joust + atetris
 
+ O blabla docs for projoy/paddles.
+	- tells: if a game needs analog control,it will automatically redirect all
+	   analog compatible controllers for a given player: so it's better to disable "player 1 mouse"
+	   if you have "player1 propjoy", or both will be used at the same time. Using a mouse and
+	   a propjoy for different players is of course ok.
+
 -----------------
 
  - Vector graphics games are implemented (starwars,Asteroid,startrek, cosmic chasm, battle zone, TacScan, (more or less 20 games).

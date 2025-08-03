@@ -67,11 +67,12 @@ static void interuptfunc( register struct PPSticksInteruptData *ppi __asm("a1") 
     // as fast as possible.
     WritePotgo(1,ppi->_allocatedbits); // value, mask of what is to write.
 
+    // yet the 2bt click buttons are there - not same place as classic digital sticks ! it's all inverted.
     ppi->_last_joyxdat[0] = custom.joy0dat; // port1 JOY1DAT $DFF00C
     ppi->_last_joyxdat[1] = custom.joy1dat; // port1
     // for propjoy it's then bit 1 and 9, unlike standard joy.
 
-    if(ppi->_nbcalls<2) ppi->_nbcalls++; // valid if ==2
+    if(ppi->_nbcalls<2) ppi->_nbcalls++; // values valid after 2 calls.
 
 }
 
@@ -283,6 +284,11 @@ VOID  __stdargs WritePotgo( ULONG word, ULONG mask );
         return NULL;
     }
 
+    // this must be done before
+    pprops->_calibration[0].x.min = 255;
+    pprops->_calibration[0].y.min = 255;
+    pprops->_calibration[1].x.min = 255;
+    pprops->_calibration[1].y.min = 255;
 //    pintdata->_Task = pprops->_Task;
 //    pintdata->_Signal = 1L << signr;
 
@@ -339,3 +345,103 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
 
     FreeVec(pprops);
 }
+
+// should be asked once per frame by ports.
+// if error or still not ready, return ~0 (invalid). Do WaitTOF() twice after init and retry.
+// Bits 15-8   POT0Y value or POT1Y value
+// Bits 7-0    POT0X value or POT1X value
+// bit 16: bt1, bit 17: bt2.
+void ProportionalSticksUpdate(struct ProportionalSticks *prop)
+{
+    // would work after init + 2 frames.
+    if((!prop->_pintdata) || (prop->_pintdata->_nbcalls<2)) return;
+
+    for(int iport=0;iport<2;iport++)
+    {
+        // if port concerned...
+        if( prop->_ports[iport]._deviceresult !=0 ) continue;
+
+        UWORD potdat = prop->_pintdata->_last_potxdat[iport];
+        UWORD joydat = prop->_pintdata->_last_joyxdat[iport];
+        UWORD vx,vy,bt1,bt2;
+
+        vx = (potdat & 0x0ff);
+        vy = (potdat>>8);
+        bt1 = ((joydat & (1<<1))!=0);
+        bt2 = ((joydat & (1<<9))!=0);
+        // the sad C64 paddle / Amiga propjoy XY inversion (theorically, to be tested).
+        // managed once for all here.
+        if(((iport == 0) && (prop->_flags & PROPJOYFLAGS_PORT1_INVERTXY))
+         || ((iport == 1) && (prop->_flags & PROPJOYFLAGS_PORT2_INVERTXY))
+            )
+        {
+            UWORD t=vx; vx=vy; vy=t;
+            t=bt1; bt1=bt2; bt2=t; // on c64/atari paddles,there's a button on each, they because 2 buttons on joysticks.
+        }
+        // - - - - -  - let's go for the auto-calibration affair
+        if(vx<prop->_calibration[iport].x.min) prop->_calibration[iport].x.min = vx;
+        if(vx>prop->_calibration[iport].x.max) prop->_calibration[iport].x.max = vx;
+        if(vy<prop->_calibration[iport].y.min) prop->_calibration[iport].y.min = vy;
+        if(vy>prop->_calibration[iport].y.max) prop->_calibration[iport].y.max = vy;
+
+        // only one of the direction may be used, so consider valid if any.
+        if(prop->_calibration[iport].x.max>prop->_calibration[iport].x.min ||
+            prop->_calibration[iport].y.max>prop->_calibration[iport].y.min)
+        {
+            UWORD dx = prop->_calibration[iport].x.max - prop->_calibration[iport].x.min;
+
+            if(dx>0)
+            {   // in my knowledge divu.w would be used, but well: compilers...
+                prop->_values[iport].x = (WORD)((ULONG)(vx-prop->_calibration[iport].x.min)*255) / dx; // would be 0->255
+            } else  prop->_values[iport].x = 128; // default center.
+
+            UWORD dy = prop->_calibration[iport].y.max - prop->_calibration[iport].y.min;
+
+            if(dy>0)
+            {   // in my knowledge divu.w would be used, but well: compilers...
+                prop->_values[iport].y = (WORD)((ULONG)(vy-prop->_calibration[iport].y.min)*255) / dy; // would be 0->255
+            } else  prop->_values[iport].y = 128; // default center.
+
+            prop->_values[iport].bt = bt1 | (bt2<<1);
+
+            prop->_values[iport].valid = 1;
+        } // end if valid
+
+    } // end iport loop
+
+//OLDE
+    // if((!prop->_pintdata) || (iport>1) ||
+    //  (prop->_ports[iport]._deviceresult !=0) ||
+    //    (prop->_pintdata->_nbcalls<2)
+    // ) return 0xffffffffUL;
+
+
+//OLDE ULONG iport
+    // // cast ulong so ~0 is an error.
+    // ULONG v = (ULONG) prop->_pintdata->_last_potxdat[iport];
+    // ULONG joydat = (ULONG) prop->_pintdata->_last_joyxdat[iport];
+    // // C64 / Atari Pads has XY inverted ? ... ok.
+    // if((iport == 0) && (prop->_flags & PROPJOYFLAGS_PORT1_INVERTXY))
+    // {
+    //     v = (ULONG)((v>>8)&0x00ff) | (ULONG)(v<<8) | (((ULONG)(joydat&1))<<(17-1))| (((ULONG)(joydat&9))<<(16-9));
+    // } else if((iport == 1) && (prop->_flags & PROPJOYFLAGS_PORT2_INVERTXY))
+    // {
+    //     v = (ULONG)((v>>8)&0x00ff) | (ULONG)(v<<8) | (((ULONG)(joydat&1))<<(17-1))| (((ULONG)(joydat&9))<<(16-9)) ;
+    // } else
+    // {   // buttons, not inverted
+    //     v |= (((ULONG)(joydat&1))<<(16-1)) | (((ULONG)(joydat&1))<<(17-9));
+    // }
+//    return (ULONG)v;
+}
+const char *getProportionalStickErrorMessage(ULONG errcode)
+{
+    if(errcode == PROPJOYRET_NOHARDWARE) return "Harware is not proportionnal joystick capable";
+    if(errcode == PROPJOYRET_ALLOC) return "prop. joystick: can't alloc";
+    if(errcode == PROPJOYRET_DEVICEFAIL) return "prop. joystick: can't open gameport device.";
+    if(errcode == PROPJOYRET_DEVICEUSED) return "prop. joystick: gameport device locked.";
+    if(errcode == PROPJOYRET_NOANALOGPINS) return "prop. joystick: can't reserve analog pins.";
+ //   if(errcode == PROPJOYRET_NOSIGNAL) return "prop. joystick: can't find signal.";
+    return "";
+}
+
+
