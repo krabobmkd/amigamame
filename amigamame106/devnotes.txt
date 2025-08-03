@@ -1,9 +1,13 @@
 
  Todo r1.6
 
+
+ O if analog controller set but not used: tell.
+
  O Repair bug mouse1-p2 + mouse2-p1
  O implement analog/proportional amiga joysticks with potgo.h
- O also implement mouse as analog absolute (<- notsure)
+	O code stealing mouse to input.device
+
  O try parallel joystick port Bt2
 
  O add defender+joust + atetris

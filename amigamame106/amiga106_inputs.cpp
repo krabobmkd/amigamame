@@ -34,8 +34,11 @@ extern "C" {
 extern "C" {
     #include "osdepend.h"
     #include "input.h"
+    #include "inptport.h"
     // for schedule_exit()
     #include "mame.h"
+    #include "usrintrf.h"
+
 }
 
 #include "amiga106_inputs.h"
@@ -46,6 +49,7 @@ extern "C" {
 
 using namespace std;
 
+//static int cnt=0;
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -70,9 +74,6 @@ struct KeyboardMatrix {
     }
 };
 #endif
-
-static int cnt=0;
-
 
 // we don't even need to publish it:
 struct MameInputs
@@ -256,7 +257,7 @@ void ConfigureLowLevelLib()
     // 2 - - - - - open lowlevel.library if needed so far
     if(useAnyLowLevelControl>0)
     {
-       //re LowLevelBase = OpenLibrary("lowlevel.library", 0);
+        LowLevelBase = OpenLibrary("lowlevel.library", 0);
         if(!LowLevelBase)
         {
             loginfo2(1,"can't open lowlevel.library needed by some controller.");
@@ -326,16 +327,26 @@ void ConfigureLowLevelLib()
             propJoysticksFlags |= PROPJOYFLAGS_PORT2 ;
            if(configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERTXY;
         }
-        printf("propJoysticksFlags:%08x\n",(int)propJoysticksFlags);
-        // if something has been asked for proportional joysticks/8bits paddle
+       // printf("propJoysticksFlags:%08x\n",(int)propJoysticksFlags);
+        // if something has been asked for proportional joysticks/8bits paddle        
         if(!g_PropsSticks && propJoysticksFlags != 0)
         {
-            ULONG result=PROPJOYRET_OK;
-            g_PropsSticks = createProportionalSticks(propJoysticksFlags,&result,loginfo2); // could fail.
-
-            if(result != PROPJOYRET_OK)
+            if(input_machine_has_any_analog())
             {
-                logerror(getProportionalStickErrorMessage(result));
+                ULONG result=PROPJOYRET_OK;
+                g_PropsSticks = createProportionalSticks(propJoysticksFlags,&result,loginfo2); // could fail.
+
+                if(result != PROPJOYRET_OK)
+                {
+                    logerror(getProportionalStickErrorMessage(result));
+                }
+                if(g_PropsSticks)
+                {
+                    ui_popup_time(5, "Analog controllers:\nGo far in all directions to calibrate.");
+                }
+            } else
+            {
+                ui_popup_time(5, "Game uses no analog input,\nso analog controllers not inited.");
             }
         }
     }
@@ -414,6 +425,7 @@ void AllocInputs()
 void FreeInputs()
 {
     // better in inverse order of init: (propjoy & ll can collide on gameport device units.)
+    // (plus PropsSticks may use lowlevel for timers.)
     if(g_PropsSticks)
     {
         closeProportionalSticks(g_PropsSticks);
@@ -466,7 +478,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     fcounter++;
     if(fcounter==255) fcounter=1; // we just need it to be different from previous frame.
 
-cnt++;
+//cnt++;
  //printf("UpdateInputs: %08x\n",(int)g_pInputs);
     if(!pMsgPort || !g_pInputs) return;
 
@@ -1213,14 +1225,12 @@ INT32 osd_get_code_value(os_code oscode)
             // validated with outrun wheel
             if(shortcode ==0)
             {
-                if((cnt & 63)==0) printf("pps x:%08x\n",(int)g_PropsSticks->_values[illport].x);
-
+               // if((cnt & 63)==0) printf("pps x:%08x\n",(int)g_PropsSticks->_values[illport].x);
                 return  (128-g_PropsSticks->_values[illport].x)<<9; // already calibrated
             }
             if(shortcode ==1)
             {
-                if((cnt & 63)==0) printf("pps y:%08x\n",(int)g_PropsSticks->_values[illport].y);
-
+               // if((cnt & 63)==0) printf("pps y:%08x\n",(int)g_PropsSticks->_values[illport].y);
                 return  (128-g_PropsSticks->_values[illport].y)<<9; // already calibrated
             }
             // buttons

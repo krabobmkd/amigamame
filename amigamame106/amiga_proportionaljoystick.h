@@ -37,7 +37,7 @@ struct PPSticksValues {
     WORD x,y; // coord
     WORD bt; // 1 & 2
 };
-
+#define PPJS_TAKEPORT0CONTROL 1
 
 // internal use, just the data exchanged between interupt and process.
 struct PPSticksInteruptData {
@@ -108,6 +108,12 @@ struct ProportionalSticks
      // must be allocated in MEMF_PUBLIC
     struct PPSticksInteruptData *_pintdata;
 
+    // - - - - special things to get port1 control
+#ifdef PPJS_TAKEPORT0CONTROL
+    struct IOStdReq _inputdevIOReq;
+    BYTE    _inputtype,_dd,_ddd,_dddd;
+    int _inputdevres;
+#endif
 };
 
 // some hardware has no potentiometer reading port at all (everything not amiga classic).
@@ -116,15 +122,22 @@ int hasProportionalStickResource();
 
 #define PROPJOYFLAGS_PORT1 1
 #define PROPJOYFLAGS_PORT2 2
+// C64 pads need XY inversion ?
 #define PROPJOYFLAGS_PORT1_INVERTXY 4
 #define PROPJOYFLAGS_PORT2_INVERTXY 8
+// use LowLever timer API, if not, use vblank timer
+#define PROPJOYFLAGS_USELLTIMER 8
 
+// return codes in preturncode
 #define PROPJOYRET_OK 0
 #define PROPJOYRET_NOHARDWARE 1
 #define PROPJOYRET_ALLOC 2
-#define PROPJOYRET_DEVICEFAIL 3
-#define PROPJOYRET_DEVICEUSED 4
-#define PROPJOYRET_NOANALOGPINS 5
+#define PROPJOYRET_GAMEPORTU0FAIL 3
+#define PROPJOYRET_GAMEPORTU1FAIL 4
+#define PROPJOYRET_GAMEPORTU0INUSE 5
+#define PROPJOYRET_GAMEPORTU1INUSE 6
+#define PROPJOYRET_ALLDEVICEUSED 7
+#define PROPJOYRET_NOANALOGPINS 8
 //#define PROPJOYRET_NOSIGNAL 6
 
 typedef void (*PPStickInitLogFunc)(int elevel,const char *pMessage);
@@ -141,6 +154,7 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop);
 
 // if any after createProportionalSticks()
 const char *getProportionalStickErrorMessage(ULONG errcode);
+
 
 #ifdef __cplusplus
 }

@@ -20,14 +20,33 @@
 #include <stdio.h>
 
 
+
+
 // this one has custom.pot1dat
 #include <hardware/custom.h>
 #include <hardware/intbits.h>
 
 #include <devices/gameport.h>
+
+#ifdef PPJS_TAKEPORT0CONTROL
+#include <devices/input.h>
+#endif
+
 #include <resources/potgo.h>
 
-
+const char *getProportionalStickErrorMessage(ULONG errcode)
+{
+    if(errcode == PROPJOYRET_NOHARDWARE) return "Harware is not proportionnal joystick capable.\n";
+    if(errcode == PROPJOYRET_ALLOC) return "analog joystick: can't alloc.\n";
+    if(errcode == PROPJOYRET_GAMEPORTU0FAIL) return "analog joystick: can't open gameport 1.\n";
+    if(errcode == PROPJOYRET_GAMEPORTU1FAIL) return "analog joystick: can't open gameport 2.\n";
+    if(errcode == PROPJOYRET_GAMEPORTU0INUSE) return "analog joystick: gameport 1 in use.\n";
+    if(errcode == PROPJOYRET_GAMEPORTU1INUSE) return "analog joystick: gameport 2 in use.\n";
+    if(errcode == PROPJOYRET_ALLDEVICEUSED) return "analog joystick: gameport device locked.\n";
+    if(errcode == PROPJOYRET_NOANALOGPINS) return "analog joystick: can't reserve analog pins.\n";
+ //   if(errcode == PROPJOYRET_NOSIGNAL) return "prop. joystick: can't find signal.";
+    return "";
+}
 
 // declare to C we are managing opening/closing potgo ourselves.
 // note PotgoBase open is done here is needed, but closed in atexit is explicitly opened in main()
@@ -37,12 +56,11 @@ struct Library    *PotgoBase=NULL;
 
 static void initPotgoIfNotDone()
 {
-
     if(PotgoBase == NULL)
     {
-        printf("open potgo resource\n");
+        //printf("open potgo resource\n");
         PotgoBase = OpenResource(POTGONAME);
-        printf("potgo resource:%08x\n",(int)PotgoBase);
+        //printf("potgo resource:%08x\n",(int)PotgoBase);
         // there is no "CloseResource" there is AddResource/RemResource, but it's OS matter.
     }
 }
@@ -76,9 +94,87 @@ static void interuptfunc( register struct PPSticksInteruptData *ppi __asm("a1") 
 
 }
 
+#ifdef PPJS_TAKEPORT0CONTROL
+// if need analog controller on mouse port, need to tell input.device to release it...
+static void makeInputDeviceReleaseMousePort(struct ProportionalSticks *pprops)
+{
+    struct IOStdReq *pioreq = &(pprops->_inputdevIOReq);
+    pioreq->io_Message.mn_ReplyPort = &(pprops->_gameportPort);
+
+    pprops->_inputdevres = (int) OpenDevice("input.device",0, (struct IORequest *)pioreq,0);
+    if(pprops->_inputdevres !=0) return;
+
+// printf("input device opened ok\n");
+
+    pioreq->io_Command = IND_SETMTYPE;
+    pprops->_inputtype = GPCT_NOCONTROLLER;
+    pioreq->io_Data    = (APTR)&pprops->_inputtype;
+    pioreq->io_Length = 1;
+    pioreq->io_Flags = IOB_QUICK;
+
+    DoIO((struct IORequest *)pioreq);   /* Send the command */
+// printf("after doio\n");
+
+//IND_SETMTYPE
+/*
+
+NAME
+    IND_SETMTYPE -- Set the current mouse port controller type
+
+FUNCTION
+    This command sets the type of device at the mouse port, so
+    the signals at the port may be properly interpreted.
+
+IO REQUEST
+    io_Message      mn_ReplyPort set if quick I/O is not possible
+    io_Device       preset by the call to OpenDevice
+    io_Unit         preset by the call to OpenDevice
+    io_Command      IND_SETMTYPE
+    io_Flags        IOB_QUICK set if quick I/O is possible
+    io_Length       1
+    io_Data         the address of the byte variable describing
+                    the controller type, as per the equates in
+                    the gameport include file
+*/
+
+/* input.device ....
+IND_SETMPORT 	Set the controller port to which the mouse is connected.
+IND_SETMTRIG 	Set conditions that must be met by a mouse before a pending read request will be satisfied.
+IND_SETMTYPE 	Set the type of device at the mouse port.
+*/
+
+
+}
+static void makeInputDeviceUseMousePortBack(struct ProportionalSticks *pprops)
+{
+//     printf("makeInputDeviceUseMousePortBack\n");
+    if(pprops->_inputdevres == 0)
+    {
+//     printf("do IND_SETMTYPE GPCT_MOUSE\n");
+        //
+        struct IOStdReq *pioreq = &(pprops->_inputdevIOReq);
+        pioreq->io_Command = IND_SETMTYPE;
+        pprops->_inputtype = GPCT_MOUSE;
+        pioreq->io_Data    = (APTR)&pprops->_inputtype;
+        pioreq->io_Length = 1;
+        pioreq->io_Flags = IOB_QUICK;
+
+        DoIO((struct IORequest *)pioreq);   /* Send the command */
+
+//     printf("close device\n");
+        if (!(CheckIO((struct IORequest *)&(pprops->_inputdevIOReq))))
+        {
+            AbortIO((struct IORequest *)&(pprops->_inputdevIOReq));  /* Ask device to abort request, if pending */
+        }
+        WaitIO((struct IORequest *)&(pprops->_inputdevIOReq));   /* Wait for abort, then clean up */
+        CloseDevice((struct IORequest *)&(pprops->_inputdevIOReq));
+        pprops->_inputdevres = 1;
+    }
+}
+#endif
 struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG *preturncode, PPStickInitLogFunc logFunc)
 {
-printf("createProportionalSticks:%08x\n",flags);
+
     if((flags &3)==0) return NULL; // need port1 or/and port2
 
     initPotgoIfNotDone();
@@ -98,7 +194,10 @@ printf("createProportionalSticks:%08x\n",flags);
 
     if(preturncode) *preturncode = PROPJOYRET_OK; // default for now on.
 
-
+#ifdef PPJS_TAKEPORT0CONTROL
+    // not ok:
+    pprops->_inputdevres = 1;
+#endif
     pprops->_ports[0]._deviceresult = 1; // ports not ok by default.
     pprops->_ports[1]._deviceresult = 1;
  //   pprops->_signr = -1; // default error state for this.
@@ -110,16 +209,17 @@ printf("createProportionalSticks:%08x\n",flags);
     AddPort(&(pprops->_gameportPort));
     pprops->_portAdded = 1;
 
+//printf("flag:%d\n",flags); // 8+2
     for(int iportunit=0 ;iportunit<2 ; iportunit++ )
     {
         int portmask = PROPJOYFLAGS_PORT1<<iportunit;
-printf("portmask:%d flag:%d\n",portmask,flags);
+//printf("portmask:%d flag:%d\n",portmask,flags);
         if((flags & portmask)!=0)
         {
             // - - -- - - - -allocjoyport - - - - -
             struct PStickDevice *ppsd = &(pprops->_ports[iportunit]);
                // OpenDevice( CONST_STRPTR devName, ULONG unit, struct IORequest *ioRequest, ULONG flags );
-printf("OpenDevice:%d\n",iportunit);
+//printf("OpenDevice:%d\n",iportunit);
             BYTE res = OpenDevice("gameport.device",
                             iportunit,
                             &(ppsd->_gameportIOReq),0);
@@ -127,8 +227,9 @@ printf("OpenDevice:%d\n",iportunit);
             if(res !=0)
             {   // only some port could fail...
                 //closeProportionalSticks(pprops);
-                if(preturncode) *preturncode = PROPJOYRET_DEVICEFAIL;
-                return NULL;
+                if(logFunc) logFunc(1,getProportionalStickErrorMessage(PROPJOYRET_GAMEPORTU0FAIL+iportunit));
+                if(preturncode) *preturncode = PROPJOYRET_GAMEPORTU0FAIL+iportunit;
+                continue;
             }
             Forbid();
 
@@ -137,21 +238,37 @@ printf("OpenDevice:%d\n",iportunit);
                 ppsd->_gameportIOReq.io_Length = 1;
 
                 /*BYTE resdoio =*/ DoIO(&(ppsd->_gameportIOReq));
+
+               // special case,experimental code , looks like working !
+#ifdef PPJS_TAKEPORT0CONTROL
+                // if gameport unit 0 not available, ask input.device to free it.
+                if(iportunit==0 && ppsd->_portType != GPCT_NOCONTROLLER)
+                {
+                  //  printf("ppsd->_portType before:%d\n",(int)ppsd->_portType);
+                    //Permit();
+                        makeInputDeviceReleaseMousePort(pprops);
+                    //Forbid();
+                    DoIO(&(ppsd->_gameportIOReq)); // then, ask again if port0 available.
+                    //WORKS !
+                  //  printf("ppsd->_portType after:%d\n",(int)ppsd->_portType);
+                }
+#endif
+
                 if(ppsd->_portType != GPCT_NOCONTROLLER) // GPCT_NOCONTROLLER 0
                 {
-                  printf("device state:%d\n",ppsd->_portType);
+                 // printf("iportunit:%d device state:%d\n",iportunit,(int)ppsd->_portType);
+                    if(logFunc) logFunc(1,getProportionalStickErrorMessage(PROPJOYRET_GAMEPORTU0INUSE+iportunit));
+                    if(preturncode) *preturncode = PROPJOYRET_GAMEPORTU0INUSE+iportunit;
                     Permit();
                     ppsd->_deviceresult = 1;
                     continue;
-//                    closeProportionalSticks(pprops);
-//                    if(preturncode) *preturncode = PROPJOYRET_DEVICEUSED;
-                   // return NULL;
+
                 }
                 // port free, allocating port
                 ppsd->_gameportIOReq.io_Command = GPD_SETCTYPE;
                 ppsd->_gameportIOReq.io_Data = &(ppsd->_portType);
                 ppsd->_gameportIOReq.io_Length = 1;
-                ppsd->_portType = GPCT_ALLOCATED;
+                ppsd->_portType = GPCT_ALLOCATED; // GPCT_RELJOYSTICK ?
 
                 /*BYTE resdoio =*/ DoIO(&(ppsd->_gameportIOReq));
             Permit();
@@ -166,7 +283,8 @@ printf("OpenDevice:%d\n",iportunit);
         pprops->_ports[1]._deviceresult != 0)
     {
         closeProportionalSticks(pprops);
-        if(preturncode) *preturncode = PROPJOYRET_DEVICEUSED;
+        if(logFunc) logFunc(2,getProportionalStickErrorMessage(PROPJOYRET_ALLDEVICEUSED));
+        if(preturncode) *preturncode = PROPJOYRET_ALLDEVICEUSED;
         return NULL;
     }
 
@@ -188,17 +306,17 @@ printf("OpenDevice:%d\n",iportunit);
     // we only need to alloc start, then for each pots,DAT, not OUT bits (If I get it well) !!
     if(pprops->_ports[0]._deviceresult == 0)
     {
-     printf("gameport 0 device unit opened\n");
+//     printf("gameport 0 device unit opened\n");
         potsBitsToAlloc |= (PGBIT_DATLX|PGBIT_DATLY);
     }
     if(pprops->_ports[1]._deviceresult == 0)
     {
-     printf("gameport 1 device unit opened\n");
+//     printf("gameport 1 device unit opened\n");
         potsBitsToAlloc |= (PGBIT_DATRX|PGBIT_DATRY);
     }
 
     /*
-    The AllocPotBits routine allocates bits in the hardware potgo
+    "The AllocPotBits routine allocates bits in the hardware potgo
     register that the application wishes to manipulate via
     WritePotgo.  The request may be for more than one bit.  A
     user trying to allocate bits may find that they are
@@ -207,31 +325,28 @@ printf("OpenDevice:%d\n",iportunit);
     requesting the start bit, because input bits have been
     allocated.  A user can block itself from allocation: i.e.
     it should FreePotgoBits the bits it has and re-AllocPotBits if
-    it is trying to change an allocation involving the start bit.
+    it is trying to change an allocation involving the start bit."
     */
 
     // Krb note: lowlevel block all "DAT" bits as soon as opened.
-    // this is totally OS breaking, but let's free them !
-    // sad because gameport device unit are free or locked according
-    // to current lowlevel use.
+    // this is in theory OS breaking, but let's just free them, before realloc !
+    // sad because gameport device unit are free or locked by ll
+    // according to current lowlevel use like it should.
     // In  all cases, configuration would make either DB9 ports managed
     // by lowlevel or by "potgo", but not both.
-    // in all case ports are either selected by lowlevel
     FreePotBits(potsBitsToAlloc);
 
-printf("try allocate bits:%08x\n",(int)potsBitsToAlloc);
+//printf("try allocate bits:%08x\n",(int)potsBitsToAlloc);
     pprops->_allocatedBits = AllocPotBits(potsBitsToAlloc | PGBIT_START); // #0b0101 0000 00000001
 
-printf("allocated bits:%08x\n",(int)pprops->_allocatedBits);
-    if(pprops->_allocatedBits != potsBitsToAlloc)
+//printf("allocated bits:%08x\n",(int)pprops->_allocatedBits);
+    if(pprops->_allocatedBits != (potsBitsToAlloc| PGBIT_START))
     {
-        if(logFunc) logFunc(1,"Prop.Joy: Analog pins already used by lowlevel or else.");
+        if(logFunc) logFunc(2,getProportionalStickErrorMessage(PROPJOYRET_NOANALOGPINS));
+        if(preturncode) *preturncode = PROPJOYRET_NOANALOGPINS;
+        closeProportionalSticks(pprops);
 
-        //error -> no warning.
-
-//        closeProportionalSticks(pprops);
-//        if(preturncode) *preturncode = PROPJOYRET_NOANALOGPINS;
-//        return NULL;
+        return NULL;
     }
     // note: it's to allow further calls to WritePotgo()
 
@@ -239,7 +354,6 @@ printf("allocated bits:%08x\n",(int)pprops->_allocatedBits);
 UWORD  __stdargs AllocPotBits( ULONG bits );
 VOID  __stdargs FreePotBits( ULONG bits );
 VOID  __stdargs WritePotgo( ULONG word, ULONG mask );
-
 
 #define AllocPotBits(___bits) \
       LP1(0x6, UWORD, AllocPotBits , UWORD, ___bits, d0,\
@@ -306,7 +420,8 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
 {
     if(!pprops) return;
 
-    // close interupt
+
+    // close vblank interupt, if using it
     if(pprops->_rbfint)
     {
         RemIntServer(INTB_VERTB,pprops->_rbfint);
@@ -315,14 +430,18 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
     if( pprops->_pintdata) FreeVec(pprops->_pintdata);
     //if(pprops->_signr != -1) FreeSignal(pprops->_signr);
 
-    //closetimer?
+    //closetimer? ->no just using vbl at the moment.
 
-    //freepotgo
+    //free potgo
     if(pprops->_allocatedBits != 0)
     {
         FreePotBits(pprops->_allocatedBits);
     }
-    //freejoyport devices
+
+    // order is important, to bring back mouse port to iput.device,
+    // we must free it first.
+
+    //free joyport devices
     for(int iportunit=0 ;iportunit<2 ; iportunit++)
     {
         struct PStickDevice *ppsd = &(pprops->_ports[iportunit]);
@@ -336,6 +455,11 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
         /*BYTE resdoio =*/ DoIO(&(ppsd->_gameportIOReq));
         CloseDevice(&(ppsd->_gameportIOReq));
     }
+#ifdef PPJS_TAKEPORT0CONTROL
+    // order is important
+    makeInputDeviceUseMousePortBack(pprops);
+#endif
+
     // remove gameport messagerie
     if( pprops->_portAdded)
     {
@@ -343,10 +467,11 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
        // pprops->_portAdded = 0;
     }
 
+
     FreeVec(pprops);
 }
 
-// should be asked once per frame by ports.
+// should be asked once per frame by ports, at any moment.
 // if error or still not ready, return ~0 (invalid). Do WaitTOF() twice after init and retry.
 // Bits 15-8   POT0Y value or POT1Y value
 // Bits 7-0    POT0X value or POT1X value
@@ -432,16 +557,6 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop)
     //     v |= (((ULONG)(joydat&1))<<(16-1)) | (((ULONG)(joydat&1))<<(17-9));
     // }
 //    return (ULONG)v;
-}
-const char *getProportionalStickErrorMessage(ULONG errcode)
-{
-    if(errcode == PROPJOYRET_NOHARDWARE) return "Harware is not proportionnal joystick capable";
-    if(errcode == PROPJOYRET_ALLOC) return "prop. joystick: can't alloc";
-    if(errcode == PROPJOYRET_DEVICEFAIL) return "prop. joystick: can't open gameport device.";
-    if(errcode == PROPJOYRET_DEVICEUSED) return "prop. joystick: gameport device locked.";
-    if(errcode == PROPJOYRET_NOANALOGPINS) return "prop. joystick: can't reserve analog pins.";
- //   if(errcode == PROPJOYRET_NOSIGNAL) return "prop. joystick: can't find signal.";
-    return "";
 }
 
 

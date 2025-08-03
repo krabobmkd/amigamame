@@ -234,6 +234,19 @@ struct _input_port_init_params
 #define APPLY_INVERSE_SENSITIVITY(x,s) (((x) >= 0) ? (((INT64)(x) * 100 - 50) / (s)) : ((-(INT64)(x) * 100 - 50) / -(s)))
 
 
+/* krb added */
+int input_machine_has_any_analog()
+{
+	input_port_entry *in;
+	/* scan the input port array ... */
+	for (in = Machine->input_ports; in->type != IPT_END; in++)
+		if (input_port_active(in))
+		{
+			if (port_type_is_analog(in->type)) return 1;
+		}
+    return 0;
+}
+
 
 /*************************************
  *
