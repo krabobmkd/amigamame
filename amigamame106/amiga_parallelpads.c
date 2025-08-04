@@ -79,7 +79,7 @@ static UBYTE *allocname = "Mame"; // or use task name ?
 //A5 - jump vector register (scratch)
 //A6 - scratch
 //all other registers must be preserved
-static void interuptfunc( register struct ParPadsInteruptData *ppi __asm("a1") )
+static int interuptfunc( register struct ParPadsInteruptData *ppi __asm("a1") )
 {
 
 // 	movea.l	_portptr,a1		; a1 now holds the destination
@@ -101,6 +101,7 @@ static void interuptfunc( register struct ParPadsInteruptData *ppi __asm("a1") )
 //        ppi->_counter++;
 //       if( ppi->_Signal) Signal( ppi->_Task, ppi->_Signal );
     }
+    return 0; // clear z flag
 }
 
 struct ParallelPads *createParallelPads()

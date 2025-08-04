@@ -37,7 +37,9 @@ struct PPSticksValues {
     WORD x,y; // coord
     WORD bt; // 1 & 2
 };
-#define PPJS_TAKEPORT0CONTROL 1
+// implement or not in code at compilation
+#define PPJSCODE_TAKEPORT0CONTROL 1
+#define PPJSCODE_ALLOWLOWLEVELTIMER 1
 
 // internal use, just the data exchanged between interupt and process.
 struct PPSticksInteruptData {
@@ -109,24 +111,35 @@ struct ProportionalSticks
     struct PPSticksInteruptData *_pintdata;
 
     // - - - - special things to get port1 control
-#ifdef PPJS_TAKEPORT0CONTROL
+#ifdef PPJSCODE_TAKEPORT0CONTROL
     struct IOStdReq _inputdevIOReq;
     BYTE    _inputtype,_dd,_ddd,_dddd;
     int _inputdevres;
 #endif
+
+#ifdef PPJSCODE_ALLOWLOWLEVELTIMER
+    APTR _ll_intHandler;
+#endif
+    // see enum
+    ULONG _timerMethod;
 };
 
-// some hardware has no potentiometer reading port at all (everything not amiga classic).
+// some hardware has no potentiometer port at all (everything not amiga classic).
 // if it returns 0, don't even try createProportionalSticks().
 int hasProportionalStickResource();
 
+// or'able flags for createProportionalSticks() param flags.
 #define PROPJOYFLAGS_PORT1 1
 #define PROPJOYFLAGS_PORT2 2
 // C64 pads need XY inversion ?
 #define PROPJOYFLAGS_PORT1_INVERTXY 4
 #define PROPJOYFLAGS_PORT2_INVERTXY 8
-// use LowLever timer API, if not, use vblank timer
-#define PROPJOYFLAGS_USELLTIMER 8
+
+// enum for createProportionalSticks() param timerMethod
+// dfault, use regular vblank (50 or 60Hz)
+#define PROPJOYTIMER_VBLANK_ADDINT 0
+// use cia timer the easy way.
+#define PROPJOYTIMER_LOWLEVEL_ADDTIMER 1
 
 // return codes in preturncode
 #define PROPJOYRET_OK 0
@@ -140,19 +153,21 @@ int hasProportionalStickResource();
 #define PROPJOYRET_NOANALOGPINS 8
 //#define PROPJOYRET_NOSIGNAL 6
 
+// to receive log from init.
 typedef void (*PPStickInitLogFunc)(int elevel,const char *pMessage);
 
-// public. use that.  PROPJOYFLAGS_PORT1|PROPJOYFLAGS_PORT2 for both ports.
-// preturncode and logFunc can be null.
-struct ProportionalSticks *createProportionalSticks(ULONG flag, ULONG *preturncode, PPStickInitLogFunc logFunc);
+// public. use that function.  PROPJOYFLAGS_PORT1|PROPJOYFLAGS_PORT2 for both ports.
+// preturncode and logFunc can be null. return NULL if fail, with code in preturncode.
+// logFunc can be NULL, else receive blabla.
+struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMethod, ULONG *preturncode, PPStickInitLogFunc logFunc);
 
+// to be called. Would makes huge troubles if not paired.
 void closeProportionalSticks(struct ProportionalSticks *prop);
 
-//olde ULONG getProportionalStickValues(struct ProportionalSticks *prop,ULONG iport);
 // call once per frame or so, then read prop->_values and check if valid.
 void ProportionalSticksUpdate(struct ProportionalSticks *prop);
 
-// if any after createProportionalSticks()
+// if any (*preturncode) error after createProportionalSticks().
 const char *getProportionalStickErrorMessage(ULONG errcode);
 
 

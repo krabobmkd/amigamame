@@ -20,16 +20,19 @@
 #include <stdio.h>
 
 
-
-
 // this one has custom.pot1dat
 #include <hardware/custom.h>
 #include <hardware/intbits.h>
 
 #include <devices/gameport.h>
 
-#ifdef PPJS_TAKEPORT0CONTROL
-#include <devices/input.h>
+#ifdef PPJSCODE_TAKEPORT0CONTROL
+    #include <devices/input.h>
+#endif
+
+#ifdef PPJSCODE_ALLOWLOWLEVELTIMER
+    #include <proto/lowlevel.h>
+    extern struct Library *LowLevelBase;
 #endif
 
 #include <resources/potgo.h>
@@ -74,14 +77,16 @@ int hasProportionalStickResource()
 // apparently from alib:
 extern struct Custom custom;
 
-static void interuptfunc( register struct PPSticksInteruptData *ppi __asm("a1") )
+//  - - - -generic
+static inline void inline_interuptfunc(register struct PPSticksInteruptData *ppi __asm("a1"))
 {
     // read value and relaunch potgo as soon as possible.
 
     // watch out ! values are linear to "current accumulated voltage since last Potgo start"
     // also if pin not allocated could not work (other app ?).
-    ppi->_last_potxdat[1] = custom.pot1dat; // could be  = ((UWORD *)0x00dff014); ((UWORD *)0x00dff012);
     ppi->_last_potxdat[0] = custom.pot0dat;
+    ppi->_last_potxdat[1] = custom.pot1dat; // could be  = ((UWORD *)0x00dff014); ((UWORD *)0x00dff012);
+
     // as fast as possible.
     WritePotgo(1,ppi->_allocatedbits); // value, mask of what is to write.
 
@@ -92,9 +97,40 @@ static void interuptfunc( register struct PPSticksInteruptData *ppi __asm("a1") 
 
     if(ppi->_nbcalls<2) ppi->_nbcalls++; // values valid after 2 calls.
 
-}
 
-#ifdef PPJS_TAKEPORT0CONTROL
+}
+// - - - - when interupt is installed with addIntServer
+static int interuptfunc_addIntServer( register struct PPSticksInteruptData *ppi __asm("a1") )
+{
+    inline_interuptfunc(ppi);
+    return 0; // should set z flag
+}
+// - - - - when interupt is installed with SetIntVector as override
+// NO ! TOO DANGEROUS
+//typedef int (setIntVectorFunc*)(
+//            register void* jumps __asm("a5"),
+//            register void* exec __asm("a6")
+//            );
+//struct Interrupt *globalstatic_previousVblankInt=NULL;
+//static struct PPSticksInteruptData *globalstatic_ppi=NULL;
+//static void interuptfunc_setIntVector(
+//            register void* jumps __asm("a5"),
+//            register void* exec __asm("a6")
+//            )
+//{
+//    // vblank should apply that at once.
+//    inline_interuptfunc(globalstatic_ppi);
+//    // supercall - ultradangerous
+//    if(globalstatic_previousvblankInt)
+//    {
+//        setIntVectorFunc prev = (setIntVectorFunc)globalstatic_previousVblankInt->is_Code;
+//        prev(jumps,exec);
+//    }
+//}
+
+
+
+#ifdef PPJSCODE_TAKEPORT0CONTROL
 // if need analog controller on mouse port, need to tell input.device to release it...
 static void makeInputDeviceReleaseMousePort(struct ProportionalSticks *pprops)
 {
@@ -172,7 +208,7 @@ static void makeInputDeviceUseMousePortBack(struct ProportionalSticks *pprops)
     }
 }
 #endif
-struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG *preturncode, PPStickInitLogFunc logFunc)
+struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMethod, ULONG *preturncode, PPStickInitLogFunc logFunc)
 {
 
     if((flags &3)==0) return NULL; // need port1 or/and port2
@@ -194,12 +230,15 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG *preturnc
 
     if(preturncode) *preturncode = PROPJOYRET_OK; // default for now on.
 
-#ifdef PPJS_TAKEPORT0CONTROL
+    pprops->_timerMethod = timerMethod;
+
+#ifdef PPJSCODE_TAKEPORT0CONTROL
     // not ok:
     pprops->_inputdevres = 1;
 #endif
     pprops->_ports[0]._deviceresult = 1; // ports not ok by default.
     pprops->_ports[1]._deviceresult = 1;
+
  //   pprops->_signr = -1; // default error state for this.
 
     pprops->_Task = FindTask(NULL);
@@ -240,7 +279,7 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG *preturnc
                 /*BYTE resdoio =*/ DoIO(&(ppsd->_gameportIOReq));
 
                // special case,experimental code , looks like working !
-#ifdef PPJS_TAKEPORT0CONTROL
+#ifdef PPJSCODE_TAKEPORT0CONTROL
                 // if gameport unit 0 not available, ask input.device to free it.
                 if(iportunit==0 && ppsd->_portType != GPCT_NOCONTROLLER)
                 {
@@ -378,6 +417,12 @@ VOID  __stdargs WritePotgo( ULONG word, ULONG mask );
 //        if(preturncode) *preturncode = PROPJOYRET_NOSIGNAL;
 //        return NULL;
 //    }
+    // this must be done before
+    pprops->_calibration[0].x.min = 255;
+    pprops->_calibration[0].y.min = 255;
+    pprops->_calibration[1].x.min = 255;
+    pprops->_calibration[1].y.min = 255;
+
 
     struct PPSticksInteruptData *pintdata;
     pprops->_pintdata = pintdata = AllocVec(sizeof(struct PPSticksInteruptData), MEMF_PUBLIC|MEMF_CLEAR);
@@ -389,29 +434,48 @@ VOID  __stdargs WritePotgo( ULONG word, ULONG mask );
     }
     pintdata->_allocatedbits = pprops->_allocatedBits;
 
-    struct Interrupt *rbfint;
-    pprops->_rbfint = rbfint = AllocVec(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR);
-    if(!rbfint)
+    int useVblankAsTimer; // = (timerMethod == PROPJOYTIMER_VBLANK_ADDINT);
+#ifdef PPJSCODE_ALLOWLOWLEVELTIMER
+    if(timerMethod == PROPJOYTIMER_LOWLEVEL_ADDTIMER && (LowLevelBase != NULL))
     {
-        closeProportionalSticks(pprops);
-        if(preturncode) *preturncode = PROPJOYRET_ALLOC;
-        return NULL;
+        pprops->_ll_intHandler = AddTimerInt(&interuptfunc_addIntServer,pintdata);
+        if(pprops->_ll_intHandler == NULL)
+        {   // no cia timer available, switch back to vblank !
+            timerMethod = PROPJOYTIMER_VBLANK_ADDINT;
+            useVblankAsTimer = 1;
+        }else
+        {
+            useVblankAsTimer=0;
+            // microseconds, max is 90 000 , 20000 -> 50hz
+            //  3rd param: 0 one shot, 1, multiple. (what an excellent function)
+            StartTimerInt(pprops->_ll_intHandler, 20000, /*continuous*/ 1);
+        }
+    } else
+    {
+        useVblankAsTimer = 1;
     }
+#else
+    timerMethod = PROPJOYTIMER_VBLANK_ADDINT;
+    useVblankAsTimer = 1;
+#endif
+    if(useVblankAsTimer)
+    {
+        struct Interrupt *rbfint;
+        pprops->_rbfint = rbfint = AllocVec(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR);
+        if(!rbfint)
+        {
+            closeProportionalSticks(pprops);
+            if(preturncode) *preturncode = PROPJOYRET_ALLOC;
+            return NULL;
+        }
+        //    pintdata->_Task = pprops->_Task;
+        //    pintdata->_Signal = 1L << signr;
+        rbfint->is_Node.ln_Name = (char *)"MAMEpotgo";
+        rbfint->is_Data = (APTR)pintdata;
+        rbfint->is_Code = &interuptfunc_addIntServer;
 
-    // this must be done before
-    pprops->_calibration[0].x.min = 255;
-    pprops->_calibration[0].y.min = 255;
-    pprops->_calibration[1].x.min = 255;
-    pprops->_calibration[1].y.min = 255;
-//    pintdata->_Task = pprops->_Task;
-//    pintdata->_Signal = 1L << signr;
-
-    rbfint->is_Node.ln_Name = (char *)"MAMEpotgo";
-    rbfint->is_Data = (APTR)pintdata;
-    rbfint->is_Code = &interuptfunc;
-
-    AddIntServer(INTB_VERTB,rbfint);
-
+        AddIntServer(INTB_VERTB,rbfint);
+    }
 
     return pprops;
 }
@@ -420,7 +484,15 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
 {
     if(!pprops) return;
 
-
+#ifdef PPJSCODE_ALLOWLOWLEVELTIMER
+    // close ll cia timer if needed
+    if(pprops->_ll_intHandler && (LowLevelBase != NULL))
+    {
+        StopTimerInt(pprops->_ll_intHandler);
+        RemTimerInt(pprops->_ll_intHandler);
+        pprops->_ll_intHandler = NULL;
+    }
+#endif
     // close vblank interupt, if using it
     if(pprops->_rbfint)
     {
@@ -455,7 +527,7 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
         /*BYTE resdoio =*/ DoIO(&(ppsd->_gameportIOReq));
         CloseDevice(&(ppsd->_gameportIOReq));
     }
-#ifdef PPJS_TAKEPORT0CONTROL
+#ifdef PPJSCODE_TAKEPORT0CONTROL
     // order is important
     makeInputDeviceUseMousePortBack(pprops);
 #endif
@@ -503,7 +575,7 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop)
             UWORD t=vx; vx=vy; vy=t;
             t=bt1; bt1=bt2; bt2=t; // on c64/atari paddles,there's a button on each, they because 2 buttons on joysticks.
         }
-        // - - - - -  - let's go for the auto-calibration affair
+        // - - - - -  - let's go for that auto-calibration affair
         if(vx<prop->_calibration[iport].x.min) prop->_calibration[iport].x.min = vx;
         if(vx>prop->_calibration[iport].x.max) prop->_calibration[iport].x.max = vx;
         if(vy<prop->_calibration[iport].y.min) prop->_calibration[iport].y.min = vy;
@@ -534,29 +606,6 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop)
 
     } // end iport loop
 
-//OLDE
-    // if((!prop->_pintdata) || (iport>1) ||
-    //  (prop->_ports[iport]._deviceresult !=0) ||
-    //    (prop->_pintdata->_nbcalls<2)
-    // ) return 0xffffffffUL;
-
-
-//OLDE ULONG iport
-    // // cast ulong so ~0 is an error.
-    // ULONG v = (ULONG) prop->_pintdata->_last_potxdat[iport];
-    // ULONG joydat = (ULONG) prop->_pintdata->_last_joyxdat[iport];
-    // // C64 / Atari Pads has XY inverted ? ... ok.
-    // if((iport == 0) && (prop->_flags & PROPJOYFLAGS_PORT1_INVERTXY))
-    // {
-    //     v = (ULONG)((v>>8)&0x00ff) | (ULONG)(v<<8) | (((ULONG)(joydat&1))<<(17-1))| (((ULONG)(joydat&9))<<(16-9));
-    // } else if((iport == 1) && (prop->_flags & PROPJOYFLAGS_PORT2_INVERTXY))
-    // {
-    //     v = (ULONG)((v>>8)&0x00ff) | (ULONG)(v<<8) | (((ULONG)(joydat&1))<<(17-1))| (((ULONG)(joydat&9))<<(16-9)) ;
-    // } else
-    // {   // buttons, not inverted
-    //     v |= (((ULONG)(joydat&1))<<(16-1)) | (((ULONG)(joydat&1))<<(17-9));
-    // }
-//    return (ULONG)v;
 }
 
 

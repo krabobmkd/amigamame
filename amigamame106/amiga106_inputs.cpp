@@ -183,7 +183,7 @@ struct ProportionalSticks *g_PropsSticks=NULL;
 extern "C" {
     struct Library *LowLevelBase = NULL;
 #ifdef USE_DIRECT_KEYBOARD_DEVICE
-static void mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1") )
+static int mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1") )
 {
     struct KeyboardMatrix km;
     // hello this is executed at 50Hz or 60Hz, whatever happens . It's a vblank interupt.
@@ -201,7 +201,7 @@ static void mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1
     pkm->_kl[2] |= km._kl[2];
     pkm->_kl[3] |= km._kl[3]; // not sure if useful.
     }
-
+    return 0; // must clear z flag
 }
 #endif
 
@@ -334,7 +334,9 @@ void ConfigureLowLevelLib()
             if(input_machine_has_any_analog())
             {
                 ULONG result=PROPJOYRET_OK;
-                g_PropsSticks = createProportionalSticks(propJoysticksFlags,&result,loginfo2); // could fail.
+                g_PropsSticks = createProportionalSticks(propJoysticksFlags,
+                                                        PROPJOYTIMER_LOWLEVEL_ADDTIMER, // try cia timer
+                                                        &result,loginfo2); // could fail.
 
                 if(result != PROPJOYRET_OK)
                 {
