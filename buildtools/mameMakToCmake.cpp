@@ -9,8 +9,8 @@
 #include <filesystem>
 using namespace std;
 
-//string sourcebase("../../../mame106/");
-string sourcebase("../mame106/");
+string sourcebase("../../../mame106/");
+//string sourcebase("../mame106/");
 
 class TGameDriver {
     public:
@@ -457,7 +457,12 @@ int patchMiniMachines(
 "dkongjrm","bongo","zigzag",
 
 "gaplus","galaga3",
-"frogger","frogseg1"
+"frogger","frogseg1",
+
+"cclimber","cclimbrj","ckong","ckonga","bigkong","monkeyd",
+"rpatrolb","rpatrolo","silvland","cannonb","cannonb2","ckongb",
+
+"swimmer","guzzler"
 
 });
 
@@ -472,6 +477,11 @@ int patchMiniMachines(
 		"machine/gaplus.c", "vidhrdw/gaplus.c",
         "drivers/frogger.c", // what?
         "machine/konamigx.c",
+        // brrr
+        "drivers/cclimber.c","sndhrdw/cclimber.c","vidhrdw/cclimber.c",
+
+
+
 
 //            "sound/namco52.c","sound/namco54.c",
 //             "sound/namco.c",

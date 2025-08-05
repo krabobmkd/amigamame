@@ -25,6 +25,7 @@ extern "C" {
     #include <libraries/lowlevel.h>
     #include <devices/keyboard.h>
     #include <hardware/intbits.h>
+    #include <hardware/cia.h>
 }
 
 #include <vector>
@@ -215,10 +216,11 @@ static int mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1"
 //     }
 // }
 // when effective;y asked, to further close.
-static USHORT askedPadsRawKey = 0;
+static USHORT askedPadsRawKey[2] = {0,0};
 static USHORT useAnyMouse = 0;
 static USHORT usePropJoysticks = 0;
 static USHORT useAnyLowLevelControl = 0;
+static USHORT dddummmy = 0;
 #ifdef RJP_OPTION
 static USHORT useReadJoyPortForPads = 0; // else rawkeys, added for NewLowlevel patch for A2000.
 #endif
@@ -271,26 +273,14 @@ void ConfigureLowLevelLib()
     #endif
     if(LowLevelBase)
     {
+        //looks useless and upset propsjoy
         // for correct autosense, (we don't use flappy LL autosenese, but ll docs says to do it..)
-        for(int itest=0;itest<2;itest++)
-        {
-            for(int iport=0;iport<4;iport++) ReadJoyPort(iport);
-            WaitTOF();
-            WaitTOF();
-        }
-
-        if(askedPadsRawKey==0
-        #ifdef RJP_OPTION
-             && useReadJoyPortForPads==0
-        #endif
-         )
-        {
-            SystemControl(
-                SCON_AddCreateKeys,0,
-                SCON_AddCreateKeys,1,
-                TAG_END,0);
-            askedPadsRawKey = 1;
-        }
+        // for(int itest=0;itest<2;itest++)
+        // {
+        //     for(int iport=0;iport<4;iport++) ReadJoyPort(iport);
+        //     WaitTOF();
+        //     WaitTOF();
+        // }
 
         for(int iLLPort=0;iLLPort<4;iLLPort++) // 2 hardware DB9 port, +the elusive mysterious 3&4 lowlevel ports.
         {
@@ -299,8 +289,20 @@ void ConfigureLowLevelLib()
 
             int lowlevelState = configControls._llPort_Type[iLLPort];
             if(lowlevelState>0 && lowlevelState<=3)
-            {   // configure port as mouse,jostick or CD32 pads...
+            {
+                if(askedPadsRawKey[iLLPort]==0
+                #ifdef RJP_OPTION
+                     && useReadJoyPortForPads==0
+                #endif
+                    && iLLPort<2
+                 )
+                {
+                    SystemControl( SCON_AddCreateKeys,iLLPort, TAG_END,0);
+                    askedPadsRawKey[iLLPort] = 1;
+                }
+                // configure port as mouse,jostick or CD32 pads...
                 SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
+
             }
         } // loop by ll port
 
@@ -335,7 +337,7 @@ void ConfigureLowLevelLib()
             {
                 ULONG result=PROPJOYRET_OK;
                 g_PropsSticks = createProportionalSticks(propJoysticksFlags,
-                                                        PROPJOYTIMER_LOWLEVEL_ADDTIMER, // try cia timer
+                                                        0/*PROPJOYTIMER_LOWLEVEL_ADDTIMER*/, // try cia timer
                                                         &result,loginfo2); // could fail.
 
                 if(result != PROPJOYRET_OK)
@@ -357,18 +359,23 @@ void ConfigureLowLevelLib()
 }
 void CloseLowLevelLib()
 {
+    int i;
     if(LowLevelBase == NULL) return;
 
-    if(askedPadsRawKey)
+    for(i=0;i<2;i++)
     {
-        SystemControl(
-            // stops rawkey codes for the joystick/game
-            SCON_RemCreateKeys,0,
-            SCON_RemCreateKeys,1,
-            TAG_END,0
-            );
-        askedPadsRawKey = 0;
+        if(askedPadsRawKey[i])
+        {
+            SystemControl(
+                // stops rawkey codes for the joystick/game
+                SCON_RemCreateKeys,i,
+                TAG_END,0
+                );
+
+            askedPadsRawKey[i] = 0;
+        }
     }
+
     if(LowLevelBase) CloseLibrary(LowLevelBase);
     LowLevelBase = NULL;
 
@@ -715,10 +722,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
         // ciabpra is parralel portcontrol bits, used for joystick buttons.
         // commodore official SDK defines
 //#define CIAF_PRTRSEL	(1L<<2)
-//#define CIAF_PRTRPOUT	(1L<<1)  -> should work ok
+//#define CIAF_PRTRPOUT	(1L<<1)  -> should be available for pr3 bt2
 //#define CIAF_PRTRBUSY	(1L<<0)
-        static const UWORD prportFireBits[]={0x0004,0x0001};
-        static const UWORD prportFire2Bits[]={0x0002,0x0000};
+        static const UWORD prportFire1Bits[]={0x0004,0x0001};
 
         for(int iparallelportJoystick=0 ; iparallelportJoystick<2 ; iparallelportJoystick++)
         {
@@ -738,10 +744,16 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 }
                 // fire bt
                 g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+iPlayer_rkshift] =
-                    (BYTE)((prportFireBits[iparallelportJoystick] & state)!=0); // down
-                // r1.6: may have second button on parallel port jstick
-                g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_BLUE+iPlayer_rkshift] =
-                    (BYTE)((prportFireBits[iparallelportJoystick] & state)!=0); // down
+                    (BYTE)((prportFire1Bits[iparallelportJoystick] & state)!=0); // down
+
+                // r1.6: may have second button on parallel port jstick 3 ,
+                //  but also need one more wire in parallel extension.
+                // no internally managed pin bit left for pr4 bt2
+                if(iparallelportJoystick==0)
+                {
+                    g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_BLUE+iPlayer_rkshift] =
+                        (BYTE)((CIAF_PRTRPOUT & state)!=0); // down
+                }
             }
         }
 
@@ -961,7 +973,6 @@ void RawKeyMap::init()
     };
     MameConfig::Controls &configControls = getMainConfig().controls();
     MameConfig::Misc &configMisc = getMainConfig().misc();
- //   int amega32order = (int)((configMisc._MiscFlags & 1) != 0);
 
     // then add player to paddle according to conf.    
     // lowlevel send rawkeys for each CD32 pads.
@@ -1000,6 +1011,7 @@ void RawKeyMap::init()
                 _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
 
         } // end loop by port
+        // then parallel port joystick extension pr3 pr4
         for(int ipar=0;ipar<2;ipar++) // actually 2
         {
             int iplayer = configControls._parallelPort_Player[ipar];
@@ -1014,6 +1026,7 @@ void RawKeyMap::init()
 
         // joystick are not CD32 pads, can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
           vector<os_code_info> kbi2={
+          // note standard parallel port extensions joysticks manages 1bt each, 2nd button only if hw hack.
             {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
             {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
             //{padsbtnames[iport][2],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
@@ -1034,6 +1047,7 @@ void RawKeyMap::init()
     // then may add analog controls
 
    // printf("***  USE ANY MOUSE \n");
+   // publish amiga mouses and trackballs as "Mouse" (so "relative analog") to MAME.
     for(int iport=0;iport<4;iport++) // actually 2
     {
         int iplayer = configControls._llPort_Player[iport];
@@ -1073,23 +1087,21 @@ void RawKeyMap::init()
                                 MOUSECODE_1_BUTTON3+((iplayer-1)*mameMouseBtSizePerPl) });
             }
         } // end if LL mouse
-        // release 1.6: manage real analog inputs
+        // release 1.6: also manage real proportional-analog-potentiometer-based inputs
+        // published as "analog jostick" to MAME (treated as "absolute analog").
+        // only games with analog inputs will be able to use that.
         else if((itype == PORT_TYPE_PROPORTIONALJOYSTICK ||
                 itype == PORT_TYPE_C64PADDLE) && iport<2) // iport<2 because direct DB9 port1/2 code, not Lowlevel lib.
         {
             int ispad = (itype == PORT_TYPE_C64PADDLE)?1:0;
-            // these are real analog potentiometer, with 8b absolute coords.
-            // let's declare them to MAME with enums JOYCODE_1_ANALOG_X
+
                 int analogmamecodeshift = ((int)JOYCODE_2_ANALOG_X-(int)JOYCODE_1_ANALOG_X)*(iplayer-1);
                 // but yet 2 bt joysticks. we need that.
                 int buttonmamecodeshift = ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT)*(iplayer-1);
                 int ipshft = iport<<8; // still use Lowlevel keycodes for buttons
-
-
-        //static const char * const _AnalogNames[2][2][4]=
-        // still prop joy buttons are told mame they bare regular joystick buttons... (not same reading code!)
-        // importent thing here is JOYCODE_1_ANALOG_X/Y that tells mame we are an analog joystick
-        // and so games with analog inputs will by default use it. (theorically)
+        // these are real analog potentiometer, with 8b absolute coords.
+        // let's declare them to MAME with enums JOYCODE_1_ANALOG_X
+        // prop.joy button declared as regular joystick buttons...
               vector<os_code_info> kbi2={
         {_AnalogNames[ispad][iport][2],PROPJOY_CODESTART+(iport*8)+2,JOYCODE_1_BUTTON1+buttonmamecodeshift},
         {_AnalogNames[ispad][iport][3],PROPJOY_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift},
@@ -1144,7 +1156,7 @@ void RawKeyMap::init()
         // printf("code with no name:%d\n",keystodo[i]);
         }
     }
-    // then add those which need a rawkey mapped to a mame constant, with varying name
+    // then add keys which need a rawkey mapped to a mame constant, with varying name
     // mame enum was modified for this.
     static string key3a_name;
     mapRawKeyToString((UWORD)0x003A,key3a_name);

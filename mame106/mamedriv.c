@@ -1859,12 +1859,20 @@ const game_driver * const drivers[] =
 #endif
 #ifdef LINK_JUSTGALAGA
 	DRIVER( battles ) /* 1982 "bootleg" "Battles" */
+	DRIVER( bigkong ) /*    */
 	DRIVER( bongo ) /* 1983 "Jetsoft" "Bongo" */
 	DRIVER( bosco ) /* 1981 "Namco" "Bosconian (new version)" */
 	DRIVER( boscomd ) /* 1981 "[Namco] (Midway license)" "Bosconian (Midway */
 	DRIVER( boscomdo ) /* 1981 "[Namco] (Midway license)" "Bosconian (Midway */
 	DRIVER( boscoo ) /* 1981 "Namco" "Bosconian (old version)" */
 	DRIVER( boscoo2 ) /* 1981 "Namco" "Bosconian (older version)" */
+	DRIVER( cannonb ) /*    */
+	DRIVER( cannonb2 ) /*    */
+	DRIVER( cclimber ) /*    */
+	DRIVER( cclimbrj ) /*    */
+	DRIVER( ckong ) /*    */
+	DRIVER( ckonga ) /*    */
+	DRIVER( ckongb ) /*    */
 	DRIVER( digdug ) /* 1982 "Namco" "Dig Dug (rev 2)" */
 	DRIVER( digduga1 ) /* 1982 "[Namco] (Atari license)" "Dig Dug (Atari */
 	DRIVER( digdugat ) /* 1982 "[Namco] (Atari license)" "Dig Dug (Atari */
@@ -1884,7 +1892,13 @@ const game_driver * const drivers[] =
 	DRIVER( galmidw ) /* 1979 "[Namco] (Midway license)" "Galaxian (Midway)" */
 	DRIVER( gaplus ) /* 1984 "Namco" "Gaplus (rev. D)" */
 	DRIVER( gatsbee ) /* 1984 "hack" "Gatsbee" */
+	DRIVER( guzzler ) /*    */
+	DRIVER( monkeyd ) /*    */
 	DRIVER( mooncrst ) /* 1980 "Nichibutsu" "Moon Cresta (Nichibutsu)" */
+	DRIVER( rpatrolb ) /*    */
+	DRIVER( rpatrolo ) /*    */
+	DRIVER( silvland ) /*    */
+	DRIVER( swimmer ) /*    */
 	DRIVER( sxevious ) /* 1984 "Namco" "Super Xevious" */
 	DRIVER( xevios ) /* 1982 "bootleg" "Xevios" */
 	DRIVER( xevious ) /* 1982 "Namco" "Xevious (Namco)" */
@@ -3312,6 +3326,7 @@ const game_driver * const drivers[] =
 	DRIVER( battles ) /* 1982 "bootleg" "Battles" */
 	DRIVER( berabohm ) /* 1988 "Namco" "Beraboh Man (Japan version C)" */
 	DRIVER( beraboho ) /* 1988 "Namco" "Beraboh Man (Japan version B)" */
+	DRIVER( bigkong ) /*    */
 	DRIVER( bkrtmaq ) /* 1992 "Namco" "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)" */
 	DRIVER( blastoff ) /* 1989 "Namco" "Blast Off (Japan)" */
 	DRIVER( blazer ) /* 1987 "Namco" "Blazer (Japan)" */
@@ -3326,11 +3341,18 @@ const game_driver * const drivers[] =
 	DRIVER( boxyboy ) /* 1990 "Namco" "Boxy Boy (US)" */
 	DRIVER( burnforc ) /* 1989 "Namco" "Burning Force (Japan new version)" */
 	DRIVER( burnfrco ) /* 1989 "Namco" "Burning Force (Japan old version)" */
+	DRIVER( cannonb ) /*    */
+	DRIVER( cannonb2 ) /*    */
+	DRIVER( cclimber ) /*    */
+	DRIVER( cclimbrj ) /*    */
 	DRIVER( cgangpzj ) /* 1992 "Namco" "Cosmo Gang the Puzzle (Japan)" */
 	DRIVER( cgangpzl ) /* 1992 "Namco" "Cosmo Gang the Puzzle (US)" */
 	DRIVER( checkmaj ) /* 1982 "Jaleco" "Check Man (Japan)" */
 	DRIVER( checkman ) /* 1982 "Zilec-Zenitone" "Check Man" */
 	DRIVER( chewing ) /* 19?? "unknown" "Chewing Gum" */
+	DRIVER( ckong ) /*    */
+	DRIVER( ckonga ) /*    */
+	DRIVER( ckongb ) /*    */
 	DRIVER( commsega ) /* 1983 "Sega" "Commando (Sega)" */
 	DRIVER( cosmogng ) /* 1991 "Namco" "Cosmo Gang the Video (US)" */
 	DRIVER( cosmognj ) /* 1991 "Namco" "Cosmo Gang the Video (Japan)" */
@@ -3427,6 +3449,7 @@ const game_driver * const drivers[] =
 	DRIVER( gteikoku ) /* 1980 "Irem" "Gingateikoku No Gyakushu" */
 	DRIVER( gunbulet ) /* 1994 "Namco" "Gun Bullet (Japan)" */
 	DRIVER( gutangtn ) /* 1982 "Konami (Sega license)" "Guttang Gottong" */
+	DRIVER( guzzler ) /*    */
 	DRIVER( hexpool ) /* 1986 "Shinkai" "Hex Pool" */
 	DRIVER( hopmappy ) /* 1986 "Namco" "Hopping Mappy" */
 	DRIVER( hunchbkg ) /* 1983 "Century Electronics" "Hunchback (Galaxian hardware)" */
@@ -3461,6 +3484,7 @@ const game_driver * const drivers[] =
 	DRIVER( metrocrs ) /* 1985 "Namco" "Metro-Cross (set 1)" */
 	DRIVER( mirninja ) /* 1988 "Namco" "Mirai Ninja (Japan)" */
 	DRIVER( mmaze ) /* 1988 "Namco" "Marchen Maze (Japan)" */
+	DRIVER( monkeyd ) /*    */
 	DRIVER( moonal2 ) /* 1980 "Nichibutsu" "Moon Alien Part 2" */
 	DRIVER( moonal2b ) /* 1980 "Nichibutsu" "Moon Alien Part 2 (older version)" */
 	DRIVER( moonaln ) /* 19?? "[Nichibutsu] (Karateco license)" "Moon Alien" */
@@ -3546,6 +3570,8 @@ const game_driver * const drivers[] =
 	DRIVER( roishtar ) /* 1986 "Namco" "The Return of Ishtar" */
 	DRIVER( rompers ) /* 1989 "Namco" "Rompers (Japan)" */
 	DRIVER( romperso ) /* 1989 "Namco" "Rompers (Japan old version)" */
+	DRIVER( rpatrolb ) /*    */
+	DRIVER( rpatrolo ) /*    */
 	DRIVER( rthun2 ) /* 1990 "Namco" "Rolling Thunder 2" */
 	DRIVER( rthun2j ) /* 1990 "Namco" "Rolling Thunder 2 (Japan)" */
 	DRIVER( rthunder ) /* 1986 "Namco" "Rolling Thunder (new version)" */
@@ -3557,6 +3583,7 @@ const game_driver * const drivers[] =
 	DRIVER( sgunnerj ) /* 1990 "Namco" "Steel Gunner (Japan)" */
 	DRIVER( sgunnr2j ) /* 1991 "Namco" "Steel Gunner 2 (Japan)" */
 	DRIVER( shadowld ) /* 1987 "Namco" "Shadowland" */
+	DRIVER( silvland ) /*    */
 	DRIVER( skybase ) /* 1982 "Omori Electric Co. Ltd." */
 	DRIVER( skykid ) /* 1985 "Namco" "Sky Kid (New Ver.)" */
 	DRIVER( skykidd ) /* 1985 "Namco" "Sky Kid (60A1 Ver.)" */
@@ -3585,6 +3612,7 @@ const game_driver * const drivers[] =
 	DRIVER( swarm ) /* 1979 "hack" "Swarm" */
 	DRIVER( swcourt ) /* 1992 "Namco" "Super World Court (World)" */
 	DRIVER( swcourtj ) /* 1992 "Namco" "Super World Court (Japan)" */
+	DRIVER( swimmer ) /*    */
 	DRIVER( sws ) /* 1992 "Namco" "Super World Stadium (Japan)" */
 	DRIVER( sws92 ) /* 1992 "Namco" "Super World Stadium '92 (Japan)" */
 	DRIVER( sws92g ) /* 1992 "Namco" "Super World Stadium '92 Gekitouban (Japan)" */

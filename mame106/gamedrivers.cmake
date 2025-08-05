@@ -826,8 +826,9 @@ if(OPT_JUSTGALAGA)
 		machine/xevious.c vidhrdw/xevious.c vidhrdw/digdug.c machine/atari_vg.c 
 		drivers/galaxian.c sndhrdw/galaxian.c vidhrdw/galaxian.c drivers/gaplus.c 
 		machine/gaplus.c vidhrdw/gaplus.c drivers/frogger.c machine/konamigx.c 
-		machine/atarigen.c machine/atarigen.h machine/atari_vg.c sndhrdw/atarijsa.c 
-		sndhrdw/atarijsa.h 	)
+		drivers/cclimber.c sndhrdw/cclimber.c vidhrdw/cclimber.c machine/atarigen.c 
+		machine/atarigen.h machine/atari_vg.c sndhrdw/atarijsa.c sndhrdw/atarijsa.h 
+	)
 	set(MSND_FILTER ON)
 	set(MSND_NAMCO ON)
 	set(MSND_NAMCO_52XX ON)
