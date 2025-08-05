@@ -1796,7 +1796,7 @@ const game_driver * const drivers[] =
 	DRIVER( exerionb ) /* 1983 "Jaleco" "Exerion (bootleg)" */
 	DRIVER( exeriont ) /* 1983 "Jaleco (Taito America license)" "Exerion (Taito)" */
 	DRIVER( exerizrb ) /* 1987 "Jaleco" "Exerizer (Japan) (bootleg)" */
-	DRIVER( f1gpstar ) /* 1991 "Jaleco" "Grand Prix Star" */
+	DRIVER( f1gpstar ) /* 1991 "Jaleco" "F-1 Grand Prix Star" */
 	DRIVER( f1gpstr2 ) /* 1993 "Jaleco" "F-1 Grand Prix Star II" */
 	DRIVER( fcombat ) /* 1985 "Jaleco" "Field Combat" */
 	DRIVER( formatz ) /* 1984 "Jaleco" "Formation Z" */
@@ -1859,6 +1859,7 @@ const game_driver * const drivers[] =
 #endif
 #ifdef LINK_JUSTGALAGA
 	DRIVER( battles ) /* 1982 "bootleg" "Battles" */
+	DRIVER( bongo ) /* 1983 "Jetsoft" "Bongo" */
 	DRIVER( bosco ) /* 1981 "Namco" "Bosconian (new version)" */
 	DRIVER( boscomd ) /* 1981 "[Namco] (Midway license)" "Bosconian (Midway */
 	DRIVER( boscomdo ) /* 1981 "[Namco] (Midway license)" "Bosconian (Midway */
@@ -1868,19 +1869,29 @@ const game_driver * const drivers[] =
 	DRIVER( digduga1 ) /* 1982 "[Namco] (Atari license)" "Dig Dug (Atari */
 	DRIVER( digdugat ) /* 1982 "[Namco] (Atari license)" "Dig Dug (Atari */
 	DRIVER( digdugb ) /* 1982 "Namco" "Dig Dug (rev 1)" */
+	DRIVER( dkongjrm ) /* 1982 "bootleg" "Donkey Kong Jr. (Moon Cresta hardware)" */
 	DRIVER( dzigzag ) /* 1982 "bootleg" "Zig Zag (Dig Dug hardware)" */
+	DRIVER( frogger ) /*    */
+	DRIVER( frogseg1 ) /*    */
 	DRIVER( galaga ) /* 1981 "Namco" "Galaga (Namco rev. B)" */
+	DRIVER( galaga3 ) /* 1984 "Namco" "Galaga 3 (rev. C)" */
 	DRIVER( galagamk ) /* 1981 "[Namco] (Midway license)" "Galaga (Midway set 2)" */
 	DRIVER( galagamw ) /* 1981 "[Namco] (Midway license)" "Galaga (Midway set 1)" */
 	DRIVER( galagao ) /* 1981 "Namco" "Galaga (Namco)" */
+	DRIVER( galaxiaj ) /* 1979 "Namco" "Galaxian (Namco set 2)" */
+	DRIVER( galaxian ) /* 1979 "Namco" "Galaxian (Namco set 1)" */
 	DRIVER( gallag ) /* 1981 "bootleg" "Gallag" */
+	DRIVER( galmidw ) /* 1979 "[Namco] (Midway license)" "Galaxian (Midway)" */
+	DRIVER( gaplus ) /* 1984 "Namco" "Gaplus (rev. D)" */
 	DRIVER( gatsbee ) /* 1984 "hack" "Gatsbee" */
+	DRIVER( mooncrst ) /* 1980 "Nichibutsu" "Moon Cresta (Nichibutsu)" */
 	DRIVER( sxevious ) /* 1984 "Namco" "Super Xevious" */
 	DRIVER( xevios ) /* 1982 "bootleg" "Xevios" */
 	DRIVER( xevious ) /* 1982 "Namco" "Xevious (Namco)" */
 	DRIVER( xeviousa ) /* 1982 "Namco (Atari license)" "Xevious (Atari set 1)" */
 	DRIVER( xeviousb ) /* 1982 "Namco (Atari license)" "Xevious (Atari set 2)" */
 	DRIVER( xeviousc ) /* 1982 "Namco (Atari license)" "Xevious (Atari set 3)" */
+	DRIVER( zigzag ) /* 1982 "LAX" "Zig Zag (Galaxian hardware */
 #endif
 #ifdef LINK_KANEKO
 	DRIVER( airbustj ) /* 1990 "Kaneko (Namco license)" "Air Buster: Trouble Specialty Raid Unit (Japan)" */
@@ -2695,6 +2706,61 @@ const game_driver * const drivers[] =
 	DRIVER( zero ) /* 1980 "Jeutel" "Zero" */
 	DRIVER( zwackery ) /* 1984 "Bally Midway" "Zwackery" */
 #endif
+#ifdef LINK_MIDWAYMCR
+	DRIVER( archriv2 ) /* 1989 "Bally Midway" "Arch Rivals (rev 2.0)" */
+	DRIVER( archrivl ) /* 1989 "Bally Midway" "Arch Rivals (rev 4.0)" */
+	DRIVER( blasted ) /* 1988 "Bally Midway" "Blasted" */
+	DRIVER( crater ) /* 1984 "Bally Midway" "Crater Raider" */
+	DRIVER( defender ) /* 1980 "Williams" "Defender (Red label)" */
+	DRIVER( defendg ) /* 1980 "Williams" "Defender (Green label)" */
+	DRIVER( defendw ) /* 1980 "Williams" "Defender (White label)" */
+	DRIVER( demoderb ) /* 1984 "Bally Midway" "Demolition Derby" */
+	DRIVER( demoderm ) /* 1984 "Bally Midway" "Demolition Derby (2-Player Mono Board Version)" */
+	DRIVER( domino ) /* 1982 "Bally Midway" "Domino Man" */
+	DRIVER( dotron ) /* 1983 "Bally Midway" "Discs of Tron (Upright)" */
+	DRIVER( dotrona ) /* 1983 "Bally Midway" "Discs of Tron (Upright alternate)" */
+	DRIVER( dotrone ) /* 1983 "Bally Midway" "Discs of Tron (Environmental)" */
+	DRIVER( inferno ) /* 1984 "Williams" "Inferno" */
+	DRIVER( journey ) /* 1983 "Bally Midway" "Journey" */
+	DRIVER( joust ) /* 1982 "Williams" "Joust (White/Green label)" */
+	DRIVER( joust2 ) /* 1986 "Williams" "Joust 2 - Survival of the Fittest (set 1)" */
+	DRIVER( joustr ) /* 1982 "Williams" "Joust (Solid Red label)" */
+	DRIVER( joustwr ) /* 1982 "Williams" "Joust (White/Red label)" */
+	DRIVER( kick ) /* 1981 "Midway" "Kick (upright)" */
+	DRIVER( kicka ) /* 1981 "Midway" "Kick (cocktail)" */
+	DRIVER( kroozr ) /* 1982 "Bally Midway" "Kozmik Kroozr" */
+	DRIVER( maxrpm ) /* 1986 "Bally Midway" "Max RPM" */
+	DRIVER( mysticm ) /* 1983 "Williams" "Mystic Marathon" */
+	DRIVER( pigskin ) /* 1990 "Midway" "Pigskin 621AD" */
+	DRIVER( powerdrv ) /* 1986 "Bally Midway" "Power Drive" */
+	DRIVER( rampage ) /* 1986 "Bally Midway" "Rampage (revision 3)" */
+	DRIVER( rampage2 ) /* 1986 "Bally Midway" "Rampage (revision 2)" */
+	DRIVER( rbtapper ) /* 1984 "Bally Midway" "Tapper (Root Beer)" */
+	DRIVER( sarge ) /* 1985 "Bally Midway" "Sarge" */
+	DRIVER( shollow ) /* 1981 "Bally Midway" "Satan's Hollow (set 1)" */
+	DRIVER( shollow2 ) /* 1981 "Bally Midway" "Satan's Hollow (set 2)" */
+	DRIVER( solarfox ) /* 1981 "Bally Midway" "Solar Fox (upright)" */
+	DRIVER( spyhnt2a ) /* 1987 "Bally Midway" "Spy Hunter 2 (rev 1)" */
+	DRIVER( spyhunt ) /* 1983 "Bally Midway" "Spy Hunter" */
+	DRIVER( spyhunt2 ) /* 1987 "Bally Midway" "Spy Hunter 2 (rev 2)" */
+	DRIVER( stargrds ) /* 1987 "Bally Midway" "Star Guards" */
+	DRIVER( sutapper ) /* 1983 "Bally Midway" "Tapper (Suntory)" */
+	DRIVER( tapper ) /* 1983 "Bally Midway" "Tapper (Budweiser)" */
+	DRIVER( tappera ) /* 1983 "Bally Midway" "Tapper (alternate)" */
+	DRIVER( timber ) /* 1984 "Bally Midway" "Timber" */
+	DRIVER( trisport ) /* 1989 "Bally Midway" "Tri-Sports" */
+	DRIVER( tron ) /* 1982 "Bally Midway" "Tron (set 1)" */
+	DRIVER( tron2 ) /* 1982 "Bally Midway" "Tron (set 2)" */
+	DRIVER( tron3 ) /* 1982 "Bally Midway" "Tron (set 3)" */
+	DRIVER( tron4 ) /* 1982 "Bally Midway" "Tron (set 4)" */
+	DRIVER( tshoot ) /* 1984 "Williams" "Turkey Shoot" */
+	DRIVER( turbotag ) /* 1985 "Bally Midway" "Turbo Tag (prototype)" */
+	DRIVER( twotiger ) /* 1984 "Bally Midway" "Two Tigers (dedicated)" */
+	DRIVER( twotigrc ) /* 1984 "Bally Midway" "Two Tigers (Tron conversion)" */
+	DRIVER( wacko ) /* 1982 "Bally Midway" "Wacko" */
+	DRIVER( xenophob ) /* 1987 "Bally Midway" "Xenophobe" */
+	DRIVER( zwackery ) /* 1984 "Bally Midway" "Zwackery" */
+#endif
 #ifdef LINK_MIDWAYTUNIT
 	DRIVER( hiimpac3 ) /* 1990 "Williams" "High Impact Football (rev LA3 12/27/90)" */
 	DRIVER( hiimpacp ) /* 1990 "Williams" "High Impact Football (prototype */
@@ -2757,6 +2823,12 @@ const game_driver * const drivers[] =
 	DRIVER( asteroi1 ) /* 1979 "Atari" "Asteroids (rev 1)" */
 	DRIVER( asteroib ) /* 1979 "bootleg" "Asteroids (bootleg on Lunar Lander hardware)" */
 	DRIVER( asteroid ) /* 1979 "Atari" "Asteroids (rev 2)" */
+	DRIVER( atetckt2 ) /* 1989 "Atari Games" "Tetris (Cocktail set 2)" */
+	DRIVER( atetcktl ) /* 1989 "Atari Games" "Tetris (Cocktail set 1)" */
+	DRIVER( atetris ) /* 1988 "Atari Games" "Tetris (set 1)" */
+	DRIVER( atetrisa ) /* 1988 "Atari Games" "Tetris (set 2)" */
+	DRIVER( atetrisb ) /* 1988 "bootleg" "Tetris (bootleg set 1)" */
+	DRIVER( atetrsb2 ) /* 1988 "bootleg" "Tetris (bootleg set 2)" */
 	DRIVER( bradley ) /* 1980 "Atari" "Bradley Trainer" */
 	DRIVER( bullsdrt ) /* 1985 "Shinkai Inc. (Magic Eletronics Inc. licence)" "Bulls Eye Darts" */
 	DRIVER( bwidow ) /* 1982 "Atari" "Black Widow" */
@@ -2882,16 +2954,35 @@ const game_driver * const drivers[] =
 #endif
 #ifdef LINK_MINIKONAMI
 	DRIVER( blswhstl ) /* 1991 "Konami" "Bells & Whistles (Version L)" */
+	DRIVER( dadandrn ) /* 1993 "Konami" "Kyukyoku Sentai Dadandarn (ver JAA)" */
 	DRIVER( detatwin ) /* 1991 "Konami" "Detana!! Twin Bee (Japan ver. J)" */
+	DRIVER( gaiapolj ) /* 1993 "Konami" "Gaiapolis (ver JAF)" */
+	DRIVER( gaiapols ) /* 1993 "Konami" "Gaiapolis (ver EAF)" */
+	DRIVER( gaiapolu ) /* 1993 "Konami" "Gaiapolis (ver UAF)" */
 	DRIVER( glfgreat ) /* 1991 "Konami" "Golfing Greats" */
 	DRIVER( lgtnfght ) /* 1990 "Konami" "Lightning Fighters (World)" */
 	DRIVER( lgtnfghu ) /* 1990 "Konami" "Lightning Fighters (US)" */
+	DRIVER( metamrph ) /* 1993 "Konami" "Metamorphic Force (ver EAA)" */
+	DRIVER( metamrpj ) /* 1993 "Konami" "Metamorphic Force (ver JAA)" */
+	DRIVER( metamrpu ) /* 1993 "Konami" "Metamorphic Force (ver UAA)" */
+	DRIVER( mmaulers ) /* 1993 "Konami" "Monster Maulers (ver EAA)" */
+	DRIVER( mtlchamp ) /* 1993 "Konami" "Martial Champion (ver EAB)" */
+	DRIVER( mtlchmp1 ) /* 1993 "Konami" "Martial Champion (ver EAA)" */
+	DRIVER( mtlchmpa ) /* 1993 "Konami" "Martial Champion (ver AAA)" */
+	DRIVER( mtlchmpj ) /* 1993 "Konami" "Martial Champion (ver JAA)" */
+	DRIVER( mtlchmpu ) /* 1993 "Konami" "Martial Champion (ver UAD)" */
+	DRIVER( mystwarr ) /* 1993 "Konami" "Mystic Warriors (ver EAA)" */
+	DRIVER( mystwaru ) /* 1993 "Konami" "Mystic Warriors (ver UAA)" */
 	DRIVER( prmrsocr ) /* 1993 "Konami" "Premier Soccer (ver EAB)" */
 	DRIVER( punkshot ) /* 1990 "Konami" "Punk Shot (US 4 Players)" */
 	DRIVER( simpsons ) /* 1991 "Konami" "The Simpsons (4 Players)" */
 	DRIVER( ssriders ) /* 1991 "Konami" "Sunset Riders (4 Players ver EAC)" */
 	DRIVER( tmnt ) /* 1989 "Konami" "Teenage Mutant Ninja Turtles (World 4 Players)" */
 	DRIVER( tmnt2 ) /* 1991 "Konami" "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)" */
+	DRIVER( viostorm ) /* 1993 "Konami" "Violent Storm (ver EAB)" */
+	DRIVER( viostrma ) /* 1993 "Konami" "Violent Storm (ver AAC)" */
+	DRIVER( viostrmj ) /* 1993 "Konami" "Violent Storm (ver JAC)" */
+	DRIVER( viostrmu ) /* 1993 "Konami" "Violent Storm (ver UAB)" */
 #endif
 #ifdef LINK_MINIKONAMI2
 	DRIVER( blkpnthr ) /* 1987 "Konami" "Black Panther" */
@@ -2922,6 +3013,7 @@ const game_driver * const drivers[] =
 	DRIVER( majuu ) /* 1987 "Konami" "Majuu no Ohkoku" */
 	DRIVER( merlinmm ) /* 1986 "Zilec - Zenitone" "Merlins Money Maze" */
 	DRIVER( miaj ) /* 1989 "Konami" "M.I.A. - Missing in Action (Japan)" */
+	DRIVER( mimonscr ) /* 198? "bootleg" "Mighty Monkey (bootleg on Scramble hardware)" */
 	DRIVER( mrgoemon ) /* 1986 "Konami" "Mr. Goemon (Japan)" */
 	DRIVER( nemesis ) /* 1985 "Konami" "Nemesis" */
 	DRIVER( nemesuk ) /* 1985 "Konami" "Nemesis (World?)" */
@@ -2933,6 +3025,8 @@ const game_driver * const drivers[] =
 	DRIVER( rushatck ) /* 1985 "Konami" "Rush'n Attack (US)" */
 	DRIVER( salamand ) /* 1986 "Konami" "Salamander (version D)" */
 	DRIVER( salamanj ) /* 1986 "Konami" "Salamander (version J)" */
+	DRIVER( scobra ) /* 1981 "Konami" "Super Cobra" */
+	DRIVER( scramble ) /* 1981 "Konami" "Scramble" */
 	DRIVER( twinbee ) /* 1985 "Konami" "TwinBee" */
 	DRIVER( vulcan ) /* 1988 "Konami" "Vulcan Venture" */
 #endif
@@ -3290,7 +3384,9 @@ const game_driver * const drivers[] =
 	DRIVER( finlapjc ) /* 1987 "Namco" "Final Lap (Japan - Rev C)" */
 	DRIVER( fourtrax ) /* 1989 "Namco" "Four Trax" */
 	DRIVER( frogg ) /* 1981 "bootleg" "Frog (Galaxian hardware)" */
+	DRIVER( frogger ) /*    */
 	DRIVER( froggrmc ) /* 1981 "bootleg?" "Frogger (Moon Cresta hardware)" */
+	DRIVER( frogseg1 ) /*    */
 	DRIVER( g13knd ) /* 1999 "Raizing/Namco" "Golgo 13 Kiseki no Dandou (GLS1/VER.A)" */
 	DRIVER( galag88j ) /* 1987 "Namco" "Galaga '88 (Japan)" */
 	DRIVER( galaga ) /* 1981 "Namco" "Galaga (Namco rev. B)" */

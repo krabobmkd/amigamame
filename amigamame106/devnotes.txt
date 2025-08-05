@@ -1,6 +1,13 @@
 
  Todo r1.6
 
+ added:
+  Atari tetris, defender, joust 1&2, rampage
+  scramble, super cobra, galaxian, galaga3
+  some 1993 games: Mystic Warriors, Monster Maulers, Violent Storm,Metamorphic Force,Martial Champion
+  Gaiapolis
+
+ O -> test all that, correct sprites.
 
  O if analog controller set but not used: tell.
 

@@ -673,6 +673,7 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
     if(video_attribs & VIDEO_TYPE_VECTOR)
     {
         screenid = "vector"; // resolution is computed from vector config.
+        if(drv->flags & ORIENTATION_SWAP_XY) screenid +="(V)"; // so we have different configuration for vertical screens.
         return;
     }
 
