@@ -1,4 +1,22 @@
 
+parport:
+
+
+parrallel port extension ouverte
+en haut (13 broche):
+
+	13 - black SEL
+	12 - PE (POUT? ) paper end -> A METTRE sur Fire2 par3
+	11 - busy (orange)
+	10 - ACK				-> a mettre sur fire2 par4 (si on peut)
+	9  - data8 -> up/left/right/down ...
+	...
+	2 4+4 directions
+	1 rien (strobe)
+en bas juste 2 ground
+
+
+
  Todo r1.6
 
  added:
@@ -8,6 +26,8 @@
   Gaiapolis
 
 add: Mario bros
+
+ O -> ui_popup ne diot pas se propager sur le prochani jeu
 
  O -> test all that, correct sprites.
 

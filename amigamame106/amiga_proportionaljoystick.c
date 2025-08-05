@@ -255,6 +255,15 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
 //printf("portmask:%d flag:%d\n",portmask,flags);
         if((flags & portmask)!=0)
         {
+            int dosteal = 0;
+#ifdef PPJSCODE_TAKEPORT0CONTROL
+            if(iportunit==0)
+            {
+                dosteal = 1;
+                makeInputDeviceReleaseMousePort(pprops);
+            }
+#endif
+
             // - - -- - - - -allocjoyport - - - - -
             struct PStickDevice *ppsd = &(pprops->_ports[iportunit]);
                // OpenDevice( CONST_STRPTR devName, ULONG unit, struct IORequest *ioRequest, ULONG flags );
@@ -270,6 +279,7 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
                 if(preturncode) *preturncode = PROPJOYRET_GAMEPORTU0FAIL+iportunit;
                 continue;
             }
+
             Forbid();
 
                 ppsd->_gameportIOReq.io_Command = GPD_ASKCTYPE;
@@ -281,24 +291,25 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
                // special case,experimental code , looks like working !
 #ifdef PPJSCODE_TAKEPORT0CONTROL
                 // if gameport unit 0 not available, ask input.device to free it.
-                if(iportunit==0 && ppsd->_portType != GPCT_NOCONTROLLER)
-                {
-                  //  printf("ppsd->_portType before:%d\n",(int)ppsd->_portType);
-                    //Permit();
-                        makeInputDeviceReleaseMousePort(pprops);
-                    //Forbid();
-                    DoIO(&(ppsd->_gameportIOReq)); // then, ask again if port0 available.
-                    //WORKS !
-                  //  printf("ppsd->_portType after:%d\n",(int)ppsd->_portType);
-                }
+                // if(iportunit==0 && ppsd->_portType != GPCT_NOCONTROLLER)
+                // {
+                //   //  printf("ppsd->_portType before:%d\n",(int)ppsd->_portType);
+                //     //Permit();
+                //         makeInputDeviceReleaseMousePort(pprops);
+                //     //Forbid();
+                //     DoIO(&(ppsd->_gameportIOReq)); // then, ask again if port0 available.
+                //     //WORKS !
+                //   //  printf("ppsd->_portType after:%d\n",(int)ppsd->_portType);
+                // }
 #endif
 
                 if(ppsd->_portType != GPCT_NOCONTROLLER) // GPCT_NOCONTROLLER 0
                 {
+                    Permit();
                  // printf("iportunit:%d device state:%d\n",iportunit,(int)ppsd->_portType);
                     if(logFunc) logFunc(1,getProportionalStickErrorMessage(PROPJOYRET_GAMEPORTU0INUSE+iportunit));
                     if(preturncode) *preturncode = PROPJOYRET_GAMEPORTU0INUSE+iportunit;
-                    Permit();
+
                     ppsd->_deviceresult = 1;
                     continue;
 
@@ -311,7 +322,8 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
 
                 /*BYTE resdoio =*/ DoIO(&(ppsd->_gameportIOReq));
             Permit();
-            ppsd->_deviceresult = 0; // means OK.
+            if(dosteal) if(logFunc) logFunc(1,"analog joystick steals mouse port.\n");
+            ppsd->_deviceresult = 0; // means port OK.
             // - - --  -- end allocjoyport - - - - --
 
         } // end if open one device unit
@@ -373,7 +385,7 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
     // according to current lowlevel use like it should.
     // In  all cases, configuration would make either DB9 ports managed
     // by lowlevel or by "potgo", but not both.
-    FreePotBits(potsBitsToAlloc);
+    //re? FreePotBits(potsBitsToAlloc);
 
 //printf("try allocate bits:%08x\n",(int)potsBitsToAlloc);
     pprops->_allocatedBits = AllocPotBits(potsBitsToAlloc | PGBIT_START); // #0b0101 0000 00000001
@@ -387,6 +399,7 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
 
         return NULL;
     }
+
     // note: it's to allow further calls to WritePotgo()
 
 /*
@@ -475,8 +488,9 @@ VOID  __stdargs WritePotgo( ULONG word, ULONG mask );
         rbfint->is_Code = &interuptfunc_addIntServer;
 
         AddIntServer(INTB_VERTB,rbfint);
+        if(logFunc) logFunc(0,"Analog joystick use VBlank interupt.\n");
     }
-
+    if(logFunc) logFunc(0,"Analog joystick inited.\n");
     return pprops;
 }
 

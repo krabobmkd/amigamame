@@ -257,6 +257,7 @@ static void handle_load(void);
 
 ***************************************************************************/
 extern int canAvoidPushContext;
+extern void ui_popup_stop();
 /*-------------------------------------------------
     run_game - run the given game in a session
 -------------------------------------------------*/
@@ -404,6 +405,8 @@ int run_game(int game)
 		free_callback_list(&exit_callback_list);
 		free_callback_list(&reset_callback_list);
 		free_callback_list(&pause_callback_list);
+        // krb added
+		ui_popup_stop();
 	}
 	/* return an error */
 	return error;

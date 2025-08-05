@@ -333,8 +333,8 @@ void ConfigureLowLevelLib()
         // if something has been asked for proportional joysticks/8bits paddle        
         if(!g_PropsSticks && propJoysticksFlags != 0)
         {
-            if(input_machine_has_any_analog())
-            {
+           // if(input_machine_has_any_analog())
+           // {
                 ULONG result=PROPJOYRET_OK;
                 g_PropsSticks = createProportionalSticks(propJoysticksFlags,
                                                         0/*PROPJOYTIMER_LOWLEVEL_ADDTIMER*/, // try cia timer
@@ -348,10 +348,10 @@ void ConfigureLowLevelLib()
                 {
                     ui_popup_time(5, "Analog controllers:\nGo far in all directions to calibrate.");
                 }
-            } else
-            {
-                ui_popup_time(5, "Game uses no analog input,\nso analog controllers not inited.");
-            }
+            // } else
+            // {
+            //     ui_popup_time(5, "Game uses no analog input,\nso analog controllers not inited.");
+            // }
         }
     }
 

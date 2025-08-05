@@ -142,7 +142,7 @@ static gfx_element *uirotfont=NULL;
 static pen_t uirotfont_colortable[16];
 
 static char popup_text[200];
-static int popup_text_counter;
+static int popup_text_counter=0;
 
 
 static void (*onscrd_fnc[MAX_OSD_ITEMS])(int increment,int arg);
@@ -4060,7 +4060,11 @@ static void ui_display_popup(void)
 			schedule_full_refresh();
 	}
 }
-
+void ui_popup_stop(void)
+{
+    popup_text_counter = 0;
+    popup_text[0]=0;
+}
 
 
 

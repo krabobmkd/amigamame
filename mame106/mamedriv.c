@@ -2736,10 +2736,7 @@ const game_driver * const drivers[] =
 	DRIVER( dotrone ) /* 1983 "Bally Midway" "Discs of Tron (Environmental)" */
 	DRIVER( inferno ) /* 1984 "Williams" "Inferno" */
 	DRIVER( journey ) /* 1983 "Bally Midway" "Journey" */
-	DRIVER( joust ) /* 1982 "Williams" "Joust (White/Green label)" */
 	DRIVER( joust2 ) /* 1986 "Williams" "Joust 2 - Survival of the Fittest (set 1)" */
-	DRIVER( joustr ) /* 1982 "Williams" "Joust (Solid Red label)" */
-	DRIVER( joustwr ) /* 1982 "Williams" "Joust (White/Red label)" */
 	DRIVER( kick ) /* 1981 "Midway" "Kick (upright)" */
 	DRIVER( kicka ) /* 1981 "Midway" "Kick (cocktail)" */
 	DRIVER( kroozr ) /* 1982 "Bally Midway" "Kozmik Kroozr" */

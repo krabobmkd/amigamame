@@ -1158,7 +1158,7 @@ GAME( 1994, nbajamt3, nbajam,  tunit_adpcm, nbajamte, nbajamte, ROT0, "Midway", 
 
         // williams 1982 (selection)
         "defender","defendg","defendw",
-        "joust","joustr","joustwr",
+//doesntwork        "joust","joustr","joustwr",
         // "with tilemaps"
         "mysticm","tshoot","inferno","joust2"
 

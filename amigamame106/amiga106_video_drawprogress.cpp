@@ -128,6 +128,8 @@ void IntuiBufferedDrawing::drawTextTmp(TextFont *font,int x1,int y1,int pen,cons
     SetFont(_bgrp,font);
 
     int l = strlen(ptext);
+    while(l>0 && (ptext[l-1] == '\n' || ptext[l-1] == ' ')) l--;
+
     SetDrMd(_bgrp,  JAM1  );
 
     SetAPen(_bgrp,pen);
