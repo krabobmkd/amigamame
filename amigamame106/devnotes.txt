@@ -7,6 +7,8 @@
   some 1993 games: Mystic Warriors, Monster Maulers, Violent Storm,Metamorphic Force,Martial Champion
   Gaiapolis
 
+add: Mario bros
+
  O -> test all that, correct sprites.
 
  O if analog controller set but not used: tell.
