@@ -165,7 +165,7 @@ IntuiProgressBar::IntuiProgressBar(IntuitionDrawable *drawable)
     , _pChipLogoAlloc(NULL)
     , _font(NULL)
 {
-
+    lastmessage.clear();
 }
 IntuiProgressBar::~IntuiProgressBar()
 {
