@@ -234,7 +234,7 @@ void ConfigureLowLevelLib()
     useAnyMouse=0;
     usePropJoysticks = 0;
     useAnyLowLevelControl = 0;
-    bool useParallelExtension=false;
+
 
     for(int iLLPort=0;iLLPort<4;iLLPort++) // 2 hardware DB9 port, +the elusive mysterious 3&4 lowlevel ports.
     {
@@ -311,9 +311,20 @@ void ConfigureLowLevelLib()
     } // end of LL configuration
 
     // 4 - - - - parralel port 3&4 joystick extension: init if needed.
+    // loop for parallel port
+    bool useParallelExtension=false;
+    for(int ipar=0 ; ipar<2 ;ipar++)
+    {
+        int iPlayer = configControls._parallelPort_Player[ipar] ;
+        if( iPlayer == 0 ) continue;
+        int type = configControls._parallel_type[ipar];
+        if(type == 0 ) continue;
+
+        useParallelExtension = true;
+    }
     if(!g_pParallelPads && useParallelExtension)
     {
-        g_pParallelPads = createParallelPads(); // could fail.
+        g_pParallelPads = createParallelPads(0); // could fail.
     }
 
     // 5 - - - - proportionnal joystick: init if needed.
@@ -886,7 +897,24 @@ static const char * const padsbtnames[4][11]={
         "Pad4 RIGHT"
     },
 };
-
+static const char * const parpadsbtnames[2][11]={
+    {
+        "PrPad3 Blue",
+        "PrPad3 Red",
+        "PrPad3 UP",
+        "PrPad3 DOWN",
+        "PrPad3 LEFT",
+        "PrPad3 RIGHT"
+    },
+    {
+        "PrPad4 Blue",
+        "PrPad4 Red",
+        "PrPad4 UP",
+        "PrPad4 DOWN",
+        "PrPad4 LEFT",
+        "PrPad4 RIGHT"
+    },
+};
 // - - - keyboard keymap management
 void RawKeyMap::init()
 {
@@ -984,18 +1012,17 @@ void RawKeyMap::init()
         {
             int iplayer = configControls._llPort_Player[iLLPort];
             if(iplayer == 0) continue;
+            iplayer--;
             int itype = configControls._llPort_Type[iLLPort];
-            //old bug ! if(itype == 0) continue; //still not inited
+
             // here we treat only CD32Pads and 1/2Bt joysticks...
             // do not declare pads if it is mouse !!!
             if((itype != SJA_TYPE_GAMECTLR) && (itype != SJA_TYPE_JOYSTK) ) continue;
-//            cp controlPort = configControls._PlayerPort[iplayer];
-//            int lowlevelState = (int) configControls._PlayerPortType[iLLPort];
 
                 int iport = iLLPort; // 0->3
                 int ipshft = iport<<8;
                 const int mamecodeshift =
-                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *(iplayer-1) ;
+                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
 
               vector<os_code_info> kbi2={
                 {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
@@ -1018,28 +1045,25 @@ void RawKeyMap::init()
         {
             int iplayer = configControls._parallelPort_Player[ipar];
             if(iplayer == 0) continue;
+            iplayer--;
             int itype = configControls._parallel_type[ipar];
             if(itype == 0) continue; //still not inited
 
             int iport = 2+ipar; // we hack parallel pads as Lowlevel Pads3 and 4 !!!
             int ipshft = iport<<8;
             const int mamecodeshift =
-                ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *(iplayer-1) ;
+                ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
 
-        // joystick are not CD32 pads, can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
+        // joystick can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
           vector<os_code_info> kbi2={
           // note standard parallel port extensions joysticks manages 1bt each, 2nd button only if hw hack.
-            {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
-            {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
-            //{padsbtnames[iport][2],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
-            //{padsbtnames[iport][3],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
-            //{padsbtnames[iport][4],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
-            //{padsbtnames[iport][5],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
-            //{padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
-            {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
-            {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
-            {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
-            {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
+            {parpadsbtnames[ipar][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
+            {parpadsbtnames[ipar][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
+            //
+            {parpadsbtnames[ipar][2],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
+            {parpadsbtnames[ipar][3],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
+            {parpadsbtnames[ipar][4],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
+            {parpadsbtnames[ipar][5],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
             };
             _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
 
