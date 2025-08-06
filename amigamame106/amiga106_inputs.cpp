@@ -294,11 +294,13 @@ void ConfigureLowLevelLib()
                 #ifdef RJP_OPTION
                      && useReadJoyPortForPads==0
                 #endif
-                    && iLLPort<2
+                    /*&& iLLPort<2*/ // LL port3 and 4 also need rawkey asked for port1&2 (WILD GUESS)
+                    && (askedPadsRawKey[iLLPort&1]==0)
                  )
                 {
+                    // note
                     SystemControl( SCON_AddCreateKeys,iLLPort, TAG_END,0);
-                    askedPadsRawKey[iLLPort] = 1;
+                    askedPadsRawKey[iLLPort&1] = 1;
                 }
                 // configure port as mouse,jostick or CD32 pads...
                 SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
@@ -333,7 +335,7 @@ void ConfigureLowLevelLib()
         // if something has been asked for proportional joysticks/8bits paddle        
         if(!g_PropsSticks && propJoysticksFlags != 0)
         {
-           // if(input_machine_has_any_analog())
+           // if(input_machine_has_any_analog()) <- chain not inited when called, we can't do that.
            // {
                 ULONG result=PROPJOYRET_OK;
                 g_PropsSticks = createProportionalSticks(propJoysticksFlags,

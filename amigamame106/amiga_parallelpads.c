@@ -72,6 +72,9 @@ void closeParallelPads(struct ParallelPads *parpads);
 
 static UBYTE *allocname = "Mame"; // or use task name ?
 
+/** a simple VBL interupt function to just read parallel ports pins at 50 or 60Hz,
+    whatever the main thread is doing.( If you check that on a slow main thread, clicks may be missed.)
+*/
 //D0 - scratch
 //D1 - scratch
 //A0 - scratch
@@ -79,7 +82,7 @@ static UBYTE *allocname = "Mame"; // or use task name ?
 //A5 - jump vector register (scratch)
 //A6 - scratch
 //all other registers must be preserved
-static int interuptfunc( register struct ParPadsInteruptData *ppi __asm("a1") )
+static int VBLinteruptfunc( register struct ParPadsInteruptData *ppi __asm("a1") )
 {
 
 // 	movea.l	_portptr,a1		; a1 now holds the destination
@@ -103,8 +106,15 @@ static int interuptfunc( register struct ParPadsInteruptData *ppi __asm("a1") )
     }
     return 0; // clear z flag
 }
+#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
+static void CiaParInteruptfunc()
+{
 
-struct ParallelPads *createParallelPads()
+}
+
+#endif
+
+struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
 {
     if(!MiscBase) return NULL;
     struct Interrupt *rbfint;
@@ -141,6 +151,39 @@ struct ParallelPads *createParallelPads()
         pparpads->_parallelBitsOK = (UWORD)(AllocMiscResource(MR_PARALLELBITS,allocname)==NULL);
         if(!pparpads->_parallelBitsOK) { Enable(); goto error; }
 
+#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
+    if(readJ4Bt2WithInterupt)
+    {
+        /*
+        ciaabase = (struct Library *)OpenResource(CIAANAME);
+        if (!ciaabase)
+        {
+            success = -2;
+            goto fail_out1;
+        }
+        ...
+        flag_interrupt.is_Node.ln_Name = (char *)spi_lib_name;
+        flag_interrupt.is_Node.ln_Type = NT_INTERRUPT;
+        flag_interrupt.is_Code = change_isr;
+
+        Disable();
+        if (AddICRVector(ciaabase, CIAICRB_FLG, &flag_interrupt))
+        {
+        Enable();
+        success = -5;
+        goto fail_out3;
+        }
+
+        AbleICR(ciaabase, CIAICRF_FLG);
+        SetICR(ciaabase, CIAICRF_FLG);
+        Enable();
+        // interupt can trigger now if pressed !
+        */
+
+
+
+    }
+#endif
 //    printf("Parallel acquired ok\n");
 
     // - - - - - install interupt
@@ -206,7 +249,7 @@ struct ParallelPads *createParallelPads()
        // rbfint->is_Node.ln_Name = ppidata->rd_Name;
         rbfint->is_Node.ln_Name = (char *)"parpads";
         rbfint->is_Data = (APTR)ppidata;
-        rbfint->is_Code = &interuptfunc;
+        rbfint->is_Code = &VBLinteruptfunc;
 
         AddIntServer(INTB_VERTB,rbfint);
 
@@ -244,6 +287,16 @@ void closeParallelPads(struct ParallelPads *pparpads)
 {
     if(!pparpads || !MiscBase) return;
 
+/*
+//    Disable();
+	AbleICR(ciaabase, CIAICRF_FLG);
+
+	*cia_b_ddra &= ~(ACT_MASK | REQ_MASK | CLK_MASK);
+	*cia_a_ddrb = 0;
+
+	RemICRVector(ciaabase, CIAICRB_FLG, &flag_interrupt);
+//	Enable()
+*/
 //	AbleICR(ciaabase, CIAICRF_FLG);
 
 //	*cia_b_ddra &= ~(ACT_MASK | REQ_MASK | CLK_MASK);

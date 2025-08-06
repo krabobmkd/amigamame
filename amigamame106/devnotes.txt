@@ -27,6 +27,8 @@ en bas juste 2 ground
 
 add: Mario bros
 
+ O rawkey message for LL port 3&4 !!
+
  O -> ui_popup ne diot pas se propager sur le prochani jeu
 
  O -> test all that, correct sprites.

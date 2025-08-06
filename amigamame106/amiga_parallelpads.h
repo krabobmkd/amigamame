@@ -11,6 +11,9 @@ extern "C" {
 #include <exec/types.h>
 #include <hardware/cia.h>
 
+// this is experimental unofficial code to gain Bt2 on parallel joystick "4", as "ACK" signal,
+#define PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT 1
+
 struct Task;
 struct Interrupt;
 
@@ -45,7 +48,7 @@ struct ParallelPads // : public AParallelPads
 // some hardware has no parallel port at all (everything not amiga classic).
 int hasParallelPort();
 
-struct ParallelPads *createParallelPads();
+struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt);
 void checkParallelPads();
 //void readParallelPads(struct ParallelPads *parpads);
 void closeParallelPads(struct ParallelPads *parpads);
