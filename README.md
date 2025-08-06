@@ -17,7 +17,7 @@ Release 1.5
  If not done, Install a working bebbo gcc6.5 on linux, windows or macos.
  follow instructions at : https://github.com/bebbo/amiga-gcc
  also install git and cmake.
-  08/2025 ADDENDUM: the author removed that compiler, maybe temporarily, maybe forever, so you may try https://github.com/AmigaPorts/m68k-amigaos-gcc 
+  08/2025 ADDENDUM: the author removed that compiler, maybe temporarily, maybe forever, so you may try https://github.com/AmigaPorts/m68k-amigaos-gcc . This project needs a C11 / C++11 capable compiler.
  
  ...Then in some directory do:
  
@@ -66,4 +66,5 @@ This cmake platform:
  
   
    
+
 
