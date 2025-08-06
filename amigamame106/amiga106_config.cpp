@@ -521,7 +521,8 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
     int hasPots = hasProportionalStickResource(); // some not-classic hardware will not.
 
     serializer("Mouse Port 1", (int&)_llPort_Player[0],strPlayers);
-    serializer("Types P1", (int&)_llPort_Type[0],(hasPots)?strLLTypesPlusProp:strLLTypes);
+   //ok, but: serializer("Types P1", (int&)_llPort_Type[0],(hasPots)?strLLTypesPlusProp:strLLTypes);
+    serializer("Types P1", (int&)_llPort_Type[0],strLLTypes); // do not enable pots on mouse port for the moment.
 
     serializer("Joy Port 2", (int&)_llPort_Player[1],strPlayers);
     serializer("Types P2", (int&)_llPort_Type[1],(hasPots)?strLLTypesPlusProp:strLLTypes);
