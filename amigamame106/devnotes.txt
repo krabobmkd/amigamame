@@ -9,27 +9,25 @@
 
 add: Mario bros
 
- O do not display "load cheat" !!
-
- O TEST: othund with 2 mouses inverted !
+ X do not display "load cheat" !!
+ X TEST: othund with 2 mouses inverted !
  O  2 CD32 pads
 
-
- O rawkey message for LL port 3&4 !!
+ X rawkey message for LL port 3&4 !!
 
  X -> ui_popup ne diot pas se propager sur le prochani jeu
 
  O -> test all that, correct sprites.
 
- O if analog controller set but not used: tell.
+ O if analog controller set but not used: tell ->later.
 
- O Repair bug mouse1-p2 + mouse2-p1
- O implement analog/proportional amiga joysticks with potgo.h
+ X Repair bug mouse1-p2 + mouse2-p1
+ X implement analog/proportional amiga joysticks with potgo.h
 	O code stealing mouse to input.device
 
  O try parallel joystick port Bt2
 
- O add defender+joust + atetris
+ X add defender+joust + atetris
 
  O blabla docs for projoy/paddles.
 	- tells: if a game needs analog control,it will automatically redirect all
