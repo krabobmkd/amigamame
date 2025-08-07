@@ -608,7 +608,7 @@ void MUISerializer::LGroup::setGroup(const char *pid)
     if(!_Object) return;
     if(_enableIfSelected.length()>0)
     {
-        int disab = (_enableIfSelected != string(pid) );
+        int disab = (string(pid).find(_enableIfSelected) !=0 );
         SetAttrs(_Object, MUIA_Disabled,disab,TAG_DONE);
     }
     //update();

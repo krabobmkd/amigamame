@@ -752,11 +752,13 @@ void IntuitionDisplay::drawProgress(int per256, int enm)
     if(!_drawable) return;
 
     static int lastprog = -1;
-    if(lastprog == per256)
+    static int lastenum = -1;
+    if(lastprog == per256 && lastenum == enm)
     {   // value already drawn.
         return;
     }
     lastprog = per256;
+    lastenum = enm;
 
     if(!_pProgressDrawer) _pProgressDrawer = new IntuiProgressBar(_drawable);
     if(_pProgressDrawer)

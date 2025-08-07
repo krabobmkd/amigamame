@@ -313,18 +313,20 @@ void ConfigureLowLevelLib()
     // 4 - - - - parralel port 3&4 joystick extension: init if needed.
     // loop for parallel port
     bool useParallelExtension=false;
+    int readj4bt2 = 0;
     for(int ipar=0 ; ipar<2 ;ipar++)
     {
         int iPlayer = configControls._parallelPort_Player[ipar] ;
         if( iPlayer == 0 ) continue;
         int type = configControls._parallel_type[ipar];
-        if(type == 0 ) continue;
+        if(type == 0 ) continue;        
 
         useParallelExtension = true;
+        if(ipar == 1) readj4bt2=1;
     }
     if(!g_pParallelPads && useParallelExtension)
     {
-        g_pParallelPads = createParallelPads(0); // could fail.
+        g_pParallelPads = createParallelPads(readj4bt2); // could fail.
     }
 
     // 5 - - - - proportionnal joystick: init if needed.

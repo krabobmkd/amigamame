@@ -148,6 +148,7 @@ void IntuiBufferedDrawing::maskBitmapTmp(BitMap *pbm,int x1,int y1,int w,int h,U
 
 void IntuiBufferedDrawing::finalBlit(RastPort *rp)
 {
+// printf("finalBlit:%08x %d %d\n",(int)_BgBm,_bmw,_bmh);
     if(!_BgBm || _bmw==0 || _bmh ==0) return;
 
     BltBitMapRastPort( _BgBm,//CONST struct BitMap *srcBitMap,
@@ -227,6 +228,7 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         logison = 0;
         return;
     }
+
     // - - - - our quick solution to avoid draw glitch
     // is to consider one big clean per resize
     // and then just draw temp / reblit a portion of screen.
@@ -276,10 +278,10 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         "Memory and CPU inits...",
         "Hi Score load.",
         "Rebuild machine...",
-        "...",
         "Decode graphics...",
         "Load cheats...",
         "Delithiuminization...",
+        "Done!",
         ""
     };
 

@@ -33,6 +33,7 @@ void bootlog_setvideodecode(int i, int nbgfx)
 static UINT32 totaldecode=0;
 void bootlog_setDecrypt(int  dec, int nbdec)
 {
+//     printf("bootlog_setDecrypt\n");
     anyCpuDecrypt = 1;
     lithiumdone = dec*16 / nbdec;
      bootlog_setprogress(eCpuDecrypt);
