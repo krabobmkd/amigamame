@@ -502,6 +502,8 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     fcounter++;
     if(fcounter==255) fcounter=1; // we just need it to be different from previous frame.
 
+//    prptrace();
+
 //cnt++;
  //printf("UpdateInputs: %08x\n",(int)g_pInputs);
     if(!pMsgPort || !g_pInputs) return;

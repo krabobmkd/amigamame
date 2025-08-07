@@ -25,7 +25,7 @@ std::string checkXmlName(const char *p)
             ss << c;
             i++;
         }
-        if(i>=12) break;
+        if(i>=14) break;
     }
     return ss.str();
 }

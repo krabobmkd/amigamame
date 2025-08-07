@@ -385,7 +385,8 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
     // according to current lowlevel use like it should.
     // In  all cases, configuration would make either DB9 ports managed
     // by lowlevel or by "potgo", but not both.
-    //re? FreePotBits(potsBitsToAlloc);
+    //re? -> yes. sometimes something doesnt free them, hard to know why.
+    FreePotBits(potsBitsToAlloc);
 
 //printf("try allocate bits:%08x\n",(int)potsBitsToAlloc);
     pprops->_allocatedBits = AllocPotBits(potsBitsToAlloc | PGBIT_START); // #0b0101 0000 00000001
@@ -430,7 +431,7 @@ VOID  __stdargs WritePotgo( ULONG word, ULONG mask );
 //        if(preturncode) *preturncode = PROPJOYRET_NOSIGNAL;
 //        return NULL;
 //    }
-    // this must be done before
+    // this must be done before launching interupt
     pprops->_calibration[0].x.min = 255;
     pprops->_calibration[0].y.min = 255;
     pprops->_calibration[1].x.min = 255;
