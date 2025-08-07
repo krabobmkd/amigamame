@@ -256,7 +256,19 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
     int yb1 = y1+2*border;
     int yb2 = y2-2*border;
     RectFillTmp(xb1,yb1,xb1 + ((xb2-xb1)*per256)/256,yb2);
+/*
+        ebStart=0,
+        ebInput,
+        ebRomLoad,
+        ebMemoryAndCpu,
+        ebHighScoreSaveLoad,
+        eDriver,
 
+        eSoundVideo,
+        eCheat, // OPTIONAL
+        eCpuDecrypt,
+        eProgressEnd
+*/
     const char *phases[]={
         "Temporal convector flux init.",
         "Initialize input ports.",
@@ -264,9 +276,10 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         "Memory and CPU inits...",
         "Hi Score load.",
         "Rebuild machine...",
+        "...",
         "Decode graphics...",
-        "Delithiuminization...",
         "Load cheats...",
+        "Delithiuminization...",
         ""
     };
 

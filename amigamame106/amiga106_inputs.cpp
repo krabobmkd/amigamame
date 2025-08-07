@@ -731,14 +731,10 @@ void UpdateInputs(struct MsgPort *pMsgPort)
             RAWKEY_PORT0_JOY_DOWN,RAWKEY_PORT0_JOY_UP,
         };
 
-        static const UWORD prportDirectionsBits[]={0x0800,0x8000};
-        // ciabpra is parralel portcontrol bits, used for joystick buttons.
-        // commodore official SDK defines
-//#define CIAF_PRTRSEL	(1L<<2)
-//#define CIAF_PRTRPOUT	(1L<<1)  -> should be available for pr3 bt2
-//#define CIAF_PRTRBUSY	(1L<<0)
-        static const UWORD prportFire1Bits[]={0x0004,0x0001};
+        static const UWORD prportDirectionsBits[2]={0x0800,0x8000}; //APARJOY_J3_RIGHT, APARJOY_J4_RIGHT
 
+        static const UWORD prportFire1Bits[2]={APARJOY_J3_FIRE1,APARJOY_J4_FIRE1};
+        static const UWORD prportFire2Bits[2]={APARJOY_J3_FIRE2,APARJOY_J4_FIRE2};
         for(int iparallelportJoystick=0 ; iparallelportJoystick<2 ; iparallelportJoystick++)
         {
             int iplayer = configControls._parallelPort_Player[iparallelportJoystick];
@@ -759,14 +755,10 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+iPlayer_rkshift] =
                     (BYTE)((prportFire1Bits[iparallelportJoystick] & state)!=0); // down
 
-                // r1.6: may have second button on parallel port jstick 3 ,
-                //  but also need one more wire in parallel extension.
-                // no internally managed pin bit left for pr4 bt2
-                if(iparallelportJoystick==0)
-                {
-                    g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_BLUE+iPlayer_rkshift] =
-                        (BYTE)((CIAF_PRTRPOUT & state)!=0); // down
-                }
+                // r1.6: we may have second button on parallel port jstick 3 and 4 ,
+                //  but it also needs 2 more wires in parallel extension.
+                g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_BLUE+iPlayer_rkshift] =
+                    (BYTE)((prportFire2Bits[iparallelportJoystick] & state)!=0); // down
             }
         }
 

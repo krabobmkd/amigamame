@@ -430,6 +430,7 @@ void mameExitCleanCtrlC(void)
     free_callback_list(&exit_callback_list);
     free_callback_list(&reset_callback_list);
     free_callback_list(&pause_callback_list);
+
 }
 
 /*-------------------------------------------------
@@ -1219,13 +1220,10 @@ static void init_machine(void)
 	if (video_init() != 0)
 		fatalerror("video_init failed");
 
-
-    bootlog_setprogress(eCheat);
 	/* start the cheat engine */
-
 	if (options.cheat)
 	{
-
+        bootlog_setprogress(eCheat);
 		cheat_init();
     }
 

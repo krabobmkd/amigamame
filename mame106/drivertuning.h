@@ -11,7 +11,7 @@ extern "C" {
 // Mame Driver Tuning Flags
 #define MDTF_M68K_SAFE_MOVEMWRITE 1
 #define MDTF_M68K_SAFE_MOVEMREAD 2
-#define MDTF_BOOT_BIGDECRYPT 4
+//#define MDTF_BOOT_BIGDECRYPT 4
 #define MDTF_LONGBOOT 8
 typedef struct _DriverTuning {
 	UINT32 _bootframeskip;

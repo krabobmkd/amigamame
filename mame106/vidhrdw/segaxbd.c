@@ -78,7 +78,7 @@ VIDEO_UPDATE( xboard )
     if(postscreentoclean>0)
     {
         // need a last screen cleaning because onvasive bootprogress
-        bootlog_setprogress(eProgressEnd);
+        bootlog_setprogress(eCpuDecrypt);
         postscreentoclean = 0;
         nbdecryptDone = 0;
         //fd1094_krb_preclean();

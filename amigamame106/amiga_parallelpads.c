@@ -33,8 +33,10 @@ https://github.com/niklasekstrom/amiga-par-to-spi-adapter/blob/master/spi-lib/sp
 //#include "misc_protos.h"
 
 
-#ifdef USE_CIA_INTERUPT
+#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
 #include <proto/cia.h>
+#include <hardware/cia.h>
+#include <resources/cia.h>
 struct Library *ciaabase=NULL;
 #endif
 
@@ -46,7 +48,7 @@ struct Library *ciaabase=NULL;
 //static volatile UBYTE *cia_b_pra = (volatile UBYTE *)0xbfd000;
 //static volatile UBYTE *cia_b_ddra = (volatile UBYTE *)0xbfd200;
 
-//#define USE_CIA_INTERUPT 1
+
 
 //olde test thing
 //static struct Interrupt flag_interrupt;
@@ -72,6 +74,22 @@ void closeParallelPads(struct ParallelPads *parpads);
 
 static UBYTE *allocname = "Mame"; // or use task name ?
 
+#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
+//static volatile UBYTE *cia_a_prb = (volatile UBYTE *)0xbfe101;
+//static volatile UBYTE *cia_a_ddrb = (volatile UBYTE *)0xbfe301;
+//static volatile UBYTE *cia_b_pra = (volatile UBYTE *)0xbfd000;
+//static volatile UBYTE *cia_b_ddra = (volatile UBYTE *)0xbfd200;
+
+static int AckFlagCount=0;
+// when "changeisr"
+static int CiaParInteruptfunc()
+{
+    AckFlagCount++;
+    return 0;
+}
+
+#endif
+
 /** a simple VBL interupt function to just read parallel ports pins at 50 or 60Hz,
     whatever the main thread is doing.( If you check that on a slow main thread, clicks may be missed.)
 */
@@ -91,13 +109,21 @@ static int VBLinteruptfunc( register struct ParPadsInteruptData *ppi __asm("a1")
 //	move.b	_ciabpra,(a1)		; move byte from port to dest
 //    UBYTE aprb = ~ciaaprb;
 //    UBYTE bpra = ~ciabpra;
-    UWORD ciavalues = ~(( ((UWORD)ciaaprb)<<8)| (UWORD)ciabpra);
+    UWORD ciavalues = (~(( ((UWORD)ciaaprb)<<8)| (UWORD)ciabpra)) & 0xff07; // only keep bits that we are interested in.
+#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
+    if(ppi->_lastAckFlag != AckFlagCount)
+    {
+        ppi->_lastAckFlag = AckFlagCount;
+        ciavalues |= APARJOY_J4_FIRE2;
+    }
+#endif
     if(ciavalues != ppi->_last_cia )
     {
         // here if anything changed.
 
         // got to know if anything changed between checkings
         ppi->_last_checked_changes |= (ciavalues^ppi->_last_cia); //
+        // _last_checked is set to zero by reader.
         ppi->_last_checked |= ciavalues;
 
         ppi->_last_cia = ciavalues;
@@ -106,13 +132,6 @@ static int VBLinteruptfunc( register struct ParPadsInteruptData *ppi __asm("a1")
     }
     return 0; // clear z flag
 }
-#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
-static void CiaParInteruptfunc()
-{
-
-}
-
-#endif
 
 struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
 {
@@ -151,39 +170,7 @@ struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
         pparpads->_parallelBitsOK = (UWORD)(AllocMiscResource(MR_PARALLELBITS,allocname)==NULL);
         if(!pparpads->_parallelBitsOK) { Enable(); goto error; }
 
-#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
-    if(readJ4Bt2WithInterupt)
-    {
-        /*
-        ciaabase = (struct Library *)OpenResource(CIAANAME);
-        if (!ciaabase)
-        {
-            success = -2;
-            goto fail_out1;
-        }
-        ...
-        flag_interrupt.is_Node.ln_Name = (char *)spi_lib_name;
-        flag_interrupt.is_Node.ln_Type = NT_INTERRUPT;
-        flag_interrupt.is_Code = change_isr;
 
-        Disable();
-        if (AddICRVector(ciaabase, CIAICRB_FLG, &flag_interrupt))
-        {
-        Enable();
-        success = -5;
-        goto fail_out3;
-        }
-
-        AbleICR(ciaabase, CIAICRF_FLG);
-        SetICR(ciaabase, CIAICRF_FLG);
-        Enable();
-        // interupt can trigger now if pressed !
-        */
-
-
-
-    }
-#endif
 //    printf("Parallel acquired ok\n");
 
     // - - - - - install interupt
@@ -231,8 +218,7 @@ struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
     pparpads->_signr = signr = AllocSignal(-1);
     if(signr == -1) goto error;
 
-    pparpads->_rbfint = rbfint = AllocVec(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR);
-    if(!rbfint) goto error;
+    rbfint = &(pparpads->_rbfint);
 
     pparpads->_ppidata = ppidata = AllocVec(sizeof(struct ParPadsInteruptData), MEMF_PUBLIC|MEMF_CLEAR);
     if(!ppidata) goto error;
@@ -252,6 +238,8 @@ struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
         rbfint->is_Code = &VBLinteruptfunc;
 
         AddIntServer(INTB_VERTB,rbfint);
+        pparpads->_vertbintOk = 1;
+
 
 //    pparpads->_prior_enable = (BYTE)((custom.intenar & INTF_RBF)!=0) ; /* interrupt */
 //    custom.intena = INTF_RBF;                             /* disable it. */
@@ -266,9 +254,57 @@ struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
 //    priorenable = custom.intenar & INTF_RBF ? TRUE : FALSE; /* interrupt */
 //    custom.intena = INTF_RBF;                             /* disable it. */
 //    priorint = SetIntVector(INTB_RBF, rbfint);
+/*
+ The CIAICRF_FLG signal refers to the FLAG input pin of the CIA chip, which is used to latch data
+ from PORTB and can trigger an interrupt to the CPU when the peripheral asserts the ACK signal.
+ Therefore, while the FLAG pin is involved in the handshake process by detecting the ACK signal,
+  it is not the ACK signal itself.
+
+  BALABLA: "The FLAG input is connected to printer port ACK* input pin."
+*/
 
     // went OK
 //    pparpads->_public._signalBit = (1<<(pparpads->_signr));
+#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
+    if(readJ4Bt2WithInterupt)
+    {
+        if(!ciaabase) ciaabase = (struct Library *)OpenResource(CIAANAME);
+        if (ciaabase)
+        {
+            struct Interrupt *pciaint = &(pparpads->_ciaint);
+            pciaint->is_Node.ln_Name = (char *)"ParJoy4Bt2";
+            pciaint->is_Node.ln_Type = NT_INTERRUPT;
+            pciaint->is_Code = CiaParInteruptfunc;
+/*
+#define CIAICRB_TA	0           timer
+#define CIAICRB_TB	1           timer
+#define CIAICRB_ALRM	2
+#define CIAICRB_SP	3
+#define CIAICRB_FLG	4
+
+#define CIAICRB_IR	7
+#define CIAICRB_SETCLR	7  -> to disable the other, or nenable if not.
+*/
+            Disable();
+            if (AddICRVector(ciaabase, CIAICRB_FLG, pciaint)) // 0 if success
+            {
+                //error
+                pparpads->_ciaintOk = 0;
+            } else
+            {
+                pparpads->_ciaintOk = 1;
+                //ok. enable interupt: watch out, can trigger as soon as now!
+                /*WORD oldmask =*/ AbleICR(ciaabase, CIAICRF_FLG); // note: is a mask of what to enable -> only modify this
+                SetICR(ciaabase, CIAICRF_FLG);
+            }
+            Enable();
+        } // end if ciaabase
+        // may tell if worked or not here
+        printf("pparpads->_ciaintOk:%d\n",(int)pparpads->_ciaintOk);
+
+    } // end if asked
+#endif
+
 
     return pparpads;
 error:
@@ -287,6 +323,19 @@ void closeParallelPads(struct ParallelPads *pparpads)
 {
     if(!pparpads || !MiscBase) return;
 
+    if(ciaabase && pparpads->_ciaintOk)
+    {
+        Disable();
+
+        AbleICR(ciaabase, CIAICRF_FLG | CIAICRF_SETCLR );
+
+//        *cia_b_ddra &= ~(ACT_MASK | REQ_MASK | CLK_MASK);
+//        *cia_a_ddrb = 0;
+
+        RemICRVector(ciaabase, CIAICRB_FLG,  &(pparpads->_ciaint));
+        Enable();
+    }
+
 /*
 //    Disable();
 	AbleICR(ciaabase, CIAICRF_FLG);
@@ -304,12 +353,11 @@ void closeParallelPads(struct ParallelPads *pparpads)
 
 //	RemICRVector(ciaabase, CIAICRB_FLG, &flag_interrupt);
 
-    if(pparpads->_rbfint)
+    if(pparpads->_vertbintOk)
     {
-        RemIntServer(INTB_VERTB,pparpads->_rbfint);
+        RemIntServer(INTB_VERTB,&(pparpads->_rbfint));
     }
     if(pparpads->_ppidata) FreeVec(pparpads->_ppidata);
-    if(pparpads->_rbfint) FreeVec(pparpads->_rbfint);
     if(pparpads->_signr != -1) FreeSignal(pparpads->_signr);
 
     if(pparpads->_parallelBitsOK) FreeMiscResource(MR_PARALLELBITS);

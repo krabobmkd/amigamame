@@ -21,6 +21,8 @@ int osd_display_loading_rom_message(const char *name,rom_load_data *romdata)
 }
 static UINT32 gfxtotal=0;
 static UINT32 gfxdecoded=0;
+static UINT32 anyCpuDecrypt=0;
+
 void bootlog_setvideodecode(int i, int nbgfx)
 {
     gfxtotal = (UINT32)nbgfx;
@@ -31,7 +33,8 @@ void bootlog_setvideodecode(int i, int nbgfx)
 static UINT32 totaldecode=0;
 void bootlog_setDecrypt(int  dec, int nbdec)
 {
-    lithiumdone = dec*32 / nbdec;
+    anyCpuDecrypt = 1;
+    lithiumdone = dec*16 / nbdec;
      bootlog_setprogress(eCpuDecrypt);
 }
 
@@ -42,6 +45,7 @@ void bootlog_setprogress(eProgress e)
     {
         romstotal = gfxtotal = 1;
         romsloaded = gfxdecoded = lithiumdone = 0;
+        anyCpuDecrypt = 0;
     }
     if((int)e>= (int)eProgressEnd)
     {   // case where init finished
@@ -51,15 +55,12 @@ void bootlog_setprogress(eProgress e)
     // enum to per256.
     int romloadweight=80;
     int initvidweight=64;
-    int lithiumweight=0;
-
-    UINT32 driverflags =  getDriverTuningFlags();
-    if(driverflags & MDTF_BOOT_BIGDECRYPT) lithiumweight = 32;
+    int lithiumweight=(anyCpuDecrypt)?16:0;
 
     int restweigth = 256-(romloadweight+initvidweight+lithiumweight);
 
-    int divider = (int)eProgressEnd -2;
-    if(!options.cheat) divider--;
+    int divider = (int)eProgressEnd;
+   // if(!options.cheat) divider--;
 
     int enumpercent = ((int)e * restweigth) / divider;
     if(romstotal>0)
@@ -77,7 +78,7 @@ void bootlog_setprogress(eProgress e)
     if(lithiumdone>0)
     {
         int decodegfxrate = lithiumdone;
-        if(decodegfxrate >= 32) decodegfxrate = 31; // to not reach next enum
+        if(decodegfxrate >= 16) decodegfxrate = 15; // to not reach next enum
         enumpercent += decodegfxrate;
     }
     if(enumpercent>256) enumpercent=256;

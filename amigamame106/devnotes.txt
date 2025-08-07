@@ -1,35 +1,23 @@
 
-parport:
-
-
-parrallel port extension ouverte
-en haut (13 broche):
-
-	13 - black SEL
-	12 - PE (POUT? ) paper end -> A METTRE sur Fire2 par3
-	11 - busy (orange)
-	10 - ACK				-> a mettre sur fire2 par4 (si on peut)
-	9  - data8 -> up/left/right/down ...
-	...
-	2 4+4 directions
-	1 rien (strobe)
-en bas juste 2 ground
-
-
 
  Todo r1.6
 
  added:
-  Atari tetris, defender, joust 1&2, rampage
+  Atari tetris, defender, rampage
   scramble, super cobra, galaxian, galaga3
-  some 1993 games: Mystic Warriors, Monster Maulers, Violent Storm,Metamorphic Force,Martial Champion
-  Gaiapolis
+  some 1993 games: Gaiapolis, Mystic Warriors (glitchy), Monster Maulers, Violent Storm,Metamorphic Force,Martial Champion.
 
 add: Mario bros
 
+ O do not display "load cheat" !!
+
+ O TEST: othund with 2 mouses inverted !
+ O  2 CD32 pads
+
+
  O rawkey message for LL port 3&4 !!
 
- O -> ui_popup ne diot pas se propager sur le prochani jeu
+ X -> ui_popup ne diot pas se propager sur le prochani jeu
 
  O -> test all that, correct sprites.
 
