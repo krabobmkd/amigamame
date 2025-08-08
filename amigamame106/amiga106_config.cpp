@@ -653,12 +653,12 @@ void MameConfig::init(int argc,char **argv)
 
 }
 // from some .h
-struct _input_port_init_params
-{
-    input_port_entry *	ports;		/* base of the port array */
-    int					max_ports;	/* maximum number of ports we can support */
-    int					current_port;/* current port index */
-};
+//struct _input_port_init_params
+//{
+//    input_port_entry *	ports;		/* base of the port array */
+//    int					max_ports;	/* maximum number of ports we can support */
+//    int					current_port;/* current port index */
+//};
 extern "C"
 {
     int driverGetNbPlayers(const _game_driver *drv);

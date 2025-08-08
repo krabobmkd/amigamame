@@ -1148,6 +1148,7 @@ static void init_machine(void)
 		fatalerror("input_port_init failed");
 
 
+
     bootlog_setprogress(ebRomLoad);
 	/* load the ROMs if we have some */
 	/* this must be done before memory_init in order to allocate memory regions */

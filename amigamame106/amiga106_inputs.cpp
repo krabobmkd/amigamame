@@ -1427,4 +1427,14 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 
 }
 
+void osd_post_input_port_init_check()
+{
+    // at this level both osd_code_list and input_port_init are inited.
 
+    // if analog controler inited, but game doesnt use it :
+    if( g_PropsSticks && !input_machine_has_any_analog() )
+    {
+        ui_popup_time(6, "Game uses no analog input,\nso analog controllers are useless.");
+    }
+
+}

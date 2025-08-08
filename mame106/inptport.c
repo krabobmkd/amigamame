@@ -1009,7 +1009,7 @@ static void interpolate_analog_port(int port);
  *  Input port initialize
  *
  *************************************/
-
+extern void osd_post_input_port_init_check();
 int input_port_init(void (*construct_ipt)(input_port_init_params *))
 {
 	int ipnum, player;
@@ -1072,6 +1072,8 @@ int input_port_init(void (*construct_ipt)(input_port_init_params *))
 	/* register callbacks for when we load configurations */
 	config_register("input", input_port_load, input_port_save);
 
+    /* krb added */
+    osd_post_input_port_init_check();
 	return 0;
 }
 
