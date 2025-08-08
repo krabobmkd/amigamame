@@ -9,6 +9,7 @@
 
 add: Mario bros
 
+ O update cheat file
  X do not display "load cheat" !!
  X TEST: othund with 2 mouses inverted !
  O  2 CD32 pads

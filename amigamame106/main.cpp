@@ -96,7 +96,7 @@ struct Library    *MiscBase=NULL;
 
 struct DiskObject *AppDiskObject = NULL;
 //struct Library      *P96Base = NULL;
-
+ int verbose=0;
 }
 
 struct FileRequester  *FileRequester  = NULL;
@@ -106,13 +106,11 @@ static struct StackSwapStruct StackSwapStruct;
 void initTimers();
 void closeTimers();
 
-
-int libs_init()
+int libs_init1()
 {
 #ifdef USE_OWN_DOSBASE
     if(!(DOSBase = (struct DosLibrary *) OpenLibrary("dos.library", 36))) return(1);
 #endif
-
     if(!(GfxBase = (struct GfxBase *) OpenLibrary("graphics.library", 39)))
     {
         printf("need at least OS3.0\n");
@@ -124,23 +122,30 @@ int libs_init()
     }
     if(!(UtilityBase = OpenLibrary("utility.library",0))) return(1);
     if(!(KeymapBase = OpenLibrary("keymap.library", 36))) return(1);
-    if(!(AslBase = OpenLibrary("asl.library", 36))) return(1);
-    if(!(LayersBase = OpenLibrary("layers.library", 39))) return(1);   
+    if(!(LayersBase = OpenLibrary("layers.library", 39))) return(1);
     if(!(IconBase = OpenLibrary("icon.library", 39))) return(1);
-
+    return(0);
+}
+int libs_init2()
+{
+    if(verbose) printf("try open asl\n");
+    if(!(AslBase = OpenLibrary("asl.library", 36))) return(1);
+    if(verbose) printf("try open cybergraphics\n");
 //    InitLowLevelLib();
     // optional:
     CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
+    if(verbose && (CyberGfxBase == NULL)) printf("can't open cybergraphics\n");
 //    P96Base  = OpenLibrary("Picasso96API.library", 0);
 
     // mui is done elsewhere.
 
     // also, optional, used for parallel pads:
     // "There is no CloseResource()"
+    if(verbose) printf("try open misc\n");
     MiscBase = (struct Library *)OpenResource(MISCNAME);
-
+    if(verbose) printf("init Timers\n");
     initTimers();
-
+    if(verbose) printf("init libs ok\n");
     return(0);
 }
 
@@ -270,15 +275,16 @@ int main(int argc, char **argv)
   */
     // any exit case will lead to close().
     atexit(&main_close);
-
-    if(libs_init()!=0) exit(1);
-
-    getMainConfig().init(argc,argv); // init drivers map.
+    if(libs_init1()!=0)
+    {
+     printf("can't open common OS3 libs\n");
+     exit(1);
+    }
 
     int idriver=0; // romToLaunch;
     STRPTR userdir = NULL;
     STRPTR cheatfiletofilter= NULL;
-    int verbose=0;
+
     int romlist=0;
     int dohelp=0;
     int version=0; 
@@ -295,6 +301,7 @@ int main(int argc, char **argv)
 
         userdir =  ArgString((CONST_STRPTR*)args,"USERDIR","PROGDIR:user");
         verbose = (ArgInt((CONST_STRPTR*)args,"VERBOSE",2)!=2);
+        version = (ArgInt((CONST_STRPTR*)args,"VERSION",2)!=2);
         romlist = (ArgInt((CONST_STRPTR*)args,"-listfull",2)!=2);
         if(!romlist) romlist = (ArgInt((CONST_STRPTR*)args,"-ll",2)!=2);
         dohelp = (ArgInt((CONST_STRPTR*)args,"?",2)!=2);
@@ -306,6 +313,14 @@ int main(int argc, char **argv)
         cheatfiletofilter = ArgString((CONST_STRPTR*)args,"FILTERCHEAT",NULL);
         ArgArrayDone();
     }
+    if(libs_init2()!=0) exit(1);
+
+    if(verbose) log_enableStdOut(1);
+
+    if(verbose) printf("try read user/main.cfg\n");
+    getMainConfig().init(argc,argv); // init drivers map.
+    if(verbose) printf("after user/main.cfg\n");
+
     if(cheatfiletofilter)
     {
         getMainConfig().filterCheatFile(cheatfiletofilter);
@@ -333,7 +348,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    if(verbose) log_enableStdOut(1);
+
     if(userdir) getMainConfig().setUserDir(userdir);
 
     getMainConfig().load();

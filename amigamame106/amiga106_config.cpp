@@ -698,7 +698,7 @@ void MameConfig::initDriverIndex()
    // printf("initDriverIndex() 1\n");
     // to be done once.
   int NumDrivers;
-
+  loginfo(0,"initDriverIndex()\n");
   for(NumDrivers = 0; drivers[NumDrivers]; NumDrivers++)
   {
     const game_driver *drv  =drivers[NumDrivers];
@@ -715,7 +715,7 @@ void MameConfig::initDriverIndex()
     _videoAttribs.resize(_NumDrivers);
 //    _players.reserve(_NumDrivers);
 //    _players.resize(_NumDrivers);
-
+  loginfo(0,"initDriverIndex() ...\n");
     for(NumDrivers = 0; drivers[NumDrivers]; NumDrivers++)
     {
         const game_driver *drv  =drivers[NumDrivers];
@@ -725,6 +725,7 @@ void MameConfig::initDriverIndex()
       //  _players[NumDrivers] = (UBYTE)nbp;
 
     }
+  loginfo(0,"initDriverIndex() ok\n");
 }
 // provide this C tool:
 //const game_driver *getDriverByName(const char *pName)

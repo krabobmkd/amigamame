@@ -239,6 +239,52 @@ struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
         // the parallel port, and all the lines we want to use are
         // set up.
     //Enable();
+
+
+   // went OK
+//    pparpads->_public._signalBit = (1<<(pparpads->_signr));
+#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
+    if(readJ4Bt2WithInterupt)
+    {
+        if(!ciaabase) ciaabase = (struct Library *)OpenResource(CIAANAME);
+        if (ciaabase)
+        {
+            struct Interrupt *pciaint = &(pparpads->_ciaint);
+            pciaint->is_Node.ln_Name = (char *)"ParJoy4Bt2";
+            pciaint->is_Node.ln_Type = NT_INTERRUPT;
+            pciaint->is_Code = CiaParInteruptfunc;
+/*
+#define CIAICRB_TA	0           timer
+#define CIAICRB_TB	1           timer
+#define CIAICRB_ALRM	2
+#define CIAICRB_SP	3
+#define CIAICRB_FLG	4
+
+#define CIAICRB_IR	7
+#define CIAICRB_SETCLR	7  -> to disable the other, or nenable if not.
+*/
+            Disable();
+            if (AddICRVector(ciaabase, CIAICRB_FLG, pciaint)) // 0 if success
+            {
+                //error
+                pparpads->_ciaintOk = 0;
+            } else
+            {
+                pparpads->_ciaintOk = 1;
+                //ok. enable interupt: watch out, can trigger as soon as now!
+                /*WORD oldmask =*/
+                AbleICR(ciaabase, CIAICRF_FLG); // note: is a mask of what to enable -> only modify this
+                SetICR(ciaabase, CIAICRF_FLG);
+            }
+            Enable();
+        } // end if ciaabase
+        // may tell if worked or not here
+       //always ok printf("pparpads->_ciaintOk:%d\n",(int)pparpads->_ciaintOk);
+        // strategy2: switch that off for now.
+        AbleICR(ciaabase, CIAICRF_SETCLR | CIAICRF_FLG);
+    } // end if asked
+#endif
+
     // - - - - - alloc signal so interuption send change notification to main process.
     pparpads->_signr = signr = AllocSignal(-1);
     if(signr == -1) goto error;
@@ -288,47 +334,7 @@ struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
   BALABLA: "The FLAG input is connected to printer port ACK* input pin."
 */
 
-    // went OK
-//    pparpads->_public._signalBit = (1<<(pparpads->_signr));
-#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
-    if(readJ4Bt2WithInterupt)
-    {
-        if(!ciaabase) ciaabase = (struct Library *)OpenResource(CIAANAME);
-        if (ciaabase)
-        {
-            struct Interrupt *pciaint = &(pparpads->_ciaint);
-            pciaint->is_Node.ln_Name = (char *)"ParJoy4Bt2";
-            pciaint->is_Node.ln_Type = NT_INTERRUPT;
-            pciaint->is_Code = CiaParInteruptfunc;
-/*
-#define CIAICRB_TA	0           timer
-#define CIAICRB_TB	1           timer
-#define CIAICRB_ALRM	2
-#define CIAICRB_SP	3
-#define CIAICRB_FLG	4
 
-#define CIAICRB_IR	7
-#define CIAICRB_SETCLR	7  -> to disable the other, or nenable if not.
-*/
-            Disable();
-            if (AddICRVector(ciaabase, CIAICRB_FLG, pciaint)) // 0 if success
-            {
-                //error
-                pparpads->_ciaintOk = 0;
-            } else
-            {
-                pparpads->_ciaintOk = 1;
-                //ok. enable interupt: watch out, can trigger as soon as now!
-                /*WORD oldmask =*/ AbleICR(ciaabase, CIAICRF_FLG); // note: is a mask of what to enable -> only modify this
-                SetICR(ciaabase, CIAICRF_FLG);
-            }
-            Enable();
-        } // end if ciaabase
-        // may tell if worked or not here
-       //always ok printf("pparpads->_ciaintOk:%d\n",(int)pparpads->_ciaintOk);
-
-    } // end if asked
-#endif
 
 
     return pparpads;
