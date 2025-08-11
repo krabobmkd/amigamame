@@ -1283,7 +1283,8 @@ int createCmake(map<string,TMachine> machinetargets,
          // pacmania,...
          if(upname == "MININAMCOS1") onShouldBeDefault=true;
          if(upname == "MINIATARI") onShouldBeDefault=true;
-         if(upname == "JUSTDKONG") onShouldBeDefault=true;
+if(upname == "NINTENDO") onShouldBeDefault=true;		 
+        // if(upname == "JUSTDKONG") onShouldBeDefault=true;
          if(upname == "JALECO") onShouldBeDefault=true;
          if(upname == "SUN") onShouldBeDefault=true;
          if(upname == "CAPCOM" ) onShouldBeDefault = true;
