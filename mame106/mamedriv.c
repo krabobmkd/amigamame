@@ -4127,7 +4127,6 @@ const game_driver * const drivers[] =
 	DRIVER( youma ) /* 1986 "Nichibutsu" "Youma Ninpou Chou (Japan)" */
 #endif
 #ifdef LINK_NINTENDO
-
 	DRIVER( 8ballact ) /* 1984 "Seatongrove Ltd (Magic Eletronics USA licence)" "Eight Ball Action (DK conversion)" */
 	DRIVER( 8ballat2 ) /* 1984 "Seatongrove Ltd (Magic Eletronics USA licence)" "Eight Ball Action (DKJr conversion)" */
 	DRIVER( armwrest ) /* 1985 "Nintendo" "Arm Wrestling" */

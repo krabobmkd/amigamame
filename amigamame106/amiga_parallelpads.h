@@ -75,7 +75,7 @@ struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt);
  * @param parpads
  */
 void closeParallelPads(struct ParallelPads *parpads);
-//void prptrace();
+void prptrace();
 
 // bits in ->_ppidata->_last_checked
 // (directions are the 8bit parallel "data pins")

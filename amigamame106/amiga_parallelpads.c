@@ -103,6 +103,10 @@ static int CiaParInteruptfunc()
 static int VBLinteruptfunc( register struct ParPadsInteruptData *ppi __asm("a1") )
 {
 
+    //  back to read state
+    ciaaddrb = 0; // all lines read
+    ciabddra &= 0xFF; // busy, pout, and sel. to read
+
 // 	movea.l	_portptr,a1		; a1 now holds the destination
 //	move.b	_ciaaprb,(a1)		; move byte from port to dest
 //	movea.l	_fireptr,a1		; a1 now holds the destination
@@ -133,9 +137,11 @@ static int VBLinteruptfunc( register struct ParPadsInteruptData *ppi __asm("a1")
 #ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
 
     //  back to read state
-    ciaaddrb = 0; // all lines read
-    ciabddra &= 0xFF; // busy, pout, and sel. to read
+   // ciaaddrb = 0; // all lines read
+   // ciabddra &= 0xFF; // busy, pout, and sel. to read
 
+    ciaaddrb = 0xff; // all lines output
+    ciaaprb = 0xFF;
 #endif
 //     lea $bfe101,a0      ; Load address of parallel port data register CIAA port B register,
 // lea $bfe301,a1      ; Load address of parallel port DDR register
@@ -145,18 +151,13 @@ static int VBLinteruptfunc( register struct ParPadsInteruptData *ppi __asm("a1")
 
     return 0; // clear z flag
 }
-// static int cntt=0;
-// void prptrace()
-// {
-//     // write ... nothing, could generate interupt
-//     ciaaddrb = 0xff; // all lines output
-//     ciaaprb = 0xFF;
-
-
-//     cntt++;
-//     if((cntt&63)!=0) return;
-//     printf("AckFlagCount:%d\n",AckFlagCount);
-// }
+static int cntt=0;
+void prptrace()
+{
+    cntt++;
+    if((cntt&63)!=0) return;
+    printf("AckFlagCount:%d\n",AckFlagCount);
+}
 
 struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
 {
