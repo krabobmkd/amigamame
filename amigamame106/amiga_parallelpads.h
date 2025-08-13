@@ -18,7 +18,7 @@ extern "C" {
 #include <hardware/cia.h>
 
 // this is experimental unofficial code to gain Bt2 on parallel joystick "4", as "ACK" signal,
-#define PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT 1
+//#define PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT 1
 
 struct Task;
 

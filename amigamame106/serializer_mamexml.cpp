@@ -86,7 +86,7 @@ void XmlWriter::operator()(const char *sMemberName, float &v, float min, float m
         int iv = (int)( (v-min)/step);
         if(iv<0) iv=0;
         if(iv>inbstep) iv=inbstep;
-        xml_set_attribute_int(p,"vi",iv);
+        xml_set_attribute_int(p,"v",iv);
     } else
     {
 
@@ -221,14 +221,14 @@ void XmlReader::operator()(const char *sMemberName,  float &v, float min, float 
         {
             int inbstep =  (int)((max-min)/step) + 1;
             int idef = (int)((defval-min)/step);
-            int iv =  xml_get_attribute_int(p,"vi",idef);
+            int iv =  xml_get_attribute_int(p,"v",idef);
             if(iv<0) iv=0;
             if(iv>inbstep) iv=inbstep;
             v = min + (step*((float)iv));
         } else
         {
             int idef = (int)(1024.0f*(defval-min));
-            int iv =  xml_get_attribute_int(p,"vi",idef);
+            int iv =  xml_get_attribute_int(p,"v",idef);
             v = min + (((float)iv)/1024.0f);
         }
     } else {

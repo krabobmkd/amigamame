@@ -568,7 +568,10 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop)
     // would work after init + 2 frames.
     if((!prop->_pintdata) || (prop->_pintdata->_nbcalls<2)) return;
 
-    for(int iport=0;iport<2;iport++)
+    ULONG invertXFlagMask = PROPJOYFLAGS_PORT1_INVERSEX;
+    ULONG invertYFlagMask = PROPJOYFLAGS_PORT1_INVERSEY;
+
+    for(int iport=0;iport<2;iport++, invertXFlagMask<<=2, invertYFlagMask<<=2)
     {
         // if port concerned...
         if( prop->_ports[iport]._deviceresult !=0 ) continue;
@@ -603,8 +606,9 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop)
             UWORD dx = prop->_calibration[iport].x.max - prop->_calibration[iport].x.min;
 
             if(dx>0)
-            {   // in my knowledge divu.w would be used, but well: compilers...
+            {   // in my knowledge divu.w would be used, but well: compilers...                        
                 prop->_values[iport].x = (WORD)((ULONG)(vx-prop->_calibration[iport].x.min)*255) / dx; // would be 0->255
+                if((prop->_flags & invertXFlagMask)!=0)  prop->_values[iport].x = 255 -  prop->_values[iport].x ;
             } else  prop->_values[iport].x = 128; // default center.
 
             UWORD dy = prop->_calibration[iport].y.max - prop->_calibration[iport].y.min;
@@ -612,6 +616,7 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop)
             if(dy>0)
             {   // in my knowledge divu.w would be used, but well: compilers...
                 prop->_values[iport].y = (WORD)((ULONG)(vy-prop->_calibration[iport].y.min)*255) / dy; // would be 0->255
+                if((prop->_flags & invertYFlagMask)!=0)  prop->_values[iport].y = 255 -  prop->_values[iport].y ;
             } else  prop->_values[iport].y = 128; // default center.
 
             prop->_values[iport].bt = bt1 | (bt2<<1);

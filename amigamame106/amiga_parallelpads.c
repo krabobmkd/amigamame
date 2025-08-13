@@ -354,7 +354,7 @@ error:
 void closeParallelPads(struct ParallelPads *pparpads)
 {
     if(!pparpads || !MiscBase) return;
-
+#ifdef PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT
     if(ciaabase && pparpads->_ciaintOk)
     {
         Disable();
@@ -367,7 +367,7 @@ void closeParallelPads(struct ParallelPads *pparpads)
         RemICRVector(ciaabase, CIAICRB_FLG,  &(pparpads->_ciaint));
         Enable();
     }
-
+#endif
 /*
 //    Disable();
 	AbleICR(ciaabase, CIAICRF_FLG);

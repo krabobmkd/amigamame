@@ -266,6 +266,7 @@ public:
         int _parallelPort_Player[2]; // value 1-4
         int _parallel_type[2];
 
+        ULONG_FLAGS _PropJoyAxisReverse;
     };
     Controls &controls() { return _controls; }
 

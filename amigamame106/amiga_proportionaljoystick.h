@@ -135,6 +135,12 @@ int hasProportionalStickResource();
 #define PROPJOYFLAGS_PORT1_INVERTXY 4
 #define PROPJOYFLAGS_PORT2_INVERTXY 8
 
+#define PROPJOYFLAGS_PORT1_INVERSEX 16
+#define PROPJOYFLAGS_PORT1_INVERSEY 32
+#define PROPJOYFLAGS_PORT2_INVERSEX 64
+#define PROPJOYFLAGS_PORT2_INVERSEY 128
+
+
 // enum for createProportionalSticks() param timerMethod
 // dfault, use regular vblank (50 or 60Hz)
 #define PROPJOYTIMER_VBLANK_ADDINT 0
