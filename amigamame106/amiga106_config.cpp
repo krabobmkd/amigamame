@@ -452,7 +452,8 @@ void MameConfig::Display::serialize(ASerializer &serializer)
                });
 
     // min,max,step, default
-    serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
+   //nomore serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
+   _color_brightness = 1.0f;
 
     serializer("Per Screen Mode",_perScreenModeS);
     serializer("Per Game",_perGameS);

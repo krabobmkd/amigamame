@@ -339,7 +339,8 @@ int main(int argc, char **argv)
         " commandline options (also can use icon's Tooltips):\n"
         "    -v version\n"
         "    -ll or --listfull list all archive names linked in this version.\n"
-        "    VERBOSE   log to standard output.\n");
+        "    verbose   log to standard output.\n"
+        "    filtercheat=originalcheat.dat   Create new cheat files with only supported games. (with .new)");
         return 0;
     }
     if(romlist)

@@ -151,13 +151,13 @@ static int VBLinteruptfunc( register struct ParPadsInteruptData *ppi __asm("a1")
 
     return 0; // clear z flag
 }
-static int cntt=0;
-void prptrace()
-{
-    cntt++;
-    if((cntt&63)!=0) return;
-    printf("AckFlagCount:%d\n",AckFlagCount);
-}
+//static int cntt=0;
+//void prptrace()
+//{
+//    cntt++;
+//    if((cntt&63)!=0) return;
+//    printf("AckFlagCount:%d\n",AckFlagCount);
+//}
 
 struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
 {

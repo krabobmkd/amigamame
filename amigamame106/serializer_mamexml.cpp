@@ -74,9 +74,23 @@ void XmlWriter::operator()(const char *sMemberName, float &v, float min, float m
 {
     string name = checkXmlName(sMemberName);
     xml_data_node *p = xml_add_child(_recursenode.back(),name.c_str(),  NULL );
+    if(!p) return;
+
     // beta4: float read write problematic with gcc bebbo locale mess. -> cast to int.
    // printf("write:%f %d\n",v,(int)(v*1024.0f));
-    if(p) xml_set_attribute_int(p,"vi",(int)(v*1024.0f));
+    if(defval<min) defval=min;
+    if(defval>max) defval=max;
+    if(step>0.0f)
+    {
+        int inbstep =  (int)((max-min)/step) + 1;
+        int iv = (int)( (v-min)/step);
+        if(iv<0) iv=0;
+        if(iv>inbstep) iv=inbstep;
+        xml_set_attribute_int(p,"vi",iv);
+    } else
+    {
+
+    }
 }
 
 
@@ -201,13 +215,22 @@ void XmlReader::operator()(const char *sMemberName,  float &v, float min, float 
     if(p)
     {
         // now cast int to float because locale are problematics
-        int iv =  xml_get_attribute_int(p,"vi",(int)(defval*1024.0f));
-       // printf("XmlReader int:%d def:%f\n",iv,defval);
-        float vv = (((float)iv) * (1.0f/1024.0f))+0.001f;
-       // printf("XmlReader int:%d def:%f final:%f\n",iv,defval,vv);
-        if(vv<min) vv=min;
-        if(vv>max) vv=max;
-        v = vv;
+        if(defval<min) defval=min;
+        if(defval>max) defval=max;
+        if(step>0.0f)
+        {
+            int inbstep =  (int)((max-min)/step) + 1;
+            int idef = (int)((defval-min)/step);
+            int iv =  xml_get_attribute_int(p,"vi",idef);
+            if(iv<0) iv=0;
+            if(iv>inbstep) iv=inbstep;
+            v = min + (step*((float)iv));
+        } else
+        {
+            int idef = (int)(1024.0f*(defval-min));
+            int iv =  xml_get_attribute_int(p,"vi",idef);
+            v = min + (((float)iv)/1024.0f);
+        }
     } else {
         v = defval;
     }
