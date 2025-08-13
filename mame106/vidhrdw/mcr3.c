@@ -235,7 +235,7 @@ void mcr3_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		0x00 	// priority_mask
+		0x00 |(1<<31) 	// priority_mask
 	  };
 	struct drawgfxParams dgp1={
 		bitmap, 	// dest
@@ -252,7 +252,7 @@ void mcr3_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		0x02 	// priority_mask
+		0x02|(1<<31) 	// priority_mask
 	  };
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{

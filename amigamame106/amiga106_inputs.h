@@ -8,8 +8,9 @@ extern "C" {
     #include <devices/gameport.h>
 }
 
-void InitLowLevelLib();
+//olde, now done in ConfigureLowLevelLib() if needed. void InitLowLevelLib();
 void ConfigureLowLevelLib();
+// r16, now to be used at each game closing.(FreeInputs)
 void CloseLowLevelLib();
 
 void AllocInputs();

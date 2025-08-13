@@ -240,7 +240,7 @@ void Drawable_OS3::initRemapTable()
             // use exact palette index and update if nb color fits.
             Screen *pScreen = _drawable.screen();
             int privScreenNbColors = 1<<(pScreen->RastPort.BitMap->Depth);
-            if(_colorsIndexLength<=(privScreenNbColors+10))
+            if((_colorsIndexLength+10)<=(privScreenNbColors))
             {
                      _pRemap = new Paletted_Screen8(pScreen);
             }

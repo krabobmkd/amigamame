@@ -7,6 +7,8 @@
 #include <proto/diskfont.h>
 
 #include <stdio.h>
+#include <string>
+#include "mamelog.h"
 //
 extern "C" {
 static const unsigned char tlogomamebm[(128/8)*36]={
@@ -30,6 +32,13 @@ static const unsigned char tlogomamebm[(128/8)*36]={
     0,0,1,255,128,0,0,0,0,0,0,0,0,0,0,0,0,0,3,255,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
+}
+
+static std::string lastmessage;
+static void logmess(int el,const char *pmess)
+{
+    while(*pmess == ' ' || *pmess == '\t') pmess++;
+    lastmessage = pmess;
 }
 
 IntuiBufferedDrawing::IntuiBufferedDrawing()
@@ -119,6 +128,8 @@ void IntuiBufferedDrawing::drawTextTmp(TextFont *font,int x1,int y1,int pen,cons
     SetFont(_bgrp,font);
 
     int l = strlen(ptext);
+    while(l>0 && (ptext[l-1] == '\n' || ptext[l-1] == ' ')) l--;
+
     SetDrMd(_bgrp,  JAM1  );
 
     SetAPen(_bgrp,pen);
@@ -137,6 +148,7 @@ void IntuiBufferedDrawing::maskBitmapTmp(BitMap *pbm,int x1,int y1,int w,int h,U
 
 void IntuiBufferedDrawing::finalBlit(RastPort *rp)
 {
+// printf("finalBlit:%08x %d %d\n",(int)_BgBm,_bmw,_bmh);
     if(!_BgBm || _bmw==0 || _bmh ==0) return;
 
     BltBitMapRastPort( _BgBm,//CONST struct BitMap *srcBitMap,
@@ -154,7 +166,7 @@ IntuiProgressBar::IntuiProgressBar(IntuitionDrawable *drawable)
     , _pChipLogoAlloc(NULL)
     , _font(NULL)
 {
-
+    lastmessage.clear();
 }
 IntuiProgressBar::~IntuiProgressBar()
 {
@@ -167,7 +179,12 @@ IntuiProgressBar::~IntuiProgressBar()
 }
 void IntuiProgressBar::drawProgress(int per256, int enm)
 {
-
+    static int logison=0;
+    if(logison == 0)
+    {
+        log_addCallback(&logmess);
+        logison = 1;
+    }
     Window *win = _drawable->window();
     if(!win) return;
 
@@ -207,8 +224,11 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         // means final pass before game screen , must clean again and quit.
         SetAPen(rp,blackpen); // that time 0, not blackpen, for the case of galaga 0 white
         RectFill(rp,0,0,w,h);
+        log_removeCallback(&logmess);
+        logison = 0;
         return;
     }
+
     // - - - - our quick solution to avoid draw glitch
     // is to consider one big clean per resize
     // and then just draw temp / reblit a portion of screen.
@@ -217,7 +237,7 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
 
     // this set or reuse the temp bitmap
     int dry1 = y1-37+10; // top of logo
-    int dry2 = y2+8; // down of text
+    int dry2 = y2+8+9; // down of text -> 2 lines now
     setUpdatableArea(rp,0,dry1,w,dry2-dry1);
 
     // clean at temp buffer level
@@ -238,7 +258,19 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
     int yb1 = y1+2*border;
     int yb2 = y2-2*border;
     RectFillTmp(xb1,yb1,xb1 + ((xb2-xb1)*per256)/256,yb2);
+/*
+        ebStart=0,
+        ebInput,
+        ebRomLoad,
+        ebMemoryAndCpu,
+        ebHighScoreSaveLoad,
+        eDriver,
 
+        eSoundVideo,
+        eCheat, // OPTIONAL
+        eCpuDecrypt,
+        eProgressEnd
+*/
     const char *phases[]={
         "Temporal convector flux init.",
         "Initialize input ports.",
@@ -247,8 +279,9 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         "Hi Score load.",
         "Rebuild machine...",
         "Decode graphics...",
-        "Delithiuminization...",
         "Load cheats...",
+        "Delithiuminization...",
+        "Done!",
         ""
     };
 
@@ -280,6 +313,8 @@ void IntuiProgressBar::drawProgress(int per256, int enm)
         drawTextTmp(_font,xt+1,yb2+6,blackpen,p);
         drawTextTmp(_font,xt+1,yb2+7,whitepen,p);
 
+        if(lastmessage.length()>0)
+            drawTextTmp(_font,xt+1,yb2+7+8,greypen,lastmessage.c_str());
     }
 
      // - - - logo !

@@ -452,15 +452,37 @@ int patchMiniMachines(
 "galaga","galagao","galagamw","galagamk","gallag","gatsbee",
 "xevious","xeviousa","xeviousb","xeviousc","xevios","battles","sxevious",
 "digdug","digdugb","digdugat","digduga1","dzigzag",
+//r1.6
+"galaxian","galaxiaj","galmidw","mooncrst",
+"dkongjrm","bongo","zigzag",
 
+"gaplus","galaga3",
+"frogger","frogseg1",
+
+"cclimber","cclimbrj","ckong","ckonga","bigkong","monkeyd",
+"rpatrolb","rpatrolo","silvland","cannonb","cannonb2","ckongb",
+
+"swimmer","guzzler"
 
 });
+
         m._sources={
             "drivers/galaga.c","vidhrdw/galaga.c",
             "vidhrdw/bosco.c",
             "machine/namcoio.c",
             "machine/xevious.c","vidhrdw/xevious.c","vidhrdw/digdug.c",
             "machine/atari_vg.c",
+
+		"drivers/galaxian.c","sndhrdw/galaxian.c","vidhrdw/galaxian.c","drivers/gaplus.c",
+		"machine/gaplus.c", "vidhrdw/gaplus.c",
+        "drivers/frogger.c", // what?
+        "machine/konamigx.c",
+        // brrr
+        "drivers/cclimber.c","sndhrdw/cclimber.c","vidhrdw/cclimber.c",
+
+
+
+
 //            "sound/namco52.c","sound/namco54.c",
 //             "sound/namco.c",
 
@@ -473,6 +495,9 @@ int patchMiniMachines(
         m._sound_defs["NAMCO_54XX"]=1;
         m._sound_defs["FILTER"]=1;
         m._sound_defs["SAMPLES"]=1;
+        m._sound_defs["TMS5110"]=1;
+
+// 	set(MSND_TMS5110 ON)
 
         m._cpu_defs["Z80"]=1;
 /*
@@ -531,6 +556,9 @@ int patchMiniMachines(
         m._name = mname;
 
        m._sources = {
+            "drivers/atetris.c",
+            "vidhrdw/atetris.c",
+
             "drivers/ccastles.c",
             "vidhrdw/ccastles.c",
 
@@ -611,7 +639,11 @@ int patchMiniMachines(
         // vectors bwidow
         "spacduel","bwidow","gravitar","gravitr2","gravp","lunarbat","lunarba1",
         // vector asteroids
-        "asteroid","asteroi1","asteroib","asterock","meteorts","astdelux","astdelu1","llander","llander1"
+        "asteroid","asteroi1","asteroib","asterock","meteorts","astdelux","astdelu1","llander","llander1",
+
+        // - - - atetris
+        "atetris","atetrisa","atetrisb","atetrsb2","atetcktl","atetckt2"
+
     });
 
         m._cpu_defs["M68010"]=1; // gauntlet + hardwrivin stun runner
@@ -804,11 +836,24 @@ int patchMiniMachines(
 
         // another machine
         m._gamedrivers["simpsons"] = src._gamedrivers["simpsons"];
+
+        // mystwarr
+        copyDrivers(m,src,{
+            "mystwarr","mystwaru","mmaulers","dadandrn",
+            "viostorm","viostrmu","viostrmj","viostrma","metamrph","metamrpu",
+            "metamrpj","mtlchamp","mtlchmp1","mtlchmpu","mtlchmpj","mtlchmpa",
+            "gaiapols","gaiapolu","gaiapolj"
+        });
+
+
         // drivers/simpsons.c machine/simpsons.c vidhrdw/simpsons.c
         // drivers/tmnt.c vidhrdw/tmnt.c
         m._sources = {
             "drivers/tmnt.c","vidhrdw/tmnt.c","vidhrdw/konamiic.c",
-            "drivers/simpsons.c","machine/simpsons.c","vidhrdw/simpsons.c"
+            "drivers/simpsons.c","machine/simpsons.c","vidhrdw/simpsons.c",
+
+            "drivers/mystwarr.c","vidhrdw/mystwarr.c"
+
         };
         m._cpu_defs["KONAMI"]=1;
         m._cpu_defs["M68000"]=1;
@@ -890,9 +935,26 @@ int patchMiniMachines(
             "drivers/gradius3.c","vidhrdw/gradius3.c",
             "drivers/nemesis.c","vidhrdw/nemesis.c",
             "drivers/twin16.c","vidhrdw/twin16.c", // gradius 2
-            "drivers/parodius.c","vidhrdw/parodius.c"
+            "drivers/parodius.c","vidhrdw/parodius.c",
+            // r1.6 added: (scramble & super cobra)
+            "drivers/scobra.c","drivers/scramble.c",
+            "machine/scramble.c","sndhrdw/scramble.c"
 
         };
+        m._gamedrivers["scobra"] = src._gamedrivers["scobra"];
+        m._gamedrivers["scramble"] = src._gamedrivers["scramble"];
+        m._gamedrivers["mimonscr"] = src._gamedrivers["mimonscr"];
+
+//        m._gamedrivers["parodisj"] = src._gamedrivers["parodisj"];
+
+
+/*
+
+		drivers/scotrsht.c vidhrdw/scotrsht.c drivers/scramble.c machine/scramble.c
+		sndhrdw/scramble.c
+*/
+
+
         m._cpu_defs["M68000"]=1;
         m._cpu_defs["Z80"]=1;
         m._cpu_defs["KONAMI"]=1; // parodius
@@ -1069,6 +1131,42 @@ GAME( 1994, nbajamt3, nbajam,  tunit_adpcm, nbajamte, nbajamte, ROT0, "Midway", 
 */
     }
     {
+        TMachine  &src=machinetargets["midway"];
+        string mname=string("midwaymcr");
+        TMachine  &m=machinetargets[mname];
+        m._name = mname;
+         m._sources = {
+            "drivers/mcr.c","machine/mcr.c","sndhrdw/mcr.c",
+            "vidhrdw/mcr.c","drivers/mcr3.c","vidhrdw/mcr3.c",
+            "drivers/williams.c","machine/williams.c","sndhrdw/williams.c","vidhrdw/williams.c",
+            "drivers/mcr68.c","vidhrdw/mcr68.c"
+         };
+
+        copyDrivers(m,src,{
+        // mcr
+        "solarfox","kick","kicka",
+        "shollow","shollow2","tron","tron2","tron3","tron4","domino","wacko",
+        "twotigrc","twotiger","kroozr","journey",
+        "tapper","tappera","sutapper","rbtapper","timber","dotron","dotrona","dotrone",
+        "nflfoot","demoderb",
+        //mcr3
+        "demoderm","sarge","maxrpm","rampage","rampage2",
+        "powerdrv","stargrds","spyhunt","crater","turbotag",
+        // mcr68
+        "zwackery","spyhunt2","xenophob","spyhunt2","spyhnt2a","blasted","archrivl","archriv2",
+         "trisport","pigskin",
+
+        // williams 1982 (selection)
+        "defender","defendg","defendw",
+//doesntwork        "joust","joustr","joustwr",
+        // "with tilemaps"
+        "mysticm","tshoot","inferno","joust2"
+
+        });
+
+    } // end midwaymcr
+
+    {
 
 
 
@@ -1185,7 +1283,8 @@ int createCmake(map<string,TMachine> machinetargets,
          // pacmania,...
          if(upname == "MININAMCOS1") onShouldBeDefault=true;
          if(upname == "MINIATARI") onShouldBeDefault=true;
-         if(upname == "JUSTDKONG") onShouldBeDefault=true;
+if(upname == "NINTENDO") onShouldBeDefault=true;		 
+        // if(upname == "JUSTDKONG") onShouldBeDefault=true;
          if(upname == "JALECO") onShouldBeDefault=true;
          if(upname == "SUN") onShouldBeDefault=true;
          if(upname == "CAPCOM" ) onShouldBeDefault = true;
@@ -1202,6 +1301,7 @@ int createCmake(map<string,TMachine> machinetargets,
         if(upname == "MINIDTEA" ) onShouldBeDefault = true;
 
         if(upname == "CINEMAT" ) onShouldBeDefault = true;
+
 
         // because Q*BERT ! ->doesnt work
         if(upname == "GOTTLIEB" ) onShouldBeDefault = true;
@@ -1228,6 +1328,8 @@ int createCmake(map<string,TMachine> machinetargets,
 
         // some midway machines, mk mk2 nbajam
         if(upname == "MIDWAYTUNIT" ) onShouldBeDefault = true;
+        // some old midway machines (defender, joust)
+        if(upname == "MIDWAYMCR" ) onShouldBeDefault = true;
 
         ofs << "option(OPT_"<< upname<< " \"\" "<<(onShouldBeDefault?"ON":"OFF")<< ")\n";
     }

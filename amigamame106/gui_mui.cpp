@@ -60,7 +60,9 @@ inline Object * MUINewObject(CONST_STRPTR cl, Tag tags, ...)
 {
     return MUI_NewObjectA((char *)cl, (struct TagItem *) &tags);
 }
-
+extern "C" {
+    extern int verbose;
+}
 
 // MUI5 thing
 #ifndef MUIA_List_SortColumn
@@ -136,7 +138,9 @@ static inline int GetEntryDriverIndex(ULONG entry)
 
 void AllocGUI(void)
 {
-    MUIMasterBase = OpenLibrary("muimaster.library", 16);
+    if(verbose) printf("try init MUI\n");
+
+    MUIMasterBase = OpenLibrary("muimaster.library", 16);    
     if(!MUIMasterBase)
     {
         printf(" no MUI interface found\n install MUI or launch a game installed in roms/romname.zip with:\n>Mame106 romname\n\n");
@@ -144,10 +148,12 @@ void AllocGUI(void)
     }
     if(!_pMameUI)
     {
+        if(verbose) printf("init MUI, found version: %d.%d\n",MUIMasterBase->lib_Version,MUIMasterBase->lib_Revision);
+
         _pMameUI = new MameUI;
         _pMameUI->init();
+        if(verbose) printf("after init MUI\n");
     }
-
 }
 
 
@@ -466,7 +472,7 @@ int MameUI::MainGUI(void)
 
                         UpdateUIToConfig();
 
-                    log_setCallback(muilog);
+                    log_addCallback(muilog);
 
                     //        printf("after UpdateUIToConfig\n");
 

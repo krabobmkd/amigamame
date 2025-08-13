@@ -85,6 +85,14 @@ static map<string,sDriverTuning> _tunings={
 	{"vimana",{0*60,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE}},
 	{"zerowing",{0*60,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE}},
 
+
+    {"gaiapols",{21*60,DEFMINCPUC,0}},
+    {"mystwarr",{16*60,DEFMINCPUC,0}},
+    {"mmaulers",{20*60,DEFMINCPUC,0}},
+    {"metamrph",{16*60,DEFMINCPUC,0}},
+    {"mtlchamp",{16*60,DEFMINCPUC,0}},
+
+
 };
 
 sDriverTuning *getDriverTuningByName(const char *drivername)

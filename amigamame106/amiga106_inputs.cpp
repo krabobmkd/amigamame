@@ -18,13 +18,14 @@
 #include <proto/lowlevel.h>
 #include <proto/keymap.h>
 #include <proto/alib.h>
-
+#include "mamelog.h"
 #include "intuiuncollide.h"
 
 extern "C" {
     #include <libraries/lowlevel.h>
     #include <devices/keyboard.h>
     #include <hardware/intbits.h>
+    #include <hardware/cia.h>
 }
 
 #include <vector>
@@ -34,24 +35,31 @@ extern "C" {
 extern "C" {
     #include "osdepend.h"
     #include "input.h"
+    #include "inptport.h"
     // for schedule_exit()
     #include "mame.h"
+    #include "usrintrf.h"
+
 }
 
 #include "amiga106_inputs.h"
 #include "amiga106_config.h"
 #include "amiga106_video.h"
 #include "amiga_parallelpads.h"
-
+#include "amiga_proportionaljoystick.h"
 
 using namespace std;
 
+//static int cnt=0;
 #include <stdio.h>
 
 #include <stdlib.h>
 
 // extend amiga os code given to mame after "lowlevel rawkey codes".
+// actually for lowlevel mouses
 #define ANALOG_CODESTART 1024
+// actually for real analog "potgo"
+#define PROPJOY_CODESTART 2048
 
 #ifdef USE_DIRECT_KEYBOARD_DEVICE
 struct KeyboardMatrix {
@@ -152,7 +160,18 @@ static std::vector<std::string> _keepMouseNames=
     "","","",
 
 };
-
+// pjoy/pad , port1/2 , X/Y
+static const char * const _AnalogNames[2][2][4]=
+{
+    {
+        {"PropJoy1 X","PropJoy1 Y","PropJoy1 Bt1","PropJoy1 Bt2"},
+        {"PropJoy2 X","PropJoy2 Y","PropJoy2 Bt1","PropJoy2 Bt2"}
+    },
+    {
+        {"C64Pad1 X","C64Pad1 Y","C64Pad1 Bt1","C64Pad1 Bt2"},
+        {"C64Pad2 X","C64Pad2 Y","C64Pad2 Bt1","C64Pad2 Bt2"}
+    }
+};
 RawKeyMap   rawkeymap;
 
 
@@ -160,10 +179,12 @@ MameInputs *g_pInputs=NULL;
 ParallelPads *g_pParallelPads=NULL; // createParallelPads();
 int     llPortsTypes[4]={0,0,0,0};
 
+struct ProportionalSticks *g_PropsSticks=NULL;
+
 extern "C" {
     struct Library *LowLevelBase = NULL;
 #ifdef USE_DIRECT_KEYBOARD_DEVICE
-static void mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1") )
+static int mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1") )
 {
     struct KeyboardMatrix km;
     // hello this is executed at 50Hz or 60Hz, whatever happens . It's a vblank interupt.
@@ -181,124 +202,199 @@ static void mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1
     pkm->_kl[2] |= km._kl[2];
     pkm->_kl[3] |= km._kl[3]; // not sure if useful.
     }
-
+    return 0; // must clear z flag
 }
 #endif
 
 } // end extern c
 
-void InitLowLevelLib()
-{
-    if(!LowLevelBase)
-    {
-        LowLevelBase = OpenLibrary("lowlevel.library", 0);
-    }
-}
+// void InitLowLevelLib()
+// {
+//     if(!LowLevelBase)
+//     {
+//         LowLevelBase = OpenLibrary("lowlevel.library", 0);
+//     }
+// }
 // when effective;y asked, to further close.
-static USHORT askedPadsRawKey = 0;
+static USHORT askedPadsRawKey[2] = {0,0};
 static USHORT useAnyMouse = 0;
+static USHORT usePropJoysticks = 0;
+static USHORT useAnyLowLevelControl = 0;
+static USHORT dddummmy = 0;
 #ifdef RJP_OPTION
 static USHORT useReadJoyPortForPads = 0; // else rawkeys, added for NewLowlevel patch for A2000.
 #endif
 void ConfigureLowLevelLib()
 {
 //printf(" ***** ConfigureLowLevelLib\n");
-    if(!LowLevelBase) return;
-
-    /*
-#define JP_TYPE_NOTAVAIL  (00<<28)	   port data unavailable
-#define JP_TYPE_GAMECTLR  (01<<28)	   port has game controller
-#define JP_TYPE_MOUSE	  (02<<28)	   port has mouse
-#define JP_TYPE_JOYSTK	  (03<<28)	   port has joystick
-#define JP_TYPE_UNKNOWN   (04<<28)	   port has unknown device
-#define JP_TYPE_MASK	  (15<<28)	   controller type
-*/
-//#define SJA_TYPE_AUTOSENSE 0
-//#define SJA_TYPE_GAMECTLR  1
-//#define SJA_TYPE_MOUSE	   2
-//#define SJA_TYPE_JOYSTK    3
-
-//    printf("configure lowlevel\n");
-
     MameConfig::Controls &configControls = getMainConfig().controls();
     MameConfig::Misc &configMisc = getMainConfig().misc();
-#ifdef RJP_OPTION
-    useReadJoyPortForPads = ((configMisc._MiscFlags & MISCFLAG_USEREADJOYPORT) != 0);
-#endif
-    // for correct autosense,
-    for(int itest=0;itest<2;itest++)
-    {
-        for(int iport=0;iport<4;iport++) ReadJoyPort(iport);
-        WaitTOF();
-        WaitTOF();
-    }
-
+    // 1 - - - - stats what's needed.
+    //r1.6 only open lowlevel if some lowlevel type asked, and open/close each time.
     useAnyMouse=0;
-    for(int iLLPort=0;iLLPort<4;iLLPort++) // actually 2
+    usePropJoysticks = 0;
+    useAnyLowLevelControl = 0;
+
+
+    for(int iLLPort=0;iLLPort<4;iLLPort++) // 2 hardware DB9 port, +the elusive mysterious 3&4 lowlevel ports.
     {
         int iPlayer = configControls._llPort_Player[iLLPort] ;
         if( iPlayer == 0) continue;
 
         int lowlevelState = configControls._llPort_Type[iLLPort];
 
-        if(lowlevelState<0 || lowlevelState>3) continue; // shouldnt
+        if( lowlevelState == PORT_TYPE_PROPORTIONALJOYSTICK ||
+            lowlevelState == PORT_TYPE_C64PADDLE
+        ) usePropJoysticks++;
 
-
-        if(lowlevelState != SJA_TYPE_AUTOSENSE)
+        // lowlevel only, code 0 (autosense) is now used as "no controller"
+        if(lowlevelState>0 && lowlevelState<=3) // shouldnt -> now we have values >3 for propjoy
         {
+            useAnyLowLevelControl++;
             if(lowlevelState == SJA_TYPE_MOUSE) useAnyMouse = 1;
-            SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
         }
+
     } // loop by ll port
 
-    bool useParallelExtension=false;
+    // 2 - - - - - open lowlevel.library if needed so far
+    if(useAnyLowLevelControl>0)
+    {
+        LowLevelBase = OpenLibrary("lowlevel.library", 0);
+        if(!LowLevelBase)
+        {
+            loginfo2(1,"can't open lowlevel.library needed by some controller.");
+        }
+        // r1.6: let's accept the case where LL not there when null.
+    }
+
+    // 3 - - - -configure lowlevel
+    #ifdef RJP_OPTION
+        useReadJoyPortForPads = ((configMisc._MiscFlags & MISCFLAG_USEREADJOYPORT) != 0);
+    #endif
+    if(LowLevelBase)
+    {
+        //looks useless and upset propsjoy
+        // for correct autosense, (we don't use flappy LL autosenese, but ll docs says to do it..)
+        // for(int itest=0;itest<2;itest++)
+        // {
+        //     for(int iport=0;iport<4;iport++) ReadJoyPort(iport);
+        //     WaitTOF();
+        //     WaitTOF();
+        // }
+
+        for(int iLLPort=0;iLLPort<4;iLLPort++) // 2 hardware DB9 port, +the elusive mysterious 3&4 lowlevel ports.
+        {
+            int iPlayer = configControls._llPort_Player[iLLPort] ;
+            if( iPlayer == 0) continue;
+
+            int lowlevelState = configControls._llPort_Type[iLLPort];
+            if(lowlevelState>0 && lowlevelState<=3)
+            {
+                if(askedPadsRawKey[iLLPort]==0
+                #ifdef RJP_OPTION
+                     && useReadJoyPortForPads==0
+                #endif
+                    /*&& iLLPort<2*/ // LL port3 and 4 also need rawkey asked for port1&2 (WILD GUESS)
+                    && (askedPadsRawKey[iLLPort&1]==0)
+                 )
+                {
+                    // note
+                    SystemControl( SCON_AddCreateKeys,iLLPort, TAG_END,0);
+                    askedPadsRawKey[iLLPort&1] = 1;
+                }
+                // configure port as mouse,jostick or CD32 pads...
+                SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
+
+            }
+        } // loop by ll port
+
+    } // end of LL configuration
+
+    // 4 - - - - parralel port 3&4 joystick extension: init if needed.
     // loop for parallel port
+    bool useParallelExtension=false;
+    int readj4bt2 = 0;
     for(int ipar=0 ; ipar<2 ;ipar++)
     {
         int iPlayer = configControls._parallelPort_Player[ipar] ;
         if( iPlayer == 0 ) continue;
         int type = configControls._parallel_type[ipar];
-        if(type == 0 ) continue;
+        if(type == 0 ) continue;        
 
         useParallelExtension = true;
+        if(ipar == 1) readj4bt2=1;
     }
-
-
-    if(askedPadsRawKey==0
-#ifdef RJP_OPTION
-     && useReadJoyPortForPads==0
-#endif
-     )
-    {
-        SystemControl(
-            SCON_AddCreateKeys,0,
-            SCON_AddCreateKeys,1,
-            TAG_END,0);
-        askedPadsRawKey = 1;
-    }
-    // note: if needed
-    //printf("input init: useParallelExtension:%d\n",(int)useParallelExtension);
     if(!g_pParallelPads && useParallelExtension)
     {
-        g_pParallelPads = createParallelPads(); // could fail.
+        g_pParallelPads = createParallelPads(readj4bt2); // could fail.
+    }
+
+    // 5 - - - - proportionnal joystick: init if needed.
+    {
+        ULONG propJoysticksFlags=0;
+        if( configControls._llPort_Type[0] == PORT_TYPE_PROPORTIONALJOYSTICK ||
+            configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE)
+        {
+            propJoysticksFlags |= PROPJOYFLAGS_PORT1 ;
+            if(configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERTXY;
+        }
+        if( configControls._llPort_Type[1] == PORT_TYPE_PROPORTIONALJOYSTICK ||
+            configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE)
+        {
+            propJoysticksFlags |= PROPJOYFLAGS_PORT2 ;
+           if(configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERTXY;
+        }
+        if(configControls._PropJoyAxisReverse & 1)  propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERSEX ;
+        if(configControls._PropJoyAxisReverse & 2)  propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERSEY ;
+        if(configControls._PropJoyAxisReverse & 4)  propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERSEX ;
+        if(configControls._PropJoyAxisReverse & 8)  propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERSEY ;
+       // printf("propJoysticksFlags:%08x\n",(int)propJoysticksFlags);
+        // if something has been asked for proportional joysticks/8bits paddle        
+        if(!g_PropsSticks && propJoysticksFlags != 0)
+        {
+           // if(input_machine_has_any_analog()) <- chain not inited when called, we can't do that.
+           // {
+                ULONG result=PROPJOYRET_OK;
+                g_PropsSticks = createProportionalSticks(propJoysticksFlags,
+                                                        0/*PROPJOYTIMER_LOWLEVEL_ADDTIMER*/, // try cia timer
+                                                        &result,loginfo2); // could fail.
+
+                if(result != PROPJOYRET_OK)
+                {
+                    logerror(getProportionalStickErrorMessage(result));
+                }
+                if(g_PropsSticks)
+                {
+                    ui_popup_time(5, "Analog controllers:\nGo far in all directions to calibrate.");
+                }
+            // } else
+            // {
+            //     ui_popup_time(5, "Game uses no analog input,\nso analog controllers not inited.");
+            // }
+        }
     }
 
 
 }
 void CloseLowLevelLib()
 {
+    int i;
     if(LowLevelBase == NULL) return;
 
-    if(askedPadsRawKey)
+    for(i=0;i<2;i++)
     {
-        SystemControl(
-            // stops rawkey codes for the joystick/game
-            SCON_RemCreateKeys,0,
-            SCON_RemCreateKeys,1,
-            TAG_END,0
-            );
-        askedPadsRawKey = 0;
+        if(askedPadsRawKey[i])
+        {
+            SystemControl(
+                // stops rawkey codes for the joystick/game
+                SCON_RemCreateKeys,i,
+                TAG_END,0
+                );
+
+            askedPadsRawKey[i] = 0;
+        }
     }
+
     if(LowLevelBase) CloseLibrary(LowLevelBase);
     LowLevelBase = NULL;
 
@@ -356,9 +452,12 @@ void AllocInputs()
 
 void FreeInputs()
 {
-    if(LowLevelBase)
-    {   // back to mouse ?
-        SetJoyPortAttrs(0,SJA_Type,SJA_TYPE_MOUSE,TAG_DONE);
+    // better in inverse order of init: (propjoy & ll can collide on gameport device units.)
+    // (plus PropsSticks may use lowlevel for timers.)
+    if(g_PropsSticks)
+    {
+        closeProportionalSticks(g_PropsSticks);
+        g_PropsSticks = NULL;
     }
 
     if(g_pParallelPads)
@@ -367,6 +466,11 @@ void FreeInputs()
         g_pParallelPads = NULL;
     }
 
+    if(LowLevelBase)
+    {   // back to mouse ? -> apparently wb mouse is not lowlevel managed, no need for that.
+        //SetJoyPortAttrs(0,SJA_Type,SJA_TYPE_MOUSE,TAG_DONE);
+        CloseLowLevelLib(); // r1.6: now close at each end of game.
+    }
 
     if(g_pInputs)
     {
@@ -402,6 +506,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     fcounter++;
     if(fcounter==255) fcounter=1; // we just need it to be different from previous frame.
 
+//    prptrace();
+
+//cnt++;
  //printf("UpdateInputs: %08x\n",(int)g_pInputs);
     if(!pMsgPort || !g_pInputs) return;
 
@@ -480,7 +587,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
         case IDCMP_CHANGEWINDOW:
             // after system bloqued everything for an amount of time (moving windows,...),
 
-            // need to not upset a timer.
+            // need to not upset a timer when window moves block app.
             extern void ResetWatchTimer();
             ResetWatchTimer();
             break;
@@ -528,10 +635,11 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     }
     // if any mouse (or anything that needs direct joyport ?)
     // no rawkey for this
-    if(useAnyMouse
+    if(LowLevelBase && (useAnyMouse
 #ifdef RJP_OPTION
     || useReadJoyPortForPads
 #endif
+    )
     )
     {
         MameConfig::Controls &configControls = getMainConfig().controls();
@@ -618,6 +726,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
         int prport3_player = configControls._parallelPort_Player[0];
         int prport4_player = configControls._parallelPort_Player[1];
 
+        // bit are hardware regs ((ciaaprb<<8) | ciabpra)
+        // ciaaprb: parallel port data, used as (joy3 RightLeftDownUp, joy4 LeftRightUpDown)
+        // ciabpra:
         UWORD changed = g_pParallelPads->_ppidata->_last_checked_changes;
         const UWORD state = g_pParallelPads->_ppidata->_last_checked;
 
@@ -627,9 +738,11 @@ void UpdateInputs(struct MsgPort *pMsgPort)
             RAWKEY_PORT0_JOY_RIGHT,RAWKEY_PORT0_JOY_LEFT,
             RAWKEY_PORT0_JOY_DOWN,RAWKEY_PORT0_JOY_UP,
         };
-        static const UWORD prportDirectionsBits[]={0x0800,0x8000};
-        static const UWORD prportFireBits[]={0x0004,0x0001};
 
+        static const UWORD prportDirectionsBits[2]={0x0800,0x8000}; //APARJOY_J3_RIGHT, APARJOY_J4_RIGHT
+
+        static const UWORD prportFire1Bits[2]={APARJOY_J3_FIRE1,APARJOY_J4_FIRE1};
+        static const UWORD prportFire2Bits[2]={APARJOY_J3_FIRE2,APARJOY_J4_FIRE2};
         for(int iparallelportJoystick=0 ; iparallelportJoystick<2 ; iparallelportJoystick++)
         {
             int iplayer = configControls._parallelPort_Player[iparallelportJoystick];
@@ -648,12 +761,20 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                 }
                 // fire bt
                 g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_RED+iPlayer_rkshift] =
-                    (BYTE)((prportFireBits[iparallelportJoystick] & state)!=0); // down
+                    (BYTE)((prportFire1Bits[iparallelportJoystick] & state)!=0); // down
+
+                // r1.6: we may have second button on parallel port jstick 3 and 4 ,
+                //  but it also needs 2 more wires in parallel extension.
+                g_pInputs->_Keys[RAWKEY_PORT0_BUTTON_BLUE+iPlayer_rkshift] =
+                    (BYTE)((prportFire2Bits[iparallelportJoystick] & state)!=0); // down
             }
         }
 
         g_pParallelPads->_ppidata->_last_checked = 0;
         g_pParallelPads->_ppidata->_last_checked_changes = 0;
+    }
+    if(g_PropsSticks) {
+        ProportionalSticksUpdate(g_PropsSticks);
     }
 
     if(doSwitchFS) SwitchWindowFullscreen();
@@ -724,59 +845,76 @@ inline unsigned int nameToMameKeyEnum(std::string &s)
 // strings kept static, more easy and safe to refer.
 static const char * const padsbtnames[4][11]={
     {
-        "PAD0 BLUE",
-        "PAD0 RED",
-        "PAD0 YELLOW",
-        "PAD0 GREEN",
-        "PAD0 FORWARD",
-        "PAD0 REVERSE",
-        "PAD0 PLAY",
-        "PAD0 UP",
-        "PAD0 DOWN",
-        "PAD0 LEFT",
-        "PAD0 RIGHT"
+        "Pad1 Blue",
+        "Pad1 Red",
+        "Pad1 Yellow",
+        "Pad1 Green",
+        "Pad1 Forward",
+        "Pad1 Reverse",
+        "Pad1 Play",
+        "Pad1 UP",
+        "Pad1 DOWN",
+        "Pad1 LEFT",
+        "Pad1 RIGHT"
     },
     {
-        "PAD1 BLUE",
-        "PAD1 RED",
-        "PAD1 YELLOW",
-        "PAD1 GREEN",
-        "PAD1 FORWARD",
-        "PAD1 REVERSE",
-        "PAD1 PLAY",
-        "PAD1 UP",
-        "PAD1 DOWN",
-        "PAD1 LEFT",
-        "PAD1 RIGHT"
+        "Pad2 Blue",
+        "Pad2 Red",
+        "Pad2 Yellow",
+        "Pad2 Green",
+        "Pad2 Forward",
+        "Pad2 Reverse",
+        "Pad2 Play",
+        "Pad2 UP",
+        "Pad2 DOWN",
+        "Pad2 LEFT",
+        "Pad2 RIGHT"
     },
     {
-        "PAD2 BLUE",
-        "PAD2 RED",
-        "PAD2 YELLOW",
-        "PAD2 GREEN",
-        "PAD2 FORWARD",
-        "PAD2 REVERSE",
-        "PAD2 PLAY",
-        "PAD2 UP",
-        "PAD2 DOWN",
-        "PAD2 LEFT",
-        "PAD2 RIGHT"
+        "Pad3 Blue",
+        "Pad3 Red",
+        "Pad3 Yellow",
+        "Pad3 Green",
+        "Pad3 Forward",
+        "Pad3 Reverse",
+        "Pad3 Play",
+        "Pad3 UP",
+        "Pad3 DOWN",
+        "Pad3 LEFT",
+        "Pad3 RIGHT"
     },
     {
-        "PAD3 BLUE",
-        "PAD3 RED",
-        "PAD3 YELLOW",
-        "PAD3 GREEN",
-        "PAD3 FORWARD",
-        "PAD3 REVERSE",
-        "PAD3 PLAY",
-        "PAD3 UP",
-        "PAD3 DOWN",
-        "PAD3 LEFT",
-        "PAD3 RIGHT"
-    }
+        "Pad4 Blue",
+        "Pad4 Red",
+        "Pad4 Yellow",
+        "Pad4 Green",
+        "Pad4 Forward",
+        "Pad4 Reverse",
+        "Pad4 Play",
+        "Pad4 UP",
+        "Pad4 DOWN",
+        "Pad4 LEFT",
+        "Pad4 RIGHT"
+    },
 };
-
+static const char * const parpadsbtnames[2][11]={
+    {
+        "PrPad3 Blue",
+        "PrPad3 Red",
+        "PrPad3 UP",
+        "PrPad3 DOWN",
+        "PrPad3 LEFT",
+        "PrPad3 RIGHT"
+    },
+    {
+        "PrPad4 Blue",
+        "PrPad4 Red",
+        "PrPad4 UP",
+        "PrPad4 DOWN",
+        "PrPad4 LEFT",
+        "PrPad4 RIGHT"
+    },
+};
 // - - - keyboard keymap management
 void RawKeyMap::init()
 {
@@ -865,7 +1003,6 @@ void RawKeyMap::init()
     };
     MameConfig::Controls &configControls = getMainConfig().controls();
     MameConfig::Misc &configMisc = getMainConfig().misc();
- //   int amega32order = (int)((configMisc._MiscFlags & 1) != 0);
 
     // then add player to paddle according to conf.    
     // lowlevel send rawkeys for each CD32 pads.
@@ -875,17 +1012,18 @@ void RawKeyMap::init()
         {
             int iplayer = configControls._llPort_Player[iLLPort];
             if(iplayer == 0) continue;
+            iplayer--;
             int itype = configControls._llPort_Type[iLLPort];
-            if(itype == 0) continue; //still not inited
-//            cp controlPort = configControls._PlayerPort[iplayer];
-//            int lowlevelState = (int) configControls._PlayerPortType[iLLPort];
+
+            // here we treat only CD32Pads and 1/2Bt joysticks...
+            // do not declare pads if it is mouse !!!
+            if((itype != SJA_TYPE_GAMECTLR) && (itype != SJA_TYPE_JOYSTK) ) continue;
 
                 int iport = iLLPort; // 0->3
                 int ipshft = iport<<8;
                 const int mamecodeshift =
-                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *(iplayer-1) ;
-            // if(amega32order == 0)
-            // {
+                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
+
               vector<os_code_info> kbi2={
                 {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
                 {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
@@ -900,77 +1038,32 @@ void RawKeyMap::init()
                 {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
                 };
                 _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
-           // } else {
-           //    vector<os_code_info> kbi2={
-           //      {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
-           //      {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
-           //      {padsbtnames[iport][5-1],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
-           //      {padsbtnames[iport][4-1],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
-           //      {padsbtnames[iport][3-1],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
-           //      {padsbtnames[iport][6-1],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
-           //      {padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
-           //      {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
-           //      {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
-           //      {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
-           //      {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
-           //      };
-           //      _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
-           // }
 
-//            // if parralel port hacks as port 3 and 4.
-//           if(controlPort == cp::Para3 ||
-//               controlPort == cp::Para4 ||
-//               controlPort == cp::Para3Bt4 )
-//            {
-//                int iport = 2;
-//                if(controlPort == cp::Para4) iport=3;
-//                int ipshft = iport<<8;
-//                const int mamecodeshift =
-//                    ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iLLPort ;
-
-//            // joystick are not CD32 pads, can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
-//              vector<os_code_info> kbi2={
-//                {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
-//                {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
-//                //{padsbtnames[iport][2],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
-//                //{padsbtnames[iport][3],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
-//                //{padsbtnames[iport][4],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
-//                //{padsbtnames[iport][5],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
-//                //{padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
-//                {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
-//                {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
-//                {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
-//                {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
-//                };
-//                _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
-
-//            } // end if parallel port hacks concerned.
         } // end loop by port
+        // then parallel port joystick extension pr3 pr4
         for(int ipar=0;ipar<2;ipar++) // actually 2
         {
             int iplayer = configControls._parallelPort_Player[ipar];
             if(iplayer == 0) continue;
+            iplayer--;
             int itype = configControls._parallel_type[ipar];
             if(itype == 0) continue; //still not inited
 
             int iport = 2+ipar; // we hack parallel pads as Lowlevel Pads3 and 4 !!!
             int ipshft = iport<<8;
             const int mamecodeshift =
-                ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *(iplayer-1) ;
+                ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
 
-        // joystick are not CD32 pads, can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
+        // joystick can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
           vector<os_code_info> kbi2={
-            {padsbtnames[iport][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
-            {padsbtnames[iport][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
-            //{padsbtnames[iport][2],RAWKEY_PORT0_BUTTON_YELLOW+ipshft,JOYCODE_1_BUTTON3+mamecodeshift},
-            //{padsbtnames[iport][3],RAWKEY_PORT0_BUTTON_GREEN+ipshft,JOYCODE_1_BUTTON4+mamecodeshift},
-            //{padsbtnames[iport][4],RAWKEY_PORT0_BUTTON_FORWARD+ipshft,JOYCODE_1_BUTTON6+mamecodeshift},
-            //{padsbtnames[iport][5],RAWKEY_PORT0_BUTTON_REVERSE+ipshft,JOYCODE_1_BUTTON5+mamecodeshift},
-            //{padsbtnames[iport][6],RAWKEY_PORT0_BUTTON_PLAY+ipshft,JOYCODE_1_START+mamecodeshift},
-            {padsbtnames[iport][7],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
-            {padsbtnames[iport][8],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
-            {padsbtnames[iport][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
-            {padsbtnames[iport][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
+          // note standard parallel port extensions joysticks manages 1bt each, 2nd button only if hw hack.
+            {parpadsbtnames[ipar][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
+            {parpadsbtnames[ipar][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
+            //
+            {parpadsbtnames[ipar][2],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
+            {parpadsbtnames[ipar][3],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
+            {parpadsbtnames[ipar][4],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
+            {parpadsbtnames[ipar][5],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
             };
             _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
 
@@ -978,18 +1071,17 @@ void RawKeyMap::init()
 
     }
     // then may add analog controls
-    if(useAnyMouse)
-    {
-        MameConfig::Controls &configControls = getMainConfig().controls();
-       // printf("***  USE ANY MOUSE \n");
-        for(int iport=0;iport<4;iport++) // actually 2
-        {
-            int iplayer = configControls._llPort_Player[iport];
-            if(iplayer == 0) continue;
-            int itype = configControls._llPort_Type[iport];
-          //  printf("iport:%d itype:%d\n",iport,itype);
-            if(itype != SJA_TYPE_MOUSE) continue; //still not inited
 
+   // printf("***  USE ANY MOUSE \n");
+   // publish amiga mouses and trackballs as "Mouse" (so "relative analog") to MAME.
+    for(int iport=0;iport<4;iport++) // actually 2
+    {
+        int iplayer = configControls._llPort_Player[iport];
+        if(iplayer == 0) continue;
+        int itype = configControls._llPort_Type[iport];
+      //  printf("iport:%d itype:%d\n",iport,itype);
+        if(itype == SJA_TYPE_MOUSE) // if LL mouse
+        {
             int mameAnlgSizePerPl = ((int)MOUSECODE_2_ANALOG_X-(int)MOUSECODE_1_ANALOG_X);
             int mameMouseBtSizePerPl = ((int)MOUSECODE_2_BUTTON1-(int)MOUSECODE_1_BUTTON1);
             {
@@ -1020,8 +1112,38 @@ void RawKeyMap::init()
                                 ANALOG_CODESTART+(iport*8)+4,
                                 MOUSECODE_1_BUTTON3+((iplayer-1)*mameMouseBtSizePerPl) });
             }
-        } // loop by player
-    }
+        } // end if LL mouse
+        // release 1.6: also manage real proportional-analog-potentiometer-based inputs
+        // published as "analog jostick" to MAME (treated as "absolute analog").
+        // only games with analog inputs will be able to use that.
+        else if((itype == PORT_TYPE_PROPORTIONALJOYSTICK ||
+                itype == PORT_TYPE_C64PADDLE) && iport<2) // iport<2 because direct DB9 port1/2 code, not Lowlevel lib.
+        {
+            int ispad = (itype == PORT_TYPE_C64PADDLE)?1:0;
+
+                int analogmamecodeshift = ((int)JOYCODE_2_ANALOG_X-(int)JOYCODE_1_ANALOG_X)*(iplayer-1);
+                // but yet 2 bt joysticks. we need that.
+                int buttonmamecodeshift = ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT)*(iplayer-1);
+                int ipshft = iport<<8; // still use Lowlevel keycodes for buttons
+        // these are real analog potentiometer, with 8b absolute coords.
+        // let's declare them to MAME with enums JOYCODE_1_ANALOG_X
+        // prop.joy button declared as regular joystick buttons...
+              vector<os_code_info> kbi2={
+        {_AnalogNames[ispad][iport][2],PROPJOY_CODESTART+(iport*8)+2,JOYCODE_1_BUTTON1+buttonmamecodeshift},
+        {_AnalogNames[ispad][iport][3],PROPJOY_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift},
+        // use same internal slot as mouses XY.
+        {_AnalogNames[ispad][iport][0], PROPJOY_CODESTART+(iport*8)+0,JOYCODE_1_ANALOG_X+analogmamecodeshift},
+        {_AnalogNames[ispad][iport][1], PROPJOY_CODESTART+(iport*8)+1,JOYCODE_1_ANALOG_Y+analogmamecodeshift},
+
+                };
+                _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
+                // then updates will do the job of writting prop joy values in .
+
+
+
+        } // end if pots.
+    } // loop by player
+
 
     // then add rawkeys which meanings changes by locale settings
     vector<unsigned char> keystodo={0x0b,0x0c,0x0d}; // first of each lines
@@ -1060,7 +1182,7 @@ void RawKeyMap::init()
         // printf("code with no name:%d\n",keystodo[i]);
         }
     }
-    // then add those which need a rawkey mapped to a mame constant, with varying name
+    // then add keys which need a rawkey mapped to a mame constant, with varying name
     // mame enum was modified for this.
     static string key3a_name;
     mapRawKeyToString((UWORD)0x003A,key3a_name);
@@ -1120,15 +1242,43 @@ INT32 osd_get_code_value(os_code oscode)
         }
     }
 #endif
-    if(oscode<(256*4)) // 256*4 is lowlevel extended rawkey range.
+    if(oscode<(ANALOG_CODESTART)) // 256*4 is lowlevel extended rawkey range.
     {
        // printf("ASKED :%04x\n",(int)oscode);
-//        if(g_pInputs->_Keys[oscode])
-//        {
-//            printf("ASKED AND GOT KEY:%d\n",(int)oscode);
-//        }
+        // works for all keyboard keys + anything lowlevel joystick managed.
         return (int)g_pInputs->_Keys[oscode];
-    } else
+    } else if(oscode>=PROPJOY_CODESTART)
+    {
+        // new r1.6
+        if(!g_PropsSticks) return 0;
+
+        oscode -= PROPJOY_CODESTART;
+    //printf("oscode:%08x\n",(int)oscode);
+    // a ,8   8+2 ark.
+        int illport = oscode>>3; // /8
+        if(illport>=2) return 0;
+        UINT8 shortcode = ((UINT8)oscode) & 7; // analog X,Y ,bt1,bt2
+
+
+        if( g_PropsSticks->_values[illport].valid)
+        {
+            // validated with outrun wheel
+            if(shortcode ==0)
+            {
+               // if((cnt & 63)==0) printf("pps x:%08x\n",(int)g_PropsSticks->_values[illport].x);
+                return  (128-g_PropsSticks->_values[illport].x)<<9; // already calibrated
+            }
+            if(shortcode ==1)
+            {
+               // if((cnt & 63)==0) printf("pps y:%08x\n",(int)g_PropsSticks->_values[illport].y);
+                return  (128-g_PropsSticks->_values[illport].y)<<9; // already calibrated
+            }
+            // buttons
+            if(shortcode ==2) return ((g_PropsSticks->_values[illport].bt & 1)!=0);
+            if(shortcode ==3) return ((g_PropsSticks->_values[illport].bt & 2)!=0);
+        }
+        return 0;
+    } else // ANALOG_CODESTART
     {
         // does analog like this
         // 1024: analog ll port1
@@ -1281,4 +1431,14 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 
 }
 
+void osd_post_input_port_init_check()
+{
+    // at this level both osd_code_list and input_port_init are inited.
 
+    // if analog controler inited, but game doesnt use it :
+    if( g_PropsSticks && !input_machine_has_any_analog() )
+    {
+        ui_popup_time(6, "Game uses no analog input,\nso analog controllers are useless.");
+    }
+
+}

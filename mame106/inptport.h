@@ -723,4 +723,7 @@ UINT32 readinputport(int port);
 UINT32 readinputportbytag(const char *tag);
 UINT32 readinputportbytag_safe(const char *tag, UINT32 defvalue);
 
+/* krb added */
+int input_machine_has_any_analog();
+
 #endif	/* __INPTPORT_H__ */

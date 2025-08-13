@@ -27,7 +27,7 @@ option(OPT_IGS "" OFF)
 option(OPT_IREM "" ON)
 option(OPT_ITECH "" OFF)
 option(OPT_JALECO "" ON)
-option(OPT_JUSTDKONG "" ON)
+option(OPT_JUSTDKONG "" OFF)
 option(OPT_JUSTGALAGA "" ON)
 option(OPT_KANEKO "" ON)
 option(OPT_KONAMI "" OFF)
@@ -37,6 +37,7 @@ option(OPT_METRO "" OFF)
 option(OPT_MIDCOIN "" OFF)
 option(OPT_MIDW8080 "" OFF)
 option(OPT_MIDWAY "" OFF)
+option(OPT_MIDWAYMCR "" ON)
 option(OPT_MIDWAYTUNIT "" ON)
 option(OPT_MINIATARI "" ON)
 option(OPT_MINIDTEA "" ON)
@@ -50,7 +51,7 @@ option(OPT_NAMCOS "" OFF)
 option(OPT_NASCO "" OFF)
 option(OPT_NEOGEO "" ON)
 option(OPT_NICHIBUT "" OFF)
-option(OPT_NINTENDO "" OFF)
+option(OPT_NINTENDO "" ON)
 option(OPT_NIX "" OFF)
 option(OPT_NMK "" OFF)
 option(OPT_OLYMPIA "" OFF)
@@ -823,17 +824,21 @@ if(OPT_JUSTGALAGA)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/galaga.c vidhrdw/galaga.c vidhrdw/bosco.c machine/namcoio.c 
 		machine/xevious.c vidhrdw/xevious.c vidhrdw/digdug.c machine/atari_vg.c 
-		machine/atarigen.c machine/atarigen.h machine/atari_vg.c sndhrdw/atarijsa.c 
-		sndhrdw/atarijsa.h 	)
+		drivers/galaxian.c sndhrdw/galaxian.c vidhrdw/galaxian.c drivers/gaplus.c 
+		machine/gaplus.c vidhrdw/gaplus.c drivers/frogger.c machine/konamigx.c 
+		drivers/cclimber.c sndhrdw/cclimber.c vidhrdw/cclimber.c machine/atarigen.c 
+		machine/atarigen.h machine/atari_vg.c sndhrdw/atarijsa.c sndhrdw/atarijsa.h 
+	)
 	set(MSND_FILTER ON)
 	set(MSND_NAMCO ON)
 	set(MSND_NAMCO_52XX ON)
 	set(MSND_NAMCO_54XX ON)
 	set(MSND_SAMPLES ON)
+	set(MSND_TMS5110 ON)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
 		HAS_FILTER=1 HAS_NAMCO=1 HAS_NAMCO_52XX=1 HAS_NAMCO_54XX=1 
-		HAS_SAMPLES=1 	)
+		HAS_SAMPLES=1 HAS_TMS5110=1 	)
 	list(APPEND CPU_DEFS
 		HAS_Z80=1 	)
 endif()
@@ -1078,6 +1083,14 @@ if(OPT_MIDWAY)
 		HAS_M6809=1 HAS_R5000LE=1 HAS_TMS32031=1 HAS_TMS34010=1 
 		HAS_TMS34020=1 HAS_Z80=1 	)
 endif()
+if(OPT_MIDWAYMCR)
+	add_compile_definitions(LINK_MIDWAYMCR=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/mcr.c machine/mcr.c sndhrdw/mcr.c vidhrdw/mcr.c 
+		drivers/mcr3.c vidhrdw/mcr3.c drivers/williams.c machine/williams.c 
+		sndhrdw/williams.c vidhrdw/williams.c drivers/mcr68.c vidhrdw/mcr68.c 
+	)
+endif()
 if(OPT_MIDWAYTUNIT)
 	add_compile_definitions(LINK_MIDWAYTUNIT=1)
 	list(APPEND MAME_DRIVERS_SRC
@@ -1106,16 +1119,16 @@ endif()
 if(OPT_MINIATARI)
 	add_compile_definitions(LINK_MINIATARI=1)
 	list(APPEND MAME_DRIVERS_SRC
-		drivers/ccastles.c vidhrdw/ccastles.c drivers/centiped.c vidhrdw/centiped.c 
-		drivers/gauntlet.c vidhrdw/gauntlet.c drivers/rampart.c vidhrdw/rampart.c 
-		vidhrdw/atarimo.c machine/slapstic.c drivers/klax.c vidhrdw/klax.c 
-		drivers/atarisy1.c drivers/atarisy2.c vidhrdw/atarisy1.c vidhrdw/atarisy2.c 
-		machine/asic65.c machine/atari_vg.c machine/atarigen.c machine/atarigen.h 
-		machine/atari_vg.c sndhrdw/atarijsa.c sndhrdw/atarijsa.h drivers/starwars.c 
-		machine/starwars.c sndhrdw/starwars.c drivers/bzone.c sndhrdw/bzone.c 
-		drivers/tempest.c machine/mathbox.h machine/mathbox.c sndhrdw/redbaron.c 
-		sndhrdw/llander.c drivers/asteroid.c machine/asteroid.c sndhrdw/asteroid.c 
-		drivers/bwidow.c 	)
+		drivers/atetris.c vidhrdw/atetris.c drivers/ccastles.c vidhrdw/ccastles.c 
+		drivers/centiped.c vidhrdw/centiped.c drivers/gauntlet.c vidhrdw/gauntlet.c 
+		drivers/rampart.c vidhrdw/rampart.c vidhrdw/atarimo.c machine/slapstic.c 
+		drivers/klax.c vidhrdw/klax.c drivers/atarisy1.c drivers/atarisy2.c 
+		vidhrdw/atarisy1.c vidhrdw/atarisy2.c machine/asic65.c machine/atari_vg.c 
+		machine/atarigen.c machine/atarigen.h machine/atari_vg.c sndhrdw/atarijsa.c 
+		sndhrdw/atarijsa.h drivers/starwars.c machine/starwars.c sndhrdw/starwars.c 
+		drivers/bzone.c sndhrdw/bzone.c drivers/tempest.c machine/mathbox.h 
+		machine/mathbox.c sndhrdw/redbaron.c sndhrdw/llander.c drivers/asteroid.c 
+		machine/asteroid.c sndhrdw/asteroid.c drivers/bwidow.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
 	set(MSND_OKIM6295 ON)
@@ -1173,7 +1186,8 @@ if(OPT_MINIKONAMI)
 	add_compile_definitions(LINK_MINIKONAMI=1)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/tmnt.c vidhrdw/tmnt.c vidhrdw/konamiic.c drivers/simpsons.c 
-		machine/simpsons.c vidhrdw/simpsons.c 	)
+		machine/simpsons.c vidhrdw/simpsons.c drivers/mystwarr.c vidhrdw/mystwarr.c 
+	)
 	set(MSND_K007232 ON)
 	set(MSND_K053260 ON)
 	set(MSND_K054539 ON)
@@ -1197,6 +1211,7 @@ if(OPT_MINIKONAMI2)
 		vidhrdw/gyruss.c machine/konami.c drivers/pingpong.c vidhrdw/pingpong.c 
 		drivers/gradius3.c vidhrdw/gradius3.c drivers/nemesis.c vidhrdw/nemesis.c 
 		drivers/twin16.c vidhrdw/twin16.c drivers/parodius.c vidhrdw/parodius.c 
+		drivers/scobra.c drivers/scramble.c machine/scramble.c sndhrdw/scramble.c 
 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)

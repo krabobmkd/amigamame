@@ -1,4 +1,158 @@
 
+
+ New in release r1.6:
+
+  - Support for "Potentiometer-based analog-absolute controllers" such as
+   Amiga proportional joysticks produced around 1988, Atari8Bit/ C64
+   "rotating Paddles", and 1990's "PC gameport" analog sticks and steering wheels.
+    Only on joystick port 2. This can be used by games that needs analog controllers.
+    "Go far in each directions at the begining of game to calibrate."
+    (More about this in documentation.)
+
+  - Support for a second button on "joystick3" of parallel port extension,
+   but you'll need to solder a wire. (More about this in documentation)
+
+  - 244 more roms supported:
+    - Some 1980/83 games: defender, scramble, galaxian,galaga3, tron, discs of tron,...
+    - a few 1985 atari and midway: Atari tetris, rampage, joust2,...
+    - a truckload of ntd "vs" and "playchoice" machine games.
+    - a few 1993 knm, (some glitchy):  Gaiapolis, Mystic Warriors (glitchy),
+      Monster Maulers, Violent Storm,Metamorphic Force,Martial Champion.
+
+    Mame106Minimix now support 2742 roms (counting versions, bootlegs, bioses,...)
+
+ - reminder: AGA/OCS users, you should install blazeWCP patch or rendering will be slow.
+    That *is* the "C2P". https://www.aminet.net/util/boot/Blazewcp.lha
+
+ - a few new features:
+   - the vector games with vertical screen have now a display conf slot different from the vector horizontal games.
+    ( so you can set rotate mode accordingly to vertical screen.)
+   - added a log line on the progressbar.
+   - verbose option tells more details about inits when option is used.
+
+ - bug corrections fixed:
+   - when using 2 mouses, buttons could be mixed : repaired.
+   - message of loading cheat when it was not loading cheats: repaired.
+   - some ui popup issue
+   - xml prefs save/load trashing float values: corrected.
+
+ Thanks to "Pops^Woodtower" for talking to me about the Amiga analog controllers at the NASS party.
+ What's missing now ? Phasers/Lightguns ? but I don't have a CRT.
+ Thanks to Glames, Fred "Screetch" Boisdron and family for testing the 4 player mode.
+ Thanks to all that have reported problems to the issue page.
+ Thanks to people for having made video on YT.
+ Bigger thanks again to Bebbo for the great (the immense) GCC6.5 port that made it possible.
+  (Sadly this project has been removed.)
+
+  Report problems, but also say hello, to :
+   https://github.com/krabobmkd/amigamame/issues
+  Last releases can be watched at:
+   https://github.com/krabobmkd/amigamame/releases
+
+
+
+  = = = = = = Special: "let's have more controllers" release. = = = = =
+
+  I've learned recently at an Amiga party that potentiometer-based,
+  analog-absolute joysticks actually existed on Amiga,
+  and were only produced for a few flight simulator games around 1988.
+  Extremely rare, but Atari 8bit and C64 "rotating paddles", more common,
+  are compatible with this. 1990's era "PC gameport" analog joystick and
+  steering wheels are also common and can be adapted easily as
+  "Amiga Analog absolute stick" (see documentation about this).
+
+  ...So here we go: this is now supported on DB9 joyport 2, when selected
+  in control panel. MAME will select it when the game needs analog control.
+  Just go far in all direction for "calibration" at the beginning.
+  A real pleasure with car games using analog wheels and pedals.
+  (A simple rotating paddle does a great wheel with outrun or chasehq).
+  "MousePort 1" can also potentially use potentiometers, but stealing port
+  to lowlevel and input.device didn't work in 100% cases, so it was disabled.
+
+ ... also 4 player games with parallel extension were tested at the party,
+  and if gauntlet and dynablaster looked ok with 1 button and 4 joypads,
+ tmnt,simpsons, and cadillac really needed a second button for parallel
+  pad extension 3 and 4.
+ ... so I found out a second button for pad3 can be easily added with
+ one more wire to parallel port PE/POUT pin, and this is now managed
+ by this emulator. But a second button for pad4 is more
+  difficult to get (using ACK signal and interupts?).
+  well Pad3 button2 hack works ! Half a victory.
+  read documentation about that if interested.
+
+  = = = = = = Special: "let's have more games" release. = = = = =
+
+ .... For all the 1980 arcade nostalgic barflies ...
+ Some of the missing all-time-top games of that era was added:
+  defender, scramble, super cobra, galaxian,
+  a few 1985 atari and midway: Atari tetris, rampage, galaga3, joust2
+  and then a truckload of ntd "vs" and "playchoice" machine games.
+  Really too much 8 bits games. So we also added:
+  some 1993 games: Gaiapolis, Mystic Warriors (glitchy), Monster Maulers,
+   Violent Storm,Metamorphic Force,Martial Champion.
+
+  Some roms statistics on Amiga MAME ports:
+
+  AMAME (0.35 port, 1998) 180 roms managed
+  MAME060 (0.37b port 1999) 600 roms managed <- (what we had for 25 years).
+  MAMEMinimix (0.106 port 2006, 2025) 2742 roms (244 more than r1.5)
+
+ Yet AMAME and MAME060 supports some roms that MAMEMinimix doesn't, and are certainly faster
+ for some games, because branch 0.106 has close to nothing in common with 0.37 branches
+ ( 7 years of work of the MAME team with at least 2 complete rewrites ).
+
+  Actually original 0.106 branch has about 6700 roms managed (including versions, bootlegs, and bioses),
+  with a good third of non working, which is logic because MAME is in eternal beta by design.
+ Reminder: original 106 branch code was *way more slow* (actually 250% slower, neogeo certainly 1000% slower)
+ and 14 months of work was necessary so it would be enjoyable on pistorm 3 (and more likely pi4).
+ That's why drivers were implemented along releases.
+
+  = = = = = = Special: "let's have less bugs" release. = = = = =
+
+ - when using 2 mouses, buttons could be mixed : repaired.
+ - message of loading cheat when it was not loading cheats: repaired.
+ - added a log line on the progressbar.
+ - some ui popup issue
+ - verbose tells everything about inits when option verbose is used.
+ - the vector games with vertical screen have now a display conf slot different of the vector horizontal games.
+  ( so you can set rotate mode accordingly)
+ O float value XML still not good !!!
+
+
+add: Mario bros
+
+
+ O rerepair xml
+ O test actual "no analog needed" message
+ O update cheat file
+ X do not display "load cheat" !!
+ X TEST: othund with 2 mouses inverted !
+ O  2 CD32 pads
+
+ X rawkey message for LL port 3&4 !!
+
+ X -> ui_popup ne diot pas se propager sur le prochani jeu
+
+ O -> test all that, correct sprites.
+
+ O if analog controller set but not used: tell ->later.
+
+ X Repair bug mouse1-p2 + mouse2-p1
+ X implement analog/proportional amiga joysticks with potgo.h
+	O code stealing mouse to input.device
+
+ O try parallel joystick port Bt2
+
+ X add defender+joust + atetris
+
+ O blabla docs for projoy/paddles.
+	- tells: if a game needs analog control,it will automatically redirect all
+	   analog compatible controllers for a given player: so it's better to disable "player 1 mouse"
+	   if you have "player1 propjoy", or both will be used at the same time. Using a mouse and
+	   a propjoy for different players is of course ok.
+
+-----------------
+
  - Vector graphics games are implemented (starwars,Asteroid,startrek, cosmic chasm, battle zone, TacScan, (more or less 20 games).
  - vector screens have specific configuration to finetune resolution, remanance,...
  - .. and surprise: a special glow effect for vector Screens, specially coded for MAME Minimix.
@@ -16,7 +170,7 @@
  - Numberous little corrections here and there.
 
  Todo r1.5
-  O battlezon check commands
+  O battlezone check commands
   O test mischevious atoi() calls.
   X mapped modeid to screen panel
   X regenerate amigaguide
@@ -25,7 +179,7 @@
   X Appicon support
   X corrected some screen rotation axis on some fliped screen games cases
   X windows overlap OS4 -> no-optim for >v50
-  O vector games
+  X vector games
         X cchasm+starwars
         X rotate bug shiftRotationBits tacscan
         X +opt_cinematic
@@ -35,7 +189,7 @@
         X implement full 15b mode
         X optim , search div64 -> was pokey
   X docs for OS4 petunia
-  O f1gp, turbo orun wheel+lever
+  X f1gp, turbo orun wheel+lever
 
 
   X MUI:

@@ -225,7 +225,7 @@ void osd_joystick_calibrate(void);
 void osd_joystick_end_calibration(void);
 
 
-
+void osd_post_input_port_init_check();
 /******************************************************************************
 
     File I/O

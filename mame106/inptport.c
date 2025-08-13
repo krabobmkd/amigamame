@@ -234,6 +234,19 @@ struct _input_port_init_params
 #define APPLY_INVERSE_SENSITIVITY(x,s) (((x) >= 0) ? (((INT64)(x) * 100 - 50) / (s)) : ((-(INT64)(x) * 100 - 50) / -(s)))
 
 
+/* krb added */
+int input_machine_has_any_analog()
+{
+	input_port_entry *in;
+	/* scan the input port array ... */
+	for (in = Machine->input_ports; in->type != IPT_END; in++)
+		if (input_port_active(in))
+		{
+			if (port_type_is_analog(in->type)) return 1;
+		}
+    return 0;
+}
+
 
 /*************************************
  *
@@ -996,7 +1009,7 @@ static void interpolate_analog_port(int port);
  *  Input port initialize
  *
  *************************************/
-
+extern void osd_post_input_port_init_check();
 int input_port_init(void (*construct_ipt)(input_port_init_params *))
 {
 	int ipnum, player;
@@ -1059,6 +1072,8 @@ int input_port_init(void (*construct_ipt)(input_port_init_params *))
 	/* register callbacks for when we load configurations */
 	config_register("input", input_port_load, input_port_save);
 
+    /* krb added */
+    osd_post_input_port_init_check();
 	return 0;
 }
 

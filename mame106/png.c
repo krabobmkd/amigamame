@@ -220,7 +220,7 @@ int png_read_file(mame_file *fp, png_info *p)
 			return 0;
 		}
 
-		loginfo(2,"Reading PNG chunk %s\n", str_chunk_type);
+		//loginfo(2,"Reading PNG chunk %s\n", str_chunk_type);
 
 		switch (chunk_type)
 		{
@@ -234,23 +234,23 @@ int png_read_file(mame_file *fp, png_info *p)
 			p->interlace_method = *(chunk_data+12);
 			free (chunk_data);
 
-			loginfo(2,"PNG IHDR information:\n");
-			loginfo(2,"Width: %i, Height: %i\n", p->width, p->height);
-			loginfo(2,"Bit depth %i, color type: %i\n", p->bit_depth, p->color_type);
-			loginfo(2,"Compression method: %i, filter: %i, interlace: %i\n",
-					p->compression_method, p->filter_method, p->interlace_method);
+			// loginfo(2,"PNG IHDR information:\n");
+			// loginfo(2,"Width: %i, Height: %i\n", p->width, p->height);
+			// loginfo(2,"Bit depth %i, color type: %i\n", p->bit_depth, p->color_type);
+			// loginfo(2,"Compression method: %i, filter: %i, interlace: %i\n",
+			// 		p->compression_method, p->filter_method, p->interlace_method);
 			break;
 
 		case PNG_CN_PLTE:
 			p->num_palette=chunk_length/3;
 			p->palette=chunk_data;
-			loginfo(2,"%i palette entries\n", p->num_palette);
+			//loginfo(2,"%i palette entries\n", p->num_palette);
 			break;
 
 		case PNG_CN_tRNS:
 			p->num_trans=chunk_length;
 			p->trans=chunk_data;
-			loginfo(2,"%i transparent palette entries\n", p->num_trans);
+			//loginfo(2,"%i transparent palette entries\n", p->num_trans);
 			break;
 
 		case PNG_CN_IDAT:
@@ -309,10 +309,10 @@ int png_read_file(mame_file *fp, png_info *p)
 			break;
 
 		default:
-			if (chunk_type & 0x20000000)
-				loginfo(2,"Ignoring ancillary chunk %s\n",str_chunk_type);
-			else
-				loginfo(2,"Ignoring critical chunk %s!\n",str_chunk_type);
+			// if (chunk_type & 0x20000000)
+			// 	loginfo(2,"Ignoring ancillary chunk %s\n",str_chunk_type);
+			// else
+			// 	loginfo(2,"Ignoring critical chunk %s!\n",str_chunk_type);
 			if (chunk_data)
 				free(chunk_data);
 			break;

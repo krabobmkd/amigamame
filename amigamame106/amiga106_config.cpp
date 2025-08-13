@@ -421,7 +421,7 @@ void MameConfig::Display_Vector::serialize(ASerializer &serializer)
 
     serializer(" ",_flags,VDISPLAYFLAGS_ANTIALIAS,{"Antialias","High Color"});
      // min,max,step, default
-    serializer("Intensity",_intensity,0.5f,1.5f,0.05f,1.0f);
+   serializer("Intensity",_intensity,0.5f,1.5f,0.05f,1.0f);
 
 }
 bool MameConfig::Display_Vector::isDefault()
@@ -452,7 +452,8 @@ void MameConfig::Display::serialize(ASerializer &serializer)
                });
 
     // min,max,step, default
-    serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
+   //nomore serializer("Brightness",_color_brightness,0.25f,1.5f,0.125f,1.0f);
+   _color_brightness = 1.0f;
 
     serializer("Per Screen Mode",_perScreenModeS);
     serializer("Per Game",_perGameS);
@@ -483,8 +484,11 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
    //finaly not serializer("Flags",_Flags,1,{"Use Samples"});
 }
 extern "C" {
-     int hasParallelPort();
-}MameConfig::Controls::Controls() : ASerializable() {
+    int hasParallelPort();
+    int hasProportionalStickResource();
+}
+
+MameConfig::Controls::Controls() : ASerializable() {
 }
 
 void MameConfig::Controls::serialize(ASerializer &serializer)
@@ -496,23 +500,33 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         "Player 3",
         "Player 4"
     };
+    // these are the bare lowlevel managed enum types of controllers
     static const vector<string> strLLTypes={
         "None", //"Auto Sense",  now ask explicit config.
         "CD32 7bt Pad",
         "Mouse",
-        "Joystick(2bt)",
+        "Joystick(2bt)"
     };
-    static const vector<string> strPrlTypes={
+    // this is the same, plus proportional analog controllers not managed by LL.
+    // also Amiga Prop.Stick and C64/Atari 8bits paddles are same, but with potentiometer X/Y inverted.
+    static const vector<string> strLLTypesPlusProp={
         "None",
-        "Joystick(1bt)",
+        "CD32 7bt Pad",
+        "Mouse",
+        "Joystick(2bt)",
+        "Analog Joystick(2bt)",
+        "C64/Atari Paddles(2bt)"
     };
+
+
+    int hasPots = hasProportionalStickResource(); // some not-classic hardware will not.
 
     serializer("Mouse Port 1", (int&)_llPort_Player[0],strPlayers);
-    serializer("Types P1", (int&)_llPort_Type[0],strLLTypes);
+   //ok, but: serializer("Types P1", (int&)_llPort_Type[0],(hasPots)?strLLTypesPlusProp:strLLTypes);
+    serializer("Types P1", (int&)_llPort_Type[0],strLLTypes); // do not enable pots on mouse port for the moment.
 
     serializer("Joy Port 2", (int&)_llPort_Player[1],strPlayers);
-    serializer("Types P2", (int&)_llPort_Type[1],strLLTypes);
-
+    serializer("Types P2", (int&)_llPort_Type[1],(hasPots)?strLLTypesPlusProp:strLLTypes);
 
     serializer("Lowlevel Port 3", (int&)_llPort_Player[2],strPlayers);
     serializer("Types P3", (int&)_llPort_Type[2],strLLTypes);
@@ -522,13 +536,29 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
 
     // - - - -
 
-    if(hasParallelPort())
+    if(hasParallelPort())  // some not-classic hardware will not.
     {
+        static const vector<string> strPrlTypes={
+            "None",
+            "Joystick(1or2 bt)",
+        };
+
         serializer("Parallel Port 3", (int&)_parallelPort_Player[0],strPlayers);
         serializer("Types Pr3", (int&)_parallel_type[0],strPrlTypes);
         serializer("Parallel Port 4", (int&)_parallelPort_Player[1],strPlayers);
         serializer("Types Pr4", (int&)_parallel_type[1],strPrlTypes);
     }
+
+    serializer("Inverse Axis",_PropJoyAxisReverse,0,{"Joy2X","Joy2Y"});
+    serializer.listenChange("Types P2",[](ASerializer &serializer, void *p)
+    {
+        if(!p) return;
+        int *pPort2Type = (int *)p;
+
+        serializer.enable("Controls.Inverse Axis",
+                    (*pPort2Type == PORT_TYPE_PROPORTIONALJOYSTICK ||
+                     *pPort2Type == PORT_TYPE_C64PADDLE    )?1:0);
+    });
 
 }
 #ifdef LINK_NEOGEO
@@ -635,12 +665,12 @@ void MameConfig::init(int argc,char **argv)
 
 }
 // from some .h
-struct _input_port_init_params
-{
-    input_port_entry *	ports;		/* base of the port array */
-    int					max_ports;	/* maximum number of ports we can support */
-    int					current_port;/* current port index */
-};
+//struct _input_port_init_params
+//{
+//    input_port_entry *	ports;		/* base of the port array */
+//    int					max_ports;	/* maximum number of ports we can support */
+//    int					current_port;/* current port index */
+//};
 extern "C"
 {
     int driverGetNbPlayers(const _game_driver *drv);
@@ -656,6 +686,7 @@ void MameConfig::getDriverScreenModestringP(const _game_driver *drv, std::string
     if(video_attribs & VIDEO_TYPE_VECTOR)
     {
         screenid = "vector"; // resolution is computed from vector config.
+        if(drv->flags & ORIENTATION_SWAP_XY) screenid +="(V)"; // so we have different configuration for vertical screens.
         return;
     }
 
@@ -679,7 +710,7 @@ void MameConfig::initDriverIndex()
    // printf("initDriverIndex() 1\n");
     // to be done once.
   int NumDrivers;
-
+  loginfo(0,"initDriverIndex()\n");
   for(NumDrivers = 0; drivers[NumDrivers]; NumDrivers++)
   {
     const game_driver *drv  =drivers[NumDrivers];
@@ -696,7 +727,7 @@ void MameConfig::initDriverIndex()
     _videoAttribs.resize(_NumDrivers);
 //    _players.reserve(_NumDrivers);
 //    _players.resize(_NumDrivers);
-
+  loginfo(0,"initDriverIndex() ...\n");
     for(NumDrivers = 0; drivers[NumDrivers]; NumDrivers++)
     {
         const game_driver *drv  =drivers[NumDrivers];
@@ -706,6 +737,7 @@ void MameConfig::initDriverIndex()
       //  _players[NumDrivers] = (UBYTE)nbp;
 
     }
+  loginfo(0,"initDriverIndex() ok\n");
 }
 // provide this C tool:
 //const game_driver *getDriverByName(const char *pName)
