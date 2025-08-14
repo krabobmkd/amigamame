@@ -1,6 +1,6 @@
 # amigamame
 
-Release 1.5
+Release 1.6
 
  Mame106Minimix is a fork of Mame106 (2006) to Amiga classic 68060, using bebbo gcc6.5 crosscompiler and cmake.
  would only work on very fast Amigas with more than 64Mo (likely a PiStorm + Rpi3 or 4). 
@@ -66,5 +66,6 @@ This cmake platform:
  
   
    
+
 
 
