@@ -282,22 +282,18 @@ int main(int argc, char **argv)
     }
 
     int idriver=0; // romToLaunch;
-    STRPTR userdir = NULL;
-    STRPTR cheatfiletofilter= NULL;
-
+    std::string userdir;
+    std::string cheatfiletofilter;
+    std::string rom;
     int romlist=0;
     int dohelp=0;
     int version=0; 
     if(argc>1)
     {
-        // test if just "mame romname".
-        int itest = getMainConfig().driverIndex().index(argv[1]);
-        if(itest>0) idriver= itest;
 
         // this manages both args by command line and args by icon tooltips.
         STRPTR *args = ArgArrayInit(argc,(const char **)argv);
-        STRPTR rom = ArgString((CONST_STRPTR*)args,"ROM","");
-        if(rom && *rom != 0)  idriver = getMainConfig().driverIndex().index(rom);
+        rom = ArgString((CONST_STRPTR*)args,"ROM","");
 
         userdir =  ArgString((CONST_STRPTR*)args,"USERDIR","PROGDIR:user");
         verbose = (ArgInt((CONST_STRPTR*)args,"VERBOSE",2)!=2);
@@ -317,13 +313,23 @@ int main(int argc, char **argv)
 
     if(verbose) log_enableStdOut(1);
 
-    if(verbose) printf("try read user/main.cfg\n");
-    getMainConfig().init(argc,argv); // init drivers map.
-    if(verbose) printf("after user/main.cfg\n");
 
-    if(cheatfiletofilter)
+    getMainConfig().init(argc,argv); // init drivers map and read conf.
+
+
+     // test if just "mame romname".
+    if(argc>1)
     {
-        getMainConfig().filterCheatFile(cheatfiletofilter);
+        int itest = getMainConfig().driverIndex().index(argv[1]);
+        if(itest>=0) idriver= itest;
+    }
+    // test if romname in arg:
+    if(rom.length()>0)  idriver = getMainConfig().driverIndex().index(rom.c_str());
+
+
+    if(cheatfiletofilter.length()>0)
+    {
+        getMainConfig().filterCheatFile(cheatfiletofilter.c_str());
     }
     // command line things...
     if(version)
@@ -350,10 +356,10 @@ int main(int argc, char **argv)
     }
 
 
-    if(userdir) getMainConfig().setUserDir(userdir);
-
+    if(userdir.length()) getMainConfig().setUserDir(userdir.c_str());
+    if(verbose) printf("try read main.cfg\n");
     getMainConfig().load();
-
+    if(verbose) printf("after main.cfg\n");
     //  if game was explicit, no GUI
     if(idriver>0)
     {

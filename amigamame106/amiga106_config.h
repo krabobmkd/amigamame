@@ -36,7 +36,8 @@ public:
     int index(const char *n) const {
         using namespace std;
         if(!n || *n==0) return -1;
-        string sn(n);
+        string sn; char c;
+        while( (c=*n++) != 0) { sn += (c>='A' && c<='Z')?(c+32):c;  }
         unordered_map<string,int>::const_iterator cit2 = _m.find(sn);
         if(cit2==_m.end()) return -1;
         return cit2->second;
