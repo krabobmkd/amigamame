@@ -192,7 +192,8 @@ static LONG AHISStaticThread_Open( sAHISoundServer *pAHIS )
 	//ok for ahi init.
 }
 
-static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
+// note: OS3 CreateNewProc have no args and return values !!
+static void AHISStaticThread()
 {
     // use global var
 //    if(_pAHIS==NULL || !mainprocess) return 1;
@@ -203,7 +204,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
     // must be done in all wase, calling process must be waiting.
     //printf("send ok signal res:%d\n",res);
     if(mainprocess) Signal((struct Task *)mainprocess, SIGF_SINGLE);
-    if(res!=0) return res;
+    if(res!=0) return ;
 
     sAHISoundServer *pAHIS = _pThreadAHI;
     ULONG streamBytes = pAHIS->m_nextSamples<<1; // *sizeof(SHORT);
@@ -301,7 +302,7 @@ static LONG AHISStaticThread(STRPTR args,LONG length,APTR sysbase)
     {
     	Signal((struct Task *)mainprocess, SIGF_SINGLE);
     }
-	return 0;
+	return;
 
 }
 
