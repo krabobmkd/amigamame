@@ -317,86 +317,6 @@ int getNbPlayer(string name, string parent)
 }
 
 
-bool changeapi(std::string ofilepath,std::string nfilepath)
-{
-cout << "check: " <<ofilepath << endl;
-if(ofilepath.find("neogeo") != string::npos)
-{
-    printf("?");
-}
-    fstr bfile;
-    bfile._filename = ofilepath;
-    { //
-        ifstream ifs(ofilepath);
-        if(!ifs.good()) return 1;
-        ifs.seekg(0,ios::end);
-        size_t sz = (size_t)ifs.tellg();
-        ifs.seekg(0,ios::beg);
-        ifs.clear();
-
-        bfile._b.reserve(sz+1);
-        bfile._b.resize(sz+1);
-        ifs.read(bfile._b.data(),sz);
-        bfile._b[sz] = 0;
-    }
-    ofstream ofsb(nfilepath);
-    if(!ofsb.good()) return 2;
-
-
-
-    size_t i=0;
-    while(i<bfile.length())
-    {
-         size_t iadd=0;
-         size_t inxt = bfile.find("GAME(",i);
-         if(inxt != string::npos) iadd = 5;
-
-         size_t inxtb = bfile.find("GAMEB(",i);
-         if(inxtb != string::npos && (inxt == string::npos || inxtb<inxt) )
-         {
-             inxt = inxtb;
-             iadd = 6;
-         }
-
-         inxtb = bfile.find("GAME (",i);
-         if(inxtb != string::npos && (inxt == string::npos || inxtb<inxt) )
-         {
-             inxt = inxtb;
-             iadd = 6;
-         }
-
-        if(inxt != string::npos )
-        {
-            inxt+=iadd;
-            size_t iend = bfile.findceiq(')',inxt);
-            if(iend == string::npos) { i= inxt; continue; }
-            string sparams =bfile.substr(inxt,iend-inxt);
-            vector<string> prms = splitt_trim(sparams, ",");
-            string name = prms[1];
-            string parent = prms[2];
-            int nbp = getNbPlayer( name,  parent);
-            bfile.substros(ofsb,i,iend-i);
-            ofsb << "," << nbp<<")";
-            i=iend+1;
-        } else
-            break;
-    }
-    bfile.substros(ofsb,i,bfile.length()-i);
-
-//    vector<CFileModifier> modifiers;
-
-//    CFileParse fp;
-//    fp._type = BaseType::eMain;
-//    fp._start = 0;
-//    fp._end = bfile._b.size()-1;
-//    fp.parseStruct(bfile,0,0,modifiers);
-
-//    fp.findsyntax(bfile);
-
-    return false;
-//    return didchange;
-}
-
 string getAttrib(fstr &xmlfile,size_t i, const char *pattrib)
 {
     size_t iend = xmlfile.find("</game>",i);
@@ -416,70 +336,73 @@ string getAttrib(fstr &xmlfile,size_t i, const char *pattrib)
 
 }
 
+
+#define UNROLL_GENRENUM(tfunc) \
+tfunc(egg_Unknown)\
+tfunc(egg_Platform)\
+tfunc(egg_Climbing)\
+tfunc(egg_ShootEmUp)\
+tfunc(egg_Shooter)\
+tfunc(egg_BeatNUp)\
+tfunc(egg_Fighter)\
+tfunc(egg_Driving)\
+tfunc(egg_Motorcycle)\
+tfunc(egg_Flying)\
+tfunc(egg_LightGuns)\
+tfunc(egg_BallNPaddles)\
+tfunc(egg_Pinballs)\
+tfunc(egg_Maze)\
+\
+tfunc(egg_Tabletop)\
+tfunc(egg_Puzzle)\
+tfunc(egg_CardBattle)\
+tfunc(egg_Mahjong)\
+tfunc(egg_Quizz)\
+tfunc(egg_ChiFouMi)\
+\
+tfunc(egg_Casino)\
+tfunc(egg_HorseRacing)\
+tfunc(egg_PoolNDart)\
+\
+tfunc(egg_sport_)\
+tfunc(egg_sport_Baseball)\
+tfunc(egg_sport_Basketball)\
+tfunc(egg_sport_Volleyball)\
+tfunc(egg_sport_Football)\
+tfunc(egg_sport_Soccer)\
+tfunc(egg_sport_Golf)\
+tfunc(egg_sport_Hockey)\
+tfunc(egg_sport_Rugby)\
+tfunc(egg_sport_Tennis)\
+tfunc(egg_sport_TrackNField)\
+tfunc(egg_sport_Boxing)\
+tfunc(egg_sport_Wrestling)\
+\
+tfunc(egg_sport_Bowling)\
+tfunc(egg_sport_Skiing)\
+tfunc(egg_sport_Skate)\
+tfunc(egg_sport_Rythm)\
+\
+tfunc(egg_Fishing)\
+\
+tfunc(egg_Compilation)\
+tfunc(egg_Miscellaneous)\
+tfunc(egg_Mature)
+
+#define tenum(a) a,
 typedef enum {
- egg_Unknown=0,
- // - - - - -arcade
-    egg_Platform,
-    egg_Climbing,
-
-    egg_ShootEmUp,
-    egg_Shooter,
-     egg_BeatNUp,
-     egg_Fighter,
-
-     egg_Driving,
-     egg_Motorcycle,
-     egg_Flying,
-
-    egg_LightGuns,
-
-    egg_BallNPaddles,
-    egg_Pinballs,
-    egg_Maze,
- // - - - reflexion/...
- egg_Tabletop,
- egg_Puzzle,
- egg_CardBattle,
- egg_Mahjong,
- egg_Quizz,
- egg_ChiFouMi,
-
-// - -  - casino
- egg_Casino,
- egg_HorseRacing,
- egg_PoolNDart,
-
- // - - -sport
- egg_sport_,
- egg_sport_Baseball,
- egg_sport_Basketball,
- egg_sport_Volleyball,
-
- egg_sport_Football,
- egg_sport_Soccer,
- egg_sport_Golf,
- egg_sport_Hockey,
- egg_sport_Rugby,
- egg_sport_Tennis,
- egg_sport_TrackNField,
-
- egg_sport_Boxing,
- egg_sport_Wrestling,
-
- egg_sport_Bowling,
- egg_sport_Skiing,
- egg_sport_Skate,
- egg_sport_Rythm,
-    // - - -leisure
- egg_Fishing,
-
-
- // - - -
- egg_Compilation,
- egg_Miscellaneous,
- egg_Mature,
-
+    UNROLL_GENRENUM(tenum)
 } eGameGenre;
+#undef tenum
+
+
+#define tenum(a) #a,
+const char *enumCnames[]={
+    UNROLL_GENRENUM(tenum)
+};
+#undef tenum
+
+
 
 eGameGenre numBHyName(std::string name)
 {
@@ -555,13 +478,28 @@ struct GGenre {
 
 map<string,GGenre> ggenres;
 
+GGenre &getGenre(string archive,string parent)
+{
+    map<string,GGenre>::iterator fit = ggenres.find(archive);
+    if(fit != ggenres.end())
+    {
+        return fit->second;
+    }
+
+    fit = ggenres.find(parent);
+    if(fit != ggenres.end())
+    {
+        return fit->second;
+    }
+    return ggenres[""];
+}
 
 void readgenrefile(std::string genrefilepath,int uenum)
 {
     fstr xmlfile;
     { //
         ifstream ifs(genrefilepath);
-        if(!ifs.good()) return 1;
+        if(!ifs.good()) return;
         ifs.seekg(0,ios::end);
         size_t sz = (size_t)ifs.tellg();
         ifs.seekg(0,ios::beg);
@@ -606,7 +544,7 @@ void readplayerfile(std::string genrefilepath,int nbplayer,int bSimult)
     fstr xmlfile;
     { //
         ifstream ifs(genrefilepath);
-        if(!ifs.good()) return 1;
+        if(!ifs.good()) return;
         ifs.seekg(0,ios::end);
         size_t sz = (size_t)ifs.tellg();
         ifs.seekg(0,ios::beg);
@@ -667,7 +605,7 @@ void readGenres()
 }
 void readPlayers()
 {
-   string sdir =playerssbase;
+   string sdir =playersbase;
 
     readplayerfile(sdir+"/2P sim Games.xml",2,1);
     readplayerfile(sdir+"/2P alt Games.xml",2,0);
@@ -682,13 +620,130 @@ void readPlayers()
 
 }
 
+// , nbp) ->
+// , nbpsim,nbpalt, enumgenre,0|flag| flag|flag)
+bool changeapi(std::string ofilepath,std::string nfilepath)
+{
+cout << "check: " <<ofilepath << endl;
+//if(ofilepath.find("neogeo") != string::npos)
+//{
+//    printf("?");
+//}
+    fstr bfile;
+    bfile._filename = ofilepath;
+    { //
+        ifstream ifs(ofilepath);
+        if(!ifs.good()) return 1;
+        ifs.seekg(0,ios::end);
+        size_t sz = (size_t)ifs.tellg();
+        ifs.seekg(0,ios::beg);
+        ifs.clear();
+
+        bfile._b.reserve(sz+1);
+        bfile._b.resize(sz+1);
+        ifs.read(bfile._b.data(),sz);
+        bfile._b[sz] = 0;
+    }
+    ofstream ofsb(nfilepath);
+    if(!ofsb.good()) return 2;
+
+
+
+    size_t i=0;
+    while(i<bfile.length())
+    {
+         size_t iadd=0;
+         size_t inxt = bfile.find("GAME(",i);
+         if(inxt != string::npos) iadd = 5;
+
+         size_t inxtb = bfile.find("GAMEB(",i);
+         if(inxtb != string::npos && (inxt == string::npos || inxtb<inxt) )
+         {
+             inxt = inxtb;
+             iadd = 6;
+         }
+
+         inxtb = bfile.find("GAME (",i);
+         if(inxtb != string::npos && (inxt == string::npos || inxtb<inxt) )
+         {
+             inxt = inxtb;
+             iadd = 6;
+         }
+
+        if(inxt != string::npos )
+        {
+            inxt+=iadd;
+            size_t iend = bfile.findceiq(')',inxt);
+            if(iend == string::npos) { i= inxt; continue; }
+            // get one coma back
+            size_t iendcoma = bfile.rfind_first_of(",",iend);
+
+            string sparams =bfile.substr(inxt,iend-inxt);
+            vector<string> prms = splitt_trim(sparams, ",");
+            string name = prms[1];
+            string parent = prms[2];
+            //int nbp = getNbPlayer( name,  parent);
+
+           // bfile.substros(ofsb,i,iend-i);
+            bfile.substros(ofsb,i,iendcoma-i+1);
+
+
+            GGenre &g = getGenre(name,parent);
+            int gnum = 0;
+            if(g.genreEnums.size()>0) gnum = g.genreEnums[0];
+            const char *penumname = enumCnames[gnum];
+            ofsb << g.nbPlayersSim <<","<<g.nbPlayersAlt<<"," << penumname << ",0)";
+
+            i=iend+1;
+        } else
+            break;
+    }
+    bfile.substros(ofsb,i,bfile.length()-i);
+
+//    vector<CFileModifier> modifiers;
+
+//    CFileParse fp;
+//    fp._type = BaseType::eMain;
+//    fp._start = 0;
+//    fp._end = bfile._b.size()-1;
+//    fp.parseStruct(bfile,0,0,modifiers);
+
+//    fp.findsyntax(bfile);
+
+    return false;
+//    return didchange;
+}
 //bool compareFunction (std::string a, std::string b) {return a<b;}
 int main(int argc, char **argv)
 {
-// read
+    // - - - - - - read database in map.
     readGenres();
     cout << "found genres for: " << (int)ggenres.size() << endl;
     readPlayers();
+
+    if(ggenres.size()==0)
+    {
+        cout << "couldn't get genre" <<endl;
+        return 1;
+
+    }
+    // - - - - - -
+    string sdir =sourcebase+"driverso";
+
+    vector<string> entries;
+   for (const auto & entry : fs::directory_iterator(sdir))
+   {
+        string sname =  entry.path().filename().string();
+      //entries.push_back(entry.path().filename().string());
+      if(sname.rfind(".c") != sname.length()-2 &&
+      sname.rfind(".h") != sname.length()-2
+      ) continue;
+
+        string ofilepath = sourcebase+"driverso/" + sname;
+        string nfilepath = sourcebase+"drivers/" + sname;
+        changeapi(ofilepath,nfilepath);
+   }
+
 /*
     fstr xmlfile;
     xmlfile._filename = "../controls.xml";

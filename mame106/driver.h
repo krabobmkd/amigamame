@@ -252,7 +252,13 @@ struct _game_driver
 
 	UINT32				flags;						/* orientation and other flags; see defines below */
     // krb minimix
-    INT8                nbplayers;
+    // - - -this would be 32b.
+    UINT8  nbplayersAlt : 4;
+    UINT8  nbplayersSim : 4;
+
+    UINT8 genre; // enum
+    UINT16 genreflag; // V,H,3D , ...
+    // - - -  -
 };
 
 
