@@ -282,4 +282,4 @@ static DRIVER_INIT( subs )
  *
  *************************************/
 
-GAME( 1977, subs, 0, subs, subs, subs, ROT0, "Atari", "Subs", GAME_IMPERFECT_SOUND ,2)
+GAME( 1977, subs, 0, subs, subs, subs, ROT0, "Atari", "Subs", GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)

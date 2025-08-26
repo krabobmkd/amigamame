@@ -214,4 +214,4 @@ ROM_START( 4enraya )
 	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* not used */
 ROM_END
 
-GAME( 1990, 4enraya,  0,       4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", 0 ,2)
+GAME( 1990, 4enraya,  0,       4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", 0 ,2,0,egg_Puzzle,0)

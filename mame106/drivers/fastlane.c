@@ -339,4 +339,4 @@ ROM_END
 
 
 
-GAME( 1987, fastlane, 0, fastlane, fastlane, 0, ROT90, "Konami", "Fast Lane", GAME_IMPERFECT_COLORS ,0)
+GAME( 1987, fastlane, 0, fastlane, fastlane, 0, ROT90, "Konami", "Fast Lane", GAME_IMPERFECT_COLORS ,0,2,egg_Maze,0)

@@ -2154,13 +2154,13 @@ static INPUT_PORTS_START( aircombt )
 INPUT_PORTS_END
 
 /*    YEAR, NAME,     PARENT,   MACHINE,           INPUT,        INIT,     MONITOR, COMPANY, FULLNAME,             FLAGS */
-GAME( 1992, aircombj, 0,       poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (Japan)", GAME_NOT_WORKING ,0) /* mostly working */
-GAME( 1992, aircombu, aircombj,poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (US)",	  GAME_NOT_WORKING ,0) /* mostly working */
-GAME( 1993, cybsled,  0,       poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled",         GAME_NOT_WORKING ,1) /* mostly working */
-GAME( 1999, driveyes, 0,       poly_c140_typeA,   s21default,   driveyes, ROT0,    "Namco", "Driver's Eyes",      GAME_NOT_WORKING ,0)
+GAME( 1992, aircombj, 0,       poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (Japan)", GAME_NOT_WORKING ,0,1,egg_Flying,0) /* mostly working */
+GAME( 1992, aircombu, aircombj,poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (US)",	  GAME_NOT_WORKING ,0,1,egg_Flying,0) /* mostly working */
+GAME( 1993, cybsled,  0,       poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled",         GAME_NOT_WORKING ,0,1,egg_ShootEmUp,0) /* mostly working */
+GAME( 1999, driveyes, 0,       poly_c140_typeA,   s21default,   driveyes, ROT0,    "Namco", "Driver's Eyes",      GAME_NOT_WORKING ,0,0,egg_Driving,0)
 /* 1992, ShimDrive */
-GAME( 1991, solvalou, 0,       poly_c140_typeA,   s21default,   solvalou, ROT0,    "Namco", "Solvalou (Japan)",   GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS ,0) /* working and playable */
-GAME( 1991, starblad, 0,       poly_c140_typeA,   s21default,   starblad, ROT0,    "Namco", "Starblade",		  GAME_IMPERFECT_GRAPHICS ,0) /* working and playable */
-GAME( 1988, winrun,   0,       winrun_c140_typeB, s21default,   winrun,   ROT0,    "Namco", "Winning Run",        GAME_NOT_WORKING ,0)
+GAME( 1991, solvalou, 0,       poly_c140_typeA,   s21default,   solvalou, ROT0,    "Namco", "Solvalou (Japan)",   GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS ,0,1,egg_Flying,0) /* working and playable */
+GAME( 1991, starblad, 0,       poly_c140_typeA,   s21default,   starblad, ROT0,    "Namco", "Starblade",		  GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0) /* working and playable */
+GAME( 1988, winrun,   0,       winrun_c140_typeB, s21default,   winrun,   ROT0,    "Namco", "Winning Run",        GAME_NOT_WORKING ,0,0,egg_Unknown,0)
 /* 1989, Winning Run Suzuka Grand Prix */
-GAME( 1991, winrun91, 0,       winrun_c140_typeB, s21default,   winrun,   ROT0,    "Namco", "Winning Run 91", 	  GAME_NOT_WORKING ,0) /* not working */
+GAME( 1991, winrun91, 0,       winrun_c140_typeB, s21default,   winrun,   ROT0,    "Namco", "Winning Run 91", 	  GAME_NOT_WORKING ,0,1,egg_Driving,0) /* not working */

@@ -339,6 +339,6 @@ ROM_START( jcross )
 	ROM_LOAD( "jcrossp0.j9",  0x800, 0x400, CRC(99f54d48) SHA1(9bd20eaa9706d28eaca9f5e195204d89e302272f) )
 ROM_END
 
-GAME( 1984, jcross, 0, jcross, jcross, 0, ROT270,   "SNK", "Jumping Cross",GAME_NO_COCKTAIL|GAME_IMPERFECT_GRAPHICS,0)
+GAME( 1984, jcross, 0, jcross, jcross, 0, ROT270,   "SNK", "Jumping Cross",GAME_NO_COCKTAIL|GAME_IMPERFECT_GRAPHICS,0,2,egg_Motorcycle,0)
 
 

@@ -355,5 +355,5 @@ static DRIVER_INIT( blockhl )
 
 
 
-GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl, ROT0, "Konami", "Block Hole", 0 ,0)
-GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl, ROT0, "Konami", "Quarth (Japan)", 0 ,0)
+GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl, ROT0, "Konami", "Block Hole", 0 ,2,0,egg_Puzzle,0)
+GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl, ROT0, "Konami", "Quarth (Japan)", 0 ,2,0,egg_Miscellaneous,0)

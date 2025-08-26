@@ -550,4 +550,4 @@ static DRIVER_INIT(bmcbowl)
 	colorram=auto_malloc(768);
 }
 
-GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl,    bmcbowl, ROT0,  "BMC", "BMC Bowling", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl,    bmcbowl, ROT0,  "BMC", "BMC Bowling", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ,0,1,egg_sport_Bowling,0)

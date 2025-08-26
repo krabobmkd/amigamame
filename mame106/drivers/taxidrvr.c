@@ -445,4 +445,4 @@ ROM_END
 
 
 
-GAME( 1984, taxidrvr, 0, taxidrvr, taxidrvr, 0, ROT90, "Graphic Techno", "Taxi Driver", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ,0)
+GAME( 1984, taxidrvr, 0, taxidrvr, taxidrvr, 0, ROT90, "Graphic Techno", "Taxi Driver", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ,0,0,egg_Unknown,0)

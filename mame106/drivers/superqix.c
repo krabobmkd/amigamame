@@ -1275,10 +1275,10 @@ static DRIVER_INIT( perestro )
 
 
 
-GAME( 1986, pbillian, 0,        pbillian, pbillian, pbillian, ROT0,  "Taito", "Prebillian", 0 ,0)
-GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, hotsmash, ROT90, "Taito", "Vs. Hot Smash", 0 ,2)
-GAME( 1987, sqix,     0,        sqix,     superqix, sqix,     ROT90, "Taito", "Super Qix (set 1)", 0 ,2)
-GAME( 1987, sqixa,    sqix,     sqix,     superqix, sqixa,    ROT90, "Taito", "Super Qix (set 2)", 0 ,2)
-GAME( 1987, sqixbl,   sqix,     sqixbl,   superqix, 0,        ROT90, "bootleg", "Super Qix (bootleg)", 0 ,2)
-GAME( 1994, perestro, 0,        sqixbl,   superqix, perestro, ROT90, "Promat", "Perestroika Girls", 0 ,0)
-GAME( 1993, perestrf, perestro, sqixbl,   superqix, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", 0 ,0)
+GAME( 1986, pbillian, 0,        pbillian, pbillian, pbillian, ROT0,  "Taito", "Prebillian", 0 ,0,2,egg_PoolNDart,0)
+GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, hotsmash, ROT90, "Taito", "Vs. Hot Smash", 0 ,2,0,egg_Miscellaneous,0)
+GAME( 1987, sqix,     0,        sqix,     superqix, sqix,     ROT90, "Taito", "Super Qix (set 1)", 0 ,0,0,egg_Unknown,0)
+GAME( 1987, sqixa,    sqix,     sqix,     superqix, sqixa,    ROT90, "Taito", "Super Qix (set 2)", 0 ,0,0,egg_Unknown,0)
+GAME( 1987, sqixbl,   sqix,     sqixbl,   superqix, 0,        ROT90, "bootleg", "Super Qix (bootleg)", 0 ,0,0,egg_Unknown,0)
+GAME( 1994, perestro, 0,        sqixbl,   superqix, perestro, ROT90, "Promat", "Perestroika Girls", 0 ,0,2,egg_Mature,0)
+GAME( 1993, perestrf, perestro, sqixbl,   superqix, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", 0 ,0,2,egg_Mature,0)

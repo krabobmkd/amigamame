@@ -523,7 +523,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1985, gunsmoke, 0,        gunsmoke, gunsmoke, 0, ROT270, "Capcom", "Gun.Smoke (World)", 0 ,2)
-GAME( 1985, gunsmokj, gunsmoke, gunsmoke, gunsmoke, 0, ROT270, "Capcom", "Gun.Smoke (Japan)", 0 ,2)
-GAME( 1985, gunsmoku, gunsmoke, gunsmoke, gunsmoke, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 1)", 0 ,2)
-GAME( 1986, gunsmoka, gunsmoke, gunsmoke, gunsmoka, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 2)", 0 ,2)
+GAME( 1985, gunsmoke, 0,        gunsmoke, gunsmoke, 0, ROT270, "Capcom", "Gun.Smoke (World)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1985, gunsmokj, gunsmoke, gunsmoke, gunsmoke, 0, ROT270, "Capcom", "Gun.Smoke (Japan)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1985, gunsmoku, gunsmoke, gunsmoke, gunsmoke, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1986, gunsmoka, gunsmoke, gunsmoke, gunsmoka, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 2)", 0 ,0,2,egg_ShootEmUp,0)

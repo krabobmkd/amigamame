@@ -422,5 +422,5 @@ DRIVER_INIT( supertnk ){
 
 
 /*          rom       parent     machine   inp       init */
-GAME( 1981, supertnk,  0,        supertnk, supertnk, supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 ,0)
+GAME( 1981, supertnk,  0,        supertnk, supertnk, supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 ,2,0,egg_ShootEmUp,0)
 

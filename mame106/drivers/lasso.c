@@ -969,9 +969,9 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1982, lasso,    0,     lasso,    lasso,    0, ROT90, "SNK", "Lasso"                  , 0 ,0)
-GAME( 1983, chameleo, 0,     chameleo, chameleo, 0, ROT0,  "Jaleco", "Chameleon"              , 0 ,0)
-GAME( 1984, wwjgtin,  0,     wwjgtin,  wwjgtin,  0, ROT0,  "Jaleco / Casio", "Wai Wai Jockey Gate-In!", 0 ,0)
-GAME( 1984, pinbo,    0,     pinbo,    pinbo,    0, ROT90, "Jaleco", "Pinbo (set 1)", 0 ,0)
-GAME( 1984, pinboa,   pinbo, pinbo,    pinbo,   0, ROT90, "Jaleco", "Pinbo (set 2)", 0 ,0)
-GAME( 1985, pinbos,   pinbo, pinbo,    pinbo,   0, ROT90, "bootleg?", "Pinbo (Strike)", 0 ,0)
+GAME( 1982, lasso,    0,     lasso,    lasso,    0, ROT90, "SNK", "Lasso"                  , 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1983, chameleo, 0,     chameleo, chameleo, 0, ROT0,  "Jaleco", "Chameleon"              , 0 ,0,2,egg_Platform,0)
+GAME( 1984, wwjgtin,  0,     wwjgtin,  wwjgtin,  0, ROT0,  "Jaleco / Casio", "Wai Wai Jockey Gate-In!", 0 ,2,0,egg_HorseRacing,0)
+GAME( 1984, pinbo,    0,     pinbo,    pinbo,    0, ROT90, "Jaleco", "Pinbo (set 1)", 0 ,0,2,egg_Pinballs,0)
+GAME( 1984, pinboa,   pinbo, pinbo,    pinbo,   0, ROT90, "Jaleco", "Pinbo (set 2)", 0 ,0,2,egg_Pinballs,0)
+GAME( 1985, pinbos,   pinbo, pinbo,    pinbo,   0, ROT90, "bootleg?", "Pinbo (Strike)", 0 ,0,2,egg_Pinballs,0)

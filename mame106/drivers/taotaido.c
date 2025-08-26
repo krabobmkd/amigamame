@@ -467,5 +467,5 @@ ROM_START( taotaida )
 	ROM_LOAD( "u15.bin", 0x000000, 0x200000, CRC(e95823e9) SHA1(362583944ad4fdde4f9e29928cf34376c7ad931f) )
 ROM_END
 
-GAME( 1993, taotaido, 0,        taotaido, taotaido, 0, ROT0, "Video System Co.", "Tao Taido (set 1)", GAME_NO_COCKTAIL ,0)
-GAME( 1993, taotaida, taotaido, taotaido, taotaida, 0, ROT0, "Video System Co.", "Tao Taido (set 2)", GAME_NO_COCKTAIL ,0)
+GAME( 1993, taotaido, 0,        taotaido, taotaido, 0, ROT0, "Video System Co.", "Tao Taido (set 1)", GAME_NO_COCKTAIL ,2,0,egg_Fighter,0)
+GAME( 1993, taotaida, taotaido, taotaido, taotaida, 0, ROT0, "Video System Co.", "Tao Taido (set 2)", GAME_NO_COCKTAIL ,2,0,egg_Fighter,0)

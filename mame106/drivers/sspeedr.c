@@ -272,4 +272,4 @@ ROM_START( sspeedr )
 ROM_END
 
 
-GAME( 1979, sspeedr, 0, sspeedr, sspeedr, 0, ROT270, "Midway", "Super Speed Race", GAME_NO_SOUND ,1)
+GAME( 1979, sspeedr, 0, sspeedr, sspeedr, 0, ROT270, "Midway", "Super Speed Race", GAME_NO_SOUND ,0,1,egg_Driving,0)

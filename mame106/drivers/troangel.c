@@ -229,4 +229,4 @@ ROM_END
 
 
 
-GAME( 1983, troangel, 0, troangel, troangel, 0, ROT0, "Irem", "Tropical Angel", 0 ,0)
+GAME( 1983, troangel, 0, troangel, troangel, 0, ROT0, "Irem", "Tropical Angel", 0 ,0,2,egg_sport_Skiing,0)

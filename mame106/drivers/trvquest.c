@@ -313,4 +313,4 @@ ROM_START( trvquest )
 ROM_END
 
 
-GAME( 1984, trvquest, 0, trvquest, trvquest, 0, ROT90, "Sunn / Techstar", "Trivia Quest", GAME_NOT_WORKING ,0)
+GAME( 1984, trvquest, 0, trvquest, trvquest, 0, ROT90, "Sunn / Techstar", "Trivia Quest", GAME_NOT_WORKING ,0,1,egg_Quizz,0)

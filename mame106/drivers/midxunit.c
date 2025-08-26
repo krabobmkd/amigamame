@@ -291,4 +291,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, revx,   0,         midxunit, revx, revx, ROT0, "Midway",   "Revolution X (Rev. 1.0 6/16/94)", 0 ,3)
+GAME( 1994, revx,   0,         midxunit, revx, revx, ROT0, "Midway",   "Revolution X (Rev. 1.0 6/16/94)", 0 ,3,0,egg_LightGuns,0)

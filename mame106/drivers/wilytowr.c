@@ -767,6 +767,6 @@ DRIVER_INIT( fghtbskt )
 	sy_offset = 240;
 }
 
-GAME( 1984, wilytowr, 0,        wilytowr, wilytowr, wilytowr, ROT180, "Irem",                    "Wily Tower", GAME_NO_SOUND ,0)
-GAME( 1985, atomboy,  wilytowr, wilytowr, wilytowr, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy", GAME_NO_SOUND ,0)
-GAME( 1984, fghtbskt, 0,        fghtbskt, fghtbskt, fghtbskt, ROT0,   "Paradise Co. Ltd.",       "Fighting Basketball", GAME_IMPERFECT_SOUND ,0)
+GAME( 1984, wilytowr, 0,        wilytowr, wilytowr, wilytowr, ROT180, "Irem",                    "Wily Tower", GAME_NO_SOUND ,0,2,egg_Platform,0)
+GAME( 1985, atomboy,  wilytowr, wilytowr, wilytowr, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy", GAME_NO_SOUND ,0,2,egg_Platform,0)
+GAME( 1984, fghtbskt, 0,        fghtbskt, fghtbskt, fghtbskt, ROT0,   "Paradise Co. Ltd.",       "Fighting Basketball", GAME_IMPERFECT_SOUND ,0,2,egg_sport_Basketball,0)

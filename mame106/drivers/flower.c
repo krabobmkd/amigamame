@@ -360,5 +360,5 @@ ROM_START( flowerbl )
 ROM_END
 
 
-GAME( 1986, flower, 0, flower, flower, 0, ROT0, "Komax", "Flower", GAME_IMPERFECT_SOUND ,0)
-GAME( 1986, flowerbl, flower, flower, flower, 0, ROT0, "bootleg", "Flower (bootleg)", GAME_IMPERFECT_SOUND ,0)
+GAME( 1986, flower, 0, flower, flower, 0, ROT0, "Komax", "Flower", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1986, flowerbl, flower, flower, flower, 0, ROT0, "bootleg", "Flower (bootleg)", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)

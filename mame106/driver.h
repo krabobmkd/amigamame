@@ -230,6 +230,60 @@ struct _machine_config
 };
 
 
+typedef enum {
+    egg_Unknown,
+    egg_Platform,
+    egg_Climbing,
+    egg_ShootEmUp,
+    egg_Shooter,
+    egg_BeatNUp,
+    egg_Fighter,
+    egg_Driving,
+    egg_Motorcycle,
+    egg_Flying,
+    egg_LightGuns,
+    egg_BallNPaddles,
+    egg_Pinballs,
+    egg_Maze,
+
+    egg_Tabletop,
+    egg_Puzzle,
+    egg_CardBattle,
+    egg_Mahjong,
+    egg_Quizz,
+    egg_ChiFouMi,
+
+    egg_Casino,
+    egg_HorseRacing,
+    egg_PoolNDart,
+
+    egg_sport_,
+    egg_sport_Baseball,
+    egg_sport_Basketball,
+    egg_sport_Volleyball,
+    egg_sport_Football,
+    egg_sport_Soccer,
+    egg_sport_Golf,
+    egg_sport_Hockey,
+    egg_sport_Rugby,
+    egg_sport_Tennis,
+    egg_sport_TrackNField,
+    egg_sport_Boxing,
+    egg_sport_Wrestling,
+
+    egg_sport_Bowling,
+    egg_sport_Skiing,
+    egg_sport_Skate,
+    egg_sport_Rythm,
+
+    egg_Fishing,
+
+    egg_Compilation,
+    egg_Miscellaneous,
+    egg_Mature
+} eGGenre;
+
+
 /* In mamecore.h: typedef struct _game_driver game_driver; */
 struct _game_driver
 {
@@ -253,8 +307,8 @@ struct _game_driver
 	UINT32				flags;						/* orientation and other flags; see defines below */
     // krb minimix
     // - - -this would be 32b.
-    UINT8  nbplayersAlt : 4;
     UINT8  nbplayersSim : 4;
+    UINT8  nbplayersAlt : 4;
 
     UINT8 genre; // enum
     UINT16 genreflag; // V,H,3D , ...
@@ -509,7 +563,7 @@ struct _game_driver
 
 ***************************************************************************/
 
-#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPLAYER)	\
+#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPSIM,NBPALT,EGENRE,GFLAGS)	\
 game_driver driver_##NAME =					\
 {											\
 	__FILE__,								\
@@ -524,10 +578,13 @@ game_driver driver_##NAME =					\
 	init_##INIT,							\
 	rom_##NAME,								\
 	(MONITOR)|(FLAGS),						\
-    NBPLAYER \
+    NBPSIM, \
+    NBPALT, \
+    EGENRE, \
+    GFLAGS \
 };
 
-#define GAMEB(YEAR,NAME,PARENT,BIOS,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPLAYER)	\
+#define GAMEB(YEAR,NAME,PARENT,BIOS,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPSIM,NBPALT,EGENRE,GFLAGS)	\
 game_driver driver_##NAME =					\
 {											\
 	__FILE__,								\
@@ -542,7 +599,10 @@ game_driver driver_##NAME =					\
 	init_##INIT,							\
 	rom_##NAME,								\
 	(MONITOR)|(FLAGS),						\
-    NBPLAYER \
+    NBPSIM, \
+    NBPALT, \
+    EGENRE, \
+    GFLAGS \
 };
 
 /* this allows to leave the INIT field empty in the GAME() macro call */

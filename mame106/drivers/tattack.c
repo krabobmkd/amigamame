@@ -262,4 +262,4 @@ static DRIVER_INIT(tattack)
 
 }
 
-GAME( 198?, tattack, 0, tattack, tattack, tattack, ROT270, "Shonan", "Time Attacker", GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING,0)
+GAME( 198?, tattack, 0, tattack, tattack, tattack, ROT270, "Shonan", "Time Attacker", GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING,0,2,egg_BallNPaddles,0)

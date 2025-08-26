@@ -496,6 +496,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, liberatr, 0,        liberatr, liberatr, 0, ROT0, "Atari", "Liberator (set 1)", GAME_NO_COCKTAIL ,2)
-GAME( 1982, liberat2, liberatr, liberat2, liberatr, 0, ROT0, "Atari", "Liberator (set 2)", GAME_NO_COCKTAIL ,2)
+GAME( 1982, liberatr, 0,        liberatr, liberatr, 0, ROT0, "Atari", "Liberator (set 1)", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1982, liberat2, liberatr, liberat2, liberatr, 0, ROT0, "Atari", "Liberator (set 2)", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
 

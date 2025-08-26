@@ -490,5 +490,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk,      0,          mainsnk, mainsnk, 0,        ROT0, "SNK", "Main Event (1984)", 0,0)
-GAME( 1985, canvas,       0,          canvas,  canvas,  canvas,   ROT0, "SNK", "Canvas Croquis", GAME_IMPERFECT_GRAPHICS,0) // some gfx banks might be wrong...
+GAME( 1984, mainsnk,      0,          mainsnk, mainsnk, 0,        ROT0, "SNK", "Main Event (1984)", 0,2,0,egg_sport_Boxing,0)
+GAME( 1985, canvas,       0,          canvas,  canvas,  canvas,   ROT0, "SNK", "Canvas Croquis", GAME_IMPERFECT_GRAPHICS,0,2,egg_Mature,0) // some gfx banks might be wrong...

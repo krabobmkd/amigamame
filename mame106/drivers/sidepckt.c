@@ -439,6 +439,6 @@ ROM_END
 
 
 
-GAME( 1986, sidepckt, 0,        sidepckt, sidepckt, 0, ROT0, "Data East Corporation", "Side Pocket (World)", 0 ,0)
-GAME( 1986, sidepctj, sidepckt, sidepctj, sidepckt, 0, ROT0, "Data East Corporation", "Side Pocket (Japan)", 0 ,0)
-GAME( 1986, sidepctb, sidepckt, sidepckt, sidepckt, 0, ROT0, "bootleg", "Side Pocket (bootleg)", 0 ,0)
+GAME( 1986, sidepckt, 0,        sidepckt, sidepckt, 0, ROT0, "Data East Corporation", "Side Pocket (World)", 0 ,0,2,egg_PoolNDart,0)
+GAME( 1986, sidepctj, sidepckt, sidepctj, sidepckt, 0, ROT0, "Data East Corporation", "Side Pocket (Japan)", 0 ,0,2,egg_PoolNDart,0)
+GAME( 1986, sidepctb, sidepckt, sidepckt, sidepckt, 0, ROT0, "bootleg", "Side Pocket (bootleg)", 0 ,0,2,egg_PoolNDart,0)

@@ -544,4 +544,4 @@ static DRIVER_INIT( beathead )
  *
  *************************************/
 
-GAME( 1993, beathead, 0, beathead, beathead, beathead, ROT0, "Atari Games", "BeatHead (prototype)", 0 ,2)
+GAME( 1993, beathead, 0, beathead, beathead, beathead, ROT0, "Atari Games", "BeatHead (prototype)", 0 ,2,0,egg_Platform,0)

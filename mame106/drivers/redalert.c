@@ -552,5 +552,5 @@ ROM_START( demoneye )
 	ROM_LOAD( "demoneye.1a2", 0x0200, 0x0200, CRC(eaf5a66e) SHA1(d8ebe05ba5d75fbf6ad45f710e5bd27b6afad44b) )
 ROM_END
 
-GAME( 1981, redalert, 0, redalert, redalert, 0, ROT270, "Irem + GDI",	"Red Alert",  GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1981, demoneye, 0, demoneye, demoneye, 0, ROT270, "Irem",		"Demoneye-X", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ,0)
+GAME( 1981, redalert, 0, redalert, redalert, 0, ROT270, "Irem + GDI",	"Red Alert",  GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1981, demoneye, 0, demoneye, demoneye, 0, ROT270, "Irem",		"Demoneye-X", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)

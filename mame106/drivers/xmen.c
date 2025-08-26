@@ -871,9 +871,9 @@ static DRIVER_INIT( xmen )
 	konami_rom_deinterleave_4(REGION_GFX2);
 }
 
-GAME( 1992, xmen,    0,    xmen, xmen,   xmen,   ROT0, "Konami", "X-Men (4 Players ver UBB)", 0 ,4)
-GAME( 1992, xmen2p,  xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver AAA)", 0 ,4)
-GAME( 1992, xmen2pj, xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver JAA)", 0 ,4)
+GAME( 1992, xmen,    0,    xmen, xmen,   xmen,   ROT0, "Konami", "X-Men (4 Players ver UBB)", 0 ,0,0,egg_Unknown,0)
+GAME( 1992, xmen2p,  xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver AAA)", 0 ,0,0,egg_Unknown,0)
+GAME( 1992, xmen2pj, xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver JAA)", 0 ,2,0,egg_BeatNUp,0)
 
-GAME( 1992, xmen6p,  xmen, xmen6p,xmen6p,   xmen, ROT0, "Konami", "X-Men (6 Players ver ECB)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1992, xmen6pu, xmen, xmen6p,xmen6p,   xmen, ROT0, "Konami", "X-Men (6 Players ver UCB)", GAME_IMPERFECT_GRAPHICS ,4)
+GAME( 1992, xmen6p,  xmen, xmen6p,xmen6p,   xmen, ROT0, "Konami", "X-Men (6 Players ver ECB)", GAME_IMPERFECT_GRAPHICS ,6,0,egg_BeatNUp,0)
+GAME( 1992, xmen6pu, xmen, xmen6p,xmen6p,   xmen, ROT0, "Konami", "X-Men (6 Players ver UCB)", GAME_IMPERFECT_GRAPHICS ,6,0,egg_BeatNUp,0)

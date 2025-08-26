@@ -235,4 +235,4 @@ ROM_START( mirax )
 
 ROM_END
 
-GAME( 1985, mirax,  0,		mirax, mirax, 0, ROT90, "Current Technologies", "Mirax", GAME_NOT_WORKING,0)
+GAME( 1985, mirax,  0,		mirax, mirax, 0, ROT90, "Current Technologies", "Mirax", GAME_NOT_WORKING,0,2,egg_Flying,0)

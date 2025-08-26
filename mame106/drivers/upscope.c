@@ -390,4 +390,4 @@ DRIVER_INIT( upscope )
  *
  *************************************/
 
-GAME( 1986, upscope, 0, upscope, upscope, upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", GAME_IMPERFECT_SOUND ,0)
+GAME( 1986, upscope, 0, upscope, upscope, upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", GAME_IMPERFECT_SOUND ,0,1,egg_ShootEmUp,0)

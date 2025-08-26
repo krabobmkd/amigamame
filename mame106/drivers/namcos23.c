@@ -1094,7 +1094,7 @@ ROM_START( finfrl2j )
 ROM_END
 
 /* Games */
-GAME( 1997, timecrs2, 0,         s23, ss23, ss23, ROT0, "Namco", "Time Crisis 2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0)
-GAME( 1999, gp500,    0,        ss23, ss23, ss23, ROT0, "Namco", "GP500", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0)
-GAME( 1999, finfurl2, 0,        ss23, ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0)
-GAME( 1999, finfrl2j, finfurl2, ss23, ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0)
+GAME( 1997, timecrs2, 0,         s23, ss23, ss23, ROT0, "Namco", "Time Crisis 2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0,1,egg_LightGuns,0)
+GAME( 1999, gp500,    0,        ss23, ss23, ss23, ROT0, "Namco", "GP500", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
+GAME( 1999, finfurl2, 0,        ss23, ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0,0,egg_HorseRacing,0)
+GAME( 1999, finfrl2j, finfurl2, ss23, ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0,0,egg_HorseRacing,0)

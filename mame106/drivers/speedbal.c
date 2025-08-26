@@ -290,4 +290,4 @@ ROM_START( speedbal )
 ROM_END
 
 
-GAME( 1987, speedbal, 0, speedbal, speedbal, 0, ROT270, "Tecfri", "Speed Ball", 0 ,0)
+GAME( 1987, speedbal, 0, speedbal, speedbal, 0, ROT270, "Tecfri", "Speed Ball", 0 ,0,0,egg_Unknown,0)

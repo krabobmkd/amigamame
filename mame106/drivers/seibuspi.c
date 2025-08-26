@@ -2763,42 +2763,42 @@ ROM_END
 
 
 /* SPI */
-GAME( 1995, senkyu,    0,       spi,      spi_3button, senkyu,   ROT0,   "Seibu Kaihatsu", "Senkyu (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1995, senkyua,   senkyu,  spi,      spi_3button, senkyua,  ROT0,   "Seibu Kaihatsu", "Senkyu (Japan, set 2)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1995, batlball,  senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Tuning License)", "Battle Balls (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1995, batlbala,  senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Metrotainment License)", "Battle Balls (Asia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
+GAME( 1995, senkyu,    0,       spi,      spi_3button, senkyu,   ROT0,   "Seibu Kaihatsu", "Senkyu (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_Puzzle,0)
+GAME( 1995, senkyua,   senkyu,  spi,      spi_3button, senkyua,  ROT0,   "Seibu Kaihatsu", "Senkyu (Japan, set 2)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_Puzzle,0)
+GAME( 1995, batlball,  senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Tuning License)", "Battle Balls (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_Puzzle,0)
+GAME( 1995, batlbala,  senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Metrotainment License)", "Battle Balls (Asia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_Puzzle,0)
 
-GAME( 1995, viprp1,    0,       spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Japan, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1995, viprp1s,   viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Switzerland, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
+GAME( 1995, viprp1,    0,       spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Japan, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
+GAME( 1995, viprp1s,   viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Switzerland, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
 
-GAME( 1995, viprp1o,   viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1995, viprp1ot,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Tuning License)", "Viper Phase 1 (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
+GAME( 1995, viprp1o,   viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
+GAME( 1995, viprp1ot,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Tuning License)", "Viper Phase 1 (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
 
-GAME( 1996, ejanhs,    0,       spi,      spi_ejanhs,  ejanhs,   ROT0,   "Seibu Kaihatsu", "E-Jan High School (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
+GAME( 1996, ejanhs,    0,       spi,      spi_ejanhs,  ejanhs,   ROT0,   "Seibu Kaihatsu", "E-Jan High School (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0,1,egg_Mature,0)
 
-GAME( 1996, rdft,      0,       spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 1)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1996, rdftu,     rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1996, rdftau,    rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Australia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1996, rdftj,     rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 2)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1996, rdftdi,    rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters (Dream Island Co. license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
+GAME( 1996, rdft,      0,       spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 1)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
+GAME( 1996, rdftu,     rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1996, rdftau,    rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Australia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1996, rdftj,     rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 2)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1996, rdftdi,    rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters (Dream Island Co. license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
 
-GAME( 1997, rdft2,     0,       spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden Fighters 2",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1997, rdft2a2,   rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters 2 (Asia, Dream Island license, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1997, rdft2a,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 (Asia, Metrotainment license, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1997, rdft2j,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 (Japan, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
+GAME( 1997, rdft2,     0,       spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden Fighters 2",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1997, rdft2a2,   rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters 2 (Asia, Dream Island license, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1997, rdft2a,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 (Asia, Metrotainment license, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1997, rdft2j,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 (Japan, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
 
-GAME( 1998, rfjet,     0,       spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden Fighters Jet",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1998, rfjetu,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1998, rfjeta,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters Jet (Asia)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
-GAME( 1998, rfjetj,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,0)
+GAME( 1998, rfjet,     0,       spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden Fighters Jet",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1998, rfjetu,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1998, rfjeta,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters Jet (Asia)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1998, rfjetj,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
 
 /* there is another rf dump rf_spi_asia.zip but it seems strange, 1 program rom, cart pic seems to show others as a different type of rom */
 
 /* SXX2F */
-GAME( 1997, rdft2us,   rdft2,   sxx2f,    spi_2button, rdft2us,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2.1 (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND ,0) // title screen shows '2.1'
+GAME( 1997, rdft2us,   rdft2,   sxx2f,    spi_2button, rdft2us,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2.1 (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND ,2,0,egg_ShootEmUp,0) // title screen shows '2.1'
 
 /* SXX2G */
-GAME( 1999, rfjetus,   rfjet,   sxx2f,    spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND  ,0) // has 1998-99 copyright + planes unlocked
+GAME( 1999, rfjetus,   rfjet,   sxx2f,    spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND  ,2,0,egg_ShootEmUp,0) // has 1998-99 copyright + planes unlocked
 
 /* SYS386 */
-GAME( 2000, rdft22kc,  rdft2,   seibu386, seibu386_2button, rdft22kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - 2000 (China)", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 2000, rdft22kc,  rdft2,   seibu386, seibu386_2button, rdft22kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - 2000 (China)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_ShootEmUp,0)

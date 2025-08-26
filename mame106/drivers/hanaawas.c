@@ -263,4 +263,4 @@ ROM_END
 
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, 0, ROT0, "Seta", "Hana Awase (Flower Matching)", 0 ,0)
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, 0, ROT0, "Seta", "Hana Awase (Flower Matching)", 0 ,0,1,egg_Tabletop,0)

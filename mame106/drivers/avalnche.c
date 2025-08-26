@@ -245,5 +245,5 @@ static DRIVER_INIT( avalnche )
  *
  *************************************/
 
-GAME( 1978, avalnche, 0,        avalnche, avalnche, avalnche, ROT0, "Atari", "Avalanche", 0 ,2)
-GAME( 1978, cascade,  avalnche, avalnche, cascade,  avalnche, ROT0, "Sidam", "Cascade", 0 ,2)
+GAME( 1978, avalnche, 0,        avalnche, avalnche, avalnche, ROT0, "Atari", "Avalanche", 0 ,0,2,egg_BallNPaddles,0)
+GAME( 1978, cascade,  avalnche, avalnche, cascade,  avalnche, ROT0, "Sidam", "Cascade", 0 ,0,2,egg_BallNPaddles,0)

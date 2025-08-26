@@ -384,5 +384,5 @@ static DRIVER_INIT( shuuz )
  *
  *************************************/
 
-GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz, ROT0, "Atari Games", "Shuuz (version 8.0)", 0 ,0)
-GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz, ROT0, "Atari Games", "Shuuz (version 7.1)", 0 ,0)
+GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz, ROT0, "Atari Games", "Shuuz (version 8.0)", 0 ,0,4,egg_sport_,0)
+GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz, ROT0, "Atari Games", "Shuuz (version 7.1)", 0 ,0,4,egg_sport_,0)

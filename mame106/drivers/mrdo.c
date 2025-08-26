@@ -399,10 +399,10 @@ ROM_END
 
 
 
-GAME( 1982, mrdo,     0,    mrdo, mrdo, 0, ROT270, "Universal", "Mr. Do!", 0 ,2)
-GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, 0, ROT270, "Universal", "Mr. Do! (prototype)" , 0,2)	/* aka "Yukidaruma" */
-GAME( 1982, mrdot,    mrdo, mrdo, mrdo, 0, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)", 0 ,2)
-GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, 0, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)", 0 ,2)
-GAME( 1982, mrlo,     mrdo, mrdo, mrdo, 0, ROT270, "bootleg", "Mr. Lo!", 0 ,2)
-GAME( 1982, mrdu,     mrdo, mrdo, mrdo, 0, ROT270, "bootleg", "Mr. Du!", 0 ,2)
-GAME( 1982, yankeedo, mrdo, mrdo, mrdo, 0, ROT270, "hack", "Yankee DO!", 0 ,2)
+GAME( 1982, mrdo,     0,    mrdo, mrdo, 0, ROT270, "Universal", "Mr. Do!", 0 ,0,2,egg_Maze,0)
+GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, 0, ROT270, "Universal", "Mr. Do! (prototype)" , 0,0,2,egg_Maze,0)	/* aka "Yukidaruma" */
+GAME( 1982, mrdot,    mrdo, mrdo, mrdo, 0, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, 0, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, mrlo,     mrdo, mrdo, mrdo, 0, ROT270, "bootleg", "Mr. Lo!", 0 ,0,2,egg_Maze,0)
+GAME( 1982, mrdu,     mrdo, mrdo, mrdo, 0, ROT270, "bootleg", "Mr. Du!", 0 ,0,2,egg_Maze,0)
+GAME( 1982, yankeedo, mrdo, mrdo, mrdo, 0, ROT270, "hack", "Yankee DO!", 0 ,0,2,egg_Maze,0)

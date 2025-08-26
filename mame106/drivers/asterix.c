@@ -389,6 +389,6 @@ static DRIVER_INIT( asterix )
 }
 
 
-GAME( 1992, asterix,  0,       asterix, asterix, asterix, ROT0, "Konami", "Asterix (ver EAD)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1992, astrxeac, asterix, asterix, asterix, asterix, ROT0, "Konami", "Asterix (ver EAC)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1992, astrxeaa, asterix, asterix, asterix, asterix, ROT0, "Konami", "Asterix (ver EAA)", GAME_IMPERFECT_GRAPHICS ,2)
+GAME( 1992, asterix,  0,       asterix, asterix, asterix, ROT0, "Konami", "Asterix (ver EAD)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_BeatNUp,0)
+GAME( 1992, astrxeac, asterix, asterix, asterix, asterix, ROT0, "Konami", "Asterix (ver EAC)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_BeatNUp,0)
+GAME( 1992, astrxeaa, asterix, asterix, asterix, asterix, ROT0, "Konami", "Asterix (ver EAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_BeatNUp,0)

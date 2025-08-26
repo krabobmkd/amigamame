@@ -349,4 +349,4 @@ static DRIVER_INIT( copsnrob )
  *
  *************************************/
 
-GAME( 1976, copsnrob, 0, copsnrob, copsnrob, copsnrob, ROT0, "Atari", "Cops'n Robbers", GAME_NO_SOUND ,0)
+GAME( 1976, copsnrob, 0, copsnrob, copsnrob, copsnrob, ROT0, "Atari", "Cops'n Robbers", GAME_NO_SOUND ,4,0,egg_ShootEmUp,0)

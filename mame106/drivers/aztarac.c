@@ -242,4 +242,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, aztarac, 0, aztarac, aztarac, 0, ROT0, "Centuri", "Aztarac", 0 ,2)
+GAME( 1983, aztarac, 0, aztarac, aztarac, 0, ROT0, "Centuri", "Aztarac", 0 ,0,2,egg_ShootEmUp,0)

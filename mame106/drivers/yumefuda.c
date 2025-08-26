@@ -457,4 +457,4 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg001003.u3", 0xc000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
 ROM_END
 
-GAME( 198?, yumefuda, 0, yumefuda, yumefuda, 0, ROT0, "Alba", "(Medal) Yumefuda [BET]", GAME_NOT_WORKING | GAME_WRONG_COLORS ,0)
+GAME( 198?, yumefuda, 0, yumefuda, yumefuda, 0, ROT0, "Alba", "(Medal) Yumefuda [BET]", GAME_NOT_WORKING | GAME_WRONG_COLORS ,0,1,egg_Tabletop,0)

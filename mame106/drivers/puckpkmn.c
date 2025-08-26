@@ -291,4 +291,4 @@ ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
 ROM_END
 
 /* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */
-GAME( 2000, puckpkmn, 0,        puckpkmn, puckpkmn, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon", 0 ,0)
+GAME( 2000, puckpkmn, 0,        puckpkmn, puckpkmn, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon", 0 ,0,0,egg_Unknown,0)

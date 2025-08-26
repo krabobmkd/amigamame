@@ -223,4 +223,4 @@ static DRIVER_INIT(lastfght)
 	// memory_region(REGION_CPU1)[0x00355]=0x40;
 }
 
-GAME(2000, lastfght, 0, lastfght, lastfght, lastfght, ROT0, "Subsino", "Last Fighting", GAME_NOT_WORKING|GAME_NO_SOUND,0)
+GAME(2000, lastfght, 0, lastfght, lastfght, lastfght, ROT0, "Subsino", "Last Fighting", GAME_NOT_WORKING|GAME_NO_SOUND,2,0,egg_Maze,0)

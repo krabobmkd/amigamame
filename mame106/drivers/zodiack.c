@@ -642,8 +642,8 @@ ROM_END
 
 
 
-GAME( 1983, zodiack,  0, zodiack, zodiack,  0, ROT270, "Orca (Esco Trading Co)", "Zodiack", GAME_IMPERFECT_COLORS ,2)	/* bullet color needs to be verified */
-GAME( 1983, dogfight, 0, zodiack, dogfight, 0, ROT270, "[Orca] Thunderbolt", "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS ,0)	/* bullet color needs to be verified */
-GAME( 1982, moguchan, 0, percuss, moguchan, 0, ROT270, "Orca (Eastern Commerce Inc. license) (bootleg?)",  /* this is in the ROM at $0b5c */ "Moguchan", GAME_WRONG_COLORS ,2)
-GAME( 1981, percuss,  0, percuss, percuss,  0, ROT270, "Orca", "The Percussor", 0 ,0)
-GAME( 1982, bounty,   0, percuss, bounty,   0, ROT180, "Orca", "The Bounty", 0 ,0)
+GAME( 1983, zodiack,  0, zodiack, zodiack,  0, ROT270, "Orca (Esco Trading Co)", "Zodiack", GAME_IMPERFECT_COLORS ,0,2,egg_ShootEmUp,0)	/* bullet color needs to be verified */
+GAME( 1983, dogfight, 0, zodiack, dogfight, 0, ROT270, "[Orca] Thunderbolt", "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS ,0,2,egg_ShootEmUp,0)	/* bullet color needs to be verified */
+GAME( 1982, moguchan, 0, percuss, moguchan, 0, ROT270, "Orca (Eastern Commerce Inc. license) (bootleg?)",  /* this is in the ROM at $0b5c */ "Moguchan", GAME_WRONG_COLORS ,0,2,egg_Maze,0)
+GAME( 1981, percuss,  0, percuss, percuss,  0, ROT270, "Orca", "The Percussor", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, bounty,   0, percuss, bounty,   0, ROT180, "Orca", "The Bounty", 0 ,0,2,egg_Driving,0)

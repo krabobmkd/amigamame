@@ -200,4 +200,4 @@ ROM_START( fortecar )
 ROM_END
 
 
-GAME( 19??, fortecar, 0, fortecar, fortecar, 0, ROT0, "unknown", "Forte Card",GAME_NO_SOUND|GAME_NOT_WORKING ,0)
+GAME( 19??, fortecar, 0, fortecar, fortecar, 0, ROT0, "unknown", "Forte Card",GAME_NO_SOUND|GAME_NOT_WORKING ,0,0,egg_Unknown,0)

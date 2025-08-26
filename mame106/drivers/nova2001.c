@@ -267,5 +267,5 @@ ROM_END
 
 
 
-GAME( 1983, nova2001, 0,        nova2001, nova2001, 0, ROT0, "UPL", "Nova 2001 (Japan)", 0 ,2)
-GAME( 1983, nov2001u, nova2001, nova2001, nova2001, 0, ROT0, "UPL (Universal license)", "Nova 2001 (US)", 0 ,2)
+GAME( 1983, nova2001, 0,        nova2001, nova2001, 0, ROT0, "UPL", "Nova 2001 (Japan)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1983, nov2001u, nova2001, nova2001, nova2001, 0, ROT0, "UPL (Universal license)", "Nova 2001 (US)", 0 ,0,2,egg_ShootEmUp,0)

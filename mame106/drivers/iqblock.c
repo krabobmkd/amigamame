@@ -466,7 +466,7 @@ static DRIVER_INIT( cabaret )
 
 
 
-GAME( 1993, iqblock, 0, iqblock, iqblock, iqblock, ROT0, "IGS", "IQ-Block", 0 ,0)
-GAME( 1993, grndtour, 0, iqblock, iqblock, grndtour, ROT0, "IGS", "Grand Tour", 0 ,0)
+GAME( 1993, iqblock, 0, iqblock, iqblock, iqblock, ROT0, "IGS", "IQ-Block", 0 ,2,0,egg_Puzzle,0)
+GAME( 1993, grndtour, 0, iqblock, iqblock, grndtour, ROT0, "IGS", "Grand Tour", 0 ,2,0,egg_Mature,0)
 
-GAME( 19??, cabaret, 0, cabaret, iqblock, cabaret, ROT0, "IGS", "Cabaret", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
+GAME( 19??, cabaret, 0, cabaret, iqblock, cabaret, ROT0, "IGS", "Cabaret", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Mature,0)

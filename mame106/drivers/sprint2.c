@@ -689,7 +689,7 @@ ROM_START( dominos )
 ROM_END
 
 
-GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint1, ROT0, "Atari", "Sprint 1", 0 ,1)
-GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2, ROT0, "Atari", "Sprint 2 (set 1)", 0 ,1)
-GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2, ROT0, "Atari", "Sprint 2 (set 2)", 0 ,1)
-GAME( 1977, dominos,  0,       dominos, dominos, dominos, ROT0, "Atari", "Dominos", 0 ,2)
+GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint1, ROT0, "Atari", "Sprint 1", 0 ,0,1,egg_Driving,0)
+GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2, ROT0, "Atari", "Sprint 2 (set 1)", 0 ,2,0,egg_Driving,0)
+GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2, ROT0, "Atari", "Sprint 2 (set 2)", 0 ,2,0,egg_Driving,0)
+GAME( 1977, dominos,  0,       dominos, dominos, dominos, ROT0, "Atari", "Dominos", 0 ,2,0,egg_Maze,0)

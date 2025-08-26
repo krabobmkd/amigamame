@@ -674,7 +674,7 @@ static DRIVER_INIT( thief )
 }
 
 
-GAME( 1980, sharkatt, 0,       sharkatt, sharkatt, 0,     ROT0, "Pacific Novelty", "Shark Attack", 0 ,2)
-GAME( 1981, thief,    0,       thief,    thief,    thief, ROT0, "Pacific Novelty", "Thief", 0 ,2)
-GAME( 1982, natodef,  0,       natodef,  natodef,  thief, ROT0, "Pacific Novelty", "NATO Defense" , 0 ,2)
-GAME( 1982, natodefa, natodef, natodef,  natodef,  thief, ROT0, "Pacific Novelty", "NATO Defense (alternate mazes)" , 0 ,2)
+GAME( 1980, sharkatt, 0,       sharkatt, sharkatt, 0,     ROT0, "Pacific Novelty", "Shark Attack", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, thief,    0,       thief,    thief,    thief, ROT0, "Pacific Novelty", "Thief", 0 ,0,2,egg_Maze,0)
+GAME( 1982, natodef,  0,       natodef,  natodef,  thief, ROT0, "Pacific Novelty", "NATO Defense" , 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, natodefa, natodef, natodef,  natodef,  thief, ROT0, "Pacific Novelty", "NATO Defense (alternate mazes)" , 0 ,0,2,egg_ShootEmUp,0)

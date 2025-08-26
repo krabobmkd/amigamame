@@ -433,4 +433,4 @@ DRIVER_INIT( galpani3 )
 	memset(galpani3_mcu_com, 0, 4 * sizeof( UINT16) );
 }
 
-GAME( 1995, galpani3, 0, galpani3, galpani3, galpani3, ROT90, "Kaneko", "Gals Panic 3", GAME_NOT_WORKING ,0)
+GAME( 1995, galpani3, 0, galpani3, galpani3, galpani3, ROT90, "Kaneko", "Gals Panic 3", GAME_NOT_WORKING ,0,0,egg_Unknown,0)

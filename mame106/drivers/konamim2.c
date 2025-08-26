@@ -354,8 +354,8 @@ static DRIVER_INIT( m2 )
 }
 
 
-GAME( 1997, polystar,	0,	m2, m2, polystar,		ROT0,	"Konami",	"Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
-GAME( 1997, totlvice,	0,	m2, m2, m2,				ROT0,	"Konami",	"Total Vice (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
-GAME( 1998, btltryst,	0,	m2,	m2,	btltryst,		ROT0,	"Konami",	"Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
-GAME( 1998, heatof11,	0,	m2,	m2,	m2,				ROT0,	"Konami",	"Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
-GAME( 1998, evilngt,	0,	m2,	m2,	m2,				ROT0,	"Konami",	"Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
+GAME( 1997, polystar,	0,	m2, m2, polystar,		ROT0,	"Konami",	"Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,2,0,egg_Flying,0)
+GAME( 1997, totlvice,	0,	m2, m2, m2,				ROT0,	"Konami",	"Total Vice (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1998, btltryst,	0,	m2,	m2,	btltryst,		ROT0,	"Konami",	"Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND ,2,0,egg_Fighter,0)
+GAME( 1998, heatof11,	0,	m2,	m2,	m2,				ROT0,	"Konami",	"Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,2,0,egg_sport_Soccer,0)
+GAME( 1998, evilngt,	0,	m2,	m2,	m2,				ROT0,	"Konami",	"Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Unknown,0)

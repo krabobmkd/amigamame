@@ -137,5 +137,5 @@ ROM_START( mastboyi )
 	ROM_LOAD( "7-rom.ic97", 0x40000, 0x20000, CRC(7818408f) SHA1(2a69688b6cda5baf2a45966dd86f10b2fcd54b66) )
 ROM_END
 
-GAME( 1991, mastboy,  0,          mastboy, mastboy, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", GAME_NO_SOUND|GAME_NOT_WORKING ,0)
-GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A)", GAME_NO_SOUND|GAME_NOT_WORKING ,0)
+GAME( 1991, mastboy,  0,          mastboy, mastboy, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", GAME_NO_SOUND|GAME_NOT_WORKING ,0,0,egg_Unknown,0)
+GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A)", GAME_NO_SOUND|GAME_NOT_WORKING ,2,0,egg_Quizz,0)

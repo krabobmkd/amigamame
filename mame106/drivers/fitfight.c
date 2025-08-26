@@ -1004,6 +1004,6 @@ static DRIVER_INIT( bbprot )
 
 /* GAME */
 
-GAME( 199?, fitfight, 0, fitfight, fitfight, fitfight, ROT0, "bootleg", "Fit of Fighting", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ,0)
-GAME( 199?, histryma, 0, fitfight, histryma, histryma, ROT0, "bootleg", "The History of Martial Arts", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ,0)
-GAME( 199?, bbprot,   0, bbprot,   bbprot,   bbprot,   ROT0, "<unknown>", "Untitled Fighter 'BB' (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ,0)
+GAME( 199?, fitfight, 0, fitfight, fitfight, fitfight, ROT0, "bootleg", "Fit of Fighting", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ,2,0,egg_Fighter,0)
+GAME( 199?, histryma, 0, fitfight, histryma, histryma, ROT0, "bootleg", "The History of Martial Arts", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ,2,0,egg_Fighter,0)
+GAME( 199?, bbprot,   0, bbprot,   bbprot,   bbprot,   ROT0, "<unknown>", "Untitled Fighter 'BB' (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ,0,1,egg_Fighter,0)

@@ -784,9 +784,9 @@ static DRIVER_INIT( soccer )
  *************************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT      MONITOR  */
-GAME( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb,  ROT0, "Atari", "Atari Football (revision 2)", 0 ,2)
-GAME( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb,  ROT0, "Atari", "Atari Football (revision 1)", 0 ,2)
-GAME( 1979, atarifb4, atarifb, atarifb4, atarifb4, atarifb4, ROT0, "Atari", "Atari Football (4 players)", 0 ,2)
-GAME( 1979, abaseb,   0,       abaseb,   abaseb,   abaseb,   ROT0, "Atari", "Atari Baseball (set 1)", 0 ,2)
-GAME( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   abaseb,   ROT0, "Atari", "Atari Baseball (set 2)", 0 ,2)
-GAME( 1980, soccer,   0,       soccer,   soccer,   soccer,   ROT0, "Atari", "Atari Soccer", 0 ,0)
+GAME( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb,  ROT0, "Atari", "Atari Football (revision 2)", 0 ,2,0,egg_sport_Football,0)
+GAME( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb,  ROT0, "Atari", "Atari Football (revision 1)", 0 ,2,0,egg_sport_Football,0)
+GAME( 1979, atarifb4, atarifb, atarifb4, atarifb4, atarifb4, ROT0, "Atari", "Atari Football (4 players)", 0 ,4,0,egg_sport_Football,0)
+GAME( 1979, abaseb,   0,       abaseb,   abaseb,   abaseb,   ROT0, "Atari", "Atari Baseball (set 1)", 0 ,2,0,egg_sport_Baseball,0)
+GAME( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   abaseb,   ROT0, "Atari", "Atari Baseball (set 2)", 0 ,2,0,egg_sport_Baseball,0)
+GAME( 1980, soccer,   0,       soccer,   soccer,   soccer,   ROT0, "Atari", "Atari Soccer", 0 ,4,0,egg_sport_Soccer,0)

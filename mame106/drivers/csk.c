@@ -667,5 +667,5 @@ static void init_cska(void)
 	}
 }
 
-GAME( 198?, csk227it, 0,        csk227it, csk227, cska, ROT0, "IGS", "Champion Skill (with Ability)", GAME_NO_SOUND ,0)               /* SU 062 */
-GAME( 198?, csk234it, csk227it, csk234it, csk234, cska, ROT0, "IGS", "Champion Skill (Ability, Poker & Symbols)", GAME_NO_SOUND ,0)   /* SU 062 */
+GAME( 198?, csk227it, 0,        csk227it, csk227, cska, ROT0, "IGS", "Champion Skill (with Ability)", GAME_NO_SOUND ,0,1,egg_Mature,0)               /* SU 062 */
+GAME( 198?, csk234it, csk227it, csk234it, csk234, cska, ROT0, "IGS", "Champion Skill (Ability, Poker & Symbols)", GAME_NO_SOUND ,0,1,egg_Mature,0)   /* SU 062 */

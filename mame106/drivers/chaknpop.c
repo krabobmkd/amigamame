@@ -356,4 +356,4 @@ ROM_END
 
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY              FULLNAME ) */
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop, ROT0,    "Taito Corporation", "Chack'n Pop", 0,0)
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop, ROT0,    "Taito Corporation", "Chack'n Pop", 0,0,2,egg_Platform,0)

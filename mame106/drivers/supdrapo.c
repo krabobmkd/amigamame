@@ -317,4 +317,4 @@ ROM_START( supdrapo )
 ROM_END
 
 
-GAME( 1983, supdrapo, 0, supdrapo, supdrapo, 0, ROT90, "Stern", "Super Draw Poker", GAME_NOT_WORKING ,0)
+GAME( 1983, supdrapo, 0, supdrapo, supdrapo, 0, ROT90, "Stern", "Super Draw Poker", GAME_NOT_WORKING ,0,1,egg_CardBattle,0)

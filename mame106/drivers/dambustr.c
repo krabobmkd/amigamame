@@ -152,5 +152,5 @@ static DRIVER_INIT(dambustr)
 	}
 }
 
-GAME( 19??, dambustr,  0,       dambustr,  dambustr,  dambustr, ROT90, "GAT", "Dambusters (set 1)",GAME_NOT_WORKING ,0)
-GAME( 19??, dambust ,  dambustr,       dambustr,  dambustr,  dambustr, ROT90, "GAT", "Dambusters (set 2)",GAME_NOT_WORKING ,0)
+GAME( 19??, dambustr,  0,       dambustr,  dambustr,  dambustr, ROT90, "GAT", "Dambusters (set 1)",GAME_NOT_WORKING ,0,2,egg_ShootEmUp,0)
+GAME( 19??, dambust ,  dambustr,       dambustr,  dambustr,  dambustr, ROT90, "GAT", "Dambusters (set 2)",GAME_NOT_WORKING ,0,2,egg_ShootEmUp,0)

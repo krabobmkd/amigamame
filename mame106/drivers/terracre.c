@@ -972,10 +972,10 @@ DRIVER_INIT( horekid )
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */
-GAME( 1985, terracre, 0,        ym3526,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", 0 ,2)
-GAME( 1985, terracrb, terracre, ym3526,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", 0 ,2)
-GAME( 1985, terracra, terracre, ym2203,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", 0 ,2)
-GAME( 1986, amazon,   0,        amazon,  amazon,   amazon,   ROT270,  "Nichibutsu", "Soldier Girl Amazon", 0 ,2)
-GAME( 1986, amatelas, amazon,   amazon,  amazon,   amatelas, ROT270,  "Nichibutsu", "Sei Senshi Amatelass", 0 ,2)
-GAME( 1987, horekid,  0,        amazon,  horekid,  horekid,  ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", 0 ,0)
-GAME( 1987, horekidb, horekid,  amazon,  horekid,  horekid,  ROT270,  "bootleg", "Kid no Hore Hore Daisakusen (bootleg)", 0 ,0)
+GAME( 1985, terracre, 0,        ym3526,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", 0 ,0,0,egg_Unknown,0)
+GAME( 1985, terracrb, terracre, ym3526,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", 0 ,0,0,egg_Unknown,0)
+GAME( 1985, terracra, terracre, ym2203,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", 0 ,0,0,egg_Unknown,0)
+GAME( 1986, amazon,   0,        amazon,  amazon,   amazon,   ROT270,  "Nichibutsu", "Soldier Girl Amazon", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1986, amatelas, amazon,   amazon,  amazon,   amatelas, ROT270,  "Nichibutsu", "Sei Senshi Amatelass", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1987, horekid,  0,        amazon,  horekid,  horekid,  ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", 0 ,0,2,egg_Maze,0)
+GAME( 1987, horekidb, horekid,  amazon,  horekid,  horekid,  ROT270,  "bootleg", "Kid no Hore Hore Daisakusen (bootleg)", 0 ,0,2,egg_Maze,0)

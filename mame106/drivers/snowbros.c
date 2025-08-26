@@ -2443,23 +2443,23 @@ static DRIVER_INIT( cookbib3 )
 }
 
 
-GAME( 1990, snowbros, 0,        snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 1)", 0 ,2)
-GAME( 1990, snowbroa, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 2)", 0 ,2)
-GAME( 1990, snowbrob, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 3)", 0 ,2)
-GAME( 1990, snowbroc, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 4)", 0 ,2)
-GAME( 1990, snowbroj, snowbros, snowbros, snowbroj, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (Japan)", 0 ,2)
-GAME( 1990, wintbob,  snowbros, wintbob,  snowbros, 0, ROT0, "bootleg", "The Winter Bobble", 0 ,2)
+GAME( 1990, snowbros, 0,        snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 1)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, snowbroa, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 2)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, snowbrob, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 3)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, snowbroc, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 4)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, snowbroj, snowbros, snowbros, snowbroj, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (Japan)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, wintbob,  snowbros, wintbob,  snowbros, 0, ROT0, "bootleg", "The Winter Bobble", 0 ,2,0,egg_Platform,0)
 
-GAME( 1995, honeydol, 0,        honeydol, honeydol, 0, ROT0, "Barko Corp.", "Honey Dolls", GAME_IMPERFECT_GRAPHICS ,0) // based on snowbros code..
-GAME( 1995, hyperpac, 0,        semicom,  hyperpac, hyperpac, ROT0, "SemiCom", "Hyper Pacman", 0 ,0)
-GAME( 1995, hyperpcb, hyperpac, semicom,  hyperpac, 0,        ROT0, "bootleg", "Hyper Pacman (bootleg)", 0 ,0)
-GAME( 1996, cookbib2, 0,        semiprot, cookbib2, cookbib2, ROT0, "SemiCom", "Cookie & Bibi 2", 0 ,0)
-GAME( 1996, toppyrap, 0,        semiprot, toppyrap, 0,        ROT0, "SemiCom", "Toppy & Rappy", 0 ,0)
-GAME( 1997, cookbib3, 0,        semiprot, cookbib3, cookbib3, ROT0, "SemiCom", "Cookie & Bibi 3", 0 ,0)
-GAME( 1997, 3in1semi, 0,        semiprot, moremore, 3in1semi, ROT0, "SemiCom", "XESS - The New Revolution (SemiCom 3-in-1)", 0 ,0)
-GAME( 1997, twinkle,  0,        semiprot, moremore, 0,        ROT0, "SemiCom", "Twinkle", 0 ,0)
-GAME( 1999, moremore, 0,        semiprot, moremore, moremorp, ROT0, "SemiCom / Exit", "More More", 0 ,0)
-GAME( 1999, moremorp, 0,        semiprot, moremore, moremorp, ROT0, "SemiCom / Exit", "More More Plus", 0 ,0)
-GAME( 1999, 4in1boot, 0,        _4in1,    4in1boot, 4in1boot, ROT0, "bootleg", "Puzzle King (bootleg)" , 0,0) // original is 1999, bootleg 2002?
-GAME( 2002, snowbro3, snowbros, snowbro3, snowbroj, snowbro3, ROT0, "bootleg", "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND ,2) // its basically snowbros code?...
-GAME( 1993, finalttr, 0,        finalttr, finalttr, 0,        ROT0, "Jeil Computer System", "Final Tetris", 0 ,0)
+GAME( 1995, honeydol, 0,        honeydol, honeydol, 0, ROT0, "Barko Corp.", "Honey Dolls", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Mature,0) // based on snowbros code..
+GAME( 1995, hyperpac, 0,        semicom,  hyperpac, hyperpac, ROT0, "SemiCom", "Hyper Pacman", 0 ,2,0,egg_Maze,0)
+GAME( 1995, hyperpcb, hyperpac, semicom,  hyperpac, 0,        ROT0, "bootleg", "Hyper Pacman (bootleg)", 0 ,2,0,egg_Maze,0)
+GAME( 1996, cookbib2, 0,        semiprot, cookbib2, cookbib2, ROT0, "SemiCom", "Cookie & Bibi 2", 0 ,2,0,egg_Puzzle,0)
+GAME( 1996, toppyrap, 0,        semiprot, toppyrap, 0,        ROT0, "SemiCom", "Toppy & Rappy", 0 ,2,0,egg_Platform,0)
+GAME( 1997, cookbib3, 0,        semiprot, cookbib3, cookbib3, ROT0, "SemiCom", "Cookie & Bibi 3", 0 ,2,0,egg_Puzzle,0)
+GAME( 1997, 3in1semi, 0,        semiprot, moremore, 3in1semi, ROT0, "SemiCom", "XESS - The New Revolution (SemiCom 3-in-1)", 0 ,2,0,egg_Compilation,0)
+GAME( 1997, twinkle,  0,        semiprot, moremore, 0,        ROT0, "SemiCom", "Twinkle", 0 ,2,0,egg_Maze,0)
+GAME( 1999, moremore, 0,        semiprot, moremore, moremorp, ROT0, "SemiCom / Exit", "More More", 0 ,2,0,egg_Compilation,0)
+GAME( 1999, moremorp, 0,        semiprot, moremore, moremorp, ROT0, "SemiCom / Exit", "More More Plus", 0 ,2,0,egg_Compilation,0)
+GAME( 1999, 4in1boot, 0,        _4in1,    4in1boot, 4in1boot, ROT0, "bootleg", "Puzzle King (bootleg)" , 0,2,0,egg_Compilation,0) // original is 1999, bootleg 2002?
+GAME( 2002, snowbro3, snowbros, snowbro3, snowbroj, snowbro3, ROT0, "bootleg", "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND ,2,0,egg_Platform,0) // its basically snowbros code?...
+GAME( 1993, finalttr, 0,        finalttr, finalttr, 0,        ROT0, "Jeil Computer System", "Final Tetris", 0 ,2,0,egg_Puzzle,0)

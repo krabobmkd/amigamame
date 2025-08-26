@@ -508,7 +508,7 @@ ROM_START( crzrallg )
 ROM_END
 
 
-GAME( 1984, holeland, 0,        holeland, holeland, 0, ROT0,   "Tecfri", "Hole Land", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1985, crzrally, 0,        crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 1)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1985, crzralla, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1985, crzrallg, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1984, holeland, 0,        holeland, holeland, 0, ROT0,   "Tecfri", "Hole Land", GAME_IMPERFECT_GRAPHICS ,0,2,egg_Shooter,0)
+GAME( 1985, crzrally, 0,        crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 1)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_Driving,0)
+GAME( 1985, crzralla, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_Driving,0)
+GAME( 1985, crzrallg, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_Driving,0)

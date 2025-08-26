@@ -3482,51 +3482,51 @@ static DRIVER_INIT(konamigx)
 /*     year  ROM       parent    machine   inp       init */
 
 /* dummy parent for the BIOS */
-GAME( 1994, konamigx, 0, konamigx, konamigx, konamigx, ROT0, "Konami", "System GX", NOT_A_DRIVER ,0)
+GAME( 1994, konamigx, 0, konamigx, konamigx, konamigx, ROT0, "Konami", "System GX", NOT_A_DRIVER ,0,0,egg_Unknown,0)
 
 
 /* Type 1: standard with an add-on 53936 on the ROM board, analog inputs, */
 /* and optional LAN capability (only on Racin' Force - chips aren't present on the golf games) */
 /* needs the ROZ layer to be playable */
-GAME( 1994, racinfrc, konamigx, racinfrc,  racinfrc, konamigx, ROT0, "Konami", "Racin' Force (ver UAB)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  ,0)
-GAME( 1994, opengolf, konamigx, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  ,0)
-GAME( 1994, opengol2, opengolf, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  ,0)
-GAME( 1994, ggreats2, opengolf, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0)
+GAME( 1994, racinfrc, konamigx, racinfrc,  racinfrc, konamigx, ROT0, "Konami", "Racin' Force (ver UAB)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  ,0,0,egg_Unknown,0)
+GAME( 1994, opengolf, konamigx, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  ,0,0,egg_sport_Golf,0)
+GAME( 1994, opengol2, opengolf, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  ,0,0,egg_sport_Golf,0)
+GAME( 1994, ggreats2, opengolf, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0,2,egg_sport_Golf,0)
 
 
 /* Type 2: totally stock, sometimes with funny protection chips on the ROM board */
 /* these games work and are playable with minor graphics glitches */
-GAME( 1994, le2,      konamigx, le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1994, le2u,     le2,      le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1994, le2j,     le2,      le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver JAA)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING,0)
-GAME( 1994, gokuparo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1994, puzldama, konamigx, konamigx, puzldama, konamigx, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1995, tbyahhoo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1995, tkmmpzdm, konamigx, konamigx_6bpp, puzldama, konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1995, dragoona, konamigx, dragoonj, dragoonj, konamigx, ROT0, "Konami", "Dragoon Might (ver AAB)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1995, dragoonj, dragoona, dragoonj, dragoonj, konamigx, ROT0, "Konami", "Dragoon Might (ver JAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1996, sexyparo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1996, tokkae,   konamigx, konamigx_6bpp, puzldama, konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1994, le2,      konamigx, le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_LightGuns,0)
+GAME( 1994, le2u,     le2,      le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_LightGuns,0)
+GAME( 1994, le2j,     le2,      le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver JAA)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING,2,0,egg_LightGuns,0)
+GAME( 1994, gokuparo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_ShootEmUp,0)
+GAME( 1994, puzldama, konamigx, konamigx, puzldama, konamigx, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Puzzle,0)
+GAME( 1995, tbyahhoo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_ShootEmUp,0)
+GAME( 1995, tkmmpzdm, konamigx, konamigx_6bpp, puzldama, konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Puzzle,0)
+GAME( 1995, dragoona, konamigx, dragoonj, dragoonj, konamigx, ROT0, "Konami", "Dragoon Might (ver AAB)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
+GAME( 1995, dragoonj, dragoona, dragoonj, dragoonj, konamigx, ROT0, "Konami", "Dragoon Might (ver JAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
+GAME( 1996, sexyparo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Mature,0)
+GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Compilation,0)
+GAME( 1996, tokkae,   konamigx, konamigx_6bpp, puzldama, konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Miscellaneous,0)
 /* protection controls player ship direction in attract mode - doesn't impact playability */
-GAME( 1996, salmndr2, konamigx, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION ,0)
+GAME( 1996, salmndr2, konamigx, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION ,2,0,egg_ShootEmUp,0)
 /* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
-GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1997, winspikj, winspike, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS ,2,0,egg_sport_Volleyball,0)
+GAME( 1997, winspikj, winspike, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS ,2,0,egg_sport_Volleyball,0)
 
 /* this game is unplayable due to protection */
-GAME( 1994, fantjour, gokuparo, konamigx, gokuparo, konamigx, ROT0, "Konami", "Fantastic Journey", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,0)
+GAME( 1994, fantjour, gokuparo, konamigx, gokuparo, konamigx, ROT0, "Konami", "Fantastic Journey", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,2,0,egg_ShootEmUp,0)
 
 
 /* Type 3: dual monitor output and 53936 on the ROM board, external palette RAM */
-GAME( 1994, soccerss, konamigx, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver EAA)", GAME_NOT_WORKING ,0)
-GAME( 1994, soccersj, soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAA)", GAME_NOT_WORKING ,0)
-GAME( 1994, soccersa, soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver AAA)", GAME_NOT_WORKING ,0)
+GAME( 1994, soccerss, konamigx, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver EAA)", GAME_NOT_WORKING ,4,0,egg_sport_Soccer,0)
+GAME( 1994, soccersj, soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAA)", GAME_NOT_WORKING ,4,0,egg_sport_Soccer,0)
+GAME( 1994, soccersa, soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver AAA)", GAME_NOT_WORKING ,4,0,egg_sport_Soccer,0)
 
 
 /* Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection */
-GAME( 1996, vsnetscr, konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,0)
-GAME( 1996, vsnetscj, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,0)
-GAME( 1996, rungun2,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,0)
-GAME( 1996, slamdnk2, rungun2,  gxtype4, type3, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,0)
-GAME( 1996, rushhero, konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  ,0)
+GAME( 1996, vsnetscr, konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,0,0,egg_Unknown,0)
+GAME( 1996, vsnetscj, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,0,0,egg_Unknown,0)
+GAME( 1996, rungun2,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,4,0,egg_sport_Basketball,0)
+GAME( 1996, slamdnk2, rungun2,  gxtype4, type3, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ,4,0,egg_sport_Basketball,0)
+GAME( 1996, rushhero, konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  ,4,0,egg_sport_Football,0)

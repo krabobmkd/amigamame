@@ -603,5 +603,5 @@ DRIVER_INIT( magicstk )
 	yoffset = -5;
 }
 
-GAME( 1994, powerbal, 0, powerbal, powerbal, powerbal, ROT0, "Playmark", "Power Balls", 0 ,0)
-GAME( 1995, magicstk, 0, magicstk, magicstk, magicstk, ROT0, "Playmark", "Magic Sticks", 0 ,0)
+GAME( 1994, powerbal, 0, powerbal, powerbal, powerbal, ROT0, "Playmark", "Power Balls", 0 ,2,0,egg_BallNPaddles,0)
+GAME( 1995, magicstk, 0, magicstk, magicstk, magicstk, ROT0, "Playmark", "Magic Sticks", 0 ,0,1,egg_Miscellaneous,0)

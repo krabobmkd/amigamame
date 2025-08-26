@@ -1176,14 +1176,14 @@ static DRIVER_INIT( turtship ) { sidearms_gameid = 1; }
 static DRIVER_INIT( dyger    ) { sidearms_gameid = 2; }
 static DRIVER_INIT( whizz    ) { sidearms_gameid = 3; }
 
-GAME( 1986, sidearms, 0,        sidearms, sidearms, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (World)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1986, sidearmr, sidearms, sidearms, sidearms, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1986, sidearjp, sidearms, sidearms, sidearms, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (Japan)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1988, turtship, 0,        turtship, turtship, turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", 0 ,0)
-GAME( 1988, turtshik, turtship, turtship, turtship, turtship, ROT0,   "Philko", "Turtle Ship (Korea)", 0 ,0)
-GAME( 1989, dyger,    0,        turtship, dyger,    dyger,    ROT270, "Philko", "Dyger (Korea set 1)", 0 ,0)
-GAME( 1989, dygera,   dyger,    turtship, dyger,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", 0 ,0)
-GAME( 1989, twinfalc, 0,        whizz, 	  whizz,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", 0 ,0)
-GAME( 1989, whizz,    twinfalc, whizz, 	  whizz,    whizz,    ROT0,   "Philko", "Whizz", 0 ,0)
+GAME( 1986, sidearms, 0,        sidearms, sidearms, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (World)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_ShootEmUp,0)
+GAME( 1986, sidearmr, sidearms, sidearms, sidearms, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_ShootEmUp,0)
+GAME( 1986, sidearjp, sidearms, sidearms, sidearms, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (Japan)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_ShootEmUp,0)
+GAME( 1988, turtship, 0,        turtship, turtship, turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1988, turtshik, turtship, turtship, turtship, turtship, ROT0,   "Philko", "Turtle Ship (Korea)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1989, dyger,    0,        turtship, dyger,    dyger,    ROT270, "Philko", "Dyger (Korea set 1)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1989, dygera,   dyger,    turtship, dyger,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1989, twinfalc, 0,        whizz, 	  whizz,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1989, whizz,    twinfalc, whizz, 	  whizz,    whizz,    ROT0,   "Philko", "Whizz", 0 ,2,0,egg_ShootEmUp,0)
 
 

@@ -324,4 +324,4 @@ ROM_START( orbit )
 ROM_END
 
 
-GAME( 1978, orbit, 0, orbit, orbit, 0, 0, "Atari", "Orbit", 0 ,0)
+GAME( 1978, orbit, 0, orbit, orbit, 0, 0, "Atari", "Orbit", 0 ,2,0,egg_ShootEmUp,0)

@@ -664,6 +664,6 @@ ROM_START( ultratnk )
 ROM_END
 
 
-GAME( 1977, sprint4,  0,       sprint4,  sprint4,  0, ROT180, "Atari", "Sprint 4 (set 1)", 0 ,0) /* large cars */
-GAME( 1977, sprint4a, sprint4, sprint4,  sprint4,  0, ROT180, "Atari", "Sprint 4 (set 2)", 0 ,0) /* small cars */
-GAME( 1978, ultratnk, 0,       ultratnk, ultratnk, 0, ROT0,   "Atari", "Ultra Tank",       0 ,2)
+GAME( 1977, sprint4,  0,       sprint4,  sprint4,  0, ROT180, "Atari", "Sprint 4 (set 1)", 0 ,0,0,egg_Unknown,0) /* large cars */
+GAME( 1977, sprint4a, sprint4, sprint4,  sprint4,  0, ROT180, "Atari", "Sprint 4 (set 2)", 0 ,4,0,egg_Driving,0) /* small cars */
+GAME( 1978, ultratnk, 0,       ultratnk, ultratnk, 0, ROT0,   "Atari", "Ultra Tank",       0 ,2,0,egg_ShootEmUp,0)

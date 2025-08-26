@@ -291,5 +291,5 @@ ROM_START( farmer )
 	ROM_LOAD( "prom17_2", 0x0100,  0x0100, CRC(f3c55174) SHA1(936c5432c4fccfcb2601c1e08b98d5509202fe5b) ) /* unknown */
 ROM_END
 
-GAME( 1985, ikki,   0,    ikki, ikki, 0, ROT0, "Sun Electronics", "Ikki (Japan)", 0 ,0)
-GAME( 1985, farmer, ikki, ikki, ikki, 0, ROT0, "Sun Electronics", "Farmers Rebellion", 0 ,0)
+GAME( 1985, ikki,   0,    ikki, ikki, 0, ROT0, "Sun Electronics", "Ikki (Japan)", 0 ,2,0,egg_Maze,0)
+GAME( 1985, farmer, ikki, ikki, ikki, 0, ROT0, "Sun Electronics", "Farmers Rebellion", 0 ,2,0,egg_Maze,0)

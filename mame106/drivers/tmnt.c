@@ -4147,55 +4147,55 @@ static DRIVER_INIT( cuebrckj )
 	shuffle(memory_region(REGION_GFX2),memory_region_length(REGION_GFX2));
 }
 
-GAME( 1989, cuebrckj, cuebrick, cuebrckj, mia,      cuebrckj, ROT0,  "Konami", "Cue Brick (World version D)", 0 ,0)
+GAME( 1989, cuebrckj, cuebrick, cuebrckj, mia,      cuebrckj, ROT0,  "Konami", "Cue Brick (World version D)", 0 ,0,2,egg_Puzzle,0)
 
-GAME( 1989, mia,      0,        mia,      mia,      mia,      ROT0,  "Konami", "M.I.A. - Missing in Action (version T)", 0 ,0)
-GAME( 1989, mia2,     mia,      mia,      mia,      mia,      ROT0,  "Konami", "M.I.A. - Missing in Action (version S)", 0 ,0)
+GAME( 1989, mia,      0,        mia,      mia,      mia,      ROT0,  "Konami", "M.I.A. - Missing in Action (version T)", 0 ,2,0,egg_Platform,0)
+GAME( 1989, mia2,     mia,      mia,      mia,      mia,      ROT0,  "Konami", "M.I.A. - Missing in Action (version S)", 0 ,2,0,egg_Platform,0)
 
-GAME( 1989, tmnt,     0,        tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (World 4 Players)", 0 ,4)
-GAME( 1989, tmntu,    tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 1)", 0 ,4)
-GAME( 1989, tmntua,   tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 2)", 0 ,4)
-GAME( 1989, tmht,     tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 4 Players)", 0 ,4)
-GAME( 1990, tmntj,    tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players)", 0 ,4)
-GAME( 1989, tmht2p,   tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 2 Players)", 0 ,4)
-GAME( 1990, tmnt2pj,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players)", 0 ,4)
-GAME( 1989, tmnt2po,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players)", 0 ,4)
+GAME( 1989, tmnt,     0,        tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (World 4 Players)", 0 ,4,0,egg_BeatNUp,0)
+GAME( 1989, tmntu,    tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 1)", 0 ,4,0,egg_BeatNUp,0)
+GAME( 1989, tmntua,   tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 2)", 0 ,4,0,egg_BeatNUp,0)
+GAME( 1989, tmht,     tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 4 Players)", 0 ,4,0,egg_BeatNUp,0)
+GAME( 1990, tmntj,    tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players)", 0 ,4,0,egg_BeatNUp,0)
+GAME( 1989, tmht2p,   tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 2 Players)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1990, tmnt2pj,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1989, tmnt2po,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players)", 0 ,2,0,egg_BeatNUp,0)
 
-GAME( 1990, punkshot, 0,        punkshot, punkshot, gfx,      ROT0,  "Konami", "Punk Shot (US 4 Players)", 0 ,2)
-GAME( 1990, punksht2, punkshot, punkshot, punksht2, gfx,      ROT0,  "Konami", "Punk Shot (US 2 Players)", 0 ,2)
-GAME( 1990, punkshtj, punkshot, punkshot, punksht2, gfx,      ROT0,  "Konami", "Punk Shot (Japan 2 Players)", 0 ,2)
+GAME( 1990, punkshot, 0,        punkshot, punkshot, gfx,      ROT0,  "Konami", "Punk Shot (US 4 Players)", 0 ,4,0,egg_sport_Basketball,0)
+GAME( 1990, punksht2, punkshot, punkshot, punksht2, gfx,      ROT0,  "Konami", "Punk Shot (US 2 Players)", 0 ,4,0,egg_sport_Basketball,0)
+GAME( 1990, punkshtj, punkshot, punkshot, punksht2, gfx,      ROT0,  "Konami", "Punk Shot (Japan 2 Players)", 0 ,4,0,egg_sport_Basketball,0)
 
-GAME( 1990, lgtnfght, 0,        lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Lightning Fighters (World)", 0 ,0)
-GAME( 1990, lgtnfghu, lgtnfght, lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Lightning Fighters (US)", 0 ,0)
-GAME( 1990, trigon,   lgtnfght, lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Trigon (Japan)", 0 ,0)
+GAME( 1990, lgtnfght, 0,        lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Lightning Fighters (World)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1990, lgtnfghu, lgtnfght, lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Lightning Fighters (US)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1990, trigon,   lgtnfght, lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Trigon (Japan)", 0 ,2,0,egg_ShootEmUp,0)
 
-GAME( 1991, blswhstl, 0,        detatwin, detatwin, gfx,      ROT90, "Konami", "Bells & Whistles (Version L)", 0 ,2)
-GAME( 1991, detatwin, blswhstl, detatwin, detatwin, gfx,      ROT90, "Konami", "Detana!! Twin Bee (Japan ver. J)", 0 ,2)
+GAME( 1991, blswhstl, 0,        detatwin, detatwin, gfx,      ROT90, "Konami", "Bells & Whistles (Version L)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1991, detatwin, blswhstl, detatwin, detatwin, gfx,      ROT90, "Konami", "Detana!! Twin Bee (Japan ver. J)", 0 ,2,0,egg_ShootEmUp,0)
 
-GAME( 1991, glfgreat, 0,        glfgreat, glfgreat, glfgreat, ROT0,  "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,4)
-GAME( 1991, glfgretj, glfgreat, glfgreat, glfgreat, glfgreat, ROT0,  "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,4)
+GAME( 1991, glfgreat, 0,        glfgreat, glfgreat, glfgreat, ROT0,  "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,0,4,egg_sport_Golf,0)
+GAME( 1991, glfgretj, glfgreat, glfgreat, glfgreat, glfgreat, ROT0,  "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,0,4,egg_sport_Golf,0)
 
-GAME( 1991, tmnt2,    0,        tmnt2,    ssridr4p, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", GAME_UNEMULATED_PROTECTION ,4) // ver. UAA
-GAME( 1991, tmnt22p,  tmnt2,    tmnt2,    ssriders, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", GAME_UNEMULATED_PROTECTION ,4) // ver. UDA
-GAME( 1991, tmnt2a,   tmnt2,    tmnt2,    ssrid4ps, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", GAME_UNEMULATED_PROTECTION ,4) // ver. ADA
+GAME( 1991, tmnt2,    0,        tmnt2,    ssridr4p, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", GAME_UNEMULATED_PROTECTION ,4,0,egg_BeatNUp,0) // ver. UAA
+GAME( 1991, tmnt22p,  tmnt2,    tmnt2,    ssriders, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", GAME_UNEMULATED_PROTECTION ,4,0,egg_BeatNUp,0) // ver. UDA
+GAME( 1991, tmnt2a,   tmnt2,    tmnt2,    ssrid4ps, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", GAME_UNEMULATED_PROTECTION ,4,0,egg_BeatNUp,0) // ver. ADA
 
-GAME( 1993, qgakumon, 0,        tmnt2,    qgakumon, gfx,      ROT0,  "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", 0 ,0)
+GAME( 1993, qgakumon, 0,        tmnt2,    qgakumon, gfx,      ROT0,  "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", 0 ,2,0,egg_Quizz,0)
 
-GAME( 1991, ssriders, 0,        ssriders, ssridr4p, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAC)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, ssrdrebd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBD)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, ssrdrebc, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBC)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, ssrdruda, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver UDA)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, ssrdreaa, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAA)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, ssrdruac, ssriders, ssriders, ssridr4p, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver UAC)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, ssrdrubc, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver UBC)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, ssrdrabd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, ssrdradd, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, ssrdrjbd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1991, sunsetbl, ssriders, ssridersbl, ssridbl, gfx,     ROT0,  "Konami", "Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS ,4)
+GAME( 1991, ssriders, 0,        ssriders, ssridr4p, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAC)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, ssrdrebd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBD)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, ssrdrebc, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBC)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, ssrdruda, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver UDA)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, ssrdreaa, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAA)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, ssrdruac, ssriders, ssriders, ssridr4p, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver UAC)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, ssrdrubc, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver UBC)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, ssrdrabd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, ssrdradd, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, ssrdrjbd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
+GAME( 1991, sunsetbl, ssriders, ssridersbl, ssridbl, gfx,     ROT0,  "Konami", "Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS ,4,0,egg_Platform,0)
 
-GAME( 1991, thndrx2,  0,        thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (Japan)", 0 ,0)
-GAME( 1991, thndrx2a, thndrx2,  thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (Asia)", 0 ,0)
+GAME( 1991, thndrx2,  0,        thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (Japan)", 0 ,0,0,egg_Unknown,0)
+GAME( 1991, thndrx2a, thndrx2,  thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (Asia)", 0 ,2,0,egg_ShootEmUp,0)
 
-GAME( 1993, prmrsocr, 0,        prmrsocr, prmrsocr, glfgreat, ROT0,  "Konami", "Premier Soccer (ver EAB)", 0 ,0)
-GAME( 1993, prmrsocj, prmrsocr, prmrsocr, prmrsocr, glfgreat, ROT0,  "Konami", "Premier Soccer (ver JAB)", 0 ,0)
+GAME( 1993, prmrsocr, 0,        prmrsocr, prmrsocr, glfgreat, ROT0,  "Konami", "Premier Soccer (ver EAB)", 0 ,2,0,egg_sport_Soccer,0)
+GAME( 1993, prmrsocj, prmrsocr, prmrsocr, prmrsocr, glfgreat, ROT0,  "Konami", "Premier Soccer (ver JAB)", 0 ,2,0,egg_sport_Soccer,0)
 

@@ -361,6 +361,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1984, mikie,   0,     mikie, mikie, 0, ROT270, "Konami", "Mikie", 0 ,0)
-GAME( 1984, mikiej,  mikie, mikie, mikie, 0, ROT270, "Konami", "Shinnyuushain Tooru-kun", 0 ,0)
-GAME( 1984, mikiehs, mikie, mikie, mikie, 0, ROT270, "Konami", "Mikie (High School Graffiti)", 0 ,0)
+GAME( 1984, mikie,   0,     mikie, mikie, 0, ROT270, "Konami", "Mikie", 0 ,0,2,egg_Maze,0)
+GAME( 1984, mikiej,  mikie, mikie, mikie, 0, ROT270, "Konami", "Shinnyuushain Tooru-kun", 0 ,0,2,egg_Maze,0)
+GAME( 1984, mikiehs, mikie, mikie, mikie, 0, ROT270, "Konami", "Mikie (High School Graffiti)", 0 ,0,2,egg_Maze,0)

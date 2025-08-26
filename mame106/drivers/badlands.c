@@ -529,4 +529,4 @@ static DRIVER_INIT( badlands )
  *
  *************************************/
 
-GAME( 1989, badlands, 0, badlands, badlands, badlands, ROT0, "Atari Games", "Bad Lands", 0 ,2)
+GAME( 1989, badlands, 0, badlands, badlands, badlands, ROT0, "Atari Games", "Bad Lands", 0 ,2,0,egg_Driving,0)

@@ -132,5 +132,5 @@ ROM_START( dorachan )
 	ROM_LOAD( "d14.rom",    0x0000, 0x400, CRC(c0d3ee84) SHA1(f2207c685ce8d5144a373c28f11d2cebf9518b65) ) /* color map ? */
 ROM_END
 
-GAME( 1980, dorachan, 0, dorachan, dorachan, 0, ROT90, "Craul Denshi", "Dorachan",GAME_NO_SOUND,0)
+GAME( 1980, dorachan, 0, dorachan, dorachan, 0, ROT90, "Craul Denshi", "Dorachan",GAME_NO_SOUND,0,2,egg_Maze,0)
 

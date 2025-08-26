@@ -440,5 +440,5 @@ ROM_START( spbactnj )
 	ROM_LOAD( "b-u111",  0x40000, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
 ROM_END
 
-GAME( 1991, spbactn, 0,        spbactn, spbactn, 0, ROT90, "Tecmo", "Super Pinball Action (US)", GAME_IMPERFECT_GRAPHICS ,1)
-GAME( 1991, spbactnj, spbactn, spbactn, spbactn, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)", GAME_IMPERFECT_GRAPHICS ,1)
+GAME( 1991, spbactn, 0,        spbactn, spbactn, 0, ROT90, "Tecmo", "Super Pinball Action (US)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Mature,0)
+GAME( 1991, spbactnj, spbactn, spbactn, spbactn, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Mature,0)

@@ -219,4 +219,4 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1976, nitedrvr, 0, nitedrvr, nitedrvr, 0, ROT0, "Atari", "Night Driver", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE,0)
+GAME( 1976, nitedrvr, 0, nitedrvr, nitedrvr, 0, ROT0, "Atari", "Night Driver", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE,0,1,egg_Driving,0)

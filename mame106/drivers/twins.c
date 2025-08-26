@@ -210,4 +210,4 @@ ROM_START( twins )
 	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x080000, CRC(8a5392f4) SHA1(e6a2ecdb775138a87d27aa4ad267bdec33c26baa) )
 ROM_END
 
-GAME( 1994, twins, 0, twins, twins, 0, ROT0, "Electronic Devices", "Twins", 0 ,0)
+GAME( 1994, twins, 0, twins, twins, 0, ROT0, "Electronic Devices", "Twins", 0 ,0,0,egg_Unknown,0)

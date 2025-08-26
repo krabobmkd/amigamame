@@ -339,4 +339,4 @@ ROM_START( hexion )
 ROM_END
 
 
-GAME( 1992, hexion, 0, hexion, hexion, 0, ROT0, "Konami", "Hexion (Japan)", 0 ,0)
+GAME( 1992, hexion, 0, hexion, hexion, 0, ROT0, "Konami", "Hexion (Japan)", 0 ,2,0,egg_Puzzle,0)

@@ -580,9 +580,9 @@ DRIVER_INIT( a600xl )
 	memcpy( memory_region(REGION_CPU1) + 0x5000, memory_region(REGION_CPU1) + 0xd000, 0x800 );
 }
 
-GAME( 1984, maxaflex, 0,		  a600xl, a600xl, a600xl, ROT0, "Exidy", "Max-A-Flex", NOT_A_DRIVER ,0)
-GAME( 1982, mf_achas, maxaflex,  a600xl, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Astro Chase (Max-A-Flex)", 0 ,0)
-GAME( 1983, mf_brist, maxaflex,  a600xl, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Bristles (Max-A-Flex)", 0 ,0)
-GAME( 1983, mf_flip,  maxaflex,  a600xl, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Flip & Flop (Max-A-Flex)", 0 ,0)
-GAME( 1984, mf_bdash, maxaflex,  a600xl, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Boulder Dash (Max-A-Flex)", 0 ,0)
+GAME( 1984, maxaflex, 0,		  a600xl, a600xl, a600xl, ROT0, "Exidy", "Max-A-Flex", NOT_A_DRIVER ,0,0,egg_Unknown,0)
+GAME( 1982, mf_achas, maxaflex,  a600xl, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Astro Chase (Max-A-Flex)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1983, mf_brist, maxaflex,  a600xl, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Bristles (Max-A-Flex)", 0 ,0,1,egg_Platform,0)
+GAME( 1983, mf_flip,  maxaflex,  a600xl, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Flip & Flop (Max-A-Flex)", 0 ,0,1,egg_Platform,0)
+GAME( 1984, mf_bdash, maxaflex,  a600xl, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Boulder Dash (Max-A-Flex)", 0 ,0,1,egg_Maze,0)
 

@@ -333,6 +333,6 @@ ROM_START( labyrunk )
 ROM_END
 
 
-GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, 0, ROT90, "Konami", "Trick Trap (World?)", 0 ,0)
-GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, 0, ROT90, "Konami", "Labyrinth Runner (Japan)", 0 ,0)
-GAME( 1987, labyrunk, tricktrp, labyrunr, labyrunr, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", 0 ,0)
+GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, 0, ROT90, "Konami", "Trick Trap (World?)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, 0, ROT90, "Konami", "Labyrinth Runner (Japan)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1987, labyrunk, tricktrp, labyrunr, labyrunr, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", 0 ,0,2,egg_ShootEmUp,0)

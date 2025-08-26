@@ -382,5 +382,5 @@ ROM_START( kickboy )
 	ROM_LOAD( "proms", 0x0000, 0x0020, NO_DUMP )
 ROM_END
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_WRONG_COLORS | GAME_NO_SOUND ,0)
-GAME( 1983, kickboy,  0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Kick Boy", GAME_WRONG_COLORS | GAME_NO_SOUND ,0)
+GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_WRONG_COLORS | GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1983, kickboy,  0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Kick Boy", GAME_WRONG_COLORS | GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)

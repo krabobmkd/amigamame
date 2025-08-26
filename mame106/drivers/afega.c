@@ -1920,14 +1920,14 @@ static DRIVER_INIT( twinactn )
 
 ***************************************************************************/
 
-GAME( 1995, twinactn, 0,        twinactn, twinactn, twinactn, ROT0,               "Afega",    "Twin Action",                      0 ,0)
-GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270,             "Afega",    "Red Hawk (US)",                    GAME_NOT_WORKING ,0)
-GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,               "bootleg",  "Red Hawk (bootleg)",               GAME_NOT_WORKING ,0)
-GAME( 1998, stagger1, 0,        stagger1, stagger1, 0,        ROT270,             "Afega",    "Stagger I (Japan)",                GAME_NOT_WORKING ,0)
-GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, grdnstrm, ROT270,             "Afega",    "Sen Jin - Guardian Storm (Korea)", GAME_NOT_WORKING ,0)
-GAME( 1998, bubl2000, 0,        bubl2000, bubl2000, bubl2000, ROT0,               "Tuning",   "Bubble 2000",                      0 ,0) // on a tuning board (bootleg?)
-GAME( 1998, hotbubl,  bubl2000, bubl2000, bubl2000, bubl2000, ROT0,               "Pandora",  "Hot Bubble" ,                      0 ,0) // on an afega board ..
-GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,               "Afega",    "Pop's Pop's",                      0 ,0)
-GAME( 2000, mangchi,  0,        bubl2000, mangchi,  bubl2000, ROT0,               "Afega",    "Mang-Chi",                         0 ,0)
-GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "Yonatech", "Spectrum 2000 (Euro)",             GAME_NOT_WORKING ,0)
-GAME( 2001, firehawk, 0,        firehawk, firehawk, 0,        ORIENTATION_FLIP_Y, "ESD",      "Fire Hawk",                        GAME_NOT_WORKING ,0)
+GAME( 1995, twinactn, 0,        twinactn, twinactn, twinactn, ROT0,               "Afega",    "Twin Action",                      0 ,2,0,egg_ShootEmUp,0)
+GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270,             "Afega",    "Red Hawk (US)",                    GAME_NOT_WORKING ,2,0,egg_ShootEmUp,0)
+GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,               "bootleg",  "Red Hawk (bootleg)",               GAME_NOT_WORKING ,2,0,egg_ShootEmUp,0)
+GAME( 1998, stagger1, 0,        stagger1, stagger1, 0,        ROT270,             "Afega",    "Stagger I (Japan)",                GAME_NOT_WORKING ,2,0,egg_ShootEmUp,0)
+GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, grdnstrm, ROT270,             "Afega",    "Sen Jin - Guardian Storm (Korea)", GAME_NOT_WORKING ,0,0,egg_Unknown,0)
+GAME( 1998, bubl2000, 0,        bubl2000, bubl2000, bubl2000, ROT0,               "Tuning",   "Bubble 2000",                      0 ,2,0,egg_Mature,0) // on a tuning board (bootleg?)
+GAME( 1998, hotbubl,  bubl2000, bubl2000, bubl2000, bubl2000, ROT0,               "Pandora",  "Hot Bubble" ,                      0 ,2,0,egg_Mature,0) // on an afega board ..
+GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,               "Afega",    "Pop's Pop's",                      0 ,0,2,egg_Quizz,0)
+GAME( 2000, mangchi,  0,        bubl2000, mangchi,  bubl2000, ROT0,               "Afega",    "Mang-Chi",                         0 ,2,0,egg_Maze,0)
+GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "Yonatech", "Spectrum 2000 (Euro)",             GAME_NOT_WORKING ,0,0,egg_Unknown,0)
+GAME( 2001, firehawk, 0,        firehawk, firehawk, 0,        ORIENTATION_FLIP_Y, "ESD",      "Fire Hawk",                        GAME_NOT_WORKING ,2,0,egg_ShootEmUp,0)

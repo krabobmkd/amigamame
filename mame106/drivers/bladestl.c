@@ -519,5 +519,5 @@ ROM_END
 
 
 
-GAME( 1987, bladestl, 0,        bladestl, bladestl, 0, ROT90, "Konami", "Blades of Steel (version T)", 0 ,2)
-GAME( 1987, bladstle, bladestl, bladestl, bladstle, 0, ROT90, "Konami", "Blades of Steel (version E)", 0 ,2)
+GAME( 1987, bladestl, 0,        bladestl, bladestl, 0, ROT90, "Konami", "Blades of Steel (version T)", 0 ,2,0,egg_sport_Hockey,0)
+GAME( 1987, bladstle, bladestl, bladestl, bladstle, 0, ROT90, "Konami", "Blades of Steel (version E)", 0 ,2,0,egg_sport_Hockey,0)

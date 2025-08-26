@@ -468,6 +468,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,   0, tickee,   tickee,   0, ROT0, "Raster Elite",  "Tickee Tickats", 0 ,2)
-GAME( 1996, ghoshunt, 0, ghoshunt, ghoshunt, 0, ROT0, "Hanaho Games",  "Ghost Hunter", 0 ,0)
-GAME( 1996, tutstomb, 0, ghoshunt, ghoshunt, 0, ROT0, "Island Design", "Tut's Tomb", 0 ,0)
+GAME( 1994, tickee,   0, tickee,   tickee,   0, ROT0, "Raster Elite",  "Tickee Tickats", 0 ,2,0,egg_LightGuns,0)
+GAME( 1996, ghoshunt, 0, ghoshunt, ghoshunt, 0, ROT0, "Hanaho Games",  "Ghost Hunter", 0 ,2,0,egg_LightGuns,0)
+GAME( 1996, tutstomb, 0, ghoshunt, ghoshunt, 0, ROT0, "Island Design", "Tut's Tomb", 0 ,2,0,egg_LightGuns,0)

@@ -425,5 +425,5 @@ static DRIVER_INIT( gbusters )
 
 
 
-GAME( 1988, gbusters, 0,        gbusters, gbusters, gbusters, ROT90, "Konami", "Gang Busters", 0 ,0)
-GAME( 1988, crazycop, gbusters, gbusters, gbusters, gbusters, ROT90, "Konami", "Crazy Cop (Japan)", 0 ,0)
+GAME( 1988, gbusters, 0,        gbusters, gbusters, gbusters, ROT90, "Konami", "Gang Busters", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1988, crazycop, gbusters, gbusters, gbusters, gbusters, ROT90, "Konami", "Crazy Cop (Japan)", 0 ,2,0,egg_ShootEmUp,0)

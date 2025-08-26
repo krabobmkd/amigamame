@@ -328,6 +328,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1983, yard,    0,    yard, yard,   0, ROT0, "Irem", "10-Yard Fight (Japan)", 0 ,0)
-GAME( 1984, vsyard,  yard, yard, vsyard, 0, ROT0, "Irem", "Vs 10-Yard Fight (World, 11/05/84)", 0 ,0)
-GAME( 1984, vsyard2, yard, yard, vsyard, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", 0 ,0)
+GAME( 1983, yard,    0,    yard, yard,   0, ROT0, "Irem", "10-Yard Fight (Japan)", 0 ,0,0,egg_Unknown,0)
+GAME( 1984, vsyard,  yard, yard, vsyard, 0, ROT0, "Irem", "Vs 10-Yard Fight (World, 11/05/84)", 0 ,0,0,egg_Unknown,0)
+GAME( 1984, vsyard2, yard, yard, vsyard, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", 0 ,0,0,egg_Unknown,0)

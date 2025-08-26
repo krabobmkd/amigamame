@@ -780,5 +780,5 @@ ROM_END
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY  FULLNAME */
-GAME( 1988, topland,  0,        airsys,   topland,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", GAME_NOT_WORKING ,0)
-GAME( 1990, ainferno, 0,        airsys,   ainferno, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", GAME_NOT_WORKING ,0)
+GAME( 1988, topland,  0,        airsys,   topland,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", GAME_NOT_WORKING ,0,1,egg_Driving,0)
+GAME( 1990, ainferno, 0,        airsys,   ainferno, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", GAME_NOT_WORKING ,0,0,egg_Unknown,0)

@@ -1382,7 +1382,7 @@ ROM_START( buggyboy )
 	ROM_LOAD( "bb2.162", 0x1900, 0x200, CRC(71d47de1) SHA1(2da9aeb3f2ebb1114631c8042a37c4f4c18e741b) )  /* Arithmetic instruction PROM */
 ROM_END
 
-GAME( 1983, tx1,      0,       tx1,      tx1,      0, ROT0, "Tazmi",   "TX-1",                             GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0)
-GAME( 1983, tx1a,     0,       tx1,      tx1,      0, ROT0, "Tazmi",   "TX-1 (Atari/Namco/Taito License)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0)
-GAME( 1985, buggyboy, buggyb1, buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy",                        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0)
-GAME( 1986, buggyb1,  0,       buggyb1,  buggyb1,  0, ROT0, "Tatsumi", "Buggy Boy (Single Monitor)",       GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0)
+GAME( 1983, tx1,      0,       tx1,      tx1,      0, ROT0, "Tazmi",   "TX-1",                             GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0,1,egg_Driving,0)
+GAME( 1983, tx1a,     0,       tx1,      tx1,      0, ROT0, "Tazmi",   "TX-1 (Atari/Namco/Taito License)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0,0,egg_Unknown,0)
+GAME( 1985, buggyboy, buggyb1, buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy",                        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0,1,egg_Driving,0)
+GAME( 1986, buggyb1,  0,       buggyb1,  buggyb1,  0, ROT0, "Tatsumi", "Buggy Boy (Single Monitor)",       GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ,0,0,egg_Unknown,0)

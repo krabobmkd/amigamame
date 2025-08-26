@@ -506,5 +506,5 @@ static DRIVER_INIT( relief2 )
  *
  *************************************/
 
-GAME( 1992, relief,  0,      relief, relief, relief,  ROT0, "Atari Games", "Relief Pitcher (set 1)", 0 ,0)
-GAME( 1992, relief2, relief, relief, relief, relief2, ROT0, "Atari Games", "Relief Pitcher (set 2)", 0 ,0)
+GAME( 1992, relief,  0,      relief, relief, relief,  ROT0, "Atari Games", "Relief Pitcher (set 1)", 0 ,2,0,egg_sport_Baseball,0)
+GAME( 1992, relief2, relief, relief, relief, relief2, ROT0, "Atari Games", "Relief Pitcher (set 2)", 0 ,2,0,egg_sport_Baseball,0)

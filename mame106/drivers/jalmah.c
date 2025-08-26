@@ -1850,13 +1850,13 @@ static DRIVER_INIT( suchipi )
 
 /*First version of the MCU*/
 /*Pseudo-random stuff is not 100% working*/
-GAME( 1989, daireika, 0, jalmah, jalmah, daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai",			        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ,0)
+GAME( 1989, daireika, 0, jalmah, jalmah, daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai",			        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ,0,1,egg_Mahjong,0)
 /*Protection controls tilemap scrolling on this,you can't see anything unless you use fake scroll register values...*/
-GAME( 1989, urashima, 0, jalmah, jalmah, urashima, ROT0, "UPL",	      "Urashima Mahjong", 					GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ,0)
+GAME( 1989, urashima, 0, jalmah, jalmah, urashima, ROT0, "UPL",	      "Urashima Mahjong", 					GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ,0,1,egg_Mahjong,0)
 
 /*No known gameplay bugs for the following games:*/
-GAME( 1990, mjzoomin, 0, jalmah, jalmah, mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In",            GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1990, mjzoomin, 0, jalmah, jalmah, mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In",            GAME_IMPERFECT_GRAPHICS ,0,1,egg_Mature,0)
 /*Second version of the MCU*/
-GAME( 1990, kakumei,  0, jalmah, jalmah2, kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei",                      GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1992, kakumei2, 0, jalmah, jalmah2, kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League",  GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, suchipi,  0, jalmah, jalmah2, suchipi,  ROT0, "Jaleco",       "Idol Janshi Su-Chi-Pie Special",       GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1990, kakumei,  0, jalmah, jalmah2, kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei",                      GAME_IMPERFECT_GRAPHICS ,0,1,egg_Mature,0)
+GAME( 1992, kakumei2, 0, jalmah, jalmah2, kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League",  GAME_IMPERFECT_GRAPHICS ,0,1,egg_Mature,0)
+GAME( 1993, suchipi,  0, jalmah, jalmah2, suchipi,  ROT0, "Jaleco",       "Idol Janshi Su-Chi-Pie Special",       GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)

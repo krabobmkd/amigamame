@@ -2858,42 +2858,42 @@ static DRIVER_INIT( radarscp )
 }
 
 
-GAME( 1980, radarscp, 0,        radarscp, dkong,    radarscp, ROT90, "Nintendo", "Radar Scope", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ,2)
+GAME( 1980, radarscp, 0,        radarscp, dkong,    radarscp, ROT90, "Nintendo", "Radar Scope", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ,0,0,egg_Unknown,0)
 
-GAME( 1981, dkong,    0,        dkong,    dkong,    0,        ROT90, "Nintendo of America", "Donkey Kong (US set 1)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1981, dkongo,   dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (US set 2)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1981, dkongjp,  dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1981, dkongjo,  dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1981, dkongjo1, dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (Japan set 3) (bad dump?)", GAME_SUPPORTS_SAVE ,2)
+GAME( 1981, dkong,    0,        dkong,    dkong,    0,        ROT90, "Nintendo of America", "Donkey Kong (US set 1)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
+GAME( 1981, dkongo,   dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (US set 2)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
+GAME( 1981, dkongjp,  dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
+GAME( 1981, dkongjo,  dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
+GAME( 1981, dkongjo1, dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (Japan set 3) (bad dump?)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
 
-GAME( 1982, dkongjr,  0,        dkongjr,  dkong,    0,        ROT90, "Nintendo of America", "Donkey Kong Junior (US)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkong,    0,        ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, dkngjnrj, dkongjr,  dkongjr,  dkong,    0,        ROT90, "Nintendo", "Donkey Kong Junior (Japan?)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, dkongjrb, dkongjr,  dkongjr,  dkong,    0,        ROT90, "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, dkngjnrb, dkongjr,  dkongjr,  dkong,    0,        ROT90, "Nintendo of America", "Donkey Kong Junior (bootleg?)", GAME_SUPPORTS_SAVE ,2)
+GAME( 1982, dkongjr,  0,        dkongjr,  dkong,    0,        ROT90, "Nintendo of America", "Donkey Kong Junior (US)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
+GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkong,    0,        ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
+GAME( 1982, dkngjnrj, dkongjr,  dkongjr,  dkong,    0,        ROT90, "Nintendo", "Donkey Kong Junior (Japan?)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
+GAME( 1982, dkongjrb, dkongjr,  dkongjr,  dkong,    0,        ROT90, "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
+GAME( 1982, dkngjnrb, dkongjr,  dkongjr,  dkong,    0,        ROT90, "Nintendo of America", "Donkey Kong Junior (bootleg?)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
 
-GAME( 1983, dkong3,   0,        dkong3,   dkong3,   0,        ROT90, "Nintendo of America", "Donkey Kong 3 (US)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1983, dkong3j,  dkong3,   dkong3,   dkong3,   0,        ROT90, "Nintendo", "Donkey Kong 3 (Japan)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1984, dkong3b,  dkong3,	dkong3b,  dkong3b,  0,        ROT90, "bootleg", "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", GAME_SUPPORTS_SAVE ,2)
+GAME( 1983, dkong3,   0,        dkong3,   dkong3,   0,        ROT90, "Nintendo of America", "Donkey Kong 3 (US)", GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)
+GAME( 1983, dkong3j,  dkong3,   dkong3,   dkong3,   0,        ROT90, "Nintendo", "Donkey Kong 3 (Japan)", GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)
+GAME( 1984, dkong3b,  dkong3,	dkong3b,  dkong3b,  0,        ROT90, "bootleg", "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)
 
-GAME( 1984, herbiedk, huncholy, herbiedk, herbiedk, 0,        ROT90, "CVS", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE ,0)
+GAME( 1984, herbiedk, huncholy, herbiedk, herbiedk, 0,        ROT90, "CVS", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE ,0,2,egg_sport_TrackNField,0)
 
-GAME( 1983, hunchbkd, hunchbak, hunchbkd, hunchbkd, 0,        ROT90, "Century Electronics", "Hunchback (DK conversion)", GAME_WRONG_COLORS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ,0)
+GAME( 1983, hunchbkd, hunchbak, hunchbkd, hunchbkd, 0,        ROT90, "Century Electronics", "Hunchback (DK conversion)", GAME_WRONG_COLORS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
 
-GAME( 1984, sbdk,	  superbik,	hunchbkd, sbdk,		0,        ROT90, "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE ,0)
+GAME( 1984, sbdk,	  superbik,	hunchbkd, sbdk,		0,        ROT90, "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)
 
-GAME( 1984, herodk,   hero,     hunchbkd, herodk,   herodk,   ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion)", GAME_SUPPORTS_SAVE ,0)
-GAME( 1984, herodku,  hero,     hunchbkd, herodk,   0,        ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", GAME_SUPPORTS_SAVE ,0)
+GAME( 1984, herodk,   hero,     hunchbkd, herodk,   herodk,   ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1984, herodku,  hero,     hunchbkd, herodk,   0,        ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
 
-GAME( 1984, 8ballact, 0,    	eightact, 8ballact, 0,        ROT90, "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (DK conversion)", GAME_SUPPORTS_SAVE ,0)
-GAME( 1984, 8ballat2, 8ballact,	eightact, 8ballact, 0,        ROT90, "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (DKJr conversion)", GAME_SUPPORTS_SAVE ,0)
+GAME( 1984, 8ballact, 0,    	eightact, 8ballact, 0,        ROT90, "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (DK conversion)", GAME_SUPPORTS_SAVE ,0,2,egg_PoolNDart,0)
+GAME( 1984, 8ballat2, 8ballact,	eightact, 8ballact, 0,        ROT90, "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (DKJr conversion)", GAME_SUPPORTS_SAVE ,0,2,egg_PoolNDart,0)
 
-GAME( 1984, shootgal, 0,		shootgal, hunchbkd, 0,		  ROT180, "Seatongrove Ltd (Zaccaria licence)", "Shooting Gallery", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ,0)
+GAME( 1984, shootgal, 0,		shootgal, hunchbkd, 0,		  ROT180, "Seatongrove Ltd (Zaccaria licence)", "Shooting Gallery", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ,0,1,egg_LightGuns,0)
 
-GAME( 1983, pestplce, mario,	pestplce, pestplce, 0,        ROT180, "bootleg", "Pest Place", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ,2)
+GAME( 1983, pestplce, mario,	pestplce, pestplce, 0,        ROT180, "bootleg", "Pest Place", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ,2,0,egg_Platform,0)
 
-GAME( 1985, spclforc, 0,		spclforc, spclforc, 0,        ROT90, "Senko Industries (Magic Eletronics Inc. licence)", "Special Forces", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ,0)
-GAME( 1985, spcfrcii, 0,		spclforc, spclforc, 0,        ROT90, "Senko Industries (Magic Eletronics Inc. licence)", "Special Forces II", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ,0)
+GAME( 1985, spclforc, 0,		spclforc, spclforc, 0,        ROT90, "Senko Industries (Magic Eletronics Inc. licence)", "Special Forces", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)
+GAME( 1985, spcfrcii, 0,		spclforc, spclforc, 0,        ROT90, "Senko Industries (Magic Eletronics Inc. licence)", "Special Forces II", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)
 
-GAME( 1984, drakton,  0,        drakton,  drakton,  drakton,  ROT90, "Epos Corporation", "Drakton", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ,0)
-GAME( 1985, strtheat, 0,        strtheat, strtheat, strtheat, ROT90, "Epos Corporation", "Street Heat - Cardinal Amusements", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ,0)
+GAME( 1984, drakton,  0,        drakton,  drakton,  drakton,  ROT90, "Epos Corporation", "Drakton", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)
+GAME( 1985, strtheat, 0,        strtheat, strtheat, strtheat, ROT90, "Epos Corporation", "Street Heat - Cardinal Amusements", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)

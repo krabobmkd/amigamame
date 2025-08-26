@@ -385,4 +385,4 @@ static void timer_callback(int param)
 }
 
 /* game driver */
-GAME( 1985, polyplay, 0, polyplay, polyplay, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play", 0 ,1)
+GAME( 1985, polyplay, 0, polyplay, polyplay, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play", 0 ,0,1,egg_Compilation,0)

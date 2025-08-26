@@ -580,7 +580,7 @@ DRIVER_INIT( looping ){
 }
 
 /*          rom       parent    machine   inp       init */
-GAME( 1982, looping,  0,        looping, looping, looping, ROT90, "Venture Line", "Looping (set 1)", 0 ,2)
-GAME( 1982, loopinga, looping,  looping, looping, looping, ROT90, "Venture Line", "Looping (set 2)", 0 ,2)
-GAME( 1982, skybump,  0,        looping, skybump, looping, ROT90, "Venture Line", "Sky Bumper", 0 ,0)
+GAME( 1982, looping,  0,        looping, looping, looping, ROT90, "Venture Line", "Looping (set 1)", 0 ,0,0,egg_Unknown,0)
+GAME( 1982, loopinga, looping,  looping, looping, looping, ROT90, "Venture Line", "Looping (set 2)", 0 ,0,0,egg_Unknown,0)
+GAME( 1982, skybump,  0,        looping, skybump, looping, ROT90, "Venture Line", "Sky Bumper", 0 ,0,2,egg_ShootEmUp,0)
 

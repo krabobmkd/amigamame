@@ -386,4 +386,4 @@ static DRIVER_INIT( madmotor )
 
 
  /* The title screen is undated, but it's (c) 1989 Data East at 0xefa0 */
-GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor, ROT0, "Mitchell", "Mad Motor", 0 ,0)
+GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor, ROT0, "Mitchell", "Mad Motor", 0 ,2,0,egg_BeatNUp,0)

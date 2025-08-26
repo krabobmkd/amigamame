@@ -713,4 +713,4 @@ static DRIVER_INIT( darkhors )
 		eeprom[i] = eeprom[i*2];
 }
 
-GAME( 2001, darkhors, 0, darkhors, darkhors, darkhors, ROT0, "bootleg", "Dark Horse", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 2001, darkhors, 0, darkhors, darkhors, darkhors, ROT0, "bootleg", "Dark Horse", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)

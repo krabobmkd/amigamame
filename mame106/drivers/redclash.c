@@ -530,7 +530,7 @@ static DRIVER_INIT( redclash )
 
 
 
-GAME( 1980, zerohour, 0,        zerohour, zerohour, redclash, ROT270, "Universal", "Zero Hour",          GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1981, redclash, 0,        redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 1)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1981, redclsha, redclash, redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 2)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1981, redclask, redclash, redclash, redclash, redclash, ROT270, "Kaneko",    "Red Clash (Kaneko)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1980, zerohour, 0,        zerohour, zerohour, redclash, ROT270, "Universal", "Zero Hour",          GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1981, redclash, 0,        redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 1)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1981, redclsha, redclash, redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 2)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1981, redclask, redclash, redclash, redclash, redclash, ROT270, "Kaneko",    "Red Clash (Kaneko)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)

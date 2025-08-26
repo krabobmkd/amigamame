@@ -469,4 +469,4 @@ ROM_START( wc90b )
 ROM_END
 
 
-GAME( 1989, wc90b, wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND ,0)
+GAME( 1989, wc90b, wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)

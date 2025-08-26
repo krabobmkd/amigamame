@@ -721,7 +721,7 @@ static DRIVER_INIT( suprmatk )
  *
  *************************************/
 
-GAME( 1980, missile,  0,       missile, missile,         0, ROT0, "Atari", "Missile Command (set 1)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1980, missile2, missile, missile, missile,         0, ROT0, "Atari", "Missile Command (set 2)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1981, suprmatk, missile, missile, suprmatk, suprmatk, ROT0, "Atari + Gencomp", "Super Missile Attack (for set 2)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1981, sprmatkd, missile, missile, suprmatk,        0, ROT0, "Atari + Gencomp", "Super Missile Attack (not encrypted)", GAME_SUPPORTS_SAVE ,2)
+GAME( 1980, missile,  0,       missile, missile,         0, ROT0, "Atari", "Missile Command (set 1)", GAME_SUPPORTS_SAVE ,0,0,egg_Unknown,0)
+GAME( 1980, missile2, missile, missile, missile,         0, ROT0, "Atari", "Missile Command (set 2)", GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)
+GAME( 1981, suprmatk, missile, missile, suprmatk, suprmatk, ROT0, "Atari + Gencomp", "Super Missile Attack (for set 2)", GAME_SUPPORTS_SAVE ,0,2,egg_ShootEmUp,0)
+GAME( 1981, sprmatkd, missile, missile, suprmatk,        0, ROT0, "Atari + Gencomp", "Super Missile Attack (not encrypted)", GAME_SUPPORTS_SAVE ,0,0,egg_Unknown,0)

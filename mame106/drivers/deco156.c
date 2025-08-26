@@ -704,5 +704,5 @@ static DRIVER_INIT( wcvol95 )
 
 /**********************************************************************************/
 
-GAME( 1993, hvysmsh,  0,        hvysmsh,       hvysmsh,  hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", 0,0)
-GAME( 1995, wcvol95,  0,        wcvol95,       wcvol95,  wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)",0 ,0)
+GAME( 1993, hvysmsh,  0,        hvysmsh,       hvysmsh,  hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", 0,0,0,egg_Unknown,0)
+GAME( 1995, wcvol95,  0,        wcvol95,       wcvol95,  wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)",0 ,0,0,egg_Unknown,0)

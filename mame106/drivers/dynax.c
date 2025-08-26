@@ -3869,24 +3869,24 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1988, hanamai,  0,        hanamai,  hanamai,  0,        ROT180, "Dynax",                   "Hana no Mai (Japan)"                                  , 0 ,0)
-GAME( 1989, hnkochou, hanamai,  hanamai,  hnkochou, 0,        ROT180, "Dynax",                   "Hana Kochou [BET] (Japan)"                            , 0 ,0)
-GAME( 1989, hnoridur, 0,        hnoridur, hnoridur, 0,        ROT180, "Dynax",                   "Hana Oriduru (Japan)",                                 GAME_IMPERFECT_GRAPHICS ,0) // 1 rom is bad
-GAME( 1989, drgpunch, 0,        sprtmtch, sprtmtch, 0,        ROT0,   "Dynax",                   "Dragon Punch (Japan)"                                 , 0 ,0)
-GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, 0,        ROT0,   "Dynax (Fabtek license)",  "Sports Match"                                         , 0 ,0)
-GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, 0,        ROT180, "Dynax",                   "Mahjong Friday (Japan)"                               , 0 ,1)
-GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, 0,        ROT0,   "Dynax",                   "Mahjong Campus Hunting (Japan)"                       , 0 ,1)
-GAME( 1990, 7jigen,   0,        nanajign, nanajign, 0,        ROT180, "Dynax",                   "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)", GAME_IMPERFECT_GRAPHICS ,1)
-GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, 0,        ROT180, "Dynax",                   "Mahjong Dial Q2 (Japan)"                              , 0 ,1)
-GAME( 1991, yarunara, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                   "Mahjong Yarunara (Japan)"                             , 0 ,1)
-GAME( 1991, mjangels, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                   "Mahjong Angels - Comic Theater Vol.2 (Japan)"         , 0 ,1)
-GAME( 1992, quiztvqq, 0,        yarunara, quiztvqq, 0,        ROT180, "Dynax",                   "Quiz TV Gassyuukoku Q&Q (Japan)"                      , 0 ,0)
-GAME( 1994, maya,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                  "Maya"                                                 , 0 ,0)
-GAME( 199?, inca,     maya,     sprtmtch, sprtmtch, maya,     ROT0,   "<unknown>",               "Inca"                                                 , 0 ,0)
-GAME( 1990, jantouki, 0,        jantouki, jantouki, 0,        ROT0,   "Dynax",                   "Jong Tou Ki (Japan)"                                  , 0 ,1)
-GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, mjelct3,  ROT180, "Dynax",                   "Mahjong Electron Base (parts 2 & 4, Japan)"           , 0 ,1)
-GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",                   "Mahjong Electron Base (parts 2 & 3, Japan)"           , 0 ,1)
-GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  mjelct3a, ROT180, "Dynax",                   "Mahjong Electron Base (parts 2 & 3, alt., Japan)"     , 0 ,1)
-GAME( 1990, neruton,  0,        neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro","Mahjong Neruton Haikujirada (Japan)",                         GAME_IMPERFECT_GRAPHICS ,1)	// e.g. dynax logo
+GAME( 1988, hanamai,  0,        hanamai,  hanamai,  0,        ROT180, "Dynax",                   "Hana no Mai (Japan)"                                  , 0 ,0,1,egg_Mature,0)
+GAME( 1989, hnkochou, hanamai,  hanamai,  hnkochou, 0,        ROT180, "Dynax",                   "Hana Kochou [BET] (Japan)"                            , 0 ,0,1,egg_Mature,0)
+GAME( 1989, hnoridur, 0,        hnoridur, hnoridur, 0,        ROT180, "Dynax",                   "Hana Oriduru (Japan)",                                 GAME_IMPERFECT_GRAPHICS ,0,1,egg_Tabletop,0) // 1 rom is bad
+GAME( 1989, drgpunch, 0,        sprtmtch, sprtmtch, 0,        ROT0,   "Dynax",                   "Dragon Punch (Japan)"                                 , 0 ,0,2,egg_Mature,0)
+GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, 0,        ROT0,   "Dynax (Fabtek license)",  "Sports Match"                                         , 0 ,0,2,egg_Puzzle,0)
+GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, 0,        ROT180, "Dynax",                   "Mahjong Friday (Japan)"                               , 0 ,0,1,egg_Mature,0)
+GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, 0,        ROT0,   "Dynax",                   "Mahjong Campus Hunting (Japan)"                       , 0 ,0,1,egg_Mature,0)
+GAME( 1990, 7jigen,   0,        nanajign, nanajign, 0,        ROT180, "Dynax",                   "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Mature,0)
+GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, 0,        ROT180, "Dynax",                   "Mahjong Dial Q2 (Japan)"                              , 0 ,0,1,egg_Mature,0)
+GAME( 1991, yarunara, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                   "Mahjong Yarunara (Japan)"                             , 0 ,0,1,egg_Mature,0)
+GAME( 1991, mjangels, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                   "Mahjong Angels - Comic Theater Vol.2 (Japan)"         , 0 ,0,1,egg_Mature,0)
+GAME( 1992, quiztvqq, 0,        yarunara, quiztvqq, 0,        ROT180, "Dynax",                   "Quiz TV Gassyuukoku Q&Q (Japan)"                      , 0 ,2,0,egg_Quizz,0)
+GAME( 1994, maya,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                  "Maya"                                                 , 0 ,0,2,egg_Mature,0)
+GAME( 199?, inca,     maya,     sprtmtch, sprtmtch, maya,     ROT0,   "<unknown>",               "Inca"                                                 , 0 ,0,2,egg_Mature,0)
+GAME( 1990, jantouki, 0,        jantouki, jantouki, 0,        ROT0,   "Dynax",                   "Jong Tou Ki (Japan)"                                  , 0 ,0,1,egg_Mature,0)
+GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, mjelct3,  ROT180, "Dynax",                   "Mahjong Electron Base (parts 2 & 4, Japan)"           , 0 ,0,1,egg_Mature,0)
+GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",                   "Mahjong Electron Base (parts 2 & 3, Japan)"           , 0 ,0,1,egg_Mature,0)
+GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  mjelct3a, ROT180, "Dynax",                   "Mahjong Electron Base (parts 2 & 3, alt., Japan)"     , 0 ,0,1,egg_Mature,0)
+GAME( 1990, neruton,  0,        neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro","Mahjong Neruton Haikujirada (Japan)",                         GAME_IMPERFECT_GRAPHICS ,0,1,egg_Mature,0)	// e.g. dynax logo
 /* not a dynax board */
-GAME( 1995, shpeng,   0,        sprtmtch, sprtmtch, 0,        ROT0,   "WSAC Systems?",                   "Sea Hunter Penguin"                                 , GAME_WRONG_COLORS ,0) // proms?
+GAME( 1995, shpeng,   0,        sprtmtch, sprtmtch, 0,        ROT0,   "WSAC Systems?",                   "Sea Hunter Penguin"                                 , GAME_WRONG_COLORS ,0,1,egg_Platform,0) // proms?

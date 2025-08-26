@@ -473,5 +473,5 @@ ROM_END
 
 
 
-GAME( 1987, mnight,  0, mnight, mnight,  0, ROT0, "UPL (Kawakus license)", "Mutant Night", 0 ,0)
-GAME( 1988?,arkarea, 0, mnight, arkarea, 0, ROT0, "UPL", "Ark Area", 0 ,2)
+GAME( 1987, mnight,  0, mnight, mnight,  0, ROT0, "UPL (Kawakus license)", "Mutant Night", 0 ,0,0,egg_Unknown,0)
+GAME( 1988?,arkarea, 0, mnight, arkarea, 0, ROT0, "UPL", "Ark Area", 0 ,2,0,egg_ShootEmUp,0)

@@ -261,4 +261,4 @@ ROM_START( pastelg )
 ROM_END
 
 
-GAME( 1985, pastelg, 0, pastelg, pastelg, pastelg, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 ,1)
+GAME( 1985, pastelg, 0, pastelg, pastelg, pastelg, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 ,0,1,egg_Mature,0)

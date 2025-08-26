@@ -490,9 +490,9 @@ static DRIVER_INIT( atetris )
  *
  *************************************/
 
-GAME( 1988, atetris,  0,       atetris,  atetris,  atetris, ROT0,   "Atari Games", "Tetris (set 1)", 0 ,2)
-GAME( 1988, atetrisa, atetris, atetris,  atetris,  atetris, ROT0,   "Atari Games", "Tetris (set 2)", 0 ,2)
-GAME( 1988, atetrisb, atetris, atetris,  atetris,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", 0 ,2)
-GAME( 1988, atetrsb2, atetris, atetrsb2, atetris,  atetris, ROT0,   "bootleg",   "Tetris (bootleg set 2)", 0 ,2)
-GAME( 1989, atetcktl, atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (Cocktail set 1)", 0 ,2)
-GAME( 1989, atetckt2, atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (Cocktail set 2)", 0 ,2)
+GAME( 1988, atetris,  0,       atetris,  atetris,  atetris, ROT0,   "Atari Games", "Tetris (set 1)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1988, atetrisa, atetris, atetris,  atetris,  atetris, ROT0,   "Atari Games", "Tetris (set 2)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1988, atetrisb, atetris, atetris,  atetris,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1988, atetrsb2, atetris, atetrsb2, atetris,  atetris, ROT0,   "bootleg",   "Tetris (bootleg set 2)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1989, atetcktl, atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (Cocktail set 1)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1989, atetckt2, atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (Cocktail set 2)", 0 ,2,0,egg_Puzzle,0)

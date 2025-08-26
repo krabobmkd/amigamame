@@ -2758,22 +2758,22 @@ ROM_END
 
 /* System16A */
 /*          rom       parent    machine   inp       init */
-GAME( 1987, shinobl,  shinobi,  shinobl,  shinobi,  shinobi,  ROT0,   "bootleg", "Shinobi (bootleg)", 0 ,2)
+GAME( 1987, shinobl,  shinobi,  shinobl,  shinobi,  shinobi,  ROT0,   "bootleg", "Shinobi (bootleg)", 0 ,0,2,egg_Platform,0)
 
 /* System16B */
 /*          rom       parent    machine   inp       init */
 
-GAME( 1989, bayrtbl1, bayroute, bayroute, bayroute, bayrtbl1, ROT0,   "bootleg", "Bay Route (bootleg set 1)", GAME_NOT_WORKING ,2)
-GAME( 1989, bayrtbl2, bayroute, bayroute, bayroute, bayrtbl1, ROT0,   "bootleg", "Bay Route (bootleg set 2)", GAME_NOT_WORKING ,2)
-GAME( 1989, dduxbl,   ddux,     dduxbl,   ddux,     dduxbl,   ROT0,   "bootleg", "Dynamite Dux (bootleg)", 0 ,0)
-GAME( 1989, eswatbl,  eswat,    eswatbl,  eswat,    eswatbl,  ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg)", 0 ,2)
-GAME( 1989, fpointbl, fpoint,   fpointbl, fpoint,   fpointbl, ROT0,   "bootleg", "Flash Point (World, bootleg)", 0 ,0)
-GAME( 1989, fpointbj, fpoint,   fpointbl, fpointbj, fpointbl, ROT0,   "bootleg", "Flash Point (Japan, bootleg)", GAME_WRONG_COLORS ,0)
+GAME( 1989, bayrtbl1, bayroute, bayroute, bayroute, bayrtbl1, ROT0,   "bootleg", "Bay Route (bootleg set 1)", GAME_NOT_WORKING ,2,0,egg_Platform,0)
+GAME( 1989, bayrtbl2, bayroute, bayroute, bayroute, bayrtbl1, ROT0,   "bootleg", "Bay Route (bootleg set 2)", GAME_NOT_WORKING ,2,0,egg_Platform,0)
+GAME( 1989, dduxbl,   ddux,     dduxbl,   ddux,     dduxbl,   ROT0,   "bootleg", "Dynamite Dux (bootleg)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1989, eswatbl,  eswat,    eswatbl,  eswat,    eswatbl,  ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg)", 0 ,2,0,egg_Platform,0)
+GAME( 1989, fpointbl, fpoint,   fpointbl, fpoint,   fpointbl, ROT0,   "bootleg", "Flash Point (World, bootleg)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1989, fpointbj, fpoint,   fpointbl, fpointbj, fpointbl, ROT0,   "bootleg", "Flash Point (Japan, bootleg)", GAME_WRONG_COLORS ,2,0,egg_Puzzle,0)
 
-GAME( 1989, goldnabl, goldnaxe, goldnaxe, goldnaxe, goldnabl, ROT0,   "bootleg", "Golden Axe (bootleg)", GAME_NOT_WORKING ,2)
+GAME( 1989, goldnabl, goldnaxe, goldnaxe, goldnaxe, goldnabl, ROT0,   "bootleg", "Golden Axe (bootleg)", GAME_NOT_WORKING ,2,0,egg_BeatNUp,0)
 
-GAME( 1988, passshtb, passsht,  passsht,  passsht,  passsht,  ROT270, "bootleg", "Passing Shot (2 Players) (bootleg)", 0 ,2)
-GAME( 1988, passht4b, passsht,  passht4b, passht4b, passht4b, ROT270, "bootleg", "Passing Shot (4 Players) (bootleg)", GAME_NO_SOUND ,4)
-GAME( 1988, tetrisbl, tetris,   tetrisbl, tetris,   tetrisbl, ROT0,   "bootleg", "Tetris (bootleg)", 0 ,2)
-GAME( 1989, tturfbl,  tturf,    tturfbl,  tturf,    tturfbl,  ROT0,   "bootleg", "Tough Turf (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND,0)
-GAME( 1988, wb3bbl,   wb3,     wb3bbl,   wb3b,     wb3bbl, ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", 0 ,0)
+GAME( 1988, passshtb, passsht,  passsht,  passsht,  passsht,  ROT270, "bootleg", "Passing Shot (2 Players) (bootleg)", 0 ,2,0,egg_sport_Tennis,0)
+GAME( 1988, passht4b, passsht,  passht4b, passht4b, passht4b, ROT270, "bootleg", "Passing Shot (4 Players) (bootleg)", GAME_NO_SOUND ,4,0,egg_sport_Tennis,0)
+GAME( 1988, tetrisbl, tetris,   tetrisbl, tetris,   tetrisbl, ROT0,   "bootleg", "Tetris (bootleg)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1989, tturfbl,  tturf,    tturfbl,  tturf,    tturfbl,  ROT0,   "bootleg", "Tough Turf (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND,2,0,egg_BeatNUp,0)
+GAME( 1988, wb3bbl,   wb3,     wb3bbl,   wb3b,     wb3bbl, ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", 0 ,2,0,egg_Platform,0)

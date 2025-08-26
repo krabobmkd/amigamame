@@ -190,6 +190,6 @@ DRIVER_INIT(chwrestl)
 	regulus_decode();
 }
 
-GAME( 1984, chboxing, 0, sg1000a, chboxing, 0, ROT0, "Sega", "Champion Boxing", 0,0)
-GAME( 1985, chwrestl, 0, sg1000a, chwrestl, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0,0)
+GAME( 1984, chboxing, 0, sg1000a, chboxing, 0, ROT0, "Sega", "Champion Boxing", 0,2,0,egg_sport_Boxing,0)
+GAME( 1985, chwrestl, 0, sg1000a, chwrestl, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0,2,0,egg_sport_Wrestling,0)
 

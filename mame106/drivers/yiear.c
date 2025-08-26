@@ -345,5 +345,5 @@ ROM_END
 
 
 
-GAME( 1985, yiear,  0,     yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (set 1)", 0 ,2)
-GAME( 1985, yiear2, yiear, yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (set 2)", 0 ,2)
+GAME( 1985, yiear,  0,     yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (set 1)", 0 ,0,2,egg_Fighter,0)
+GAME( 1985, yiear2, yiear, yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (set 2)", 0 ,0,2,egg_Fighter,0)

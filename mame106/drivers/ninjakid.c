@@ -335,4 +335,4 @@ INPUT_PORTS_END
  Game Drivers
 *******************************************************************************/
 
-GAME( 1984, ninjakun, 0, ninjakid, ninjakid, 0, ROT0, "[UPL] (Taito license)", "Ninjakun Majou no Bouken", 0 ,0)
+GAME( 1984, ninjakun, 0, ninjakid, ninjakid, 0, ROT0, "[UPL] (Taito license)", "Ninjakun Majou no Bouken", 0 ,0,2,egg_Platform,0)

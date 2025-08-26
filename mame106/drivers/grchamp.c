@@ -583,4 +583,4 @@ ROM_END
 
 /***************************************************************************/
 
-GAME( 1981, grchamp, 0, grchamp, grchamp, grchamp, ROT90, "Taito", "Grand Champion", GAME_IMPERFECT_SOUND ,1)
+GAME( 1981, grchamp, 0, grchamp, grchamp, grchamp, ROT90, "Taito", "Grand Champion", GAME_IMPERFECT_SOUND ,0,1,egg_Driving,0)

@@ -652,12 +652,12 @@ static DRIVER_INIT( twrldc94 )
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1993, gstriker, 0,        gstriker, gstriker, 0,        ROT0, "Human", "Grand Striker", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1993, gstriker, 0,        gstriker, gstriker, 0,        ROT0, "Human", "Grand Striker", GAME_IMPERFECT_GRAPHICS ,2,0,egg_sport_Soccer,0)
 
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
-GAME( 199?, vgoalsoc, 0,        gstriker, gstriker, 0,        ROT0, "Tecmo", "V Goal Soccer", GAME_NOT_WORKING ,0)
-GAME( 199?, vgoalsca, vgoalsoc, gstriker, gstriker, 0,        ROT0, "Tecmo", "V Goal Soccer (alt)", GAME_NOT_WORKING ,0)
-GAME( 1994, twrldc94, 0,        twrldc94, gstriker, twrldc94,        ROT0, "Tecmo", "Tecmo World Cup '94", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1994, twrdc94a, twrldc94,        twrldc94, gstriker, twrldc94,        ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 199?, vgoalsoc, 0,        gstriker, gstriker, 0,        ROT0, "Tecmo", "V Goal Soccer", GAME_NOT_WORKING ,2,0,egg_sport_Soccer,0)
+GAME( 199?, vgoalsca, vgoalsoc, gstriker, gstriker, 0,        ROT0, "Tecmo", "V Goal Soccer (alt)", GAME_NOT_WORKING ,2,0,egg_sport_Soccer,0)
+GAME( 1994, twrldc94, 0,        twrldc94, gstriker, twrldc94,        ROT0, "Tecmo", "Tecmo World Cup '94", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1994, twrdc94a, twrldc94,        twrldc94, gstriker, twrldc94,        ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
 
 

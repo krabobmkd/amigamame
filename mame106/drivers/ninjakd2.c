@@ -718,7 +718,7 @@ static DRIVER_INIT( bootleg )
 
 
 
-GAME( 1987, ninjakd2, 0,        ninjakd2, ninjakd2, ninjakd2, ROT0, "UPL", "Ninja-Kid II (set 1)", 0 ,0)
-GAME( 1987, ninjak2a, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0, "UPL", "Ninja-Kid II (set 2)", 0 ,0)
-GAME( 1987, ninjak2b, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0, "UPL", "Ninja-Kid II (set 3)", 0 ,0)
-GAME( 1987, rdaction, ninjakd2, ninjakd2, ninjakd2, ninjakd2, ROT0, "UPL (World Games license)", "Rad Action", 0 ,0)
+GAME( 1987, ninjakd2, 0,        ninjakd2, ninjakd2, ninjakd2, ROT0, "UPL", "Ninja-Kid II (set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1987, ninjak2a, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0, "UPL", "Ninja-Kid II (set 2)", 0 ,0,2,egg_Platform,0)
+GAME( 1987, ninjak2b, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0, "UPL", "Ninja-Kid II (set 3)", 0 ,0,2,egg_Platform,0)
+GAME( 1987, rdaction, ninjakd2, ninjakd2, ninjakd2, ninjakd2, ROT0, "UPL (World Games license)", "Rad Action", 0 ,0,2,egg_Platform,0)

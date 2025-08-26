@@ -754,5 +754,5 @@ DRIVER_INIT( madalien )
 
 
 /*          rom       parent     machine   inp       init */
-GAME( 1980, madalien,  0,        madalien, madalien, madalien, ROT270, "Data East Corporation", "Mad Alien", 0 ,0)
+GAME( 1980, madalien,  0,        madalien, madalien, madalien, ROT270, "Data East Corporation", "Mad Alien", 0 ,0,2,egg_ShootEmUp,0)
 

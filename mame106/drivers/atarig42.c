@@ -752,5 +752,5 @@ static DRIVER_INIT( guardian )
  *
  *************************************/
 
-GAME( 1991, roadriot, 0,        atarig42, roadriot, roadriot, ROT0, "Atari Games", "Road Riot 4WD", GAME_UNEMULATED_PROTECTION ,0)
-GAME( 1992, guardian, 0,        atarig42, guardian, guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 ,2)
+GAME( 1991, roadriot, 0,        atarig42, roadriot, roadriot, ROT0, "Atari Games", "Road Riot 4WD", GAME_UNEMULATED_PROTECTION ,0,0,egg_Unknown,0)
+GAME( 1992, guardian, 0,        atarig42, guardian, guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 ,3,0,egg_BeatNUp,0)

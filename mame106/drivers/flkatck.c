@@ -344,6 +344,6 @@ ROM_END
 
 
 
-GAME( 1987, mx5000,  0, 	 flkatck, flkatck, 0, ROT90, "Konami", "MX5000", 0 ,2)
-GAME( 1987, flkatck, mx5000, flkatck, flkatck, 0, ROT90, "Konami", "Flak Attack (Japan)", 0 ,2)
+GAME( 1987, mx5000,  0, 	 flkatck, flkatck, 0, ROT90, "Konami", "MX5000", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1987, flkatck, mx5000, flkatck, flkatck, 0, ROT90, "Konami", "Flak Attack (Japan)", 0 ,0,2,egg_ShootEmUp,0)
 

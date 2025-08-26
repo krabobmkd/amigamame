@@ -522,6 +522,6 @@ ROM_START( quasara )
 	ROM_LOAD( "12m_q.bin",    0x0000, 0x0200, CRC(1ab8633d) SHA1(3aed29f2326676a8d8a5de6f6bb923b6510896d8) )
 ROM_END
 
-GAME( 1980, quasar,        0, quasar,   quasar,   0,		ROT90, "Zelco / Zaccaria",                         "Quasar",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,2)
-GAME( 1980, quasara,  quasar, quasar,   quasar,   0,		ROT90, "Zelco / Zaccaria",                         "Quasar (Alternate)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,2)
+GAME( 1980, quasar,        0, quasar,   quasar,   0,		ROT90, "Zelco / Zaccaria",                         "Quasar",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1980, quasara,  quasar, quasar,   quasar,   0,		ROT90, "Zelco / Zaccaria",                         "Quasar (Alternate)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
 

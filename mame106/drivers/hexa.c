@@ -202,4 +202,4 @@ static DRIVER_INIT( hexa )
 }
 
 
-GAME( 199?, hexa, 0, hexa, hexa, hexa, ROT0, "D. R. Korea", "Hexa", 0 ,0)
+GAME( 199?, hexa, 0, hexa, hexa, hexa, ROT0, "D. R. Korea", "Hexa", 0 ,0,1,egg_Mature,0)

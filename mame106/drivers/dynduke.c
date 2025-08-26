@@ -521,7 +521,7 @@ static DRIVER_INIT( dynduke )
 
 /* Game Drivers */
 
-GAME( 1989, dynduke, 0,       dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", 0 ,0)
-GAME( 1989, dyndukf, dynduke, dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", 0 ,0)
-GAME( 1989, dbldyn,  dynduke, dbldyn,  dynduke, dynduke, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", 0 ,0)
-GAME( 1989, dbldynf, dynduke, dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", 0 ,0)
+GAME( 1989, dynduke, 0,       dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", 0 ,0,0,egg_Unknown,0)
+GAME( 1989, dyndukf, dynduke, dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", 0 ,0,0,egg_Unknown,0)
+GAME( 1989, dbldyn,  dynduke, dbldyn,  dynduke, dynduke, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", 0 ,0,0,egg_Unknown,0)
+GAME( 1989, dbldynf, dynduke, dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", 0 ,0,0,egg_Unknown,0)

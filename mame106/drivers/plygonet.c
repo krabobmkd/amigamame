@@ -738,4 +738,4 @@ ROM_START( plygonet )
 ROM_END
 
 /*          ROM        parent   machine    inp        init */
-GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
+GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", GAME_NOT_WORKING | GAME_NO_SOUND ,0,1,egg_ShootEmUp,0)

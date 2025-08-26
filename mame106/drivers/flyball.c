@@ -307,4 +307,4 @@ ROM_START( flyball )
 ROM_END
 
 
-GAME( 1976, flyball, 0, flyball, flyball, 0, 0, "Atari", "Flyball", GAME_NO_SOUND ,0)
+GAME( 1976, flyball, 0, flyball, flyball, 0, 0, "Atari", "Flyball", GAME_NO_SOUND ,0,0,egg_Unknown,0)

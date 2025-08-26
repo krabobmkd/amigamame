@@ -1330,8 +1330,8 @@ ROM_START( thoop )
 	ROM_RELOAD(		   0x040000, 0x100000 )
 ROM_END
 
-GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, 0, ROT0, "Gaelco", "Big Karnak", 0 ,2)
-GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  0, ROT0, "Gaelco", "Biomechanical Toy (unprotected)", 0 ,1)
-GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, 0, ROT0, "Gaelco", "Maniac Square (prototype)", 0 ,0)
-GAME( 1992, squash,   0,		squash,   squash,   0, ROT0, "Gaelco", "Squash (Ver. 1.0)", GAME_IMPERFECT_GRAPHICS ,0)  // problems with decryption + prioirites
-GAME( 1992, thoop,    0,		thoop,    thoop,    0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1)", 0 ,0)
+GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, 0, ROT0, "Gaelco", "Big Karnak", 0 ,2,0,egg_Platform,0)
+GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  0, ROT0, "Gaelco", "Biomechanical Toy (unprotected)", 0 ,0,1,egg_Platform,0)
+GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, 0, ROT0, "Gaelco", "Maniac Square (prototype)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1992, squash,   0,		squash,   squash,   0, ROT0, "Gaelco", "Squash (Ver. 1.0)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_sport_Tennis,0)  // problems with decryption + prioirites
+GAME( 1992, thoop,    0,		thoop,    thoop,    0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1)", 0 ,0,2,egg_Platform,0)

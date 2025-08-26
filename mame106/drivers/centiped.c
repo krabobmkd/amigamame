@@ -1642,15 +1642,15 @@ static DRIVER_INIT( bullsdrt )
  *
  *************************************/
 
-GAME( 1980, centiped, 0,        centiped, centiped, 0,        ROT270, "Atari",   "Centipede (revision 3)", 0 ,2)
-GAME( 1980, centipd2, centiped, centiped, centiped, 0,        ROT270, "Atari",   "Centipede (revision 2)", 0 ,2)
-GAME( 1980, centtime, centiped, centiped, centtime, 0,        ROT270, "Atari",   "Centipede (1 player, timed)", 0 ,2)
-GAME( 1980, centipdb, centiped, centipdb, centiped, 0,        ROT270, "bootleg", "Centipede (bootleg)", 0 ,2)
-GAME( 1980, caterplr, centiped, caterplr, caterplr, caterplr, ROT270, "bootleg", "Caterpillar", 0 ,2)
-GAME( 1980, millpac,  centiped, centipdb, centiped, 0, 	      ROT270, "Valadon Automation", "Millpac", 0 ,2)
-GAME( 1980, magworm,  centiped, magworm,  magworm,  magworm,  ROT270, "bootleg", "Magic Worm (bootleg)", 0 ,2)
-GAME( 1982, milliped, 0,        milliped, milliped, 0,        ROT270, "Atari",   "Millipede", 0 ,2)
+GAME( 1980, centiped, 0,        centiped, centiped, 0,        ROT270, "Atari",   "Centipede (revision 3)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1980, centipd2, centiped, centiped, centiped, 0,        ROT270, "Atari",   "Centipede (revision 2)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1980, centtime, centiped, centiped, centtime, 0,        ROT270, "Atari",   "Centipede (1 player, timed)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1980, centipdb, centiped, centipdb, centiped, 0,        ROT270, "bootleg", "Centipede (bootleg)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, caterplr, centiped, caterplr, caterplr, caterplr, ROT270, "bootleg", "Caterpillar", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, millpac,  centiped, centipdb, centiped, 0, 	      ROT270, "Valadon Automation", "Millpac", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, magworm,  centiped, magworm,  magworm,  magworm,  ROT270, "bootleg", "Magic Worm (bootleg)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, milliped, 0,        milliped, milliped, 0,        ROT270, "Atari",   "Millipede", 0 ,0,2,egg_ShootEmUp,0)
 
-GAME( 1980, warlords, 0,        warlords, warlords, 0,        ROT0,   "Atari",   "Warlords", 0 ,4)
+GAME( 1980, warlords, 0,        warlords, warlords, 0,        ROT0,   "Atari",   "Warlords", 0 ,4,0,egg_BallNPaddles,0)
 
-GAME( 1985, bullsdrt, 0,        bullsdrt, bullsdrt, bullsdrt, ROT270, "Shinkai Inc. (Magic Eletronics Inc. licence)", "Bulls Eye Darts", GAME_IMPERFECT_COLORS ,0)
+GAME( 1985, bullsdrt, 0,        bullsdrt, bullsdrt, bullsdrt, ROT270, "Shinkai Inc. (Magic Eletronics Inc. licence)", "Bulls Eye Darts", GAME_IMPERFECT_COLORS ,0,2,egg_PoolNDart,0)

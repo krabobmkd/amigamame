@@ -450,5 +450,5 @@ static DRIVER_INIT(enigma2)
 		memory_region(REGION_CPU2)[i]=BITSWAP8(memory_region(REGION_CPU2)[i],4,5,6,0,7,1,3,2);
 }
 
-GAME( 1981, enigma2,  0,	   enigma2,  enigma2,  enigma2, ROT90, "GamePlan (Zilec Electronics license)", "Enigma 2", 0 ,2)
-GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2, ROT90, "Zilec Electronics", "Enigma 2 (Space Invaders Hardware)", 0 ,2)
+GAME( 1981, enigma2,  0,	   enigma2,  enigma2,  enigma2, ROT90, "GamePlan (Zilec Electronics license)", "Enigma 2", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2, ROT90, "Zilec Electronics", "Enigma 2 (Space Invaders Hardware)", 0 ,0,2,egg_ShootEmUp,0)

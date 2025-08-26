@@ -1460,15 +1460,15 @@ static DRIVER_INIT( hvoltage )
 // Game Entries
 
 // Equites Hardware
-GAME( 1984, equites,  0,        equites,  equites,  equites,  ROT90, "Alpha Denshi Co.",                "Equites", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL ,0)
-GAME( 1984, equitess, equites,  equites,  equites,  equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL ,0)
-GAME( 1985, gekisou,  0,        equites,  equites,  equites,  ROT90, "Eastern",                         "Gekisou (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL | GAME_NOT_WORKING ,0)
-GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co.",                "Bull Fighter", GAME_UNEMULATED_PROTECTION ,0)
-GAME( 1984, bullfgts, bullfgtr, equites,  bullfgtr, bullfgts, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", GAME_UNEMULATED_PROTECTION ,0)
-GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, kouyakyu, ROT0,  "Alpha Denshi Co.",                "The Koukouyakyuh", GAME_UNEMULATED_PROTECTION ,0)
+GAME( 1984, equites,  0,        equites,  equites,  equites,  ROT90, "Alpha Denshi Co.",                "Equites", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1984, equitess, equites,  equites,  equites,  equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1985, gekisou,  0,        equites,  equites,  equites,  ROT90, "Eastern",                         "Gekisou (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL | GAME_NOT_WORKING ,0,2,egg_Driving,0)
+GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co.",                "Bull Fighter", GAME_UNEMULATED_PROTECTION ,2,0,egg_sport_Hockey,0)
+GAME( 1984, bullfgts, bullfgtr, equites,  bullfgtr, bullfgts, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", GAME_UNEMULATED_PROTECTION ,2,0,egg_sport_Hockey,0)
+GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, kouyakyu, ROT0,  "Alpha Denshi Co.",                "The Koukouyakyuh", GAME_UNEMULATED_PROTECTION ,2,0,egg_sport_Baseball,0)
 
 // Splendor Blast Hardware
-GAME( 1985, splndrbt, 0,        splndrbt, splndrbt, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL ,0)
-GAME( 1985, hvoltage, 0,        splndrbt, hvoltage, hvoltage, ROT0,  "Alpha Denshi Co.", "High Voltage", GAME_UNEMULATED_PROTECTION ,0)
+GAME( 1985, splndrbt, 0,        splndrbt, splndrbt, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1985, hvoltage, 0,        splndrbt, hvoltage, hvoltage, ROT0,  "Alpha Denshi Co.", "High Voltage", GAME_UNEMULATED_PROTECTION ,0,2,egg_ShootEmUp,0)
 
 /******************************************************************************/

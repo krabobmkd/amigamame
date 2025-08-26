@@ -213,4 +213,4 @@ ROM_START( galaxia )
 	ROM_LOAD( "11o", 0x00000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
 ROM_END
 
-GAME( 1979, galaxia, 0, galaxia, galaxia, 0, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 1979, galaxia, 0, galaxia, galaxia, 0, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)

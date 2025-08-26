@@ -533,9 +533,9 @@ static DRIVER_INIT( aliens )
 
 
 
-GAME( 1990, aliens,   0,      aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 1)", 0 ,2)
-GAME( 1990, aliens2,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 2)", 0 ,2)
-GAME( 1990, aliens3,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 3)", 0 ,2)
-GAME( 1990, aliensu,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (US)", 0 ,2)
-GAME( 1990, aliensj,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 1)", 0 ,2)
-GAME( 1990, aliensj2, aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 2)", 0 ,2)
+GAME( 1990, aliens,   0,      aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 1)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, aliens2,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 2)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, aliens3,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 3)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, aliensu,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (US)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, aliensj,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 1)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, aliensj2, aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 2)", 0 ,2,0,egg_Platform,0)

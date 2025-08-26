@@ -725,12 +725,12 @@ static DRIVER_INIT( hidctch2 )
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 }
 
-GAME( 1998, hidnctch, 0,       eolith, hidnctch, 0,        ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ,0) // or Teurrin Geurim Chajgi '98
-GAME( 1998, raccoon,  0,       eolith, raccoon,  0,        ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND ,0)
-GAME( 1998, puzzlekg, 0,       eolith, puzzlekg, 0,        ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND ,0)
-GAME( 1999, hidctch2, 0,       eolith, hidnctch, hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03)", GAME_NO_SOUND ,0)
-GAME( 1999, landbrk,  0,       eolith, landbrk,  landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ,0) // or Miss Ttang Jjareugi
-GAME( 1999, landbrka, landbrk, eolith, landbrk,  landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ,0) // or Miss Ttang Jjareugi
-GAME( 1999, nhidctch, 0,       eolith, hidnctch, 0,        ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_NO_SOUND ,0) // or New Teurrin Geurim Chajgi '98
-GAME( 2001, fort2b,   0,       eolith, common,   0,        ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_NO_SOUND ,0)
-GAME( 2001, fort2ba,  fort2b,  eolith, common,   0,        ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_NO_SOUND ,0)
+GAME( 1998, hidnctch, 0,       eolith, hidnctch, 0,        ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ,2,0,egg_Miscellaneous,0) // or Teurrin Geurim Chajgi '98
+GAME( 1998, raccoon,  0,       eolith, raccoon,  0,        ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND ,2,0,egg_Platform,0)
+GAME( 1998, puzzlekg, 0,       eolith, puzzlekg, 0,        ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND ,2,0,egg_Puzzle,0)
+GAME( 1999, hidctch2, 0,       eolith, hidnctch, hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03)", GAME_NO_SOUND ,2,0,egg_Miscellaneous,0)
+GAME( 1999, landbrk,  0,       eolith, landbrk,  landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ,0,1,egg_Mature,0) // or Miss Ttang Jjareugi
+GAME( 1999, landbrka, landbrk, eolith, landbrk,  landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ,0,1,egg_Mature,0) // or Miss Ttang Jjareugi
+GAME( 1999, nhidctch, 0,       eolith, hidnctch, 0,        ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_NO_SOUND ,2,0,egg_Miscellaneous,0) // or New Teurrin Geurim Chajgi '98
+GAME( 2001, fort2b,   0,       eolith, common,   0,        ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 2001, fort2ba,  fort2b,  eolith, common,   0,        ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)

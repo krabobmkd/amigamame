@@ -535,4 +535,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(1997, pf2012, 0,	taitowlf, taitowlf, taitowlf,	ROT0,   "Taito",  "Psychic Force 2012", GAME_NOT_WORKING | GAME_NO_SOUND,0);
+GAME(1997, pf2012, 0,	taitowlf, taitowlf, taitowlf,	ROT0,   "Taito",  "Psychic Force 2012", GAME_NOT_WORKING | GAME_NO_SOUND,0,0,egg_Fighter,0);

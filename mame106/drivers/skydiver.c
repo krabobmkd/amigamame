@@ -420,4 +420,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, skydiver, 0, skydiver, skydiver, 0, ROT0, "Atari", "Sky Diver", 0 ,2)
+GAME( 1978, skydiver, 0, skydiver, skydiver, 0, ROT0, "Atari", "Sky Diver", 0 ,2,0,egg_sport_,0)

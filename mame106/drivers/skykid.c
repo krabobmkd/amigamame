@@ -555,7 +555,7 @@ static DRIVER_INIT( skykidd )
 
 
 
-GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid,  ROT0,   "Namco", "Dragon Buster", 0 ,0)
-GAME( 1985, skykid,   0,      skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (New Ver.)", 0 ,0)
-GAME( 1985, skykido,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (Old Ver.)", 0 ,0)
-GAME( 1985, skykidd,  skykid, skykid, skykid,   skykidd, ROT180, "Namco", "Sky Kid (60A1 Ver.)", 0 ,0)
+GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid,  ROT0,   "Namco", "Dragon Buster", 0 ,0,2,egg_Platform,0)
+GAME( 1985, skykid,   0,      skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (New Ver.)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1985, skykido,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (Old Ver.)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1985, skykidd,  skykid, skykid, skykid,   skykidd, ROT180, "Namco", "Sky Kid (60A1 Ver.)", 0 ,2,0,egg_ShootEmUp,0)

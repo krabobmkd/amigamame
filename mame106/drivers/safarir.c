@@ -298,4 +298,4 @@ DRIVER_INIT( safarir )
 }
 
 
-GAME( 1979, safarir, 0, safarir, safarir, safarir, ROT90, "SNK", "Safari Rally (Japan)", GAME_NO_SOUND | GAME_WRONG_COLORS ,0)
+GAME( 1979, safarir, 0, safarir, safarir, safarir, ROT90, "SNK", "Safari Rally (Japan)", GAME_NO_SOUND | GAME_WRONG_COLORS ,0,0,egg_Unknown,0)

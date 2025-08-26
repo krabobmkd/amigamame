@@ -473,10 +473,10 @@ ROM_END
 
 
 
-GAME( 1997, sfiii,   0,        cps3, cps3, nocpu, ROT0,   "Capcom", "Street Fighter III: New Generation", GAME_NOT_WORKING | GAME_NO_SOUND ,2)
-GAME( 1998, sfiii2,  0,        cps3, cps3, nocpu, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack", GAME_NOT_WORKING | GAME_NO_SOUND ,2)
-GAME( 1999, sfiii3,  0,        cps3, cps3, nocpu, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future", GAME_NOT_WORKING | GAME_NO_SOUND ,2)
-GAME( 1996, warzard, 0,        cps3, cps3, nocpu, ROT0,   "Capcom", "Warzard / Red Earth", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
-GAME( 1998, jojo,    0,        cps3, cps3, nocpu, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
-GAME( 1999, jojoba,  0,        cps3, cps3, nocpu, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
-GAME( 1999, jojobaa, jojoba,   cps3, cps3, nocpu, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (alt)", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
+GAME( 1997, sfiii,   0,        cps3, cps3, nocpu, ROT0,   "Capcom", "Street Fighter III: New Generation", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1998, sfiii2,  0,        cps3, cps3, nocpu, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1999, sfiii3,  0,        cps3, cps3, nocpu, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1996, warzard, 0,        cps3, cps3, nocpu, ROT0,   "Capcom", "Warzard / Red Earth", GAME_NOT_WORKING | GAME_NO_SOUND ,2,0,egg_Fighter,0)
+GAME( 1998, jojo,    0,        cps3, cps3, nocpu, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1999, jojoba,  0,        cps3, cps3, nocpu, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1999, jojobaa, jojoba,   cps3, cps3, nocpu, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (alt)", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Unknown,0)

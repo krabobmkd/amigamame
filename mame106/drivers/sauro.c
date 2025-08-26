@@ -478,6 +478,6 @@ static DRIVER_INIT( tecfri )
 	RAM[0xe000] = 1;
 }
 
-GAME( 1987, sauro,    0,        sauro,    tecfri, tecfri, ROT0, "Tecfri", "Sauro", GAME_IMPERFECT_SOUND ,0)
-GAME( 1987, trckydoc, 0,        trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 1)", 0 ,0)
-GAME( 1987, trckydca, trckydoc, trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 2)", 0 ,0)
+GAME( 1987, sauro,    0,        sauro,    tecfri, tecfri, ROT0, "Tecfri", "Sauro", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1987, trckydoc, 0,        trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1987, trckydca, trckydoc, trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 2)", 0 ,0,2,egg_Platform,0)

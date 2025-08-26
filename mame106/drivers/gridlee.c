@@ -501,4 +501,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, gridlee, 0,        gridlee, gridlee, 0,     ROT0, "Videa", "Gridlee", GAME_IMPERFECT_SOUND ,2)
+GAME( 1983, gridlee, 0,        gridlee, gridlee, 0,     ROT0, "Videa", "Gridlee", GAME_IMPERFECT_SOUND ,0,2,egg_Shooter,0)

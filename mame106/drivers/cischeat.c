@@ -3206,10 +3206,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1989, bigrun,   0, bigrun,   bigrun,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", GAME_IMPERFECT_GRAPHICS ,1)	// there's a 13th Rallye version (1991)
-GAME( 1990, cischeat, 0, cischeat, cischeat, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1991, f1gpstar, 0, f1gpstar, f1gpstar, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star",               GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1992, armchmp2, 0, armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II",                 GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1992, wildplt,  0, f1gpstr2, wildplt,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, f1gpstr2, 0, f1gpstr2, f1gpstar, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1994, scudhamm, 0, scudhamm, scudhamm, 0,        ROT270, "Jaleco", "Scud Hammer",                   GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1989, bigrun,   0, bigrun,   bigrun,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,0)	// there's a 13th Rallye version (1991)
+GAME( 1990, cischeat, 0, cischeat, cischeat, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,0)
+GAME( 1991, f1gpstar, 0, f1gpstar, f1gpstar, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star",               GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1992, armchmp2, 0, armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II",                 GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1992, wildplt,  0, f1gpstr2, wildplt,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    GAME_IMPERFECT_GRAPHICS ,2,0,egg_LightGuns,0)
+GAME( 1993, f1gpstr2, 0, f1gpstr2, f1gpstar, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,0)
+GAME( 1994, scudhamm, 0, scudhamm, scudhamm, 0,        ROT270, "Jaleco", "Scud Hammer",                   GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)

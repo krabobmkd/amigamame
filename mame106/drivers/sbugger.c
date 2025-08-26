@@ -232,5 +232,5 @@ ROM_END
 
 /* game drivers */
 
-GAME( 1981, sbugger, 0, sbugger, sbugger, 0, ROT270, "Game-A-Tron", "Space Bugger", GAME_NO_SOUND | GAME_NOT_WORKING ,0)
+GAME( 1981, sbugger, 0, sbugger, sbugger, 0, ROT270, "Game-A-Tron", "Space Bugger", GAME_NO_SOUND | GAME_NOT_WORKING ,0,2,egg_ShootEmUp,0)
 

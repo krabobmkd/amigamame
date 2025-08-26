@@ -1018,10 +1018,10 @@ static DRIVER_INIT( decode_buckrog )
  *
  *************************************/
 
-GAME( 1981, turbo,    0,       turbo,    turbo,    0,              ROT270,             "Sega", "Turbo", GAME_NO_COCKTAIL ,1)
-GAME( 1981, turboa,   turbo,   turbo,    turbo,    decode_turbo,   ROT270,             "Sega", "Turbo (encrypted set 1)", GAME_NO_COCKTAIL ,1)
-GAME( 1981, turbob,   turbo,   turbo,    turbo,    decode_turbo,   ROT270,             "Sega", "Turbo (encrypted set 2)", GAME_NO_COCKTAIL ,1)
-GAME( 1982, subroc3d, 0,       subroc3d, subroc3d, 0,              ORIENTATION_FLIP_X, "Sega", "Subroc-3D", 0 ,0)
-GAME( 1982, buckrog,  0,       buckrog,  buckrog,  decode_buckrog, ROT0,               "Sega", "Buck Rogers: Planet of Zoom", 0 ,2)
-GAME( 1982, zoom909,  buckrog, buckrog,  buckrog,  decode_buckrog, ROT0,               "Sega", "Zoom 909", 0 ,2)
-GAME( 1982, buckrogn, buckrog, buckrog,  buckrog,  0,              ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted)", 0 ,2)
+GAME( 1981, turbo,    0,       turbo,    turbo,    0,              ROT270,             "Sega", "Turbo", GAME_NO_COCKTAIL ,0,1,egg_Driving,0)
+GAME( 1981, turboa,   turbo,   turbo,    turbo,    decode_turbo,   ROT270,             "Sega", "Turbo (encrypted set 1)", GAME_NO_COCKTAIL ,0,1,egg_Driving,0)
+GAME( 1981, turbob,   turbo,   turbo,    turbo,    decode_turbo,   ROT270,             "Sega", "Turbo (encrypted set 2)", GAME_NO_COCKTAIL ,0,1,egg_Driving,0)
+GAME( 1982, subroc3d, 0,       subroc3d, subroc3d, 0,              ORIENTATION_FLIP_X, "Sega", "Subroc-3D", 0 ,0,1,egg_Flying,0)
+GAME( 1982, buckrog,  0,       buckrog,  buckrog,  decode_buckrog, ROT0,               "Sega", "Buck Rogers: Planet of Zoom", 0 ,0,1,egg_Flying,0)
+GAME( 1982, zoom909,  buckrog, buckrog,  buckrog,  decode_buckrog, ROT0,               "Sega", "Zoom 909", 0 ,0,1,egg_Flying,0)
+GAME( 1982, buckrogn, buckrog, buckrog,  buckrog,  0,              ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted)", 0 ,0,1,egg_Flying,0)

@@ -555,4 +555,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, exterm, 0, exterm, exterm, 0, ROT0, "Gottlieb / Premier Technology", "Exterminator", 0 ,2)
+GAME( 1989, exterm, 0, exterm, exterm, 0, ROT0, "Gottlieb / Premier Technology", "Exterminator", 0 ,2,0,egg_Shooter,0)

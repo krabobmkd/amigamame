@@ -560,6 +560,6 @@ static DRIVER_INIT( gradius3 )
 
 
 
-GAME( 1989, gradius3, 0,        gradius3, gradius3, gradius3, ROT0, "Konami", "Gradius III (Japan)", 0 ,0)
-GAME( 1989, grdius3a, gradius3, gradius3, gradius3, gradius3, ROT0, "Konami", "Gradius III (Asia)", 0 ,0)
-GAME( 1989, grdius3e, gradius3, gradius3, gradius3, gradius3, ROT0, "Konami", "Gradius III (World ?)", 0 ,0)
+GAME( 1989, gradius3, 0,        gradius3, gradius3, gradius3, ROT0, "Konami", "Gradius III (Japan)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1989, grdius3a, gradius3, gradius3, gradius3, gradius3, ROT0, "Konami", "Gradius III (Asia)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1989, grdius3e, gradius3, gradius3, gradius3, gradius3, ROT0, "Konami", "Gradius III (World ?)", 0 ,0,2,egg_ShootEmUp,0)

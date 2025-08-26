@@ -558,6 +558,6 @@ static DRIVER_INIT( 88games )
 
 
 
-GAME( 1988, 88games,  0,       88games, 88games, 88games, ROT0, "Konami", "'88 Games", 0 ,2)
-GAME( 1988, konami88, 88games, 88games, 88games, 88games, ROT0, "Konami", "Konami '88", 0 ,2)
-GAME( 1988, hypsptsp, 88games, 88games, 88games, 88games, ROT0, "Konami", "Hyper Sports Special (Japan)", 0 ,2)
+GAME( 1988, 88games,  0,       88games, 88games, 88games, ROT0, "Konami", "'88 Games", 0 ,2,4,egg_sport_TrackNField,0)
+GAME( 1988, konami88, 88games, 88games, 88games, 88games, ROT0, "Konami", "Konami '88", 0 ,2,4,egg_sport_TrackNField,0)
+GAME( 1988, hypsptsp, 88games, 88games, 88games, 88games, ROT0, "Konami", "Hyper Sports Special (Japan)", 0 ,2,4,egg_sport_TrackNField,0)

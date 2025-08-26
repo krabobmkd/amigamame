@@ -807,5 +807,5 @@ DRIVER_INIT( kickgoal )
 }
 
 
-GAME( 1995, kickgoal,0, kickgoal, kickgoal, kickgoal, ROT0, "TCH", "Kick Goal", GAME_NO_SOUND ,0)
-GAME( 1995, actionhw,0, actionhw, kickgoal, kickgoal, ROT0, "TCH", "Action Hollywood", GAME_IMPERFECT_SOUND ,0)
+GAME( 1995, kickgoal,0, kickgoal, kickgoal, kickgoal, ROT0, "TCH", "Kick Goal", GAME_NO_SOUND ,2,0,egg_sport_Soccer,0)
+GAME( 1995, actionhw,0, actionhw, kickgoal, kickgoal, ROT0, "TCH", "Action Hollywood", GAME_IMPERFECT_SOUND ,2,0,egg_Maze,0)

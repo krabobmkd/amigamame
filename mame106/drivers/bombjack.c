@@ -415,5 +415,5 @@ ROM_START( bombjac2 )
 ROM_END
 
 
-GAME( 1984, bombjack, 0,        bombjack, bombjack, 0, ROT90, "Tehkan", "Bomb Jack (set 1)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1984, bombjac2, bombjack, bombjack, bombjack, 0, ROT90, "Tehkan", "Bomb Jack (set 2)", GAME_SUPPORTS_SAVE ,2)
+GAME( 1984, bombjack, 0,        bombjack, bombjack, 0, ROT90, "Tehkan", "Bomb Jack (set 1)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)
+GAME( 1984, bombjac2, bombjack, bombjack, bombjack, 0, ROT90, "Tehkan", "Bomb Jack (set 2)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,0)

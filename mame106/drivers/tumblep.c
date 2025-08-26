@@ -412,6 +412,6 @@ static DRIVER_INIT( tumblep )
 
 /******************************************************************************/
 
-GAME( 1991, tumblep,  0,       tumblep,   tumblep,  tumblep,  ROT0, "Data East Corporation", "Tumble Pop (World)", 0 ,0)
-GAME( 1991, tumblepj, tumblep, tumblep,   tumblep,  tumblep,  ROT0, "Data East Corporation", "Tumble Pop (Japan)", 0 ,0)
+GAME( 1991, tumblep,  0,       tumblep,   tumblep,  tumblep,  ROT0, "Data East Corporation", "Tumble Pop (World)", 0 ,2,0,egg_Platform,0)
+GAME( 1991, tumblepj, tumblep, tumblep,   tumblep,  tumblep,  ROT0, "Data East Corporation", "Tumble Pop (Japan)", 0 ,2,0,egg_Platform,0)
 /* for bootlegs and games on similar hardware see tumbleb.c */

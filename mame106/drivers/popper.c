@@ -368,4 +368,4 @@ ROM_START( popper )
 ROM_END
 
 
-GAME( 1983, popper, 0, popper, popper, 0, ROT90, "Omori Electric Co., Ltd.", "Popper", GAME_IMPERFECT_COLORS ,2)
+GAME( 1983, popper, 0, popper, popper, 0, ROT90, "Omori Electric Co., Ltd.", "Popper", GAME_IMPERFECT_COLORS ,0,2,egg_Platform,0)

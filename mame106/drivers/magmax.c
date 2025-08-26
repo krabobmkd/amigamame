@@ -438,4 +438,4 @@ ROM_START( magmax )
 ROM_END
 
 
-GAME( 1985, magmax, 0, magmax, magmax, 0, ROT0, "Nichibutsu", "Mag Max", 0 ,0)
+GAME( 1985, magmax, 0, magmax, magmax, 0, ROT0, "Nichibutsu", "Mag Max", 0 ,0,2,egg_ShootEmUp,0)

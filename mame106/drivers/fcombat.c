@@ -474,4 +474,4 @@ ROM_START( fcombat )
 	ROM_LOAD( "fcprom_c.a9",  0x0220, 0x0100, CRC(768ac120) SHA1(ceede1d6cbeae08da96ef52bdca2718a839d88ab) ) /* bg char mixer */
 ROM_END
 
-GAME( 1985, fcombat,  0,       fcombat, fcombat, fcombat,  ROT90, "Jaleco", "Field Combat", GAME_WRONG_COLORS ,0)
+GAME( 1985, fcombat,  0,       fcombat, fcombat, fcombat,  ROT90, "Jaleco", "Field Combat", GAME_WRONG_COLORS ,0,2,egg_ShootEmUp,0)

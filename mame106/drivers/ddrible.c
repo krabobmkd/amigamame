@@ -423,4 +423,4 @@ ROM_END
 
 
 
-GAME( 1986, ddribble, 0, ddribble, ddribble, 0, ROT0, "Konami", "Double Dribble", 0,2)
+GAME( 1986, ddribble, 0, ddribble, ddribble, 0, ROT0, "Konami", "Double Dribble", 0,2,0,egg_sport_Basketball,0)

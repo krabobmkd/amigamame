@@ -954,13 +954,13 @@ ROM_END
 ***************************************************************************/
 
 /* ESD 11-09-98 */
-GAME( 1999, multchmp, 0,        multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (World)", 0 ,0)
-GAME( 1998, multchmk, multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", 0 ,0)
+GAME( 1999, multchmp, 0,        multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (World)", 0 ,0,0,egg_Unknown,0)
+GAME( 1998, multchmk, multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", 0 ,0,0,egg_Unknown,0)
 
 /* ESD 08-26-1999 */
-GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", 0 ,0) // 06/01/2000 ?
-GAME( 1999, mchampda, mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", 0 ,0) // 26/11/1999 ?
-GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", 0 ,0) // 15/03/2000 ?
+GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", 0 ,2,0,egg_Mature,0) // 06/01/2000 ?
+GAME( 1999, mchampda, mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", 0 ,2,0,egg_Mature,0) // 26/11/1999 ?
+GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", 0 ,2,0,egg_Platform,0) // 15/03/2000 ?
 
 /* ESD */
-GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", 0 ,0) // 26/05/2000 ?
+GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", 0 ,2,0,egg_Platform,0) // 26/05/2000 ?

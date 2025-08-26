@@ -457,5 +457,5 @@ ROM_START( metlclsh )
 	ROM_LOAD( "82s123.prm",   0x0000, 0x20, CRC(6844cc88) SHA1(89d23367aa6ff541205416e82781fe938dfeeb52) )
 ROM_END
 
-GAME( 1985, metlclsh, 0, metlclsh, metlclsh, 0, ROT0, "Data East", "Metal Clash (Japan)", 0 ,0)
+GAME( 1985, metlclsh, 0, metlclsh, metlclsh, 0, ROT0, "Data East", "Metal Clash (Japan)", 0 ,2,0,egg_Miscellaneous,0)
 

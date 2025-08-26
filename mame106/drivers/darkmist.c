@@ -488,4 +488,4 @@ static DRIVER_INIT(darkmist)
 	free(buffer);
 }
 
-GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist, ROT270, "Taito", "The Lost Castle In Darkmist", GAME_IMPERFECT_GRAPHICS|GAME_NO_COCKTAIL|GAME_NO_SOUND ,0)
+GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist, ROT270, "Taito", "The Lost Castle In Darkmist", GAME_IMPERFECT_GRAPHICS|GAME_NO_COCKTAIL|GAME_NO_SOUND ,0,2,egg_Platform,0)

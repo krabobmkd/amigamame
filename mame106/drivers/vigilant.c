@@ -954,10 +954,10 @@ ROM_START( buccanra )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant, 0,        vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (World)", GAME_NO_COCKTAIL ,2)
-GAME( 1988, vigilntu, vigilant, vigilant, vigilant, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL ,2)
-GAME( 1988, vigilntj, vigilant, vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (Japan)", GAME_NO_COCKTAIL ,2)
-GAME( 1988, kikcubic, 0,        kikcubic, kikcubic, 0, ROT0, "Irem", "Meikyu Jima (Japan)", GAME_NO_COCKTAIL ,0)	/* English title is Kickle Cubicle */
-GAME( 1988, kikcubib, kikcubic, kikcubic, kikcubic, 0, ROT0, "bootleg", "Kickle Cubele", GAME_NO_COCKTAIL ,0)
-GAME( 1989, buccanrs, 0,        buccanrs, buccanrs, 0, ROT0, "Duintronic", "Buccaneers (set 1)", GAME_NO_COCKTAIL ,0)
-GAME( 1989, buccanra, buccanrs, buccanrs, buccanra, 0, ROT0, "Duintronic", "Buccaneers (set 2)", GAME_NO_COCKTAIL ,0)
+GAME( 1988, vigilant, 0,        vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (World)", GAME_NO_COCKTAIL ,0,0,egg_Unknown,0)
+GAME( 1988, vigilntu, vigilant, vigilant, vigilant, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL ,0,0,egg_Unknown,0)
+GAME( 1988, vigilntj, vigilant, vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (Japan)", GAME_NO_COCKTAIL ,0,0,egg_Unknown,0)
+GAME( 1988, kikcubic, 0,        kikcubic, kikcubic, 0, ROT0, "Irem", "Meikyu Jima (Japan)", GAME_NO_COCKTAIL ,0,2,egg_Maze,0)	/* English title is Kickle Cubicle */
+GAME( 1988, kikcubib, kikcubic, kikcubic, kikcubic, 0, ROT0, "bootleg", "Kickle Cubele", GAME_NO_COCKTAIL ,0,2,egg_Maze,0)
+GAME( 1989, buccanrs, 0,        buccanrs, buccanrs, 0, ROT0, "Duintronic", "Buccaneers (set 1)", GAME_NO_COCKTAIL ,0,2,egg_BeatNUp,0)
+GAME( 1989, buccanra, buccanrs, buccanrs, buccanra, 0, ROT0, "Duintronic", "Buccaneers (set 2)", GAME_NO_COCKTAIL ,0,2,egg_BeatNUp,0)

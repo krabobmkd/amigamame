@@ -356,6 +356,6 @@ ROM_END
 
 
 
-GAME( 1982, pooyan,  0,      pooyan, pooyan, 0, ROT270, "Konami", "Pooyan", 0 ,2)
-GAME( 1982, pooyans, pooyan, pooyan, pooyan, 0, ROT270, "[Konami] (Stern license)", "Pooyan (Stern)", 0 ,2)
-GAME( 1982, pootan,  pooyan, pooyan, pooyan, 0, ROT270, "bootleg", "Pootan", 0 ,2)
+GAME( 1982, pooyan,  0,      pooyan, pooyan, 0, ROT270, "Konami", "Pooyan", 0 ,0,2,egg_Shooter,0)
+GAME( 1982, pooyans, pooyan, pooyan, pooyan, 0, ROT270, "[Konami] (Stern license)", "Pooyan (Stern)", 0 ,0,2,egg_Shooter,0)
+GAME( 1982, pootan,  pooyan, pooyan, pooyan, 0, ROT270, "bootleg", "Pootan", 0 ,0,2,egg_Shooter,0)

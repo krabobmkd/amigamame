@@ -398,4 +398,4 @@ ROM_START( wolfpack )
 ROM_END
 
 
-GAME( 1978, wolfpack, 0, wolfpack, wolfpack, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", GAME_NO_SOUND ,1)
+GAME( 1978, wolfpack, 0, wolfpack, wolfpack, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", GAME_NO_SOUND ,0,1,egg_ShootEmUp,0)

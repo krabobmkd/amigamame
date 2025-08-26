@@ -736,8 +736,8 @@ DRIVER_INIT( tokib )
 
 
 
-GAME( 1989, toki,  0,    toki,  toki,  toki,  ROT0, "Tad", "Toki (World set 1)", 0 ,2)
-GAME( 1989, tokia, toki, toki,  toki,  toki,  ROT0, "Tad", "Toki (World set 2)", 0 ,2)
-GAME( 1989, tokij, toki, toki,  toki,  toki,  ROT0, "Tad", "JuJu Densetsu (Japan)", 0 ,2)
-GAME( 1989, tokiu, toki, toki,  toki,  toki,  ROT0, "Tad (Fabtek license)", "Toki (US)", 0 ,2)
-GAME( 1989, tokib, toki, tokib, tokib, tokib, ROT0, "bootleg", "Toki (bootleg)", 0 ,2)
+GAME( 1989, toki,  0,    toki,  toki,  toki,  ROT0, "Tad", "Toki (World set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1989, tokia, toki, toki,  toki,  toki,  ROT0, "Tad", "Toki (World set 2)", 0 ,0,2,egg_Platform,0)
+GAME( 1989, tokij, toki, toki,  toki,  toki,  ROT0, "Tad", "JuJu Densetsu (Japan)", 0 ,0,2,egg_Platform,0)
+GAME( 1989, tokiu, toki, toki,  toki,  toki,  ROT0, "Tad (Fabtek license)", "Toki (US)", 0 ,0,2,egg_Platform,0)
+GAME( 1989, tokib, toki, tokib, tokib, tokib, ROT0, "bootleg", "Toki (bootleg)", 0 ,0,2,egg_Platform,0)

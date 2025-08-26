@@ -1233,10 +1233,10 @@ ROM_END
 
 
 
-GAME( 1997, dendeg,   0,       taitojc, taitojc, dendeg,   ROT0, "Taito", "Densya De Go", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1997, dendegx,  dendeg,  taitojc, taitojc, dendegx,  ROT0, "Taito", "Densya De Go Ex", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1998, dendeg2,  0,       taitojc, taitojc, dendeg2,  ROT0, "Taito", "Densya De Go 2", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1998, dendeg2x, dendeg2, taitojc, taitojc, dendeg2x, ROT0, "Taito", "Densya De Go 2 Ex", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1996, sidebs,   0,       taitojc, taitojc, sidebs,   ROT0, "Taito", "Side By Side", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1997, sidebs2,  0,       taitojc, taitojc, sidebs2,  ROT0, "Taito", "Side By Side 2", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1995, landgear, 0,       taitojc, taitojc, landgear, ROT0, "Taito", "Landing Gear", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 1997, dendeg,   0,       taitojc, taitojc, dendeg,   ROT0, "Taito", "Densya De Go", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1997, dendegx,  dendeg,  taitojc, taitojc, dendegx,  ROT0, "Taito", "Densya De Go Ex", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1998, dendeg2,  0,       taitojc, taitojc, dendeg2,  ROT0, "Taito", "Densya De Go 2", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1998, dendeg2x, dendeg2, taitojc, taitojc, dendeg2x, ROT0, "Taito", "Densya De Go 2 Ex", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1996, sidebs,   0,       taitojc, taitojc, sidebs,   ROT0, "Taito", "Side By Side", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1997, sidebs2,  0,       taitojc, taitojc, sidebs2,  ROT0, "Taito", "Side By Side 2", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1995, landgear, 0,       taitojc, taitojc, landgear, ROT0, "Taito", "Landing Gear", GAME_NOT_WORKING|GAME_NO_SOUND ,0,1,egg_Driving,0)

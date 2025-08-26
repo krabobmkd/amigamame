@@ -406,6 +406,6 @@ ROM_END
 
 
 
-GAME( 1984, vulgus,  0,      vulgus, vulgus, 0, ROT90,  "Capcom", "Vulgus (set 1)", 0 ,0)
-GAME( 1984, vulgus2, vulgus, vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (set 2)", 0 ,0)
-GAME( 1984, vulgusj, vulgus, vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (Japan?)", 0 ,0)
+GAME( 1984, vulgus,  0,      vulgus, vulgus, 0, ROT90,  "Capcom", "Vulgus (set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1984, vulgus2, vulgus, vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1984, vulgusj, vulgus, vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (Japan?)", 0 ,0,2,egg_ShootEmUp,0)

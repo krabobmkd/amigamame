@@ -357,4 +357,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1982?, starspnr, 0, starspnr, starspnr, 0, ROT270, "ACE", "Starspinner (Dutch/Nederlands)", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
+GAME( 1982?, starspnr, 0, starspnr, starspnr, 0, ROT270, "ACE", "Starspinner (Dutch/Nederlands)", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Casino,0)

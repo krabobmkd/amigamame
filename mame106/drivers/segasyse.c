@@ -951,10 +951,10 @@ ROM_END
 
 /*-- Game Drivers --*/
 
-GAME( 1985, hangonjr, 0,        segae, hangonjr, hangonjr, ROT0,  "Sega", "Hang-On Jr.", 0 ,0)
-GAME( 1986, transfrm, 0,        segae, transfrm, 0,        ROT0,  "Sega", "Transformer", 0 ,0)
-GAME( 1986, astrofl,  transfrm, segae, transfrm, astrofl,  ROT0,  "Sega", "Astro Flash (Japan)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1986, ridleofp, 0,        segae, ridleofp, ridleofp, ROT90, "Sega / Nasco", "Riddle of Pythagoras (Japan)", 0 ,0)
-GAME( 1988, fantzn2,  0,        segae, dummy,    0,        ROT0,  "Sega", "Fantasy Zone 2", GAME_NOT_WORKING ,0)	/* encrypted */
-GAME( 198?, opaopa,   0,        segae, dummy,    0,        ROT0,  "Sega", "Opa Opa", GAME_NOT_WORKING ,0)	/* either encrypted or bad */
-GAME( 1988, tetrisse, 0,        segae, tetrisse, 0,        ROT0,  "Sega", "Tetris (Japan, System E)", 0 ,0)
+GAME( 1985, hangonjr, 0,        segae, hangonjr, hangonjr, ROT0,  "Sega", "Hang-On Jr.", 0 ,0,1,egg_Motorcycle,0)
+GAME( 1986, transfrm, 0,        segae, transfrm, 0,        ROT0,  "Sega", "Transformer", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1986, astrofl,  transfrm, segae, transfrm, astrofl,  ROT0,  "Sega", "Astro Flash (Japan)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1986, ridleofp, 0,        segae, ridleofp, ridleofp, ROT90, "Sega / Nasco", "Riddle of Pythagoras (Japan)", 0 ,0,1,egg_BallNPaddles,0)
+GAME( 1988, fantzn2,  0,        segae, dummy,    0,        ROT0,  "Sega", "Fantasy Zone 2", GAME_NOT_WORKING ,0,1,egg_ShootEmUp,0)	/* encrypted */
+GAME( 198?, opaopa,   0,        segae, dummy,    0,        ROT0,  "Sega", "Opa Opa", GAME_NOT_WORKING ,2,0,egg_Maze,0)	/* either encrypted or bad */
+GAME( 1988, tetrisse, 0,        segae, tetrisse, 0,        ROT0,  "Sega", "Tetris (Japan, System E)", 0 ,2,0,egg_Puzzle,0)

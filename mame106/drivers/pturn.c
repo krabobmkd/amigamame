@@ -548,4 +548,4 @@ static DRIVER_INIT(pturn)
     */
 }
 
-GAME( 1984, pturn,  0, pturn,  pturn,  pturn, ROT90,   "Jaleco", "Parallel Turn",	GAME_IMPERFECT_COLORS ,0)
+GAME( 1984, pturn,  0, pturn,  pturn,  pturn, ROT90,   "Jaleco", "Parallel Turn",	GAME_IMPERFECT_COLORS ,0,2,egg_sport_Skiing,0)

@@ -226,4 +226,4 @@ ROM_START( ttmahjng )
 ROM_END
 
 
-GAME( 1981, ttmahjng, 0, ttmahjng, ttmahjng, 0, ROT0, "Taito", "Mahjong", 0 ,1)
+GAME( 1981, ttmahjng, 0, ttmahjng, ttmahjng, 0, ROT0, "Taito", "Mahjong", 0 ,0,1,egg_Mahjong,0)

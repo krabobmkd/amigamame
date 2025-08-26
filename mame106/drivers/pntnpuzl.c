@@ -492,4 +492,4 @@ static DRIVER_INIT(pip)
 //  rom[0x26a0/2] = 0x4e71;
 }
 
-GAME( 199?, pntnpuzl,    0, pntnpuzl,    pntnpuzl,    pip, ROT90,  "Century?", "Paint & Puzzle",GAME_NO_SOUND|GAME_NOT_WORKING ,0)
+GAME( 199?, pntnpuzl,    0, pntnpuzl,    pntnpuzl,    pip, ROT90,  "Century?", "Paint & Puzzle",GAME_NO_SOUND|GAME_NOT_WORKING ,0,1,egg_Puzzle,0)

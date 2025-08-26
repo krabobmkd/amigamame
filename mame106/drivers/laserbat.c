@@ -889,7 +889,7 @@ ROM_START( catmousa )
 ROM_END
 
 
-GAME( 1981, laserbat, 0,        laserbat, laserbat, 0, ROT0,  "Zaccaria", "Laser Battle",                    GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NO_COCKTAIL ,0)
-GAME( 1981, lazarian, laserbat, laserbat, lazarian, 0, ROT0,  "Bally Midway (Zaccaria License)", "Lazarian", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NO_COCKTAIL ,0)
-GAME( 1982, catnmous, 0,        catnmous, catnmous, 0, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NO_COCKTAIL ,0)
-GAME( 1982, catmousa, catnmous, catnmous, catnmous, 0, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NO_COCKTAIL | GAME_NOT_WORKING ,0)
+GAME( 1981, laserbat, 0,        laserbat, laserbat, 0, ROT0,  "Zaccaria", "Laser Battle",                    GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1981, lazarian, laserbat, laserbat, lazarian, 0, ROT0,  "Bally Midway (Zaccaria License)", "Lazarian", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1982, catnmous, 0,        catnmous, catnmous, 0, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NO_COCKTAIL ,0,2,egg_Shooter,0)
+GAME( 1982, catmousa, catnmous, catnmous, catnmous, 0, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NO_COCKTAIL | GAME_NOT_WORKING ,0,2,egg_Shooter,0)

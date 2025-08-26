@@ -443,11 +443,11 @@ ROM_START( champb2a )
 	ROM_LOAD( "pr5956",       0x0020, 0x100, CRC(872dd450) SHA1(6c1e2c4a2fc072f4bf4996c731adb0b01b347506) ) /* look-up table */
 ROM_END
 
-GAME( 1983, champbas, 0,        champbas, champbas, 0, ROT0, "Sega",			 "Champion Baseball", 0 ,1)
-GAME( 1983, champbbj, champbas, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Baseball (Japan set 1)", 0 ,1)
-GAME( 1983, champbja, champbas, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Baseball (Japan set 2)", 0 ,1)
-GAME( 1983, champbb2, 0,        champbb2, champbas, champbb2, ROT0, "Sega",			 "Champion Baseball II (set 1)", 0 ,0)
+GAME( 1983, champbas, 0,        champbas, champbas, 0, ROT0, "Sega",			 "Champion Baseball", 0 ,0,2,egg_sport_Baseball,0)
+GAME( 1983, champbbj, champbas, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Baseball (Japan set 1)", 0 ,0,2,egg_sport_Baseball,0)
+GAME( 1983, champbja, champbas, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Baseball (Japan set 2)", 0 ,0,2,egg_sport_Baseball,0)
+GAME( 1983, champbb2, 0,        champbb2, champbas, champbb2, ROT0, "Sega",			 "Champion Baseball II (set 1)", 0 ,2,0,egg_sport_Baseball,0)
 
 /* NO DUMP */
-GAME( 1983, champb2a, champbb2, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING,0)
+GAME( 1983, champb2a, champbb2, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING,2,0,egg_sport_Baseball,0)
 

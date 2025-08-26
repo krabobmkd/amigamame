@@ -794,6 +794,6 @@ ROM_END
 
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT     MONITOR  COMPANY  FULLNAME */
-GAME( 1988, syvalion, 0,        syvalion, syvalion, 0,       ROT0,    "Taito Corporation", "Syvalion (Japan)", 0 ,0)
-GAME( 1988, recordbr, 0,        recordbr, recordbr, 0,       ROT0,    "Taito Corporation Japan", "Recordbreaker (World)", 0 ,0)
-GAME( 1990, dleague,  0,        dleague,  dleague,  0,       ROT0,    "Taito Corporation", "Dynamite League (Japan)", 0 ,0)
+GAME( 1988, syvalion, 0,        syvalion, syvalion, 0,       ROT0,    "Taito Corporation", "Syvalion (Japan)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1988, recordbr, 0,        recordbr, recordbr, 0,       ROT0,    "Taito Corporation Japan", "Recordbreaker (World)", 0 ,2,0,egg_sport_TrackNField,0)
+GAME( 1990, dleague,  0,        dleague,  dleague,  0,       ROT0,    "Taito Corporation", "Dynamite League (Japan)", 0 ,0,0,egg_Unknown,0)

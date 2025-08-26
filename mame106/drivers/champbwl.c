@@ -337,4 +337,4 @@ ROM_START( champbwl )
 	ROM_LOAD( "ab002002.2-2", 0xc0000, 0x40000, CRC(42ebe997) SHA1(1808b9e5e996a395c1d48ac001067f736f96feec) )
 ROM_END
 
-GAME( 1989, champbwl, 0, champbwl, champbwl, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling", 0 ,0)
+GAME( 1989, champbwl, 0, champbwl, champbwl, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling", 0 ,0,4,egg_sport_Bowling,0)

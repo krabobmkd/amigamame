@@ -582,5 +582,5 @@ static DRIVER_INIT( dbz2 )
 	konami_rom_deinterleave_2(REGION_GFX1);
 }
 
-GAME( 1993, dbz,  0, dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1994, dbz2, 0, dbz, dbz2, dbz2, ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1993, dbz,  0, dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1994, dbz2, 0, dbz, dbz2, dbz2, ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)

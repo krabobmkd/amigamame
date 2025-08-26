@@ -881,8 +881,8 @@ ROM_END
 
 
 /*   ( YEAR  NAME      PARENT   MACHINE  INPUT    INIT      MONITOR COMPANY  FULLNAME                 FLAGS ) */
-GAME( 1988, robokid,  0,       robokid, robokid, 0,        ROT0,   "UPL",  "Atomic Robo-kid",                GAME_NO_COCKTAIL ,2)
-GAME( 1988, robokidj, robokid, robokid, robokidj,0,        ROT0,   "UPL",  "Atomic Robo-kid (Japan, Set 1)", GAME_NO_COCKTAIL ,2)
-GAME( 1988, robokdj2, robokid, robokid, robokidj,0,        ROT0,   "UPL",  "Atomic Robo-kid (Japan, Set 2)", GAME_NO_COCKTAIL ,2)
-GAME( 1989, omegaf,   0,       omegaf,  omegaf,  omegaf,   ROT270, "UPL",  "Omega Fighter",          GAME_NO_COCKTAIL ,0)
-GAME( 1989, omegafs,  omegaf,  omegaf,  omegaf,  omegaf,   ROT270, "UPL",  "Omega Fighter Special",  GAME_NO_COCKTAIL ,0)
+GAME( 1988, robokid,  0,       robokid, robokid, 0,        ROT0,   "UPL",  "Atomic Robo-kid",                GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1988, robokidj, robokid, robokid, robokidj,0,        ROT0,   "UPL",  "Atomic Robo-kid (Japan, Set 1)", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1988, robokdj2, robokid, robokid, robokidj,0,        ROT0,   "UPL",  "Atomic Robo-kid (Japan, Set 2)", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1989, omegaf,   0,       omegaf,  omegaf,  omegaf,   ROT270, "UPL",  "Omega Fighter",          GAME_NO_COCKTAIL ,2,0,egg_ShootEmUp,0)
+GAME( 1989, omegafs,  omegaf,  omegaf,  omegaf,  omegaf,   ROT270, "UPL",  "Omega Fighter Special",  GAME_NO_COCKTAIL ,2,0,egg_ShootEmUp,0)

@@ -300,5 +300,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cloud9, 0, cloud9, cloud9, 0, ROT0, "Atari", "Cloud 9 (prototype)", GAME_NO_COCKTAIL ,0)
+GAME( 1983, cloud9, 0, cloud9, cloud9, 0, ROT0, "Atari", "Cloud 9 (prototype)", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
 

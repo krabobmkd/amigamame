@@ -361,6 +361,6 @@ static DRIVER_INIT (ttchamp)
 	memory_set_bankptr(2,&ROM1[0x180000]);
 }
 
-GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 199?, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND ,2,0,egg_sport_,0)
+GAME( 199?, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND ,2,0,egg_sport_,0)
 

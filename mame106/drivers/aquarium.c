@@ -449,7 +449,7 @@ ROM_START( aquarium )
 ROM_END
 
 #if !AQUARIUS_HACK
-GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", GAME_NO_COCKTAIL ,2)
+GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", GAME_NO_COCKTAIL ,0,0,egg_Unknown,0)
 #else
-GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium", GAME_NO_COCKTAIL ,2)
+GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium", GAME_NO_COCKTAIL ,0,0,egg_Unknown,0)
 #endif

@@ -450,8 +450,8 @@ static DRIVER_INIT( circusc )
 }
 
 
-GAME( 1984, circusc,  0,       circusc, circusc, circusc, ROT90, "Konami", "Circus Charlie (Selectable level set 1)", 0 ,2)
-GAME( 1984, circusc2, circusc, circusc, circusc, circusc, ROT90, "Konami", "Circus Charlie (Selectable level set 2)", 0 ,2)
-GAME( 1984, circusc3, circusc, circusc, circusc, circusc, ROT90, "Konami", "Circus Charlie (No level select)", 0 ,2)
-GAME( 1984, circuscc, circusc, circusc, circusc, circusc, ROT90, "Konami (Centuri license)", "Circus Charlie (Centuri)", 0 ,2)
-GAME( 1984, circusce, circusc, circusc, circusc, circusc, ROT90, "Konami (Centuri license)", "Circus Charlie (Centuri, earlier)", 0 ,2)
+GAME( 1984, circusc,  0,       circusc, circusc, circusc, ROT90, "Konami", "Circus Charlie (Selectable level set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1984, circusc2, circusc, circusc, circusc, circusc, ROT90, "Konami", "Circus Charlie (Selectable level set 2)", 0 ,0,2,egg_Platform,0)
+GAME( 1984, circusc3, circusc, circusc, circusc, circusc, ROT90, "Konami", "Circus Charlie (No level select)", 0 ,0,2,egg_Platform,0)
+GAME( 1984, circuscc, circusc, circusc, circusc, circusc, ROT90, "Konami (Centuri license)", "Circus Charlie (Centuri)", 0 ,0,2,egg_Platform,0)
+GAME( 1984, circusce, circusc, circusc, circusc, circusc, ROT90, "Konami (Centuri license)", "Circus Charlie (Centuri, earlier)", 0 ,0,2,egg_Platform,0)

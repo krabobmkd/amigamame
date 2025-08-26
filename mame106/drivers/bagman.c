@@ -899,13 +899,13 @@ DRIVER_INIT( bagnarda )
 	*bagman_video_enable = 1;
 }
 
-GAME( 1982, bagman,	 0, 	  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Bagman", 0 ,2)
-GAME( 1982, bagnard,  bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Le Bagnard (set 1)", 0 ,2)
-GAME( 1982, bagnarda, bagman,  bagman,  bagman,  bagnarda, ROT270, "Valadon Automation", "Le Bagnard (set 2)", 0 ,2)
-GAME( 1982, bagmans,  bagman,  bagman,  bagmans, 0,        ROT270, "Valadon Automation (Stern license)", "Bagman (Stern set 1)", 0 ,2)
-GAME( 1982, bagmans2, bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation (Stern license)", "Bagman (Stern set 2)", 0 ,2)
-GAME( 1984, sbagman,  0, 	  bagman,  sbagman, 0,        ROT270, "Valadon Automation", "Super Bagman", 0 ,2)
-GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern license)", "Super Bagman (Stern)", 0 ,2)
-GAME( 1983, pickin,	 0, 	  pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 ,0)
-GAME( 1984, botanic,  0,       botanic, pickin,  0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 ,0)
+GAME( 1982, bagman,	 0, 	  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Bagman", 0 ,0,2,egg_Platform,0)
+GAME( 1982, bagnard,  bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Le Bagnard (set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, bagnarda, bagman,  bagman,  bagman,  bagnarda, ROT270, "Valadon Automation", "Le Bagnard (set 2)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, bagmans,  bagman,  bagman,  bagmans, 0,        ROT270, "Valadon Automation (Stern license)", "Bagman (Stern set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, bagmans2, bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation (Stern license)", "Bagman (Stern set 2)", 0 ,0,2,egg_Platform,0)
+GAME( 1984, sbagman,  0, 	  bagman,  sbagman, 0,        ROT270, "Valadon Automation", "Super Bagman", 0 ,0,0,egg_Unknown,0)
+GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern license)", "Super Bagman (Stern)", 0 ,0,2,egg_Platform,0)
+GAME( 1983, pickin,	 0, 	  pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 ,0,2,egg_Maze,0)
+GAME( 1984, botanic,  0,       botanic, pickin,  0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 ,0,0,egg_Unknown,0)
 

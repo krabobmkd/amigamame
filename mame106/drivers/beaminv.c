@@ -161,4 +161,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 19??, beaminv, 0, beaminv, beaminv, 0, ROT0, "Tekunon Kougyou", "Beam Invader", GAME_NO_SOUND,2)
+GAME( 19??, beaminv, 0, beaminv, beaminv, 0, ROT0, "Tekunon Kougyou", "Beam Invader", GAME_NO_SOUND,0,2,egg_ShootEmUp,0)

@@ -459,6 +459,6 @@ static DRIVER_INIT( gijoe )
 	konami_rom_deinterleave_4(REGION_GFX2);
 }
 
-GAME( 1992, gijoe,  0,     gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (World)", 0,4)
-GAME( 1992, gijoeu, gijoe, gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (US)", 0,4)
-GAME( 1992, gijoej, gijoe, gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (Japan)", 0,4)
+GAME( 1992, gijoe,  0,     gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (World)", 0,4,0,egg_Shooter,0)
+GAME( 1992, gijoeu, gijoe, gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (US)", 0,4,0,egg_Shooter,0)
+GAME( 1992, gijoej, gijoe, gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (Japan)", 0,4,0,egg_Shooter,0)

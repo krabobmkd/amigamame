@@ -418,4 +418,4 @@ INPUT_PORTS_START( mrflea )
 INPUT_PORTS_END
 
 
-GAME( 1982, mrflea,   0,        mrflea,   mrflea,   0,        ROT270, "Pacific Novelty", "The Amazing Adventures of Mr. F. Lea" , 0 ,0)
+GAME( 1982, mrflea,   0,        mrflea,   mrflea,   0,        ROT270, "Pacific Novelty", "The Amazing Adventures of Mr. F. Lea" , 0 ,0,2,egg_Platform,0)

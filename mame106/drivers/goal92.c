@@ -518,5 +518,5 @@ ROM_START( cupsocbl )
 	ROM_LOAD( "sc_03.bin",    0x000000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
 ROM_END
 
-GAME( 1992, goal92,   cupsoc, goal92,   goal92, 0, ROT0, "bootleg", "Goal! '92", GAME_IMPERFECT_SOUND ,0)
-GAME( 1992, cupsocbl, cupsoc, cupsocbl, goal92, 0, ROT0, "bootleg", "Seibu Cup Soccer (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
+GAME( 1992, goal92,   cupsoc, goal92,   goal92, 0, ROT0, "bootleg", "Goal! '92", GAME_IMPERFECT_SOUND ,4,0,egg_sport_Soccer,0)
+GAME( 1992, cupsocbl, cupsoc, cupsocbl, goal92, 0, ROT0, "bootleg", "Seibu Cup Soccer (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND ,4,0,egg_sport_Soccer,0)

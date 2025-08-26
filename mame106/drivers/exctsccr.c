@@ -608,7 +608,7 @@ DRIVER_INIT( exctscc2 )
 #endif
 }
 
-GAME( 1983, exctsccr, 0,        exctsccr, exctsccr, exctsccr, ROT90, "Alpha Denshi Co.", "Exciting Soccer", 0 ,0)
-GAME( 1983, exctscca, exctsccr, exctsccr, exctsccr, exctsccr, ROT90, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", 0 ,0)
-GAME( 1983, exctsccb, exctsccr, exctsccb, exctsccr, 0,        ROT90, "bootleg",          "Exciting Soccer (bootleg)", 0 ,0)
-GAME( 1984, exctscc2, 0       , exctsccr, exctsccr, exctscc2, ROT90, "Alpha Denshi Co.", "Exciting Soccer II", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1983, exctsccr, 0,        exctsccr, exctsccr, exctsccr, ROT90, "Alpha Denshi Co.", "Exciting Soccer", 0 ,0,2,egg_sport_Soccer,0)
+GAME( 1983, exctscca, exctsccr, exctsccr, exctsccr, exctsccr, ROT90, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", 0 ,0,2,egg_sport_Soccer,0)
+GAME( 1983, exctsccb, exctsccr, exctsccb, exctsccr, 0,        ROT90, "bootleg",          "Exciting Soccer (bootleg)", 0 ,0,2,egg_sport_Soccer,0)
+GAME( 1984, exctscc2, 0       , exctsccr, exctsccr, exctscc2, ROT90, "Alpha Denshi Co.", "Exciting Soccer II", GAME_IMPERFECT_GRAPHICS ,0,2,egg_sport_Soccer,0)

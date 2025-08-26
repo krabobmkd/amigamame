@@ -637,8 +637,8 @@ static int DriverCompareScreenMode(const struct _game_driver **drv1,const  struc
 }
 static int DriverCompareNbPlayers(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
-  int a = (*drv1)->nbplayers;
-  int b = (*drv2)->nbplayers;
+  int a = (*drv1)->nbplayersSim ;
+  int b = (*drv2)->nbplayersSim;
 
     return (b-a);
 }
@@ -767,8 +767,17 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
    else
     pColumns->_parent = (char*)drv->parent;
 
-   if(drv->nbplayers == 0) players[0]=0;
-   else snprintf(players,7,"%d", (int) drv->nbplayers);
+   if(drv->nbplayersSim  <2)
+   {
+    if(drv->nbplayersAlt <2)
+        players[0]=0;
+    else
+    {
+        snprintf(players,7,"%d(Alt)", (int) drv->nbplayersAlt);
+
+    }
+   }
+   else snprintf(players,7,"%d", (int) drv->nbplayersSim);
 pColumns->_players = players;
 
     pColumns->_year = (char *)drv->year;

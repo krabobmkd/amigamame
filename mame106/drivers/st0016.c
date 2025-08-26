@@ -852,11 +852,11 @@ static DRIVER_INIT(mayjisn2)
  *
  *************************************/
 
-GAME(  1994, renju,	0,	  st0016,   renju,    renju,    ROT0, "Visco", "Renju Kizoku", 0,0)
-GAME(  1996, nratechu,	0,	  st0016,   nratechu, nratechu, ROT0, "Seta",  "Neratte Chu", 0,0)
-GAME(  1994, mayjisn2,	0,	  mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",  "Mayjinsen 2", 0,0)
+GAME(  1994, renju,	0,	  st0016,   renju,    renju,    ROT0, "Visco", "Renju Kizoku", 0,0,2,egg_Tabletop,0)
+GAME(  1996, nratechu,	0,	  st0016,   nratechu, nratechu, ROT0, "Seta",  "Neratte Chu", 0,2,0,egg_Puzzle,0)
+GAME(  1994, mayjisn2,	0,	  mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",  "Mayjinsen 2", 0,0,2,egg_Tabletop,0)
 /* Not working */
-GAME( 199?, srmp5,	0,	  srmp5,    srmp5,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5",GAME_NOT_WORKING,0)
-GAME( 1994, speglsht,	0,	  speglsht, speglsht, speglsht, ROT0, "Seta",  "Super Eagle Shot (set 1)",GAME_NOT_WORKING,0)
-GAME( 1994, speglsha,	speglsht, speglsht, speglsht, speglsht, ROT0, "Seta",  "Super Eagle Shot (set 2)",GAME_NOT_WORKING,0)
-GAME( 1994, mayjinsn,	0,	  mayjinsn, st0016,   mayjinsn, ROT0, "Seta",  "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING,0)
+GAME( 199?, srmp5,	0,	  srmp5,    srmp5,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5",GAME_NOT_WORKING,0,1,egg_Mahjong,0)
+GAME( 1994, speglsht,	0,	  speglsht, speglsht, speglsht, ROT0, "Seta",  "Super Eagle Shot (set 1)",GAME_NOT_WORKING,0,4,egg_sport_Golf,0)
+GAME( 1994, speglsha,	speglsht, speglsht, speglsht, speglsht, ROT0, "Seta",  "Super Eagle Shot (set 2)",GAME_NOT_WORKING,0,4,egg_sport_Golf,0)
+GAME( 1994, mayjinsn,	0,	  mayjinsn, st0016,   mayjinsn, ROT0, "Seta",  "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING,0,0,egg_Tabletop,0)

@@ -761,6 +761,6 @@ MACHINE_RESET( taito_dualscreen )
 
 /* Working Games */
 
-GAME( 1989, darius2d, darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan)", 0 ,0)
-GAME( 1989, drius2do, darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan old version)", 0 ,0)
-GAME( 1991, warriorb, 0,        warriorb, warriorb, 0, ROT0, "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", 0 ,0)
+GAME( 1989, darius2d, darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1989, drius2do, darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan old version)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1991, warriorb, 0,        warriorb, warriorb, 0, ROT0, "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", 0 ,2,0,egg_BeatNUp,0)

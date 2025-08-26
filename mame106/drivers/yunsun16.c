@@ -844,7 +844,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 19??, magicbub, 0,        magicbub, magicbub, magicbub, ROT0, "Yun Sung", "Magic Bubble", GAME_NO_COCKTAIL ,0)
-GAME( 19??, magicbua, magicbub, magicbub, magicbua, magicbub, ROT0, "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL ,0)
-GAME( 1997, shocking, 0,        shocking, shocking, 0,        ROT0, "Yun Sung", "Shocking",     GAME_NO_COCKTAIL ,0)
-GAME( 1998, bombkick, 0,        shocking, bombkick, 0,        ROT0, "Yun Sung", "Bomb Kick",    GAME_NO_COCKTAIL ,0)
+GAME( 19??, magicbub, 0,        magicbub, magicbub, magicbub, ROT0, "Yun Sung", "Magic Bubble", GAME_NO_COCKTAIL ,2,0,egg_Puzzle,0)
+GAME( 19??, magicbua, magicbub, magicbub, magicbua, magicbub, ROT0, "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL ,2,0,egg_Puzzle,0)
+GAME( 1997, shocking, 0,        shocking, shocking, 0,        ROT0, "Yun Sung", "Shocking",     GAME_NO_COCKTAIL ,2,0,egg_Maze,0)
+GAME( 1998, bombkick, 0,        shocking, bombkick, 0,        ROT0, "Yun Sung", "Bomb Kick",    GAME_NO_COCKTAIL ,2,0,egg_Platform,0)

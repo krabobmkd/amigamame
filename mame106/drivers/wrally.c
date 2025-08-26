@@ -300,5 +300,5 @@ ROM_END
 
 
 
-GAME( 1993, wrally,  0, 	  wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 1)", GAME_NOT_WORKING ,0)
-GAME( 1993, wrallya, wrally, wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 2)", GAME_NOT_WORKING ,0)
+GAME( 1993, wrally,  0, 	  wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 1)", GAME_NOT_WORKING ,0,2,egg_Driving,0)
+GAME( 1993, wrallya, wrally, wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 2)", GAME_NOT_WORKING ,0,2,egg_Driving,0)

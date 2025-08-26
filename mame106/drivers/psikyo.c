@@ -2280,14 +2280,14 @@ DRIVER_INIT( tengai )
 ***************************************************************************/
 
 /* Working Games */
-GAME( 1993, samuraia, 0,        sngkace,  samuraia, sngkace,  ROT270, "Psikyo", "Samurai Aces (World)"  , 0,0) // Banpresto?
-GAME( 1993, sngkace,  samuraia, sngkace,  sngkace,  sngkace,  ROT270, "Psikyo", "Sengoku Ace (Japan)"   , 0,0) // Banpresto?
-GAME( 1994, gunbird,  0,        gunbird,  gunbird,  gunbird,  ROT270, "Psikyo", "Gunbird (World)"     , 0 ,2)
-GAME( 1994, gunbirdk, gunbird,  gunbird,  gunbirdj, gunbird,  ROT270, "Psikyo", "Gunbird (Korea)"     , 0 ,2)
-GAME( 1994, gunbirdj, gunbird,  gunbird,  gunbirdj, gunbird,  ROT270, "Psikyo", "Gunbird (Japan)"     , 0 ,2)
-GAME( 1994, btlkroad, 0,        gunbird,  btlkroad, gunbird,  ROT0,   "Psikyo", "Battle K-Road", 0 ,2)
-GAME( 1995, s1945,    0,        s1945,    s1945,    s1945,    ROT270, "Psikyo", "Strikers 1945", 0 ,2)
-GAME( 1995, s1945a,   s1945,    s1945,    s1945a,   s1945a,   ROT270, "Psikyo", "Strikers 1945 (Alt)" , 0,2) // Region dip - 0x0f=Japan, anything else=World
-GAME( 1995, s1945j,   s1945,    s1945,    s1945j,   s1945j,   ROT270, "Psikyo", "Strikers 1945 (Japan)", 0 ,2)
-GAME( 1995, s1945jn,  s1945,    gunbird,  s1945j,   s1945jn,  ROT270, "Psikyo", "Strikers 1945 (Japan, unprotected)", 0 ,2)
-GAME( 1996, tengai,   0,        s1945,    tengai,   tengai,   ROT0,   "Psikyo", "Tengai / Sengoku Blade: Sengoku Ace Episode II", 0 ,2)
+GAME( 1993, samuraia, 0,        sngkace,  samuraia, sngkace,  ROT270, "Psikyo", "Samurai Aces (World)"  , 0,2,0,egg_ShootEmUp,0) // Banpresto?
+GAME( 1993, sngkace,  samuraia, sngkace,  sngkace,  sngkace,  ROT270, "Psikyo", "Sengoku Ace (Japan)"   , 0,2,0,egg_ShootEmUp,0) // Banpresto?
+GAME( 1994, gunbird,  0,        gunbird,  gunbird,  gunbird,  ROT270, "Psikyo", "Gunbird (World)"     , 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1994, gunbirdk, gunbird,  gunbird,  gunbirdj, gunbird,  ROT270, "Psikyo", "Gunbird (Korea)"     , 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1994, gunbirdj, gunbird,  gunbird,  gunbirdj, gunbird,  ROT270, "Psikyo", "Gunbird (Japan)"     , 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1994, btlkroad, 0,        gunbird,  btlkroad, gunbird,  ROT0,   "Psikyo", "Battle K-Road", 0 ,2,0,egg_Fighter,0)
+GAME( 1995, s1945,    0,        s1945,    s1945,    s1945,    ROT270, "Psikyo", "Strikers 1945", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1995, s1945a,   s1945,    s1945,    s1945a,   s1945a,   ROT270, "Psikyo", "Strikers 1945 (Alt)" , 0,2,0,egg_ShootEmUp,0) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1995, s1945j,   s1945,    s1945,    s1945j,   s1945j,   ROT270, "Psikyo", "Strikers 1945 (Japan)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1995, s1945jn,  s1945,    gunbird,  s1945j,   s1945jn,  ROT270, "Psikyo", "Strikers 1945 (Japan, unprotected)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1996, tengai,   0,        s1945,    tengai,   tengai,   ROT0,   "Psikyo", "Tengai / Sengoku Blade: Sengoku Ace Episode II", 0 ,0,0,egg_Unknown,0)

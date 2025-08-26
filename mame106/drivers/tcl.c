@@ -198,4 +198,4 @@ DRIVER_INIT(tcl)
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, dest+0x10000);
 }
 
-GAME( 1995, tcl,  0,       tcl,  tcl,  tcl, ROT0, "Uniwang", "Taiwan Chess Legend", GAME_NOT_WORKING ,0)
+GAME( 1995, tcl,  0,       tcl,  tcl,  tcl, ROT0, "Uniwang", "Taiwan Chess Legend", GAME_NOT_WORKING ,0,0,egg_Tabletop,0)

@@ -749,8 +749,8 @@ static DRIVER_INIT( rmhaihai )
 }
 
 
-GAME( 1985, rmhaihai, 0,        rmhaihai, rmhaihai, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan)", 0 ,1)
-GAME( 1985, rmhaihib, rmhaihai, rmhaihai, rmhaihib, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", 0 ,1)
-GAME( 1986, rmhaijin, 0,        rmhaihai, rmhaihai, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", 0 ,1)
-GAME( 1986, rmhaisei, 0,        rmhaisei, rmhaihai, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", 0 ,1)
-GAME( 1987, themj,    0,        themj,    rmhaihai, rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", 0 ,1)
+GAME( 1985, rmhaihai, 0,        rmhaihai, rmhaihai, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan)", 0 ,0,1,egg_Mature,0)
+GAME( 1985, rmhaihib, rmhaihai, rmhaihai, rmhaihib, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", 0 ,0,1,egg_Mature,0)
+GAME( 1986, rmhaijin, 0,        rmhaihai, rmhaihai, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", 0 ,0,1,egg_Mature,0)
+GAME( 1986, rmhaisei, 0,        rmhaisei, rmhaihai, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", 0 ,0,1,egg_Mature,0)
+GAME( 1987, themj,    0,        themj,    rmhaihai, rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", 0 ,0,1,egg_Mature,0)

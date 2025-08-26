@@ -243,4 +243,4 @@ ROM_START( mosaicf2 )
 ROM_END
 
 
-GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, 0, ROT0, "F2 System", "Mosaic (F2 System)", GAME_SUPPORTS_SAVE ,0)
+GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, 0, ROT0, "F2 System", "Mosaic (F2 System)", GAME_SUPPORTS_SAVE ,2,0,egg_Mature,0)

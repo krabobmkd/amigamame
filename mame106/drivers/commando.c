@@ -497,8 +497,8 @@ static DRIVER_INIT( spaceinv )
 
 /* Game Drivers */
 
-GAME( 1985, commando, 0,        commando, commando, commando, ROT90, "Capcom", "Commando (World)", 0 ,2)
-GAME( 1985, commandu, commando, commando, commandu, commando, ROT90, "Capcom (Data East USA license)", "Commando (US)", 0 ,2)
-GAME( 1985, commandj, commando, commando, commando, commando, ROT90, "Capcom", "Senjou no Ookami", 0 ,2)
-GAME( 1985, sinvasn,  commando, commando, commando, commando, ROT90, "Capcom", "Space Invasion (Europe)", 0 ,2)
-GAME( 1985, sinvasnb, commando, commando, commando, spaceinv, ROT90, "bootleg", "Space Invasion (bootleg)", 0 ,2)
+GAME( 1985, commando, 0,        commando, commando, commando, ROT90, "Capcom", "Commando (World)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1985, commandu, commando, commando, commandu, commando, ROT90, "Capcom (Data East USA license)", "Commando (US)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1985, commandj, commando, commando, commando, commando, ROT90, "Capcom", "Senjou no Ookami", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1985, sinvasn,  commando, commando, commando, commando, ROT90, "Capcom", "Space Invasion (Europe)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1985, sinvasnb, commando, commando, commando, spaceinv, ROT90, "bootleg", "Space Invasion (bootleg)", 0 ,0,2,egg_ShootEmUp,0)

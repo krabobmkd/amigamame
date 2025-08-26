@@ -1300,8 +1300,8 @@ static DRIVER_INIT(cyclshtg)
 	nyc_gametype=1;
 }
 
-GAME( 1985, nycaptor, 0,       nycaptor,  nycaptor, nycaptor, ROT0,  "Taito", "N.Y. Captor", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1986, cyclshtg, 0,       cyclshtg,  cyclshtg, cyclshtg, ROT90, "Taito", "Cycle Shooting", GAME_NOT_WORKING,0)
+GAME( 1985, nycaptor, 0,       nycaptor,  nycaptor, nycaptor, ROT0,  "Taito", "N.Y. Captor", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,0,1,egg_LightGuns,0)
+GAME( 1986, cyclshtg, 0,       cyclshtg,  cyclshtg, cyclshtg, ROT90, "Taito", "Cycle Shooting", GAME_NOT_WORKING,0,1,egg_LightGuns,0)
 //bootlegs
-GAME( 1986, bronx, cyclshtg,       bronx,  cyclshtg, bronx, ROT90, "bootleg", "Bronx",GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND,0)
-GAME( 1986, colt , nycaptor,       bronx,  nycaptor, colt, ROT0, "bootleg", "Colt",GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS,0)
+GAME( 1986, bronx, cyclshtg,       bronx,  cyclshtg, bronx, ROT90, "bootleg", "Bronx",GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND,0,1,egg_LightGuns,0)
+GAME( 1986, colt , nycaptor,       bronx,  nycaptor, colt, ROT0, "bootleg", "Colt",GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS,0,1,egg_LightGuns,0)

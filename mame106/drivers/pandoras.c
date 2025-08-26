@@ -485,4 +485,4 @@ ROM_END
 
 
 
-GAME( 1984, pandoras, 0, pandoras, pandoras, 0, ROT90, "Konami/Interlogic", "Pandora's Palace", 0 ,2)
+GAME( 1984, pandoras, 0, pandoras, pandoras, 0, ROT90, "Konami/Interlogic", "Pandora's Palace", 0 ,0,2,egg_Platform,0)

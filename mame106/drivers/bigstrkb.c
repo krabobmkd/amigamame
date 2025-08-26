@@ -293,4 +293,4 @@ ROM_END
 
 /* GAME drivers */
 
-GAME( 1992, bigstrkb, bigstrik, bigstrkb, bigstrkb, 0, ROT0, "bootleg", "Big Striker (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ,2)
+GAME( 1992, bigstrkb, bigstrik, bigstrkb, bigstrkb, 0, ROT0, "bootleg", "Big Striker (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ,2,0,egg_sport_Soccer,0)

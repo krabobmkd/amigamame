@@ -182,5 +182,5 @@ ROM_START( newsa )
 	ROM_LOAD( "virus.1", 0x00000, 0x40000, CRC(41f5935a) SHA1(1566d243f165019660cd4dd69df9f049e0130f15) )
 ROM_END
 
-GAME( 1993, news,  0,    news, news, 0, ROT0, "Poby / Virus", "News (set 1)", 0 ,0)
-GAME( 1993, newsa, news, news, newsa,0, ROT0, "Poby",         "News (set 2)", 0 ,0)
+GAME( 1993, news,  0,    news, news, 0, ROT0, "Poby / Virus", "News (set 1)", 0 ,0,1,egg_Mature,0)
+GAME( 1993, newsa, news, news, newsa,0, ROT0, "Poby",         "News (set 2)", 0 ,0,1,egg_Mature,0)

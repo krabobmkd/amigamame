@@ -267,4 +267,4 @@ ROM_END
 
 
 
-GAME( 1980, toratora, 0, toratora, toratora, 0, ROT90, "GamePlan", "Tora Tora", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
+GAME( 1980, toratora, 0, toratora, toratora, 0, ROT90, "GamePlan", "Tora Tora", GAME_NOT_WORKING | GAME_NO_SOUND ,0,1,egg_ShootEmUp,0)

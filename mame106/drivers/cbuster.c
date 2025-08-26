@@ -586,7 +586,7 @@ static DRIVER_INIT( twocrude )
 
 /******************************************************************************/
 
-GAME( 1990, cbuster,  0,       twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FX version)", 0 ,2)
-GAME( 1990, cbusterw, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", 0 ,2)
-GAME( 1990, cbusterj, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan)", 0 ,2)
-GAME( 1990, twocrude, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East USA", "Two Crude (US)", 0 ,2)
+GAME( 1990, cbuster,  0,       twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FX version)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, cbusterw, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, cbusterj, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, twocrude, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East USA", "Two Crude (US)", 0 ,2,0,egg_Platform,0)

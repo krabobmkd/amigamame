@@ -801,10 +801,10 @@ DRIVER_INIT( f1dream )
 
 
 
-GAME( 1987, tigeroad, 0,        tigeroad, tigeroad, tigeroad, ROT0, "Capcom (Romstar license)", "Tiger Road (US)", 0 ,2)
-GAME( 1987, toramich, tigeroad, toramich, toramich, tigeroad, ROT0, "Capcom", "Tora-he no Michi (Japan)", 0 ,2)
-GAME( 1987, tigerodb, tigeroad, tigeroad, tigeroad, tigeroad, ROT0, "bootleg", "Tiger Road (US bootleg)", 0 ,2)
+GAME( 1987, tigeroad, 0,        tigeroad, tigeroad, tigeroad, ROT0, "Capcom (Romstar license)", "Tiger Road (US)", 0 ,0,0,egg_Unknown,0)
+GAME( 1987, toramich, tigeroad, toramich, toramich, tigeroad, ROT0, "Capcom", "Tora-he no Michi (Japan)", 0 ,0,2,egg_Platform,0)
+GAME( 1987, tigerodb, tigeroad, tigeroad, tigeroad, tigeroad, ROT0, "bootleg", "Tiger Road (US bootleg)", 0 ,0,0,egg_Unknown,0)
 
 /* F1 Dream has an Intel 8751 microcontroller for protection */
-GAME( 1988, f1dream,  0,        tigeroad, f1dream,  f1dream,  ROT0, "Capcom (Romstar license)", "F-1 Dream", 0 ,2)
-GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream,  tigeroad, ROT0, "bootleg", "F-1 Dream (bootleg)", 0 ,2)
+GAME( 1988, f1dream,  0,        tigeroad, f1dream,  f1dream,  ROT0, "Capcom (Romstar license)", "F-1 Dream", 0 ,0,2,egg_Driving,0)
+GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream,  tigeroad, ROT0, "bootleg", "F-1 Dream (bootleg)", 0 ,0,2,egg_Driving,0)

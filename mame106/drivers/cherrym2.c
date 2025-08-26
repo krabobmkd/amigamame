@@ -454,5 +454,5 @@ ROM_START( cm2841a )
 	ROM_LOAD( "msii841.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 ROM_END
 
-GAME( 198?, cm2v841, 0,       cm2v841, cm2v841, 0, ROT0, "Dyna Electronics", "Cherry Master II v8.41 (set 1)", GAME_NOT_WORKING ,0)
-GAME( 198?, cm2841a, cm2v841, cm2841a, cm2v841, 0, ROT0, "Dyna Electronics", "Cherry Master II v8.41 (set 2)", GAME_NOT_WORKING ,0)
+GAME( 198?, cm2v841, 0,       cm2v841, cm2v841, 0, ROT0, "Dyna Electronics", "Cherry Master II v8.41 (set 1)", GAME_NOT_WORKING ,0,0,egg_Unknown,0)
+GAME( 198?, cm2841a, cm2v841, cm2841a, cm2v841, 0, ROT0, "Dyna Electronics", "Cherry Master II v8.41 (set 2)", GAME_NOT_WORKING ,0,0,egg_Unknown,0)

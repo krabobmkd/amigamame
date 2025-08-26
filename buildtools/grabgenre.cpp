@@ -19,9 +19,9 @@ namespace fs = std::filesystem;
 
 using namespace std;
 
-string sourcebase("../mame106/");
-string genresbase("../Genres/");
-string playersbase("../Players/");
+string sourcebase("../../../mame106/");
+string genresbase("../../../Genres");
+string playersbase("../../../Players");
 
 std::string trim(std::string& str) {
     const std::string whitespace = " \t\r";
@@ -606,7 +606,7 @@ void readGenres()
 void readPlayers()
 {
    string sdir =playersbase;
-
+    readplayerfile(sdir+"/1P Games.xml",1,0);
     readplayerfile(sdir+"/2P sim Games.xml",2,1);
     readplayerfile(sdir+"/2P alt Games.xml",2,0);
     readplayerfile(sdir+"/3P sim Games.xml",3,1);
@@ -691,6 +691,13 @@ cout << "check: " <<ofilepath << endl;
             GGenre &g = getGenre(name,parent);
             int gnum = 0;
             if(g.genreEnums.size()>0) gnum = g.genreEnums[0];
+            if(g.genreEnums.size()>1)
+            {
+                if(gnum ==0) gnum = g.genreEnums[1];
+                if(gnum == (int)egg_sport_) {
+                    gnum = g.genreEnums[1];
+                }
+            }
             const char *penumname = enumCnames[gnum];
             ofsb << g.nbPlayersSim <<","<<g.nbPlayersAlt<<"," << penumname << ",0)";
 

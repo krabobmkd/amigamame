@@ -329,7 +329,7 @@ ROM_START( piratetr )
 ROM_END
 
 
-GAME( 1982, leprechn, 0,        leprechn, leprechn, leprechn, ROT0, "Tong Electronic", "Leprechaun", 0 ,0)
-GAME( 1982, potogold, leprechn, leprechn, leprechn, leprechn, ROT0, "GamePlan", "Pot of Gold", 0 ,0)
-GAME( 1982, leprechp, leprechn, leprechn, leprechn, leprechn, ROT0, "Tong Electronic", "Leprechaun (Pacific Polytechnical license)", 0 ,0)
-GAME( 1982, piratetr, 0,        leprechn, piratetr, leprechn, ROT0, "Tong Electronic", "Pirate Treasure", 0 ,2)
+GAME( 1982, leprechn, 0,        leprechn, leprechn, leprechn, ROT0, "Tong Electronic", "Leprechaun", 0 ,0,2,egg_Platform,0)
+GAME( 1982, potogold, leprechn, leprechn, leprechn, leprechn, ROT0, "GamePlan", "Pot of Gold", 0 ,0,2,egg_Platform,0)
+GAME( 1982, leprechp, leprechn, leprechn, leprechn, leprechn, ROT0, "Tong Electronic", "Leprechaun (Pacific Polytechnical license)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, piratetr, 0,        leprechn, piratetr, leprechn, ROT0, "Tong Electronic", "Pirate Treasure", 0 ,0,2,egg_Maze,0)

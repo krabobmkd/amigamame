@@ -1275,8 +1275,8 @@ static DRIVER_INIT( bigtwin )
 	} while (src_pos < 0x2d4c);		/* 0x2d4c is the size of the HEX rom loaded */
 }
 
-GAME( 1995, bigtwin,  0,        bigtwin,  bigtwin,  bigtwin, ROT0, "Playmark", "Big Twin", GAME_NO_COCKTAIL ,2)
-GAME( 1995, wbeachvl, 0,        wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND ,4)
-GAME( 1995, wbeachv2, wbeachvl, wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND ,4)
-GAME( 1996, excelsr,  0,        excelsr,  excelsr,  bigtwin, ROT0, "Playmark", "Excelsior", 0 ,0)
-GAME( 1995, hotmind,  0,        hotmind,  hotmind,  bigtwin, ROT0, "Playmark", "Hot Mind", 0 ,0)
+GAME( 1995, bigtwin,  0,        bigtwin,  bigtwin,  bigtwin, ROT0, "Playmark", "Big Twin", GAME_NO_COCKTAIL ,2,0,egg_Mature,0)
+GAME( 1995, wbeachvl, 0,        wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND ,4,0,egg_sport_Volleyball,0)
+GAME( 1995, wbeachv2, wbeachvl, wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND ,4,0,egg_sport_Volleyball,0)
+GAME( 1996, excelsr,  0,        excelsr,  excelsr,  bigtwin, ROT0, "Playmark", "Excelsior", 0 ,2,0,egg_Mature,0)
+GAME( 1995, hotmind,  0,        hotmind,  hotmind,  bigtwin, ROT0, "Playmark", "Hot Mind", 0 ,0,1,egg_Miscellaneous,0)

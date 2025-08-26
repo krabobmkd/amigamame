@@ -373,5 +373,5 @@ ROM_START( progress )
 	ROM_LOAD( "57.bin", 0x0040, 0x0020, CRC(18455a79) SHA1(e4d64368560e3116a922588129f5f91a4c520f7d) )
 ROM_END
 
-GAME( 1983, timelimt, 0, timelimt, timelimt, 0, ROT90, "Chuo Co. Ltd", "Time Limit", GAME_IMPERFECT_COLORS ,0)
-GAME( 1984, progress, 0, progress, progress, 0, ROT90, "Chuo Co. Ltd", "Progress", 0 ,0)
+GAME( 1983, timelimt, 0, timelimt, timelimt, 0, ROT90, "Chuo Co. Ltd", "Time Limit", GAME_IMPERFECT_COLORS ,0,2,egg_Platform,0)
+GAME( 1984, progress, 0, progress, progress, 0, ROT90, "Chuo Co. Ltd", "Progress", 0 ,0,2,egg_ShootEmUp,0)

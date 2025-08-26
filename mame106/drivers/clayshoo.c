@@ -162,4 +162,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, clayshoo, 0, clayshoo, clayshoo, 0, ROT0, "Allied Leisure", "Clay Shoot", GAME_NO_SOUND ,0)
+GAME( 1979, clayshoo, 0, clayshoo, clayshoo, 0, ROT0, "Allied Leisure", "Clay Shoot", GAME_NO_SOUND ,0,2,egg_Shooter,0)

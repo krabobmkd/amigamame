@@ -843,9 +843,9 @@ DRIVER_INIT( gemini )   { tecmo_video_type = 2; }
 
 
 
-GAME( 1986, rygar,    0,        rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", 0 ,0)
-GAME( 1986, rygar2,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", 0 ,0)
-GAME( 1986, rygarj,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", 0 ,0)
-GAME( 1987, gemini,   0,        gemini,   gemini,   gemini,   ROT90, "Tecmo", "Gemini Wing", 0 ,0)
-GAME( 1988, silkworm, 0,        silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 1)", 0 ,0)
-GAME( 1988, silkwrm2, silkworm, silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 2)", 0 ,0)
+GAME( 1986, rygar,    0,        rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1986, rygar2,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", 0 ,0,2,egg_Platform,0)
+GAME( 1986, rygarj,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", 0 ,0,2,egg_Platform,0)
+GAME( 1987, gemini,   0,        gemini,   gemini,   gemini,   ROT90, "Tecmo", "Gemini Wing", 0 ,0,0,egg_Unknown,0)
+GAME( 1988, silkworm, 0,        silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 1)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1988, silkwrm2, silkworm, silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 2)", 0 ,2,0,egg_ShootEmUp,0)

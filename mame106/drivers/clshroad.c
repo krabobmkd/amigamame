@@ -523,6 +523,6 @@ die once, it would be nice to avoid the hack however
 	ROM[0x05C8] = 0x23;
 }
 
-GAME( 1984, firebatl, 0,        firebatl, firebatl, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1986, clshroad, 0,        clshroad, clshroad, 0,        ROT0,  "Woodplace Inc.", "Clash-Road", 0 ,0)
-GAME( 1986, clshrdst, clshroad, clshroad, clshroad, 0,        ROT0,  "Woodplace Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 ,0)
+GAME( 1984, firebatl, 0,        firebatl, firebatl, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1986, clshroad, 0,        clshroad, clshroad, 0,        ROT0,  "Woodplace Inc.", "Clash-Road", 0 ,0,2,egg_Motorcycle,0)
+GAME( 1986, clshrdst, clshroad, clshroad, clshroad, 0,        ROT0,  "Woodplace Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 ,0,2,egg_Motorcycle,0)

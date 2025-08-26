@@ -361,4 +361,4 @@ ROM_START( triplhnt )
 ROM_END
 
 
-GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt, 0, "Atari", "Triple Hunt", GAME_IMPERFECT_SOUND ,1)
+GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt, 0, "Atari", "Triple Hunt", GAME_IMPERFECT_SOUND ,0,1,egg_LightGuns,0)

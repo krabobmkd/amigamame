@@ -243,4 +243,4 @@ ROM_START( klondkp )
 	ROM_LOAD( "kd.u28", 0x000000, 0x080000, CRC(c12112a1) SHA1(729bbaca6db933a730099a4a560a10ed99cae1c3) )
 ROM_END
 
-GAME( 1999, klondkp, 0, eolith16, eolith16, 0, ROT0, "Eolith", "KlonDike+", 0 ,0)
+GAME( 1999, klondkp, 0, eolith16, eolith16, 0, ROT0, "Eolith", "KlonDike+", 0 ,0,1,egg_Tabletop,0)

@@ -864,20 +864,20 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 
 */
 
-/* -- */ GAMEB( 1993, megaplay, 0,        megaplay, megaplay, megaplay, megaplay, ROT0, "Sega",                  "Mega Play BIOS", NOT_A_DRIVER ,0)
-/* 01 */ GAMEB( 1993, mp_sonic, megaplay, megaplay, megaplay, mp_sonic, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)" , 0 ,0)
-/* 02 */ GAMEB( 1993, mp_gaxe2, megaplay, megaplay, megaplay, mp_gaxe2, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 ,0)
-/* 03 */ GAMEB( 1993, mp_gslam, megaplay, megaplay, megaplay, mp_gslam,	megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",GAME_NOT_WORKING  ,0)
-/* 04 */ GAMEB( 1993, mp_twc,   megaplay, megaplay, megaplay, mp_twc,	megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 ,0)
-/* 05 */ GAMEB( 1993, mp_sor2,  megaplay, megaplay, megaplay, mp_sor2,	megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 ,0)
-/* 06 */ GAMEB( 1993, mp_bio,   megaplay, megaplay, megaplay, mp_bio,	megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 ,0)
-/* 07 */ GAMEB( 1993, mp_soni2, megaplay, megaplay, megaplay, mp_soni2, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)" , 0 ,0)
+/* -- */ GAMEB( 1993, megaplay, 0,        megaplay, megaplay, megaplay, megaplay, ROT0, "Sega",                  "Mega Play BIOS", NOT_A_DRIVER ,0,0,egg_Unknown,0)
+/* 01 */ GAMEB( 1993, mp_sonic, megaplay, megaplay, megaplay, mp_sonic, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)" , 0 ,0,1,egg_Platform,0)
+/* 02 */ GAMEB( 1993, mp_gaxe2, megaplay, megaplay, megaplay, mp_gaxe2, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 ,2,0,egg_BeatNUp,0)
+/* 03 */ GAMEB( 1993, mp_gslam, megaplay, megaplay, megaplay, mp_gslam,	megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",GAME_NOT_WORKING  ,2,0,egg_sport_Tennis,0)
+/* 04 */ GAMEB( 1993, mp_twc,   megaplay, megaplay, megaplay, mp_twc,	megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 ,0,0,egg_Unknown,0)
+/* 05 */ GAMEB( 1993, mp_sor2,  megaplay, megaplay, megaplay, mp_sor2,	megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 ,2,0,egg_BeatNUp,0)
+/* 06 */ GAMEB( 1993, mp_bio,   megaplay, megaplay, megaplay, mp_bio,	megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 ,2,0,egg_ShootEmUp,0)
+/* 07 */ GAMEB( 1993, mp_soni2, megaplay, megaplay, megaplay, mp_soni2, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)" , 0 ,2,0,egg_Platform,0)
 /* 08 */
 /* 09 */
 /* 10 */
-/* 11 */ GAMEB( 1993, mp_mazin,   megaplay, megaplay, megaplay, mp_mazin,	megaplay, ROT0, "Sega",                  "Mazin Wars (Mega Play)",GAME_NOT_WORKING  ,0)
+/* 11 */ GAMEB( 1993, mp_mazin,   megaplay, megaplay, megaplay, mp_mazin,	megaplay, ROT0, "Sega",                  "Mazin Wars (Mega Play)",GAME_NOT_WORKING  ,0,1,egg_BeatNUp,0)
 
-/* ?? */ GAMEB( 1993, mp_col3,   megaplay, megaplay, megaplay, mp_col3,	megaplay, ROT0, "Sega",                  "Columns III (Mega Play)" , 0 ,0)
+/* ?? */ GAMEB( 1993, mp_col3,   megaplay, megaplay, megaplay, mp_col3,	megaplay, ROT0, "Sega",                  "Columns III (Mega Play)" , 0 ,2,0,egg_Puzzle,0)
 
 
 /* Also known to exist:

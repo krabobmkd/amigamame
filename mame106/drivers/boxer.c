@@ -350,4 +350,4 @@ ROM_START( boxer )
 ROM_END
 
 
-GAME( 1978, boxer, 0, boxer, boxer, 0, 0, "Atari", "Boxer (prototype)", GAME_NO_SOUND ,0)
+GAME( 1978, boxer, 0, boxer, boxer, 0, 0, "Atari", "Boxer (prototype)", GAME_NO_SOUND ,2,0,egg_sport_Boxing,0)

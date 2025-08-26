@@ -167,5 +167,5 @@ ROM_START( beezer1 )
 	ROM_LOAD( "e1.cpu", 0x100, 0x0100, CRC(3c775c5e) SHA1(ac86f45938c0c9d5fec1245bf86718442baf445b) )
 ROM_END
 
-GAME( 1982, beezer,  0,       beezer, beezer, beezer, ORIENTATION_FLIP_X, "Tong Electronic", "Beezer (set 1)", GAME_IMPERFECT_SOUND ,2)
-GAME( 1982, beezer1,  beezer, beezer, beezer, beezer, ORIENTATION_FLIP_X, "Tong Electronic", "Beezer (set 2)", GAME_IMPERFECT_SOUND ,2)
+GAME( 1982, beezer,  0,       beezer, beezer, beezer, ORIENTATION_FLIP_X, "Tong Electronic", "Beezer (set 1)", GAME_IMPERFECT_SOUND ,0,2,egg_Maze,0)
+GAME( 1982, beezer1,  beezer, beezer, beezer, beezer, ORIENTATION_FLIP_X, "Tong Electronic", "Beezer (set 2)", GAME_IMPERFECT_SOUND ,0,2,egg_Maze,0)

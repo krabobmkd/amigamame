@@ -243,4 +243,4 @@ ROM_START( coolridr )
 	ROMX_LOAD( "mp17649.10",0x0000009, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd), ROM_SKIP(9) )
 ROM_END
 
-GAME( 1995, coolridr,    0, coolridr,    coolridr,    0, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 1995, coolridr,    0, coolridr,    coolridr,    0, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND ,2,0,egg_Motorcycle,0)

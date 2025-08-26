@@ -612,7 +612,7 @@ static DRIVER_INIT( baraduke )
 
 
 
-GAME( 1985, metrocrs, 0,        baraduke, metrocrs, baraduke, ROT0, "Namco", "Metro-Cross (set 1)", 0 ,2)
-GAME( 1985, metrocra, metrocrs, baraduke, metrocrs, baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 ,2)
-GAME( 1985, baraduke, 0,        baraduke, baraduke, baraduke, ROT0, "Namco", "Baraduke (set 1)", 0 ,2)
-GAME( 1985, baraduka, baraduke, baraduke, baraduke, baraduke, ROT0, "Namco", "Baraduke (set 2)", 0 ,2)
+GAME( 1985, metrocrs, 0,        baraduke, metrocrs, baraduke, ROT0, "Namco", "Metro-Cross (set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1985, metrocra, metrocrs, baraduke, metrocrs, baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 ,0,2,egg_Platform,0)
+GAME( 1985, baraduke, 0,        baraduke, baraduke, baraduke, ROT0, "Namco", "Baraduke (set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1985, baraduka, baraduke, baraduke, baraduke, baraduke, ROT0, "Namco", "Baraduke (set 2)", 0 ,0,2,egg_ShootEmUp,0)

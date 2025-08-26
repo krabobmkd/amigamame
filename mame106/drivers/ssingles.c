@@ -122,4 +122,4 @@ ROM_START( ssingles )
 
 ROM_END
 
-GAME ( 19??, ssingles, 0, ssingles, ssingles, 0, ROT90, "Yachiyo", "Swinging Singles",GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME ( 19??, ssingles, 0, ssingles, ssingles, 0, ROT90, "Yachiyo", "Swinging Singles",GAME_NOT_WORKING|GAME_NO_SOUND ,0,2,egg_Mature,0)

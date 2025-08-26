@@ -542,4 +542,4 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-GAME( 1990, cybertnk,  0,       cybertnk,  cybertnk,  0, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NO_SOUND|GAME_NOT_WORKING ,0)
+GAME( 1990, cybertnk,  0,       cybertnk,  cybertnk,  0, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NO_SOUND|GAME_NOT_WORKING ,2,0,egg_Shooter,0)
