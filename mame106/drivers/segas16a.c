@@ -2702,8 +2702,8 @@ static DRIVER_INIT( timesca1 )
  *************************************/
 
 /* "Pre-System 16" */
-GAME( 1987, aliensy2, aliensyn, system16a,        aliensyn, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", 0 ,2,0,egg_ShootEmUp,0)
-GAME( 1987, aliensy1, aliensyn, system16a,        aliensyn, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 1, System 16A, FD1089A 317-0033)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1987, aliensy2, aliensyn, system16a,        aliensyn, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", 0 ,2,0,egg_ShootEmUp,EGF_Hentai)
+GAME( 1987, aliensy1, aliensyn, system16a,        aliensyn, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 1, System 16A, FD1089A 317-0033)", 0 ,2,0,egg_ShootEmUp,EGF_Hentai)
 GAME( 1986, bodyslam, 0,        system16a_8751,   bodyslam, bodyslam,    ROT0,   "Sega",           "Body Slam (8751 317-unknown)", 0 ,2,0,egg_sport_Wrestling,0)
 GAME( 1986, dumpmtmt, bodyslam, system16a_8751,   bodyslam, bodyslam,    ROT0,   "Sega",           "Dump Matsumoto (Japan, 8751 317-unknown)", 0 ,2,0,egg_sport_Wrestling,0)
 GAME( 1985, mjleague, 0,        system16a,        mjleague, mjleague,    ROT270, "Sega",           "Major League", 0 ,2,0,egg_sport_Baseball,0)
@@ -2714,8 +2714,8 @@ GAME( 1986, quartt2j, quartet,  system16a_8751,   quartet2, quartet,     ROT0,  
 
 /* System 16A */
 GAME( 1986, afighter, 0,        system16a_no7751, afighter, afighter,    ROT270, "Sega",           "Action Fighter, FD1089A 317-0018", 0 ,0,2,egg_ShootEmUp,0)
-GAME( 1986, alexkidd, 0,        system16a,        alexkidd, generic_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 2, unprotected)", 0 ,2,0,egg_Platform,0)
-GAME( 1986, alexkid1, alexkidd, system16a,        alexkidd, alexkid1,    ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 1, FD1089A 317-unknown)", 0 ,2,0,egg_Platform,0)
+GAME( 1986, alexkidd, 0,        system16a,        alexkidd, generic_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 2, unprotected)", 0 ,2,0,egg_Platform,EGF_Childish)
+GAME( 1986, alexkid1, alexkidd, system16a,        alexkidd, alexkid1,    ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 1, FD1089A 317-unknown)", 0 ,2,0,egg_Platform,EGF_Childish)
 GAME( 1986, fantzone, 0,        system16a_no7751, fantzone, generic_16a, ROT0,   "Sega",           "Fantasy Zone (set 2, unprotected)", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1986, fantzon1, fantzone, system16a_no7751, fantzone, generic_16a, ROT0,   "Sega",           "Fantasy Zone (set 1, unprotected)", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1987, sdi,      0,        system16a_no7751, sdi,      sdi,         ROT0,   "Sega",           "SDI - Strategic Defense Initiative (Europe, System 16A, FD1089B 317-0027)", 0 ,2,0,egg_ShootEmUp,0)
@@ -2725,4 +2725,4 @@ GAME( 1987, sjryuko1, sjryuko,  system16a,        sjryuko,  sjryukoa,    ROT0,  
 GAME( 1988, tetris,   0,        system16a_no7751, tetris,   generic_16a, ROT0,   "Sega",           "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", 0 ,2,0,egg_Puzzle,0)
 GAME( 1988, tetris3,  tetris,   system16a_no7751, tetris,   generic_16a, ROT0,   "Sega",           "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", 0 ,2,0,egg_Puzzle,0)
 GAME( 1987, timesca1, timescan, system16a,        timescan, timesca1,    ROT270, "Sega",           "Time Scanner (set 1, System 16A, FD1089B 317-0024)", 0 ,0,2,egg_Pinballs,0)
-GAME( 1988, wb31,     wb3,      system16a_no7751, wb3,      generic_16a, ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, System 16A, FD1094 317-0084)", 0 ,2,0,egg_Platform,0)
+GAME( 1988, wb31,     wb3,      system16a_no7751, wb3,      generic_16a, ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, System 16A, FD1094 317-0084)", 0 ,2,0,egg_Platform,EGF_Childish)

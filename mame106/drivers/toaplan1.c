@@ -2404,7 +2404,7 @@ GAME( 1988, rallybik, 0,        rallybik, rallybik, toaplan1, ROT270, "[Toaplan]
 GAME( 1988, truxton,  0,        truxton,  truxton,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1989, hellfire, 0,        hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1989, hellfir1, hellfire, hellfire, hellfir1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 ,2,0,egg_ShootEmUp,0)
-GAME( 1989, zerowing, 0,        zerowing, zerowing, toaplan1, ROT0,   "Toaplan", "Zero Wing", 0 ,0,0,egg_Unknown,0)
+GAME( 1989, zerowing, 0,        zerowing, zerowing, toaplan1, ROT0,   "Toaplan", "Zero Wing", 0 ,0,0,egg_ShootEmUp,0)
 GAME( 1990, demonwld, 0,        demonwld, demonwld, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story", 0 ,2,0,egg_Platform,0)
 GAME( 1989, demonwl1, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan (Taito license)", "Demon's World / Horror Story (Taito license)", 0 ,2,0,egg_Platform,0)
 GAME( 1989, demonwl2, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (first edition)", 0 ,2,0,egg_Platform,0)

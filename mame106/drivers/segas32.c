@@ -3778,8 +3778,8 @@ GAME( 1994, jleague,  svf,		system32,     svf,      jleague,  ROT0, "Sega",   "T
 
 GAME( 1994, harddunk, 0,        multi32,      harddunk, harddunk, ROT0, "Sega",   "Hard Dunk (World)", GAME_IMPERFECT_GRAPHICS ,6,0,egg_sport_Basketball,0)
 GAME( 1994, harddunj, harddunk, multi32,      harddunk, harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", GAME_IMPERFECT_GRAPHICS ,6,0,egg_sport_Basketball,0)
-GAME( 1992, orunners, 0,        multi32,      orunners, orunners, ROT0, "Sega",   "OutRunners (World)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,0)
-GAME( 1992, orunneru, orunners, multi32,      orunners, orunners, ROT0, "Sega",   "OutRunners (US)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,0)
+GAME( 1992, orunners, 0,        multi32,      orunners, orunners, ROT0, "Sega",   "OutRunners (World)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,EGF_P3D)
+GAME( 1992, orunneru, orunners, multi32,      orunners, orunners, ROT0, "Sega",   "OutRunners (US)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,EGF_P3D)
 GAME( 1992, scross,   0,        multi32,      scross,   scross,   ROT0, "Sega",   "Stadium Cross (World)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Motorcycle,0)
 GAME( 1992, titlef,   0,        multi32,      titlef,   titlef,   ROT0, "Sega",   "Title Fight (World)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_sport_Boxing,0)
 GAME( 1992, titlefu,  titlef,   multi32,      titlef,   titlef,   ROT0, "Sega",   "Title Fight (US)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_sport_Boxing,0)

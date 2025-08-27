@@ -552,4 +552,4 @@ static DRIVER_INIT( superchs )
 	memory_install_read16_handler(2, ADDRESS_SPACE_PROGRAM, 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
 }
 
-GAME( 1992, superchs, 0, superchs, superchs, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0 ,0,0,egg_Unknown,0)
+GAME( 1992, superchs, 0, superchs, superchs, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0 ,0,0,egg_Driving,EGF_P3D)

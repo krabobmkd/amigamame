@@ -885,6 +885,7 @@ pColumns->_players = players;
                         ((fgenre&EGF_UViolent)?" Ultra Violent":""),
                        ((fgenre&EGF_Hentai)?" Hentai":"")
                         );
+        genre[23]=0;
     }
 /*
 #define EGF_HOR 1
