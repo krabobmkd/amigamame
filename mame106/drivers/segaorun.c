@@ -1891,15 +1891,15 @@ static DRIVER_INIT( shangon3 )
  *
  *************************************/
 
-GAME( 1986, outrun,   0,        outrun,  outrun,   outrun,   ROT0, "Sega",    "Out Run (set 3)", 0 ,0,1,egg_Driving,0)
-GAME( 1986, outrun2,  outrun,   outrun,  outrun,   outrun,   ROT0, "Sega",    "Out Run (set 2)", 0 ,0,1,egg_Driving,0)
-GAME( 1986, outrun1,  outrun,   outrun,  outrundx, outrun,   ROT0, "Sega",    "Out Run (set 1, Deluxe?)", 0 ,0,1,egg_Driving,0)
-GAME( 1986, outrunb,  outrun,   outrun,  outrun,   outrunb,  ROT0, "bootleg", "Out Run (bootleg)", 0 ,0,1,egg_Driving,0)
-GAME( 1987, shangon,  0,        shangon, shangon,  shangon,  ROT0, "Sega",    "Super Hang-On (set 4, 68000)", 0 ,0,1,egg_Motorcycle,0)
-GAME( 1987, shangon3, shangon,  shangon, shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (set 3, FD1089B 317-0034)", 0 ,0,1,egg_Motorcycle,0)
-GAME( 1987, shangon2, shangon,  shangon, shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (set 2, FD1089B 317-0034)", 0 ,0,1,egg_Motorcycle,0)
-GAME( 1987, shangon1, shangon,  shangon, shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (set 1, FD1089B 317-0034)", 0 ,0,1,egg_Motorcycle,0)
-GAME( 1991, shangnle, shangon,  shangon, shangon,  shangon,  ROT0, "Sega",    "Limited Edition Hang-On", 0 ,0,1,egg_Motorcycle,0)
-GAME( 1989, toutrun,  0,        outrun,  toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (set 3, upgrade kit, FD1094 317-0118)" , 0 ,0,1,egg_Driving,0)
-GAME( 1989, toutrun2, toutrun,  outrun,  toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (set 2, upright, FD1094 317-unknown)", 0 ,0,1,egg_Driving,0)
-GAME( 1989, toutrun1, toutrun,  outrun,  toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (set 1, FD1094 317-unknown)", GAME_NOT_WORKING ,0,1,egg_Driving,0) // not decrypted
+GAME( 1986, outrun,   0,        outrun,  outrun,   outrun,   ROT0, "Sega",    "Out Run (set 3)", 0 ,0,1,egg_Driving,EGF_P3D)
+GAME( 1986, outrun2,  outrun,   outrun,  outrun,   outrun,   ROT0, "Sega",    "Out Run (set 2)", 0 ,0,1,egg_Driving,EGF_P3D)
+GAME( 1986, outrun1,  outrun,   outrun,  outrundx, outrun,   ROT0, "Sega",    "Out Run (set 1, Deluxe?)", 0 ,0,1,egg_Driving,EGF_P3D)
+GAME( 1986, outrunb,  outrun,   outrun,  outrun,   outrunb,  ROT0, "bootleg", "Out Run (bootleg)", 0 ,0,1,egg_Driving,EGF_P3D)
+GAME( 1987, shangon,  0,        shangon, shangon,  shangon,  ROT0, "Sega",    "Super Hang-On (set 4, 68000)", 0 ,0,1,egg_Motorcycle,EGF_P3D)
+GAME( 1987, shangon3, shangon,  shangon, shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (set 3, FD1089B 317-0034)", 0 ,0,1,egg_Motorcycle,EGF_P3D)
+GAME( 1987, shangon2, shangon,  shangon, shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (set 2, FD1089B 317-0034)", 0 ,0,1,egg_Motorcycle,EGF_P3D)
+GAME( 1987, shangon1, shangon,  shangon, shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (set 1, FD1089B 317-0034)", 0 ,0,1,egg_Motorcycle,EGF_P3D)
+GAME( 1991, shangnle, shangon,  shangon, shangon,  shangon,  ROT0, "Sega",    "Limited Edition Hang-On", 0 ,0,1,egg_Motorcycle,EGF_P3D)
+GAME( 1989, toutrun,  0,        outrun,  toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (set 3, upgrade kit, FD1094 317-0118)" , 0 ,0,1,egg_Driving,EGF_P3D)
+GAME( 1989, toutrun2, toutrun,  outrun,  toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (set 2, upright, FD1094 317-unknown)", 0 ,0,1,egg_Driving,EGF_P3D)
+GAME( 1989, toutrun1, toutrun,  outrun,  toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (set 1, FD1094 317-unknown)", GAME_NOT_WORKING ,0,1,egg_Driving,EGF_P3D) // not decrypted

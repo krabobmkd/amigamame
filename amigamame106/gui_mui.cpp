@@ -40,7 +40,7 @@ extern "C" {
 
     // this one has bugs with -O2
     #include <proto/muimaster.h>
-    // we point MUI50 in almigacommonlibs repository ....
+    // we point MUI50 in amigacommonlibs repository ....
     #include <../../MUI50/include/mui/Guigfx_mcc.h>
     #include <../../MUI50/include/mui/GIFAnim_mcc.h>
 
@@ -618,13 +618,6 @@ static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2
 static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1));
 
 
-
-
-
-
-
-
-
 static int DriverCompareNames(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
   return(stricmp((*drv1)->description, (*drv2)->description));
@@ -875,14 +868,38 @@ pColumns->_players = players;
     pColumns->_year = (char *)drv->year;
 
     int eGenre =  drv->genre;
+    int fgenre =  drv->genreflag;
     if(eGenre ==0 || eGenre>=nbGenreNames) {
         genre[0] = 0;
     } else
     {
         // V K G F H
-        snprintf(genre,15,"%s ",genreNames[eGenre]);
+        snprintf(genre,23,"%s%s%s%s%s%s%s%s%s",
+                        genreNames[eGenre],
+                        ((fgenre&EGF_VER)?" Vertical":""),
+                        ((fgenre&EGF_P3D)?" 3D":""),
+                        ((fgenre&EGF_I3D)?" Isometric":""),
+                        ((fgenre&EGF_Girly)?" Girly":""),
+                        ((fgenre&EGF_Childish)?" Childish":""),
+                        ((fgenre&EGF_Funny)?" Funny":""),
+                        ((fgenre&EGF_UViolent)?" Ultra Violent":""),
+                       ((fgenre&EGF_Hentai)?" Hentai":"")
+                        );
     }
+/*
+#define EGF_HOR 1
+#define EGF_VER 2  // just to seek vertical egg_ShootEmUp.
+#define EGF_P3D 4 // perspective 3D
+#define EGF_I3D 8 // isometric 3D
 
+#define EGF_Girly 16 // basically twinkle star and rodland.
+#define EGF_Childish 32
+#define EGF_Sexy 64 // would match egg_Mature ? -> not only.
+#define EGF_Funny 128
+#define EGF_UViolent 256 // all are violent, this is for blood and gore games.
+#define EGF_Hentai 512 // because "monster maulers"
+
+*/
 
 
 //  if(drv->flags & GAME_NOT_WORKING)

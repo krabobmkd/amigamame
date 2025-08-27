@@ -1446,5 +1446,5 @@ GAME( 1981, elim4p,	  elim2,	elim2,	  elim4,	elim4,	  ORIENTATION_FLIP_Y,   "Gre
 GAME( 1981, spacfury, 0,        spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision C)", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1981, spacfura, spacfury, spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision A)", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1982, zektor,   0,        zektor,   zektor,   zektor,   ORIENTATION_FLIP_Y,   "Sega", "Zektor (revision B)", 0 ,0,2,egg_ShootEmUp,0)
-GAME( 1982, tacscan,  0,        tacscan,  tacscan,  tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega", "Tac/Scan", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1982, tacscan,  0,        tacscan,  tacscan,  tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega", "Tac/Scan", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,EGF_VER)
 GAME( 1982, startrek, 0,        startrek, startrek, startrek, ORIENTATION_FLIP_Y,   "Sega", "Star Trek", GAME_IMPERFECT_SOUND ,0,2,egg_Flying,0)

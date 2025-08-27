@@ -8217,8 +8217,8 @@ GAMEB( 1998, rbff2k,   rbff2,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK",
 GAMEB( 1998, mslug2,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Metal Slug 2 - Super Vehicle-001/II", 0 ,2,0,egg_Platform,0)
 
 // demoscene !
-GAMEB( 2025, vaporous,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "The Twitch Elite", "Vaporous Demo - ( TTE, Revision, W0rld )", 0 ,0,0,egg_Demoscene,0)
-GAMEB( 2012, neogeo3d, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Oxygene", "NeoGeo 3D ! - ( Oxygene, W0rld )", 0 ,0,0,egg_Demoscene,0)
+GAMEB( 2025, vaporous,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "The Twitch Elite", "Vaporous Demo - ( TTE, Revision, W0rld )", 0 ,0,0,egg_Demoscene,EGF_P3D)
+GAMEB( 2012, neogeo3d, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Oxygene", "NeoGeo 3D ! - ( Oxygene, W0rld )", 0 ,0,0,egg_Demoscene,EGF_P3D)
 
 GAMEB( 1998, kof98,    neogeo,   neogeo, neogeo, neogeo,  kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends", 0 ,2,0,egg_Fighter,0)
 GAMEB( 1998, kof98k,   kof98,    neogeo, neogeo, neogeo,  kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (Korean board)", 0 ,2,0,egg_Fighter,0)

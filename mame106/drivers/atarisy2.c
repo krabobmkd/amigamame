@@ -3380,16 +3380,16 @@ static DRIVER_INIT( apb )
  *
  *************************************/
 
-GAME( 1984, paperboy, 0,        atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 3)", 0 ,0,2,egg_Maze,0)
-GAME( 1984, paperbr2, paperboy, atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 2)", 0 ,0,2,egg_Maze,0)
-GAME( 1984, paperbr1, paperboy, atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 1)", 0 ,0,2,egg_Maze,0)
+GAME( 1984, paperboy, 0,        atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 3)", 0 ,0,2,egg_Maze,EGF_I3D)
+GAME( 1984, paperbr2, paperboy, atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 2)", 0 ,0,2,egg_Maze,EGF_I3D)
+GAME( 1984, paperbr1, paperboy, atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 1)", 0 ,0,2,egg_Maze,EGF_I3D)
 
-GAME( 1986, 720,      0,        720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 4)", 0 ,0,2,egg_sport_Skate,0)
-GAME( 1986, 720r3,    720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 3)", 0 ,0,2,egg_sport_Skate,0)
-GAME( 1986, 720r2,    720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 2)", 0 ,0,2,egg_sport_Skate,0)
-GAME( 1986, 720r1,    720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 1)", 0 ,0,2,egg_sport_Skate,0)
-GAME( 1986, 720g,     720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (German, rev 2)", 0 ,0,2,egg_sport_Skate,0)
-GAME( 1986, 720gr1,   720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (German, rev 1)", 0 ,0,2,egg_sport_Skate,0)
+GAME( 1986, 720,      0,        720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 4)", 0 ,0,2,egg_sport_Skate,EGF_I3D)
+GAME( 1986, 720r3,    720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 3)", 0 ,0,2,egg_sport_Skate,EGF_I3D)
+GAME( 1986, 720r2,    720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 2)", 0 ,0,2,egg_sport_Skate,EGF_I3D)
+GAME( 1986, 720r1,    720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 1)", 0 ,0,2,egg_sport_Skate,EGF_I3D)
+GAME( 1986, 720g,     720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (German, rev 2)", 0 ,0,2,egg_sport_Skate,EGF_I3D)
+GAME( 1986, 720gr1,   720,      720,      720,      720,      ROT0,   "Atari Games", "720 Degrees (German, rev 1)", 0 ,0,2,egg_sport_Skate,EGF_I3D)
 
 GAME( 1986, ssprint,  0,        sprint,   ssprint,  ssprint,  ROT0,   "Atari Games", "Super Sprint (rev 4)", 0 ,3,0,egg_Driving,0)
 GAME( 1986, ssprint3, ssprint,  sprint,   ssprint,  ssprint1, ROT0,   "Atari Games", "Super Sprint (rev 3)", 0 ,3,0,egg_Driving,0)

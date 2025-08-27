@@ -2277,12 +2277,12 @@ static DRIVER_INIT( laserdsc )
 
 
 GAME( 1982, reactor,  0,        reactor,  reactor,  0,        ROT0,   "Gottlieb", "Reactor", 0 ,0,2,egg_ShootEmUp,0)
-GAME( 1982, qbert,    0,        qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (US set 1)", 0 ,0,2,egg_Platform,0)
-GAME( 1982, qberta,   qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (US set 2)", 0 ,0,2,egg_Platform,0)
-GAME( 1982, qbertjp,  qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", 0 ,0,2,egg_Platform,0)
-GAME( 1982, myqbert,  qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Mello Yello Q*bert", 0 ,0,2,egg_Platform,0)
-GAME( 1982, qberttst, qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (early test version)", 0 ,0,2,egg_Platform,0)
-GAME( 1982, qbtrktst, qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert Board Input Test Rom", 0 ,0,2,egg_Platform,0)
+GAME( 1982, qbert,    0,        qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (US set 1)", 0 ,0,2,egg_Platform,EGF_I3D)
+GAME( 1982, qberta,   qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (US set 2)", 0 ,0,2,egg_Platform,EGF_I3D)
+GAME( 1982, qbertjp,  qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", 0 ,0,2,egg_Platform,EGF_I3D)
+GAME( 1982, myqbert,  qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Mello Yello Q*bert", 0 ,0,2,egg_Platform,EGF_I3D)
+GAME( 1982, qberttst, qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (early test version)", 0 ,0,2,egg_Platform,EGF_I3D)
+GAME( 1982, qbtrktst, qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert Board Input Test Rom", 0 ,0,2,egg_Platform,EGF_I3D)
 GAME( 1982, insector, 0,        gottlieb, insector, 0,        ROT0,   "Gottlieb", "Insector (prototype)", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1982, tylz,     0,        gottlieb, tylz,     0,        ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ,0,2,egg_Maze,0) // modified sound hw?
 GAME( 1984, argusg,   0,        krull,    argusg,   0,        ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0,0,2,egg_ShootEmUp,0) // aka Guardian / Protector?

@@ -2527,7 +2527,7 @@ GAME( 1982, kroozr,   0,        mcr_90010,     kroozr,   kroozr,    ROT0,  "Ball
 GAME( 1983, journey,  0,        mcr_91475,     journey,  journey,   ROT90, "Bally Midway", "Journey", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
 
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O */
-GAME( 1983, tapper,   0,        mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser)", GAME_SUPPORTS_SAVE ,0,0,egg_Unknown,EGF_Funny)
+GAME( 1983, tapper,   0,        mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser)", GAME_SUPPORTS_SAVE ,0,0,egg_Platform,EGF_Funny)
 GAME( 1983, tappera,  tapper,   mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (alternate)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,EGF_Funny)
 GAME( 1983, sutapper, tapper,   mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,EGF_Funny)
 GAME( 1984, rbtapper, tapper,   mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Root Beer)", GAME_SUPPORTS_SAVE ,0,2,egg_Platform,EGF_Funny)

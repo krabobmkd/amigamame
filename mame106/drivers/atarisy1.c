@@ -2170,18 +2170,18 @@ static DRIVER_INIT( roadb110 )
  *
  *************************************/
 
-GAME( 1984, marble,   0,        atarisy1, marble,   marble,   ROT0, "Atari Games", "Marble Madness (set 1)", 0 ,2,0,egg_Maze,0)
-GAME( 1984, marble2,  marble,   atarisy1, marble,   marble,   ROT0, "Atari Games", "Marble Madness (set 2)", 0 ,2,0,egg_Maze,0)
-GAME( 1984, marble3,  marble,   atarisy1, marble,   marble,   ROT0, "Atari Games", "Marble Madness (set 3)", 0 ,2,0,egg_Maze,0)
-GAME( 1984, marble4,  marble,   atarisy1, marble,   marble,   ROT0, "Atari Games", "Marble Madness (set 4)", 0 ,2,0,egg_Maze,0)
+GAME( 1984, marble,   0,        atarisy1, marble,   marble,   ROT0, "Atari Games", "Marble Madness (set 1)", 0 ,2,0,egg_Maze,EGF_I3D)
+GAME( 1984, marble2,  marble,   atarisy1, marble,   marble,   ROT0, "Atari Games", "Marble Madness (set 2)", 0 ,2,0,egg_Maze,EGF_I3D)
+GAME( 1984, marble3,  marble,   atarisy1, marble,   marble,   ROT0, "Atari Games", "Marble Madness (set 3)", 0 ,2,0,egg_Maze,EGF_I3D)
+GAME( 1984, marble4,  marble,   atarisy1, marble,   marble,   ROT0, "Atari Games", "Marble Madness (set 4)", 0 ,2,0,egg_Maze,EGF_I3D)
 
 GAME( 1984, peterpak, 0,        atarisy1, peterpak, peterpak, ROT0, "Atari Games", "Peter Pack-Rat", 0 ,0,2,egg_Platform,0)
 
-GAME( 1985, indytemp, 0,        atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", 0 ,0,2,egg_Maze,0)
-GAME( 1985, indytem2, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 ,0,2,egg_Maze,0)
-GAME( 1985, indytem3, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 ,0,2,egg_Maze,0)
-GAME( 1985, indytem4, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 ,0,2,egg_Maze,0)
-GAME( 1985, indytemd, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 ,0,2,egg_Maze,0)
+GAME( 1985, indytemp, 0,        atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", 0 ,0,2,egg_Maze,EGF_I3D)
+GAME( 1985, indytem2, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 ,0,2,egg_Maze,EGF_I3D)
+GAME( 1985, indytem3, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 ,0,2,egg_Maze,EGF_I3D)
+GAME( 1985, indytem4, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 ,0,2,egg_Maze,EGF_I3D)
+GAME( 1985, indytemd, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 ,0,2,egg_Maze,EGF_I3D)
 
 GAME( 1985, roadrunn, 0,        atarisy1, roadrunn, roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 ,0,2,egg_Platform,0)
 GAME( 1985, roadrun2, roadrunn, atarisy1, roadrunn, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 ,0,2,egg_Platform,0)
