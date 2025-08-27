@@ -838,7 +838,10 @@ int MameConfig::DriverCompareScreenMode(const struct _game_driver **drv1,const  
     // then shape is 640x480 nb
     int width1 = atoi(s1.c_str());
     int width2 = atoi(s2.c_str());
-    return width2-width1;
+    int i = width2-width1;
+    if(i!=0) return i;
+    // else keep alphabetic
+    return(stricmp((*drv1)->description, (*drv2)->description));
 }
 
 

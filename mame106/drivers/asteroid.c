@@ -836,9 +836,9 @@ static DRIVER_INIT( astdelux )
  *
  *************************************/
 
-GAME( 1979, asteroid, 0,        asteroid, asteroid, 0,        ROT0, "Atari", "Asteroids (rev 2)", 0 ,0,0,egg_Unknown,0)
-GAME( 1979, asteroi1, asteroid, asteroid, asteroid, 0,        ROT0, "Atari", "Asteroids (rev 1)", 0 ,0,0,egg_Unknown,0)
-GAME( 1979, asteroib, asteroid, asteroid, asteroib, asteroib, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)", 0 ,0,0,egg_Unknown,0)
+GAME( 1979, asteroid, 0,        asteroid, asteroid, 0,        ROT0, "Atari", "Asteroids (rev 2)", 0 ,0,0,egg_ShootEmUp,0)
+GAME( 1979, asteroi1, asteroid, asteroid, asteroid, 0,        ROT0, "Atari", "Asteroids (rev 1)", 0 ,0,0,egg_ShootEmUp,0)
+GAME( 1979, asteroib, asteroid, asteroid, asteroib, asteroib, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)", 0 ,0,0,egg_ShootEmUp,0)
 GAME( 1979, asterock, asteroid, asterock, asterock, asterock, ROT0, "Sidam", "Asterock", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1979, meteorts, asteroid, asteroid, asteroid, 0,        ROT0, "VGG",   "Meteorites", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1980, astdelux, 0,        astdelux, astdelux, astdelux, ROT0, "Atari", "Asteroids Deluxe (rev 2)", 0 ,0,2,egg_ShootEmUp,0)

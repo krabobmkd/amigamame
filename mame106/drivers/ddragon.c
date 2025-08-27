@@ -1792,9 +1792,9 @@ GAME( 1988, ddragn2u, ddragon2, ddragon2, ddragon2, 0, ROT0, "Technos", "Double 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,   0,        darktowr,  tstrike,   0, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Newer)", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1991, tstrikea,  tstrike,  darktowr,  tstrike,   0, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Older)", 0 ,0,2,egg_ShootEmUp,0)
-GAME( 1992, ddungeon,  0,        darktowr,  ddungeon,  0, ROT0, "East Coast Coin Company (Melbourne)", "Dangerous Dungeons", 0 ,0,0,egg_Unknown,0)
+GAME( 1992, ddungeon,  0,        darktowr,  ddungeon,  0, ROT0, "East Coast Coin Company (Melbourne)", "Dangerous Dungeons", 0 ,0,0,egg_Platform,0)
 GAME( 1992, darktowr,  0,        darktowr,  darktowr,  0, ROT0, "Game Room", "Dark Tower", 0 ,2,0,egg_Platform,0)
 
 /* these run on their own board, but are basically the same game. Toffy even has 'dangerous dungeons' text in it */
 GAME( 1993, toffy,  0, toffy, toffy, toffy, ROT0, "Midas",                 "Toffy", 0 ,2,0,egg_Maze,0)
-GAME( 1994, stoffy, 0, toffy, toffy, toffy, ROT0, "Midas (Unico license)", "Super Toffy", 0 ,0,0,egg_Unknown,0)
+GAME( 1994, stoffy, 0, toffy, toffy, toffy, ROT0, "Midas (Unico license)", "Super Toffy", 0 ,0,0,egg_Maze,0)

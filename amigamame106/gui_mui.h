@@ -39,6 +39,7 @@ struct MameUI {
     const char *String_Archive=NULL;
     const char *String_Parent=NULL;
     const char *String_Screen=NULL;
+    const char *String_Genre=NULL;
     const char *String_Players=NULL;
     const char *String_Year=NULL;
     const char *String_Comment=NULL;

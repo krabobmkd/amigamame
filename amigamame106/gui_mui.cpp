@@ -264,7 +264,7 @@ extern STRPTR ShowCycleValues[];
     const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,";
     if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
     {
-        ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,";
+        ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,";
     }
 
     if(DriverClass!=NULL)
@@ -637,22 +637,49 @@ static int DriverCompareScreenMode(const struct _game_driver **drv1,const  struc
 }
 static int DriverCompareNbPlayers(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
-  int a = (*drv1)->nbplayersSim ;
-  int b = (*drv2)->nbplayersSim;
-
-    return (b-a);
+    int a = (*drv1)->nbplayersSim;
+    int b = (*drv2)->nbplayersSim;
+    int i = b-a;
+    if(i!=0) return i;
+    a = (*drv1)->nbplayersAlt;
+    b = (*drv2)->nbplayersAlt;
+    i = b-a;
+    if(i!=0) return i;
+    // else keep alphabetic
+    return(stricmp((*drv1)->description, (*drv2)->description));
 }
 static int DriverCompareYear(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
-  return(strcmp((*drv1)->year, (*drv2)->year));
+    int i = strcmp((*drv1)->year, (*drv2)->year);
+    if(i != 0) return i;
+    // else keep alphabetic
+    return(stricmp((*drv1)->description, (*drv2)->description));
 }
 static int DriverCompareArchive(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
-  return(stricmp((*drv1)->name, (*drv2)->name));
+  return(stricmp((*drv1)->name, (*drv2)->name)); // garanteed dfifferents
 }
 static int DriverCompareParent(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
-  return(stricmp((*drv1)->parent, (*drv2)->parent));
+    int  i = (stricmp((*drv1)->parent, (*drv2)->parent));
+    if(i != 0) return i;
+    // else keep alphabetic
+    return(stricmp((*drv1)->description, (*drv2)->description));
+}
+static int DriverCompareGenre(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+    int a = (int)(*drv1)->genre;
+    if(a== 0) a=50;
+    int b = (int)(*drv2)->genre;
+    if(b== 0) b=50;
+    int i = a-b;
+    if(i != 0) return i;
+    a = (int)(*drv1)->genreflag;
+    b = (int)(*drv2)->genreflag;
+    i = a-b;
+    if(i != 0) return i;
+    // else keep alphabetic
+    return(stricmp((*drv1)->description, (*drv2)->description));
 }
 
 
@@ -678,15 +705,76 @@ static ULONG DriverSort(
     {
         case 0: return DriverCompareNames(drva,drvb);
         case 1: return DriverCompareNbPlayers(drva,drvb);
-        case 2: return DriverCompareScreenMode(drva,drvb); // screens TODO ?
-        case 3: return DriverCompareYear(drva,drvb);
-        case 4: return DriverCompareArchive(drva,drvb);
-        case 5: return DriverCompareParent(drva,drvb);
+        case 2: return DriverCompareScreenMode(drva,drvb);
+        case 3: return DriverCompareGenre(drva,drvb);
+        case 4: return DriverCompareYear(drva,drvb);
+        case 5: return DriverCompareArchive(drva,drvb);
+        case 6: return DriverCompareParent(drva,drvb);
     }
 
    return DriverCompareNames(drva,drvb);
 
 }
+
+
+static const char *genreNames[]={
+    "", // unknown
+
+    "Platform",
+    "Climbing",
+
+    "ShootEmUp",
+    "Shooter", // actually pang or some joystick gun games..(?)
+
+    "BeatNUp", // cooperative
+    "Fighter", // versus
+    "Driving", // would have tag 3D
+    "Motorcycle",
+    "Flying",
+    "LightGuns",
+    "BallNPaddles",
+    "Pinballs",
+    "Maze",
+
+    "Tabletop",
+    "Puzzle",
+    "CardBattle",
+    "Mahjong",
+    "Quizz",
+    "ChiFouMi", // added for scud hammer
+
+    "Casino",
+    "HorseRacing",
+    "PoolNDart",
+
+    "Sport",
+    "Baseball",
+    "Basketball",
+    "Volleyball",
+    "Football",
+    "Soccer",
+    "Golf",
+    "Hockey",
+    "Rugby",
+    "Tennis",
+    "TrackNField",
+    "Boxing",
+    "Wrestling",
+
+    "Bowling",
+    "Skiing",
+    "Skate",
+    "Rythm",
+    "Fishing",
+
+    "Compilation",
+    "Miscellaneous",
+    "Mature",
+    "Demoscene"
+};
+
+#define nbGenreNames (sizeof(genreNames)/sizeof(char *))
+
 static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const struct _game_driver **drv_indirect REG(a1))
 {
     MameUI *ui = (MameUI *) hook->h_Data;
@@ -694,13 +782,14 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
     const struct _game_driver *drv;
 
     struct ColumnsString {
-          char *_driver,*_players,*_screen,*_year,*_archive,*_parent,*_comment;
+          char *_driver,*_players,*_screen,*_genre,*_year,*_archive,*_parent,*_comment;
     };
     ColumnsString *pColumns = (ColumnsString *)array;
 
   static char driver[64];
   static char screen[32];
   static char archive[16];
+  static char genre[24];
   static char parent[16];
  static char players[16];
  static char year[12];
@@ -712,6 +801,8 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
     driver[55]=0;
     snprintf(screen,31,   "\033b\033u%s", ui->String_Screen);
     screen[31]=0;
+    snprintf(genre,15,   "\033b\033u%s", ui->String_Genre);
+    //genre[23]=0;
     snprintf(archive,15,  "\033b\033u%s", ui->String_Archive);
     archive[15]=0;
     snprintf(parent,15,  "\033b\033u%s", ui->String_Parent);
@@ -727,6 +818,7 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
 
     pColumns->_driver = driver;
     pColumns->_players = players;
+    pColumns->_genre = genre;
     pColumns->_year = year;
     pColumns->_screen = screen;
     pColumns->_archive = archive;
@@ -781,6 +873,17 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
 pColumns->_players = players;
 
     pColumns->_year = (char *)drv->year;
+
+    int eGenre =  drv->genre;
+    if(eGenre ==0 || eGenre>=nbGenreNames) {
+        genre[0] = 0;
+    } else
+    {
+        // V K G F H
+        snprintf(genre,15,"%s ",genreNames[eGenre]);
+    }
+
+
 
 //  if(drv->flags & GAME_NOT_WORKING)
 //   pColumns->_comment = NotWorkingString;
@@ -1284,6 +1387,7 @@ int MameUI::init()
     String_Archive=GetMessagec("Archive");
     String_Parent=GetMessagec("Parent");
     String_Screen=GetMessagec("Screen");
+    String_Genre=GetMessagec("Genre");
     String_Players=GetMessagec("Players");
     String_Year=GetMessagec("Year");
     String_Comment=GetMessagec("Comment");

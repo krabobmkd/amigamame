@@ -7524,7 +7524,7 @@ static DRIVER_INIT( pang3 )
 
 
 
-GAME( 1988, forgottn, 0,        forgottn, forgottn, cps1,     ROT0,   "Capcom", "Forgotten Worlds (US)", 0 ,0,0,egg_Unknown,0)
+GAME( 1988, forgottn, 0,        forgottn, forgottn, cps1,     ROT0,   "Capcom", "Forgotten Worlds (US)", 0 ,0,0,egg_ShootEmUp,0)
 GAME( 1988, lostwrld, forgottn, forgottn, forgottn, cps1,     ROT0,   "Capcom", "Lost Worlds (Japan)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1988, ghouls,   0,        cps1,     ghouls,   cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (World)" , 0,0,2,egg_Platform,0)						// Wed.26.10.1988 in the ROMS
 GAME( 1988, ghoulsu,  ghouls,   cps1,     ghoulsu,  cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (US)" , 0,0,2,egg_Platform,0)						// Wed.26.10.1988 in the ROMS
@@ -7535,9 +7535,9 @@ GAME( 1989, striderj, strider,  cps1,     strider,  cps1,     ROT0,   "Capcom", 
 GAME( 1989, stridrja, strider,  cps1,     strider,  cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan set 2)", 0 ,0,2,egg_Platform,0)
 GAME( 1989, dynwar,   0,        cps1,     dynwar,   cps1,     ROT0,   "Capcom", "Dynasty Wars (World)", 0 ,2,0,egg_BeatNUp,0)						// (c) Capcom U.S.A.
 GAME( 1989, dynwarj,  dynwar,   cps1,     dynwar,   cps1,     ROT0,   "Capcom", "Tenchi wo Kurau (Japan)", 0 ,2,0,egg_BeatNUp,0)
-GAME( 1989, willow,   0,        cps1,     willow,   cps1,     ROT0,   "Capcom", "Willow (US)", 0 ,0,0,egg_Unknown,0)
+GAME( 1989, willow,   0,        cps1,     willow,   cps1,     ROT0,   "Capcom", "Willow (US)", 0 ,0,0,egg_Platform,0)
 GAME( 1989, willowj,  willow,   cps1,     willow,   cps1,     ROT0,   "Capcom", "Willow (Japan, Japanese)" , 0,0,2,egg_Platform,0)					// Japan "warning"
-GAME( 1989, willowje, willow,   cps1,     willow,   cps1,     ROT0,   "Capcom", "Willow (Japan, English)", 0 ,0,0,egg_Unknown,0)						// (c) Capcom U.S.A. but Japan "warning"
+GAME( 1989, willowje, willow,   cps1,     willow,   cps1,     ROT0,   "Capcom", "Willow (Japan, English)", 0 ,0,2,egg_Platform,0)						// (c) Capcom U.S.A. but Japan "warning"
 GAME( 1989, unsquad,  0,        cps1,     unsquad,  cps1,     ROT0,   "Capcom", "U.N. Squadron (US)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1989, area88,   unsquad,  cps1,     unsquad,  cps1,     ROT0,   "Capcom", "Area 88 (Japan)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1989, ffight,   0,        cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (World)", 0 ,2,0,egg_BeatNUp,0)
@@ -7545,7 +7545,7 @@ GAME( 1989, ffightu,  ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", 
 GAME( 1989, ffightua, ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (US 900613)", 0 ,2,0,egg_BeatNUp,0)
 GAME( 1989, ffightj,  ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan)", 0 ,2,0,egg_BeatNUp,0)
 GAME( 1989, ffightj1, ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900305)", 0 ,2,0,egg_BeatNUp,0)
-GAME( 1990, 1941,     0,        cps1,     1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (World)", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, 1941,     0,        cps1,     1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (World)", 0 ,0,0,egg_ShootEmUp,0)
 GAME( 1990, 1941j,    1941,     cps1,     1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (Japan)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1990, mercs,    0,        cps1,     mercs,    cps1,     ROT270, "Capcom", "Mercs (World 900302)" , 0,3,0,egg_ShootEmUp,0)						// "ETC"
 GAME( 1990, mercsu,   mercs,    cps1,     mercs,    cps1,     ROT270, "Capcom", "Mercs (US 900302)", 0 ,3,0,egg_ShootEmUp,0)
@@ -7578,7 +7578,7 @@ GAME( 1991, sf2jc,    sf2,      sf2,      sf2j,     cps1,     ROT0,   "Capcom", 
 GAME( 1991, 3wonders, 0,        cps1,     3wonders, cps1,     ROT0,   "Capcom", "Three Wonders (World 910520)" , 0,2,0,egg_Compilation,0)					// "ETC"
 GAME( 1991, 3wonderu, 3wonders, cps1,     3wonders, cps1,     ROT0,   "Capcom", "Three Wonders (US 910520)", 0 ,2,0,egg_Compilation,0)
 GAME( 1991, wonder3,  3wonders, cps1,     3wonders, cps1,     ROT0,   "Capcom", "Wonder 3 (Japan 910520)", 0 ,2,0,egg_Compilation,0)
-GAME( 1991, kod,      0,        cps1,     kod,      cps1,     ROT0,   "Capcom", "The King of Dragons (World 910711)" , 0,0,0,egg_Unknown,0)				// "ETC"
+GAME( 1991, kod,      0,        cps1,     kod,      cps1,     ROT0,   "Capcom", "The King of Dragons (World 910711)" , 0,0,0,egg_BeatNUp,0)				// "ETC"
 GAME( 1991, kodu,     kod,      cps1,     kodj,     cps1,     ROT0,   "Capcom", "The King of Dragons (US 910910)", 0 ,3,0,egg_BeatNUp,0)
 GAME( 1991, kodj,     kod,      cps1,     kodj,     cps1,     ROT0,   "Capcom", "The King of Dragons (Japan 910805)", 0 ,3,0,egg_BeatNUp,0)
 GAME( 1991, kodb,     kod,      cps1,     kod,      cps1,     ROT0,   "Capcom", "The King of Dragons (bootleg)", GAME_NOT_WORKING ,3,0,egg_BeatNUp,0)		// 910731  "ETC"
@@ -7588,11 +7588,11 @@ GAME( 1991, captcomj, captcomm, cps1,     captcomm, cps1,     ROT0,   "Capcom", 
 GAME( 1991, knights,  0,        cps1,     knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (World 911127)" , 0,3,0,egg_BeatNUp,0)				// "ETC"
 GAME( 1991, knightsu, knights,  cps1,     knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (US 911127)", 0 ,3,0,egg_BeatNUp,0)
 GAME( 1991, knightsj, knights,  cps1,     knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127)", 0 ,3,0,egg_BeatNUp,0)
-GAME( 1992, sf2ce,    0,        sf2,      sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (World 920313)" , 0,0,0,egg_Unknown,0)	// "ETC"
+GAME( 1992, sf2ce,    0,        sf2,      sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (World 920313)" , 0,0,0,egg_Fighter,0)	// "ETC"
 GAME( 1992, sf2ceua,  sf2ce,    sf2,      sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920313)", 0 ,2,0,egg_Fighter,0)
 GAME( 1992, sf2ceub,  sf2ce,    sf2,      sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920513)", 0 ,2,0,egg_Fighter,0)
 GAME( 1992, sf2ceuc,  sf2ce,    sf2,      sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920803)", 0 ,2,0,egg_Fighter,0)
-GAME( 1992, sf2cej,   sf2ce,    sf2,      sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (Japan 920513)", 0 ,0,0,egg_Unknown,0)
+GAME( 1992, sf2cej,   sf2ce,    sf2,      sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (Japan 920513)", 0 ,0,0,egg_Fighter,0)
 GAME( 1992, sf2rb,    sf2ce,    sf2,      sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Rainbow set 1)" , 0,2,0,egg_Fighter,0)	// 920322 - based on World version
 GAME( 1992, sf2rb2,   sf2ce,    sf2,      sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Rainbow set 2)" , 0,2,0,egg_Fighter,0)	// 920322 - based on World version
 GAME( 1992, sf2red,   sf2ce,    sf2,      sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Red Wave)" , 0,2,0,egg_Fighter,0)		// 920313 - based on World version
@@ -7613,15 +7613,15 @@ GAME( 1992, varthu,   varth,    cps1,     varth,    cps1,     ROT270, "Capcom (R
 GAME( 1992, varthj,   varth,    cps1,     varth,    cps1,     ROT270, "Capcom", "Varth - Operation Thunderstorm (Japan 920714)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1992, cworld2j, 0,        cps1,     cworld2j, cps1,     ROT0,   "Capcom", "Capcom World 2 (Japan 920611)", 0 ,2,0,egg_Quizz,0)
 GAME( 1992, sf2hf,    sf2ce,    sf2,      sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Hyper Fighting (World 921209)", 0 ,2,0,egg_Fighter,0)
-GAME( 1992, sf2t,     sf2ce,    sf2,      sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Hyper Fighting (US 921209)", 0 ,0,0,egg_Unknown,0)
-GAME( 1992, sf2tj,    sf2ce,    sf2,      sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo - Hyper Fighting (Japan 921209)", 0 ,0,0,egg_Unknown,0)
+GAME( 1992, sf2t,     sf2ce,    sf2,      sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Hyper Fighting (US 921209)", 0 ,0,0,egg_Fighter,0)
+GAME( 1992, sf2tj,    sf2ce,    sf2,      sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo - Hyper Fighting (Japan 921209)", 0 ,0,0,egg_Fighter,0)
 GAME( 1992, qad,      0,        cps1,     qad,      cps1,     ROT0,   "Capcom", "Quiz & Dragons (US 920701)", 0 ,2,0,egg_Quizz,0)
 GAME( 1994, qadj,     qad,      cps1,     qadj,     cps1,     ROT0,   "Capcom", "Quiz & Dragons (Japan 940921)", 0 ,2,0,egg_Quizz,0)
-GAME( 1995, qtono2,   0,        cps1,     qtono2,   cps1,     ROT0,   "Capcom", "Quiz Tonosama no Yabou 2 Zenkoku-ban (Japan 950123)", 0 ,0,0,egg_Unknown,0)
-GAME( 1995, megaman,  0,        cps1,     megaman,  cps1,     ROT0,   "Capcom", "Mega Man - The Power Battle (CPS1 Asia 951006)", 0 ,0,0,egg_Unknown,0)
+GAME( 1995, qtono2,   0,        cps1,     qtono2,   cps1,     ROT0,   "Capcom", "Quiz Tonosama no Yabou 2 Zenkoku-ban (Japan 950123)", 0 ,0,0,egg_Quizz,0)
+GAME( 1995, megaman,  0,        cps1,     megaman,  cps1,     ROT0,   "Capcom", "Mega Man - The Power Battle (CPS1 Asia 951006)", 0 ,0,0,egg_Fighter,0)
 GAME( 1995, rockmanj, megaman,  cps1,     megaman,  cps1,     ROT0,   "Capcom", "Rockman - The Power Battle (CPS1 Japan 950922)", 0 ,2,0,egg_Fighter,0)
 
-GAME( 1992, wof,      0,        qsound,   wof,      wof,      ROT0,   "Capcom", "Warriors of Fate (World 921002)" , 0,0,0,egg_Unknown,0)				// "ETC"
+GAME( 1992, wof,      0,        qsound,   wof,      wof,      ROT0,   "Capcom", "Warriors of Fate (World 921002)" , 0,0,0,egg_BeatNUp,0)				// "ETC"
 GAME( 1992, wofa,     wof,      qsound,   wof,      wof,      ROT0,   "Capcom", "Sangokushi II (Asia 921005)" , 0,3,0,egg_BeatNUp,0)					// World "warning"
 GAME( 1992, wofu,     wof,      qsound,   wof,      wof,      ROT0,   "Capcom", "Warriors of Fate (US 921031)" , 0,3,0,egg_BeatNUp,0)					// World "warning"
 GAME( 1992, wofj,     wof,      qsound,   wof,      wof,      ROT0,   "Capcom", "Tenchi wo Kurau II - Sekiheki no Tatakai (Japan 921031)", 0 ,3,0,egg_BeatNUp,0)
@@ -7639,5 +7639,5 @@ GAME( 1993, mbombrdj, slammast, qsound,   slammast, slammast, ROT0,   "Capcom", 
 
 GAME( 1994, pnickj,   0,        cps1,     pnickj,   cps1,     ROT0,   "Compile (Capcom license)", "Pnickies (Japan 940608)", 0 ,2,0,egg_Puzzle,0)
 /* Japanese version of Pang 3 is encrypted, Euro version is not */
-GAME( 1995, pang3,    0,        pang3,    pang3,    cps1,     ROT0,   "Mitchell", "Pang! 3 (Euro 950511)", 0 ,0,0,egg_Unknown,0)
+GAME( 1995, pang3,    0,        pang3,    pang3,    cps1,     ROT0,   "Mitchell", "Pang! 3 (Euro 950511)", 0 ,0,0,egg_Shooter,0)
 GAME( 1995, pang3j,   pang3,    pang3,    pang3,    pang3,    ROT0,   "Mitchell", "Pang! 3 (Japan 950511)", 0 ,2,0,egg_Shooter,0)

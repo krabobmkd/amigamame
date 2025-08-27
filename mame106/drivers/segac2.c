@@ -2193,7 +2193,7 @@ GAME( 1994, stkclmns, 0,        segac2,   stkclmns, stkclmns, ROT0, "Sega",     
 GAME( 1994, stkclmnj, stkclmns, segac2,   stkclmns, stkclmnj, ROT0, "Sega",                   "Stack Columns (Japan)", 0 ,2,0,egg_Puzzle,0)
 GAME( 1994, puyopuy2, 0,        segac2,   puyopuy2, puyopuy2, ROT0, "Compile (Sega license)", "Puyo Puyo 2 (Japan)", 0 ,2,0,egg_Puzzle,0)
 GAME( 1994, potopoto, 0,        segac2,   potopoto, potopoto, ROT0, "Sega",                   "Poto Poto (Japan)", 0 ,2,0,egg_Puzzle,0)
-GAME( 1994, zunkyou,  0,        segac2,   zunkyou,  zunkyou,  ROT0, "Sega",                   "Zunzunkyou No Yabou (Japan)", 0 ,2,0,egg_Shooter,0)
+GAME( 1994, zunkyou,  0,        segac2,   zunkyou,  zunkyou,  ROT0, "Sega",                   "Zunzunkyou No Yabou (Japan)", 0 ,2,0,egg_Shooter,EGF_Funny)
 
 /* Atlus Print Club 'Games' (C-2 Hardware, might not be possible to support them because they use camera + printer, really just put here for reference) */
 GAME( 1995, pclubj,   0,        segac2,   pclub,    pclub,    ROT0, "Atlus",                  "Print Club (Japan Vol.1)", GAME_NOT_WORKING ,0,0,egg_Miscellaneous,0)

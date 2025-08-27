@@ -8136,7 +8136,7 @@ GAMEB( 1990, neogeo, 0, neogeo, neogeo, neogeo, neogeo, ROT0, "SNK", "Neo-Geo", 
 
 /* SNK */
 GAMEB( 1990, nam1975,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "NAM-1975", 0 ,2,0,egg_Shooter,0)
-GAMEB( 1990, bstars,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Baseball Stars Professional", 0 ,0,0,egg_Unknown,0)
+GAMEB( 1990, bstars,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Baseball Stars Professional", 0 ,0,0,egg_sport_Baseball,0)
 GAMEB( 1990, tpgolf,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Top Player's Golf", 0 ,0,2,egg_sport_Golf,0)
 GAMEB( 1990, mahretsu, neogeo,   neogeo, neogeo, mjneogeo,mjneogeo, ROT0, "SNK", "Mahjong Kyoretsuden", 0 ,0,1,egg_Mature,0)
 GAMEB( 1990, ridhero,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Riding Hero (set 1)", 0 ,0,1,egg_Motorcycle,0)
@@ -8161,7 +8161,7 @@ GAMEB( 1991, legendos, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK",
 GAMEB( 1991, 2020bb,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 1)", 0 ,2,0,egg_sport_Baseball,0)
 GAMEB( 1991, 2020bba,  2020bb,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 2)", 0 ,2,0,egg_sport_Baseball,0)
 GAMEB( 1991, 2020bbh,  2020bb,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 3)", 0 ,2,0,egg_sport_Baseball,0)
-GAMEB( 1991, socbrawl, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Soccer Brawl", 0 ,0,0,egg_Unknown,0)
+GAMEB( 1991, socbrawl, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Soccer Brawl", 0 ,0,0,egg_sport_Soccer,0)
 GAMEB( 1991, fatfury1, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Fatal Fury - King of Fighters / Garou Densetsu - shukumei no tatakai", 0 ,2,0,egg_Fighter,0)
 GAMEB( 1991, roboarmy, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Robo Army (set 1)", 0 ,2,0,egg_BeatNUp,0)
 GAMEB( 1991, roboarma, roboarmy, neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Robo Army (set 2)", 0 ,2,0,egg_BeatNUp,0)
@@ -8217,8 +8217,8 @@ GAMEB( 1998, rbff2k,   rbff2,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK",
 GAMEB( 1998, mslug2,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Metal Slug 2 - Super Vehicle-001/II", 0 ,2,0,egg_Platform,0)
 
 // demoscene !
-GAMEB( 2025, vaporous,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "The Twitch Elite", "Vaporous Demo - ( TTE, Revision, W0rld )", 0 ,0,0,egg_Unknown,0)
-GAMEB( 2012, neogeo3d, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Oxygene", "NeoGeo 3D ! - ( Oxygene, W0rld )", 0 ,0,0,egg_Unknown,0)
+GAMEB( 2025, vaporous,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "The Twitch Elite", "Vaporous Demo - ( TTE, Revision, W0rld )", 0 ,0,0,egg_Demoscene,0)
+GAMEB( 2012, neogeo3d, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Oxygene", "NeoGeo 3D ! - ( Oxygene, W0rld )", 0 ,0,0,egg_Demoscene,0)
 
 GAMEB( 1998, kof98,    neogeo,   neogeo, neogeo, neogeo,  kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends", 0 ,2,0,egg_Fighter,0)
 GAMEB( 1998, kof98k,   kof98,    neogeo, neogeo, neogeo,  kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (Korean board)", 0 ,2,0,egg_Fighter,0)
@@ -8288,7 +8288,7 @@ GAMEB( 1990, bjourney, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "
 GAMEB( 1991, crsword,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Alpha Denshi Co.", "Crossed Swords", 0 ,2,0,egg_Miscellaneous,0)
 GAMEB( 1991, trally,   neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Alpha Denshi Co.", "Thrash Rally", 0 ,0,1,egg_Driving,0)
 GAMEB( 1992, ncommand, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Alpha Denshi Co.", "Ninja Commando", 0 ,2,0,egg_ShootEmUp,0)
-GAMEB( 1992, wh1,      neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Alpha Denshi Co.", "World Heroes (set 1)", 0 ,0,0,egg_Unknown,0)
+GAMEB( 1992, wh1,      neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Alpha Denshi Co.", "World Heroes (set 1)", 0 ,0,0,egg_Fighter,0)
 GAMEB( 1992, wh1h,     wh1,      neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Alpha Denshi Co.", "World Heroes (set 2)", 0 ,2,0,egg_Fighter,0)
 GAMEB( 1993, wh2,      neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "ADK",              "World Heroes 2", 0 ,2,0,egg_Fighter,0)
 GAMEB( 1994, wh2j,     neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "ADK / SNK",        "World Heroes 2 Jet", 0 ,2,0,egg_Fighter,0)
@@ -8297,7 +8297,7 @@ GAMEB( 1995, whp,      neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "
 GAMEB( 1995, mosyougi, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "ADK / SNK",        "Syougi No Tatsujin - Master of Syougi", 0 ,0,0,egg_Unknown,0)
 GAMEB( 1996, overtop,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "ADK",              "Over Top", 0 ,0,1,egg_Driving,0)
 GAMEB( 1996, ninjamas, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "ADK / SNK",        "Ninja Master's - haoh-ninpo-cho", 0 ,2,0,egg_Fighter,0)
-GAMEB( 1996, twinspri, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "ADK",              "Twinkle Star Sprites", 0 ,2,0,egg_ShootEmUp,0)
+GAMEB( 1996, twinspri, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "ADK",              "Twinkle Star Sprites", 0 ,2,0,egg_ShootEmUp,EGF_Girly|EGF_Childish)
 GAMEB( 1996, zintrckb, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "hack / bootleg",   "Zintrick / Oshidashi Zentrix (hack / bootleg)", 0 ,2,0,egg_Puzzle,0)
 
 

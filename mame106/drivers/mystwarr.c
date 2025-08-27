@@ -2131,7 +2131,7 @@ static DRIVER_INIT(metamrph)
 /*           ROM       parent    machine   inp       init */
 GAME( 1993, mystwarr, 0,        mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver EAA)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_BeatNUp,0)
 GAME( 1993, mystwaru, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver UAA)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_BeatNUp,0)
-GAME( 1993, mmaulers, 0,        dadandrn, dadandrn, 0,        ROT0,  "Konami", "Monster Maulers (ver EAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
+GAME( 1993, mmaulers, 0,        dadandrn, dadandrn, 0,        ROT0,  "Konami", "Monster Maulers (ver EAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,EGF_Hentai|EGF_Sexy)
 GAME( 1993, dadandrn, mmaulers, dadandrn, dadandrn, 0,        ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
 GAME( 1993, viostorm, 0,        viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver EAB)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
 GAME( 1993, viostrmu, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)

@@ -739,4 +739,4 @@ GAME( 19??, tetrsark, 0,        bootleg,  tetrsark, tetrsark,ROT0,  "D.R. Korea"
 
 // (YEAR,  NAME,  PARENT ,MACHINE  ,INPUT    ,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPLAYER)
 
-GAME( 2023, arkcrsn5, 0,  arkcrsn5, arkanoid, /*arkcrsn5_init*/0,       ROT90, "Abyss leader of the 80's", "Cruisin'5 Demo (Arkanoid Hw) By Abyss (2023,W0rld)", 0 ,0,0,egg_Unknown,0)
+GAME( 2023, arkcrsn5, 0,  arkcrsn5, arkanoid, /*arkcrsn5_init*/0,       ROT90, "Abyss leader of the 80's", "Cruisin'5 Demo (Arkanoid Hw) By Abyss (2023,W0rld)", 0 ,0,0,egg_Demoscene,0)
