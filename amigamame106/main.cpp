@@ -287,8 +287,16 @@ int main(int argc, char **argv)
     std::string rom;
     int romlist=0;
     int dohelp=0;
-    int version=0; 
-    if(argc>1)
+    int version=0;
+//no! args can also be tooltips !!   if(argc>1)
+//printf("argc:%d %08x\n",argc,(int)argv);
+// do like https://amigadev.elowar.com/read/ADCD_2.1/Libraries_Manual_guide/node05C3.html
+    // for(int i=0;i<argc;i++)
+    // {
+    //     printf("arg%d:%s:\n",i,argv[i]);
+
+    // }
+
     {
 
         // this manages both args by command line and args by icon tooltips.
@@ -297,6 +305,7 @@ int main(int argc, char **argv)
 
         userdir =  ArgString((CONST_STRPTR*)args,"USERDIR","PROGDIR:user");
         verbose = (ArgInt((CONST_STRPTR*)args,"VERBOSE",2)!=2);
+
         version = (ArgInt((CONST_STRPTR*)args,"VERSION",2)!=2);
         romlist = (ArgInt((CONST_STRPTR*)args,"-listfull",2)!=2);
         if(!romlist) romlist = (ArgInt((CONST_STRPTR*)args,"-ll",2)!=2);
