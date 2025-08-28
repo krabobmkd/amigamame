@@ -516,6 +516,7 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         "Joystick(2bt)",
         "Analog Joystick(2bt)",
         "C64/Atari Paddles(2bt)"
+        //"Lightgun"
     };
 
 

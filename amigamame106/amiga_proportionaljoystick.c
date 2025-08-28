@@ -318,7 +318,7 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
                 ppsd->_gameportIOReq.io_Command = GPD_SETCTYPE;
                 ppsd->_gameportIOReq.io_Data = &(ppsd->_portType);
                 ppsd->_gameportIOReq.io_Length = 1;
-                ppsd->_portType = GPCT_ALLOCATED; // GPCT_RELJOYSTICK ?
+                ppsd->_portType = GPCT_ALLOCATED; // GPCT_RELJOYSTICK/GPCT_ABSJOYSTICK  ? -> no both are digital
 
                 /*BYTE resdoio =*/ DoIO(&(ppsd->_gameportIOReq));
             Permit();

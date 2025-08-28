@@ -49,7 +49,7 @@ public:
 // extend the lowlevel port enum  SJA_TYPE_XXX with 2 more tings we manage
 #define PORT_TYPE_PROPORTIONALJOYSTICK 4
 #define PORT_TYPE_C64PADDLE 5
-
+#define PORT_TYPE_LIGHTGUN 6
 /** Main configuration.
  *  Mame106 core manage itself default and per driver configuration.
  *  We just manage here:

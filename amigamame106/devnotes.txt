@@ -3,11 +3,16 @@
 
  r1.7
   TODO
-  O genre and flags
-  O have genre column in MUI list
-  O have genre filter panel
 
-  O activate Moo mesa !!!
+  X project icon for game launch.
+  O explain how to make project icon in documentation
+
+  X genre and flags in db
+  X have genre column in MUI list
+  O have genre filter panel -> or menu ?
+
+
+  O activate konami Moo mesa !!!
   O ITECH ninja clowns ?
   O activate SNK
   O activate mrDo
@@ -15,7 +20,7 @@
     -> validate new games
   O correct sprite prio
 
-  O have MUI icons for flags
+  O have MUI icons for flags -> maybe not.
 
  New in release r1.6:
 

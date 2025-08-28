@@ -22,6 +22,7 @@ struct MameUI {
     MameUI();
     virtual ~MameUI();
     int init();
+    int initFilterMenu();
 
     Object *App=NULL;
     Object *MainWin=NULL;
@@ -51,6 +52,9 @@ struct MameUI {
     Object * RE_Options=NULL;
     Object * CY_Show=NULL;
     Object * BU_Scan=NULL;
+
+    Object * MENU_GenreFilter=NULL;
+    Object * MENU_TagFilter=NULL;
 
     Object *LI_Driver=NULL;
     Object * LV_Driver=NULL;

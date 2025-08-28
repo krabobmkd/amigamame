@@ -324,6 +324,12 @@ ULONG MameUI::createOptionTabGroup()
 
     return (ULONG)RE_Options;
 }
+int MameUI::initFilterMenu(void)
+{
+    if(!MENU_GenreFilter || !MENU_TagFilter) return 1;
+
+    return 0;
+}
 
 //trick to send debug string from interuptions
 //std::stringstream drivdispdbg;
@@ -417,12 +423,18 @@ int MameUI::MainGUI(void)
                                                                                                                                        MUIA_UserData,      MUIV_Application_ReturnID_Quit,
                                                                                                                                        TAG_DONE),
                                                                                                                   TAG_DONE),
+                                                                                                                MUIA_Family_Child,(ULONG)(MENU_GenreFilter=MUINewObject(MUIC_Menu,MUIA_Menu_Title,(ULONG)GetMessagec("Genre Filter")),
+                                                                                                                  TAG_DONE),
+                                                                                                                MUIA_Family_Child,(ULONG)(MENU_TagFilter=MUINewObject(MUIC_Menu,MUIA_Menu_Title,(ULONG)GetMessagec("Tag Filter")),
+                                                                                                                  TAG_DONE),
                                                                                              TAG_DONE)},
 
                                                 {WindowContents, (ULONG)windowContent},
                                                 TAG_DONE,0};
 
                 MainWin =  MUI_NewObjectA(MUIC_Window, (struct TagItem *) &mainwintags[0]);// MUINewObject(MUIC_Window,
+
+                initFilterMenu();
 
                     //        printf("after MUINewObject():%08x\n",(int)MainWin);
                     // MUIA_Disabled
