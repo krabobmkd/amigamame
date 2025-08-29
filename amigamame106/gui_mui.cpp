@@ -324,11 +324,95 @@ ULONG MameUI::createOptionTabGroup()
 
     return (ULONG)RE_Options;
 }
-int MameUI::initFilterMenu(void)
-{
-    if(!MENU_GenreFilter || !MENU_TagFilter) return 1;
 
-    return 0;
+
+static const char *genreNames[]={
+    "", // unknown
+
+    "Platform",
+    "Climbing",
+
+    "ShootEmUp",
+    "Shooter", // actually pang or some joystick gun games..(?)
+
+    "BeatNUp", // cooperative
+    "Fighter", // versus
+    "Driving", // would have tag 3D
+    "Motorcycle",
+    "Flying",
+    "LightGuns",
+    "BallNPaddles",
+    "Pinballs",
+    "Maze",
+
+    "Tabletop",
+    "Puzzle",
+    "CardBattle",
+    "Mahjong",
+    "Quizz",
+    "ChiFouMi", // added for scud hammer
+
+    "Casino",
+    "HorseRacing",
+    "PoolNDart",
+
+    "Sport",
+    "Baseball",
+    "Basketball",
+    "Volleyball",
+    "Football",
+    "Soccer",
+    "Golf",
+    "Hockey",
+    "Rugby",
+    "Tennis",
+    "TrackNField",
+    "Boxing",
+    "Wrestling",
+
+    "Bowling",
+    "Skiing",
+    "Skate",
+    "Rythm",
+    "Fishing",
+
+    "Compilation",
+    "Miscellaneous",
+    "Mature",
+    "Demoscene"
+};
+
+#define nbGenreNames (sizeof(genreNames)/sizeof(char *))
+
+
+Object *MameUI::MenuGenreFilter()
+{
+    std::vector<ULONG> v={
+        MUIA_Menu_Title,(ULONG)GetMessagec("Genre Filter"),
+        MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menuitem, MUIA_Menuitem_Title,(ULONG)GetMessagec("All"),TAG_DONE),
+        MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menuitem, MUIA_Menuitem_Title,(ULONG)GetMessagec("None"),TAG_DONE),
+        MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menuitem, MUIA_Menuitem_Title,  NM_BARLABEL, TAG_DONE),
+    };
+// https://github.com/amiga-mui/muidev/wiki/MUI_Menuitem#MUIA_Menuitem_Toggle
+    for(int i=1;i<nbGenreNames ;i++)
+    {
+        Object *psub = MUINewObject(MUIC_Menuitem,
+                            MUIA_Menuitem_Title,(ULONG)genreNames[i],
+                            MUIA_Menuitem_Checkit,TRUE,
+                           // MUIA_Menuitem_Toggle,TRUE,
+                            MUIA_Menuitem_Checked,TRUE,
+                            TAG_DONE);
+        if(psub)
+        {
+            v.push_back(MUIA_Family_Child);
+            v.push_back((ULONG)psub);
+        }
+    }
+    v.push_back(TAG_DONE);
+    Object *o = MUI_NewObjectA((char *)MUIC_Menu, (struct TagItem *) v.data());
+
+   // MENU_GenreFilter = o;
+    return o;
 }
 
 //trick to send debug string from interuptions
@@ -423,18 +507,15 @@ int MameUI::MainGUI(void)
                                                                                                                                        MUIA_UserData,      MUIV_Application_ReturnID_Quit,
                                                                                                                                        TAG_DONE),
                                                                                                                   TAG_DONE),
-                                                                                                                MUIA_Family_Child,(ULONG)(MENU_GenreFilter=MUINewObject(MUIC_Menu,MUIA_Menu_Title,(ULONG)GetMessagec("Genre Filter")),
-                                                                                                                  TAG_DONE),
-                                                                                                                MUIA_Family_Child,(ULONG)(MENU_TagFilter=MUINewObject(MUIC_Menu,MUIA_Menu_Title,(ULONG)GetMessagec("Tag Filter")),
-                                                                                                                  TAG_DONE),
+                                                                                             MUIA_Family_Child,(ULONG)(MENU_GenreFilter=MenuGenreFilter()),
+//                                                                                                                MUIA_Family_Child,(ULONG)(MENU_TagFilter=MUINewObject(MUIC_Menu,MUIA_Menu_Title,(ULONG)GetMessagec("Tag Filter")),
+//                                                                                                                  TAG_DONE),
                                                                                              TAG_DONE)},
 
                                                 {WindowContents, (ULONG)windowContent},
                                                 TAG_DONE,0};
 
                 MainWin =  MUI_NewObjectA(MUIC_Window, (struct TagItem *) &mainwintags[0]);// MUINewObject(MUIC_Window,
-
-                initFilterMenu();
 
                     //        printf("after MUINewObject():%08x\n",(int)MainWin);
                     // MUIA_Disabled
@@ -721,64 +802,6 @@ static ULONG DriverSort(
 
 }
 
-
-static const char *genreNames[]={
-    "", // unknown
-
-    "Platform",
-    "Climbing",
-
-    "ShootEmUp",
-    "Shooter", // actually pang or some joystick gun games..(?)
-
-    "BeatNUp", // cooperative
-    "Fighter", // versus
-    "Driving", // would have tag 3D
-    "Motorcycle",
-    "Flying",
-    "LightGuns",
-    "BallNPaddles",
-    "Pinballs",
-    "Maze",
-
-    "Tabletop",
-    "Puzzle",
-    "CardBattle",
-    "Mahjong",
-    "Quizz",
-    "ChiFouMi", // added for scud hammer
-
-    "Casino",
-    "HorseRacing",
-    "PoolNDart",
-
-    "Sport",
-    "Baseball",
-    "Basketball",
-    "Volleyball",
-    "Football",
-    "Soccer",
-    "Golf",
-    "Hockey",
-    "Rugby",
-    "Tennis",
-    "TrackNField",
-    "Boxing",
-    "Wrestling",
-
-    "Bowling",
-    "Skiing",
-    "Skate",
-    "Rythm",
-    "Fishing",
-
-    "Compilation",
-    "Miscellaneous",
-    "Mature",
-    "Demoscene"
-};
-
-#define nbGenreNames (sizeof(genreNames)/sizeof(char *))
 
 static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const struct _game_driver **drv_indirect REG(a1))
 {

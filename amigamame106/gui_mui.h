@@ -22,7 +22,7 @@ struct MameUI {
     MameUI();
     virtual ~MameUI();
     int init();
-    int initFilterMenu();
+    Object *MenuGenreFilter();
 
     Object *App=NULL;
     Object *MainWin=NULL;
