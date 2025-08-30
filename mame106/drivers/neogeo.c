@@ -8360,10 +8360,10 @@ GAMEB( 1995, galaxyfg, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Sunso
 GAMEB( 1996, wakuwak7, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Sunsoft", "Waku Waku 7", 0 ,2,0,egg_Fighter,0)
 
 /* Taito */
-GAMEB( 1994, pbobblen, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 1)", 0 ,2,0,egg_Puzzle,0)
-GAMEB( 1994, pbobblna, pbobblen, neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 2)", 0 ,2,0,egg_Puzzle,0)
-GAMEB( 1999, pbobbl2n, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Taito (SNK license)", "Puzzle Bobble 2 / Bust-A-Move Again (Neo-Geo)", 0 ,2,0,egg_Puzzle,0)
-GAMEB( 2003, pnyaa,    neogeo,   neogeo, neogeo, neogeo,  pnyaa,    ROT0, "Aiky / Taito", "Pochi and Nyaa", 0 ,0,0,egg_Unknown,0)
+GAMEB( 1994, pbobblen, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 1)", 0 ,2,0,egg_Puzzle,EGF_Childish)
+GAMEB( 1994, pbobblna, pbobblen, neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 2)", 0 ,2,0,egg_Puzzle,EGF_Childish)
+GAMEB( 1999, pbobbl2n, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Taito (SNK license)", "Puzzle Bobble 2 / Bust-A-Move Again (Neo-Geo)", 0 ,2,0,egg_Puzzle,EGF_Childish)
+GAMEB( 2003, pnyaa,    neogeo,   neogeo, neogeo, neogeo,  pnyaa,    ROT0, "Aiky / Taito", "Pochi and Nyaa", 0 ,0,0,egg_Unknown,EGF_Childish)
 
 /* Takara */
 GAMEB( 1995, marukodq, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "Takara", "Chibi Marukochan Deluxe Quiz", 0 ,2,0,egg_Quizz,0)

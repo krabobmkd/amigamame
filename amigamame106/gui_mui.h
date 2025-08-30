@@ -65,6 +65,9 @@ struct MameUI {
     Object *LA_statusbar=NULL;
     Object *GIF_cornerlogo=NULL;
 
+    Object *EnumFilters[45]={0};
+    Object *TagFilters[10]={0};
+
     int MainGUI(void);
     void CreateApp(void);
     Object *createPanel_Drivers();
@@ -72,10 +75,10 @@ struct MameUI {
     void UpdateUIToConfig();
     void AboutGUI(void);
     int GetDriverIndex(void);
-    void ShowFound(void);
-    void ShowAll(void);
-
+    void UpdateList();
+    void setAllFilterToggles(int values);
     void setDriverListShowState(int state);
+    void updateFiltersFromMenu();
 };
 extern MameUI *_pMameUI;
 

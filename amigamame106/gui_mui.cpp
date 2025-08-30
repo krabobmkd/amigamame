@@ -105,6 +105,14 @@ typedef ULONG (*RE_HOOKFUNC)(); // because C++ type issue.
 #define MID_About     104
 #define MID_AboutMUI  105
 
+#define MID_START_FILTER_MENU 256
+
+#define MENU_CODE_START (MID_START_FILTER_MENU)
+#define MENU_CODE_TAGSTART (MID_START_FILTER_MENU+256)
+#define MENU_CODE_ALL (MID_START_FILTER_MENU+512)
+#define MENU_CODE_NONE (MID_START_FILTER_MENU+513)
+#define MENU_CODE_END (MID_START_FILTER_MENU+514)
+
 
 STRPTR ShowCycleValues[] =
 {
@@ -347,16 +355,16 @@ static const char *genreNames[]={
 
     "Tabletop",
     "Puzzle",
-    "CardBattle",
+    "Card Battle",
     "Mahjong",
     "Quizz",
-    "ChiFouMi", // added for scud hammer
+    "Rock Paper Scissors", // added for scud hammer
 
     "Casino",
     "HorseRacing",
     "PoolNDart",
 
-    "Sport",
+    "Other Sport",
     "Baseball",
     "Basketball",
     "Volleyball",
@@ -382,37 +390,163 @@ static const char *genreNames[]={
     "Demoscene"
 };
 
+// keep order of EGF_ tags
+static const char *genreTagNames[]={
+  " Horizontal",
+  " Vertical",
+  " 3D",
+  " Isometric",
+  " Girly",
+  " Childish",
+  " Sexy",
+  " Funny",
+  " Ultra Violent",
+  " Hentai"
+};
+
 #define nbGenreNames (sizeof(genreNames)/sizeof(char *))
 
 
 Object *MameUI::MenuGenreFilter()
 {
+
     std::vector<ULONG> v={
-        MUIA_Menu_Title,(ULONG)GetMessagec("Genre Filter"),
-        MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menuitem, MUIA_Menuitem_Title,(ULONG)GetMessagec("All"),TAG_DONE),
-        MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menuitem, MUIA_Menuitem_Title,(ULONG)GetMessagec("None"),TAG_DONE),
-        MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menuitem, MUIA_Menuitem_Title,  NM_BARLABEL, TAG_DONE),
+        MUIA_Menu_Title,(ULONG)GetMessagec("List Filter"),
+        MUIA_Family_Child,(ULONG)MUI_MakeObject(MUIO_Menuitem,(ULONG)GetMessagec("All"),0,0,MENU_CODE_ALL),
+        MUIA_Family_Child,(ULONG)MUI_MakeObject(MUIO_Menuitem,(ULONG)GetMessagec("None"),0,0,MENU_CODE_NONE),
+      //  MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menuitem, MUIA_Menuitem_Title,  NM_BARLABEL, TAG_DONE),
+
+
     };
 // https://github.com/amiga-mui/muidev/wiki/MUI_Menuitem#MUIA_Menuitem_Toggle
     for(int i=1;i<nbGenreNames ;i++)
     {
-        Object *psub = MUINewObject(MUIC_Menuitem,
-                            MUIA_Menuitem_Title,(ULONG)genreNames[i],
-                            MUIA_Menuitem_Checkit,TRUE,
-                           // MUIA_Menuitem_Toggle,TRUE,
-                            MUIA_Menuitem_Checked,TRUE,
-                            TAG_DONE);
+        if(i==(int) egg_Platform)
+        {
+            v.push_back(MUIA_Family_Child);
+            v.push_back((ULONG)MUI_MakeObject(MUIO_Menuitem,(ULONG)"--- Action ---",0,ITEMTEXT|NM_ITEMDISABLED,0));
+        }
+        if(i==(int) egg_Tabletop)
+        {
+            v.push_back(MUIA_Family_Child);
+            v.push_back((ULONG)MUI_MakeObject(MUIO_Menuitem,(ULONG)"--- Mind ---",0,ITEMTEXT|NM_ITEMDISABLED,0));
+        }
+        if(i==(int) egg_sport_)
+        {
+            v.push_back(MUIA_Family_Child);
+            v.push_back((ULONG)MUI_MakeObject(MUIO_Menuitem,(ULONG)"--- Sport ---",0,ITEMTEXT|NM_ITEMDISABLED,0));
+        }
+        if(i==(int) egg_Compilation)
+        {
+            v.push_back(MUIA_Family_Child);
+            v.push_back((ULONG)MUI_MakeObject(MUIO_Menuitem,(ULONG)"--- Other ---",0,ITEMTEXT|NM_ITEMDISABLED,0));
+        }
+        //
+
+        Object *psub =
+        MUI_MakeObject(MUIO_Menuitem,(ULONG)genreNames[i],0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_START+i);
         if(psub)
         {
+            EnumFilters[i]=psub;
             v.push_back(MUIA_Family_Child);
             v.push_back((ULONG)psub);
         }
     }
-    v.push_back(TAG_DONE);
+    // put i==0 "Unknown" at the end...
+    v.push_back(MUIA_Family_Child);
+    EnumFilters[0]= MUI_MakeObject(MUIO_Menuitem,(ULONG)"Genre not set yet",0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_START+0);
+    v.push_back((ULONG)EnumFilters[0]);
+
+// - - -
+    std::vector<ULONG> vv={
+    MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menuitem, MUIA_Menuitem_Title,  NM_BARLABEL, TAG_DONE),
+
+   // MUIA_Family_Child, (ULONG)MUI_MakeObject(MUIO_Menuitem,(ULONG)"",0,ITEMTEXT|NM_ITEMDISABLED,0),
+    MUIA_Family_Child, (ULONG)MUI_MakeObject(MUIO_Menuitem,(ULONG)" Select By Tags:",0,ITEMTEXT|NM_ITEMDISABLED,0),
+
+// #define EGF_HOR 1
+// #define EGF_VER 2  // just to seek vertical egg_ShootEmUp.
+// #define EGF_P3D 4 // perspective 3D
+// #define EGF_I3D 8 // isometric 3D
+
+// #define EGF_Girly 16 // basically twinkle star and rodland.
+// #define EGF_Childish 32
+// #define EGF_Sexy 64 // would match egg_Mature ? -> not only.
+// #define EGF_Funny 128
+// #define EGF_UViolent 256 // all are violent, this is for blood and gore games.
+// #define EGF_Hentai 512 // because "monster maulers"
+
+        MUIA_Family_Child,
+            (ULONG)(TagFilters[1]=MUI_MakeObject(MUIO_Menuitem,(ULONG)"... Vertical",0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_TAGSTART+1)),
+        MUIA_Family_Child,
+            (ULONG)(TagFilters[2]=MUI_MakeObject(MUIO_Menuitem,(ULONG)"... 3D",0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_TAGSTART+2)),
+        MUIA_Family_Child,
+            (ULONG)(TagFilters[3]=MUI_MakeObject(MUIO_Menuitem,(ULONG)"... Isometric",0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_TAGSTART+3)),
+
+  //  MUIA_Family_Child,(ULONG)MUINewObject(MUIC_Menuitem, MUIA_Menuitem_Title,  NM_BARLABEL, TAG_DONE),
+    MUIA_Family_Child, (ULONG)MUI_MakeObject(MUIO_Menuitem,(ULONG)"",0,ITEMTEXT|NM_ITEMDISABLED,0),
+
+        MUIA_Family_Child,
+            (ULONG)(TagFilters[4]=MUI_MakeObject(MUIO_Menuitem,(ULONG)"... Girly",0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_TAGSTART+4)),
+        MUIA_Family_Child,
+            (ULONG)(TagFilters[5]=MUI_MakeObject(MUIO_Menuitem,(ULONG)"... Childish",0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_TAGSTART+5)),
+        MUIA_Family_Child,
+            (ULONG)(TagFilters[7]=MUI_MakeObject(MUIO_Menuitem,(ULONG)"... Funny",0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_TAGSTART+7)),
+       MUIA_Family_Child,
+            (ULONG)(TagFilters[8]=MUI_MakeObject(MUIO_Menuitem,(ULONG)"... Ultra Violent",0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_TAGSTART+8)),
+       MUIA_Family_Child,
+            (ULONG)(TagFilters[9]=MUI_MakeObject(MUIO_Menuitem,(ULONG)"... Hentai",0,CHECKIT|CHECKED|MENUTOGGLE,MENU_CODE_TAGSTART+9)),
+
+    TAG_DONE
+    };
+
+    v.insert(v.end(),vv.begin(),vv.end());
+
     Object *o = MUI_NewObjectA((char *)MUIC_Menu, (struct TagItem *) v.data());
 
    // MENU_GenreFilter = o;
     return o;
+}
+void MameUI::setAllFilterToggles(int values)
+{
+    // printf("nbGenreNames:%d\n",nbGenreNames);
+    for(int i=0;i<nbGenreNames;i++)
+    {
+        if(EnumFilters[i]==NULL) continue;
+        set(EnumFilters[i], MUIA_Menuitem_Checked, values);
+    }
+    for(int i=0;i<10;i++)
+    {
+        if(TagFilters[i]==NULL) continue;
+        set(TagFilters[i], MUIA_Menuitem_Checked, values);
+    }
+
+}
+void MameUI::updateFiltersFromMenu()
+{
+    // read filter values
+    unsigned long long enumsmask = 0ULL,cmask=1ULL;
+    UWORD tagsmask = 0,tcmask=1;
+
+    for(int i=0;i<nbGenreNames;i++,cmask<<=1)
+    {
+        if(EnumFilters[i]==NULL) continue;
+        ULONG value;
+        get(EnumFilters[i], MUIA_Menuitem_Checked, &value);
+        if(value) enumsmask |= cmask;
+    }
+    for(int i=0;i<10;i++,tcmask<<=1)
+    {
+        if(TagFilters[i]==NULL) continue;
+        ULONG value;
+        get(TagFilters[i], MUIA_Menuitem_Checked, &value);
+        if(value) tagsmask |= tcmask;
+    }
+
+    MameConfig &config = getMainConfig();
+    config.setDriverListFilters(enumsmask,tagsmask);
+    UpdateList();
+
 }
 
 //trick to send debug string from interuptions
@@ -420,7 +554,6 @@ Object *MameUI::MenuGenreFilter()
 
 int MameUI::MainGUI(void)
 {
-    ULONG rid;
     ULONG v;
     ULONG signals = 0;
     BOOL  loop  = TRUE;
@@ -576,6 +709,9 @@ int MameUI::MainGUI(void)
 
             if(MainWin)
             {
+                ULONG dostart=0;
+                ULONG rid,prevrid,nbMenuCode=0;
+
                 set(MainWin,  MUIA_Window_ActiveObject, (ULONG) LV_Driver);
                 set(MainWin,  MUIA_Window_Open,     TRUE);
 
@@ -591,16 +727,31 @@ int MameUI::MainGUI(void)
                     // if(strdbg.size()>0) printf("%s",strdbg.c_str());
 
                     rid = DoMethod(App,MUIM_Application_NewInput,&signals);
+
+                     // krb: all messages are received 2 times ??? Why ?
+                    if(rid != prevrid) {
+
+                    if(rid>=MENU_CODE_START && rid<MENU_CODE_END) {
+                        if(rid == MENU_CODE_ALL) setAllFilterToggles(TRUE);
+                        else if(rid == MENU_CODE_NONE) setAllFilterToggles(FALSE);
+                        nbMenuCode++;
+                       // printf("menu code:%d\n",rid);
+                    } else
+                    {
+                        // ends a menu change serie
+                        if(nbMenuCode>0)
+                        {
+                            updateFiltersFromMenu();
+                            nbMenuCode = 0;
+                        }
+                    }
+
                     switch(rid)
                     {
                     case RID_Start:
                     {
-
                         // game rom selected to start !
                         get(LI_Driver, MUIA_List_Active, &v);
-
-
-                        //             printf("GUI start:%d \n",(int)v);
 
                         if(v != (ULONG)MUIV_List_Active_Off)
                         {
@@ -609,19 +760,14 @@ int MameUI::MainGUI(void)
 
                             if(driverptr) config.setActiveDriver(GetEntryDriverIndex(driverptr));
                             loop = FALSE;
-
+                            dostart = 1;
                         }
                     } // end case
                     break;
 
                     case RID_Scan:
-                        // GetOptions(FALSE);
-
-                        DoMethod(LI_Driver, MUIM_List_Clear);
-
                         config.scanDrivers();
-                        ShowFound();
-
+                        setDriverListShowState(CFGS_FOUND);
                         break;
                     case MUIV_Application_ReturnID_Quit:
 
@@ -643,6 +789,8 @@ int MameUI::MainGUI(void)
 
                         break;
                     }
+                    }
+                    prevrid = rid;
 
                     if(signals && loop)
                     {
@@ -656,7 +804,7 @@ int MameUI::MainGUI(void)
                 set(AboutWin, MUIA_Window_Open, FALSE);
                 set(MainWin,  MUIA_Window_Open, FALSE);
 
-                if(rid == RID_Start)
+                if(dostart)
                     return(0);
             }
         }
@@ -1278,6 +1426,8 @@ static ULONG DriverNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *pa
 }
 static ULONG ShowNotify(struct Hook *hook REG(a0), APTR obj REG(a2), ULONG *par REG(a1))
 {
+    // also sent at init
+    //printf("ShowNotify setDriverListShowState\n");
     MameUI *ui = (MameUI *) hook->h_Data;
     ui->setDriverListShowState((int)*par);
 
@@ -1317,21 +1467,9 @@ static ULONG DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG *par
 }
 void MameUI::setDriverListShowState(int state)
 {
-  MameConfig &config = getMainConfig();
-
-    if(LI_Driver)  DoMethod(LI_Driver, MUIM_List_Clear);
-
-  config.setDriverListState(state);
-  switch(state)
-  {
-    case CFGS_ALL:
-      ShowAll();
-      break;
-
-    case CFGS_FOUND:
-      ShowFound();
-      break;
-  }
+    MameConfig &config = getMainConfig();
+    config.setDriverListShowMode(state);
+    UpdateList();
 
 }
 // at init
@@ -1340,7 +1478,8 @@ void MameUI::UpdateUIToConfig()
     MameConfig &config = getMainConfig();
 
     // set list is in previous state, from configuration.
-    int listShowState = config.driverListstate();
+    int listShowState = config.driverListShowMode();
+ //printf("UpdateUIToConfig->setDriverListShowState\n");
     setDriverListShowState(listShowState);
 
     muiConfigCreator.updateUI();
@@ -1372,47 +1511,63 @@ int MameUI::GetDriverIndex(void)
 
   return(index);
 }
-
-void MameUI::ShowFound(void)
+static int dontreupdatetwice=0;
+void MameUI::UpdateList(void)
 {
+    if(dontreupdatetwice) {
+        dontreupdatetwice=0;
+        return;
+    }
+    DoMethod(LI_Driver, MUIM_List_Clear);
+
     MameConfig &config = getMainConfig();
-    const std::vector<const _game_driver *const*> &roms = config.romsFound();
+    int showmode = config.driverListShowMode();
+    int useFilters = config.usesListFilter();
+    // get list accoring to show mode and filters
+    const std::vector<const _game_driver *const*> &roms = config.roms();
+
+    int nbroms = (int)roms.size();
+// printf("MameUI::UpdateList:%d\n",(int)roms.size());
     //MUIM_List_Insert can insert everything in a blow.
         DoMethod((Object *)_pMameUI->LI_Driver, MUIM_List_Insert,
-         (ULONG)roms.data(),(int)roms.size(),  /*MUIV_List_Insert_Bottom*/MUIV_List_Insert_Sorted);
+         (ULONG)roms.data(),nbroms,  /*MUIV_List_Insert_Bottom*/MUIV_List_Insert_Sorted);
 
 // no need because MUIV_List_Insert_Sorted (would ressort):   DoMethod(LI_Driver,MUIM_List_Sort);
 
     // ensure cycle is in correct state
     int cyclestate=0;
     get(_pMameUI->CY_Show, MUIA_Cycle_Active, &cyclestate);
-    if(cyclestate != 1)
+    if(cyclestate != showmode)
     {
-        set(_pMameUI->CY_Show, MUIA_Cycle_Active,1);
+        dontreupdatetwice = 1;
+        set(_pMameUI->CY_Show, MUIA_Cycle_Active,showmode);
     }
-
+    char temp[64];
+    snprintf(temp,63,"Displaying %d%s%s driver%s.",nbroms,
+            ((showmode)?" found":""),((useFilters)?" filtered":""),((nbroms>1)?"s":""));
+    muilog(0,temp);
 
 }
-void MameUI::ShowAll(void)
-{
-    MameConfig &config = getMainConfig();
-    std::vector<const _game_driver *const*> roms;
-    config.buildAllRomsVector(roms);
+// void MameUI::ShowAll(void)
+// {
+//     MameConfig &config = getMainConfig();
+//     std::vector<const _game_driver *const*> roms;
+//     config.buildAllRomsVector(roms);
 
-    //MUIM_List_Insert can insert everything in a blow.
-        DoMethod(_pMameUI->LI_Driver, MUIM_List_Insert,
-         (ULONG)roms.data(),(int)roms.size(),  /*MUIV_List_Insert_Bottom*/MUIV_List_Insert_Sorted);
+//     //MUIM_List_Insert can insert everything in a blow.
+//         DoMethod(_pMameUI->LI_Driver, MUIM_List_Insert,
+//          (ULONG)roms.data(),(int)roms.size(),  /*MUIV_List_Insert_Bottom*/MUIV_List_Insert_Sorted);
 
-   // no need because MUIV_List_Insert_Sorted does the job: DoMethod(LI_Driver,MUIM_List_Sort);
+//    // no need because MUIV_List_Insert_Sorted does the job: DoMethod(LI_Driver,MUIM_List_Sort);
 
-    // ensure cycle is in correct state
-    int cyclestate=0;
-    get(_pMameUI->CY_Show, MUIA_Cycle_Active, &cyclestate);
-    if(cyclestate != 0)
-    {
-        set(_pMameUI->CY_Show, MUIA_Cycle_Active,0);
-    }
-}
+//     // ensure cycle is in correct state
+//     int cyclestate=0;
+//     get(_pMameUI->CY_Show, MUIA_Cycle_Active, &cyclestate);
+//     if(cyclestate != 0)
+//     {
+//         set(_pMameUI->CY_Show, MUIA_Cycle_Active,0);
+//     }
+// }
 
 
 int MameUI::init()

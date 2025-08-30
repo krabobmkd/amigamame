@@ -73,14 +73,15 @@ public:
     void setUserPath(const char *userpath);
     // set when driver selected,
     void setActiveDriver(int indexInDriverList);
-    void setDriverListState(int listState);
+    void setDriverListShowMode(int listState);
+    void setDriverListFilters(unsigned long long enums,UWORD tagmask);
 
     int save();
     int load();
 
     int activeDriver() const { return _activeDriver; }
-    int driverListstate() const {return _listShowState; }
-
+    int driverListShowMode() const {return _listShowState; }
+    int usesListFilter() const;
     // - -  update detected rom list - - -
     int scanDrivers();
     //int allDrivers();
@@ -92,7 +93,8 @@ public:
     const char *getRomsDir() const {return _misc._romsPath.c_str(); }
     const char *getSamplesDir() const {return _misc._samplesPath.c_str(); }
 
-    const std::vector<const _game_driver *const*> &romsFound() const { return _romsFound; };
+    // r1.7, now return filtered list ( found x genre x tags)
+    const std::vector<const _game_driver *const*> &roms() const;
     // do not keep that table...
     void buildAllRomsVector(std::vector<const _game_driver *const*> &v);
 
@@ -324,13 +326,17 @@ protected:
     Display     _display;
     Audio       _audio;
     Controls    _controls;
-    Misc       _misc;
+    Misc        _misc;
     Help        _help;
 
     int     _activeDriver;
 
+    // - - -  drivers filtering
     int     _listShowState;
 
+    unsigned long long _filter_genre_enums;
+    UWORD   _ored_genre_tags;
+    //  - - - -
 
     SortMode     _sortMode;
 //    ScreenConf _defaultscreenconf;
@@ -341,13 +347,16 @@ protected:
     // name to current mame index to fasten dir search
     NameDriverMap _driverIndex;
 
-
     // - - - - - scanned roms zip or dir for UI.
     // mui like a ptr to ptr list, to insert in one blow.
     // this is meant to be sorted a way or another    
-    std::vector<const _game_driver *const*> _romsFound;
+    std::vector<const _game_driver *const*> _romsFound;    
     std::vector<UBYTE> _romsFoundReverse;
     bool            _romsFoundTouched; // should save or not on exit.
+
+    // - - - - current rom filter, use _romsFound or all.
+    std::vector<const _game_driver *const*> _romsFiltered;
+
     void initDriverIndex();
     int scanDriversRecurse(BPTR lock, FileInfoBlock*fib);
 
@@ -357,6 +366,8 @@ protected:
 
     //void sortDrivers( std::vector<const _game_driver *const*> &romsFound);
     void initRomsFoundReverse();
+
+    void updateRomFilters();
 };
 
 // access to singleton

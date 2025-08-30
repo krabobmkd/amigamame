@@ -67,9 +67,20 @@ void MameConfig::setActiveDriver(int indexInDriverList)
     _display._perGameS.setActive(drv->name);
 
 }
-void MameConfig::setDriverListState(int listState)
+void MameConfig::setDriverListShowMode(int listState)
 {
+    if(_listShowState == listState) return;
     _listShowState = listState;
+    updateRomFilters();
+}
+void MameConfig::setDriverListFilters(unsigned long long enums,UWORD tagmask)
+{
+    if(_filter_genre_enums == enums &&
+     _ored_genre_tags == tagmask) return;
+    _filter_genre_enums = enums;
+    _ored_genre_tags = tagmask;
+    updateRomFilters();
+
 }
 // xml ids must be all lowercase
 static const char *pcd_mame="mame";
@@ -265,10 +276,12 @@ int MameConfig::load()
 
     xml_file_free(root);
 	mame_fclose(file);
+	updateRomFilters();
 	return 1;
 error:
     if(root) xml_file_free(root);
     if(file) mame_fclose(file);
+    updateRomFilters();
     return 0;
 }
 void MameConfig::serialize(ASerializer &serializer)
@@ -663,6 +676,7 @@ void MameConfig::init(int argc,char **argv)
     {
         loginfo(2,"initDriverIndex exception:%s\n",e.what());
     }
+    _filter_genre_enums = 0xffffffffffffffffULL;
 
 }
 // from some .h
@@ -870,6 +884,8 @@ int MameConfig::scanDrivers()
     _romsFoundTouched = true;
 //    printf(" *** ScanDrivers end\n");
     initRomsFoundReverse();
+
+    updateRomFilters();
     return (int)_romsFound.size();
 }
 int MameConfig::scanDriversRecurse(BPTR lock, FileInfoBlock*fib)
@@ -985,6 +1001,78 @@ void MameConfig::buildAllRomsVector(std::vector<const _game_driver *const*> &v)
     }
 // now done by mui list    sortDrivers(v);
 }
+const vector<const _game_driver *const*> &MameConfig::roms() const
+{
+//    updateRomFilters();
+/*
+   int     _listShowState;
+    UBYTE   _genreEnumSet[60];
+    UWORD   _ored_genre_tags;
+    UWORD   _usefilter; // optim. If all enums
+*/
+    const unsigned long long enumsmask = (1ULL<<45)-1;
+    int   usefilter=1;
+    if((_filter_genre_enums & enumsmask)==enumsmask) usefilter=0;
+
+    if(!usefilter && _listShowState)
+    {
+        return _romsFound;
+    }
+    return _romsFiltered;
+
+}
+int MameConfig::usesListFilter() const
+{
+   const unsigned long long enumsmask = (1ULL<<45)-1;
+    int   usefilter=1;
+    if((_filter_genre_enums & enumsmask)==enumsmask) usefilter=0;
+    return usefilter;
+
+}
+void MameConfig::updateRomFilters()
+{
+   _romsFiltered.clear();
+//#define CFGS_ALL 0
+//#define CFGS_FOUND 1
+// extern const game_driver * const drivers[];
+    if(_listShowState) {
+        // found
+        for(int i = 0; i<(int)_romsFound.size() ; i++)
+        {
+            const game_driver *drv  = *_romsFound[i];
+            if(drv->flags & (NOT_A_DRIVER)) continue;
+            if(((_filter_genre_enums & (1ULL<<drv->genre))!=0)||
+                ((drv->genreflag & _ored_genre_tags)!=0))
+                _romsFiltered.push_back(_romsFound[i]);
+        }
+
+    } else {
+        // all
+        for(int i = 0; i<_NumDrivers ; i++)
+        {
+            const game_driver *drv =drivers[i];
+            if(drv->flags & (NOT_A_DRIVER)) continue;  
+            if(((_filter_genre_enums & (1ULL<<drv->genre))!=0)||
+                ((drv->genreflag & _ored_genre_tags)!=0))
+                 _romsFiltered.push_back(&drivers[i]);
+        }
+
+    }
+
+
+/*
+        // found
+        originlist = _romsFound.data();
+        nbOriginDrivers = (int)_romsFound.size();
+    } else {
+        // all
+        originlist = drivers;
+        nbOriginDrivers = _NumDrivers;
+    }
+*/
+
+}
+
 // from cheat.c
 extern "C" {
     extern const char	* cheatfile;

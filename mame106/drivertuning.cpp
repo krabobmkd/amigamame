@@ -26,7 +26,7 @@ static map<string,sDriverTuning> _tunings={
 	{"sgemf",{8*60,DEFMINCPUC,0}},
 	{"chasehq",{5*60,DEFMINCPUC,0}},
 	{"ghouls",{22*60,DEFMINCPUC,0}},
-
+	{"qcrayon2",{14*60,DEFMINCPUC,0}},
 
 	{"outrun",{0,256,0}}, // for _minimumCpuCycles
 	{"shangon",{0,2,0}}, // for _minimumCpuCycles
