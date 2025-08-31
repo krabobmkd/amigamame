@@ -68,6 +68,11 @@ extern "C" {
 #ifndef MUIA_List_SortColumn
 #define MUIA_List_SortColumn                0x8042cafb /* V21 isg LONG              */
 #endif
+#ifndef MUIA_List_ColumnOrder
+// V20
+#define MUIA_List_ColumnOrder               0x9d5100f6
+#endif
+
 // this is from mui.h, but unreachable from C++ there
 #define get(obj,attr,store) GetAttr(attr,(Object *)obj,(ULONG *)store)
 #define set(obj,attr,value) SetAttrs(obj,attr,value,TAG_DONE)
@@ -286,6 +291,7 @@ extern STRPTR ShowCycleValues[];
                                                                            MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
                                                                            InputListFrame,
                                                                             MUIA_CycleChain, TRUE,
+                                                                            MUIA_ObjectID, MAKE_ID('D','L','S','T'),
                                                                            TAG_DONE)),
                                          TAG_END);
     } else
@@ -299,6 +305,7 @@ extern STRPTR ShowCycleValues[];
                                                                               MUIA_List_DisplayHook,(ULONG)  &DriverDisplayHook,
                                                                               MUIA_List_CompareHook,(ULONG)  &DriverSortHook,
                                                                                 MUIA_CycleChain, TRUE,
+                                                                                MUIA_ObjectID, MAKE_ID('D','L','S','T'),
                                                                               TAG_DONE)),
                                             TAG_DONE);
     }
@@ -334,7 +341,7 @@ ULONG MameUI::createOptionTabGroup()
 }
 
 
-static const char *genreNames[]={
+static const char *genreNames[(int)egg_NumberOfGenre]={
     "", // unknown
 
     "Platform",
@@ -389,6 +396,7 @@ static const char *genreNames[]={
     "Mature",
     "Demoscene"
 };
+//#define nbGenreNames (sizeof(genreNames)/sizeof(char *))
 
 // keep order of EGF_ tags
 static const char *genreTagNames[]={
@@ -404,7 +412,7 @@ static const char *genreTagNames[]={
   " Hentai"
 };
 
-#define nbGenreNames (sizeof(genreNames)/sizeof(char *))
+
 
 
 Object *MameUI::MenuGenreFilter()
@@ -419,7 +427,7 @@ Object *MameUI::MenuGenreFilter()
 
     };
 // https://github.com/amiga-mui/muidev/wiki/MUI_Menuitem#MUIA_Menuitem_Toggle
-    for(int i=1;i<nbGenreNames ;i++)
+    for(int i=1;i<(int)egg_NumberOfGenre ;i++)
     {
         if(i==(int) egg_Platform)
         {
@@ -510,12 +518,12 @@ Object *MameUI::MenuGenreFilter()
 void MameUI::setAllFilterToggles(int values)
 {
     // printf("nbGenreNames:%d\n",nbGenreNames);
-    for(int i=0;i<nbGenreNames;i++)
+    for(int i=0;i<(int)egg_NumberOfGenre;i++)
     {
         if(EnumFilters[i]==NULL) continue;
         set(EnumFilters[i], MUIA_Menuitem_Checked, values);
     }
-    for(int i=0;i<10;i++)
+    for(int i=0;i<EGFB_Numberof;i++)
     {
         if(TagFilters[i]==NULL) continue;
         set(TagFilters[i], MUIA_Menuitem_Checked, values);
@@ -528,14 +536,14 @@ void MameUI::updateFiltersFromMenu()
     unsigned long long enumsmask = 0ULL,cmask=1ULL;
     UWORD tagsmask = 0,tcmask=1;
 
-    for(int i=0;i<nbGenreNames;i++,cmask<<=1)
+    for(int i=0;i<(int)egg_NumberOfGenre;i++,cmask<<=1)
     {
         if(EnumFilters[i]==NULL) continue;
         ULONG value;
         get(EnumFilters[i], MUIA_Menuitem_Checked, &value);
         if(value) enumsmask |= cmask;
     }
-    for(int i=0;i<10;i++,tcmask<<=1)
+    for(int i=0;i<EGFB_Numberof;i++,tcmask<<=1)
     {
         if(TagFilters[i]==NULL) continue;
         ULONG value;
@@ -682,6 +690,10 @@ int MameUI::MainGUI(void)
                     DoMethod(LI_Driver, MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
                              LI_Driver, 3, MUIM_CallHook, &DriverNotifyHook, MUIV_TriggerValue);
 
+
+
+
+
                     //          if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
                     //          {
 
@@ -712,11 +724,17 @@ int MameUI::MainGUI(void)
                 ULONG dostart=0;
                 ULONG rid,prevrid,nbMenuCode=0;
 
+                if(LI_Driver && MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
+                {
+                  DoMethod(App,MUIM_Application_Load,MUIV_Application_Load_ENVARC);
+                }
                 set(MainWin,  MUIA_Window_ActiveObject, (ULONG) LV_Driver);
                 set(MainWin,  MUIA_Window_Open,     TRUE);
 
                 /* This must be done after the window has been opened. */
                 DoMethod( LI_Driver, MUIM_List_Jump, MUIV_List_Jump_Active);
+
+
 
                // printf("before MUI loop\n");
                 do
@@ -800,6 +818,19 @@ int MameUI::MainGUI(void)
                             loop = FALSE;
                     }
                 } while(loop);
+
+
+                // save some window state
+                if(LI_Driver && MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
+                {
+                    // UIListState uiliststate={0};
+                    // uiliststate.nbcolumn = 8;
+                    // get(LI_Driver, MUIA_List_ColumnOrder, &uiliststate.columnOrder[0]);
+                    // get(LI_Driver,MUIA_List_SortColumn,&uiliststate.sortedcolumn );
+                    // config.setColumnOrder(uiliststate);
+ printf("save\n");
+                    DoMethod(App,MUIM_Application_Save,MUIV_Application_Save_ENVARC);
+                }
 
                 set(AboutWin, MUIA_Window_Open, FALSE);
                 set(MainWin,  MUIA_Window_Open, FALSE);
@@ -1046,17 +1077,16 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
     }
    }
    else snprintf(players,7,"%d", (int) drv->nbplayersSim);
-pColumns->_players = players;
+    pColumns->_players = players;
 
     pColumns->_year = (char *)drv->year;
 
     int eGenre =  drv->genre;
     int fgenre =  drv->genreflag;
-    if(eGenre ==0 || eGenre>=nbGenreNames) {
+    if(eGenre ==0 || eGenre>=(int)egg_NumberOfGenre) {
         genre[0] = 0;
     } else
     {
-        // V K G F H
         snprintf(genre,23,"%s%s%s%s%s%s%s%s%s",
                         genreNames[eGenre],
                         ((fgenre&EGF_VER)?" Vertical":""),
@@ -1531,6 +1561,15 @@ void MameUI::UpdateList(void)
     //MUIM_List_Insert can insert everything in a blow.
         DoMethod((Object *)_pMameUI->LI_Driver, MUIM_List_Insert,
          (ULONG)roms.data(),nbroms,  /*MUIV_List_Insert_Bottom*/MUIV_List_Insert_Sorted);
+
+
+    if(LI_Driver && MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
+    {
+        const struct UIListState &uiliststate = config.columnOrder();
+       // set(LI_Driver,MUIA_List_SortColumn,(ULONG)&uiliststate.sortedcolumn );
+//        set(LI_Driver,MUIA_List_ColumnOrder,(ULONG) &uiliststate.columnOrder[0]);
+
+    }
 
 // no need because MUIV_List_Insert_Sorted (would ressort):   DoMethod(LI_Driver,MUIM_List_Sort);
 

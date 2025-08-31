@@ -12,6 +12,7 @@ extern "C" {
 
     void AllocGUI(void);
     void FreeGUI(void);
+    #include "genredefs.h"
 }
 
 
@@ -65,8 +66,8 @@ struct MameUI {
     Object *LA_statusbar=NULL;
     Object *GIF_cornerlogo=NULL;
 
-    Object *EnumFilters[45]={0};
-    Object *TagFilters[10]={0};
+    Object *EnumFilters[(int)egg_NumberOfGenre]={0};
+    Object *TagFilters[EGFB_Numberof]={0};
 
     int MainGUI(void);
     void CreateApp(void);

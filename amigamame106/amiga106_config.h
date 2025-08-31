@@ -45,6 +45,12 @@ public:
 
     std::unordered_map<std::string,int> _m;
 };
+struct UIListState
+{
+    int nbcolumn;
+    int sortedcolumn;
+    BYTE columnOrder[8+4];
+};
 
 // extend the lowlevel port enum  SJA_TYPE_XXX with 2 more tings we manage
 #define PORT_TYPE_PROPORTIONALJOYSTICK 4
@@ -75,6 +81,12 @@ public:
     void setActiveDriver(int indexInDriverList);
     void setDriverListShowMode(int listState);
     void setDriverListFilters(unsigned long long enums,UWORD tagmask);
+
+    // interface list state, so you keep ui prefs.
+    // set at app exit, load at app boot.
+
+    void setColumnOrder(struct UIListState &listcolstate);
+    const struct UIListState &columnOrder() const { return m_listcolstate; }
 
     int save();
     int load();
@@ -363,6 +375,8 @@ protected:
     std::vector<std::string> _resolutionStrings;
     std::vector<int> _videoAttribs;
     //std::vector<UBYTE> _players;
+
+    struct UIListState m_listcolstate;
 
     //void sortDrivers( std::vector<const _game_driver *const*> &romsFound);
     void initRomsFoundReverse();

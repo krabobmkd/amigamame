@@ -44,6 +44,7 @@ MameConfig::MameConfig() : ASerializable()
     , _listShowState(0)
     , _sortMode(SortMode::Name)
     , _romsFoundTouched(false)
+    , m_listcolstate({0})
 {
 
 }
@@ -82,6 +83,12 @@ void MameConfig::setDriverListFilters(unsigned long long enums,UWORD tagmask)
     updateRomFilters();
 
 }
+
+void MameConfig::setColumnOrder(struct UIListState &listcolstate)
+{
+    m_listcolstate = listcolstate;
+}
+
 // xml ids must be all lowercase
 static const char *pcd_mame="mame";
 
@@ -151,6 +158,19 @@ int MameConfig::save()
     {
         xml_data_node *pn = xml_add_child(confignode,pcf_list,NULL);
         if(pn) xml_set_attribute_int(pn,"show",_listShowState);
+
+        if(m_listcolstate.nbcolumn>0)
+        {
+            std::stringstream ss;
+            for(int i=0;i<m_listcolstate.nbcolumn;i++)
+            {
+                ss << (int)m_listcolstate.columnOrder[i] << " ";
+            }
+            string s =ss.str();
+            xml_set_attribute(pn,"order",s.c_str());
+            std::stringstream ss2;
+            xml_set_attribute_int(pn,"sort",m_listcolstate.sortedcolumn);
+        }
     }
 
     // - - - automatise serialized members:
@@ -266,7 +286,27 @@ int MameConfig::load()
     node = xml_get_sibling(confignode->child, pcf_list);
 
     _listShowState = 0;
-    if(node) _listShowState = xml_get_attribute_int(node,"show",0);
+    if(node)
+    {
+        _listShowState = xml_get_attribute_int(node,"show",0);
+
+        const char *porderlist = xml_get_attribute_string(node,"order","");
+        if(porderlist && *porderlist != 0) {
+            stringstream ss;
+            ss << porderlist;
+            for(int i=0;i<8;i++) {
+                int v;
+                ss >> v;
+                //printf("v:%d\n",v);
+                m_listcolstate.columnOrder[i]=v;
+            }
+        } else
+        {
+            for(int i=0;i<8;i++) m_listcolstate.columnOrder[i]=i;
+        }
+        m_listcolstate.sortedcolumn = xml_get_attribute_int(node,"sort",0);
+
+    }
 
     // - - - automatise serialized members, same way as write:
     {

@@ -1788,7 +1788,7 @@ GAME( 1991, cninja,   0,       cninja,   cninja,  cninja,   ROT0, "Data East Cor
 GAME( 1991, cninja0,  cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World revision 0)", 0 ,2,0,egg_Platform,EGF_Funny)
 GAME( 1991, cninjau,  cninja,  cninja,   cninjau, cninja,   ROT0, "Data East Corporation", "Caveman Ninja (US)", 0 ,2,0,egg_Platform,EGF_Funny)
 GAME( 1991, joemac,   cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan)", 0 ,2,0,egg_Platform,EGF_Funny)
-GAME( 1991, stoneage, cninja,  stoneage, cninja,  stoneage, ROT0, "bootleg", "Stoneage", 0 ,2,0,egg_Platform,EGF_Funny)
+GAME( 1991, stoneage, cninja,  stoneage, cninja,  stoneage, ROT0, "bootleg", "Stoneage", 0 ,2,0,egg_Platform,0)
 GAME( 1991, robocop2, 0,       robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", 0 ,2,0,egg_BeatNUp,0)
 GAME( 1991, robocp2u, robocop2,robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", 0 ,2,0,egg_BeatNUp,0)
 GAME( 1991, robocp2j, robocop2,robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)", 0 ,2,0,egg_BeatNUp,0)

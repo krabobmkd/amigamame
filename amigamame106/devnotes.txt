@@ -5,6 +5,7 @@
   TODO
   X MUI interface poptimisation, and scan button doesn't rescan twice without reason (old MUI bug!)
   X project icon can be useed for game launch.
+  O MUI saves list column/sort states
   O explain how to make project icon in documentation
 
   X genre and flags in db
