@@ -1379,7 +1379,7 @@ static DRIVER_INIT( trisport )
  *************************************/
 
 GAME( 1984, zwackery, 0,        zwackery, zwackery, zwackery, ROT0,   "Bally Midway", "Zwackery", GAME_SUPPORTS_SAVE ,0,1,egg_Platform,0)
-GAME( 1987, xenophob, 0,        xenophob, xenophob, xenophob, ROT0,   "Bally Midway", "Xenophobe", GAME_SUPPORTS_SAVE ,3,0,egg_Platform,0)
+GAME( 1987, xenophob, 0,        xenophob, xenophob, xenophob, ROT0,   "Bally Midway", "Xenophobe", GAME_SUPPORTS_SAVE ,3,0,egg_Platform,EGF_Hentai)
 GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 2)", GAME_SUPPORTS_SAVE ,2,0,egg_ShootEmUp,0)
 GAME( 1987, spyhnt2a, spyhunt2, spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 1)", GAME_SUPPORTS_SAVE ,2,0,egg_ShootEmUp,0)
 GAME( 1988, blasted,  0,        xenophob, blasted,  blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE ,2,0,egg_Shooter,0)

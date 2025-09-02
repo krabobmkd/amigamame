@@ -6074,9 +6074,9 @@ GAME( 1989, bayroutj, bayroute, system16b,      bayroute, generic_5704,  ROT0,  
 GAME( 1989, bayrout1, bayroute, system16b,      bayroute, generic_5358,  ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US, unprotected)", 0 ,2,0,egg_Platform,0)
 GAME( 1987, bullet,   0,        system16b,      generic,  generic_5358,  ROT0,   "Sega",           "Bullet (FD1094 317-0041)", GAME_NOT_WORKING ,3,0,egg_ShootEmUp,0)
 /* Charon */
-GAME( 1991, cotton,   0,        system16b,      cotton,   generic_5704,  ROT0,   "Sega / Success", "Cotton (set 3, World, FD1094 317-0181a)", 0 ,0,2,egg_ShootEmUp,0)
-GAME( 1991, cottonu,  cotton,   system16b,      cotton,   generic_5704,  ROT0,   "Sega / Success", "Cotton (set 2, US, FD1094 317-0180)", 0 ,0,2,egg_ShootEmUp,0)
-GAME( 1991, cottonj,  cotton,   system16b,      cotton,   generic_5704,  ROT0,   "Sega / Success", "Cotton (set 1, Japan, FD1094 317-0179a)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1991, cotton,   0,        system16b,      cotton,   generic_5704,  ROT0,   "Sega / Success", "Cotton (set 3, World, FD1094 317-0181a)", 0 ,0,2,egg_ShootEmUp,EGF_Childish|EGF_Girly)
+GAME( 1991, cottonu,  cotton,   system16b,      cotton,   generic_5704,  ROT0,   "Sega / Success", "Cotton (set 2, US, FD1094 317-0180)", 0 ,0,2,egg_ShootEmUp,EGF_Childish|EGF_Girly)
+GAME( 1991, cottonj,  cotton,   system16b,      cotton,   generic_5704,  ROT0,   "Sega / Success", "Cotton (set 1, Japan, FD1094 317-0179a)", 0 ,0,2,egg_ShootEmUp,EGF_Childish|EGF_Girly)
 GAME( 1989, ddux,     0,        system16b,      ddux,     generic_5521,  ROT0,   "Sega",           "Dynamite Dux (set 2, FD1094 317-0096)", 0 ,2,0,egg_BeatNUp,EGF_Childish|EGF_Funny)
 GAME( 1989, ddux1,    ddux,     system16b_8751, ddux,     ddux_5704,     ROT0,   "Sega",           "Dynamite Dux (set 1, 8751 317-0095)", 0 ,2,0,egg_BeatNUp,EGF_Childish|EGF_Funny)
 GAME( 1986, dunkshot, 0,        timescan,       dunkshot, dunkshot_5358, ROT0,   "Sega",           "Dunk Shot (FD1089 317-0022)", 0 ,0,0,egg_Unknown,0)
