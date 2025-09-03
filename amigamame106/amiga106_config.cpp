@@ -342,7 +342,7 @@ void MameConfig::serialize(ASerializer &serializer)
         "Keyboard is configured during game with Tab Key menu.";
     if(hasProportionalStickResource()) // unrelated bu tells we are on Amiga classic.
     {   // if classic hardware ports...
-        controlPanelComments += "\nAnalog controllers, phasers, and CD32 pads\n must be plugged when switched off.";
+        controlPanelComments += "\nAnalog controllers must be plugged when switched off.";
     }
     serializer.setComment("Controls",controlPanelComments);
 

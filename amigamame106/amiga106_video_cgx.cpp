@@ -26,6 +26,7 @@ extern "C" {
 extern "C" {
     // from mame
     #include "mame.h"
+    #include "mamelog.h"
     #include "video.h"
     #include "mamecore.h"
     #include "osdepend.h"
@@ -466,15 +467,24 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
         initARGB32DrawFunctionFromPixelFormat();
     }
 }
+extern "C" {
+void ui_popup_time(int seconds, const char *text,...);
 
-
+}
 bool Intuition_Screen_CGX::open()
 {
+    if(_flags & DISPFLAG_LIGHTGUN)
+    {
+    log_err
+       // ui_popup_time(5, "Lightguns can't be used with RTG screens !\nIt needs AGA/OCS screens with Cathode Ray Tube !");
+    }
     bool ok = Intuition_Screen::open();
     if(!ok) return false;
 
     // after Screen is open, may create create color remap table for clut.
     initRemapTable();
+
+
 
     return true;
 }
