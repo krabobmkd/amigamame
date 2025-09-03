@@ -40,15 +40,12 @@ template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
 
 // because BestCModeIDTagList is sabotaged in recent P96 drivers.
-// do some based on "height first"
+// do some search based on "correct height first" - it seems that is what correct drivers does.
 ULONG OwnCGXBestModeID(int w,int h,int depth)
 {
-    printf("OwnCGXBestModeID\n");
     std::vector<ULONG> bestHeightModesTooBig;
     int errorTooBigH= 0xffff;
     std::vector<ULONG> bestHeightModesExact;
-//    std::vector<ULONG> bestHeightModesTooLow;
-//    int errorTooLow= 0xffff;
 
     // - -  primarily bother about height
     ULONG tid = NextDisplayInfo(INVALID_ID);
@@ -60,19 +57,10 @@ ULONG OwnCGXBestModeID(int w,int h,int depth)
         if(depth != depth) continue;
 
         ULONG hm = GetCyberIDAttr( CYBRIDATTR_HEIGHT, tid );
-        if(hm < h ) {
-//            LONG error = h-hm;
-//            if(error<errorTooLow)
-//            {
-//                bestHeightModesTooLow.clear();
-//                errorTooLow = error;
-//            }
-//            if(error == errorTooLow) bestHeightModesTooLow.push_back(tid);
-        } else
         if(hm == h ) {
              bestHeightModesExact.push_back(tid);
-        } else
-        {   // hm>h
+        } else if(hm > h )
+        {
             LONG error = hm-h;
             if(error<errorTooBigH)
             {
@@ -84,29 +72,33 @@ ULONG OwnCGXBestModeID(int w,int h,int depth)
     }
     // - - - - then only bother for width...
     if(bestHeightModesExact.size()==0) bestHeightModesExact = bestHeightModesTooBig;
-    //if(bestHeightModesExact.size()==0) bestHeightModesExact = bestHeightModesTooLow;
+
     if(bestHeightModesExact.size()==0) return INVALID_ID;
     int errorWidth= 0xffff;
     ULONG bestmode = INVALID_ID;
+    // ultimately, if we asked a 32b mode, we would prefer RGBA32 to BGRA32.
+    /*
+    #define PIXFMT_ARGB32	(11UL)
+#define PIXFMT_BGRA32	(12UL)
+#define PIXFMT_RGBA32	(13UL)
+    */
     for( ULONG tid : bestHeightModesExact)
     {
         ULONG wm = GetCyberIDAttr( CYBRIDATTR_WIDTH, tid );
+        ULONG pixfmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, tid );
+
         int e = wm-w;
         if(e<0) continue;
+        if(depth ==16 && pixfmt != PIXFMT_RGB16) e++; //  would be faster than PIXFMT_RGB16PC
+        if(depth ==32 && pixfmt != PIXFMT_RGBA32) e++; // RGBA would be faster
         if(e<errorWidth)
         {
             bestmode = tid;
             errorWidth = e;
-            if(wm == w) break;
         }
     }
+    // RGBA32
     return bestmode;
-
-    //NextDisplayInfo() starting from INVALID_ID until it returns INVALID_ID
-//        _fullscreenWidth = GetCyberIDAttr( CYBRIDATTR_WIDTH, _ScreenModeId );
-//        _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
-//        _PixelFmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, _ScreenModeId );
-//        _PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
 }
 
 bool Intuition_Screen_CGX::useForThisMode(ULONG modeID)
@@ -411,7 +403,7 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
     if(/*_ScreenDepthAsked == 32 &&*/ (_flags & DISPFLAG_FORCEDEPTH16)!=0)
         _ScreenDepthAsked = 16;
 
-    int useOwnBestMethod=1;
+    int useOwnBestMethod=((_flags &DISPFLAG_USEOWNCGXBESTMODE)!=0);
     if(_ScreenModeId == INVALID_ID)
     {
    // printf("find best mode, _screenDepthAsked:%d...\n",(int)_ScreenDepthAsked);

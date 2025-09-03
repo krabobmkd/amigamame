@@ -34,8 +34,9 @@ public:
     #define DISPFLAG_USETRIPLEBUFFER  64
     #define DISPFLAG_USEHEIGHTBUFFER  128
     #define DISPFLAG_FORCEDEPTH16      256
+    #define DISPFLAG_USEOWNCGXBESTMODE 512
     // native screen init may activate lightguns.
-    #define DISPFLAG_LIGHTGUN          512
+    #define DISPFLAG_LIGHTGUN          1024
 
     struct params {
         ULONG _flags;

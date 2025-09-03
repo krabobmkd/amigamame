@@ -724,10 +724,10 @@ int MameUI::MainGUI(void)
                 ULONG dostart=0;
                 ULONG rid,prevrid,nbMenuCode=0;
 
-                if(LI_Driver && MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
-                {
-                  DoMethod(App,MUIM_Application_Load,MUIV_Application_Load_ENVARC);
-                }
+                // if(LI_Driver && MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
+                // {
+                //   DoMethod(App,MUIM_Application_Load,MUIV_Application_Load_ENVARC);
+                // }
                 set(MainWin,  MUIA_Window_ActiveObject, (ULONG) LV_Driver);
                 set(MainWin,  MUIA_Window_Open,     TRUE);
 
@@ -1499,6 +1499,7 @@ void MameUI::setDriverListShowState(int state)
 {
     MameConfig &config = getMainConfig();
     config.setDriverListShowMode(state);
+    printf("go updatelist\n");
     UpdateList();
 
 }
@@ -1509,7 +1510,7 @@ void MameUI::UpdateUIToConfig()
 
     // set list is in previous state, from configuration.
     int listShowState = config.driverListShowMode();
- //printf("UpdateUIToConfig->setDriverListShowState\n");
+ printf("UpdateUIToConfig->setDriverListShowState:%d\n",listShowState);
     setDriverListShowState(listShowState);
 
     muiConfigCreator.updateUI();

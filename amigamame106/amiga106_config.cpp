@@ -295,7 +295,7 @@ int MameConfig::load()
     if(node)
     {
         _listShowState = xml_get_attribute_int(node,"show",0);
-
+    printf("load show:%d\n");
         const char *porderlist = xml_get_attribute_string(node,"order","");
         if(porderlist && *porderlist != 0) {
             stringstream ss;

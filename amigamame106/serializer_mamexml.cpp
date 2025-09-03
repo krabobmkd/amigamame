@@ -19,7 +19,7 @@ std::string checkXmlName(const char *p)
     int i=0;
     while(*p) {
         char c =*p++;
-        if(c != ' ' && c != '%' && c != '(' && c != ')' && c != '.')
+        if(c != ' ' && c != '%' && c != '(' && c != ')' && c != '.'  && c != '?')
         {
             if(c >= 'A' && c<='Z') c+=32;
             ss << c;
