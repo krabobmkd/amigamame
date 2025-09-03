@@ -7,6 +7,9 @@
   X project icon can be useed for game launch.
   O MUI saves list column/sort states
   O explain how to make project icon in documentation
+  O key for throttle
+  O F4 guide in amigaguide.
+  O recode BestCModeIDTagList
 
   X genre and flags in db
   X have genre column in MUI list

@@ -304,7 +304,8 @@ public:
         ULONG_FLAGS  _Goodies = GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR;
 
     #define OPTIMFLAGS_DIRECTWGXWIN 1
-        ULONG_FLAGS  _Optims = OPTIMFLAGS_DIRECTWGXWIN;
+    #define OPTIMFLAGS_USEOWNBESTMODE 2
+        ULONG_FLAGS  _Optims = OPTIMFLAGS_DIRECTWGXWIN | OPTIMFLAGS_USEOWNBESTMODE;
 
         std::vector<std::string> _neogeoBiosList;
     };

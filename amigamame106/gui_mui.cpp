@@ -821,16 +821,16 @@ int MameUI::MainGUI(void)
 
 
                 // save some window state
-                if(LI_Driver && MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
-                {
-                    // UIListState uiliststate={0};
-                    // uiliststate.nbcolumn = 8;
-                    // get(LI_Driver, MUIA_List_ColumnOrder, &uiliststate.columnOrder[0]);
-                    // get(LI_Driver,MUIA_List_SortColumn,&uiliststate.sortedcolumn );
-                    // config.setColumnOrder(uiliststate);
- printf("save\n");
-                    DoMethod(App,MUIM_Application_Save,MUIV_Application_Save_ENVARC);
-                }
+//                if(LI_Driver && MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
+//                {
+//                    // UIListState uiliststate={0};
+//                    // uiliststate.nbcolumn = 8;
+//                    // get(LI_Driver, MUIA_List_ColumnOrder, &uiliststate.columnOrder[0]);
+//                    // get(LI_Driver,MUIA_List_SortColumn,&uiliststate.sortedcolumn );
+//                    // config.setColumnOrder(uiliststate);
+//// printf("save\n");
+//                    DoMethod(App,MUIM_Application_Save,MUIV_Application_Save_ENVARC);
+//                }
 
                 set(AboutWin, MUIA_Window_Open, FALSE);
                 set(MainWin,  MUIA_Window_Open, FALSE);

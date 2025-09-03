@@ -39,6 +39,76 @@ extern struct Library *CyberGfxBase;
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
 
+// because BestCModeIDTagList is sabotaged in recent P96 drivers.
+// do some based on "height first"
+ULONG OwnCGXBestModeID(int w,int h,int depth)
+{
+    printf("OwnCGXBestModeID\n");
+    std::vector<ULONG> bestHeightModesTooBig;
+    int errorTooBigH= 0xffff;
+    std::vector<ULONG> bestHeightModesExact;
+//    std::vector<ULONG> bestHeightModesTooLow;
+//    int errorTooLow= 0xffff;
+
+    // - -  primarily bother about height
+    ULONG tid = NextDisplayInfo(INVALID_ID);
+    for(;tid != INVALID_ID; tid = NextDisplayInfo(tid))
+    {   // here we only want RTG screens.
+        if(!IsCyberModeID(tid) || (tid&0x0000ffff) ==0 ) continue; // escape P96 bugged "ghost modes with RGB inverted."
+
+        ULONG depth = GetCyberIDAttr( CYBRIDATTR_DEPTH, tid );
+        if(depth != depth) continue;
+
+        ULONG hm = GetCyberIDAttr( CYBRIDATTR_HEIGHT, tid );
+        if(hm < h ) {
+//            LONG error = h-hm;
+//            if(error<errorTooLow)
+//            {
+//                bestHeightModesTooLow.clear();
+//                errorTooLow = error;
+//            }
+//            if(error == errorTooLow) bestHeightModesTooLow.push_back(tid);
+        } else
+        if(hm == h ) {
+             bestHeightModesExact.push_back(tid);
+        } else
+        {   // hm>h
+            LONG error = hm-h;
+            if(error<errorTooBigH)
+            {
+                bestHeightModesTooBig.clear();
+                errorTooBigH = error;
+            }
+            if(error == errorTooBigH) bestHeightModesTooBig.push_back(tid);
+        }
+    }
+    // - - - - then only bother for width...
+    if(bestHeightModesExact.size()==0) bestHeightModesExact = bestHeightModesTooBig;
+    //if(bestHeightModesExact.size()==0) bestHeightModesExact = bestHeightModesTooLow;
+    if(bestHeightModesExact.size()==0) return INVALID_ID;
+    int errorWidth= 0xffff;
+    ULONG bestmode = INVALID_ID;
+    for( ULONG tid : bestHeightModesExact)
+    {
+        ULONG wm = GetCyberIDAttr( CYBRIDATTR_WIDTH, tid );
+        int e = wm-w;
+        if(e<0) continue;
+        if(e<errorWidth)
+        {
+            bestmode = tid;
+            errorWidth = e;
+            if(wm == w) break;
+        }
+    }
+    return bestmode;
+
+    //NextDisplayInfo() starting from INVALID_ID until it returns INVALID_ID
+//        _fullscreenWidth = GetCyberIDAttr( CYBRIDATTR_WIDTH, _ScreenModeId );
+//        _fullscreenHeight = GetCyberIDAttr( CYBRIDATTR_HEIGHT, _ScreenModeId );
+//        _PixelFmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, _ScreenModeId );
+//        _PixelBytes = GetCyberIDAttr( CYBRIDATTR_BPPIX, _ScreenModeId );
+}
+
 bool Intuition_Screen_CGX::useForThisMode(ULONG modeID)
 {
     if(!CyberGfxBase) return false;
@@ -341,6 +411,7 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
     if(/*_ScreenDepthAsked == 32 &&*/ (_flags & DISPFLAG_FORCEDEPTH16)!=0)
         _ScreenDepthAsked = 16;
 
+    int useOwnBestMethod=1;
     if(_ScreenModeId == INVALID_ID)
     {
    // printf("find best mode, _screenDepthAsked:%d...\n",(int)_ScreenDepthAsked);
@@ -349,12 +420,18 @@ Intuition_Screen_CGX::Intuition_Screen_CGX(const AbstractDisplay::params &params
         while(depthsToTest[idepth] != 0 &&
            _ScreenModeId == INVALID_ID)
         {
-            struct TagItem cgxtags[]={
+            if(useOwnBestMethod) {
+                _ScreenModeId = OwnCGXBestModeID(width,height,depthsToTest[idepth]);
+            } else
+            {
+                struct TagItem cgxtags[]={
                     CYBRBIDTG_NominalHeight,height,
                     CYBRBIDTG_NominalWidth,width,
                     CYBRBIDTG_Depth,depthsToTest[idepth],
                     TAG_DONE,0 };
-            _ScreenModeId = BestCModeIDTagList(cgxtags);
+                _ScreenModeId = BestCModeIDTagList(cgxtags);
+            }
+
             if(_ScreenModeId != INVALID_ID) _ScreenDepthAsked = (int)depthsToTest[idepth];
             idepth++;
         }

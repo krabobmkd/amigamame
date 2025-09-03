@@ -200,6 +200,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
 
     MameConfig &mainConfig = getMainConfig();
     MameConfig::Display &config = mainConfig.display();
+    MameConfig::Controls &controls = mainConfig.controls();
 
     MameConfig::Display_PerScreenMode &screenModeConf = config.getActiveMode();
 
@@ -242,6 +243,12 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
 
         if(config._flags & CONFDISPLAYFLAGS_FORCEDEPTH16 )
             params._flags |= DISPFLAG_FORCEDEPTH16;
+
+        if((controls._llPort_Player[0]>0 && controls._llPort_Type[0]==PORT_TYPE_LIGHTGUN) ||
+           (controls._llPort_Player[1]>0 && controls._llPort_Type[1]==PORT_TYPE_LIGHTGUN) )
+           {
+               params._flags |= DISPFLAG_LIGHTGUN;
+           }
 
         // these 2 are exclusive:
         if(config._buffering == MameConfig::ScreenBufferMode::TripleBufferCSB )

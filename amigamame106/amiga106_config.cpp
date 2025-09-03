@@ -22,6 +22,12 @@ extern "C" {
 
 #include "serializer_mamexml.h"
 
+extern "C" {
+    int hasParallelPort();
+    int hasProportionalStickResource();
+}
+
+
 using namespace std;
 
 inline const std::string trimSlach( std::string s) {
@@ -330,9 +336,15 @@ void MameConfig::serialize(ASerializer &serializer)
     serializer("Display",   (ASerializable&)_display,SERFLAG_GROUP_SCROLLER);
     serializer("Audio",     (ASerializable&)_audio,0);
     serializer("Controls",  (ASerializable&)_controls, SERFLAG_GROUP_2COLUMS|SERFLAG_GROUP_HASCOMMENT);
-    serializer.setComment("Controls",
+
+    std::string controlPanelComments =
         "Describe what is plugged (Joystick,Pads,Mouses)\n and to which player it belongs.\n"
-        "Keyboard is configured during game with Tab Key menu.");
+        "Keyboard is configured during game with Tab Key menu.";
+    if(hasProportionalStickResource()) // unrelated bu tells we are on Amiga classic.
+    {   // if classic hardware ports...
+        controlPanelComments += "\nAnalog controllers, phasers, and CD32 pads\n must be plugged when switched off.";
+    }
+    serializer.setComment("Controls",controlPanelComments);
 
     serializer("Misc",     (ASerializable&)_misc,0);
     serializer("Help",     (ASerializable&)_help,SERFLAG_GROUP_SCROLLER);
@@ -536,10 +548,6 @@ void MameConfig::Audio::serialize(ASerializer &serializer)
 
    //finaly not serializer("Flags",_Flags,1,{"Use Samples"});
 }
-extern "C" {
-    int hasParallelPort();
-    int hasProportionalStickResource();
-}
 
 MameConfig::Controls::Controls() : ASerializable() {
 }
@@ -568,8 +576,8 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         "Mouse",
         "Joystick(2bt)",
         "Analog Joystick(2bt)",
-        "C64/Atari Paddles(2bt)"
-        //"Lightgun"
+        "C64/Atari Paddles(2bt)",
+        "Lightgun Phaser (2bt)" // only available for one port.
     };
 
 
@@ -662,9 +670,10 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
       });
 
     serializer("Optims",_Optims,
-          OPTIMFLAGS_DIRECTWGXWIN //def.
+          OPTIMFLAGS_DIRECTWGXWIN | SERFLAG_GROUP_FLAGINT2COLUMS //def.
     ,{
-        "Direct draw for RTG Windows"
+        "Direct draw for RTG Windows",
+        "Use (bugged?) P96 BestCModeID()."
       });
 
 }

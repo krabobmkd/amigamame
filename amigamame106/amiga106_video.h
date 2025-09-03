@@ -34,6 +34,8 @@ public:
     #define DISPFLAG_USETRIPLEBUFFER  64
     #define DISPFLAG_USEHEIGHTBUFFER  128
     #define DISPFLAG_FORCEDEPTH16      256
+    // native screen init may activate lightguns.
+    #define DISPFLAG_LIGHTGUN          512
 
     struct params {
         ULONG _flags;
@@ -43,7 +45,7 @@ public:
         int _colorsIndexLength;
         int _video_attributes;
         int _driverDepth;
-        WindowGeo _wingeo;
+        WindowGeo _wingeo; //<<< in window on workbench mode, force window geometry.
     };
     virtual bool open(const params &params) = 0;
     virtual void init_rgb_components(unsigned int *rgbcomponents) = 0; // needed for RGB mode.
