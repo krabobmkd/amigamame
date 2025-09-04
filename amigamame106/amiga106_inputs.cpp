@@ -1181,6 +1181,7 @@ void RawKeyMap::init()
         } // end if pots.
         else if((itype == PORT_TYPE_LIGHTGUN ) && iport<2)
         {
+            int analogmamecodeshift = ((int)JOYCODE_2_ANALOG_X-(int)JOYCODE_1_ANALOG_X)*(iplayer-1);
             int guncodeshift = ((int)GUNCODE_2_ANALOG_X-(int)GUNCODE_1_ANALOG_X)*(iplayer-1);
             // but yet 2 bt joysticks. we need that.
             int buttonmamecodeshift = ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT)*(iplayer-1);
@@ -1190,8 +1191,12 @@ void RawKeyMap::init()
         {_LGunNames[iport][2],LIGHTGUN_CODESTART+(iport*8)+2,JOYCODE_1_BUTTON1+buttonmamecodeshift},
         {_LGunNames[iport][3],LIGHTGUN_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift},
         // use same internal slot as mouses XY.
+        /*
         {_LGunNames[iport][0], LIGHTGUN_CODESTART+(iport*8)+0,GUNCODE_1_ANALOG_X+guncodeshift},
         {_LGunNames[iport][1], LIGHTGUN_CODESTART+(iport*8)+1,GUNCODE_1_ANALOG_Y+guncodeshift},
+        */
+        {_LGunNames[iport][0], LIGHTGUN_CODESTART+(iport*8)+0,JOYCODE_1_ANALOG_X+analogmamecodeshift},
+        {_LGunNames[iport][1], LIGHTGUN_CODESTART+(iport*8)+1,JOYCODE_1_ANALOG_Y+analogmamecodeshift},
 
                 };
                 _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());

@@ -6,7 +6,7 @@
 #include <hardware/intbits.h>
 
 struct LPInteruptData {
-    ULONG vposr;
+    ULONG vposr,vposr2;
 };
 
 
@@ -24,6 +24,7 @@ struct sLightGunsPrivate
 static int lightpeninterupt( register struct LPInteruptData *plpid __asm("a1") )
 {
     plpid->vposr = *((ULONG *)(0x00DFF004));
+    plpid->vposr2 = *((ULONG *)(0x00DFF004));
     // custom.vposr;
     return 0; // should set z flag
 }
