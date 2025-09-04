@@ -316,7 +316,7 @@ public:
     {
         Help();
         void serialize(ASerializer &serializer) override;
-        strText _[10+4];
+        strText _[10+5];
     };
 
     void toDefault();

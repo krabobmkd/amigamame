@@ -673,7 +673,7 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
           OPTIMFLAGS_DIRECTWGXWIN | SERFLAG_GROUP_FLAGINT2COLUMS //def.
     ,{
         "Direct draw for RTG Windows",
-        "Use (bugged?) P96 BestCModeID()."
+        "Use native BestCModeID()"
       });
 
 }
@@ -698,21 +698,25 @@ _[4] ="Show / Hide Mame Settings";
     serializer("Tab : ",_[4]);
 _[5] ="Switch Window / Fullscreen";
     serializer("F10 : ",_[5]);
-_[6] ="Show / Hide Statistics";
-    serializer("Help : ",_[6]);
-_[7] ="Save State  ...  F7+Shift: Load State";
-    serializer("F7 : ",_[7]);
-_[8] ="Reset";
-        serializer("F3 : ",_[8]);
-_[9] ="Escape Game";
-    serializer("Esc : ",_[9]);
+
+_[6] ="Throttle when kept pressed";
+    serializer("Shit+F10 : ",_[6]);
+
+_[7] ="Show / Hide Statistics";
+    serializer("Help : ",_[7]);
+_[8] ="Save State  ...  F7+Shift: Load State";
+    serializer("F7 : ",_[8]);
+_[9] ="Reset";
+        serializer("F3 : ",_[9]);
+_[10] ="Escape Game";
+    serializer("Esc : ",_[10]);
 // - - - - --
-_[10] ="\n- Copy some Mame106 zip archive in 'roms' dir and press scan.";
-            serializer(" ",_[10]);
-_[11] ="- Don't try to run games tagged 'not working'";
-        serializer(" ",_[11]);
-_[12] ="- Games with parent archive need their parent,\n   non working games may have a working parent.";
+_[11] ="\n- Copy some Mame106 zip archive in 'roms' dir and press scan.";
+            serializer(" ",_[11]);
+_[12] ="- Don't try to run games tagged 'not working'";
         serializer(" ",_[12]);
+_[13] ="- Games with parent archive need their parent,\n   non working games may have a working parent.";
+        serializer(" ",_[13]);
 
 }
 

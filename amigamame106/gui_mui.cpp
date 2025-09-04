@@ -1499,7 +1499,6 @@ void MameUI::setDriverListShowState(int state)
 {
     MameConfig &config = getMainConfig();
     config.setDriverListShowMode(state);
-    printf("go updatelist\n");
     UpdateList();
 
 }
@@ -1510,7 +1509,7 @@ void MameUI::UpdateUIToConfig()
 
     // set list is in previous state, from configuration.
     int listShowState = config.driverListShowMode();
- printf("UpdateUIToConfig->setDriverListShowState:%d\n",listShowState);
+// printf("UpdateUIToConfig->setDriverListShowState:%d\n",listShowState);
     setDriverListShowState(listShowState);
 
     muiConfigCreator.updateUI();

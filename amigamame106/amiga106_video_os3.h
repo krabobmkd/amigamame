@@ -51,8 +51,9 @@ public:
 
     bool open() override;
     void close() override;
-    void draw(_mame_display *display) override;
+    void draw(_mame_display *display) override;    
 protected:
+    int _lightpen_inited;
 };
 class Intuition_Window_OS3 : public Intuition_Window, public Drawable_OS3
 {

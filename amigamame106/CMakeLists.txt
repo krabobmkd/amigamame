@@ -103,6 +103,8 @@ set(AMIGA_SRC
 	amiga_locale.cpp
 	amiga_parallelpads.h
 	amiga_parallelpads.c
+	amiga_lightgun.h
+	amiga_lightgun.c
 	amiga_proportionaljoystick.h
 	amiga_proportionaljoystick.c
 

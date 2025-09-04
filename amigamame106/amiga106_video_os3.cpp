@@ -6,6 +6,7 @@
 #include <proto/graphics.h>
 #include <proto/intuition.h>
 
+#include "amiga_lightgun.h"
 extern "C" {
     // from mame
     #include "mame.h"
@@ -14,6 +15,13 @@ extern "C" {
     #include "osdepend.h"
     #include "palette.h"
 }
+extern "C" {
+    // from amigaos but not proto
+    #include "hardware/custom.h"
+    #include "graphics/gfxbase.h"
+}
+
+
 //#include <stdio.h>
 //#include <stdlib.h>
 
@@ -286,6 +294,7 @@ void Drawable_OS3::close()
 
 Intuition_Screen_OS3::Intuition_Screen_OS3(const AbstractDisplay::params &params)
     : Intuition_Screen(params), Drawable_OS3((IntuitionDrawable&)*this)
+    , _lightpen_inited(0)
 {
     _colorsIndexLength = params._colorsIndexLength;
     _video_attributes = params._video_attributes;
@@ -362,10 +371,24 @@ bool Intuition_Screen_OS3::open()
     if(!ok) return false;
     // after Screen is open, may create create color remap table for clut.
     initRemapTable();
+
+    if(_flags & DISPFLAG_LIGHTGUN)
+    {
+    	GfxBase->system_bplcon0 |= LP_ENABLE;
+    	RemakeDisplay();
+    	_lightpen_inited = 1;
+    }
+
     return ok;
 }
 void Intuition_Screen_OS3::close()
 {
+    if(_lightpen_inited)
+    {
+    	GfxBase->system_bplcon0 &= ~LP_ENABLE;
+    	RemakeDisplay();
+    	_lightpen_inited = 0;
+    }
     Intuition_Screen::close();
     Drawable_OS3::close();
 }

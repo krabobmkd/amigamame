@@ -343,8 +343,13 @@ void osd_close_display(void)
   on the window title bar.
 */
 // this counter is from mame and take account of resets.
-extern ULONG _frame;
-extern ULONG _bootframeskip;
+
+extern "C" {
+    extern ULONG _frame;
+    extern ULONG _bootframeskip;
+	extern UINT32 _throttleIsOn; // with shift+f10 key
+}
+
 void osd_update_video_and_audio(struct _mame_display *display)
 {
 
@@ -370,7 +375,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
             ResetWatchTimer();
         }
         static int lastwaitskipped = 0;
-        if(_frame>=_bootframeskip)
+        if(_frame>=_bootframeskip && _throttleIsOn==0)
         {
             if(lastwaitskipped) {
                 ResetWatchTimer();

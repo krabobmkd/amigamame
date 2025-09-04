@@ -47,6 +47,7 @@ extern "C" {
 #include "amiga106_video.h"
 #include "amiga_parallelpads.h"
 #include "amiga_proportionaljoystick.h"
+#include "amiga_lightgun.h"
 
 using namespace std;
 
@@ -60,6 +61,8 @@ using namespace std;
 #define ANALOG_CODESTART 1024
 // actually for real analog "potgo"
 #define PROPJOY_CODESTART 2048
+// actually for real analog "potgo"
+#define LIGHTGUN_CODESTART 2048+256
 
 #ifdef USE_DIRECT_KEYBOARD_DEVICE
 struct KeyboardMatrix {
@@ -172,6 +175,11 @@ static const char * const _AnalogNames[2][2][4]=
         {"C64Pad2 X","C64Pad2 Y","C64Pad2 Bt1","C64Pad2 Bt2"}
     }
 };
+static const char * const _LGunNames[2][4]=
+{
+    {"Lightgun1 X","Lightgun1 Y","Lightgun1 Bt1","Lightgun1 Bt2"},
+    {"Lightgun2 X","Lightgun2 Y","Lightgun2 Bt1","Lightgun2 Bt2"}
+};
 RawKeyMap   rawkeymap;
 
 
@@ -180,6 +188,7 @@ ParallelPads *g_pParallelPads=NULL; // createParallelPads();
 int     llPortsTypes[4]={0,0,0,0};
 
 struct ProportionalSticks *g_PropsSticks=NULL;
+struct sLightGuns *g_LightGun=NULL; //LightGun_create();
 
 extern "C" {
     struct Library *LowLevelBase = NULL;
@@ -219,6 +228,7 @@ static int mamekbdInteruptfunc( register struct KeyboardMatrix  *pkm  __asm("a1"
 static USHORT askedPadsRawKey[2] = {0,0};
 static USHORT useAnyMouse = 0;
 static USHORT usePropJoysticks = 0;
+static USHORT useLightgun = 0;
 static USHORT useAnyLowLevelControl = 0;
 static USHORT dddummmy = 0;
 #ifdef RJP_OPTION
@@ -233,6 +243,7 @@ void ConfigureLowLevelLib()
     //r1.6 only open lowlevel if some lowlevel type asked, and open/close each time.
     useAnyMouse=0;
     usePropJoysticks = 0;
+    useLightgun = 0;
     useAnyLowLevelControl = 0;
 
 
@@ -246,6 +257,8 @@ void ConfigureLowLevelLib()
         if( lowlevelState == PORT_TYPE_PROPORTIONALJOYSTICK ||
             lowlevelState == PORT_TYPE_C64PADDLE
         ) usePropJoysticks++;
+
+        if( lowlevelState == PORT_TYPE_LIGHTGUN ) useLightgun++;
 
         // lowlevel only, code 0 (autosense) is now used as "no controller"
         if(lowlevelState>0 && lowlevelState<=3) // shouldnt -> now we have values >3 for propjoy
@@ -374,6 +387,10 @@ void ConfigureLowLevelLib()
         }
     }
 
+    // 6 - - - - Lightguns: init if needed.
+    if(useLightgun && !g_LightGun){
+        g_LightGun = LightGun_create();
+    }
 
 }
 void CloseLowLevelLib()
@@ -450,10 +467,22 @@ void AllocInputs()
 #endif
 }
 
+extern "C" {
+	extern UINT32 _throttleIsOn; // with shift+f10 key
+}
+
+
 void FreeInputs()
 {
     // better in inverse order of init: (propjoy & ll can collide on gameport device units.)
     // (plus PropsSticks may use lowlevel for timers.)
+
+    if(g_LightGun)
+    {
+        LightGun_close(g_LightGun);
+        g_LightGun = NULL;
+    }
+
     if(g_PropsSticks)
     {
         closeProportionalSticks(g_PropsSticks);
@@ -553,6 +582,7 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                         // shouldnt happen, but does maintain consistency.
                         g_pInputs->_Keys[finalkeycode] = 0; // down
                    }
+                   if(finalkeycode == 0x59) _throttleIsOn=0;
                 }
                 else
                 {
@@ -574,7 +604,14 @@ void UpdateInputs(struct MsgPort *pMsgPort)
                     //printf("key:%04x on\n",(int)finalkeycode);
                     // F10 -> switch fullscreen, but next, it will destroy the current port wer'e using.
                     if(finalkeycode == 0x59) { // F10
-                        doSwitchFS =1;
+                        if(imqual &(IEQUALIFIER_LSHIFT|IEQUALIFIER_RSHIFT))
+                        {
+                            // r1.7, shift F10, throttle mode when pressed
+                            _throttleIsOn = 1;
+                        } else
+                        {
+                            doSwitchFS =1;
+                        }
                     }
                 }
             }
@@ -775,6 +812,9 @@ void UpdateInputs(struct MsgPort *pMsgPort)
     }
     if(g_PropsSticks) {
         ProportionalSticksUpdate(g_PropsSticks);
+    }
+    if(g_LightGun) {
+        LightGun_update(g_LightGun);
     }
 
     if(doSwitchFS) SwitchWindowFullscreen();
@@ -1138,10 +1178,35 @@ void RawKeyMap::init()
                 };
                 _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
                 // then updates will do the job of writting prop joy values in .
-
-
-
         } // end if pots.
+        else if((itype == PORT_TYPE_LIGHTGUN ) && iport<2)
+        {
+            int guncodeshift = ((int)GUNCODE_2_ANALOG_X-(int)GUNCODE_1_ANALOG_X)*(iplayer-1);
+            // but yet 2 bt joysticks. we need that.
+            int buttonmamecodeshift = ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT)*(iplayer-1);
+            int ipshft = iport<<8; // still use Lowlevel keycodes for buttons
+
+              vector<os_code_info> kbi2={
+        {_LGunNames[iport][2],LIGHTGUN_CODESTART+(iport*8)+2,JOYCODE_1_BUTTON1+buttonmamecodeshift},
+        {_LGunNames[iport][3],LIGHTGUN_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift},
+        // use same internal slot as mouses XY.
+        {_LGunNames[iport][0], LIGHTGUN_CODESTART+(iport*8)+0,GUNCODE_1_ANALOG_X+guncodeshift},
+        {_LGunNames[iport][1], LIGHTGUN_CODESTART+(iport*8)+1,GUNCODE_1_ANALOG_Y+guncodeshift},
+
+                };
+                _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
+
+            /*
+	GUNCODE_1_ANALOG_X,
+	GUNCODE_1_ANALOG_Y,
+	GUNCODE_2_ANALOG_X,
+	GUNCODE_2_ANALOG_Y,
+	GUNCODE_3_ANALOG_X,
+	GUNCODE_3_ANALOG_Y,
+
+*/
+
+        }
     } // loop by player
 
 
@@ -1249,34 +1314,42 @@ INT32 osd_get_code_value(os_code oscode)
         return (int)g_pInputs->_Keys[oscode];
     } else if(oscode>=PROPJOY_CODESTART)
     {
-        // new r1.6
-        if(!g_PropsSticks) return 0;
-
-        oscode -= PROPJOY_CODESTART;
-    //printf("oscode:%08x\n",(int)oscode);
-    // a ,8   8+2 ark.
-        int illport = oscode>>3; // /8
-        if(illport>=2) return 0;
-        UINT8 shortcode = ((UINT8)oscode) & 7; // analog X,Y ,bt1,bt2
-
-
-        if( g_PropsSticks->_values[illport].valid)
+        if(oscode>=LIGHTGUN_CODESTART)
         {
-            // validated with outrun wheel
-            if(shortcode ==0)
+            if(!g_LightGun) return 0;
+
+        } else
+        { //PROPJOY_CODESTART
+
+            // new r1.6
+            if(!g_PropsSticks) return 0;
+
+            oscode -= PROPJOY_CODESTART;
+        //printf("oscode:%08x\n",(int)oscode);
+        // a ,8   8+2 ark.
+            int illport = oscode>>3; // /8
+            if(illport>=2) return 0;
+            UINT8 shortcode = ((UINT8)oscode) & 7; // analog X,Y ,bt1,bt2
+
+
+            if( g_PropsSticks->_values[illport].valid)
             {
-               // if((cnt & 63)==0) printf("pps x:%08x\n",(int)g_PropsSticks->_values[illport].x);
-                return  (128-g_PropsSticks->_values[illport].x)<<9; // already calibrated
+                // validated with outrun wheel
+                if(shortcode ==0)
+                {
+                   // if((cnt & 63)==0) printf("pps x:%08x\n",(int)g_PropsSticks->_values[illport].x);
+                    return  (128-g_PropsSticks->_values[illport].x)<<9; // already calibrated
+                }
+                if(shortcode ==1)
+                {
+                   // if((cnt & 63)==0) printf("pps y:%08x\n",(int)g_PropsSticks->_values[illport].y);
+                    return  (128-g_PropsSticks->_values[illport].y)<<9; // already calibrated
+                }
+                // buttons
+                if(shortcode ==2) return ((g_PropsSticks->_values[illport].bt & 1)!=0);
+                if(shortcode ==3) return ((g_PropsSticks->_values[illport].bt & 2)!=0);
             }
-            if(shortcode ==1)
-            {
-               // if((cnt & 63)==0) printf("pps y:%08x\n",(int)g_PropsSticks->_values[illport].y);
-                return  (128-g_PropsSticks->_values[illport].y)<<9; // already calibrated
-            }
-            // buttons
-            if(shortcode ==2) return ((g_PropsSticks->_values[illport].bt & 1)!=0);
-            if(shortcode ==3) return ((g_PropsSticks->_values[illport].bt & 2)!=0);
-        }
+        }// end PROPJOY_CODESTART
         return 0;
     } else // ANALOG_CODESTART
     {

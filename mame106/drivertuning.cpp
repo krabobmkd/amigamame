@@ -8,6 +8,7 @@
 extern "C" {
 	#include "mamecore.h"
 	UINT32 _bootframeskip=0;
+	UINT32 _throttleIsOn=0; // with shift+f10 key
 	UINT32 _minimumCpuCycles=DEFMINCPUC;
 }
 

@@ -3,17 +3,21 @@
 
  r1.7
   TODO
-  X MUI interface poptimisation, and scan button doesn't rescan twice without reason (old MUI bug!)
-  X project icon can be useed for game launch.
-  O MUI saves list column/sort states
+  X MUI interface optimisation, and scan button doesn't rescan twice without reason (old  bug!)
+  X project icon can be used for game launch.
+  O MUI saves list column/sort states -> LOOKS NOT POSSIBLE
   O explain how to make project icon in documentation
-  O key for throttle
+  X key for throttle (shift+F10?)
   O F4 guide in amigaguide.
-  O recode BestCModeIDTagList
+  X recode BestCModeIDTagList
+  O do a shortcut-creator on WB ?
+
+  O PHASERS !!
 
   X genre and flags in db
   X have genre column in MUI list
-  O have genre filter panel -> or menu ?
+  X have genre filter panel -> in menu.
+
 
 
   O activate konami Moo mesa !!!
