@@ -14,9 +14,9 @@
  added again more missing knm: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta, escape kids, rollergames
 
  Bugs:
-  O betsmode fail with 384
+  X betsmode fail with 384
   O suprslam Super slam sprite xflip bug ugly
-  O rungun plante son boot grave.
+  O rungun plante son boot grave. polyginet too
 
 
  -> add the 3 cave shooter

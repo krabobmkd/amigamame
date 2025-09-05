@@ -943,8 +943,8 @@ int patchMiniMachines(
             "drivers/moo.c","vidhrdw/moo.c",
             "drivers/thunderx.c","vidhrdw/thunderx.c",
             "drivers/suprslam.c","vidhrdw/suprslam.c",
-            "drivers/rungun.c","vidhrdw/rungun.c",
-            "drivers/plygonet.c",
+      //DOESNTWORK      "drivers/rungun.c","vidhrdw/rungun.c",
+      //DOESNWORK      "drivers/plygonet.c",
             "drivers/rollerg.c","vidhrdw/rollerg.c",
             "drivers/vendetta.c","vidhrdw/vendetta.c"
         };
@@ -953,9 +953,7 @@ int patchMiniMachines(
         copyDrivers(m,src,{"suprslam" });
 
 //        copyDrivers(m,src,{"","","","","" });
-
-        copyDrivers(m,src,{"rungun","runguna","rungunu","rungunua","slmdunkj" });
-        copyDrivers(m,src,{"plygonet","rollerg","rollergj" });
+        copyDrivers(m,src,{"rollerg","rollergj" });
 
         copyDrivers(m,src,{"vendetta","vendetao","vendet2p","vendetas","vendtaso","vendettj" });
         copyDrivers(m,src,{"esckids","esckidsj" });

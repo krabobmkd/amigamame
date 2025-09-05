@@ -90,25 +90,26 @@ static void suprslam_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 				NULL, 	// pri_buffer
 				0 	// priority_mask
 			  };
+
+            dgpz0.scalex = xzoom << 11;
+            dgpz0.scaley = yzoom << 11;
+            dgpz0.flipx=flipx;
+
 			for (ycnt = 0; ycnt < high+1; ycnt ++) {
 				if (!flipx) {
+
 					for (xcnt = 0; xcnt < wide+1; xcnt ++)	{
 						int tileno = suprslam_sp_videoram[word_offset+loopno];
-						
+
 						dgpz0.code = tileno;
 						dgpz0.color = col;
 						dgpz0.sx = xpos + xcnt * xzoom/2;
 						dgpz0.sy = ypos + ycnt * yzoom/2;
-						dgpz0.scalex = xzoom << 11;
-						dgpz0.scaley = yzoom << 11;
+
 						drawgfxzoom(&dgpz0);
-						
-						dgpz0.code = tileno;
-						dgpz0.color = col;
+
 						dgpz0.sx = -0x200+xpos + xcnt * xzoom/2;
 						dgpz0.sy = ypos + ycnt * yzoom/2;
-						dgpz0.scalex = xzoom << 11;
-						dgpz0.scaley = yzoom << 11;
 						drawgfxzoom(&dgpz0);
 						loopno ++;
 					}
@@ -118,18 +119,13 @@ static void suprslam_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 						
 						dgpz0.code = tileno;
 						dgpz0.color = col;
+
 						dgpz0.sx = xpos + xcnt * xzoom/2;
 						dgpz0.sy = ypos + ycnt * yzoom/2;
-						dgpz0.scalex = xzoom << 11;
-						dgpz0.scaley = yzoom << 11;
 						drawgfxzoom(&dgpz0);
 						
-						dgpz0.code = tileno;
-						dgpz0.color = col;
 						dgpz0.sx = -0x200+xpos + xcnt * xzoom/2;
 						dgpz0.sy = ypos + ycnt * yzoom/2;
-						dgpz0.scalex = xzoom << 11;
-						dgpz0.scaley = yzoom << 11;
 						drawgfxzoom(&dgpz0);
 						loopno ++;
 					}
