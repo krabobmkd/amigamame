@@ -5,22 +5,32 @@
 //        copyDrivers(m,src,{"","","","","" });
 
         copyDrivers(m,src,{"rungun","runguna","rungunu","rungunua","slmdunkj" });
-        copyDrivers(m,src,{"plygonet","rollerg","rollergj" });
+        copyDrivers(m,src,{"","rollerg","rollergj" });
 
         copyDrivers(m,src,{"vendetta","vendetao","vendet2p","vendetas","vendtaso","vendettj" });
         copyDrivers(m,src,{"esckids","esckidsj" });
 
 
- added again more missing knm: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta, escape kids, rollergames
+ added again more missing knm: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta (4p beatnup), escape kids, rollergames
 
  Bugs:
   X betsmode fail with 384
-  O suprslam Super slam sprite xflip bug ugly
-  O rungun plante son boot grave. polyginet too
-
+  X suprslam Super slam sprite xflip bug ugly
+  X rungun plante son boot grave. polyginet too
+  O test throttle IRL
 
  -> add the 3 cave shooter
-  -> all psychio ?
+  -> all psychio  LINK_PSIKYO ?
+ DDOYYONG "bluehawk"
+ LINK_NICHIBUT armedf
+ test "cyvern"
+
+ from MISC: the cave games
+ misc: ddonpach 1997 v shoot
+esprade 1998 atlus cave
+feversos
+-> any "cave"
+
 
  r1.7
   TODO
