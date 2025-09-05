@@ -3351,7 +3351,7 @@ GAME( 1990, dkgensan, hharry,   hharryu,  hharry,   0,        ROT0,   "Irem", "D
 GAME( 1990, dkgenm72, hharry,   dkgenm72, hharry,   dkgenm72, ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", GAME_NO_COCKTAIL ,0,2,egg_Platform,0)
 GAME( 1990, poundfor, 0,        poundfor, poundfor, 0,        ROT270, "Irem", "Pound for Pound (World)", GAME_NO_COCKTAIL ,2,0,egg_sport_Boxing,0)
 GAME( 1990, poundfou, poundfor, poundfor, poundfor, 0,        ROT270, "Irem America", "Pound for Pound (US)", GAME_NO_COCKTAIL ,2,0,egg_sport_Boxing,0)
-GAME( 1990, airduel,  0,        m72,      airduel,  airduel,  ROT270, "Irem", "Air Duel (Japan)", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, airduel,  0,        m72,      airduel,  airduel,  ROT270, "Irem", "Air Duel (Japan)", 0 ,0,0,egg_ShootEmUp,EGF_VER)
 GAME( 1991, cosmccop, 0,        kengo,    gallop,   0,        ROT0,   "Irem", "Cosmic Cop (World)", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
 GAME( 1991, gallop,   cosmccop, m72,      gallop,   gallop,   ROT0,   "Irem", "Gallop - Armed police Unit (Japan)", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
 GAME( 1991, kengo,    0,        kengo,    kengo,    kengo,    ROT0,   "Irem", "Ken-Go", GAME_NO_COCKTAIL ,2,0,egg_BeatNUp,0)

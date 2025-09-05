@@ -1827,8 +1827,8 @@ const game_driver * const drivers[] =
 	DRIVER( pturn ) /* 1984 "Jaleco" "Parallel Turn" */
 	DRIVER( rockn ) /* 1999 "Jaleco" "Rock'n Tread (Japan)" */
 	DRIVER( rockn2 ) /* 1999 "Jaleco" "Rock'n Tread 2 (Japan)" */
-	DRIVER( rockn3 ) /* 1999 "Jaleco" "Rock'n 3 (Japan)" */
-	DRIVER( rockn4 ) /* 2000 "Jaleco (PCCWJ)" "Rock'n 4 (Japan */
+	DRIVER( rockn3 ) /* 1999 "Jaleco" "Rock'n Tread 3 (Japan)" */
+	DRIVER( rockn4 ) /* 2000 "Jaleco (PCCWJ)" "Rock'n Tread 4 (Japan */
 	DRIVER( rockna ) /* 1999 "Jaleco" "Rock'n Tread (Japan */
 	DRIVER( rocknms ) /* 1999 "Jaleco" "Rock'n MegaSession (Japan)" */
 	DRIVER( rodland ) /* 1990 "Jaleco" "Rod-Land (World)" */
@@ -2290,6 +2290,7 @@ const game_driver * const drivers[] =
 	DRIVER( stratgyx ) /* 1981 "Konami" "Strategy X" */
 	DRIVER( strfbomb ) /* 1981 "Omni" "Strafe Bomb" */
 	DRIVER( superbon ) /* 198? "bootleg" "Super Bond" */
+	DRIVER( suprslam ) /*    */
 	DRIVER( suratk ) /* 1990 "Konami" "Surprise Attack (World ver. K)" */
 	DRIVER( suratka ) /* 1990 "Konami" "Surprise Attack (Asia ver. L)" */
 	DRIVER( suratkj ) /* 1990 "Konami" "Surprise Attack (Japan ver. M)" */
@@ -2997,11 +2998,15 @@ const game_driver * const drivers[] =
 #endif
 #ifdef LINK_MINIKONAMI2
 	DRIVER( blkpnthr ) /* 1987 "Konami" "Black Panther" */
+	DRIVER( bucky ) /* 1992 "Konami" "Bucky O'Hare (ver EA)" */
+	DRIVER( buckyua ) /* 1992 "Konami" "Bucky O'Hare (ver UA)" */
 	DRIVER( citybmrj ) /* 1987 "Konami" "City Bomber (Japan)" */
 	DRIVER( citybomb ) /* 1987 "Konami" "City Bomber (World)" */
 	DRIVER( cuebrick ) /* 1989 "Konami" "Cue Brick (Japan)" */
 	DRIVER( darkadv ) /* 1987 "Konami" "Dark Adventure" */
 	DRIVER( devilw ) /* 1987 "Konami" "Devil World" */
+	DRIVER( esckids ) /* 1991 "Konami" "Escape Kids (Asia */
+	DRIVER( esckidsj ) /* 1991 "Konami" "Escape Kids (Japan */
 	DRIVER( fround ) /* 1988 "Konami" "The Final Round (version M)" */
 	DRIVER( froundl ) /* 1988 "Konami" "The Final Round (version L)" */
 	DRIVER( gberet ) /* 1985 "Konami" "Green Beret" */
@@ -3025,6 +3030,9 @@ const game_driver * const drivers[] =
 	DRIVER( merlinmm ) /* 1986 "Zilec - Zenitone" "Merlins Money Maze" */
 	DRIVER( miaj ) /* 1989 "Konami" "M.I.A. - Missing in Action (Japan)" */
 	DRIVER( mimonscr ) /* 198? "bootleg" "Mighty Monkey (bootleg on Scramble hardware)" */
+	DRIVER( moo ) /* 1992 "Konami" "Wild West C.O.W.-Boys of Moo Mesa (ver EA)" */
+	DRIVER( mooaa ) /* 1992 "Konami" "Wild West C.O.W.-Boys of Moo Mesa (ver AA)" */
+	DRIVER( mooua ) /* 1992 "Konami" "Wild West C.O.W.-Boys of Moo Mesa (ver UA)" */
 	DRIVER( mrgoemon ) /* 1986 "Konami" "Mr. Goemon (Japan)" */
 	DRIVER( nemesis ) /* 1985 "Konami" "Nemesis" */
 	DRIVER( nemesuk ) /* 1985 "Konami" "Nemesis (World?)" */
@@ -3033,12 +3041,32 @@ const game_driver * const drivers[] =
 	DRIVER( parodius ) /* 1990 "Konami" "Parodius DA! (World)" */
 	DRIVER( pingpong ) /* 1985 "Konami" "Ping Pong" */
 	DRIVER( rf2 ) /* 1985 "Konami" "Konami RF2 - Red Fighter" */
+	DRIVER( rollerg ) /* 1991 "Konami" "Rollergames (US)" */
+	DRIVER( rollergj ) /* 1991 "Konami" "Rollergames (Japan)" */
+	DRIVER( rungun ) /* 1993 "Konami" "Run and Gun (ver EAA 1993 10.8)" */
+	DRIVER( runguna ) /* 1993 "Konami" "Run and Gun (ver EAA 1993 10.4)" */
+	DRIVER( rungunu ) /* 1993 "Konami" "Run and Gun (ver UAB 1993 10.12)" */
+	DRIVER( rungunua ) /* 1993 "Konami" "Run and Gun (ver UBA 1993 10.8)" */
 	DRIVER( rushatck ) /* 1985 "Konami" "Rush'n Attack (US)" */
 	DRIVER( salamand ) /* 1986 "Konami" "Salamander (version D)" */
 	DRIVER( salamanj ) /* 1986 "Konami" "Salamander (version J)" */
 	DRIVER( scobra ) /* 1981 "Konami" "Super Cobra" */
+	DRIVER( scontra ) /* 1988 "Konami" "Super Contra" */
+	DRIVER( scontraj ) /* 1988 "Konami" "Super Contra (Japan)" */
 	DRIVER( scramble ) /* 1981 "Konami" "Scramble" */
+	DRIVER( slmdunkj ) /* 1993 "Konami" "Slam Dunk (ver JAA 1993 10.8)" */
+	DRIVER( suprslam ) /*    */
+	DRIVER( thnderxa ) /* 1988 "Konami" "Thunder Cross (Set 2)" */
+	DRIVER( thnderxb ) /* 1988 "Konami" "Thunder Cross (Set 3)" */
+	DRIVER( thnderxj ) /* 1988 "Konami" "Thunder Cross (Japan)" */
+	DRIVER( thunderx ) /* 1988 "Konami" "Thunder Cross" */
 	DRIVER( twinbee ) /* 1985 "Konami" "TwinBee" */
+	DRIVER( vendet2p ) /* 1991 "Konami" "Vendetta (World 2 Players ver. W)" */
+	DRIVER( vendetao ) /* 1991 "Konami" "Vendetta (World 4 Players ver. R)" */
+	DRIVER( vendetas ) /* 1991 "Konami" "Vendetta (Asia 2 Players ver. U)" */
+	DRIVER( vendetta ) /* 1991 "Konami" "Vendetta (World 4 Players ver. T)" */
+	DRIVER( vendettj ) /* 1991 "Konami" "Crime Fighters 2 (Japan 2 Players ver. P)" */
+	DRIVER( vendtaso ) /* 1991 "Konami" "Vendetta (Asia 2 Players ver. D)" */
 	DRIVER( vulcan ) /* 1988 "Konami" "Vulcan Venture" */
 #endif
 #ifdef LINK_MINIKONAMI3

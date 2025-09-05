@@ -1745,7 +1745,7 @@ GAME( 1996, skns,     0,    skns, skns, 0,        ROT0,  "Kaneko", "Super Kaneko
 
 GAME( 1996, galpani4, skns,    skns, cyvern,   galpani4, ROT0,  "Kaneko", "Gals Panic 4 (Japan)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
 GAME( 1997, galpanis, skns,    skns, galpanis, galpanis, ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
-GAME( 1998, cyvern,   skns,    skns, cyvern,   cyvern,   ROT90, "Kaneko", "Cyvern (Japan)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1998, cyvern,   skns,    skns, cyvern,   cyvern,   ROT90, "Kaneko", "Cyvern (Japan)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_ShootEmUp,EGF_VER)
 GAME( 1999, galpans2, skns,    skns, galpanis, galpans2, ROT0,  "Kaneko", "Gals Panic S2 (Japan)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
 GAME( 1999, panicstr, skns,    skns, galpanis, panicstr, ROT0,  "Kaneko", "Panic Street (Japan)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Puzzle,0)
 GAME( 1999, senknow , skns,    skns, skns,     senknow,  ROT0,  "Kaneko / Kouyousha", "Sen-Know (Japan)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Puzzle,0)

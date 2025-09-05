@@ -7545,7 +7545,7 @@ GAME( 1989, ffightu,  ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", 
 GAME( 1989, ffightua, ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (US 900613)", 0 ,2,0,egg_BeatNUp,0)
 GAME( 1989, ffightj,  ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan)", 0 ,2,0,egg_BeatNUp,0)
 GAME( 1989, ffightj1, ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900305)", 0 ,2,0,egg_BeatNUp,0)
-GAME( 1990, 1941,     0,        cps1,     1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (World)", 0 ,0,0,egg_ShootEmUp,0)
+GAME( 1990, 1941,     0,        cps1,     1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (World)", 0 ,0,0,egg_ShootEmUp,EGF_VER)
 GAME( 1990, 1941j,    1941,     cps1,     1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (Japan)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1990, mercs,    0,        cps1,     mercs,    cps1,     ROT270, "Capcom", "Mercs (World 900302)" , 0,3,0,egg_ShootEmUp,0)						// "ETC"
 GAME( 1990, mercsu,   mercs,    cps1,     mercs,    cps1,     ROT270, "Capcom", "Mercs (US 900302)", 0 ,3,0,egg_ShootEmUp,0)

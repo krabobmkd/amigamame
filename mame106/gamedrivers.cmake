@@ -1212,7 +1212,10 @@ if(OPT_MINIKONAMI2)
 		drivers/gradius3.c vidhrdw/gradius3.c drivers/nemesis.c vidhrdw/nemesis.c 
 		drivers/twin16.c vidhrdw/twin16.c drivers/parodius.c vidhrdw/parodius.c 
 		drivers/scobra.c drivers/scramble.c machine/scramble.c sndhrdw/scramble.c 
-	)
+		drivers/moo.c vidhrdw/moo.c drivers/thunderx.c vidhrdw/thunderx.c 
+		drivers/suprslam.c vidhrdw/suprslam.c drivers/rungun.c vidhrdw/rungun.c 
+		drivers/plygonet.c drivers/rollerg.c vidhrdw/rollerg.c drivers/vendetta.c 
+		vidhrdw/vendetta.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
 	set(MSND_K005289 ON)

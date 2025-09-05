@@ -3702,5 +3702,5 @@ GAME( 1991, 64streej, 64street, system_C,          64street, 64street, ROT0,   "
 GAME( 1992, soldamj,  0,        system_A,          soldamj,  soldam,   ROT0,   "Jaleco", "Soldam (Japan)", 0 ,2,0,egg_Puzzle,0)
 GAME( 1992, bigstrik, 0,        system_C,          bigstrik, bigstrik, ROT0,   "Jaleco", "Big Striker", 0 ,2,0,egg_sport_Soccer,0)
 GAME( 1993, chimerab, 0,        system_C,          chimerab, chimerab, ROT0,   "Jaleco", "Chimera Beast (prototype)", 0 ,2,0,egg_ShootEmUp,0)
-GAME( 1993, cybattlr, 0,        system_C,          cybattlr, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1993, cybattlr, 0,        system_C,          cybattlr, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 1993, peekaboo, 0,        system_D,          peekaboo, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo!", 0 ,0,2,egg_Mature,0)

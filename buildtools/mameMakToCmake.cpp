@@ -9,8 +9,8 @@
 #include <filesystem>
 using namespace std;
 
-string sourcebase("../../../mame106/");
-//string sourcebase("../mame106/");
+//string sourcebase("../../../mame106/");
+string sourcebase("../mame106/");
 
 class TGameDriver {
     public:
@@ -938,12 +938,35 @@ int patchMiniMachines(
             "drivers/parodius.c","vidhrdw/parodius.c",
             // r1.6 added: (scramble & super cobra)
             "drivers/scobra.c","drivers/scramble.c",
-            "machine/scramble.c","sndhrdw/scramble.c"
-
+            "machine/scramble.c","sndhrdw/scramble.c",
+            // r1.7
+            "drivers/moo.c","vidhrdw/moo.c",
+            "drivers/thunderx.c","vidhrdw/thunderx.c",
+            "drivers/suprslam.c","vidhrdw/suprslam.c",
+            "drivers/rungun.c","vidhrdw/rungun.c",
+            "drivers/plygonet.c",
+            "drivers/rollerg.c","vidhrdw/rollerg.c",
+            "drivers/vendetta.c","vidhrdw/vendetta.c"
         };
+        copyDrivers(m,src,{"moo","mooua","mooaa","bucky","buckyua" });
+        copyDrivers(m,src,{"scontra","scontraj","thunderx","thnderxa","thnderxb","thnderxj" });
+        copyDrivers(m,src,{"suprslam" });
+
+//        copyDrivers(m,src,{"","","","","" });
+
+        copyDrivers(m,src,{"rungun","runguna","rungunu","rungunua","slmdunkj" });
+        copyDrivers(m,src,{"plygonet","rollerg","rollergj" });
+
+        copyDrivers(m,src,{"vendetta","vendetao","vendet2p","vendetas","vendtaso","vendettj" });
+        copyDrivers(m,src,{"esckids","esckidsj" });
+
+
         m._gamedrivers["scobra"] = src._gamedrivers["scobra"];
         m._gamedrivers["scramble"] = src._gamedrivers["scramble"];
         m._gamedrivers["mimonscr"] = src._gamedrivers["mimonscr"];
+
+        m._gamedrivers["mimonscr"] = src._gamedrivers["mimonscr"];
+
 
 //        m._gamedrivers["parodisj"] = src._gamedrivers["parodisj"];
 

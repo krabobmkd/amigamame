@@ -8141,7 +8141,7 @@ GAMEB( 1990, tpgolf,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK",
 GAMEB( 1990, mahretsu, neogeo,   neogeo, neogeo, mjneogeo,mjneogeo, ROT0, "SNK", "Mahjong Kyoretsuden", 0 ,0,1,egg_Mature,0)
 GAMEB( 1990, ridhero,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Riding Hero (set 1)", 0 ,0,1,egg_Motorcycle,0)
 GAMEB( 1990, ridheroh, ridhero,  neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Riding Hero (set 2)", 0 ,0,1,egg_Motorcycle,0)
-GAMEB( 1991, alpham2,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Alpha Mission II / ASO II - Last Guardian", 0 ,2,0,egg_ShootEmUp,0)
+GAMEB( 1991, alpham2,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Alpha Mission II / ASO II - Last Guardian", 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAMEB( 1990, cyberlip, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Cyber-Lip", 0 ,2,0,egg_Platform,0)
 GAMEB( 1990, superspy, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "The Super Spy", 0 ,0,1,egg_Miscellaneous,0)
 GAMEB( 1992, mutnat,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Mutation Nation", 0 ,2,0,egg_BeatNUp,0)
@@ -8152,7 +8152,7 @@ GAMEB( 1991, sengokh,  sengoku,  neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK",
 GAMEB( 1991, burningf, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Burning Fight (set 1)", 0 ,2,0,egg_BeatNUp,0)
 GAMEB( 1991, burningh, burningf, neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Burning Fight (set 2)", 0 ,2,0,egg_BeatNUp,0)
 GAMEB( 1990, lbowling, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "League Bowling", 0 ,2,4,egg_sport_Bowling,0)
-GAMEB( 1991, gpilots,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Ghost Pilots", 0 ,2,0,egg_ShootEmUp,0)
+GAMEB( 1991, gpilots,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Ghost Pilots", 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAMEB( 1990, joyjoy,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Puzzled / Joy Joy Kid", 0 ,2,0,egg_Puzzle,0)
 GAMEB( 1991, quizdais, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Quiz Daisousa Sen - The Last Count Down", 0 ,2,0,egg_Quizz,0)
 GAMEB( 1992, lresort,  neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Last Resort", 0 ,2,0,egg_ShootEmUp,0)
@@ -8386,8 +8386,8 @@ GAMEB( 1994, fightfva, fightfev, neogeo, neogeo, neogeo,  neogeo,   ROT0, "Vicco
 
 /* Video System Co. */
 GAMEB( 1994, pspikes2, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Video System Co.", "Power Spikes II", 0 ,2,0,egg_sport_Volleyball,0)
-GAMEB( 1994, sonicwi2, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Video System Co.", "Aero Fighters 2 / Sonic Wings 2", 0 ,2,0,egg_ShootEmUp,0)
-GAMEB( 1995, sonicwi3, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Video System Co.", "Aero Fighters 3 / Sonic Wings 3", 0 ,2,0,egg_ShootEmUp,0)
+GAMEB( 1994, sonicwi2, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Video System Co.", "Aero Fighters 2 / Sonic Wings 2", 0 ,2,0,egg_ShootEmUp,EGF_VER)
+GAMEB( 1995, sonicwi3, neogeo,   neogeo, neogeo_full, neogeo,  neogeo,   ROT0, "Video System Co.", "Aero Fighters 3 / Sonic Wings 3", 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAMEB( 1997, popbounc, neogeo,   neogeo, neogeo_full, popbounc,popbounc, ROT0, "Video System Co.", "Pop 'n Bounce / Gapporin", 0 ,2,0,egg_BallNPaddles,0)
 
 /* Visco */

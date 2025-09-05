@@ -7782,11 +7782,11 @@ GAME( 1995, sfzh,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fi
 GAME( 1995, sfzb,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Brazil 951109)", GAME_NOT_WORKING ,2,0,egg_Fighter,0)
 GAME( 1995, sfzbr1,   sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Brazil 950727)", GAME_NOT_WORKING ,2,0,egg_Fighter,0)
 GAME( 1995, rckmanj,  0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Rockman: The Power Battle (Japan 950922)", GAME_NOT_WORKING ,0,0,egg_Fighter,0)
-GAME( 1996, 19xx,     0,       cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (US 951207)", 0 ,0,0,egg_ShootEmUp,0)
-GAME( 1996, 19xxa,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Asia 951207)", 0 ,0,0,egg_ShootEmUp,0)
-GAME( 1996, 19xxj,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951225)", GAME_NOT_WORKING ,0,0,egg_ShootEmUp,0)
-GAME( 1996, 19xxjr1,  19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951207)", 0 ,2,0,egg_ShootEmUp,0)
-GAME( 1996, 19xxh,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Hispanic 951218)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1996, 19xx,     0,       cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (US 951207)", 0 ,0,0,egg_ShootEmUp,EGF_VER)
+GAME( 1996, 19xxa,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Asia 951207)", 0 ,0,0,egg_ShootEmUp,EGF_VER)
+GAME( 1996, 19xxj,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951225)", GAME_NOT_WORKING ,0,0,egg_ShootEmUp,EGF_VER)
+GAME( 1996, 19xxjr1,  19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951207)", 0 ,2,0,egg_ShootEmUp,EGF_VER)
+GAME( 1996, 19xxh,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Hispanic 951218)", 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 1996, ddsom,    0,       cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960619)", 0 ,4,0,egg_BeatNUp,0)
 GAME( 1996, ddsomr1,  ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960223)", GAME_NOT_WORKING ,4,0,egg_BeatNUp,0)
 GAME( 1996, ddsomr2,  ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960209)", 0 ,4,0,egg_BeatNUp,0)
@@ -7873,9 +7873,9 @@ GAME( 1998, sfz3ar1,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fi
 
 /* Games released on CPS-2 hardware by Takumi */
 
-GAME( 1999, gigawing, 0,       cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (US 990222)", 0 ,2,0,egg_ShootEmUp,0)
-GAME( 1999, gwingj,   gigawing,cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (Japan 990223)", 0 ,2,0,egg_ShootEmUp,0)
-GAME( 1999, gwinga,   gigawing,cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (Asia 990222)", GAME_NOT_WORKING ,2,0,egg_ShootEmUp,0)
+GAME( 1999, gigawing, 0,       cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (US 990222)", 0 ,2,0,egg_ShootEmUp,EGF_VER)
+GAME( 1999, gwingj,   gigawing,cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (Japan 990223)", 0 ,2,0,egg_ShootEmUp,EGF_VER)
+GAME( 1999, gwinga,   gigawing,cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (Asia 990222)", GAME_NOT_WORKING ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 2000, mmatrix,  0,       cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (US 000412)", 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 2000, mmatrixj, mmatrix, cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (Japan 000412)", 0 ,2,0,egg_ShootEmUp,EGF_VER)
 

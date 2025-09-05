@@ -2525,7 +2525,7 @@ GAME( 1991, gunforce, 0,        raster,    gunforce, gunforce, ROT0,   "Irem",  
 GAME( 1991, gunforcj, gunforce, raster,    gunforce, gunforce, ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (Japan)", 0 ,2,0,egg_Platform,0)
 GAME( 1991, gunforcu, gunforce, raster,    gunforce, gunforce, ROT0,   "Irem America", "Gunforce - Battle Fire Engulfed Terror Island (US)", 0 ,2,0,egg_Platform,0)
 GAME( 1991, bmaster,  0,        nonraster, bmaster,  bmaster,  ROT0,   "Irem",         "Blade Master (World)", 0 ,2,0,egg_BeatNUp,0)
-GAME( 1991, lethalth, 0,        lethalth,  lethalth, lethalth, ROT270, "Irem",         "Lethal Thunder (World)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1991, lethalth, 0,        lethalth,  lethalth, lethalth, ROT270, "Irem",         "Lethal Thunder (World)", 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 1991, thndblst, lethalth, lethalth,  lethalth, lethalth, ROT270, "Irem",         "Thunder Blaster (Japan)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1992, uccops,   0,        raster,    uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (World)", 0 ,3,0,egg_BeatNUp,0)
 GAME( 1992, uccopsj,  uccops,   raster,    uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Japan)", 0 ,3,0,egg_BeatNUp,0)

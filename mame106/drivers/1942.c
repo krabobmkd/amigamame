@@ -425,6 +425,6 @@ DRIVER_INIT( 1942 )
 }
 
 
-GAME( 1984, 1942,  0,    1942, 1942, 1942, ROT270, "Capcom", "1942 (set 1)", 0 ,0,2,egg_ShootEmUp,0)
-GAME( 1984, 1942a, 1942, 1942, 1942, 1942, ROT270, "Capcom", "1942 (set 2)", 0 ,0,2,egg_ShootEmUp,0)
-GAME( 1984, 1942b, 1942, 1942, 1942, 1942, ROT270, "Capcom", "1942 (set 3)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1984, 1942,  0,    1942, 1942, 1942, ROT270, "Capcom", "1942 (set 1)", 0 ,0,2,egg_ShootEmUp,EGF_VER)
+GAME( 1984, 1942a, 1942, 1942, 1942, 1942, ROT270, "Capcom", "1942 (set 2)", 0 ,0,2,egg_ShootEmUp,EGF_VER)
+GAME( 1984, 1942b, 1942, 1942, 1942, 1942, ROT270, "Capcom", "1942 (set 3)", 0 ,0,2,egg_ShootEmUp,EGF_VER)
