@@ -818,6 +818,30 @@ int patchMiniMachines(
 
     }
     {
+        TMachine  &src=machinetargets["misc"];
+        string mname=string("cave");
+        TMachine  &m=machinetargets[mname];
+
+        copyDrivers(m,src,{
+            "pwrinst2","pwrins2j","mazinger","donpachi","donpachj",
+            "donpachk","metmqstr","nmaster","plegends","plegendj",
+            "sailormn","sailormo","agallet","hotdogst","ddonpach",
+            "ddonpchj","dfeveron","feversos","esprade","espradej",
+            "espradeo","uopoko","uopokoj","guwange","gaia",
+            "korokoro"
+            });
+        m._sources = {
+            "drivers/cave.c","vidhrdw/cave.c"
+        };
+        m._cpu_defs["M68000"]=1;
+        m._cpu_defs["Z80"]=1;
+        // YMZ280B OKIM6295 YM2203 YM2151
+        m._sound_defs["YMZ280B"]=1;
+        m._sound_defs["OKIM6295"]=1;
+        m._sound_defs["YM2203"]=1;
+        m._sound_defs["YM2151"]=1;
+    }
+    {
         TMachine  &src=machinetargets["konami"];
         string mname=string("minikonami");
         TMachine  &m=machinetargets[mname];
@@ -1301,6 +1325,8 @@ int createCmake(map<string,TMachine> machinetargets,
         if(upname == "SHARED") onShouldBeDefault=true;
         // this is optional
         if(upname == "SEGA" ) onShouldBeDefault = true;
+
+         if(upname == "CAVE") onShouldBeDefault=true;
          // pacmania,...
          if(upname == "MININAMCOS1") onShouldBeDefault=true;
          if(upname == "MINIATARI") onShouldBeDefault=true;

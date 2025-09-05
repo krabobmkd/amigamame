@@ -12,7 +12,7 @@
 
 
  added again more missing knm: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta (4p beatnup), escape kids, rollergames
-
+ support for game from companies that still supported 68000 at the end of the 90's: Cave Games (25 excellent games)
  Bugs:
   X betsmode fail with 384
   X suprslam Super slam sprite xflip bug ugly

@@ -6,6 +6,7 @@ option(OPT_ATARI "" OFF)
 option(OPT_ATLUS "" OFF)
 option(OPT_BFM "" OFF)
 option(OPT_CAPCOM "" ON)
+option(OPT_CAVE "" ON)
 option(OPT_CINEMAT "" ON)
 option(OPT_COMAD "" OFF)
 option(OPT_CVS "" OFF)
@@ -321,6 +322,22 @@ if(OPT_CAPCOM)
 	list(APPEND CPU_DEFS
 		HAS_M68000=1 HAS_M6809=1 HAS_PSXCPU=1 HAS_SH2=1 
 		HAS_Z80=1 	)
+endif()
+if(OPT_CAVE)
+	add_compile_definitions(LINK_CAVE=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/cave.c vidhrdw/cave.c 	)
+	set(MSND_OKIM6295 ON)
+	set(MSND_YM2151 ON)
+	set(MSND_YM2203 ON)
+	set(MSND_YMZ280B ON)
+	set(MCPU_M68000 ON)
+	set(MCPU_Z80 ON)
+	list(APPEND CPU_DEFS
+		HAS_OKIM6295=1 HAS_YM2151=1 HAS_YM2203=1 HAS_YMZ280B=1 
+	)
+	list(APPEND CPU_DEFS
+		HAS_M68000=1 HAS_Z80=1 	)
 endif()
 if(OPT_CINEMAT)
 	add_compile_definitions(LINK_CINEMAT=1)
@@ -1213,9 +1230,8 @@ if(OPT_MINIKONAMI2)
 		drivers/twin16.c vidhrdw/twin16.c drivers/parodius.c vidhrdw/parodius.c 
 		drivers/scobra.c drivers/scramble.c machine/scramble.c sndhrdw/scramble.c 
 		drivers/moo.c vidhrdw/moo.c drivers/thunderx.c vidhrdw/thunderx.c 
-		drivers/suprslam.c vidhrdw/suprslam.c drivers/rungun.c vidhrdw/rungun.c 
-		drivers/plygonet.c drivers/rollerg.c vidhrdw/rollerg.c drivers/vendetta.c 
-		vidhrdw/vendetta.c 	)
+		drivers/suprslam.c vidhrdw/suprslam.c drivers/rollerg.c vidhrdw/rollerg.c 
+		drivers/vendetta.c vidhrdw/vendetta.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
 	set(MSND_K005289 ON)
