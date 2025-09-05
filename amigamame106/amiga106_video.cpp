@@ -211,8 +211,8 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
         // get the 3 swapxy/flipx/flipy screen bits, and may apply rotation from config.
         params._flags = shiftRotationBits(Machine->gamedrv->flags,(int)screenModeConf._rotateMode);
 
-        if( screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose
-            && screenModeConf._modeid._modeId != INVALID_ID )
+        if( /*screenModeConf._ScreenModeChoice == MameConfig::ScreenModeChoice::Choose
+            &&*/ screenModeConf._modeid._modeId != INVALID_ID )
         {
             params._forcedModeID = (ULONG) screenModeConf._modeid._modeId;
             params._forcedDepth = (ULONG) screenModeConf._modeid._depth; // only used in AGA/OCS

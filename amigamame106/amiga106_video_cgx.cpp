@@ -44,8 +44,12 @@ template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 // do some search based on "correct height first" - it seems that is what correct drivers does.
 ULONG OwnCGXBestModeID(int w,int h,int depth)
 {
+    if(depth >8 && depth <16 ) depth=16;
+    else if(depth>16 && depth<24) depth=24;
+    else if(depth>24 && depth<32) depth=32;
+    if(depth>32) depth=32;
+
     std::vector<ULONG> bestHeightModesTooBig;
-    int errorTooBigH= 0xffff;
     std::vector<ULONG> bestHeightModesExact;
 
     // - -  primarily bother about height
@@ -54,27 +58,21 @@ ULONG OwnCGXBestModeID(int w,int h,int depth)
     {   // here we only want RTG screens.
         if(!IsCyberModeID(tid) || (tid&0x0000ffff) ==0 ) continue; // escape P96 bugged "ghost modes with RGB inverted."
 
-        ULONG depth = GetCyberIDAttr( CYBRIDATTR_DEPTH, tid );
-        if(depth != depth) continue;
+        ULONG mdepth = GetCyberIDAttr( CYBRIDATTR_DEPTH, tid );
+        if(mdepth != depth) continue;
 
         ULONG hm = GetCyberIDAttr( CYBRIDATTR_HEIGHT, tid );
         if(hm == h ) {
              bestHeightModesExact.push_back(tid);
         } else if(hm > h )
         {
-            LONG error = hm-h;
-            if(error<errorTooBigH)
-            {
-                bestHeightModesTooBig.clear();
-                errorTooBigH = error;
-            }
-            if(error == errorTooBigH) bestHeightModesTooBig.push_back(tid);
+            bestHeightModesTooBig.push_back(tid);
         }
     }
-    // - - - - then only bother for width...
-    if(bestHeightModesExact.size()==0) bestHeightModesExact = bestHeightModesTooBig;
 
-    if(bestHeightModesExact.size()==0) return INVALID_ID;
+    // - - - - then only bother for width...
+    if(bestHeightModesExact.size() == 0 ) bestHeightModesExact = bestHeightModesTooBig;
+
     int errorWidth= 0xffff;
     ULONG bestmode = INVALID_ID;
     // ultimately, if we asked a 32b mode, we would prefer RGBA32 to BGRA32.
@@ -89,16 +87,17 @@ ULONG OwnCGXBestModeID(int w,int h,int depth)
         ULONG pixfmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, tid );
 
         int e = wm-w;
+       // printf("wm:%d e:%d\n",wm,e);
         if(e<0) continue;
         if(depth ==16 && pixfmt != PIXFMT_RGB16) e++; //  would be faster than PIXFMT_RGB16PC
-        if(depth ==32 && pixfmt != PIXFMT_RGBA32) e++; // RGBA would be faster
+        if(depth ==32 && pixfmt != PIXFMT_RGBA32) e++; // RGBA would be faster than BGRA
         if(e<errorWidth)
         {
             bestmode = tid;
             errorWidth = e;
         }
     }
-    // RGBA32
+
     return bestmode;
 }
 

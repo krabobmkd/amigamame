@@ -1,5 +1,26 @@
+       copyDrivers(m,src,{"moo","mooua","mooaa","bucky","buckyua" });
+        copyDrivers(m,src,{"scontra","scontraj","thunderx","thnderxa","thnderxb","thnderxj" });
+        copyDrivers(m,src,{"suprslam" });
+
+//        copyDrivers(m,src,{"","","","","" });
+
+        copyDrivers(m,src,{"rungun","runguna","rungunu","rungunua","slmdunkj" });
+        copyDrivers(m,src,{"plygonet","rollerg","rollergj" });
+
+        copyDrivers(m,src,{"vendetta","vendetao","vendet2p","vendetas","vendtaso","vendettj" });
+        copyDrivers(m,src,{"esckids","esckidsj" });
 
 
+ added again more missing knm: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta, escape kids, rollergames
+
+ Bugs:
+  O betsmode fail with 384
+  O suprslam Super slam sprite xflip bug ugly
+  O rungun plante son boot grave.
+
+
+ -> add the 3 cave shooter
+  -> all psychio ?
 
  r1.7
   TODO
