@@ -576,7 +576,7 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         "Joystick(2bt)",
         "Analog Joystick(2bt)",
         "C64/Atari Paddles(2bt)",
-        "Lightgun Phaser (2bt)" // only available for one port.
+        "Lightgun (2bt)" // only available for one port.
     };
 
 
@@ -610,16 +610,32 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         serializer("Types Pr4", (int&)_parallel_type[1],strPrlTypes);
     }
 
-    serializer("Inverse Axis",_PropJoyAxisReverse,0,{"Joy2X","Joy2Y"});
-    serializer.listenChange("Types P2",[](ASerializer &serializer, void *p)
+    if(hasPots)
     {
-        if(!p) return;
-        int *pPort2Type = (int *)p;
+        // special options for potentiometers
+        serializer("Inverse Axis",_PropJoyAxisReverse,0,{"Joy2X","Joy2Y"});
+        serializer.listenChange("Types P2",[](ASerializer &serializer, void *p)
+        {
+            if(!p) return;
+            int *pPort2Type = (int *)p;
 
-        serializer.enable("Controls.Inverse Axis",
-                    (*pPort2Type == PORT_TYPE_PROPORTIONALJOYSTICK ||
-                     *pPort2Type == PORT_TYPE_C64PADDLE    )?1:0);
-    });
+            serializer.enable("Controls.Inverse Axis",
+                        (*pPort2Type == PORT_TYPE_PROPORTIONALJOYSTICK ||
+                         *pPort2Type == PORT_TYPE_C64PADDLE    )?1:0);
+        });
+
+        // special options for lightgun
+        serializer("Lightgun as",_LightgunPublish,{"Lightgun(no interpolations)","Generic Analog(fit more games)"});
+        serializer.listenChange("Types P2",[](ASerializer &serializer, void *p)
+        {
+            if(!p) return;
+            int *pPort2Type = (int *)p;
+
+            serializer.enable("Controls.Lightgun as",
+                        (*pPort2Type == PORT_TYPE_LIGHTGUN)?1:0);
+        });
+    }
+
 
 }
 #ifdef LINK_NEOGEO

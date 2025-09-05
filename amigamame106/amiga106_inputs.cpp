@@ -1187,30 +1187,27 @@ void RawKeyMap::init()
             int buttonmamecodeshift = ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT)*(iplayer-1);
             int ipshft = iport<<8; // still use Lowlevel keycodes for buttons
 
-              vector<os_code_info> kbi2={
-        {_LGunNames[iport][2],LIGHTGUN_CODESTART+(iport*8)+2,JOYCODE_1_BUTTON1+buttonmamecodeshift},
-        {_LGunNames[iport][3],LIGHTGUN_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift},
-        // use same internal slot as mouses XY.
-        /*
-        {_LGunNames[iport][0], LIGHTGUN_CODESTART+(iport*8)+0,GUNCODE_1_ANALOG_X+guncodeshift},
-        {_LGunNames[iport][1], LIGHTGUN_CODESTART+(iport*8)+1,GUNCODE_1_ANALOG_Y+guncodeshift},
-        */
-        {_LGunNames[iport][0], LIGHTGUN_CODESTART+(iport*8)+0,JOYCODE_1_ANALOG_X+analogmamecodeshift},
-        {_LGunNames[iport][1], LIGHTGUN_CODESTART+(iport*8)+1,JOYCODE_1_ANALOG_Y+analogmamecodeshift},
-
+                  vector<os_code_info> kbi2={
+            {_LGunNames[iport][2],LIGHTGUN_CODESTART+(iport*8)+2,JOYCODE_1_BUTTON1+buttonmamecodeshift},
+            {_LGunNames[iport][3],LIGHTGUN_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift}
+            };
+            _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
+            if(configControls._LightgunPublish == 0)
+            {   // publish Lightgun as Lightgun
+                vector<os_code_info> kbi3={
+                {_LGunNames[iport][0], LIGHTGUN_CODESTART+(iport*8)+0,GUNCODE_1_ANALOG_X+guncodeshift},
+                {_LGunNames[iport][1], LIGHTGUN_CODESTART+(iport*8)+1,GUNCODE_1_ANALOG_Y+guncodeshift},
                 };
-                _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
+                _kbi.insert(_kbi.end(),kbi3.begin(),kbi3.end());
 
-            /*
-	GUNCODE_1_ANALOG_X,
-	GUNCODE_1_ANALOG_Y,
-	GUNCODE_2_ANALOG_X,
-	GUNCODE_2_ANALOG_Y,
-	GUNCODE_3_ANALOG_X,
-	GUNCODE_3_ANALOG_Y,
-
-*/
-
+            } else
+            {   // publish Lightgun as Generic Analog
+                vector<os_code_info> kbi3={
+                {_LGunNames[iport][0], LIGHTGUN_CODESTART+(iport*8)+0,JOYCODE_1_ANALOG_X+analogmamecodeshift},
+                {_LGunNames[iport][1], LIGHTGUN_CODESTART+(iport*8)+1,JOYCODE_1_ANALOG_Y+analogmamecodeshift},
+                };
+                _kbi.insert(_kbi.end(),kbi3.begin(),kbi3.end());
+            }
         }
     } // loop by player
 
