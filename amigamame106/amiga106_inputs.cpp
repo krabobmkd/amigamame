@@ -1187,9 +1187,9 @@ void RawKeyMap::init()
             int buttonmamecodeshift = ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT)*(iplayer-1);
             int ipshft = iport<<8; // still use Lowlevel keycodes for buttons
 
-                  vector<os_code_info> kbi2={
-            {_LGunNames[iport][2],LIGHTGUN_CODESTART+(iport*8)+2,JOYCODE_1_BUTTON1+buttonmamecodeshift},
-            {_LGunNames[iport][3],LIGHTGUN_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift}
+            vector<os_code_info> kbi2={
+             {_LGunNames[iport][2],LIGHTGUN_CODESTART+(iport*8)+2,JOYCODE_1_BUTTON1+buttonmamecodeshift},
+             {_LGunNames[iport][3],LIGHTGUN_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift}
             };
             _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
             if(configControls._LightgunPublish == 0)
