@@ -1434,7 +1434,11 @@ INLINE uint OPER_AY_PI_16(M68KOPT_PARAMS) {
     return m68ki_read_16(ea);
 }
 INLINE uint OPER_AY_PI_32(M68KOPT_PARAMS)
-    {uint ea = EA_AY_PI_32(); return m68ki_read_32(ea);}
+    { //uint ea = EA_AY_PI_32();
+    uint ea = p68k->m_cpu.dar[8+(REG_IR & 7)];
+    p68k->m_cpu.dar[8+(REG_IR & 7)] = ea+4;
+    return m68ki_read_32(ea);
+    }
 INLINE uint OPER_AY_PD_8(M68KOPT_PARAMS)  {uint ea = EA_AY_PD_8();  return m68ki_read_8(ea); }
 INLINE uint OPER_AY_PD_16(M68KOPT_PARAMS) {uint ea = EA_AY_PD_16(); return m68ki_read_16(ea);}
 INLINE uint OPER_AY_PD_32(M68KOPT_PARAMS) {uint ea = EA_AY_PD_32(); return m68ki_read_32(ea);}

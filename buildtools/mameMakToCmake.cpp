@@ -1326,6 +1326,8 @@ int createCmake(map<string,TMachine> machinetargets,
         // this is optional
         if(upname == "SEGA" ) onShouldBeDefault = true;
 
+        if(upname == "PSIKYO" ) onShouldBeDefault = true;
+
          if(upname == "CAVE") onShouldBeDefault=true;
          // pacmania,...
          if(upname == "MININAMCOS1") onShouldBeDefault=true;

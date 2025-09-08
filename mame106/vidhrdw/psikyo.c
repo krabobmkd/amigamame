@@ -54,8 +54,10 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 **************************************************************************/
 
-#include "driver.h"
+//#pragma GCC optimize ("O0")
 
+#include "driver.h"
+#include "drawgfxn.h"
 /* Variables that driver has access to: */
 
 UINT32 *psikyo_vram_0, *psikyo_vram_1, *psikyo_vregs;
@@ -303,7 +305,10 @@ Note:   Not all sprites are displayed: in the top part of spriteram
 static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int trans_pen)
 {
 	/* tile layers 0 & 1 have priorities 1 & 2 */
-	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
+	static const int pri[] = { 0| (1L<<31),
+                             0xfc| (1L<<31),
+                              0xff| (1L<<31),
+                               0xff| (1L<<31) };
 
 	int offs;
 
@@ -327,27 +332,7 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 	offs -= 2/2;
 
 	//  fprintf(stderr, "\n");
-	
-	{ 
-	struct drawgfxParams dgp0={
-		bitmap, 	// dest
-		Machine->gfx[0], 	// gfx
-		0, 	// code
-		0, 	// color
-		0, 	// flipx
-		0, 	// flipy
-		0, 	// sx
-		0, 	// sy
-		cliprect, 	// clip
-		TRANSPARENCY_PEN, 	// transparency
-		trans_pen, 	// transparent_color
-		0, 	// scalex
-		0, 	// scaley
-		priority_bitmap, 	// pri_buffer
-		pri[(attr & 0xc0) >> 6] 	// priority_mask
-	  };
-	
-	{ 
+		
 	struct drawgfxParams dgpz0={
 		bitmap, 	// dest
 		Machine->gfx[0], 	// gfx
@@ -363,7 +348,7 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		pri[(attr & 0xc0) >> 6] 	// priority_mask
+		(1<<31) 	// priority_mask
 	  };
 	for ( ; offs >= 0/2 ; offs -= 2/2 )
 	{
@@ -384,6 +369,8 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 		y		=	source[ 0/4 ] >> 16;
 		x		=	source[ 0/4 ] & 0xffff;
 		attr	=	source[ 4/4 ] >> 16;
+
+
 		code	=	source[ 4/4 ] & 0x1ffff;
 
 		flipx	=	attr & 0x4000;
@@ -422,41 +409,65 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 		if (flipy)	{ ystart = ny-1;  yend = -1;   yinc = -1; }
 		else		{ ystart = 0;     yend = ny;   yinc = +1; }
 
+        dgpz0.flipx = flipx;
+        dgpz0.flipy = flipy;
+      dgpz0.scalex = zoomx << 11;
+        dgpz0.scaley = zoomy << 11;
+
 		for (dy = ystart; dy != yend; dy += yinc)
 		{
 			for (dx = xstart; dx != xend; dx += xinc)
 			{
 				int addr	=	(code*2) & (TILES_LEN-1);
 
+                dgpz0.code = TILES[addr+1] * 256 + TILES[addr];
+        		dgpz0.priority_mask = pri[(attr & 0xc0) >> 6] ;
+                dgpz0.color = attr >> 8;
 				if (zoomx == 32 && zoomy == 32)
 				{
-					dgp0.code = TILES[addr+1] * 256 + TILES[addr];
-					dgp0.color = attr >> 8;
-					dgp0.flipx = flipx;
-					dgp0.flipy = flipy;
-					dgp0.sx = x + dx * 16;
-					dgp0.sy = y + dy * 16;
-					drawgfx(&dgp0);
+					dgpz0.sx = x + dx * 16;
+					dgpz0.sy = y + dy * 16;
+					//drawgfx(&dgpz0);
+					//drawgfx_clut16_Src8_pal(&dgpz0);
+					drawgfx_clut16_Src8_prio_pal(&dgpz0); //ok
+
                 }
 				else
 				{
-					dgpz0.code = TILES[addr+1] * 256 + TILES[addr];
-					dgpz0.color = attr >> 8;
-					dgpz0.flipx = flipx;
-					dgpz0.flipy = flipy;
 					dgpz0.sx = x + (dx * zoomx) / 2;
 					dgpz0.sy = y + (dy * zoomy) / 2;
-					dgpz0.scalex = zoomx << 11;
-					dgpz0.scaley = zoomy << 11;
 					drawgfxzoom(&dgpz0);
                 }
 				code++;
+
+
+/*
+				int addr	=	(code*2) & (TILES_LEN-1);
+
+				if (zoomx == 32 && zoomy == 32)
+					pdrawgfx(bitmap,Machine->gfx[0],
+							TILES[addr+1] * 256 + TILES[addr],
+							attr >> 8,
+							flipx, flipy,
+							x + dx * 16, y + dy * 16,
+							cliprect,TRANSPARENCY_PEN,trans_pen,
+							pri[(attr & 0xc0) >> 6]);
+				else
+					pdrawgfxzoom(bitmap,Machine->gfx[0],
+								TILES[addr+1] * 256 + TILES[addr],
+								attr >> 8,
+								flipx, flipy,
+								x + (dx * zoomx) / 2, y + (dy * zoomy) / 2,
+								cliprect,TRANSPARENCY_PEN,trans_pen,
+								zoomx << 11,zoomy << 11,
+								pri[(attr & 0xc0) >> 6]);
+
+				code++;
+*/
+
 			}
 		}
 	}
-	} // end of patch paragraph
-
-	} // end of patch paragraph
 
 }
 

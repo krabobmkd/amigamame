@@ -193,7 +193,10 @@ void QProc::process()
     // "sci"
       //"sharrier"
 //      "arkanoid"
- "starwars"
+// "starwars"
+//"btlkroad"
+//"samuraia"
+"s1945"
 //"cchasm"
 //"startrek"
 //"tacscan"
@@ -639,5 +642,8 @@ int osd_is_bad_read_ptr(const void *ptr, size_t size)
 {
     return 0;
 }
+void osd_post_input_port_init_check()
+{
 
+}
 

@@ -406,6 +406,8 @@ void MameConfig::toDefault()
 }
 MameConfig::Display_PerScreenMode::Display_PerScreenMode() : ASerializable() {
 // printf("Display_PerScreenMode\n");
+    _modeid._modeId = INVALID_ID;
+    _modeid._depth = 8;
 }
 void MameConfig::Display_PerScreenMode::serialize(ASerializer &serializer)
 {

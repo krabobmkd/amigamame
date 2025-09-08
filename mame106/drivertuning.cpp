@@ -93,6 +93,14 @@ static map<string,sDriverTuning> _tunings={
     {"metamrph",{16*60,DEFMINCPUC,0}},
     {"mtlchamp",{16*60,DEFMINCPUC,0}},
 
+    // test psikyo1 68020
+    {"samuraia",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+    {"gunbird",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+    {"btlkroad",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+    {"s1945",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+    {"tengai",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+
+
 
 };
 

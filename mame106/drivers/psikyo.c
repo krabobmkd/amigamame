@@ -59,16 +59,18 @@ region as it trys to read beyond the allocated rom region
 This was pointed out by Bart Puype
 
 *****/
-
+//#pragma GCC optimize ("O0")
 #include "driver.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
-
+#include "palette.h"
 
 /* Variables defined in vidhrdw */
 
 extern UINT32 *psikyo_vram_0, *psikyo_vram_1, *psikyo_vregs;
 extern int psikyo_ka302c_banking;
+
+
 
 /* Functions defined in vidhrdw */
 
@@ -325,14 +327,44 @@ READ32_HANDLER( s1945_input_r )
 
 
 ***************************************************************************/
+// static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
+// {
+// 	paletteram16 = (UINT16 *)paletteram32;
+// 	if (ACCESSING_MSW32)
+// 		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2, data >> 16, mem_mask >> 16);
+// 	if (ACCESSING_LSW32)
+// 		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2+1, data, mem_mask);
+// }
 
+static inline rgb_t rgb15Torgb32(UINT16 rgb)
+{
+    rgb_t c;
+    UINT32 r =(rgb>>10)&0x01f;
+    c = ((r<<(3)) | (r>>2))<<16;
+    UINT32 g =(rgb>>5)&0x01f;
+    c |= ((g<<(3)) | (g>>2))<<8;
+    UINT32 b =rgb&0x01f;
+    c |= ((b<<(3)) | (b>>2));
+    return c;
+}
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
+    // doing move.w (or move.l) on 32bit bus...
 	paletteram16 = (UINT16 *)paletteram32;
+	offset*=2;
 	if (ACCESSING_MSW32)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2, data >> 16, mem_mask >> 16);
+	{
+    	UINT16 datab = data >> 16;
+ 		paletteram16[offset] = datab;
+        setpalettefast_neogeo(offset,rgb15Torgb32(datab));
+    }
 	if (ACCESSING_LSW32)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2+1, data, mem_mask);
+	{
+    	offset+=1;
+        UINT16 datab = (UINT16)data;
+        paletteram16[offset] = datab;
+        setpalettefast_neogeo(offset,rgb15Torgb32(datab));
+    }
 }
 
 static ADDRESS_MAP_START( psikyo_readmem, ADDRESS_SPACE_PROGRAM, 32 )
