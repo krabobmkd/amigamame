@@ -1,6 +1,7 @@
 #include "m68kcpu.h"
 #include "memory.h"
 #include "m68kkrbopt.h"
+#include <stdio.h>
 extern void m68040_fpu_op0(M68KOPT_PARAMS);
 extern void m68040_fpu_op1(M68KOPT_PARAMS);
 
@@ -8966,8 +8967,14 @@ void m68k_op_move_32_pi_ai(M68KOPT_PARAMS)
 
 void m68k_op_move_32_pi_pi(M68KOPT_PARAMS)
 {
+    uint eal = AY;
+
 	uint res = OPER_AY_PI_32(M68KOPT_PASSPARAMS);
 	uint ea = EA_AX_PI_32();
+ // if(eal == 0xfffe6318)
+ // {
+ // printf("pipiread:%08x\n",res);
+ // }
 
 	m68ki_write_32(ea, res);
 

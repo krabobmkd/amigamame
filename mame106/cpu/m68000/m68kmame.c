@@ -107,13 +107,13 @@ static const struct m68k_memory_interface interface_d16 =
 
 
 // - - - -override to trace calls
-//#define DOTRACEMEM 1
+// #define DOTRACEMEM 1
 #if DOTRACEMEM
 #include <stdio.h>
 #include <stdlib.h>
 FILE *traceFH = NULL;
 UINT32 nbt=0;
-int mintrace=(746265*32)+25;
+int mintrace=0; // (746265*32)+25;
 UINT32 nbtt=0;
 /*
 
@@ -146,7 +146,7 @@ void openTraceFH()
         }
      return;
     }
-    traceFH = fopen("memtrace.txt","wb");
+    traceFH = fopen("memtraceA.txt","wb");
 }
 
 UINT32 readlong_d16(offs_t address  REGM(d0));
@@ -298,12 +298,11 @@ struct m68k_memory_interface m68k_memory_tracer_d16 ={
 
 // }
 
-
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
 static UINT16 readword_d32(offs_t address REGM(d0))
 {
 	UINT16 result;
-
+    address &= 0x00ffffff;
 	if (!(address & 1))
 		return program_read_word_32be(address);
 	result = program_read_byte_32be(address) << 8;
@@ -313,6 +312,7 @@ static UINT16 readword_d32(offs_t address REGM(d0))
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
 static void writeword_d32(offs_t address REGM(d0), UINT16 data REGM(d1))
 {
+    address &= 0x00ffffff;
 	if (!(address & 1))
 	{
 		program_write_word_32be(address, data);
@@ -325,8 +325,8 @@ static void writeword_d32(offs_t address REGM(d0), UINT16 data REGM(d1))
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
 static UINT32 readlong_d32(offs_t address REGM(d0))
 {
+    address &= 0x00ffffff;
 	UINT32 result;
-
 	if (!(address & 3))
 		return program_read_dword_32be(address);
 	else if (!(address & 1))
@@ -342,6 +342,7 @@ static UINT32 readlong_d32(offs_t address REGM(d0))
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
 static void writelong_d32(offs_t address REGM(d0), UINT32 data REGM(d1))
 {
+    address &= 0x00ffffff;
 	if (!(address & 3))
 	{
 		program_write_dword_32be(address, data);
@@ -360,7 +361,7 @@ static void writelong_d32(offs_t address REGM(d0), UINT32 data REGM(d1))
 
 
 extern UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
-
+extern UINT32 last68kpc;
 /* interface for 32-bit data bus (68EC020, 68020) */
 static const struct m68k_memory_interface interface_d32 =
 {
@@ -375,6 +376,93 @@ static const struct m68k_memory_interface interface_d32 =
     memory_readmovem32_wr16,
     memory_writemovem32_wr32_reverseSAFE
 };
+
+#if DOTRACEMEM
+UINT8 m68kmemtrace32_read8(offs_t adr REGM(d0))
+{
+    UINT8 v = program_read_byte_32be(adr);
+    openTraceFH();
+
+    fprintf(traceFH,"PC:%08x ",last68kpc);
+    fprintf(traceFH,"R:%08x ______%02x",adr,(int)v);
+
+    return v;
+}
+
+UINT16 m68kmemtrace32_read16(offs_t adr REGM(d0))
+{
+    UINT16 v = readword_d32(adr);
+//    if(nbt == mintrace)
+//    {
+//        printf("?");
+//    }
+    openTraceFH();
+
+    fprintf(traceFH,"PC:%08x ",last68kpc);
+    fprintf(traceFH,"R:%08x ____%04x",adr,(int)v);
+
+    return v;
+}
+
+UINT32 m68kmemtrace32_read32(offs_t adr REGM(d0))
+{
+    UINT32 v = readlong_d32(adr);
+    openTraceFH();
+
+    fprintf(traceFH,"PC:%08x ",last68kpc);
+    fprintf(traceFH,"R:%08x %08x",adr,(int)v);
+
+    return v;
+}
+// - - -
+void m68kmemtrace32_write8(offs_t adr REGM(d0),UINT8 data REGM(d1))
+{
+    adr = adr & 0x00ffffff;
+    program_write_byte_32be(adr,data);
+    openTraceFH();
+
+    fprintf(traceFH,"PC:%08x ",last68kpc);
+    fprintf(traceFH,"W:%08x ______%02x",adr,(int)data);
+
+}
+
+void m68kmemtrace32_write16(offs_t adr REGM(d0),UINT16 data REGM(d1))
+{
+    adr = adr & 0x00ffffff;
+    writeword_d32(adr,data);
+    openTraceFH();
+
+    fprintf(traceFH,"PC:%08x ",last68kpc);
+    fprintf(traceFH,"W:%08x ____%04x",adr,(int)data);
+
+}
+
+void m68kmemtrace32_write32(offs_t adr REGM(d0),UINT32 data REGM(d1))
+{
+    adr = adr & 0x00ffffff;
+    writelong_d32(adr,data);
+    openTraceFH();
+
+    fprintf(traceFH,"PC:%08x ",last68kpc);
+    fprintf(traceFH,"W:%08x %08x",adr,(int)data);
+
+}
+
+
+static const struct m68k_memory_interface interface_tracer_d32 =
+{
+	WORD_XOR_BE(0),
+    m68kmemtrace32_read8,
+    m68kmemtrace32_read16,
+    m68kmemtrace32_read32,
+    m68kmemtrace32_write8,
+    m68kmemtrace32_write16,
+    m68kmemtrace32_write32,
+    NULL, // changepc
+    memory_readmovem32_wr16,
+    memory_writemovem32_wr32_reverseSAFE
+};
+#endif
 /*
 orig:
 {
@@ -736,11 +824,12 @@ static void m68020_init(int index, int clock, const void *config, int (*irqcallb
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68020);
 
-// #ifdef OPTIM68K_USEFAST32INTRF
-//     p68k->mem = interface_fast32;
-// #else
-    p68k->mem = interface_d32;
-//#endif
+#if DOTRACEMEM
+     p68k->mem =   interface_tracer_d32;
+#else
+     p68k->mem =   interface_d32;
+#endif
+
 
 	m68k_state_register(p68k,"m68020", index);
 	m68k_set_int_ack_callback(p68k,irqcallback);
@@ -804,7 +893,14 @@ static void m68ec020_init(int index, int clock, const void *config, int (*irqcal
     struct m68k_cpu_instance *p68k = m68k_getcpu(index);
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68EC020);
-	p68k->mem = interface_d32;
+
+
+#if DOTRACEMEM
+     p68k->mem =   interface_tracer_d32;
+#else
+     p68k->mem =   interface_d32;
+#endif
+
 	m68k_state_register(p68k,"m68ec020", index);
 	m68k_set_int_ack_callback(p68k,irqcallback);
 }

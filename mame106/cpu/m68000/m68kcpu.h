@@ -1199,19 +1199,21 @@ char* m68ki_disassemble_quick( struct m68k_cpu_instance *p68k COREREG,unsigned i
 INLINE uint m68ki_read_imm_16( struct m68k_cpu_instance *p68k COREREG)
 {
     #ifdef LSB_FIRST
+// 	return cpu_readop16((address) ^ m68k_memory_intf.opcode_xor);
 
-        uint v= program_read_word_16be(ADDRESS_68K(REG_PC));
-        REG_PC+=2;
-        return v;
+  //      uint v= program_read_word_16be((ADDRESS_68K(REG_PC) ^ p68k->mem.opcode_xor)& opcode_mask);
+       uint v =  p68k->mem.read16((REG_PC ^ p68k->mem.opcode_xor) & opcode_mask); //readlong_d32(REG_PC ^ p68k->mem.opcode_xor);
+
+
     #else
         // what m68k_read_immediate_16 actually does:
         //  this is "direct rom reading"
 	// opcode mask only needed for thunderforceac !
-        UINT16 v= (*(UINT16 *)&opcode_base[p68k->m_cpu.pc /*& opcode_mask*/]);
+        UINT16 v= (*(UINT16 *)&opcode_base[p68k->m_cpu.pc & opcode_mask]);
 
-        REG_PC+=2;
-        return (uint)v;
     #endif
+    REG_PC+=2;
+    return v;
 }
 
 UINT32 readlong_d16(offs_t address REGM(d0));
@@ -1219,18 +1221,20 @@ void writelong_d16(offs_t address REGM(d0), UINT32 data REGM(d1));
 
 INLINE uint m68ki_read_imm_32( struct m68k_cpu_instance *p68k COREREG)
 {
-
     #ifdef LSB_FIRST
-        uint v= readlong_d16(ADDRESS_68K(REG_PC));
+      //  uint v= p68k->mem.read32(REG_PC);
+       // p68k->mem.read32(REG_PC); // would be ok
+       uint v =  p68k->mem.read32((REG_PC ^ p68k->mem.opcode_xor) & opcode_mask); //readlong_d32(REG_PC ^ p68k->mem.opcode_xor);
+
+        // readlong_d16(ADDRESS_68K(REG_PC));
         REG_PC+=4;
         return v;
     #else
         //  this is "direct rom reading"
-        uint v= (*(uint *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
-        REG_PC+=4;
-        return v;
+        uint v= (*(uint *)&opcode_base[(REG_PC) & opcode_mask ]);
     #endif
-
+    REG_PC+=4;
+    return v;
 }
 
 

@@ -797,7 +797,11 @@ void m68k_set_cpu_type(struct m68k_cpu_instance *p68k COREREG, unsigned int cpu_
 			return;
 	}
 }
-
+#define TRAAACE 1
+#ifdef TRAAACE
+UINT32 last68kpc=0;
+UINT32 last68ki=0;
+#endif
 /* Execute some instructions until we use up num_cycles clock cycles */
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(int num_cycles)
@@ -819,6 +823,9 @@ int m68k_execute(int num_cycles)
 
         do
 		{
+#ifdef TRAAACE
+    last68kpc = 		REG_PC;
+#endif
     		REG_PPC = REG_PC;
 			uint16 ir = m68ki_read_imm_16(p68k);
 

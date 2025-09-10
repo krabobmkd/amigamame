@@ -453,6 +453,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
 nbframe++;
     // logo
+//    if(nbframe == 10) exit(0);
 //if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 
 // chasehq sprite prio bug:
