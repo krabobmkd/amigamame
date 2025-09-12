@@ -107,7 +107,7 @@ static const struct m68k_memory_interface interface_d16 =
 
 
 // - - - -override to trace calls
-// #define DOTRACEMEM 1
+ #define DOTRACEMEM 1
 #if DOTRACEMEM
 #include <stdio.h>
 #include <stdlib.h>
@@ -380,6 +380,7 @@ static const struct m68k_memory_interface interface_d32 =
 #if DOTRACEMEM
 UINT8 m68kmemtrace32_read8(offs_t adr REGM(d0))
 {
+    adr &= 0x00ffffff;
     UINT8 v = program_read_byte_32be(adr);
     openTraceFH();
 
@@ -391,6 +392,7 @@ UINT8 m68kmemtrace32_read8(offs_t adr REGM(d0))
 
 UINT16 m68kmemtrace32_read16(offs_t adr REGM(d0))
 {
+    adr &= 0x00ffffff;
     UINT16 v = readword_d32(adr);
 //    if(nbt == mintrace)
 //    {
@@ -406,6 +408,7 @@ UINT16 m68kmemtrace32_read16(offs_t adr REGM(d0))
 
 UINT32 m68kmemtrace32_read32(offs_t adr REGM(d0))
 {
+    adr &= 0x00ffffff;
     UINT32 v = readlong_d32(adr);
     openTraceFH();
 
