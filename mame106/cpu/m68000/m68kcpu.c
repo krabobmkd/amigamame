@@ -821,6 +821,7 @@ int m68k_execute(int num_cycles)
 		/* Return point if we had an address error */
 		m68ki_set_address_error_trap(); /* auto-disable (see m68kcpu.h) */
 
+FILE *fh = fopen("mtrace.txt","wb");
         do
 		{
 #ifdef TRAAACE
@@ -846,10 +847,12 @@ int m68k_execute(int num_cycles)
 
 //    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
 #endif
+ fprintf(fh,"pc:%08x ir:%04x\n",REG_PPC,ir);
 			m68ki_instruction_jump_table[ir](p68k,ir);
             m68k_ICount -= CYC_INSTRUCTION[ir];
 		} while(m68k_ICount > 0);
-
+ fclose(fh);
+ exit(0);
         /* original:
         do
 		{
@@ -986,9 +989,10 @@ void m68k_pulse_reset(void)
 	m68ki_jump(p68k,0);
 	REG_SP = m68ki_read_imm_32(p68k);
 	REG_PC = m68ki_read_imm_32(p68k);
+ printf("reset SP:%08x REG_PC:%08x\n",REG_SP,REG_PC);
 	REG_PC &= opcode_mask;
 	m68ki_jump(p68k,REG_PC);
-
+ printf("REG_PC:%08x\n",REG_PC);
 	CPU_RUN_MODE = RUN_MODE_NORMAL;
 }
 

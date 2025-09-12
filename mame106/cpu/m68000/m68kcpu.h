@@ -1202,8 +1202,9 @@ INLINE uint m68ki_read_imm_16( struct m68k_cpu_instance *p68k COREREG)
 // 	return cpu_readop16((address) ^ m68k_memory_intf.opcode_xor);
 
   //      uint v= program_read_word_16be((ADDRESS_68K(REG_PC) ^ p68k->mem.opcode_xor)& opcode_mask);
-       uint v =  p68k->mem.read16((REG_PC ^ p68k->mem.opcode_xor) & opcode_mask); //readlong_d32(REG_PC ^ p68k->mem.opcode_xor);
+   //    uint v =  p68k->mem.read16((REG_PC ^ p68k->mem.opcode_xor) & opcode_mask); //readlong_d32(REG_PC ^ p68k->mem.opcode_xor);
 
+        UINT16 v= (*(UINT16 *)&opcode_base[(p68k->m_cpu.pc ^ p68k->mem.opcode_xor) & opcode_mask]);
 
     #else
         // what m68k_read_immediate_16 actually does:
@@ -1224,17 +1225,47 @@ INLINE uint m68ki_read_imm_32( struct m68k_cpu_instance *p68k COREREG)
     #ifdef LSB_FIRST
       //  uint v= p68k->mem.read32(REG_PC);
        // p68k->mem.read32(REG_PC); // would be ok
-       uint v =  p68k->mem.read32((REG_PC ^ p68k->mem.opcode_xor) & opcode_mask); //readlong_d32(REG_PC ^ p68k->mem.opcode_xor);
+    //   uint v =  p68k->mem.read32((REG_PC ^ p68k->mem.opcode_xor) & opcode_mask); //readlong_d32(REG_PC ^ p68k->mem.opcode_xor);
+        // 32b 16 swap...
+        UINT16 *opbase16 = (UINT16 *)opcode_base;
+        uint adr = REG_PC  & opcode_mask;
+        REG_PC +=4;
+        adr>>=1;
+        if(p68k->mem.opcode_xor == 2)
+        {   // if xor==2 means _d32 interface where mame keeps memory by 32b block
+            // so we have to manage strange inversions...
+            UINT32 h,l;
+            if(adr & 1)
+            {   // unaligned
+                h = opbase16[adr-1];
+                l = opbase16[adr+2];
+                return (h<<16)|l;
+            } else
+            {
+                h = opbase16[adr+1];
+                l = opbase16[adr];
+            }
+            return (h<<16)|l;
+        } else
+        {
+            // else 16 bit bus ordering, big endian at 16b level
+            UINT32 h = opbase16[adr];
+            UINT32 l = opbase16[adr+1];
+            return (h<<16)|l;
+        }
 
-        // readlong_d16(ADDRESS_68K(REG_PC));
-        REG_PC+=4;
-        return v;
+        // uint v= (*(uint *)&opcode_base[(REG_PC ^ p68k->mem.opcode_xor) & opcode_mask ]);
+
+        // // readlong_d16(ADDRESS_68K(REG_PC));
+        // REG_PC+=4;
+        // return v;
     #else
         //  this is "direct rom reading"
         uint v= (*(uint *)&opcode_base[(REG_PC) & opcode_mask ]);
+        REG_PC+=4;
+        return v;
     #endif
-    REG_PC+=4;
-    return v;
+
 }
 
 
