@@ -1434,10 +1434,13 @@ INLINE uint m68ki_get_ea_ix( struct m68k_cpu_instance *p68k COREREG, uint An)
 
 	/* Postindex */
 	if(BIT_2(extension))                /* I/IS:  0 = preindex, 1 = postindex */
-		return m68ki_read_32(An + bd) + Xn + od;
-
+	{
+        uint a = m68ki_read_32(An + bd);
+		return (a + Xn + od);
+    }
 	/* Preindex */
-	return m68ki_read_32(An + bd + Xn) + od;
+	 uint a = m68ki_read_32(An + bd + Xn);
+	return a + od;
 }
 
 
