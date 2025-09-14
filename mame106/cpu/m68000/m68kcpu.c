@@ -827,15 +827,30 @@ int m68k_execute(int num_cycles)
 #ifdef TRAAACE
     last68kpc = 		REG_PC;
 #endif
+   static int ccount=0;
+  ccount++;
+  // if(ccount == 7540884)
+  // {
+  // static int g=0;
+  // g++;
+
+  // }
     		REG_PPC = REG_PC;
+    		int rpc = REG_PC;
 			uint16 ir = m68ki_read_imm_16(p68k);
 
- if(last68kpc == 0x0420)
+ if(last68kpc == 0x000060d4)
  {
   static int g=0;
   g++;
 
  }
+
+ // if(REG_PPC==0x0001801c) // start of loop
+ // {
+ //    uint16 v= p68k->mem.read16(REG_A[1]);
+ //  printf("read:%08x write:%08x d2:%d readval:%04x\n",REG_A[1],REG_D[3],REG_D[2],v);
+ //  }
 
 #ifdef STATCPUINSTR
 //          if( ir == 0x000008b8)
@@ -857,6 +872,30 @@ int m68k_execute(int num_cycles)
 // fprintf(fh,"pc:%08x ir:%04x\n",REG_PPC,ir);
 			m68ki_instruction_jump_table[ir](p68k,ir);
             m68k_ICount -= CYC_INSTRUCTION[ir];
+
+    if(rpc == 0x00017f5e) // set a2
+    {
+        printf("set a2:%08x   (a2):%08x\n",REG_A[2],p68k->mem.read32(REG_A[2]));
+    }
+    if(rpc == 0x00017f54) // add.q 4 a2
+    {
+        printf("+4a2:%08x   (a2):%08x\n",REG_A[2],p68k->mem.read32(REG_A[2]));
+    }
+    if(rpc == 0x00017f6c) // move.l  (A2), -(A7)
+    {
+        printf("pparam: a2:%08x (a2):%08x\n",REG_A[2],p68k->mem.read32(REG_A[2]));
+    }
+    if(rpc == 0x00017f92) //
+    {
+        printf("jump because (a2)=-1\n");
+    }
+
+    if(rpc == 0x00017ff6) // movea.l ($14,A7), A1  ; lecture ptr read , index
+    {
+        printf("func read:%08x write:%d\n",REG_A[1],REG_D[3]);
+    }
+
+
 		} while(m68k_ICount > 0);
 // fclose(fh);
 // exit(0);
@@ -876,6 +915,7 @@ int m68k_execute(int num_cycles)
 		/* ASG: update cycles */
 		USE_CYCLES(CPU_INT_CYCLES);
 		CPU_INT_CYCLES = 0;
+
 
 		/* return how many clocks we used */
 		return m68ki_initial_cycles - GET_CYCLES();

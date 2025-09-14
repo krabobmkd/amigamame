@@ -349,6 +349,8 @@ static inline rgb_t rgb15Torgb32(UINT16 rgb)
 }
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
+
+
     // doing move.w (or move.l) on 32bit bus...
 	paletteram16 = (UINT16 *)paletteram32;
 	offset*=2;

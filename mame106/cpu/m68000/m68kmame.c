@@ -22,7 +22,7 @@ void m68k_set_encrypted_opcode_range(int cpunum, offs_t start, offs_t end)
 	m68k_encrypted_opcode_start[cpunum] = start;
 	m68k_encrypted_opcode_end[cpunum] = end;
 }
-
+extern UINT32 last68kpc;
 /****************************************************************************
  * 8-bit data memory interface
  ****************************************************************************/
@@ -313,6 +313,13 @@ static UINT16 readword_d32(offs_t address REGM(d0))
 static void writeword_d32(offs_t address REGM(d0), UINT16 data REGM(d1))
 {
     address &= 0x00ffffff;
+
+    if(address>=(0x00fe6318-2) && address<=(0x00fe6318+6)) {
+     printf("w16_d32 pc:%08x adr:%08x v:%04x\n",last68kpc,address,data);
+        // static int gg=0;
+        // gg++;
+    }
+
 	if (!(address & 1))
 	{
 		program_write_word_32be(address, data);
@@ -343,6 +350,18 @@ static UINT32 readlong_d32(offs_t address REGM(d0))
 static void writelong_d32(offs_t address REGM(d0), UINT32 data REGM(d1))
 {
     address &= 0x00ffffff;
+
+    // if(address>=(0x00fe6318-2) && address<=(0x00fe6318+6)) {
+    //  printf("w32_d32 pc:%08x adr:%08x v:%08x\n",last68kpc,address,data);
+    //     // static int gg=0;
+    //     // gg++;
+    // }
+    if(address >= 0x00fe5964 && address <= (0x00fe5968+16) && data ==0x0001bb24)
+    {
+        printf("wr32:%08x v:%08x\n",address,data);
+
+    }
+
 	if (!(address & 3))
 	{
 		program_write_dword_32be(address, data);
@@ -361,7 +380,7 @@ static void writelong_d32(offs_t address REGM(d0), UINT32 data REGM(d1))
 
 
 extern UINT32 memory_writemovem32_wr32_reverseSAFE(UINT32 address REGM(d0), UINT32 bits REGM(d1), UINT32 *preg REGM(a0) );
-extern UINT32 last68kpc;
+
 /* interface for 32-bit data bus (68EC020, 68020) */
 static const struct m68k_memory_interface interface_d32 =
 {

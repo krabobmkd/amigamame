@@ -9183,6 +9183,14 @@ void m68k_op_move_32_pd_di(M68KOPT_PARAMS)
 
 void m68k_op_move_32_pd_ix(M68KOPT_PARAMS)
 {
+    uint a7 = REG_A[7] & 0x00ffffff;
+    uint d2 = REG_D[2];
+
+    uint ea0 = p68k->mem.read32(a7+0x28);
+    uint res0 = p68k->mem.read32(ea0);
+    uint res1 = p68k->mem.read32(ea0+4);
+    uint res2 = p68k->mem.read32(ea0+8);
+
 	uint res = OPER_AY_IX_32(M68KOPT_PASSPARAMS);
 	uint ea = EA_AX_PD_32();
 
