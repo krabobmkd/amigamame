@@ -351,7 +351,7 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
     // doing move.w (or move.l) on 32bit bus...
 	paletteram16 = (UINT16 *)paletteram32;
-	offset*=2;
+	offset<<=1; // *2
 	if (ACCESSING_MSW32)
 	{
     	UINT16 datab = data >> 16;

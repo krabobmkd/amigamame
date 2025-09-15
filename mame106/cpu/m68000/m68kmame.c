@@ -347,15 +347,19 @@ static void writelong_d32(offs_t address REGM(d0), UINT32 data REGM(d1))
 		program_write_dword_32be(address, data);
 		return;
 	}
-	else if (!(address & 1))
-	{
-		program_write_word_32be(address, data >> 16);
-		program_write_word_32be(address + 2, data);
-		return;
-	}
-	program_write_byte_32be(address, data >> 24);
-	program_write_word_32be(address + 1, data >> 8);
-	program_write_byte_32be(address + 3, data);
+//	else if (!(address & 1))
+//	{
+//		program_write_word_32be(address, data >> 16);
+//		program_write_word_32be(address + 2, data);
+//		return;
+//	}
+// krb sez: move.l on 1b doesnt happen IRL, would crash any bus arch on any 68k version:
+// remove one test.
+//	program_write_byte_32be(address, data >> 24);
+//	program_write_word_32be(address + 1, data >> 8);
+//	program_write_byte_32be(address + 3, data);
+    program_write_word_32be(address, data >> 16);
+    program_write_word_32be(address + 2, data);
 }
 
 
