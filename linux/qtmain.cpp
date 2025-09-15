@@ -196,7 +196,7 @@ void QProc::process()
 // "starwars"
 //"btlkroad"
 //"samuraia"
-"s1945"
+"tengai"
 //"cchasm"
 //"startrek"
 //"tacscan"

@@ -19,5 +19,4 @@ add_executable( mamemakToCmake mameMakToCmake.cpp )
 add_executable( md2ag md2ag.cpp )
 
 #add_executable( grabcontrols grabcontrols.cpp )
-
-add_executable( grabgenre grabgenre.cpp )
+# add_executable( grabgenre grabgenre.cpp )

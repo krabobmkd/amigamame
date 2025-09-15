@@ -9,8 +9,8 @@
 #include <filesystem>
 using namespace std;
 
-//string sourcebase("../../../mame106/");
-string sourcebase("../mame106/");
+string sourcebase("../../../mame106/");
+//string sourcebase("../mame106/");
 
 class TGameDriver {
     public:
@@ -217,7 +217,7 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
         {
             string line = rgetline(ifssrc);
             trim(line);
-            size_t isComment = line.find("//");            
+            size_t isComment = line.find("//");
             if(isComment == 0) continue; // quick escape
 
             // simply parse official mame macros to know machine dfinition
@@ -354,7 +354,7 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
                     if(soundh=="PSX") soundh="PSXSPU";
                     if(soundh=="GAELCO") soundh="GAELCO_GAE1";
                     //
-                    bool isInDefs = false;                 
+                    bool isInDefs = false;
                     for(const string &sounditem : sounds )
                     {
                         if(sounditem == soundh) {isInDefs = true; break;}
@@ -1327,12 +1327,12 @@ int createCmake(map<string,TMachine> machinetargets,
         if(upname == "SEGA" ) onShouldBeDefault = true;
 
         if(upname == "PSIKYO" ) onShouldBeDefault = true;
-
+        if(upname == "DOOYONG" ) onShouldBeDefault = true;
          if(upname == "CAVE") onShouldBeDefault=true;
          // pacmania,...
          if(upname == "MININAMCOS1") onShouldBeDefault=true;
          if(upname == "MINIATARI") onShouldBeDefault=true;
-if(upname == "NINTENDO") onShouldBeDefault=true;		 
+if(upname == "NINTENDO") onShouldBeDefault=true;
         // if(upname == "JUSTDKONG") onShouldBeDefault=true;
          if(upname == "JALECO") onShouldBeDefault=true;
          if(upname == "SUN") onShouldBeDefault=true;
@@ -1902,10 +1902,6 @@ void completeDefinitionsByHand(
     removeSegaModel23(machinetargets["sega"]);
 
 
-
-    machinetargets["neogeo"]._sound_defs["YM2610B"]=1;
-
-    machinetargets["capcom"]._sound_defs["YM2610B"]=1;
     machinetargets["capcom"]._cpu_defs["PSXCPU"]=1;
 
     // original makefile set that in general sources, link it has it is due:
@@ -1998,6 +1994,18 @@ void completeDefinitionsByHand(
         machinetargets[pkgname]._gamedrivers["tmnt"] = src._gamedrivers["tmnt"];
         machinetargets[pkgname]._gamedrivers["tmnt2"] = src._gamedrivers["tmnt2"];
     }*/
+
+    // some rules...
+    map<string,TMachine>::iterator mait = machinetargets.begin();
+    while(mait != machinetargets.end())
+    {
+        pair<const string,TMachine> &p = *mait++;
+        TMachine &m = p.second;
+        // "if got YM2610, must have YM2610B too or will not compile"
+        if(m._sound_defs.find("YM2610") != m._sound_defs.end())  m._sound_defs["YM2610B"]=1;
+    }
+
+
 }
 
 int recurseEverWork(std::string drv,
@@ -2089,7 +2097,7 @@ void removeUselessDrivers(
                 drv._useful = recurseEverWork(p.first,driverMap,reverseDependencies);
             }
             if(drv._useful) machine._useful = 1;
-        }                              
+        }
     }
     // - - - machine level
 
