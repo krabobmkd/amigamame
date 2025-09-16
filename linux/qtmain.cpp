@@ -157,9 +157,9 @@ options.samplerate = 22050;
 //    osd_fclose(options.record);
 }
 int nbframe=0;
-int w = 320;
-int h = 224;
-vector<uint8_t> bm(w * h * 3, 128);
+int w = 0;
+int h = 0;
+vector<uint8_t> bm;
 QProc *proc=nullptr;
 QThread *qthread = nullptr;
 struct _mame_display *_display=nullptr;
@@ -197,6 +197,7 @@ void QProc::process()
 //"btlkroad"
 //"samuraia"
 "tengai"
+//"bublbob2"
 //"cchasm"
 //"startrek"
 //"tacscan"
@@ -240,7 +241,7 @@ QWin::QWin() : QLabel()
     emit startproc();
     connect(&m_timer,&QTimer::timeout,this,&QWin::updateWin);
     m_timer.setSingleShot(false);
-    m_timer.start(1000/40);
+    m_timer.start(1000/60);
     show();
     setMouseTracking(true);
 
@@ -280,7 +281,7 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        int izoom = 1;
+        int izoom = 3;
     QPixmap qpx = QPixmap::fromImage(_image).scaled(QSize(w * izoom, h * izoom));
     _imageMutex.unlock();
 
@@ -415,24 +416,25 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
             }
         }
-    } 
-
-    for(int y=0;y<realHeight;y++)
+    } else
     {
-        uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
-        pline += x1;
-        for(int x=0;x<realWidth;x++)
+        for(int y=0;y<realHeight;y++)
         {
-            uint16_t c = *pline++;
-            uint32_t rgb=0;
-            if(c<display->game_palette_entries)
-            rgb = display->game_palette[c];
+            uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
+            pline += x1;
+            for(int x=0;x<realWidth;x++)
+            {
+                uint16_t c = *pline++;
+                uint32_t rgb=0;
+                if(c<display->game_palette_entries)
+                rgb = display->game_palette[c];
 
-            int i = (x+y*w)*3;
-            bm[i]= rgb>>16;
-            bm[i+1]= rgb>>8;
-            bm[i+2]= rgb;
+                int i = (x+y*w)*3;
+                bm[i]= rgb>>16;
+                bm[i+1]= rgb>>8;
+                bm[i+2]= rgb;
 
+            }
         }
     }
 

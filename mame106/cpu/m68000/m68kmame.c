@@ -394,7 +394,7 @@ orig:
 /* krb */
 static const struct m68k_memory_interface interface_xfast16 =
 { // force 32b bus to 68k, ...
-	WORD_XOR_BE(0), // 2 if compilation target is LE, 0 if BE. (xor useless)
+	0,  // it's 0 for all 16b BUS, (and for 32bit bus it's 2 on LE and 0 on BE)
      memory_readbyte_d16_be, //program_read_byte_16be, // memory_readbyte_d16_be,
 	 memory_readword_d16_be, // program_read_word_16be,
 	 memory_readlong_d16_be, // readlong_d16
