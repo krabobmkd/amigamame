@@ -1199,11 +1199,11 @@ char* m68ki_disassemble_quick( struct m68k_cpu_instance *p68k COREREG,unsigned i
 INLINE uint m68ki_read_imm_16( struct m68k_cpu_instance *p68k COREREG)
 {
     #ifdef LSB_FIRST
-        UINT16 v= (*(UINT16 *)&opcode_base[(p68k->m_cpu.pc ^ p68k->mem.opcode_xor) /*& opcode_mask*/]);
+        UINT16 v= (*(UINT16 *)&opcode_base[(p68k->m_cpu.pc ^ p68k->mem.opcode_xor) & opcode_mask]);
     #else
         // what m68k_read_immediate_16 actually does:
         // opcode mask only needed for thunderforceac !
-        UINT16 v= (*(UINT16 *)&opcode_base[p68k->m_cpu.pc /*& opcode_mask*/]);
+        UINT16 v= (*(UINT16 *)&opcode_base[p68k->m_cpu.pc & opcode_mask]);
 
     #endif
     REG_PC+=2;
@@ -1245,7 +1245,7 @@ INLINE uint m68ki_read_imm_32( struct m68k_cpu_instance *p68k COREREG)
 
     #else
         //  this is "direct rom reading"
-        uint v= (*(uint *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
+        uint v= (*(uint *)&opcode_base[(REG_PC) & opcode_mask]);
         REG_PC+=4;
         return v;
     #endif

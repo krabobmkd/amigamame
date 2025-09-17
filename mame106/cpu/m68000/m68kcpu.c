@@ -979,7 +979,10 @@ void m68k_pulse_reset(void)
 	m68ki_jump(p68k,0);
 	REG_SP = m68ki_read_imm_32(p68k);
 	REG_PC = m68ki_read_imm_32(p68k);
-	REG_PC &= opcode_mask;
+
+	// krb r18 must not be masked here, or upset the entry in memory_set_opbase
+	// (bubble bobble 2, most taito_f3)
+	//REG_PC &= opcode_mask;
 	m68ki_jump(p68k,REG_PC);
 
 	CPU_RUN_MODE = RUN_MODE_NORMAL;
