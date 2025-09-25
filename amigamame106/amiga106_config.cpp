@@ -835,7 +835,7 @@ void MameConfig::initDriverIndex()
 // list all drivers to output.
 void MameConfig::listFull()
 {
-    printf("Archive   Parent    Year Description\n");
+    printf("Archive   Parent    Year Genre Description\n");
 
     //     std::map<std::string,int> _m;
     unordered_map<std::string,int>::iterator cit =  _driverIndex._m.begin();

@@ -797,7 +797,7 @@ void m68k_set_cpu_type(struct m68k_cpu_instance *p68k COREREG, unsigned int cpu_
 			return;
 	}
 }
-
+//int last68kpc=0;
 /* Execute some instructions until we use up num_cycles clock cycles */
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(int num_cycles)
@@ -820,6 +820,7 @@ int m68k_execute(int num_cycles)
         do
 		{
     		REG_PPC = REG_PC;
+//   last68kpc = REG_PPC;
 			uint16 ir = m68ki_read_imm_16(p68k);
 
 #ifdef STATCPUINSTR

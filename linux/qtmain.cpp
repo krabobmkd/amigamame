@@ -198,6 +198,7 @@ void QProc::process()
 //"samuraia"
 //"tengai"
 "bublbob2"
+//"gekirido"
 //"cchasm"
 //"startrek"
 //"tacscan"
