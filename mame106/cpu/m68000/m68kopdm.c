@@ -7289,8 +7289,8 @@ void m68k_op_move_16_ai_d(M68KOPT_PARAMS)
 #ifdef OPTIM68K_USEDIRECT68KASM_REWRITEMOVES
     // note galaxy force 2 test negs after this.
 // %0 regir d2   %1 p68k a2
-// does move.w dx,(ax)
     asm volatile(
+// does move.w dx,(ax)
         "moveq #7,d0\n"
         "\tand.l %0,d0\n"
 //#ifndef OPTIM68K_USEDIRECT68KASM_MOVEWR_SQUEEZE_NZ

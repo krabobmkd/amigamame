@@ -1,14 +1,3 @@
-       copyDrivers(m,src,{"moo","mooua","mooaa","bucky","buckyua" });
-        copyDrivers(m,src,{"scontra","scontraj","thunderx","thnderxa","thnderxb","thnderxj" });
-        copyDrivers(m,src,{"suprslam" });
-
-//        copyDrivers(m,src,{"","","","","" });
-
-        copyDrivers(m,src,{"rungun","runguna","rungunu","rungunua","slmdunkj" });
-        copyDrivers(m,src,{"","rollerg","rollergj" });
-
-        copyDrivers(m,src,{"vendetta","vendetao","vendet2p","vendetas","vendtaso","vendettj" });
-        copyDrivers(m,src,{"esckids","esckidsj" });
 
 
  added again more missing knm: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta (4p beatnup), escape kids, rollergames
@@ -18,6 +7,8 @@
   X suprslam Super slam sprite xflip bug ugly
   X rungun plante son boot grave. polyginet too
   O test throttle IRL
+
+ O bestmode fail with arabian fight 420x240
 
  -> add the 3 cave shooter
   -> all psychio  LINK_PSIKYO ?

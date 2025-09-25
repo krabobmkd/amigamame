@@ -612,19 +612,8 @@ static void m68000_init(int index, int clock, const void *config, int (*irqcallb
 
 	m68k_set_cpu_type(p68k,M68K_CPU_TYPE_68000);
 
-//#ifdef OPTIM68K_USEFAST32INTRF
-//    p68k->mem = interface_fast16;
-//#else
-//    p68k->mem = interface_d16;
-//#endif
-//#if DOTRACEMEM
-//    p68k->mem =   m68k_memory_tracer_d16;
-//#else
     p68k->mem =   interface_xfast16;
     check_xfast16(&p68k->mem);
-//#endif
-
-
 
     m68k_state_register(p68k,"m68000", index);
 	m68k_set_int_ack_callback(p68k, irqcallback);

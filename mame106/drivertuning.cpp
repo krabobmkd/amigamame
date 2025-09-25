@@ -100,6 +100,8 @@ static map<string,sDriverTuning> _tunings={
     {"s1945",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
     {"tengai",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 
+    // cave
+    {"mazinger",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 
 
 };
