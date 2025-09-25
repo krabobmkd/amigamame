@@ -300,7 +300,7 @@ struct m68k_memory_interface m68k_memory_tracer_d16 ={
 
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT16 readword_d32(offs_t address)
+static UINT16 readword_d32(offs_t address REGM(d0))
 {
 	UINT16 result;
 
@@ -311,7 +311,7 @@ static UINT16 readword_d32(offs_t address)
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writeword_d32(offs_t address, UINT16 data)
+static void writeword_d32(offs_t address REGM(d0), UINT16 data REGM(d1))
 {
 	if (!(address & 1))
 	{
@@ -323,7 +323,7 @@ static void writeword_d32(offs_t address, UINT16 data)
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT32 readlong_d32(offs_t address)
+static UINT32 readlong_d32(offs_t address REGM(d0))
 {
 	UINT32 result;
 
@@ -340,7 +340,7 @@ static UINT32 readlong_d32(offs_t address)
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writelong_d32(offs_t address, UINT32 data)
+static void writelong_d32(offs_t address REGM(d0), UINT32 data REGM(d1))
 {
 	if (!(address & 3))
 	{
