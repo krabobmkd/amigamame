@@ -7,6 +7,7 @@
 
 struct LPInteruptData {
     ULONG vposr,vposr2;
+    UWORD joy0dat,joy1dat;
 };
 
 
@@ -23,8 +24,13 @@ struct sLightGunsPrivate
 
 static int lightpeninterupt( register struct LPInteruptData *plpid __asm("a1") )
 {
-    plpid->vposr = *((ULONG *)(0x00DFF004));
+    // "read it twice"
     plpid->vposr2 = *((ULONG *)(0x00DFF004));
+    plpid->vposr = *((ULONG *)(0x00DFF004));
+
+//JOY0DAT/JOY1DAT
+    plpid->joy1dat = *((UWORD *)(0x00DFF00C));
+
     // custom.vposr;
     return 0; // should set z flag
 }
@@ -92,6 +98,8 @@ void LightGun_update(struct sLightGuns *plgp)
     plgp->_x = vposr & 0x0ff;
     plgp->_y = (vposr>>8) & 0x01ff; // would vary with resolution (200 ntsc 256 pal)
     plgp->_longFrame =  vposr>>30;
+    plgp->_joy0dat = plg->_pintdata->joy0dat;
+    plgp->_joy1dat = plg->_pintdata->joy1dat;
     //-> calibrate y.
     if(plgp->_y > plg->_maxy) plg->_maxy = plgp->_y;
     if(plgp->_y < plg->_miny) plg->_miny = plgp->_y;

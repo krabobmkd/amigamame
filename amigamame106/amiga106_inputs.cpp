@@ -1189,7 +1189,7 @@ void RawKeyMap::init()
 
             vector<os_code_info> kbi2={
              {_LGunNames[iport][2],LIGHTGUN_CODESTART+(iport*8)+2,JOYCODE_1_BUTTON1+buttonmamecodeshift},
-             {_LGunNames[iport][3],LIGHTGUN_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift}
+           //  {_LGunNames[iport][3],LIGHTGUN_CODESTART+(iport*8)+3,JOYCODE_1_BUTTON2+buttonmamecodeshift}
             };
             _kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
             if(configControls._LightgunPublish == 0)
@@ -1319,7 +1319,18 @@ INT32 osd_get_code_value(os_code oscode)
         if(oscode>=LIGHTGUN_CODESTART)
         {
             if(!g_LightGun) return 0;
-
+            oscode -= LIGHTGUN_CODESTART;
+           //  LIGHTGUN_CODESTART+(iport*8)+0
+           // int iport = oscode>>3;
+            oscode &= 7;
+            switch(oscode)
+            {
+                case 0: return (g_LightGun->_x)<<9;
+                case 1: return (g_LightGun->_y)<<9;
+                case 2: return (g_LightGun->_joy1dat & 0x100);
+               // case 3: return;
+            }
+            return 0;
         } else
         { //PROPJOY_CODESTART
 

@@ -18,6 +18,7 @@ struct sLightGuns
     UWORD _x,_y;  // only if _valid (offscreen).
     UBYTE _longFrame,_valid;
     UWORD _calibrated_y;
+    UWORD _joy0dat,_joy1dat;
 };
 struct sLightGuns *LightGun_create();
 void LightGun_update(struct sLightGuns *plg);
