@@ -1,7 +1,52 @@
 
+ r1.7
+
+  Here it is: Mame106Minimix release 1.7 "*Danmaku Edition*", loaded with novelties and bug corrections:
+
+  new features:
+   - There's a new column in the list that tells the game genre, amongst 44 genres (shootnup, platform, beatnup, sports, ...)
+   - Some games also have specific tags in that column (Childish,Violent, 3D, Girly,Funny,...)
+   - in the MUI interface, a menu allow you to filter the game list by genre or tags.
+   - Column sorting is way better on MUI5 and you can also sort the genre column. This is great if you're into a specific game genre.
+   - "Number of players" information in the list is more accurate and differentiates simultaneous and alternative number of players.
+   - during game if your machine is fast enough, you can "throttle", (that is to say: accelerate the emulation so it uses 100% of the CPU),
+    by maintaining key Shift+F10 pressed. On regular mame it's F10 key, but we use F10 for fullscreen/window switch.
+      throttle is sometimes usefull to "skip intros".
+   - reading options from icon tooltips is repaired, and now you can also create "Project icons per game" with .info file in project mode,
+   with no file associated, Mame106 as tool, and tooltip "ROM=myrom", so icon should directly boot the game.
+
+  corrections:
+   - machine taito_f3 and anything using 68EC020 has been 100% corrected ! This was a cause of bugs since the early times of minimix,
+   and was due to specific 68000 optimisations.. taito_f3 is some kind of "super neogeo" with alpha blending and pixel rendering capabilities,
+   and an "Ensoniq" sound chip (based on "Subtractive synthesis", and made by the same team as the C64 SID !)
+   taito_f3 supports 83 roms amongst: Bubble BobbleII & III, lots of Puzzle bobble versions, space invader 95, but yet it is too slow
+   (yet working, specific optimisations may come).
+   - "demon's world" enemies are back and game 100% working.
+   - the automatic screen mode choice (use best mode option) got bugged on recent rtg drivers, we have now our own version.
+
+games added in r1.7:
+  Since 68EC020 is ok, Games from editors still supporting 68000 and 68020 in the 1995/2000 period were added: Cave, Psikyo, Banpresto, Dooyong...
+   There was more than 75 rom images added, but uniquely high quality, well emulated and tested games, with excellent graphics and musics.
+
+   - Vertical shooter of that time, with lots of bullets on screens, known as the "*Danmaku*" genre, are a lot more present:
+   "Air Gallet"(agallet), "DonPachi"(donpachi), "DoDonPachi"(ddonpach),"ESP Ra.De."(esprade), "Gunbird"(gunbird), "Striker 1945"(s1945),
+   "Dangun Feveron"(dfeveron), "Fever SOS"(feversos), R-shark (rshark), ...
+   (note the "raizing" danmakus were already supported: "Armed police batrider"(batrider),"Battle Garrega"(battleg),...)
+   ...filtering the list with vertical shooters and then sorting by years would give you the full list anyway !
+
+ - Support for the excellent Banpresto franchise games (MazingerZ "Goldorak" game(mazinger), Sailor Moon.(sailormn) ).
+ - other excellent Psikyo and cave games: Tengai(tengai),Samurai Aces(samuraia),Battle K-road (btlkroad).
+ - The Dooyong games (1990/1996).
+
+ -test plygonet ->GAME_NOT_WORKING
+
+  et stun runner
+
+ 2742
+ 2815
 
  added again more missing knm: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta (4p beatnup), escape kids, rollergames
- support for game from companies that still supported 68000 at the end of the 90's: Cave Games (25 excellent games)
+ support for game from companies that still supported 68000 and 68020 in the late 1990's: Cave Games (25 excellent games)
  Bugs:
   X betsmode fail with 384
   X suprslam Super slam sprite xflip bug ugly

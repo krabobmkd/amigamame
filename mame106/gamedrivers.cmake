@@ -1139,6 +1139,7 @@ if(OPT_MINIATARI)
 	list(APPEND MAME_DRIVERS_SRC
 		drivers/atetris.c vidhrdw/atetris.c drivers/ccastles.c vidhrdw/ccastles.c 
 		drivers/centiped.c vidhrdw/centiped.c drivers/gauntlet.c vidhrdw/gauntlet.c 
+		machine/harddriv.c drivers/harddriv.c sndhrdw/harddriv.c vidhrdw/harddriv.c 
 		drivers/rampart.c vidhrdw/rampart.c vidhrdw/atarimo.c machine/slapstic.c 
 		drivers/klax.c vidhrdw/klax.c drivers/atarisy1.c drivers/atarisy2.c 
 		vidhrdw/atarisy1.c vidhrdw/atarisy2.c machine/asic65.c machine/atari_vg.c 

@@ -46,59 +46,78 @@ ULONG OwnCGXBestModeID(int w,int h,int depth)
 {
     if(depth >8 && depth <16 ) depth=16;
     else if(depth>16 && depth<24) depth=24;
-    else if(depth>24 && depth<32) depth=32;
-    if(depth>32) depth=32;
+    else if(depth>24) depth=32;
 
-    std::vector<ULONG> bestHeightModesTooBig;
-    std::vector<ULONG> bestHeightModesExact;
-
-    // - -  primarily bother about height
-    ULONG tid = NextDisplayInfo(INVALID_ID);
-    for(;tid != INVALID_ID; tid = NextDisplayInfo(tid))
-    {   // here we only want RTG screens.
-        if(!IsCyberModeID(tid) || (tid&0x0000ffff) ==0 ) continue; // escape P96 bugged "ghost modes with RGB inverted."
-
-        ULONG mdepth = GetCyberIDAttr( CYBRIDATTR_DEPTH, tid );
-        if(mdepth != depth) continue;
-
-        ULONG hm = GetCyberIDAttr( CYBRIDATTR_HEIGHT, tid );
-        if(hm == h ) {
-             bestHeightModesExact.push_back(tid);
-        } else if(hm > h )
-        {
-            bestHeightModesTooBig.push_back(tid);
-        }
-    }
-
-    // - - - - then only bother for width...
-    if(bestHeightModesExact.size() == 0 ) bestHeightModesExact = bestHeightModesTooBig;
-
-    int errorWidth= 0xffff;
-    ULONG bestmode = INVALID_ID;
-    // ultimately, if we asked a 32b mode, we would prefer RGBA32 to BGRA32.
-    /*
-    #define PIXFMT_ARGB32	(11UL)
-#define PIXFMT_BGRA32	(12UL)
-#define PIXFMT_RGBA32	(13UL)
-    */
-    for( ULONG tid : bestHeightModesExact)
+    ULONG minHeightExcluded=0;
+    while(1)
     {
-        ULONG wm = GetCyberIDAttr( CYBRIDATTR_WIDTH, tid );
-        ULONG pixfmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, tid );
+        // - -  primarily bother about height
+        ULONG tid = NextDisplayInfo(INVALID_ID);
+        ULONG bestHeightToTest=0;
+        ULONG bestHeightToTestErr=0xffffffff;
+        for(;tid != INVALID_ID; tid = NextDisplayInfo(tid))
+        {   // here we only want RTG screens.
+            if(!IsCyberModeID(tid) || (tid&0x0000ffff) ==0 ) continue; // escape new P96 bugged "ghost modes with RGB inverted."
 
-        int e = wm-w;
-       // printf("wm:%d e:%d\n",wm,e);
-        if(e<0) continue;
-        if(depth ==16 && pixfmt != PIXFMT_RGB16) e++; //  would be faster than PIXFMT_RGB16PC
-        if(depth ==32 && pixfmt != PIXFMT_RGBA32) e++; // RGBA would be faster than BGRA
-        if(e<errorWidth)
-        {
-            bestmode = tid;
-            errorWidth = e;
+            ULONG mdepth = GetCyberIDAttr( CYBRIDATTR_DEPTH, tid );
+            if(mdepth != depth) continue;
+
+            ULONG hm = GetCyberIDAttr( CYBRIDATTR_HEIGHT, tid );
+
+            if(hm>=h && hm >minHeightExcluded) {
+                ULONG err = hm-h;
+                if(err<bestHeightToTestErr) {
+                    bestHeightToTestErr = err;
+                    bestHeightToTest = hm;
+                }
+            }
         }
-    }
+        if(bestHeightToTest == 0)
+        {
+            // this is the return case when no mode found.
+            // ultimately, we could just search mode with less depth.
+            // there could be old gfx cards that manages just 16b or 8b modes...
+            if(depth == 32) return OwnCGXBestModeID(w,h,24);
+            if(depth == 24) return OwnCGXBestModeID(w,h,16);
+            if(depth == 16) return OwnCGXBestModeID(w,h,8);
+            return INVALID_ID;
+        }
+        // - - - - then only bother for width, amongst modes with selected height...
+        int errorWidth= 0xffff;
+        ULONG bestmode = INVALID_ID;
 
-    return bestmode;
+        for(tid = NextDisplayInfo(INVALID_ID);tid != INVALID_ID; tid = NextDisplayInfo(tid))
+        {
+            if(!IsCyberModeID(tid) || (tid&0x0000ffff) ==0 ) continue; // escape new P96 bugged "ghost modes with RGB inverted."
+
+            ULONG mdepth = GetCyberIDAttr( CYBRIDATTR_DEPTH, tid );
+            if(mdepth != depth) continue;
+
+            ULONG hm = GetCyberIDAttr( CYBRIDATTR_HEIGHT, tid );
+            if(hm != bestHeightToTest) continue; // what we selected in the first loop.
+
+            ULONG wm = GetCyberIDAttr( CYBRIDATTR_WIDTH, tid );
+            ULONG pixfmt = GetCyberIDAttr( CYBRIDATTR_PIXFMT, tid );
+
+            int e = wm-w;
+
+            if(e<0) continue;
+            // ultimately, if we asked a 32b mode, we would prefer RGBA32 to BGRA32.
+            if(depth ==16 && pixfmt != PIXFMT_RGB16) e++; //  would be faster than PIXFMT_RGB16PC
+            if(depth ==32 && pixfmt != PIXFMT_RGBA32) e++; // RGBA would be faster than BGRA
+            if(e<errorWidth)
+            {
+                bestmode = tid;
+                errorWidth = e;
+            }
+        }
+        if(bestmode != INVALID_ID) return bestmode;
+        // if height correct but no width big enough, had to try next bigger height...
+
+        minHeightExcluded = bestHeightToTest;
+    } // end while
+
+    return INVALID_ID;
 }
 
 bool Intuition_Screen_CGX::useForThisMode(ULONG modeID)

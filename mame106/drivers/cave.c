@@ -4354,7 +4354,7 @@ GAME( 1996, hotdogst, 0,        hotdogst, cave,     hotdogst, ROT90,  "Marble", 
 GAME( 1997, ddonpach, 0,        ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (International)"              , 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 1997, ddonpchj, ddonpach, ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (Japan)"                      , 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 1998, dfeveron, 0,        dfeveron, cave,     dfeveron, ROT270, "Cave (Nihon System license)",          "Dangun Feveron (Japan)"                  , 0 ,2,0,egg_ShootEmUp,0)
-GAME( 1998, feversos, dfeveron, dfeveron, cave,     feversos, ROT270, "Cave (Nihon System license)",          "Fever SOS (International)"               , 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1998, feversos, dfeveron, dfeveron, cave,     feversos, ROT270, "Cave (Nihon System license)",          "Fever SOS (International)"               , 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 1998, esprade,  0,        esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (International Ver 1998 4/22)", 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 1998, espradej, esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan Ver 1998 4/21)"        , 0 ,2,0,egg_ShootEmUp,EGF_VER)
 GAME( 1998, espradeo, esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan Ver 1998 4/14)"        , 0 ,2,0,egg_ShootEmUp,EGF_VER)
