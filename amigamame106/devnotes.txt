@@ -26,7 +26,7 @@
 
 games added in r1.7:
   Since 68EC020 is ok, Games from editors still supporting 68000 and 68020 in the 1995/2000 period were added: Cave, Psikyo, Banpresto, Dooyong...
-   There was more than 75 rom images added, but uniquely high quality, well emulated and tested games, with excellent graphics and musics.
+   There was more than 75 rom images added,of high quality with excellent graphics and musics,and well emulated and tested games.
 
    - Vertical shooter of that time, with lots of bullets on screens, known as the "*Danmaku*" genre, are a lot more present:
    "Air Gallet"(agallet), "DonPachi"(donpachi), "DoDonPachi"(ddonpach),"ESP Ra.De."(esprade), "Gunbird"(gunbird), "Striker 1945"(s1945),
@@ -37,6 +37,7 @@ games added in r1.7:
  - Support for the excellent Banpresto franchise games (MazingerZ "Goldorak" game(mazinger), Sailor Moon.(sailormn) ).
  - other excellent Psikyo and cave games: Tengai(tengai),Samurai Aces(samuraia),Battle K-road (btlkroad).
  - The Dooyong games (1990/1996).
+ - also more missing konamis: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta (4p beatnup), escape kids, rollergames.
 
  -test plygonet ->GAME_NOT_WORKING
 

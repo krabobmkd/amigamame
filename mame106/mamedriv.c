@@ -2896,9 +2896,6 @@ const game_driver * const drivers[] =
 	DRIVER( gravitar ) /* 1982 "Atari" "Gravitar (version 3)" */
 	DRIVER( gravitr2 ) /* 1982 "Atari" "Gravitar (version 2)" */
 	DRIVER( gravp ) /* 1982 "Atari" "Gravitar (prototype)" */
-	DRIVER( harddriv ) /* 1988 "Atari Games" "Hard Drivin' (cockpit */
-	DRIVER( harddrvc ) /* 1990 "Atari Games" "Hard Drivin' (compact */
-	DRIVER( hdrivair ) /* 1993 "Atari Games" "Hard Drivin's Airborne (prototype)" */
 	DRIVER( indytem2 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 2)" */
 	DRIVER( indytem3 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 3)" */
 	DRIVER( indytem4 ) /* 1985 "Atari Games" "Indiana Jones and the Temple of Doom (set 4)" */
@@ -2921,8 +2918,6 @@ const game_driver * const drivers[] =
 	DRIVER( paperbr1 ) /* 1984 "Atari Games" "Paperboy (rev 1)" */
 	DRIVER( paperbr2 ) /* 1984 "Atari Games" "Paperboy (rev 2)" */
 	DRIVER( peterpak ) /* 1984 "Atari Games" "Peter Pack-Rat" */
-	DRIVER( racedriv ) /* 1990 "Atari Games" "Race Drivin' (cockpit */
-	DRIVER( racedrvc ) /* 1990 "Atari Games" "Race Drivin' (compact */
 	DRIVER( rampart ) /* 1990 "Atari Games" "Rampart (Trackball)" */
 	DRIVER( rampartj ) /* 1990 "Atari Games" "Rampart (Japan */
 	DRIVER( ramprt2p ) /* 1990 "Atari Games" "Rampart (Joystick)" */
@@ -2942,10 +2937,6 @@ const game_driver * const drivers[] =
 	DRIVER( ssprintg ) /* 1986 "Atari Games" "Super Sprint (German */
 	DRIVER( starwar1 ) /* 1983 "Atari" "Star Wars (rev 1)" */
 	DRIVER( starwars ) /* 1983 "Atari" "Star Wars (rev 2)" */
-	DRIVER( steeltal ) /* 1991 "Atari Games" "Steel Talons (rev 2)" */
-	DRIVER( strtdriv ) /* 1993 "Atari Games" "Street Drivin' (prototype)" */
-	DRIVER( stunrun ) /* 1989 "Atari Games" "S.T.U.N. Runner (rev 6)" */
-	DRIVER( stunrunp ) /* 1989 "Atari Games" "S.T.U.N. Runner (upright prototype)" */
 	DRIVER( tempest ) /* 1980 "Atari" "Tempest (rev 3)" */
 	DRIVER( tempest1 ) /* 1980 "Atari" "Tempest (rev 1)" */
 	DRIVER( tempest2 ) /* 1980 "Atari" "Tempest (rev 2)" */
