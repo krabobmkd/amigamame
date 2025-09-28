@@ -286,6 +286,13 @@ public:
     };
     Controls &controls() { return _controls; }
 
+    // struct MissingROM : public ASerializable
+    // {
+    //     MissingROM();
+    //     void serialize(ASerializer &serializer) override;
+    //     std::string _missingRomAction1,_missingRomAction2;
+    // };
+
 //    #define MISCFLAG_USEREADJOYPORT 1
     #define MISCFLAG_MEGADRIVE6BT_ALTCONF 1
     struct Misc : public ASerializable
@@ -307,6 +314,8 @@ public:
     #define OPTIMFLAGS_DIRECTWGXWIN 1
     #define OPTIMFLAGS_USEP96CGXBESTMODE 2
         ULONG_FLAGS  _Optims = OPTIMFLAGS_DIRECTWGXWIN;
+
+       // MissingROM _missingROM;
 
         std::vector<std::string> _neogeoBiosList;
     };

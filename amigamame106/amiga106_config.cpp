@@ -643,6 +643,16 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
 #ifdef LINK_NEOGEO
  extern const bios_entry *system_bios_neogeo_first;
 #endif
+// MameConfig::MissingROM::MissingROM() : ASerializable()
+// {
+// }
+// void MameConfig::MissingROM::serialize(ASerializer &serializer)
+// {
+//     serializer("Action 1",_missingRomAction1,0);
+//     serializer("Action 2",_missingRomAction2,0);
+// }
+
+
 MameConfig::Misc::Misc() : ASerializable()
      , _userPath("PROGDIR:user")
 // this can be chanegd at init by args, not by load/save/todefault.
@@ -692,6 +702,8 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
         "Direct draw for RTG Windows",
         "Use native BestCModeID()"
       });
+
+    //serializer("Missing ROMs",(ASerializable &)_missingROM);
 
 }
 MameConfig::Help::Help() : ASerializable() {

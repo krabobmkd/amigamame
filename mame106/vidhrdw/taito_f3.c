@@ -3239,6 +3239,8 @@ static void f3_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( f3 )
 {
+
+//test return;
 	unsigned int sy_fix[5],sx_fix[5];
 	int tile;
 
