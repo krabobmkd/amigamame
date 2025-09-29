@@ -1915,6 +1915,9 @@ void completeDefinitionsByHand(
     machinetargets["taito"]._sound_defs["YM3526"]=1; // bubblbobbl
    machinetargets["taito"]._cpu_defs["M68705"]=1; // arkanoid need this controller
 
+// this is added by krb:
+machinetargets["taito"]._sources.push_back("vidhrdw/taito_f3k.cpp");
+
     //
     machinetargets["taito"]._sources.push_back("drivers/seta.c"); // needed by taito_x.c
     machinetargets["taito"]._sources.push_back("vidhrdw/seta.c");

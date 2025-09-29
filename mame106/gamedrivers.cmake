@@ -2088,7 +2088,7 @@ if(OPT_TAITO)
 		drivers/slapshot.c vidhrdw/slapshot.c drivers/ssrj.c vidhrdw/ssrj.c 
 		drivers/superchs.c vidhrdw/superchs.c drivers/superqix.c vidhrdw/superqix.c 
 		drivers/taito_b.c vidhrdw/taito_b.c drivers/taito_f2.c vidhrdw/taito_f2.c 
-		drivers/taito_f3.c vidhrdw/taito_f3.c sndhrdw/taito_f3.c drivers/taito_h.c 
+		drivers/taito_f3.c vidhrdw/taito_f3.c vidhrdw/taito_f3k.cpp sndhrdw/taito_f3.c drivers/taito_h.c
 		vidhrdw/taito_h.c drivers/taito_l.c vidhrdw/taito_l.c drivers/taito_x.c 
 		machine/cchip.c drivers/taito_z.c vidhrdw/taito_z.c drivers/taitosj.c 
 		machine/taitosj.c vidhrdw/taitosj.c drivers/tnzs.c machine/tnzs.c 

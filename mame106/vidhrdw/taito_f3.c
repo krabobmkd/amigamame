@@ -285,12 +285,12 @@ struct tempsprite
 	int zoomx,zoomy;
 	int pri;
 };
-static struct tempsprite *spritelist;
-static const struct tempsprite *sprite_end;
+struct tempsprite *tf3_spritelist;
+const struct tempsprite *tf3_sprite_end;
 
 static void get_sprite_info(const UINT32 *spriteram32_ptr);
 static int sprite_lag=1;
-static UINT8 sprite_pri_usage=0;
+UINT8 tf3_sprite_pri_usage=0;
 
 struct f3_playfield_line_inf
 {
@@ -331,7 +331,7 @@ static struct f3_playfield_line_inf *pf_line_inf;
 static struct f3_spritealpha_line_inf *sa_line_inf;
 
 
-static mame_bitmap *pri_alp_bitmap;
+mame_bitmap *tf3_pri_alp_bitmap;
 /*
 pri_alp_bitmap
 ---- ---1    sprite priority 0
@@ -357,7 +357,7 @@ static void init_alpha_blend_func(void);
 
 static int width_mask=0x1ff;
 static int twidth_mask=0x1f,twidth_mask_bit=5;
-static UINT8 *tile_opaque_sp;
+UINT8 *tf3_tile_opaque_sp;
 static UINT8 *tile_opaque_pf;
 
 
@@ -544,12 +544,12 @@ VIDEO_START( f3 )
 	const struct F3config *pCFG=&f3_config_table[0];
 	int tile;
 
-	spritelist=0;
+	tf3_spritelist=0;
 	spriteram32_buffered=0;
 	pivot_dirty=0;
 	pf_line_inf=0;
-	pri_alp_bitmap=0;
-	tile_opaque_sp=0;
+	tf3_pri_alp_bitmap=0;
+	tf3_tile_opaque_sp=0;
 	tile_opaque_pf=0;
 
 	/* Setup individual game */
@@ -595,18 +595,18 @@ VIDEO_START( f3 )
 	}
 
 	spriteram32_buffered = (UINT32 *)auto_malloc(0x10000);
-	spritelist = auto_malloc(0x400 * sizeof(*spritelist));
-	sprite_end = spritelist;
+	tf3_spritelist = auto_malloc(0x400 * sizeof(*tf3_spritelist));
+	tf3_sprite_end = tf3_spritelist;
 	vram_layer = tilemap_create(get_tile_info_vram,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,64);
 	pixel_layer = tilemap_create(get_tile_info_pixel,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,64,32);
 	pivot_dirty = (UINT8 *)auto_malloc(2048);
 	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
 	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));
-	pri_alp_bitmap = auto_bitmap_alloc_depth( Machine->drv->screen_width, Machine->drv->screen_height, -8 );
-	tile_opaque_sp = (UINT8 *)auto_malloc(Machine->gfx[2]->total_elements);
+	tf3_pri_alp_bitmap = auto_bitmap_alloc_depth( Machine->drv->screen_width, Machine->drv->screen_height, -8 );
+	tf3_tile_opaque_sp = (UINT8 *)auto_malloc(Machine->gfx[2]->total_elements);
 	tile_opaque_pf = (UINT8 *)auto_malloc(Machine->gfx[1]->total_elements);
 
-	if (!vram_layer || !pixel_layer || !pri_alp_bitmap)
+	if (!vram_layer || !pixel_layer || !tf3_pri_alp_bitmap)
 		return 1;
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
@@ -656,8 +656,8 @@ VIDEO_START( f3 )
 				}
 				dp += sprite_gfx->line_modulo;
 			}
-			if(chk_trans_or_opa==1) tile_opaque_sp[c]=1;
-			else					tile_opaque_sp[c]=0;
+			if(chk_trans_or_opa==1) tf3_tile_opaque_sp[c]=1;
+			else					tf3_tile_opaque_sp[c]=0;
 		}
 	}
 
@@ -1413,7 +1413,7 @@ INLINE void f3_drawscanlines(
 		yadv = -yadv;
 	}
 
-	dstp0 = (UINT8 *)pri_alp_bitmap->line[ty] + x;
+	dstp0 = (UINT8 *)tf3_pri_alp_bitmap->line[ty] + x;
 
 	pdest_2a = f3_alpha_level_2ad ? 0x10 : 0;
 	pdest_2b = f3_alpha_level_2bd ? 0x20 : 0;
@@ -2370,12 +2370,12 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 			{
 				UINT8 sprite_alpha_mode=(sprite_alpha>>(i*2))&3;
 				UINT8 sftbit=1<<i;
-				if(sprite_pri_usage&sftbit)
+				if(tf3_sprite_pri_usage&sftbit)
 				{
 					if(sprite_alpha_mode==1)
 					{
 						if(f3_alpha_level_2as==0 && f3_alpha_level_2ad==255)
-							sprite_pri_usage&=~sftbit;  // Disable sprite priority block
+							tf3_sprite_pri_usage&=~sftbit;  // Disable sprite priority block
 						else
 						{
 							dpix_sp[1<<i]=dpix_n[2];
@@ -2386,7 +2386,7 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 					{
 						if(sprite_alpha&0xff00)
 						{
-							if(f3_alpha_level_3as==0 && f3_alpha_level_3ad==255) sprite_pri_usage&=~sftbit;
+							if(f3_alpha_level_3as==0 && f3_alpha_level_3ad==255) tf3_sprite_pri_usage&=~sftbit;
 							else
 							{
 								dpix_sp[1<<i]=dpix_n[3];
@@ -2396,7 +2396,7 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 						}
 						else
 						{
-							if(f3_alpha_level_3bs==0 && f3_alpha_level_3bd==255) sprite_pri_usage&=~sftbit;
+							if(f3_alpha_level_3bs==0 && f3_alpha_level_3bd==255) tf3_sprite_pri_usage&=~sftbit;
 							else
 							{
 								dpix_sp[1<<i]=dpix_n[5];
@@ -2560,7 +2560,7 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 			for(i=0;i<4;i++)	/* i = sprite priority offset */
 			{
 				int sp,sflg=1<<i;
-				if(!(sprite_pri_usage & sflg)) continue;
+				if(!(tf3_sprite_pri_usage & sflg)) continue;
 				sp=pri_sp[i];
 
 				/*
@@ -2608,6 +2608,7 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		f3_drawscanlines(bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
 		if(y_start<0) break;
+		//break;
 	}
 }
 
@@ -2735,10 +2736,10 @@ INLINE void f3_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
 //              if (dest_bmp->depth == 32)
 				{
 					int y=ey-sy;
-					int x=(ex-sx-1)|(tile_opaque_sp[code % gfx->total_elements]<<4);
+					int x=(ex-sx-1)|(tf3_tile_opaque_sp[code % gfx->total_elements]<<4);
 					UINT8 *source0 = gfx->gfxdata + (source_base+y_index) * 16 + x_index_base;
 					UINT32 *dest0 = (UINT32 *)dest_bmp->line[sy]+sx;
-					UINT8 *pri0 = (UINT8 *)pri_alp_bitmap->line[sy]+sx;
+					UINT8 *pri0 = (UINT8 *)tf3_pri_alp_bitmap->line[sy]+sx;
 					int yadv = dest_bmp->rowpixels;
 					dy=dy*16;
 					while(1)
@@ -2904,7 +2905,7 @@ INLINE void f3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 					{
 						UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * 16;
 						UINT32 *dest = (UINT32 *)dest_bmp->line[y];
-						UINT8 *pri = pri_alp_bitmap->line[y];
+						UINT8 *pri = tf3_pri_alp_bitmap->line[y];
 
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
@@ -2952,7 +2953,7 @@ static void get_sprite_info(const UINT32 *spriteram32_ptr)
 
 	int x_addition_left = 8, y_addition_left = 8;
 
-	struct tempsprite *sprite_ptr = spritelist;
+	struct tempsprite *sprite_ptr = tf3_spritelist;
 
 	int total_sprites=0;
 
@@ -3195,7 +3196,7 @@ static void get_sprite_info(const UINT32 *spriteram32_ptr)
 		sprite_ptr++;
 		total_sprites++;
 	}
-	sprite_end = sprite_ptr;
+	tf3_sprite_end = sprite_ptr;
 }
 #undef CALC_ZOOM
 
@@ -3205,15 +3206,15 @@ static void f3_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	const struct tempsprite *sprite_ptr;
 	const gfx_element *sprite_gfx = Machine->gfx[2];
 
-	sprite_ptr = sprite_end;
-	sprite_pri_usage=0;
-	while (sprite_ptr != spritelist)
+	sprite_ptr = tf3_sprite_end;
+	tf3_sprite_pri_usage=0;
+	while (sprite_ptr != tf3_spritelist)
 	{
 		int pri;
 		sprite_ptr--;
 
 		pri=sprite_ptr->pri;
-		sprite_pri_usage|=1<<pri;
+		tf3_sprite_pri_usage|=1<<pri;
 
 		if(sprite_ptr->zoomx==16 && sprite_ptr->zoomy==16)
 			f3_drawgfx(bitmap,sprite_gfx,
@@ -3236,6 +3237,9 @@ static void f3_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 /******************************************************************************/
+// krb experimental engines...
+//extern void video_update_taito_f3k( mame_bitmap *bitmap, const rectangle *cliprect);
+extern void video_update_taito_f3k_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect);
 
 VIDEO_UPDATE( f3 )
 {
@@ -3298,11 +3302,16 @@ VIDEO_UPDATE( f3 )
 		sy_fix[4]=-sy_fix[4];
 	}
 
-	fillbitmap(pri_alp_bitmap,0,cliprect);
+
+
+	fillbitmap(tf3_pri_alp_bitmap,0,cliprect);
 
 	/* sprites */
 	if (sprite_lag==0)
 		get_sprite_info(spriteram32);
+
+// video_update_taito_f3k_drawsprites( bitmap, cliprect);
+// return;
 
 	/* Update sprite buffer */
 	f3_drawsprites(bitmap,cliprect);
