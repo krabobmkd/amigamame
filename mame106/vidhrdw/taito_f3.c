@@ -216,7 +216,7 @@ static int vram_dirty[256];
 static int pivot_changed,vram_changed;
 static UINT32 f3_control_0[8];
 static UINT32 f3_control_1[8];
-static int flipscreen;
+int f3_flipscreen;
 
 static UINT8 *pivot_dirty;
 
@@ -469,7 +469,7 @@ static void get_tile_info_pixel(int tile_index)
 {
 	int vram_tile,col_off;
 	int y_offs=(f3_control_1[2]&0x1ff);
-	if (flipscreen) y_offs+=0x100;
+	if (f3_flipscreen) y_offs+=0x100;
 
 	/* Colour is shared with VRAM layer */
 	if ((((tile_index%32)*8 + y_offs)&0x1ff)>0xff)
@@ -595,7 +595,7 @@ VIDEO_START( f3 )
 	Machine->gfx[1]->color_granularity=16;
 	Machine->gfx[2]->color_granularity=16;
 
-	flipscreen = 0;
+	f3_flipscreen = 0;
 	memset(spriteram32_buffered,0,spriteram_size);
 	memset(spriteram32,0,spriteram_size);
 
@@ -832,53 +832,11 @@ UINT8 f3_add_sat[256][256];
 //static int tr_3a = 0;
 //static int tr_3b = 1;
 
-int (*f3_dpix_n[8][16])(UINT32 s_pix);
-int (**f3_dpix_lp[5])(UINT32 s_pix);
-int (**f3_dpix_sp[9])(UINT32 s_pix);
+//int (*f3_dpix_n[8][16])(UINT32 s_pix);
+//int (**f3_dpix_lp[5])(UINT32 s_pix);
+//int (**f3_dpix_sp[9])(UINT32 s_pix);
 
 /*============================================================================*/
-
-#define SET_ALPHA_LEVEL(d,s)			\
-{										\
-	int level = s;						\
-	if(level == 0) level = -1;			\
-	d = drawgfx_alpha_cache.alpha[level+1];		\
-}
-
-INLINE void f3_alpha_set_level(void)
-{
-//  SET_ALPHA_LEVEL(f3_alpha_s_1_1, f3_alpha_level_2ad)
-	SET_ALPHA_LEVEL(f3_alpha_s_1_1, 255-f3_alpha_level_2as)
-//  SET_ALPHA_LEVEL(f3_alpha_s_1_2, f3_alpha_level_2bd)
-	SET_ALPHA_LEVEL(f3_alpha_s_1_2, 255-f3_alpha_level_2bs)
-	SET_ALPHA_LEVEL(f3_alpha_s_1_4, f3_alpha_level_3ad)
-//  SET_ALPHA_LEVEL(f3_alpha_s_1_5, f3_alpha_level_3ad*f3_alpha_level_2ad/255)
-	SET_ALPHA_LEVEL(f3_alpha_s_1_5, f3_alpha_level_3ad*(255-f3_alpha_level_2as)/255)
-//  SET_ALPHA_LEVEL(f3_alpha_s_1_6, f3_alpha_level_3ad*f3_alpha_level_2bd/255)
-	SET_ALPHA_LEVEL(f3_alpha_s_1_6, f3_alpha_level_3ad*(255-f3_alpha_level_2bs)/255)
-	SET_ALPHA_LEVEL(f3_alpha_s_1_8, f3_alpha_level_3bd)
-//  SET_ALPHA_LEVEL(f3_alpha_s_1_9, f3_alpha_level_3bd*f3_alpha_level_2ad/255)
-	SET_ALPHA_LEVEL(f3_alpha_s_1_9, f3_alpha_level_3bd*(255-f3_alpha_level_2as)/255)
-//  SET_ALPHA_LEVEL(f3_alpha_s_1_a, f3_alpha_level_3bd*f3_alpha_level_2bd/255)
-	SET_ALPHA_LEVEL(f3_alpha_s_1_a, f3_alpha_level_3bd*(255-f3_alpha_level_2bs)/255)
-
-	SET_ALPHA_LEVEL(f3_alpha_s_2a_0, f3_alpha_level_2as)
-	SET_ALPHA_LEVEL(f3_alpha_s_2a_4, f3_alpha_level_2as*f3_alpha_level_3ad/255)
-	SET_ALPHA_LEVEL(f3_alpha_s_2a_8, f3_alpha_level_2as*f3_alpha_level_3bd/255)
-
-	SET_ALPHA_LEVEL(f3_alpha_s_2b_0, f3_alpha_level_2bs)
-	SET_ALPHA_LEVEL(f3_alpha_s_2b_4, f3_alpha_level_2bs*f3_alpha_level_3ad/255)
-	SET_ALPHA_LEVEL(f3_alpha_s_2b_8, f3_alpha_level_2bs*f3_alpha_level_3bd/255)
-
-	SET_ALPHA_LEVEL(f3_alpha_s_3a_0, f3_alpha_level_3as)
-	SET_ALPHA_LEVEL(f3_alpha_s_3a_1, f3_alpha_level_3as*f3_alpha_level_2ad/255)
-	SET_ALPHA_LEVEL(f3_alpha_s_3a_2, f3_alpha_level_3as*f3_alpha_level_2bd/255)
-
-	SET_ALPHA_LEVEL(f3_alpha_s_3b_0, f3_alpha_level_3bs)
-	SET_ALPHA_LEVEL(f3_alpha_s_3b_1, f3_alpha_level_3bs*f3_alpha_level_2ad/255)
-	SET_ALPHA_LEVEL(f3_alpha_s_3b_2, f3_alpha_level_3bs*f3_alpha_level_2bd/255)
-}
-#undef SET_ALPHA_LEVEL
 
 /*============================================================================*/
 
@@ -1583,7 +1541,7 @@ static void visible_tile_check(struct f3_playfield_line_inf *line_t,
 	tile_num=(((line_t->x_zoom[line]*320+(x_index_fx & 0xffff)+0xffff)>>16)+(tile_index%16)+15)/16;
 	tile_index/=16;
 
-	if (flipscreen)
+	if (f3_flipscreen)
 	{
 		pf_base=f3_pf_data_n+((31-(y_index/16))<<twidth_mask_bit);
 		tile_index=(twidth_mask-tile_index)-tile_num+1;
@@ -1755,7 +1713,7 @@ static void get_spritealphaclip_info(void)
 	int alpha_level=0;
 	UINT16 sprite_alpha=0;
 
-	if (flipscreen)
+	if (f3_flipscreen)
 	{
 		spri_base=0x77fe;
 		clip_base_low=0x51fe;
@@ -1878,7 +1836,7 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 
 	sx+=((46<<16));
 
-	if (flipscreen)
+	if (f3_flipscreen)
 	{
 		line_base=0xa1fe + (pos*0x200);
 		zoom_base=0x81fe;// + (pos*0x200);
@@ -1988,7 +1946,7 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 				colscroll=(f3_line_ram[col_base/4]>>16)&0x3ff;
 		}
 
-		if (!pri || (!flipscreen && y<24) || (flipscreen && y>231) ||
+		if (!pri || (!f3_flipscreen && y<24) || (f3_flipscreen && y>231) ||
 			(pri&0xc000)==0xc000 || !(pri&0x2000)/**/)
  			line_enable=0;
 		else if(pri&0x4000)	//alpha1
@@ -2093,7 +2051,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 
 	const int vram_width_mask=0x1ff;
 
-	if (flipscreen)
+	if (f3_flipscreen)
 	{
 		pri_base =0x73fe;
 		inc=-2;
@@ -2126,7 +2084,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 				pri=(f3_line_ram[pri_base/4]&0xffff0000)>>16;
 		}
 
-		if (!pri || (!flipscreen && y<24) || (flipscreen && y>231) ||
+		if (!pri || (!f3_flipscreen && y<24) || (f3_flipscreen && y>231) ||
 			(pri&0xc000)==0xc000 || !(pri&0x2000)/**/)
  			line_enable=0;
 		else if(pri&0x4000)	//alpha1
@@ -2212,416 +2170,6 @@ extern     void tf3_drawscanlines_k(
 		int skip_layer_num);
 
 
-static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
-{
-	int i,j,y,ys,ye;
-	int y_start,y_end,y_start_next,y_end_next;
-	UINT8 draw_line[256];
-	INT16 draw_line_num[256];
-
-	UINT32 rot=0;
-
-	if (flipscreen)
-	{
-		rot=ORIENTATION_FLIP_Y;
-		ys=0;
-		ye=232;
-	}
-	else
-	{
-		ys=24;
-		ye=256;
-	}
-
-	y_start=ys;
-	y_end=ye;
-	memset(draw_line,0,256);
-
- //  if(shouldp()) printf("start upd\n");
-// int nbw=0;
-	while(1)
-	{
-  //      if(shouldp()) printf("start main while\n");
-
-		static int alpha_level_last=-1;
-		int pos;
-		int pri[5],alpha_mode[5],alpha_mode_flag[5],alpha_level;
-		UINT16 sprite_alpha;
-		UINT8 sprite_alpha_check;
-		UINT8 sprite_alpha_all_2a;
-		int spri;
-		int alpha;
-		int layer_tmp[5];
-
-		int count_skip_layer=0;
-		int sprite[6]={0,0,0,0,0,0};
-		const struct f3_playfield_line_inf *line_t[5];
-
-
-		/* find same status of scanlines */
-		pri[0]=pf_line_inf[0].pri[y_start];
-		pri[1]=pf_line_inf[1].pri[y_start];
-		pri[2]=pf_line_inf[2].pri[y_start];
-		pri[3]=pf_line_inf[3].pri[y_start];
-		pri[4]=pf_line_inf[4].pri[y_start];
-		alpha_mode[0]=pf_line_inf[0].alpha_mode[y_start];
-		alpha_mode[1]=pf_line_inf[1].alpha_mode[y_start];
-		alpha_mode[2]=pf_line_inf[2].alpha_mode[y_start];
-		alpha_mode[3]=pf_line_inf[3].alpha_mode[y_start];
-		alpha_mode[4]=pf_line_inf[4].alpha_mode[y_start];
-		alpha_level=sa_line_inf[0].alpha_level[y_start];
-		spri=sa_line_inf[0].spri[y_start];
-		sprite_alpha=sa_line_inf[0].sprite_alpha[y_start];
-
-		draw_line[y_start]=1;
-		draw_line_num[i=0]=y_start;
-		y_start_next=-1;
-		y_end_next=-1;
-		for(y=y_start+1;y<y_end;y++)
-		{
-			if(!draw_line[y])
-			{
-				if(pri[0]!=pf_line_inf[0].pri[y]) y_end_next=y+1;
-				else if(pri[1]!=pf_line_inf[1].pri[y]) y_end_next=y+1;
-				else if(pri[2]!=pf_line_inf[2].pri[y]) y_end_next=y+1;
-				else if(pri[3]!=pf_line_inf[3].pri[y]) y_end_next=y+1;
-				else if(pri[4]!=pf_line_inf[4].pri[y]) y_end_next=y+1;
-				else if(alpha_mode[0]!=pf_line_inf[0].alpha_mode[y]) y_end_next=y+1;
-				else if(alpha_mode[1]!=pf_line_inf[1].alpha_mode[y]) y_end_next=y+1;
-				else if(alpha_mode[2]!=pf_line_inf[2].alpha_mode[y]) y_end_next=y+1;
-				else if(alpha_mode[3]!=pf_line_inf[3].alpha_mode[y]) y_end_next=y+1;
-				else if(alpha_mode[4]!=pf_line_inf[4].alpha_mode[y]) y_end_next=y+1;
-				else if(alpha_level!=sa_line_inf[0].alpha_level[y]) y_end_next=y+1;
-				else if(spri!=sa_line_inf[0].spri[y]) y_end_next=y+1;
-				else if(sprite_alpha!=sa_line_inf[0].sprite_alpha[y]) y_end_next=y+1;
-				else
-				{
-					draw_line[y]=1;
-					draw_line_num[++i]=y;
-					continue;
-				}
-
-				if(y_start_next<0) y_start_next=y;
-			}
-		}
-
-		y_end=y_end_next;
-		y_start=y_start_next;
-		draw_line_num[++i]=-1;
-
- //   if(shouldp()) printf("go dsl y_start:%d y_end:%d\n",draw_line_num[0],draw_line_num[i-2]);
-
-		/* alpha blend */
-		alpha_mode_flag[0]=alpha_mode[0]&~3;
-		alpha_mode_flag[1]=alpha_mode[1]&~3;
-		alpha_mode_flag[2]=alpha_mode[2]&~3;
-		alpha_mode_flag[3]=alpha_mode[3]&~3;
-		alpha_mode_flag[4]=alpha_mode[4]&~3;
-		alpha_mode[0]&=3;
-		alpha_mode[1]&=3;
-		alpha_mode[2]&=3;
-		alpha_mode[3]&=3;
-		alpha_mode[4]&=3;
-		if( alpha_mode[0]>1 ||
-			alpha_mode[1]>1 ||
-			alpha_mode[2]>1 ||
-			alpha_mode[3]>1 ||
-			alpha_mode[4]>1 ||
-			(sprite_alpha&0xff) != 0xff  )
-		{
-			/* set alpha level */
-			if(alpha_level!=alpha_level_last)
-			{
-				int al_s,al_d;
-				int a=alpha_level;
-				int b=(a>>8)&0xf;
-				int c=(a>>4)&0xf;
-				int d=(a>>0)&0xf;
-				a>>=12;
-
-				/* b000 7000 */
-				al_s = ( (15-d)*256) / 8;
-				al_d = ( (15-b)*256) / 8;
-				if(al_s>255) al_s = 255;
-				if(al_d>255) al_d = 255;
-				f3_alpha_level_3as = al_s;
-				f3_alpha_level_3ad = al_d;
-				f3_alpha_level_2as = al_d;
-				f3_alpha_level_2ad = al_s;
-
-				al_s = ( (15-c)*256) / 8;
-				al_d = ( (15-a)*256) / 8;
-				if(al_s>255) al_s = 255;
-				if(al_d>255) al_d = 255;
-				f3_alpha_level_3bs = al_s;
-				f3_alpha_level_3bd = al_d;
-				f3_alpha_level_2bs = al_d;
-				f3_alpha_level_2bd = al_s;
-
-				f3_alpha_set_level();
-				alpha_level_last=alpha_level;
-			}
-
-			/* set sprite alpha mode */
-			sprite_alpha_check=0;
-			sprite_alpha_all_2a=1;
-			f3_dpix_sp[1]=0;
-			f3_dpix_sp[2]=0;
-			f3_dpix_sp[4]=0;
-			f3_dpix_sp[8]=0;
-			for(i=0;i<4;i++)	/* i = sprite priority offset */
-			{
-				UINT8 sprite_alpha_mode=(sprite_alpha>>(i*2))&3;
-				UINT8 sftbit=1<<i;
-				if(tf3_sprite_pri_usage&sftbit)
-				{
-					if(sprite_alpha_mode==1)
-					{
-						if(f3_alpha_level_2as==0 && f3_alpha_level_2ad==255)
-							tf3_sprite_pri_usage&=~sftbit;  // Disable sprite priority block
-						else
-						{
-							f3_dpix_sp[1<<i]=f3_dpix_n[2];
-							sprite_alpha_check|=sftbit;
-						}
-					}
-					else if(sprite_alpha_mode==2)
-					{
-						if(sprite_alpha&0xff00)
-						{
-							if(f3_alpha_level_3as==0 && f3_alpha_level_3ad==255) tf3_sprite_pri_usage&=~sftbit;
-							else
-							{
-								f3_dpix_sp[1<<i]=f3_dpix_n[3];
-								sprite_alpha_check|=sftbit;
-								sprite_alpha_all_2a=0;
-							}
-						}
-						else
-						{
-							if(f3_alpha_level_3bs==0 && f3_alpha_level_3bd==255) tf3_sprite_pri_usage&=~sftbit;
-							else
-							{
-								f3_dpix_sp[1<<i]=f3_dpix_n[5];
-								sprite_alpha_check|=sftbit;
-								sprite_alpha_all_2a=0;
-							}
-						}
-					}
-				}
-			}
-
-
-			/* check alpha level */
-			for(i=0;i<5;i++)	/* i = playfield num (pos) */
-			{
-				int alpha_type = (alpha_mode_flag[i]>>4)&3;
-
-				if(alpha_mode[i]==2)
-				{
-					if(alpha_type==1)
-					{
-						if     (f3_alpha_level_2as==0   && f3_alpha_level_2ad==255) alpha_mode[i]=0;
-						else if(f3_alpha_level_2as==255 && f3_alpha_level_2ad==0  ) alpha_mode[i]=1;
-					}
-					else if(alpha_type==2)
-					{
-						if     (f3_alpha_level_2bs==0   && f3_alpha_level_2bd==255) alpha_mode[i]=0;
-						else if(f3_alpha_level_2as==255 && f3_alpha_level_2ad==0 &&
-								f3_alpha_level_2bs==255 && f3_alpha_level_2bd==0  ) alpha_mode[i]=1;
-					}
-					else if(alpha_type==3)
-					{
-						if     (f3_alpha_level_2as==0   && f3_alpha_level_2ad==255 &&
-								f3_alpha_level_2bs==0   && f3_alpha_level_2bd==255) alpha_mode[i]=0;
-						else if(f3_alpha_level_2as==255 && f3_alpha_level_2ad==0   &&
-								f3_alpha_level_2bs==255 && f3_alpha_level_2bd==0  ) alpha_mode[i]=1;
-					}
-				}
-				else if(alpha_mode[i]==3)
-				{
-					if(alpha_type==1)
-					{
-						if     (f3_alpha_level_3as==0   && f3_alpha_level_3ad==255) alpha_mode[i]=0;
-						else if(f3_alpha_level_3as==255 && f3_alpha_level_3ad==0  ) alpha_mode[i]=1;
-					}
-					else if(alpha_type==2)
-					{
-						if     (f3_alpha_level_3bs==0   && f3_alpha_level_3bd==255) alpha_mode[i]=0;
-						else if(f3_alpha_level_3as==255 && f3_alpha_level_3ad==0 &&
-								f3_alpha_level_3bs==255 && f3_alpha_level_3bd==0  ) alpha_mode[i]=1;
-					}
-					else if(alpha_type==3)
-					{
-						if     (f3_alpha_level_3as==0   && f3_alpha_level_3ad==255 &&
-								f3_alpha_level_3bs==0   && f3_alpha_level_3bd==255) alpha_mode[i]=0;
-						else if(f3_alpha_level_3as==255 && f3_alpha_level_3ad==0   &&
-								f3_alpha_level_3bs==255 && f3_alpha_level_3bd==0  ) alpha_mode[i]=1;
-					}
-				}
-			}
-
-			if (	(alpha_mode[0]==1 || alpha_mode[0]==2 || !alpha_mode[0]) &&
-					(alpha_mode[1]==1 || alpha_mode[1]==2 || !alpha_mode[1]) &&
-					(alpha_mode[2]==1 || alpha_mode[2]==2 || !alpha_mode[2]) &&
-					(alpha_mode[3]==1 || alpha_mode[3]==2 || !alpha_mode[3]) &&
-					(alpha_mode[4]==1 || alpha_mode[4]==2 || !alpha_mode[4]) &&
-					sprite_alpha_all_2a						)
-			{
-				int alpha_type = (alpha_mode_flag[0] | alpha_mode_flag[1] | alpha_mode_flag[2] | alpha_mode_flag[3])&0x30;
-				if(		(alpha_type==0x10 && f3_alpha_level_2as==255) ||
-						(alpha_type==0x20 && f3_alpha_level_2as==255 && f3_alpha_level_2bs==255) ||
-						(alpha_type==0x30 && f3_alpha_level_2as==255 && f3_alpha_level_2bs==255)	)
-				{
-					if(alpha_mode[0]>1) alpha_mode[0]=1;
-					if(alpha_mode[1]>1) alpha_mode[1]=1;
-					if(alpha_mode[2]>1) alpha_mode[2]=1;
-					if(alpha_mode[3]>1) alpha_mode[3]=1;
-					if(alpha_mode[4]>1) alpha_mode[4]=1;
-					sprite_alpha_check=0;
-					f3_dpix_sp[1]=0;
-					f3_dpix_sp[2]=0;
-					f3_dpix_sp[4]=0;
-					f3_dpix_sp[8]=0;
-				}
-			}
-		}
-		else
-		{
-			sprite_alpha_check=0;
-			f3_dpix_sp[1]=0;
-			f3_dpix_sp[2]=0;
-			f3_dpix_sp[4]=0;
-			f3_dpix_sp[8]=0;
-		}
-
-
-
-		/* set scanline priority */
-		{
-			int pri_max_opa=-1;
-			for(i=0;i<5;i++)	/* i = playfield num (pos) */
-			{
-				int p0=pri[i];
-				int pri_sl1=p0&0x0f;
-
-				layer_tmp[i]=i + (pri_sl1<<3);
-
-				if(!alpha_mode[i])
-				{
-					layer_tmp[i]|=0x80;
-					count_skip_layer++;
-				}
-				else if(alpha_mode[i]==1 && (alpha_mode_flag[i]&0x80))
-				{
-					if(layer_tmp[i]>pri_max_opa) pri_max_opa=layer_tmp[i];
-				}
-			}
-
-			if(pri_max_opa!=-1)
-			{
-				if(pri_max_opa>layer_tmp[0]) {layer_tmp[0]|=0x80;count_skip_layer++;}
-				if(pri_max_opa>layer_tmp[1]) {layer_tmp[1]|=0x80;count_skip_layer++;}
-				if(pri_max_opa>layer_tmp[2]) {layer_tmp[2]|=0x80;count_skip_layer++;}
-				if(pri_max_opa>layer_tmp[3]) {layer_tmp[3]|=0x80;count_skip_layer++;}
-				if(pri_max_opa>layer_tmp[4]) {layer_tmp[4]|=0x80;count_skip_layer++;}
-			}
-		}
-
-
-		/* sort layer_tmp */
-		for(i=0;i<4;i++)
-		{
-			for(j=i+1;j<5;j++)
-			{
-				if(layer_tmp[i]<layer_tmp[j])
-				{
-					int temp = layer_tmp[i];
-					layer_tmp[i] = layer_tmp[j];
-					layer_tmp[j] = temp;
-				}
-			}
-		}
-
-
-		/* check sprite & layer priority */
-		{
-			int l0,l1,l2,l3,l4;
-			int pri_sp[5];
-
-			l0=layer_tmp[0]>>3;
-			l1=layer_tmp[1]>>3;
-			l2=layer_tmp[2]>>3;
-			l3=layer_tmp[3]>>3;
-			l4=layer_tmp[4]>>3;
-
-			pri_sp[0]=spri&0xf;
-			pri_sp[1]=(spri>>4)&0xf;
-			pri_sp[2]=(spri>>8)&0xf;
-			pri_sp[3]=spri>>12;
-
-			for(i=0;i<4;i++)	/* i = sprite priority offset */
-			{
-				int sp,sflg=1<<i;
-				if(!(tf3_sprite_pri_usage & sflg)) continue;
-				sp=pri_sp[i];
-
-				/*
-                    sprite priority==playfield priority
-                        BUBSYMPH (title)       ---> sprite
-                        DARIUSG (ZONE V' BOSS) ---> playfield
-                */
-
-				if (f3_game == BUBSYMPH ) sp++;		//BUBSYMPH (title)
-
-					 if(		  sp>l0) sprite[0]|=sflg;
-				else if(sp<=l0 && sp>l1) sprite[1]|=sflg;
-				else if(sp<=l1 && sp>l2) sprite[2]|=sflg;
-				else if(sp<=l2 && sp>l3) sprite[3]|=sflg;
-				else if(sp<=l3 && sp>l4) sprite[4]|=sflg;
-				else if(sp<=l4		   ) sprite[5]|=sflg;
-			}
-		}
-
-
-		/* draw scanlines */
-		alpha=0;
-		for(i=count_skip_layer;i<5;i++)
-		{
-			pos=layer_tmp[i]&7;
-			line_t[i]=&pf_line_inf[pos];
-
-			if(sprite[i]&sprite_alpha_check) alpha=1;
-			else if(!alpha) sprite[i]|=0x100;
-
-			if(alpha_mode[pos]>1)
-			{
-				int alpha_type=(((alpha_mode_flag[pos]>>4)&3)-1)*2;
-				f3_dpix_lp[i]=f3_dpix_n[alpha_mode[pos]+alpha_type];
-				alpha=1;
-			}
-			else
-			{
-				if(alpha) f3_dpix_lp[i]=f3_dpix_n[1];
-				else	  f3_dpix_lp[i]=f3_dpix_n[0];
-			}
-		}
-		if(sprite[5]&sprite_alpha_check) alpha=1;
-		else if(!alpha) sprite[5]|=0x100;
-
- // 		y_end=y_end_next;
-//		y_start=y_start_next;
-// y_start
-//    if(shouldp()) printf("go dsl y_start:%d y_end:%d\n",draw_line_num[0],draw_line_num[i-2]);
-	//f3_drawscanlines(bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
-    tf3_drawscanlines_k(bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
-
-		if(y_start<0) break;
-//		nbw++;
-		//break;
-	}
-//        if(shouldp()) printf("end upd %d\n",nbw);
-}
 
 /******************************************************************************/
 
@@ -2991,7 +2539,7 @@ static void get_sprite_info(const UINT32 *spriteram32_ptr)
 		/* Check if special command bit is set */
 		if (spriteram32_ptr[current_offs+1] & 0x8000) {
 			UINT32 cntrl=(spriteram32_ptr[current_offs+2])&0xffff;
-			flipscreen=cntrl&0x2000;
+			f3_flipscreen=cntrl&0x2000;
 
 			/*  cntrl&0x1000 = disabled?  (From F2 driver, doesn't seem used anywhere)
                 cntrl&0x0010 = ???
@@ -3176,7 +2724,7 @@ static void get_sprite_info(const UINT32 *spriteram32_ptr)
 		if (!sprite) continue;
 		if (!x_addition || !y_addition) continue;
 
-		if (flipscreen)
+		if (f3_flipscreen)
 		{
 			int tx,ty;
 
@@ -3251,6 +2799,7 @@ static void f3_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 // krb experimental engines...
 //extern void video_update_taito_f3k( mame_bitmap *bitmap, const rectangle *cliprect);
 extern void video_update_taito_f3k_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect);
+extern void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect);
 
 VIDEO_UPDATE( f3 )
 {
@@ -3260,7 +2809,7 @@ VIDEO_UPDATE( f3 )
 	int tile;
 
 	f3_skip_this_frame=0;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip(ALL_TILEMAPS,f3_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Dynamically decode VRAM chars if dirty */
 	if (vram_changed)
@@ -3299,7 +2848,7 @@ VIDEO_UPDATE( f3 )
 	sx_fix[2]-=((f3_control_0[1]&0x003f0000)>> 6)+0x0400-0x10000;
 	sx_fix[3]-=((f3_control_0[1]&0x0000003f)<<10)+0x0400-0x10000;
 
-	if (flipscreen)
+	if (f3_flipscreen)
 	{
 		sy_fix[0]= 0x3000000-sy_fix[0];
 		sy_fix[1]= 0x3000000-sy_fix[1];
@@ -3338,7 +2887,7 @@ VIDEO_UPDATE( f3 )
 	get_vram_info(vram_layer,pixel_layer,sx_fix[4],sy_fix[4]);
 
 	/* Draw final framebuffer */
-	f3_scanline_draw(bitmap,cliprect);
+	f3_scanline_draw_k(bitmap,cliprect);
 
 nbf++;
 //  print_debug_info(bitmap);
