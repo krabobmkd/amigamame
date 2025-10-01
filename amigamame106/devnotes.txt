@@ -29,8 +29,9 @@ games added in r1.7:
    There was more than 75 rom images added,of high quality with excellent graphics and musics,and well emulated and tested games.
 
    - Vertical shooter of that time, with lots of bullets on screens, known as the "*Danmaku*" genre, are a lot more present:
-   "Air Gallet"(agallet), "DonPachi"(donpachi), "DoDonPachi"(ddonpach),"ESP Ra.De."(esprade), "Gunbird"(gunbird), "Striker 1945"(s1945),
-   "Dangun Feveron"(dfeveron), "Fever SOS"(feversos), R-shark (rshark), ...
+   "DonPachi"(donpachi), "DoDonPachi"(ddonpach),"ESP Ra.De."(esprade), "Gunbird"(gunbird), "Striker 1945"(s1945),
+   R-shark (rshark) and the mostly excellent "Dangun Feveron"(dfeveron), "Fever SOS"(feversos), and "Air Gallet"(agallet).
+
    (note the "raizing" danmakus were already supported: "Armed police batrider"(batrider),"Battle Garrega"(battleg),...)
    ...filtering the list with vertical shooters and then sorting by years would give you the full list anyway !
 

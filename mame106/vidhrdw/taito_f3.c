@@ -1812,6 +1812,7 @@ static void get_spritealphaclip_info(void)
 		y +=y_inc;
 	}
 }
+int tf3_anyPlaneClipX;
 
 /* sx and sy are 16.16 fixed point numbers */
 static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
@@ -1976,6 +1977,7 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 			//fast path todo - remove line enable
 			// KRB test if any plane Xclip here !
 			calculate_clip(y, pri&0x0330, &line_t->clip0[y], &line_t->clip1[y], &line_enable);
+			tf3_anyPlaneClipX = 1;
 		}
 		else
 		{
@@ -2879,6 +2881,7 @@ VIDEO_UPDATE( f3 )
 	/* Parse sprite, alpha & clipping parts of lineram */
 	get_spritealphaclip_info();
 
+    tf3_anyPlaneClipX = 0;
 	/* Parse playfield effects */
 	get_line_ram_info(pf1_tilemap,sx_fix[0],sy_fix[0],0,f3_pf_data_1);
 	get_line_ram_info(pf2_tilemap,sx_fix[1],sy_fix[1],1,f3_pf_data_2);

@@ -34,6 +34,14 @@ struct tempsprite
     void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect);
 }
 
+#if defined(__GNUC__) && defined(__AMIGA__)
+#define REGPX(r) __asm(#r)
+#define REGVAL REGPX(a0)
+#else
+#define REGPX(r)
+#endif
+
+
 typedef UINT32 Pixt;
 class cPix {
 public:
@@ -789,6 +797,27 @@ void f3_init_alpha_blend_func(void)
 static int nbf=0;
 INLINE int shouldp() { return ((nbf & 127)==1); }
 
+// int nbwr_case1=0;
+// int nbwr_case2=0;
+// int nbwr_case3=0;
+// int nbwr_case4=0;
+// int nbwr_case5=0;
+// int nbwr_case6=0;
+
+// int nbwr_case7=0;
+// int nbwr_case8=0;
+// int nbwr_case9=0;
+// int nbwr_case10=0;
+// int nbwr_case11=0;
+// int nbwr_case12=0;
+
+// int nbwr_case13=0;
+// int nbwr_case14=0;
+// int nbwr_case15=0;
+// int nbwr_case16=0;
+// int nbwr_case17=0;
+// int nbwr_case18=0;
+
 template<int skip_layer_num,bool useXspriteClip,bool useXplaneClip>
 void drawscanlinesT(
 		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
@@ -817,7 +846,7 @@ void drawscanlinesT(
 //noalp 0 0 1 0 0 0
 
 
-// printf("noalp %d %d %d %d %d %d\n",sprite_noalp_0>>8,sprite_noalp_1>>8,sprite_noalp_2>>8,sprite_noalp_3>>8,sprite_noalp_4>>8,sprite_noalp_5>>8);
+// if(shouldp()) printf("noalp %d %d %d %d %d %d\n",sprite_noalp_0>>8,sprite_noalp_1>>8,sprite_noalp_2>>8,sprite_noalp_3>>8,sprite_noalp_4>>8,sprite_noalp_5>>8);
 
 	static UINT16 *src0=0,*src_s0=0,*src_e0=0,clip_al0=0,clip_ar0=0,clip_bl0=0,clip_br0=0;
 	static UINT8 *tsrc0=0,*tsrc_s0=0;
@@ -909,13 +938,20 @@ void drawscanlinesT(
                             {
                                 if(sprite_noalp_0) break;
                                 if(!f3_dpix_sp[sprite_pri]) break;
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {*dsti=val.d;break;}
+                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                               // nbwr_case1++;
+                                *dsti=val.d;
+
+                                break;}
                             }
                             if (!useXplaneClip || (cx>=clip_al0 && cx<clip_ar0 && !(cx>=clip_bl0 && cx<clip_br0)))
                             {
                                 val.t=*tsrc0;
                                 if(val.t&0xf0)
-                                    if(f3_dpix_lp[0][val.p>>4](clut[*src0],val)) {*dsti=val.d;break;}
+                                    if(f3_dpix_lp[0][val.p>>4](clut[*src0],val)) {
+                                        // nbwr_case2++;
+                                        *dsti=val.d;break;
+                                    }
                             }
                     case 1: if( (!useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) ))
                                 && (sprite_pri=sprite[1]&val.p))
@@ -924,13 +960,23 @@ void drawscanlinesT(
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
                                     if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);*dsti=val.d;break;}
+                                    else {dpix_1_sprite(*dsti,val);
+                                       //  nbwr_case3++;
+                                        *dsti=val.d;break;
+                                    }
                                 }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {*dsti=val.d;break;}
+                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                                    // nbwr_case4++;
+                                    *dsti=val.d;break;
+                                    }
                             }
                             if (!useXplaneClip ||(cx>=clip_al1 && cx<clip_ar1 && !(cx>=clip_bl1 && cx<clip_br1)))
                             {
-                                val.t=*tsrc1;if(val.t&0xf0) if(f3_dpix_lp[1][val.p>>4](clut[*src1],val)) {*dsti=val.d;break;}
+                                val.t=*tsrc1;if(val.t&0xf0) if(f3_dpix_lp[1][val.p>>4](clut[*src1],val))
+                                {
+                                    // nbwr_case5++;
+                                    *dsti=val.d;break;
+                                }
                             }
                     case 2: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
                             && (sprite_pri=sprite[2]&val.p))
@@ -939,13 +985,22 @@ void drawscanlinesT(
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
                                     if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);*dsti=val.d;break;}
+                                    else {dpix_1_sprite(*dsti,val);
+                                       //  nbwr_case6++;
+                                        *dsti=val.d;break;
+                                    }
                                 }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {*dsti=val.d;break;}
+                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                                   //  nbwr_case7++;
+                                *dsti=val.d;break;}
                             }
                             if (!useXplaneClip || (cx>=clip_al2 && cx<clip_ar2 && !(cx>=clip_bl2 && cx<clip_br2)))
                             {
-                                val.t=*tsrc2;if(val.t&0xf0) if(f3_dpix_lp[2][val.p>>4](clut[*src2],val)) {*dsti=val.d;break;}
+                                val.t=*tsrc2;if(val.t&0xf0) if(f3_dpix_lp[2][val.p>>4](clut[*src2],val))
+                                {
+                                  //   nbwr_case8++;
+                                    *dsti=val.d;break;
+                                }
                             }
                     case 3: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
                             && (sprite_pri=sprite[3]&val.p))
@@ -954,13 +1009,31 @@ void drawscanlinesT(
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
                                     if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);*dsti=val.d;break;}
+                                    else {dpix_1_sprite(*dsti,val);
+                                   //   nbwr_case9++;
+                                    *dsti=val.d;break;}
                                 }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {*dsti=val.d;break;}
+                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                              //   nbwr_case10++;
+                                *dsti=val.d;break;}
                             }
                             if (!useXplaneClip ||(cx>=clip_al3 && cx<clip_ar3 && !(cx>=clip_bl3 && cx<clip_br3)))
                             {
-                                val.t=*tsrc3;if(val.t&0xf0) if(f3_dpix_lp[3][val.p>>4](clut[*src3],val)) {*dsti=val.d;break;}
+                                val.t=*tsrc3;
+                                if(val.t&0xf0)
+                                {
+                                    UINT8 pv = val.p>>4;
+                                    if(!pv)
+                                    {
+                                        *dsti=clut[*src3];
+                                        break;
+                                    }
+                                    if(f3_dpix_lp[3][pv](clut[*src3],val))
+                                    {
+                                      //    nbwr_case11++;
+                                        *dsti=val.d;break;
+                                    }
+                                }
                             }
 
                     case 4: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
@@ -970,17 +1043,28 @@ void drawscanlinesT(
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
                                     if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);*dsti=val.d;break;}
+                                    else {dpix_1_sprite(*dsti,val);
+                                   //  nbwr_case12++;
+
+                                    *dsti=val.d;break;}
                                 }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {*dsti=val.d;break;}
+                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                             //    nbwr_case13++;
+                                *dsti=val.d;break;}
                             }
                             if (!useXplaneClip ||(cx>=clip_al4 && cx<clip_ar4 && !(cx>=clip_bl4 && cx<clip_br4)))
                              {
                                 val.t=*tsrc4;
                                 if(val.t&0xf0)
                                 {
-                                    if(f3_dpix_lp[4][val.p>>4](clut[*src4],val))
+                                    UINT8 pv=  val.p>>4;
+                                    if(!pv) {
+                                        *dsti=clut[*src4];
+                                        break;
+                                    }
+                                    if(f3_dpix_lp[4][pv](clut[*src4],val))
                                     {
+                                      //   nbwr_case14++;
                                         *dsti=val.d;
                                         break;
                                     }
@@ -994,12 +1078,19 @@ void drawscanlinesT(
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
                                     if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);*dsti=val.d;break;}
+                                    else {dpix_1_sprite(*dsti,val);
+                            //     nbwr_case15++;
+                                    *dsti=val.d;break;}
                                 }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {*dsti=val.d;break;}
+                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                             //    nbwr_case16++;
+                                *dsti=val.d;break;}
                             }
-                            if(!bgcolor) {if(!(val.p&0xf0)) {*dsti=0;break;}}
+                            if(!bgcolor) {if(!(val.p&0xf0)) {
+                             //    nbwr_case17++;
+                            *dsti=0;break;}}
                             else dpix_bg(bgcolor,val);
+                             //    nbwr_case18++;
                             *dsti=val.d;
                 }
             }
@@ -1043,6 +1134,10 @@ void drawscanlinesT(
 #undef GET_PIXMAP_POINTER
 #undef CULC_PIXMAP_POINTER
 
+extern "C" {
+extern int tf3_anyPlaneClipX;
+};
+
 static inline void tf3_drawscanlines_k(
 		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
 		const struct f3_playfield_line_inf **line_t,
@@ -1051,26 +1146,38 @@ static inline void tf3_drawscanlines_k(
 		int skip_layer_num)
 {
 //    skip_layer_num
-    const bool useSprClipxTrue = true;
-    const bool useSprClipxFalse = false;
-    const bool usePlaneClipxTrue = true;
-    const bool usePlaneClipxFalse = false;
+    // const bool useSprClipxTrue = true;
+    // const bool useSprClipxFalse = false;
+    // const bool usePlaneClipxTrue = true;
+    // const bool usePlaneClipxFalse = false;
+
+    skip_layer_num |= (tf3_anyPlaneClipX<<3);
 
     switch(skip_layer_num)
     {
-        case 0: drawscanlinesT<0,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 1: drawscanlinesT<1,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 2: drawscanlinesT<2,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 3: drawscanlinesT<3,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 4: drawscanlinesT<4,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 5: drawscanlinesT<5,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        // useClipXsprite, useClipXPlane
+        case 0: drawscanlinesT<0,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 1: drawscanlinesT<1,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 2: drawscanlinesT<2,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 3: drawscanlinesT<3,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 4: drawscanlinesT<4,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 5: drawscanlinesT<5,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
 
-        case 0+8: drawscanlinesT<0,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 1+8: drawscanlinesT<1,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 2+8: drawscanlinesT<2,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 3+8: drawscanlinesT<3,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 4+8: drawscanlinesT<4,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 5+8: drawscanlinesT<5,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        // case 0: drawscanlinesT<0,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        // case 1: drawscanlinesT<1,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        // case 2: drawscanlinesT<2,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        // case 3: drawscanlinesT<3,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        // case 4: drawscanlinesT<4,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        // case 5: drawscanlinesT<5,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+
+        case 0+8: drawscanlinesT<0,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 1+8: drawscanlinesT<1,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 2+8: drawscanlinesT<2,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 3+8: drawscanlinesT<3,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 4+8: drawscanlinesT<4,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 5+8: drawscanlinesT<5,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+
+
     }
 
 }
@@ -1150,7 +1257,29 @@ void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect)
 	y_end=ye;
 	memset(draw_line,0,256);
 
- //  if(shouldp()) printf("start upd\n");
+nbf++;
+
+ // nbwr_case1=0;
+ // nbwr_case2=0;
+ // nbwr_case3=0;
+ // nbwr_case4=0;
+ // nbwr_case5=0;
+ // nbwr_case6=0;
+
+ // nbwr_case7=0;
+ // nbwr_case8=0;
+ // nbwr_case9=0;
+ // nbwr_case10=0;
+ // nbwr_case11=0;
+ // nbwr_case12=0;
+
+ // nbwr_case13=0;
+ // nbwr_case14=0;
+ // nbwr_case15=0;
+ // nbwr_case16=0;
+ // nbwr_case17=0;
+ // nbwr_case18=0;
+
 // int nbw=0;
 	while(1)
 	{
@@ -1533,5 +1662,15 @@ void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect)
 //		nbw++;
 		//break;
 	}
+
+  // if(shouldp())
+  // {
+  //       printf("draws: c1:%d \tc2:%d \tc3:%d \tc4:%d\n",nbwr_case1,nbwr_case2,nbwr_case3,nbwr_case4);
+  //       printf("draws: c5:%d \tc6:%d \tc7:%d \tc8:%d\n",nbwr_case5,nbwr_case6,nbwr_case7,nbwr_case8);
+  //       printf("draws: c9:%d \tc10:%d \tc11:%d \tc12:%d\n",nbwr_case9,nbwr_case10,nbwr_case11,nbwr_case12);
+  //       printf("draws: c13:%d \tc14:%d \tc15:%d \tc16:%d\n",nbwr_case13,nbwr_case14,nbwr_case15,nbwr_case16);
+  //       printf("draws: c17:%d \tc18:%d\n",nbwr_case17,nbwr_case18);
+  // }
+
 //        if(shouldp()) printf("end upd %d\n",nbw);
 }
