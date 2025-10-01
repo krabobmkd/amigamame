@@ -2016,6 +2016,7 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 		else if (pri&0x0330)
 		{
 			//fast path todo - remove line enable
+			// KRB test if any plane Xclip here !
 			calculate_clip(y, pri&0x0330, &line_t->clip0[y], &line_t->clip1[y], &line_enable);
 		}
 		else
@@ -2236,11 +2237,11 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 	y_end=ye;
 	memset(draw_line,0,256);
 
-   if(shouldp()) printf("start upd\n");
- int nbw=0;
+ //  if(shouldp()) printf("start upd\n");
+// int nbw=0;
 	while(1)
 	{
-        if(shouldp()) printf("start main while\n");
+  //      if(shouldp()) printf("start main while\n");
 
 		static int alpha_level_last=-1;
 		int pos;
@@ -2308,7 +2309,7 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 		y_start=y_start_next;
 		draw_line_num[++i]=-1;
 
-    if(shouldp()) printf("go dsl y_start:%d y_end:%d\n",draw_line_num[0],draw_line_num[i-2]);
+ //   if(shouldp()) printf("go dsl y_start:%d y_end:%d\n",draw_line_num[0],draw_line_num[i-2]);
 
 		/* alpha blend */
 		alpha_mode_flag[0]=alpha_mode[0]&~3;
@@ -2611,15 +2612,15 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
  // 		y_end=y_end_next;
 //		y_start=y_start_next;
 // y_start
-    if(shouldp()) printf("go dsl y_start:%d y_end:%d\n",draw_line_num[0],draw_line_num[i-2]);
+//    if(shouldp()) printf("go dsl y_start:%d y_end:%d\n",draw_line_num[0],draw_line_num[i-2]);
 	//f3_drawscanlines(bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
     tf3_drawscanlines_k(bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
 
 		if(y_start<0) break;
-		nbw++;
+//		nbw++;
 		//break;
 	}
-        if(shouldp()) printf("end upd %d\n",nbw);
+//        if(shouldp()) printf("end upd %d\n",nbw);
 }
 
 /******************************************************************************/

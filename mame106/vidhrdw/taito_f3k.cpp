@@ -766,13 +766,12 @@ void f3_init_alpha_blend_func(void)
 static int nbf=0;
 INLINE int shouldp() { return ((nbf & 127)==1); }
 
-
-void tf3_drawscanlines_k(
+template<int skip_layer_num,bool useXspriteClip,bool useXplaneClip>
+void drawscanlinesT(
 		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
 		const struct f3_playfield_line_inf **line_t,
 		const int *sprite,
-		UINT32 orient,
-		int skip_layer_num)
+		UINT32 orient)
 {
 	pen_t *clut = &Machine->remapped_colortable[0];
 	UINT32 bgcolor=clut[0];
@@ -786,6 +785,16 @@ void tf3_drawscanlines_k(
 	UINT32 sprite_noalp_3=sprite[3]&0x100;
 	UINT32 sprite_noalp_4=sprite[4]&0x100;
 	UINT32 sprite_noalp_5=sprite[5]&0x100;
+
+// bublbob2:
+// noalp 0 0 0 0 1 1
+//noalp 0 0 0 1 1 1
+//noalp 0 0 0 0 1 1
+//noalp 0 1 0 0 0 0
+//noalp 0 0 1 0 0 0
+
+
+// printf("noalp %d %d %d %d %d %d\n",sprite_noalp_0>>8,sprite_noalp_1>>8,sprite_noalp_2>>8,sprite_noalp_3>>8,sprite_noalp_4>>8,sprite_noalp_5>>8);
 
 	static UINT16 *src0=0,*src_s0=0,*src_e0=0,clip_al0=0,clip_ar0=0,clip_bl0=0,clip_br0=0;
 	static UINT8 *tsrc0=0,*tsrc_s0=0;
@@ -838,11 +847,13 @@ void tf3_drawscanlines_k(
     while(1)
     {
         int cx=0;
-
-        clip_als=sa_line_inf->sprite_clip0[y]&0xffff;
-        clip_ars=sa_line_inf->sprite_clip0[y]>>16;
-        clip_bls=sa_line_inf->sprite_clip1[y]&0xffff;
-        clip_brs=sa_line_inf->sprite_clip1[y]>>16;
+        if(useXspriteClip)
+        {
+            clip_als=sa_line_inf->sprite_clip0[y]&0xffff;
+            clip_ars=sa_line_inf->sprite_clip0[y]>>16;
+            clip_bls=sa_line_inf->sprite_clip1[y]&0xffff;
+            clip_brs=sa_line_inf->sprite_clip1[y]>>16;
+        }
 
         length=xsize;
         dsti = dsti0;
@@ -865,19 +876,21 @@ void tf3_drawscanlines_k(
                 UINT8 sprite_pri;
                 switch(skip_layer_num)
                 {
-                    case 0: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[0]&pval))
+                    case 0: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
+                                && (sprite_pri=sprite[0]&pval))
                             {
                                 if(sprite_noalp_0) break;
                                 if(!f3_dpix_sp[sprite_pri]) break;
                                 if(f3_dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
                             }
-                            if (cx>=clip_al0 && cx<clip_ar0 && !(cx>=clip_bl0 && cx<clip_br0))
+                            if (!useXplaneClip || (cx>=clip_al0 && cx<clip_ar0 && !(cx>=clip_bl0 && cx<clip_br0)))
                             {
                                 tval=*tsrc0;
                                 if(tval&0xf0)
                                     if(f3_dpix_lp[0][pval>>4](clut[*src0])) {*dsti=dval;break;}
                             }
-                    case 1: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[1]&pval))
+                    case 1: if( (!useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) ))
+                                && (sprite_pri=sprite[1]&pval))
                             {
                                 if(sprite_noalp_1) break;
                                 if(!f3_dpix_sp[sprite_pri])
@@ -887,8 +900,12 @@ void tf3_drawscanlines_k(
                                 }
                                 if(f3_dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
                             }
-                            if (cx>=clip_al1 && cx<clip_ar1 && !(cx>=clip_bl1 && cx<clip_br1)) {tval=*tsrc1;if(tval&0xf0) if(f3_dpix_lp[1][pval>>4](clut[*src1])) {*dsti=dval;break;}}
-                    case 2: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[2]&pval))
+                            if (!useXplaneClip ||(cx>=clip_al1 && cx<clip_ar1 && !(cx>=clip_bl1 && cx<clip_br1)))
+                            {
+                                tval=*tsrc1;if(tval&0xf0) if(f3_dpix_lp[1][pval>>4](clut[*src1])) {*dsti=dval;break;}
+                            }
+                    case 2: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
+                            && (sprite_pri=sprite[2]&pval))
                             {
                                 if(sprite_noalp_2) break;
                                 if(!f3_dpix_sp[sprite_pri])
@@ -898,8 +915,12 @@ void tf3_drawscanlines_k(
                                 }
                                 if(f3_dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
                             }
-                            if (cx>=clip_al2 && cx<clip_ar2 && !(cx>=clip_bl2 && cx<clip_br2)) {tval=*tsrc2;if(tval&0xf0) if(f3_dpix_lp[2][pval>>4](clut[*src2])) {*dsti=dval;break;}}
-                    case 3: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[3]&pval))
+                            if (!useXplaneClip || (cx>=clip_al2 && cx<clip_ar2 && !(cx>=clip_bl2 && cx<clip_br2)))
+                            {
+                                tval=*tsrc2;if(tval&0xf0) if(f3_dpix_lp[2][pval>>4](clut[*src2])) {*dsti=dval;break;}
+                            }
+                    case 3: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
+                            && (sprite_pri=sprite[3]&pval))
                             {
                                 if(sprite_noalp_3) break;
                                 if(!f3_dpix_sp[sprite_pri])
@@ -909,9 +930,13 @@ void tf3_drawscanlines_k(
                                 }
                                 if(f3_dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
                             }
-                            if (cx>=clip_al3 && cx<clip_ar3 && !(cx>=clip_bl3 && cx<clip_br3)) {tval=*tsrc3;if(tval&0xf0) if(f3_dpix_lp[3][pval>>4](clut[*src3])) {*dsti=dval;break;}}
+                            if (!useXplaneClip ||(cx>=clip_al3 && cx<clip_ar3 && !(cx>=clip_bl3 && cx<clip_br3)))
+                            {
+                                tval=*tsrc3;if(tval&0xf0) if(f3_dpix_lp[3][pval>>4](clut[*src3])) {*dsti=dval;break;}
+                            }
 
-                    case 4: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[4]&pval))
+                    case 4: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
+                            && (sprite_pri=sprite[4]&pval))
                             {
                                 if(sprite_noalp_4) break;
                                 if(!f3_dpix_sp[sprite_pri])
@@ -921,7 +946,8 @@ void tf3_drawscanlines_k(
                                 }
                                 if(f3_dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
                             }
-                            if (cx>=clip_al4 && cx<clip_ar4 && !(cx>=clip_bl4 && cx<clip_br4)) {
+                            if (!useXplaneClip ||(cx>=clip_al4 && cx<clip_ar4 && !(cx>=clip_bl4 && cx<clip_br4)))
+                             {
                                 tval=*tsrc4;
                                 if(tval&0xf0)
                                 {
@@ -933,8 +959,8 @@ void tf3_drawscanlines_k(
                                 }
                             }
 
-
-                    case 5: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[5]&pval))
+                    case 5: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
+                            && (sprite_pri=sprite[5]&pval))
                             {
                                 if(sprite_noalp_5) break;
                                 if(!f3_dpix_sp[sprite_pri])
@@ -989,3 +1015,32 @@ void tf3_drawscanlines_k(
 #undef GET_PIXMAP_POINTER
 #undef CULC_PIXMAP_POINTER
 
+void tf3_drawscanlines_k(
+		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
+		const struct f3_playfield_line_inf **line_t,
+		const int *sprite,
+		UINT32 orient,
+		int skip_layer_num)
+{
+//    skip_layer_num
+    const bool useSprClipxTrue = true;
+    const bool useSprClipxFalse = false;
+    const bool usePlaneClipxTrue = true;
+    const bool usePlaneClipxFalse = false;
+
+    switch(skip_layer_num)
+    {
+        case 0: drawscanlinesT<0,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 1: drawscanlinesT<1,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 2: drawscanlinesT<2,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 3: drawscanlinesT<3,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 4: drawscanlinesT<4,useSprClipxFalse,usePlaneClipxFalse>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+
+        case 0+8: drawscanlinesT<0,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 1+8: drawscanlinesT<1,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 2+8: drawscanlinesT<2,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 3+8: drawscanlinesT<3,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 4+8: drawscanlinesT<4,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+    }
+
+}
