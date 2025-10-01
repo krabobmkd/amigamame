@@ -187,8 +187,8 @@ void QProc::process()
     {
         int idriver = getMainConfig().driverIndex().index(
 
-       //"nightstr"
-      //  "bigrun"
+//       "nightstr"
+//        "bigrun"
      // "cischeat"
     // "sci"
       //"sharrier"
@@ -200,13 +200,13 @@ void QProc::process()
 "bublbob2"
 //"gunbustr"
 //"gekirido"
-//"cchasm"
+//"outrun"
 //"startrek"
 //"tacscan"
  //     "othunder"
-      // "thndrbld"
-      // "chasehq"
-//"gforce2"
+//       "thndrbld"
+//       "chasehq"
+//"gaxeduel"
         );
         if(idriver>0)
         {
