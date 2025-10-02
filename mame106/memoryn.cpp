@@ -167,14 +167,14 @@ static inline void testEntryShitMaskUse_directwriteA( handler_data &hdata, offs_
 #define ENTRY_STAT_DirectWritesB(a)
 #define ENTRY_STAT_Overwrite(a)
 #endif
-
+#ifdef DO_TESTENTRYTYPE
 extern "C" {
     void logEntries();
 }
 
 void logEntries()
 {
-#ifdef DO_TESTENTRYTYPE
+
     printf("maskuse:%08x offsetuse:%08x adressspace_readmaskuse:%08x\n",read_maskuse,read_offsetuse,adressspace_readmaskuse);
 
     printf("  **** READ ****\n");
@@ -209,9 +209,9 @@ void logEntries()
             printf("*** DirectWriteB %03d  %08x\n", ic, entriesDirectWritesB[ic]);
         }
     }
-#endif
-}
 
+}
+#endif
 
 #else
 #define ENTRY_STAT_DirectReadA(a)

@@ -644,12 +644,15 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
  extern const bios_entry *system_bios_neogeo_first;
 #endif
 // MameConfig::MissingROM::MissingROM() : ASerializable()
+//  , _allow(false)
 // {
+//// _missingRomAction("wget -P %ROMDIR% http://thisisjustanexampletoshowyou.org/%ROM%.zip")
+////  wget -P /mnt/iso http://example.com/file.iso
 // }
 // void MameConfig::MissingROM::serialize(ASerializer &serializer)
 // {
-//     serializer("Action 1",_missingRomAction1,0);
-//     serializer("Action 2",_missingRomAction2,0);
+//     serializer("Allow",_allow,0);
+//     serializer("Action",_missingRomAction,0);
 // }
 
 

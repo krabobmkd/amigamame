@@ -39,7 +39,8 @@
 #include "machine/eeprom.h"
 #include "taito_f3.h"
 #include "sound/es5506.h"
-
+#include "cpu/m68000/m68kops.h"
+#include "memory.h"
 static UINT32 coin_word[2], *f3_ram;
 UINT32 *f3_shared_ram;
 int f3_game;
@@ -3257,11 +3258,74 @@ static DRIVER_INIT( ktiger2 )
 	tile_decode(0);
 }
 
+/*
+cpustats_log bublbobl2
+
+ ----- cpu 0 -----
+ adr:000ecf1e nbr:00352560 regir:000051c8 m68k_op_dbf_16<- wait loop on itself !!!
+ adr:000e98f8 nbr:002554e2 regir:00004a2d
+ adr:000e98fc nbr:002554e2 regir:0000660a
+
+ adr:000e9b08 nbr:002548dc regir:00006602
+ adr:000e9b04 nbr:002548dc regir:0000302d
+ adr:000e9b00 nbr:002548dc regir:00003b40
+ adr:000e9afe nbr:002548dc regir:00005a40
+ adr:000e9b14 nbr:002548dc regir:00004840
+ adr:000e9b1c nbr:002548dc regir:00004e75
+ adr:000e9afc nbr:002548dc regir:00004840
+ adr:000e9af4 nbr:002548dc regir:0000c1fc
+ adr:000e9b10 nbr:002548dc regir:000081fc
+ -------
+ ----- cpu 1 -----
+ adr:00c0b604 nbr:001d3518 regir:000051c8  m68k_op_dbf_16 <- wait loop on itself !!!
+
+ adr:00c10ae4 nbr:0007d867 regir:00006720
+ adr:00c10ae2 nbr:0007d867 regir:0000b300
+ adr:00c10ade nbr:0007d867 regir:0000122a
+ adr:00c10ada nbr:0007d867 regir:0000102a
+
+ adr:00c10b06 nbr:0006dfb6 regir:0000d4fc
+ adr:00c10b0a nbr:0006dfb6 regir:0000b4fc
+ adr:00c10b0e nbr:0006dfb6 regir:000065ca
+
+ adr:00c10dac nbr:00051306 regir:00003228
+ adr:00c10dc2 nbr:00051306 regir:0000d0fc
+ adr:00c10dc6 nbr:00051306 regir:0000b0fc
+ adr:00c10dca nbr:00051306 regir:000065e0
+*/
+void m68k_op_dbf_16_bublbob2(M68KOPT_PARAMS);
+// woot
+static void krb_bubbobl2_patch()
+{
+//    memory_set_context(0);
+//    memory_set_opbase(0x000ecf1e);
+//	//UINT16 *pcode = (UINT16 *)memory_region(REGION_CPU1);
+//    UINT16 *pcode = (UINT16 *)opcode_base;
+//    if(pcode[0x000ecf1e>>1] == 0x51c8) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
+//    {
+//        m68ki_instruction_jump_table[9] = m68k_op_dbf_16_bublbob2;
+//        pcode[0x000ecf1e>>1] = 9;
+//        //printf("orp2 done\n");
+//    }
+//    memory_set_context(1);
+//    memory_set_opbase(0x00c0b604);
+//	//pcode = (UINT16 *)memory_region(REGION_CPU2);
+//    pcode = (UINT16 *)opcode_base;
+//    if(pcode[0x00c0b604>>1] == 0x51c8) // inst. 0x4a6d  void m68k_op_tst_16_di(M68KOPT_PARAMS)
+//    {
+//        m68ki_instruction_jump_table[9] = m68k_op_dbf_16_bublbob2;
+//        pcode[0x00c0b604>>1] = 9;
+//        //printf("orp2 done\n");
+//    }
+
+}
 static DRIVER_INIT( bubsymph )
 {
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
 	f3_game=BUBSYMPH;
 	tile_decode(1);
+
+    krb_bubbobl2_patch();
 }
 
 static DRIVER_INIT( bubblem )

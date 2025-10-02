@@ -16,6 +16,33 @@ void m68k_op_dbt_16(M68KOPT_PARAMS)
 	REG_PC += 2;
 }
 
+// dbf used for autoloop to itself...
+void m68k_op_dbf_16_bublbob2(M68KOPT_PARAMS)
+{
+
+#ifdef LSB_FIRST
+    uint16 * r_dst = ((uint16 *)&DY);
+#else
+    uint16 * r_dst = ((uint16 *)&DY)+1; //krb:  just shift to get value, no mask needed.
+#endif
+    uint res = (uint)*r_dst;
+
+    uint cyclesToEndOfLoop = CYC_DBCC_F_NOEXP * res;
+    if(cyclesToEndOfLoop>m68ki_remaining_cycles)
+    {
+        // finish cycle loop, still be here
+        *r_dst = (cyclesToEndOfLoop-m68ki_remaining_cycles)/CYC_DBCC_F_NOEXP;
+        m68ki_remaining_cycles = 0;
+        REG_PC = REG_PPC;
+    } else {
+        m68ki_remaining_cycles -= cyclesToEndOfLoop;
+        *r_dst = 0xffff; // condition of quitting dbf.
+      	REG_PC += 2; // not sure !
+    }
+
+}
+
+
 void m68k_op_dbf_16(M68KOPT_PARAMS)
 {
 

@@ -286,12 +286,13 @@ public:
     };
     Controls &controls() { return _controls; }
 
-    // struct MissingROM : public ASerializable
-    // {
-    //     MissingROM();
-    //     void serialize(ASerializer &serializer) override;
-    //     std::string _missingRomAction1,_missingRomAction2;
-    // };
+//     struct MissingROM : public ASerializable
+//     {
+//         MissingROM();
+//         void serialize(ASerializer &serializer) override;
+//         bool _allow;
+//         std::string _missingRomAction;
+//     };
 
 //    #define MISCFLAG_USEREADJOYPORT 1
     #define MISCFLAG_MEGADRIVE6BT_ALTCONF 1

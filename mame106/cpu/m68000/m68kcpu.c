@@ -828,16 +828,17 @@ int m68k_execute(int num_cycles)
 //         {
 //         printf("w");
 //         }
-//    if(activecpu == 0 && REG_PPC == 0x00000616)
-////    if(REG_PPC == 0x00001380 && activecpu == 0)
-//////sharriercpu1         if(REG_PPC == 0x00001134 && activecpu == 1)
-//         {
-//         printf("ir:%08x\n",(int)ir);
-//         exit(0);
-//          static int uu=0;
-//          uu++;
-//         }
+    if(activecpu == 0 && REG_PPC == 0x000ecf1e)
+    {
+//////    if(REG_PPC == 0x00001380 && activecpu == 0)
+////////sharriercpu1         if(REG_PPC == 0x00001134 && activecpu == 1)
+////         {
+////         printf("ir:%08x\n",(int)ir);
+////         exit(0);
+          static int uu=0;
+          uu++;
 
+    }
 //    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
 #endif
 			m68ki_instruction_jump_table[ir](p68k,ir);
