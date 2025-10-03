@@ -40,6 +40,9 @@ struct tempsprite
 #else
 #define REGPX(r)
 #endif
+static int anyPlaneAlphaBlend;
+static int anySpriteAlphaBlend;
+
 
 
 typedef UINT32 Pixt;
@@ -818,7 +821,7 @@ INLINE int shouldp() { return ((nbf & 127)==1); }
 // int nbwr_case17=0;
 // int nbwr_case18=0;
 
-template<int skip_layer_num,bool useXspriteClip,bool useXplaneClip>
+template<int skip_layer_num,bool useXspriteClip,bool useXplaneClip,bool useAlphaBlend,bool useABlendSpr>
 void drawscanlinesT(
 		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
 		const struct f3_playfield_line_inf **line_t,
@@ -883,16 +886,17 @@ void drawscanlinesT(
 	}
 
 	dstp0 = (UINT8 *)tf3_pri_alp_bitmap->line[ty] + x;
-
-	pdest_2a = f3_alpha_level_2ad ? 0x10 : 0;
-	pdest_2b = f3_alpha_level_2bd ? 0x20 : 0;
-	tr_2a =(f3_alpha_level_2as==0 && f3_alpha_level_2ad==255) ? -1 : 0;
-	tr_2b =(f3_alpha_level_2bs==0 && f3_alpha_level_2bd==255) ? -1 : 1;
-	pdest_3a = f3_alpha_level_3ad ? 0x40 : 0;
-	pdest_3b = f3_alpha_level_3bd ? 0x80 : 0;
-	tr_3a =(f3_alpha_level_3as==0 && f3_alpha_level_3ad==255) ? -1 : 0;
-	tr_3b =(f3_alpha_level_3bs==0 && f3_alpha_level_3bd==255) ? -1 : 1;
-
+    if(useAlphaBlend || useABlendSpr)
+    {
+        pdest_2a = f3_alpha_level_2ad ? 0x10 : 0;
+        pdest_2b = f3_alpha_level_2bd ? 0x20 : 0;
+        tr_2a =(f3_alpha_level_2as==0 && f3_alpha_level_2ad==255) ? -1 : 0;
+        tr_2b =(f3_alpha_level_2bs==0 && f3_alpha_level_2bd==255) ? -1 : 1;
+        pdest_3a = f3_alpha_level_3ad ? 0x40 : 0;
+        pdest_3b = f3_alpha_level_3bd ? 0x80 : 0;
+        tr_3a =(f3_alpha_level_3as==0 && f3_alpha_level_3ad==255) ? -1 : 0;
+        tr_3b =(f3_alpha_level_3bs==0 && f3_alpha_level_3bd==255) ? -1 : 1;
+    }
     // - - - - - -  -
     UINT32 *dsti0,*dsti;
     dsti0 = (UINT32 *)bitmap->line[ty] + x;
@@ -936,26 +940,42 @@ void drawscanlinesT(
                     case 0: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
                                 && (sprite_pri=sprite[0]&val.p))
                             {
+                                if(!useABlendSpr) break;
                                 if(sprite_noalp_0) break;
                                 if(!f3_dpix_sp[sprite_pri]) break;
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
-                               // nbwr_case1++;
-                                *dsti=val.d;
+                                if(!useABlendSpr)
+                                {
 
-                                break;}
+                                } else
+                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val))
+                                {
+                                    // nbwr_case1++;
+                                    *dsti=val.d;
+
+                                    break;
+                                }
                             }
                             if (!useXplaneClip || (cx>=clip_al0 && cx<clip_ar0 && !(cx>=clip_bl0 && cx<clip_br0)))
                             {
                                 val.t=*tsrc0;
                                 if(val.t&0xf0)
-                                    if(f3_dpix_lp[0][val.p>>4](clut[*src0],val)) {
-                                        // nbwr_case2++;
-                                        *dsti=val.d;break;
-                                    }
+                                {
+                                    if(!useAlphaBlend)
+                                    {
+                                        *dsti=clut[*src0];break;
+                                    } else
+                                    {
+                                        if(f3_dpix_lp[0][val.p>>4](clut[*src0],val)) {
+                                            // nbwr_case2++;
+                                            *dsti=val.d;break;
+                                        }
+                                     }
+                                 }
                             }
                     case 1: if( (!useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) ))
                                 && (sprite_pri=sprite[1]&val.p))
                             {
+                                if(!useABlendSpr) break;
                                 if(sprite_noalp_1) break;
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
@@ -972,15 +992,26 @@ void drawscanlinesT(
                             }
                             if (!useXplaneClip ||(cx>=clip_al1 && cx<clip_ar1 && !(cx>=clip_bl1 && cx<clip_br1)))
                             {
-                                val.t=*tsrc1;if(val.t&0xf0) if(f3_dpix_lp[1][val.p>>4](clut[*src1],val))
+                                 val.t=*tsrc1;
+                                if(val.t&0xf0)
                                 {
-                                    // nbwr_case5++;
-                                    *dsti=val.d;break;
+                                    if(!useAlphaBlend)
+                                    {
+                                        *dsti=clut[*src1];break;
+                                    } else
+                                    {
+                                        if(f3_dpix_lp[1][val.p>>4](clut[*src1],val))
+                                        {
+                                            // nbwr_case5++;
+                                            *dsti=val.d;break;
+                                        }
+                                    }
                                 }
                             }
                     case 2: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
                             && (sprite_pri=sprite[2]&val.p))
                             {
+                                if(!useABlendSpr) break;
                                 if(sprite_noalp_2) break;
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
@@ -996,15 +1027,26 @@ void drawscanlinesT(
                             }
                             if (!useXplaneClip || (cx>=clip_al2 && cx<clip_ar2 && !(cx>=clip_bl2 && cx<clip_br2)))
                             {
-                                val.t=*tsrc2;if(val.t&0xf0) if(f3_dpix_lp[2][val.p>>4](clut[*src2],val))
+                                val.t=*tsrc2;
+                                if(val.t&0xf0)
                                 {
-                                  //   nbwr_case8++;
-                                    *dsti=val.d;break;
+                                    if(!useAlphaBlend)
+                                    {
+                                        *dsti=clut[*src2];break;
+                                    } else
+                                    {
+                                        if(f3_dpix_lp[2][val.p>>4](clut[*src2],val))
+                                        {
+                                          //   nbwr_case8++;
+                                            *dsti=val.d;break;
+                                        }
+                                    }
                                 }
                             }
                     case 3: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
                             && (sprite_pri=sprite[3]&val.p))
                             {
+                                if(!useABlendSpr) break;
                                 if(sprite_noalp_3) break;
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
@@ -1016,22 +1058,29 @@ void drawscanlinesT(
                                 if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
                               //   nbwr_case10++;
                                 *dsti=val.d;break;}
+
                             }
                             if (!useXplaneClip ||(cx>=clip_al3 && cx<clip_ar3 && !(cx>=clip_bl3 && cx<clip_br3)))
                             {
                                 val.t=*tsrc3;
                                 if(val.t&0xf0)
                                 {
-                                    UINT8 pv = val.p>>4;
-                                    if(!pv)
+                                    if(!useAlphaBlend)
                                     {
-                                        *dsti=clut[*src3];
-                                        break;
-                                    }
-                                    if(f3_dpix_lp[3][pv](clut[*src3],val))
+                                        *dsti=clut[*src3];break;
+                                    } else
                                     {
-                                      //    nbwr_case11++;
-                                        *dsti=val.d;break;
+                                        UINT8 pv = val.p>>4;
+                                        if(!pv)
+                                        {
+                                            *dsti=clut[*src3];
+                                            break;
+                                        }
+                                        if(f3_dpix_lp[3][pv](clut[*src3],val))
+                                        {
+                                          //    nbwr_case11++;
+                                            *dsti=val.d;break;
+                                        }
                                     }
                                 }
                             }
@@ -1039,6 +1088,7 @@ void drawscanlinesT(
                     case 4: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
                             && (sprite_pri=sprite[4]&val.p))
                             {
+                                if(!useABlendSpr) break;
                                 if(sprite_noalp_4) break;
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
@@ -1053,27 +1103,36 @@ void drawscanlinesT(
                                 *dsti=val.d;break;}
                             }
                             if (!useXplaneClip ||(cx>=clip_al4 && cx<clip_ar4 && !(cx>=clip_bl4 && cx<clip_br4)))
-                             {
+                            {
                                 val.t=*tsrc4;
                                 if(val.t&0xf0)
                                 {
-                                    UINT8 pv=  val.p>>4;
-                                    if(!pv) {
+                                    if(!useAlphaBlend)
+                                    {
                                         *dsti=clut[*src4];
                                         break;
-                                    }
-                                    if(f3_dpix_lp[4][pv](clut[*src4],val))
+                                    } else
                                     {
-                                      //   nbwr_case14++;
-                                        *dsti=val.d;
-                                        break;
+                                        UINT8 pv=  val.p>>4;
+                                        if(!pv) {
+                                            *dsti=clut[*src4];
+                                            break;
+                                        }
+                                        if(f3_dpix_lp[4][pv](clut[*src4],val))
+                                        {
+                                          //   nbwr_case14++;
+                                            *dsti=val.d;
+                                            break;
+                                        }
                                     }
+
                                 }
                             }
 
                     case 5: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
                             && (sprite_pri=sprite[5]&val.p))
                             {
+                                if(!useABlendSpr) break;
                                 if(sprite_noalp_5) break;
                                 if(!f3_dpix_sp[sprite_pri])
                                 {
@@ -1150,33 +1209,41 @@ static inline void tf3_drawscanlines_k(
     // const bool useSprClipxFalse = false;
     // const bool usePlaneClipxTrue = true;
     // const bool usePlaneClipxFalse = false;
-
+// anySpriteAlphaBlend
     skip_layer_num |= (tf3_anyPlaneClipX<<3);
-
+    // |((anySpriteAlphaBlend)<<4);
+// printf("has alpha:%d\n",(anySpriteAlphaBlend));
     switch(skip_layer_num)
     {
-        // useClipXsprite, useClipXPlane
-        case 0: drawscanlinesT<0,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 1: drawscanlinesT<1,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 2: drawscanlinesT<2,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 3: drawscanlinesT<3,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 4: drawscanlinesT<4,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 5: drawscanlinesT<5,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        // useClipXsprite, useClipXPlane, useAlphaBlendPlane,useAlphaBlendSprite
+        case 0: drawscanlinesT<0,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 1: drawscanlinesT<1,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 2: drawscanlinesT<2,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 3: drawscanlinesT<3,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 4: drawscanlinesT<4,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 5: drawscanlinesT<5,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
 
-        // case 0: drawscanlinesT<0,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        // case 1: drawscanlinesT<1,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        // case 2: drawscanlinesT<2,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        // case 3: drawscanlinesT<3,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        // case 4: drawscanlinesT<4,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        // case 5: drawscanlinesT<5,useSprClipxTrue,usePlaneClipxTrue>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
 
-        case 0+8: drawscanlinesT<0,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 1+8: drawscanlinesT<1,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 2+8: drawscanlinesT<2,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 3+8: drawscanlinesT<3,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 4+8: drawscanlinesT<4,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 5+8: drawscanlinesT<5,false,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 0+8: drawscanlinesT<0,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 1+8: drawscanlinesT<1,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 2+8: drawscanlinesT<2,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 3+8: drawscanlinesT<3,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 4+8: drawscanlinesT<4,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 5+8: drawscanlinesT<5,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
 
+        case 0+16: drawscanlinesT<0,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 1+16: drawscanlinesT<1,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 2+16: drawscanlinesT<2,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 3+16: drawscanlinesT<3,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 4+16: drawscanlinesT<4,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 5+16: drawscanlinesT<5,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+
+        case 0+8+16: drawscanlinesT<0,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 1+8+16: drawscanlinesT<1,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 2+8+16: drawscanlinesT<2,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 3+8+16: drawscanlinesT<3,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 4+8+16: drawscanlinesT<4,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 5+8+16: drawscanlinesT<5,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
 
     }
 
@@ -1286,6 +1353,9 @@ nbf++;
   //      if(shouldp()) printf("start main while\n");
 
 		static int alpha_level_last=-1;
+        anyPlaneAlphaBlend=0;
+        anySpriteAlphaBlend=0;
+
 		int pos;
 		int pri[5],alpha_mode[5],alpha_mode_flag[5],alpha_level;
 		UINT16 sprite_alpha;
@@ -1407,6 +1477,10 @@ nbf++;
 			/* set sprite alpha mode */
 			sprite_alpha_check=0;
 			sprite_alpha_all_2a=1;
+
+			//anyPlaneAlphaBlend = 1;
+			anySpriteAlphaBlend = 1;
+
 			f3_dpix_sp[1]=0;
 			f3_dpix_sp[2]=0;
 			f3_dpix_sp[4]=0;
@@ -1461,6 +1535,7 @@ nbf++;
 
 				if(alpha_mode[i]==2)
 				{
+
 					if(alpha_type==1)
 					{
 						if     (f3_alpha_level_2as==0   && f3_alpha_level_2ad==255) alpha_mode[i]=0;
@@ -1482,6 +1557,7 @@ nbf++;
 				}
 				else if(alpha_mode[i]==3)
 				{
+
 					if(alpha_type==1)
 					{
 						if     (f3_alpha_level_3as==0   && f3_alpha_level_3ad==255) alpha_mode[i]=0;
@@ -1527,6 +1603,7 @@ nbf++;
 					f3_dpix_sp[8]=0;
 				}
 			}
+
 		}
 		else
 		{
@@ -1535,6 +1612,7 @@ nbf++;
 			f3_dpix_sp[2]=0;
 			f3_dpix_sp[4]=0;
 			f3_dpix_sp[8]=0;
+
 		}
 
 

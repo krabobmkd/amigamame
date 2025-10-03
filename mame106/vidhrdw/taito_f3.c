@@ -206,6 +206,7 @@ Playfield tile info:
 #include "driver.h"
 #include "taito_f3.h"
 #include <stdio.h>
+#include "palette.h"
 #define DARIUSG_KLUDGE
 //#define DEBUG_F3 1
 
@@ -226,6 +227,8 @@ UINT32 *f3_vram,*f3_line_ram;
 UINT32 *f3_pf_data,*f3_pivot_ram;
 
 static int f3_skip_this_frame;
+
+//extern int anySpriteAlphaBlend;
 
 /* Game specific data, some of this can be
 removed when the software values are figured out */
@@ -742,53 +745,69 @@ WRITE32_HANDLER( f3_lineram_w )
 	COMBINE_DATA(&f3_line_ram[offset]);
 }
 
+/* 12 bit palette games - there has to be a palette select bit somewhere */
+WRITE32_HANDLER( f3_palette_24bit_SPCINVDX_w )
+{
+    int r,g,b;
+	COMBINE_DATA(&paletteram32[offset]);
+    b = 15 * ((paletteram32[offset] >> 4) & 0xf);
+    g = 15 * ((paletteram32[offset] >> 8) & 0xf);
+    r = 15 * ((paletteram32[offset] >> 12) & 0xf);
+    palette_set_color(offset,r,g,b);
+}
+WRITE32_HANDLER( f3_palette_24bit_CLEOPATR_w )
+{
+    int r,g,b;
+	COMBINE_DATA(&paletteram32[offset]);
+    if (offset<0x100 || offset>0x1000) {
+        r = ((paletteram32[offset] >>16) & 0x7f)<<1;
+        g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
+        b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
+    } else {
+//            setpalettefast_neogeo(offset,paletteram32[offset]);
+//            return;
+        r = (paletteram32[offset] >>16) & 0xff;
+        g = (paletteram32[offset] >> 8) & 0xff;
+        b = (paletteram32[offset] >> 0) & 0xff;
+    }
+    palette_set_color(offset,r,g,b);
+}
+WRITE32_HANDLER( f3_palette_24bit_TWINQIX_w )
+{
+    int r,g,b;
+	COMBINE_DATA(&paletteram32[offset]);
+    if (offset>0x1c00) {
+        r = ((paletteram32[offset] >>16) & 0x7f)<<1;
+        g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
+        b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
+
+    } else {
+//            setpalettefast_neogeo(offset,paletteram32[offset]);
+//            return;
+        r = (paletteram32[offset] >>16) & 0xff;
+        g = (paletteram32[offset] >> 8) & 0xff;
+        b = (paletteram32[offset] >> 0) & 0xff;
+    }
+    palette_set_color(offset,r,g,b);
+}
+//optimize me !!! -> done.
 WRITE32_HANDLER( f3_palette_24bit_w )
 {
-	int r,g,b;
-
 	COMBINE_DATA(&paletteram32[offset]);
+   //  setpalettefast_neogeo(offset,paletteram32[offset]);
+     Machine->remapped_colortable[offset] =paletteram32[offset];
+//#ifdef LSB_FIRST
+//	int r,g,b;
+//    r = (paletteram32[offset] >>16) & 0xff;
+//    g = (paletteram32[offset] >> 8) & 0xff;
+//    b = (paletteram32[offset] >> 0) & 0xff;
+//   // setpalettefast_neogeo(offset,paletteram32[offset]);
+//    palette_set_color(offset,r,g,b);
+//#else
+//    setpalettefast_neogeo(offset,paletteram32[offset]);
+//#endif
 
-	/* 12 bit palette games - there has to be a palette select bit somewhere */
-	if (f3_game==SPCINVDX || f3_game==RIDINGF || f3_game==ARABIANM || f3_game==RINGRAGE) {
-		b = 15 * ((paletteram32[offset] >> 4) & 0xf);
-		g = 15 * ((paletteram32[offset] >> 8) & 0xf);
-		r = 15 * ((paletteram32[offset] >> 12) & 0xf);
-	}
-
-	/* This is weird - why are only the sprites and VRAM palettes 21 bit? */
-	else if (f3_game==CLEOPATR) {
-		if (offset<0x100 || offset>0x1000) {
-		 	r = ((paletteram32[offset] >>16) & 0x7f)<<1;
-			g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
-			b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
-		} else {
-		 	r = (paletteram32[offset] >>16) & 0xff;
-			g = (paletteram32[offset] >> 8) & 0xff;
-			b = (paletteram32[offset] >> 0) & 0xff;
-		}
-	}
-
-	/* Another weird couple - perhaps this is alpha blending related? */
-	else if (f3_game==TWINQIX || f3_game==RECALH) {
-		if (offset>0x1c00) {
-		 	r = ((paletteram32[offset] >>16) & 0x7f)<<1;
-			g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
-			b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
-		} else {
-		 	r = (paletteram32[offset] >>16) & 0xff;
-			g = (paletteram32[offset] >> 8) & 0xff;
-			b = (paletteram32[offset] >> 0) & 0xff;
-		}
-	}
-
-	/* All other games - standard 24 bit palette */
-	else {
-	 	r = (paletteram32[offset] >>16) & 0xff;
-		g = (paletteram32[offset] >> 8) & 0xff;
-		b = (paletteram32[offset] >> 0) & 0xff;
-	}
-
-	palette_set_color(offset,r,g,b);
+    return;
 }
 
 /******************************************************************************/
@@ -2874,6 +2893,8 @@ VIDEO_UPDATE( f3 )
 
 // video_update_taito_f3k_drawsprites( bitmap, cliprect);
 // return;
+
+//    anySpriteAlphaBlend = 0;
 
 	/* Update sprite buffer */
 	f3_drawsprites(bitmap,cliprect);

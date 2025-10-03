@@ -3135,10 +3135,16 @@ F3_IRQ_SPEEDUP_3_R(eaction2, 0x133c,   0x07a0/4, 0x00001048 )
 F3_IRQ_SPEEDUP_1_R(twinqix,  0xe9a52,  0x0134/4, 0x000000ff )
 F3_IRQ_SPEEDUP_2_R(kirameki, 0x12fc6,  0x0414/4, 0x0000ff00 )
 
+
+WRITE32_HANDLER( f3_palette_24bit_SPCINVDX_w );
+WRITE32_HANDLER( f3_palette_24bit_CLEOPATR_w );
+WRITE32_HANDLER( f3_palette_24bit_TWINQIX_w );
+
 static DRIVER_INIT( ringrage )
 {
 	f3_game=RINGRAGE;
 	tile_decode(0);
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM,0x440000, 0x447fff, 0, 0, f3_palette_24bit_SPCINVDX_w );
 }
 
 static DRIVER_INIT( arabianm )
@@ -3146,12 +3152,14 @@ static DRIVER_INIT( arabianm )
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x408124, 0x408127, 0, 0, irq_speedup_r_arabianm );
 	f3_game=ARABIANM;
 	tile_decode(1);
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM,0x440000, 0x447fff, 0, 0, f3_palette_24bit_SPCINVDX_w );
 }
 
 static DRIVER_INIT( ridingf )
 {
 	f3_game=RIDINGF;
 	tile_decode(1);
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM,0x440000, 0x447fff, 0, 0, f3_palette_24bit_SPCINVDX_w );
 }
 
 static DRIVER_INIT( gseeker )
@@ -3228,6 +3236,8 @@ static DRIVER_INIT( spcinvdj )
 {
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x400230, 0x400233, 0, 0, irq_speedup_r_spcinvdj );
 	f3_game=SPCINVDX;
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM,0x440000, 0x447fff, 0, 0, f3_palette_24bit_SPCINVDX_w );
+
 	tile_decode(0);
 }
 
@@ -3293,10 +3303,10 @@ cpustats_log bublbobl2
  adr:00c10dc6 nbr:00051306 regir:0000b0fc
  adr:00c10dca nbr:00051306 regir:000065e0
 */
-void m68k_op_dbf_16_bublbob2(M68KOPT_PARAMS);
+//void m68k_op_dbf_16_bublbob2(M68KOPT_PARAMS);
 // woot
-static void krb_bubbobl2_patch()
-{
+//static void krb_bubbobl2_patch()
+//{
 //    memory_set_context(0);
 //    memory_set_opbase(0x000ecf1e);
 //	//UINT16 *pcode = (UINT16 *)memory_region(REGION_CPU1);
@@ -3317,15 +3327,16 @@ static void krb_bubbobl2_patch()
 //        pcode[0x00c0b604>>1] = 9;
 //        //printf("orp2 done\n");
 //    }
+//}
 
-}
+
 static DRIVER_INIT( bubsymph )
 {
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
 	f3_game=BUBSYMPH;
 	tile_decode(1);
-
-    krb_bubbobl2_patch();
+   //	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM,0x440000, 0x447fff, 0, 0, f3_palette_24bit_simple_w );
+    //krb_bubbobl2_patch();
 }
 
 static DRIVER_INIT( bubblem )
@@ -3340,6 +3351,7 @@ static DRIVER_INIT( cleopatr )
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_cleopatr );
 	f3_game=CLEOPATR;
 	tile_decode(0);
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM,0x440000, 0x447fff, 0, 0, f3_palette_24bit_CLEOPATR_w );
 }
 
 static DRIVER_INIT( popnpop )
@@ -3432,6 +3444,7 @@ static DRIVER_INIT( twinqix )
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_twinqix );
 	f3_game=TWINQIX;
 	tile_decode(0);
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM,0x440000, 0x447fff, 0, 0, f3_palette_24bit_TWINQIX_w );
 }
 
 static DRIVER_INIT( arkretrn )
@@ -3451,6 +3464,7 @@ static DRIVER_INIT( recalh )
 {
 	f3_game=RECALH;
 	tile_decode(0);
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM,0x440000, 0x447fff, 0, 0, f3_palette_24bit_TWINQIX_w );
 }
 
 static DRIVER_INIT( commandw )
