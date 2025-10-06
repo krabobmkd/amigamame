@@ -744,7 +744,12 @@ WRITE32_HANDLER( f3_lineram_w )
 
 	COMBINE_DATA(&f3_line_ram[offset]);
 }
-
+static inline void setcol(UINT32 offset, int r,int g, int b)
+{
+//    palette_set_color(offset,r,g,b);
+    UINT32 c = (r<<16)|(g<<8)|b;
+    Machine->remapped_colortable[offset] =c;
+}
 /* 12 bit palette games - there has to be a palette select bit somewhere */
 WRITE32_HANDLER( f3_palette_24bit_SPCINVDX_w )
 {
@@ -753,42 +758,50 @@ WRITE32_HANDLER( f3_palette_24bit_SPCINVDX_w )
     b = 15 * ((paletteram32[offset] >> 4) & 0xf);
     g = 15 * ((paletteram32[offset] >> 8) & 0xf);
     r = 15 * ((paletteram32[offset] >> 12) & 0xf);
-    palette_set_color(offset,r,g,b);
+    setcol(offset,r,g,b);
 }
 WRITE32_HANDLER( f3_palette_24bit_CLEOPATR_w )
 {
-    int r,g,b;
 	COMBINE_DATA(&paletteram32[offset]);
     if (offset<0x100 || offset>0x1000) {
-        r = ((paletteram32[offset] >>16) & 0x7f)<<1;
-        g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
-        b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
+        // int r,g,b;
+        // r = ((paletteram32[offset] >>16) & 0x7f)<<1;
+        // g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
+        // b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
+        // setcol(offset,r,g,b);
+        Machine->remapped_colortable[offset] = (paletteram32[offset]&0x007f7f7f)<<1;
     } else {
 //            setpalettefast_neogeo(offset,paletteram32[offset]);
 //            return;
-        r = (paletteram32[offset] >>16) & 0xff;
-        g = (paletteram32[offset] >> 8) & 0xff;
-        b = (paletteram32[offset] >> 0) & 0xff;
+        Machine->remapped_colortable[offset] = paletteram32[offset];
+
+//     setcol(offset,r,g,b);
+        // r = (paletteram32[offset] >>16) & 0xff;
+        // g = (paletteram32[offset] >> 8) & 0xff;
+        // b = (paletteram32[offset] >> 0) & 0xff;
     }
-    palette_set_color(offset,r,g,b);
+    //palette_set_color(offset,r,g,b);
+
 }
 WRITE32_HANDLER( f3_palette_24bit_TWINQIX_w )
 {
     int r,g,b;
 	COMBINE_DATA(&paletteram32[offset]);
     if (offset>0x1c00) {
-        r = ((paletteram32[offset] >>16) & 0x7f)<<1;
-        g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
-        b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
-
+        // r = ((paletteram32[offset] >>16) & 0x7f)<<1;
+        // g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
+        // b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
+        Machine->remapped_colortable[offset] = (paletteram32[offset]&0x007f7f7f)<<1;
     } else {
 //            setpalettefast_neogeo(offset,paletteram32[offset]);
 //            return;
-        r = (paletteram32[offset] >>16) & 0xff;
-        g = (paletteram32[offset] >> 8) & 0xff;
-        b = (paletteram32[offset] >> 0) & 0xff;
+        // r = (paletteram32[offset] >>16) & 0xff;
+        // g = (paletteram32[offset] >> 8) & 0xff;
+        // b = (paletteram32[offset] >> 0) & 0xff;
+        Machine->remapped_colortable[offset] = paletteram32[offset];
     }
-    palette_set_color(offset,r,g,b);
+    //palette_set_color(offset,r,g,b);
+   //  setcol(offset,r,g,b);
 }
 //optimize me !!! -> done.
 WRITE32_HANDLER( f3_palette_24bit_w )

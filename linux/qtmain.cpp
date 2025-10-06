@@ -197,7 +197,8 @@ void QProc::process()
 //"btlkroad"
 //"samuraia"
 //"tengai"
-"bublbob2"
+//"bublbob2"
+"gseeker"
 //"gunbustr"
 //"gekirido"
 //"outrun"
@@ -526,6 +527,7 @@ const os_code_info *osd_get_code_list(void)
         {"M1AY",1025,MOUSECODE_1_ANALOG_Y},
         {"M1ABT1",1026,MOUSECODE_1_BUTTON1},
         {"M1ABT2",1027,MOUSECODE_1_BUTTON2},
+        {"bt1",101,JOYCODE_1_BUTTON1},
         {"bt4",100,JOYCODE_1_BUTTON4},
         {NULL,0,0},
     };
@@ -534,6 +536,19 @@ const os_code_info *osd_get_code_list(void)
 int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
+int fs = 25*60;
+    if(oscode == 34 && nbframe>fs && nbframe<(fs+60))
+    {
+        return 1;
+    }
+    if(oscode == 35 && nbframe>(fs+1*60) && nbframe<(fs+2*60))
+    {
+        return 1;
+    }
+    if(oscode == 101 && nbframe>(fs+3*60) && nbframe<(fs+4*60))
+    {
+        return 1;
+    }
 // to open menu
     //if(oscode == 33 && nbframe>2*60)
     //{

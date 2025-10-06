@@ -135,7 +135,7 @@ int libs_init2()
     if(verbose) printf("try open cybergraphics\n");
 //    InitLowLevelLib();
     // optional:
-    CyberGfxBase  = OpenLibrary("cybergraphucs.library", 1);
+    CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
     if(verbose && (CyberGfxBase == NULL)) printf("can't open cybergraphics\n");
 //    P96Base  = OpenLibrary("Picasso96API.library", 0);
 

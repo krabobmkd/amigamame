@@ -24,22 +24,18 @@ struct tempsprite
    void f3_init_alpha_blend_func(void);
    void video_update_taito_f3k_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect);
 
-
-//    void tf3_drawscanlines_k(
-//		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
-//		const struct f3_playfield_line_inf **line_t,
-//		const int *sprite,
-//		UINT32 orient,
-//		int skip_layer_num);
     void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect);
 }
 
 #if defined(__GNUC__) && defined(__AMIGA__)
 #define REGPX(r) __asm(#r)
-#define REGVAL REGPX(a0)
 #else
 #define REGPX(r)
 #endif
+#define REGPIX
+// REGPX(d0)
+#define REGVAL
+// REGPX(a0)
 static int anyPlaneAlphaBlend;
 static int anySpriteAlphaBlend;
 
@@ -323,9 +319,9 @@ extern "C" {
     extern struct f3_spritealpha_line_inf *sa_line_inf;
 }
 
-int (*f3_dpix_n[8][16])(Pixt s_pix, cPix &val );
-int (**f3_dpix_lp[5])(Pixt s_pix, cPix &val );
-int (**f3_dpix_sp[9])(Pixt s_pix, cPix &val );
+int (*f3_dpix_n[8][16])(Pixt s_pix REGPIX, cPix &val REGVAL);
+int (**f3_dpix_lp[5])(Pixt s_pix REGPIX, cPix &val REGVAL);
+int (**f3_dpix_sp[9])(Pixt s_pix REGPIX, cPix &val REGVAL);
 
 // - - - globals used as locals during tracing...
 
@@ -361,7 +357,7 @@ static int tr_3b;// = 1;
 #endif
 
 
-INLINE void f3_alpha_blend32_s( const UINT8 *alphas, UINT32 s, cPix &val )
+INLINE void f3_alpha_blend32_s( const UINT8 *alphas, UINT32 s REGPIX, cPix &val REGVAL)
 {
 	UINT8 *sc = (UINT8 *)&s;
 	UINT8 *dc = (UINT8 *)&val.d;
@@ -370,7 +366,7 @@ INLINE void f3_alpha_blend32_s( const UINT8 *alphas, UINT32 s, cPix &val )
 	dc[COLOR3] = alphas[sc[COLOR3]];
 }
 
-INLINE void f3_alpha_blend32_d( const UINT8 *alphas, UINT32 s, cPix &val )
+INLINE void f3_alpha_blend32_d( const UINT8 *alphas, UINT32 s REGPIX, cPix &val REGVAL )
 {
 	UINT8 *sc = (UINT8 *)&s;
 	UINT8 *dc = (UINT8 *)&val.d;
@@ -381,125 +377,125 @@ INLINE void f3_alpha_blend32_d( const UINT8 *alphas, UINT32 s, cPix &val )
 
 /*============================================================================*/
 
-INLINE void f3_alpha_blend_1_1( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_1_1,s,val);}
-INLINE void f3_alpha_blend_1_2( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_1_2,s,val);}
-INLINE void f3_alpha_blend_1_4( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_1_4,s,val);}
-INLINE void f3_alpha_blend_1_5( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_1_5,s,val);}
-INLINE void f3_alpha_blend_1_6( UINT32 s, cPix &val){f3_alpha_blend32_d(f3_alpha_s_1_6,s,val);}
-INLINE void f3_alpha_blend_1_8( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_1_8,s,val);}
-INLINE void f3_alpha_blend_1_9( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_1_9,s,val);}
-INLINE void f3_alpha_blend_1_a( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_1_a,s,val);}
+INLINE void f3_alpha_blend_1_1( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_1_1,s,val);}
+INLINE void f3_alpha_blend_1_2( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_1_2,s,val);}
+INLINE void f3_alpha_blend_1_4( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_1_4,s,val);}
+INLINE void f3_alpha_blend_1_5( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_1_5,s,val);}
+INLINE void f3_alpha_blend_1_6( UINT32 s REGPIX, cPix &val REGVAL){f3_alpha_blend32_d(f3_alpha_s_1_6,s,val);}
+INLINE void f3_alpha_blend_1_8( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_1_8,s,val);}
+INLINE void f3_alpha_blend_1_9( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_1_9,s,val);}
+INLINE void f3_alpha_blend_1_a( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_1_a,s,val);}
 
-INLINE void f3_alpha_blend_2a_0( UINT32 s, cPix &val ){f3_alpha_blend32_s(f3_alpha_s_2a_0,s,val);}
-INLINE void f3_alpha_blend_2a_4( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_2a_4,s,val);}
-INLINE void f3_alpha_blend_2a_8( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_2a_8,s,val);}
+INLINE void f3_alpha_blend_2a_0( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_s(f3_alpha_s_2a_0,s,val);}
+INLINE void f3_alpha_blend_2a_4( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_2a_4,s,val);}
+INLINE void f3_alpha_blend_2a_8( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_2a_8,s,val);}
 
-INLINE void f3_alpha_blend_2b_0( UINT32 s, cPix &val ){f3_alpha_blend32_s(f3_alpha_s_2b_0,s,val);}
-INLINE void f3_alpha_blend_2b_4( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_2b_4,s,val);}
-INLINE void f3_alpha_blend_2b_8( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_2b_8,s,val);}
+INLINE void f3_alpha_blend_2b_0( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_s(f3_alpha_s_2b_0,s,val);}
+INLINE void f3_alpha_blend_2b_4( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_2b_4,s,val);}
+INLINE void f3_alpha_blend_2b_8( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_2b_8,s,val);}
 
-INLINE void f3_alpha_blend_3a_0( UINT32 s, cPix &val ){f3_alpha_blend32_s(f3_alpha_s_3a_0,s,val);}
-INLINE void f3_alpha_blend_3a_1( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_3a_1,s,val);}
-INLINE void f3_alpha_blend_3a_2( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_3a_2,s,val);}
+INLINE void f3_alpha_blend_3a_0( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_s(f3_alpha_s_3a_0,s,val);}
+INLINE void f3_alpha_blend_3a_1( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_3a_1,s,val);}
+INLINE void f3_alpha_blend_3a_2( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_3a_2,s,val);}
 
-INLINE void f3_alpha_blend_3b_0( UINT32 s, cPix &val ){f3_alpha_blend32_s(f3_alpha_s_3b_0,s,val);}
-INLINE void f3_alpha_blend_3b_1( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_3b_1,s,val);}
-INLINE void f3_alpha_blend_3b_2( UINT32 s, cPix &val ){f3_alpha_blend32_d(f3_alpha_s_3b_2,s,val);}
+INLINE void f3_alpha_blend_3b_0( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_s(f3_alpha_s_3b_0,s,val);}
+INLINE void f3_alpha_blend_3b_1( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_3b_1,s,val);}
+INLINE void f3_alpha_blend_3b_2( UINT32 s REGPIX, cPix &val REGVAL ){f3_alpha_blend32_d(f3_alpha_s_3b_2,s,val);}
 
 
-static int dpix_1_noalpha(UINT32 s_pix, cPix &val) {val.d = s_pix; return 1;}
-static int dpix_ret1(UINT32 s_pix, cPix &val) {return 1;}
-static int dpix_ret0(UINT32 s_pix, cPix &val) {return 0;}
-static int dpix_1_1(UINT32 s_pix, cPix &val) {if(s_pix) f3_alpha_blend_1_1(s_pix,val); return 1;}
-static int dpix_1_2(UINT32 s_pix, cPix &val) {if(s_pix) f3_alpha_blend_1_2(s_pix,val); return 1;}
-static int dpix_1_4(UINT32 s_pix, cPix &val) {if(s_pix) f3_alpha_blend_1_4(s_pix,val); return 1;}
-static int dpix_1_5(UINT32 s_pix, cPix &val) {if(s_pix) f3_alpha_blend_1_5(s_pix,val); return 1;}
-static int dpix_1_6(UINT32 s_pix, cPix &val) {if(s_pix) f3_alpha_blend_1_6(s_pix,val); return 1;}
-static int dpix_1_8(UINT32 s_pix, cPix &val) {if(s_pix) f3_alpha_blend_1_8(s_pix,val); return 1;}
-static int dpix_1_9(UINT32 s_pix, cPix &val) {if(s_pix) f3_alpha_blend_1_9(s_pix,val); return 1;}
-static int dpix_1_a(UINT32 s_pix, cPix &val) {if(s_pix) f3_alpha_blend_1_a(s_pix,val); return 1;}
+static int dpix_1_noalpha(UINT32 s_pix REGPIX, cPix &val REGVAL) {val.d = s_pix; return 1;}
+static int dpix_ret1(UINT32 s_pix REGPIX, cPix &val REGVAL) {return 1;}
+static int dpix_ret0(UINT32 s_pix REGPIX, cPix &val REGVAL) {return 0;}
+static int dpix_1_1(UINT32 s_pix REGPIX, cPix &val REGVAL) {if(s_pix) f3_alpha_blend_1_1(s_pix,val); return 1;}
+static int dpix_1_2(UINT32 s_pix REGPIX, cPix &val REGVAL) {if(s_pix) f3_alpha_blend_1_2(s_pix,val); return 1;}
+static int dpix_1_4(UINT32 s_pix REGPIX, cPix &val REGVAL) {if(s_pix) f3_alpha_blend_1_4(s_pix,val); return 1;}
+static int dpix_1_5(UINT32 s_pix REGPIX, cPix &val REGVAL) {if(s_pix) f3_alpha_blend_1_5(s_pix,val); return 1;}
+static int dpix_1_6(UINT32 s_pix REGPIX, cPix &val REGVAL) {if(s_pix) f3_alpha_blend_1_6(s_pix,val); return 1;}
+static int dpix_1_8(UINT32 s_pix REGPIX, cPix &val REGVAL) {if(s_pix) f3_alpha_blend_1_8(s_pix,val); return 1;}
+static int dpix_1_9(UINT32 s_pix REGPIX, cPix &val REGVAL) {if(s_pix) f3_alpha_blend_1_9(s_pix,val); return 1;}
+static int dpix_1_a(UINT32 s_pix REGPIX, cPix &val REGVAL) {if(s_pix) f3_alpha_blend_1_a(s_pix,val); return 1;}
 
-static int dpix_2a_0(UINT32 s_pix, cPix &val)
+static int dpix_2a_0(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_2a_0(s_pix,val);
 	else	  val.d = 0;
 	if(pdest_2a) {val.p |= pdest_2a;return 0;}
 	return 1;
 }
-static int dpix_2a_4(UINT32 s_pix, cPix &val)
+static int dpix_2a_4(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_2a_4(s_pix,val);
 	if(pdest_2a) {val.p |= pdest_2a;return 0;}
 	return 1;
 }
-static int dpix_2a_8(UINT32 s_pix, cPix &val)
+static int dpix_2a_8(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_2a_8(s_pix,val);
 	if(pdest_2a) {val.p |= pdest_2a;return 0;}
 	return 1;
 }
 
-static int dpix_3a_0(UINT32 s_pix, cPix &val)
+static int dpix_3a_0(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_3a_0(s_pix,val);
 	else	  val.d = 0;
 	if(pdest_3a) {val.p |= pdest_3a;return 0;}
 	return 1;
 }
-static int dpix_3a_1(UINT32 s_pix, cPix &val)
+static int dpix_3a_1(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_3a_1(s_pix,val);
 	if(pdest_3a) {val.p |= pdest_3a;return 0;}
 	return 1;
 }
-static int dpix_3a_2(UINT32 s_pix, cPix &val)
+static int dpix_3a_2(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_3a_2(s_pix,val);
 	if(pdest_3a) {val.p |= pdest_3a;return 0;}
 	return 1;
 }
 
-static int dpix_2b_0(UINT32 s_pix, cPix &val)
+static int dpix_2b_0(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_2b_0(s_pix,val);
 	else	  val.d = 0;
 	if(pdest_2b) {val.p |= pdest_2b;return 0;}
 	return 1;
 }
-static int dpix_2b_4(UINT32 s_pix, cPix &val)
+static int dpix_2b_4(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_2b_4(s_pix,val);
 	if(pdest_2b) {val.p |= pdest_2b;return 0;}
 	return 1;
 }
-static int dpix_2b_8(UINT32 s_pix, cPix &val)
+static int dpix_2b_8(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_2b_8(s_pix,val);
 	if(pdest_2b) {val.p |= pdest_2b;return 0;}
 	return 1;
 }
 
-static int dpix_3b_0(UINT32 s_pix, cPix &val)
+static int dpix_3b_0(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_3b_0(s_pix,val);
 	else	  val.d = 0;
 	if(pdest_3b) {val.p |= pdest_3b;return 0;}
 	return 1;
 }
-static int dpix_3b_1(UINT32 s_pix, cPix &val)
+static int dpix_3b_1(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_3b_1(s_pix,val);
 	if(pdest_3b) {val.p |= pdest_3b;return 0;}
 	return 1;
 }
-static int dpix_3b_2(UINT32 s_pix, cPix &val)
+static int dpix_3b_2(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix) f3_alpha_blend_3b_2(s_pix,val);
 	if(pdest_3b) {val.p |= pdest_3b;return 0;}
 	return 1;
 }
 
-static int dpix_2_0(UINT32 s_pix, cPix &val)
+static int dpix_2_0(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	UINT8 tr2=val.p&1;
 	if(s_pix)
@@ -514,7 +510,7 @@ static int dpix_2_0(UINT32 s_pix, cPix &val)
 	}
 	return 0;
 }
-static int dpix_2_4(UINT32 s_pix, cPix &val)
+static int dpix_2_4(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	UINT8 tr2=val.t&1;
 	if(s_pix)
@@ -529,7 +525,7 @@ static int dpix_2_4(UINT32 s_pix, cPix &val)
 	}
 	return 0;
 }
-static int dpix_2_8(UINT32 s_pix, cPix &val)
+static int dpix_2_8(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	UINT8 tr2=val.t&1;
 	if(s_pix)
@@ -545,7 +541,7 @@ static int dpix_2_8(UINT32 s_pix, cPix &val)
 	return 0;
 }
 
-static int dpix_3_0(UINT32 s_pix, cPix &val)
+static int dpix_3_0(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	UINT8 tr2=val.t&1;
 	if(s_pix)
@@ -560,7 +556,7 @@ static int dpix_3_0(UINT32 s_pix, cPix &val)
 	}
 	return 0;
 }
-static int dpix_3_1(UINT32 s_pix, cPix &val)
+static int dpix_3_1(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	UINT8 tr2=val.t&1;
 	if(s_pix)
@@ -575,7 +571,7 @@ static int dpix_3_1(UINT32 s_pix, cPix &val)
 	}
 	return 0;
 }
-static int dpix_3_2(UINT32 s_pix, cPix &val)
+static int dpix_3_2(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	UINT8 tr2=val.t&1;
 	if(s_pix)
@@ -592,7 +588,7 @@ static int dpix_3_2(UINT32 s_pix, cPix &val)
 }
 
 
-INLINE void dpix_1_sprite(UINT32 s_pix, cPix &val)
+INLINE void dpix_1_sprite(UINT32 s_pix REGPIX, cPix &val REGVAL)
 {
 	if(s_pix)
 	{
@@ -608,7 +604,7 @@ INLINE void dpix_1_sprite(UINT32 s_pix, cPix &val)
 	}
 }
 
-INLINE void dpix_bg(UINT32 bgcolor, cPix &val)
+INLINE void dpix_bg(UINT32 bgcolor, cPix &val REGVAL)
 {
 	UINT8 p1 = val.p&0xf0;
 	if(!p1)			val.d = bgcolor;
@@ -820,15 +816,25 @@ INLINE int shouldp() { return ((nbf & 127)==1); }
 // int nbwr_case16=0;
 // int nbwr_case17=0;
 // int nbwr_case18=0;
+typedef struct
+{
+    mame_bitmap *bitmap;
+    INT16 *draw_line_num;
+    const struct f3_playfield_line_inf **line_t;
+    const int *sprite;
+    UINT32 orient;
+} drsclparams;
+
+
 
 template<int skip_layer_num,bool useXspriteClip,bool useXplaneClip,bool useAlphaBlend,bool useABlendSpr>
-void drawscanlinesT(
-		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
-		const struct f3_playfield_line_inf **line_t,
-		const int *sprite,
-		UINT32 orient)
+void drawscanlinesT(drsclparams &p)
 {
+    INT16 *draw_line_num = p.draw_line_num;
+    const struct f3_playfield_line_inf **line_t=p.line_t;
+    const int *sprite= p.sprite;
 	pen_t *clut = &Machine->remapped_colortable[0];
+
 	UINT32 bgcolor=clut[0];
 	int length;
 
@@ -875,13 +881,13 @@ void drawscanlinesT(
 
 	UINT8 *dstp0,*dstp;
 
-	int yadv = bitmap->rowpixels;
-	int i=0,y=draw_line_num[0];
+	int yadv = p.bitmap->rowpixels;
+	int i=0,y=p.draw_line_num[0];
 	int ty = y;
 
-	if (orient & ORIENTATION_FLIP_Y)
+	if (p.orient & ORIENTATION_FLIP_Y)
 	{
-		ty = bitmap->height - 1 - ty;
+		ty = p.bitmap->height - 1 - ty;
 		yadv = -yadv;
 	}
 
@@ -899,7 +905,7 @@ void drawscanlinesT(
     }
     // - - - - - -  -
     UINT32 *dsti0,*dsti;
-    dsti0 = (UINT32 *)bitmap->line[ty] + x;
+    dsti0 = (UINT32 *)p.bitmap->line[ty] + x;
     while(1)
     {
         int cx=0;
@@ -911,7 +917,7 @@ void drawscanlinesT(
             clip_brs=sa_line_inf->sprite_clip1[y]>>16;
         }
 
-        length=xsize;
+        length=320;
         dsti = dsti0;
         dstp = dstp0;
 
@@ -932,6 +938,12 @@ void drawscanlinesT(
             {
                 UINT8 sprite_pri;
 
+    // val.p 11110000 is never used at this level !!
+    // if((val.p>>4)!=0)
+    // {
+    //     static int yy=0;
+    //     yy++;
+    // }
 //                UINT8 tval;
 //                Pixt dval;
 
@@ -943,10 +955,6 @@ void drawscanlinesT(
                                 if(!useABlendSpr) break;
                                 if(sprite_noalp_0) break;
                                 if(!f3_dpix_sp[sprite_pri]) break;
-                                if(!useABlendSpr)
-                                {
-
-                                } else
                                 if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val))
                                 {
                                     // nbwr_case1++;
@@ -1070,13 +1078,7 @@ void drawscanlinesT(
                                         *dsti=clut[*src3];break;
                                     } else
                                     {
-                                        UINT8 pv = val.p>>4;
-                                        if(!pv)
-                                        {
-                                            *dsti=clut[*src3];
-                                            break;
-                                        }
-                                        if(f3_dpix_lp[3][pv](clut[*src3],val))
+                                        if(f3_dpix_lp[3][val.p>>4](clut[*src3],val))
                                         {
                                           //    nbwr_case11++;
                                             *dsti=val.d;break;
@@ -1113,12 +1115,7 @@ void drawscanlinesT(
                                         break;
                                     } else
                                     {
-                                        UINT8 pv=  val.p>>4;
-                                        if(!pv) {
-                                            *dsti=clut[*src4];
-                                            break;
-                                        }
-                                        if(f3_dpix_lp[4][pv](clut[*src4],val))
+                                        if(f3_dpix_lp[4][val.p>>4](clut[*src4],val))
                                         {
                                           //   nbwr_case14++;
                                             *dsti=val.d;
@@ -1145,10 +1142,17 @@ void drawscanlinesT(
                              //    nbwr_case16++;
                                 *dsti=val.d;break;}
                             }
-                            if(!bgcolor) {if(!(val.p&0xf0)) {
-                             //    nbwr_case17++;
-                            *dsti=0;break;}}
-                            else dpix_bg(bgcolor,val);
+                            if(!bgcolor || !useAlphaBlend) {
+                                if(!(val.p&0xf0)) {
+                                    //    nbwr_case17++;
+                                    *dsti=0;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                dpix_bg(bgcolor,val);
+                            }
                              //    nbwr_case18++;
                             *dsti=val.d;
                 }
@@ -1190,60 +1194,60 @@ void drawscanlinesT(
     }
 
 }
-#undef GET_PIXMAP_POINTER
-#undef CULC_PIXMAP_POINTER
+//#undef GET_PIXMAP_POINTER
+//#undef CULC_PIXMAP_POINTER
 
 extern "C" {
 extern int tf3_anyPlaneClipX;
 };
 
-static inline void tf3_drawscanlines_k(
-		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
-		const struct f3_playfield_line_inf **line_t,
-		const int *sprite,
-		UINT32 orient,
+static inline void tf3_drawscanlines_k(drsclparams &p,
 		int skip_layer_num)
 {
+    UINT32 andspr= ~0;
+    for(int i=skip_layer_num;i<6;i++) andspr &=p.sprite[i];
+    int nosprblend =  (andspr & 0x100)==0;
+// printf("nosprblend:%d\n",nosprblend);
+
 //    skip_layer_num
     // const bool useSprClipxTrue = true;
     // const bool useSprClipxFalse = false;
     // const bool usePlaneClipxTrue = true;
     // const bool usePlaneClipxFalse = false;
 // anySpriteAlphaBlend
-    skip_layer_num |= (tf3_anyPlaneClipX<<3);
+    skip_layer_num |= (tf3_anyPlaneClipX<<3) | (nosprblend<<4);
     // |((anySpriteAlphaBlend)<<4);
 // printf("has alpha:%d\n",(anySpriteAlphaBlend));
     switch(skip_layer_num)
     {
         // useClipXsprite, useClipXPlane, useAlphaBlendPlane,useAlphaBlendSprite
-        case 0: drawscanlinesT<0,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 1: drawscanlinesT<1,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 2: drawscanlinesT<2,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 3: drawscanlinesT<3,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 4: drawscanlinesT<4,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 5: drawscanlinesT<5,false,false,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 0: drawscanlinesT<0,false,false,false,false>(p); break;
+        case 1: drawscanlinesT<1,false,false,false,false>(p); break;
+        case 2: drawscanlinesT<2,false,false,false,false>(p); break;
+        case 3: drawscanlinesT<3,false,false,false,false>(p); break;
+        case 4: drawscanlinesT<4,false,false,false,false>(p); break;
+        case 5: drawscanlinesT<5,false,false,false,false>(p); break;
 
+        case 0+8: drawscanlinesT<0,false,true,false,false>(p); break;
+        case 1+8: drawscanlinesT<1,false,true,false,false>(p); break;
+        case 2+8: drawscanlinesT<2,false,true,false,false>(p); break;
+        case 3+8: drawscanlinesT<3,false,true,false,false>(p); break;
+        case 4+8: drawscanlinesT<4,false,true,false,false>(p); break;
+        case 5+8: drawscanlinesT<5,false,true,false,false>(p); break;
 
-        case 0+8: drawscanlinesT<0,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 1+8: drawscanlinesT<1,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 2+8: drawscanlinesT<2,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 3+8: drawscanlinesT<3,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 4+8: drawscanlinesT<4,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 5+8: drawscanlinesT<5,false,true,false,false>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 0+16: drawscanlinesT<0,false,false,true,true>(p); break;
+        case 1+16: drawscanlinesT<1,false,false,true,true>(p); break;
+        case 2+16: drawscanlinesT<2,false,false,true,true>(p); break;
+        case 3+16: drawscanlinesT<3,false,false,true,true>(p); break;
+        case 4+16: drawscanlinesT<4,false,false,true,true>(p); break;
+        case 5+16: drawscanlinesT<5,false,false,true,true>(p); break;
 
-        case 0+16: drawscanlinesT<0,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 1+16: drawscanlinesT<1,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 2+16: drawscanlinesT<2,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 3+16: drawscanlinesT<3,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 4+16: drawscanlinesT<4,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 5+16: drawscanlinesT<5,false,false,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-
-        case 0+8+16: drawscanlinesT<0,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 1+8+16: drawscanlinesT<1,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 2+8+16: drawscanlinesT<2,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 3+8+16: drawscanlinesT<3,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 4+8+16: drawscanlinesT<4,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
-        case 5+8+16: drawscanlinesT<5,false,true,true,true>(bitmap, xsize,draw_line_num,line_t,sprite,orient); break;
+        case 0+8+16: drawscanlinesT<0,false,true,true,true>(p); break;
+        case 1+8+16: drawscanlinesT<1,false,true,true,true>(p); break;
+        case 2+8+16: drawscanlinesT<2,false,true,true,true>(p); break;
+        case 3+8+16: drawscanlinesT<3,false,true,true,true>(p); break;
+        case 4+8+16: drawscanlinesT<4,false,true,true,true>(p); break;
+        case 5+8+16: drawscanlinesT<5,false,true,true,true>(p); break;
 
     }
 
@@ -1299,6 +1303,8 @@ INLINE void f3_alpha_set_level(void)
 #undef SET_ALPHA_LEVEL
 
 
+
+
 void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i,j,y,ys,ye;
@@ -1346,6 +1352,11 @@ nbf++;
  // nbwr_case16=0;
  // nbwr_case17=0;
  // nbwr_case18=0;
+
+    drsclparams dslparams;
+
+    dslparams.bitmap = bitmap;
+    dslparams.orient = rot;
 
 // int nbw=0;
 	while(1)
@@ -1734,7 +1745,12 @@ nbf++;
 // y_start
 //    if(shouldp()) printf("go dsl y_start:%d y_end:%d\n",draw_line_num[0],draw_line_num[i-2]);
 	//f3_drawscanlines(bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
-    tf3_drawscanlines_k(bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
+
+        dslparams.draw_line_num = draw_line_num;
+        dslparams.line_t = line_t;
+        dslparams.sprite = sprite;
+        tf3_drawscanlines_k(dslparams,count_skip_layer);
+
 
 		if(y_start<0) break;
 //		nbw++;
