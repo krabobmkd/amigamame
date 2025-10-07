@@ -81,10 +81,15 @@ struct f3_playfield_line_inf
 	int pri[256];
 
 	/* use for draw_scanlines */
-	UINT16 *src[256],*src_s[256],*src_e[256];
-	UINT8 *tsrc[256],*tsrc_s[256];
-	int x_count[256];
-	UINT32 x_zoom[256];
+	UINT16 *srcs[256];
+	UINT8 *tsrcs[256];
+	INT32 x_counts[256];
+    UINT32 xmask;
+
+	// UINT16 *src[256],*src_s[256],*src_e[256];
+	// UINT8 *tsrc[256],*tsrc_s[256];
+	// int x_count[256];
+	INT32 x_zoom[256];
 	UINT32 clip0[256];
 	UINT32 clip1[256];
 };

@@ -748,7 +748,9 @@ static inline void setcol(UINT32 offset, int r,int g, int b)
 {
 //    palette_set_color(offset,r,g,b);
     UINT32 c = (r<<16)|(g<<8)|b;
+
     Machine->remapped_colortable[offset] =c;
+    setpalettefast_neogeo(offset,c);
 }
 /* 12 bit palette games - there has to be a palette select bit somewhere */
 WRITE32_HANDLER( f3_palette_24bit_SPCINVDX_w )
@@ -757,70 +759,41 @@ WRITE32_HANDLER( f3_palette_24bit_SPCINVDX_w )
 	COMBINE_DATA(&paletteram32[offset]);
     b = 15 * ((paletteram32[offset] >> 4) & 0xf);
     g = 15 * ((paletteram32[offset] >> 8) & 0xf);
-    r = 15 * ((paletteram32[offset] >> 12) & 0xf);
+    r = 15 * ((paletteram32[offset] >> 12) & 0xf);    
     setcol(offset,r,g,b);
 }
 WRITE32_HANDLER( f3_palette_24bit_CLEOPATR_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
+	UINT32 c;
     if (offset<0x100 || offset>0x1000) {
-        // int r,g,b;
-        // r = ((paletteram32[offset] >>16) & 0x7f)<<1;
-        // g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
-        // b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
-        // setcol(offset,r,g,b);
-        Machine->remapped_colortable[offset] = (paletteram32[offset]&0x007f7f7f)<<1;
+        c = (paletteram32[offset]&0x007f7f7f)<<1;
     } else {
-//            setpalettefast_neogeo(offset,paletteram32[offset]);
-//            return;
-        Machine->remapped_colortable[offset] = paletteram32[offset];
-
-//     setcol(offset,r,g,b);
-        // r = (paletteram32[offset] >>16) & 0xff;
-        // g = (paletteram32[offset] >> 8) & 0xff;
-        // b = (paletteram32[offset] >> 0) & 0xff;
+        c = paletteram32[offset];
     }
-    //palette_set_color(offset,r,g,b);
-
+    Machine->remapped_colortable[offset] =c;
+    setpalettefast_neogeo(offset,c);
 }
 WRITE32_HANDLER( f3_palette_24bit_TWINQIX_w )
 {
     int r,g,b;
 	COMBINE_DATA(&paletteram32[offset]);
+	UINT32 c;
     if (offset>0x1c00) {
-        // r = ((paletteram32[offset] >>16) & 0x7f)<<1;
-        // g = ((paletteram32[offset] >> 8) & 0x7f)<<1;
-        // b = ((paletteram32[offset] >> 0) & 0x7f)<<1;
-        Machine->remapped_colortable[offset] = (paletteram32[offset]&0x007f7f7f)<<1;
+        c = (paletteram32[offset]&0x007f7f7f)<<1;
     } else {
-//            setpalettefast_neogeo(offset,paletteram32[offset]);
-//            return;
-        // r = (paletteram32[offset] >>16) & 0xff;
-        // g = (paletteram32[offset] >> 8) & 0xff;
-        // b = (paletteram32[offset] >> 0) & 0xff;
-        Machine->remapped_colortable[offset] = paletteram32[offset];
+        c = paletteram32[offset];
     }
-    //palette_set_color(offset,r,g,b);
-   //  setcol(offset,r,g,b);
+    Machine->remapped_colortable[offset] =c;
+    setpalettefast_neogeo(offset,c);
+
 }
 //optimize me !!! -> done.
 WRITE32_HANDLER( f3_palette_24bit_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
-   //  setpalettefast_neogeo(offset,paletteram32[offset]);
-     Machine->remapped_colortable[offset] =paletteram32[offset];
-//#ifdef LSB_FIRST
-//	int r,g,b;
-//    r = (paletteram32[offset] >>16) & 0xff;
-//    g = (paletteram32[offset] >> 8) & 0xff;
-//    b = (paletteram32[offset] >> 0) & 0xff;
-//   // setpalettefast_neogeo(offset,paletteram32[offset]);
-//    palette_set_color(offset,r,g,b);
-//#else
-//    setpalettefast_neogeo(offset,paletteram32[offset]);
-//#endif
-
-    return;
+    Machine->remapped_colortable[offset] =paletteram32[offset];
+    setpalettefast_neogeo(offset,paletteram32[offset]);
 }
 
 /******************************************************************************/
@@ -2034,6 +2007,7 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 	transbitmap = tilemap_get_transparency_bitmap(tmap);
 
 	y=y_start;
+	line_t->xmask = (width_mask<<16)|0x0000ffff;
 	while(y!=y_end)
 	{
 		UINT32 x_index_fx;
@@ -2055,13 +2029,18 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 				line_t->alpha_mode[y]&=~0x80;
 
 			/* set pixmap index */
+			line_t->x_counts[y]=x_index_fx;
+			line_t->srcs[y]=(unsigned short *)srcbitmap->line[y_index];
+            line_t->tsrcs[y]= (unsigned char *)transbitmap->line[y_index];
+
+			/*orig
 			line_t->x_count[y]=x_index_fx & 0xffff; // Fractional part
 			line_t->src_s[y]=src_s=(unsigned short *)srcbitmap->line[y_index];
 			line_t->src_e[y]=&src_s[width_mask+1];
 			line_t->src[y]=&src_s[x_index_fx>>16];
-
 			line_t->tsrc_s[y]=tsrc_s=(unsigned char *)transbitmap->line[y_index];
 			line_t->tsrc[y]=&tsrc_s[x_index_fx>>16];
+			*/
 		}
 
 		y_index_fx += _y_zoom[y];
@@ -2163,6 +2142,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 	transbitmap_vram = tilemap_get_transparency_bitmap(vram_tilemap);
 
 	y=y_start;
+	line_t->xmask = (vram_width_mask<<16)|0x0000ffff;
 	while(y!=y_end)
 	{
 		if(line_t->alpha_mode[y]!=0)
@@ -2175,6 +2155,26 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 			const int usePixelLayer=((sprite_alpha_line_t->sprite_alpha[y]&0xa000)==0xa000);
 
 			/* set pixmap index */
+			if (usePixelLayer)
+			{
+				line_t->srcs[y]=(unsigned short *)srcbitmap_pixel->line[sy&0xff];
+				line_t->tsrcs[y]=(unsigned char *)transbitmap_pixel->line[sy&0xff];
+            }
+			else
+			{
+				line_t->srcs[y]=(unsigned short *)srcbitmap_vram->line[sy&0x1ff];
+				line_t->tsrcs[y]=(unsigned char *)transbitmap_vram->line[sy&0x1ff];
+
+            }
+			line_t->x_counts[y] = (sx<<16)|0xffff;
+/*
+	UINT16 *srcs[256];
+	UINT16 *tsrcs[256];
+	int x_counts[256];
+    UINT32 xmasks[256];
+*/
+
+			/*orig
 			line_t->x_count[y]=0xffff;
 			if (usePixelLayer)
 				line_t->src_s[y]=src_s=(unsigned short *)srcbitmap_pixel->line[sy&0xff];
@@ -2188,6 +2188,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 			else
 				line_t->tsrc_s[y]=tsrc_s=(unsigned char *)transbitmap_vram->line[sy&0x1ff];
 			line_t->tsrc[y]=&tsrc_s[sx];
+			*/
 		}
 
 		sy++;

@@ -764,22 +764,53 @@ void f3_init_alpha_blend_func(void)
 }
 
 
+// #define GET_PIXMAP_POINTER(pf_num) \
+// { \
+// 	const struct f3_playfield_line_inf *line_tmp=line_t[pf_num]; \
+// 	src##pf_num=line_tmp->src[y]; \
+// 	src_s##pf_num=line_tmp->src_s[y]; \
+// 	src_e##pf_num=line_tmp->src_e[y]; \
+// 	tsrc##pf_num=line_tmp->tsrc[y]; \
+// 	tsrc_s##pf_num=line_tmp->tsrc_s[y]; \
+// 	x_count##pf_num=line_tmp->x_count[y]; \
+// 	x_zoom##pf_num=line_tmp->x_zoom[y]; \
+// 	clip_al##pf_num=line_tmp->clip0[y]&0xffff; \
+// 	clip_ar##pf_num=line_tmp->clip0[y]>>16; \
+// 	clip_bl##pf_num=line_tmp->clip1[y]&0xffff; \
+// 	clip_br##pf_num=line_tmp->clip1[y]>>16; \
+// }
+
 #define GET_PIXMAP_POINTER(pf_num) \
 { \
 	const struct f3_playfield_line_inf *line_tmp=line_t[pf_num]; \
-	src##pf_num=line_tmp->src[y]; \
-	src_s##pf_num=line_tmp->src_s[y]; \
-	src_e##pf_num=line_tmp->src_e[y]; \
-	tsrc##pf_num=line_tmp->tsrc[y]; \
-	tsrc_s##pf_num=line_tmp->tsrc_s[y]; \
-	x_count##pf_num=line_tmp->x_count[y]; \
+	srcs##pf_num=line_tmp->srcs[y]; \
+	tsrcs##pf_num=line_tmp->tsrcs[y]; \
+	x_count##pf_num=line_tmp->x_counts[y]; \
 	x_zoom##pf_num=line_tmp->x_zoom[y]; \
+	x_count##pf_num &= x_mask##pf_num; \
+}
+
+#define GET_PIXMAP_CLIP(pf_num) \
+{ \
+	const struct f3_playfield_line_inf *line_tmp=line_t[pf_num]; \
 	clip_al##pf_num=line_tmp->clip0[y]&0xffff; \
 	clip_ar##pf_num=line_tmp->clip0[y]>>16; \
 	clip_bl##pf_num=line_tmp->clip1[y]&0xffff; \
 	clip_br##pf_num=line_tmp->clip1[y]>>16; \
 }
 
+
+/*
+	UINT16 *srcs[256];
+	UINT8 *tsrcs[256];
+	INT32 x_counts[256];
+    UINT32 xmasks[256];
+
+	UINT16 *srcs0;
+	UINT8 *tsrcs0;
+	UINT32 x_count0,x_zoom0,x_mask0;
+*/
+/*orig
 #define CULC_PIXMAP_POINTER(pf_num) \
 { \
 	x_count##pf_num += x_zoom##pf_num; \
@@ -790,6 +821,12 @@ void f3_init_alpha_blend_func(void)
 		tsrc##pf_num++; \
 		if(src##pf_num==src_e##pf_num) {src##pf_num=src_s##pf_num; tsrc##pf_num=tsrc_s##pf_num;} \
 	} \
+}
+*/
+#define CULC_PIXMAP_POINTER(pf_num) \
+{ \
+	x_count##pf_num += x_zoom##pf_num; \
+	x_count##pf_num &= x_mask##pf_num; \
 }
 
 /*============================================================================*/
@@ -856,27 +893,54 @@ void drawscanlinesT(drsclparams &p)
 
 
 // if(shouldp()) printf("noalp %d %d %d %d %d %d\n",sprite_noalp_0>>8,sprite_noalp_1>>8,sprite_noalp_2>>8,sprite_noalp_3>>8,sprite_noalp_4>>8,sprite_noalp_5>>8);
+	UINT16 *srcs0,clip_al0,clip_ar0,clip_bl0,clip_br0;
+	UINT8 *tsrcs0;
+	UINT32 x_count0,x_zoom0,x_mask0;
 
-	static UINT16 *src0=0,*src_s0=0,*src_e0=0,clip_al0=0,clip_ar0=0,clip_bl0=0,clip_br0=0;
-	static UINT8 *tsrc0=0,*tsrc_s0=0;
-	static UINT32 x_count0=0,x_zoom0=0;
+	UINT16 *srcs1,clip_al1,clip_ar1,clip_bl1,clip_br1;
+	UINT8 *tsrcs1;
+	UINT32 x_count1,x_zoom1,x_mask1;
 
-	static UINT16 *src1=0,*src_s1=0,*src_e1=0,clip_al1=0,clip_ar1=0,clip_bl1=0,clip_br1=0;
-	static UINT8 *tsrc1=0,*tsrc_s1=0;
-	static UINT32 x_count1=0,x_zoom1=0;
+	UINT16 *srcs2,clip_al2,clip_ar2,clip_bl2,clip_br2;
+	UINT8 *tsrcs2;
+	UINT32 x_count2,x_zoom2,x_mask2;
 
-	static UINT16 *src2=0,*src_s2=0,*src_e2=0,clip_al2=0,clip_ar2=0,clip_bl2=0,clip_br2=0;
-	static UINT8 *tsrc2=0,*tsrc_s2=0;
-	static UINT32 x_count2=0,x_zoom2=0;
+	UINT16 *srcs3,clip_al3,clip_ar3,clip_bl3,clip_br3;
+	UINT8 *tsrcs3;
+	UINT32 x_count3,x_zoom3,x_mask3;
 
-	static UINT16 *src3=0,*src_s3=0,*src_e3=0,clip_al3=0,clip_ar3=0,clip_bl3=0,clip_br3=0;
-	static UINT8 *tsrc3=0,*tsrc_s3=0;
-	static UINT32 x_count3=0,x_zoom3=0;
+	UINT16 *srcs4,clip_al4,clip_ar4,clip_bl4,clip_br4;
+	UINT8 *tsrcs4;
+	UINT32 x_count4,x_zoom4,x_mask4;
+    switch(skip_layer_num)
+    {
+        case 0: x_mask0=line_t[0]->xmask;
+        case 1: x_mask1=line_t[1]->xmask;
+        case 2: x_mask2=line_t[2]->xmask;
+        case 3: x_mask3=line_t[3]->xmask;
+        case 4: x_mask4=line_t[4]->xmask;
+    }
+/*
+	UINT16 *src0,*src_s0,*src_e0,clip_al0,clip_ar0,clip_bl0,clip_br0;
+	UINT8 *tsrc0,*tsrc_s0;
+	UINT32 x_count0,x_zoom0;
 
-	static UINT16 *src4=0,*src_s4=0,*src_e4=0,clip_al4=0,clip_ar4=0,clip_bl4=0,clip_br4=0;
-	static UINT8 *tsrc4=0,*tsrc_s4=0;
-	static UINT32 x_count4=0,x_zoom4=0;
+	UINT16 *src1,*src_s1,*src_e1,clip_al1,clip_ar1,clip_bl1,clip_br1;
+	UINT8 *tsrc1,*tsrc_s1;
+	UINT32 x_count1,x_zoom1;
 
+	UINT16 *src2,*src_s2,*src_e2,clip_al2,clip_ar2,clip_bl2,clip_br2;
+	UINT8 *tsrc2,*tsrc_s2;
+	UINT32 x_count2,x_zoom2;
+
+	UINT16 *src3,*src_s3,*src_e3,clip_al3,clip_ar3,clip_bl3,clip_br3;
+	UINT8 *tsrc3,*tsrc_s3;
+	UINT32 x_count3,x_zoom3;
+
+	UINT16 *src4,*src_s4,*src_e4,clip_al4,clip_ar4,clip_bl4,clip_br4;
+	UINT8 *tsrc4,*tsrc_s4;
+	UINT32 x_count4,x_zoom4;
+*/
 	UINT16 clip_als=0, clip_ars=0, clip_bls=0, clip_brs=0;
 
 	UINT8 *dstp0,*dstp;
@@ -923,11 +987,17 @@ void drawscanlinesT(drsclparams &p)
 
         switch(skip_layer_num)
         {
-            case 0: GET_PIXMAP_POINTER(0)
+            case 0:
+                GET_PIXMAP_POINTER(0)
+                if(useXplaneClip) GET_PIXMAP_CLIP(0)
             case 1: GET_PIXMAP_POINTER(1)
+                if(useXplaneClip) GET_PIXMAP_CLIP(1)
             case 2: GET_PIXMAP_POINTER(2)
+                if(useXplaneClip) GET_PIXMAP_CLIP(2)
             case 3: GET_PIXMAP_POINTER(3)
+                if(useXplaneClip) GET_PIXMAP_CLIP(3)
             case 4: GET_PIXMAP_POINTER(4)
+                if(useXplaneClip) GET_PIXMAP_CLIP(4)
         }
         // x loop
         while (1)
@@ -965,15 +1035,16 @@ void drawscanlinesT(drsclparams &p)
                             }
                             if (!useXplaneClip || (cx>=clip_al0 && cx<clip_ar0 && !(cx>=clip_bl0 && cx<clip_br0)))
                             {
-                                val.t=*tsrc0;
+                                val.t=tsrcs0[x_count0>>16];
                                 if(val.t&0xf0)
                                 {
+                                    UINT32 c=clut[srcs0[x_count0>>16]];
                                     if(!useAlphaBlend)
                                     {
-                                        *dsti=clut[*src0];break;
+                                        *dsti=c;break;
                                     } else
                                     {
-                                        if(f3_dpix_lp[0][val.p>>4](clut[*src0],val)) {
+                                        if(f3_dpix_lp[0][val.p>>4](c,val)) {
                                             // nbwr_case2++;
                                             *dsti=val.d;break;
                                         }
@@ -1000,15 +1071,16 @@ void drawscanlinesT(drsclparams &p)
                             }
                             if (!useXplaneClip ||(cx>=clip_al1 && cx<clip_ar1 && !(cx>=clip_bl1 && cx<clip_br1)))
                             {
-                                 val.t=*tsrc1;
+                                 val.t=tsrcs1[x_count1>>16];
                                 if(val.t&0xf0)
                                 {
+                                    UINT32 c=clut[srcs1[x_count1>>16]];
                                     if(!useAlphaBlend)
                                     {
-                                        *dsti=clut[*src1];break;
+                                        *dsti=c;break;
                                     } else
                                     {
-                                        if(f3_dpix_lp[1][val.p>>4](clut[*src1],val))
+                                        if(f3_dpix_lp[1][val.p>>4](c,val))
                                         {
                                             // nbwr_case5++;
                                             *dsti=val.d;break;
@@ -1035,15 +1107,16 @@ void drawscanlinesT(drsclparams &p)
                             }
                             if (!useXplaneClip || (cx>=clip_al2 && cx<clip_ar2 && !(cx>=clip_bl2 && cx<clip_br2)))
                             {
-                                val.t=*tsrc2;
+                                val.t=tsrcs2[x_count2>>16];
                                 if(val.t&0xf0)
                                 {
+                                    UINT32 c=clut[srcs2[x_count2>>16]];
                                     if(!useAlphaBlend)
                                     {
-                                        *dsti=clut[*src2];break;
+                                        *dsti=c;break;
                                     } else
                                     {
-                                        if(f3_dpix_lp[2][val.p>>4](clut[*src2],val))
+                                        if(f3_dpix_lp[2][val.p>>4](c,val))
                                         {
                                           //   nbwr_case8++;
                                             *dsti=val.d;break;
@@ -1070,15 +1143,16 @@ void drawscanlinesT(drsclparams &p)
                             }
                             if (!useXplaneClip ||(cx>=clip_al3 && cx<clip_ar3 && !(cx>=clip_bl3 && cx<clip_br3)))
                             {
-                                val.t=*tsrc3;
+                                val.t=tsrcs3[x_count3>>16];
                                 if(val.t&0xf0)
                                 {
+                                    UINT32 c=clut[srcs3[x_count3>>16]];
                                     if(!useAlphaBlend)
                                     {
-                                        *dsti=clut[*src3];break;
+                                        *dsti=c;break;
                                     } else
                                     {
-                                        if(f3_dpix_lp[3][val.p>>4](clut[*src3],val))
+                                        if(f3_dpix_lp[3][val.p>>4](c,val))
                                         {
                                           //    nbwr_case11++;
                                             *dsti=val.d;break;
@@ -1106,16 +1180,17 @@ void drawscanlinesT(drsclparams &p)
                             }
                             if (!useXplaneClip ||(cx>=clip_al4 && cx<clip_ar4 && !(cx>=clip_bl4 && cx<clip_br4)))
                             {
-                                val.t=*tsrc4;
+                                val.t=tsrcs4[x_count4>>16];
                                 if(val.t&0xf0)
                                 {
+                                    UINT32 c=clut[srcs4[x_count4>>16]];
                                     if(!useAlphaBlend)
                                     {
-                                        *dsti=clut[*src4];
+                                        *dsti=c;
                                         break;
                                     } else
                                     {
-                                        if(f3_dpix_lp[4][val.p>>4](clut[*src4],val))
+                                        if(f3_dpix_lp[4][val.p>>4](c,val))
                                         {
                                           //   nbwr_case14++;
                                             *dsti=val.d;
@@ -1226,28 +1301,28 @@ static inline void tf3_drawscanlines_k(drsclparams &p,
         case 2: drawscanlinesT<2,false,false,false,false>(p); break;
         case 3: drawscanlinesT<3,false,false,false,false>(p); break;
         case 4: drawscanlinesT<4,false,false,false,false>(p); break;
-        case 5: drawscanlinesT<5,false,false,false,false>(p); break;
+        //case 5: drawscanlinesT<5,false,false,false,false>(p); break;
 
         case 0+8: drawscanlinesT<0,false,true,false,false>(p); break;
         case 1+8: drawscanlinesT<1,false,true,false,false>(p); break;
         case 2+8: drawscanlinesT<2,false,true,false,false>(p); break;
         case 3+8: drawscanlinesT<3,false,true,false,false>(p); break;
         case 4+8: drawscanlinesT<4,false,true,false,false>(p); break;
-        case 5+8: drawscanlinesT<5,false,true,false,false>(p); break;
+        //case 5+8: drawscanlinesT<5,false,true,false,false>(p); break;
 
         case 0+16: drawscanlinesT<0,false,false,true,true>(p); break;
         case 1+16: drawscanlinesT<1,false,false,true,true>(p); break;
         case 2+16: drawscanlinesT<2,false,false,true,true>(p); break;
         case 3+16: drawscanlinesT<3,false,false,true,true>(p); break;
         case 4+16: drawscanlinesT<4,false,false,true,true>(p); break;
-        case 5+16: drawscanlinesT<5,false,false,true,true>(p); break;
+        //case 5+16: drawscanlinesT<5,false,false,true,true>(p); break;
 
         case 0+8+16: drawscanlinesT<0,false,true,true,true>(p); break;
         case 1+8+16: drawscanlinesT<1,false,true,true,true>(p); break;
         case 2+8+16: drawscanlinesT<2,false,true,true,true>(p); break;
         case 3+8+16: drawscanlinesT<3,false,true,true,true>(p); break;
         case 4+8+16: drawscanlinesT<4,false,true,true,true>(p); break;
-        case 5+8+16: drawscanlinesT<5,false,true,true,true>(p); break;
+        //case 5+8+16: drawscanlinesT<5,false,true,true,true>(p); break;
 
     }
 
