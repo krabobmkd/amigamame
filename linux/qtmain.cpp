@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <sstream>
 #include <fstream>
-
+#include <QKeyEvent>
 extern "C" {
     #include "osdepend.h"
     #include "mamecore.h"
@@ -197,8 +197,8 @@ void QProc::process()
 //"btlkroad"
 //"samuraia"
 //"tengai"
-//"bublbob2"
-"gseeker"
+"bublbob2"
+//"gseeker"
 //"gunbustr"
 //"gekirido"
 //"outrun"
@@ -247,6 +247,7 @@ QWin::QWin() : QLabel()
     m_timer.start(1000/60);
     show();
     setMouseTracking(true);
+    grabKeyboard();
 
 }
 extern "C" {
@@ -273,6 +274,19 @@ void QWin::paintEvent(QPaintEvent *event)
 
 //    p.drawText(60,60,QString("woot:")+QString::number(nbframe));
 }
+std::map<int,int> keystates;
+
+void QWin::keyPressEvent(QKeyEvent *event)
+{
+    keystates[event->key()] = 1;
+  //cout << "p:"<<event->key() << endl;
+}
+void QWin::keyReleaseEvent(QKeyEvent *event)
+{
+    keystates[event->key()] = 0;
+//  cout << "r:"<<event->key() << endl;
+}
+
 void QWin::updateWin()
 {
 
@@ -458,7 +472,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
 nbframe++;
     // logo
-//if(nbframe ==2200) mame_pause(1);
+//if(nbframe == 60*20+60-4-4-4) mame_pause(1);
 
 // chasehq sprite prio bug:
 // if(nbframe == 60*100 && m_nbtest == 0)
@@ -518,17 +532,17 @@ void osd_sound_enable(int enable)
 const os_code_info *osd_get_code_list(void)
 {
     static os_code_info l[]={
-        {"5",34,KEYCODE_5},
-        {"1",35,KEYCODE_1},
-        {"A",32,KEYCODE_A},
-        {"TAB",33,KEYCODE_TAB},
-        {"SPACE",65,KEYCODE_SPACE},
-        {"M1AX",1024,MOUSECODE_1_ANALOG_X},
-        {"M1AY",1025,MOUSECODE_1_ANALOG_Y},
-        {"M1ABT1",1026,MOUSECODE_1_BUTTON1},
-        {"M1ABT2",1027,MOUSECODE_1_BUTTON2},
-        {"bt1",101,JOYCODE_1_BUTTON1},
-        {"bt4",100,JOYCODE_1_BUTTON4},
+       {"tab",16777217,KEYCODE_TAB},
+
+       {"Up",16777235,KEYCODE_UP},
+       {"Down",16777237,KEYCODE_DOWN},
+       {"Left",16777234,KEYCODE_LEFT},
+       {"Right",16777236,KEYCODE_RIGHT},
+
+       {"5",40,KEYCODE_5},
+       {"1",38,KEYCODE_1},
+       {"bt1",16777249,JOYCODE_1_BUTTON1},
+
         {NULL,0,0},
     };
     return &l[0];
@@ -536,6 +550,8 @@ const os_code_info *osd_get_code_list(void)
 int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
+    if(keystates[oscode] !=0) return 1;
+    return 0;
 
 // to open menu
     //if(oscode == 33 && nbframe>2*60)

@@ -17,6 +17,9 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void paintEvent(QPaintEvent *event) override;
 
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+
 };
 
 class QProc : public QObject
