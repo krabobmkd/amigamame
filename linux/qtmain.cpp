@@ -130,6 +130,8 @@ void StartGame(int idriver)
     options.pause_bright = 1.0f;
 options.samplerate = 22050;
 
+options.tf3_disblend = 1;
+
     // vector things
     options.beam = 0x0001c000;               /* vector beam width */
     options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
@@ -197,8 +199,9 @@ void QProc::process()
 //"btlkroad"
 //"samuraia"
 //"tengai"
-"bublbob2"
-//"gseeker"
+//"bublbob2"
+//"ridingf"
+"gseeker"
 //"gunbustr"
 //"gekirido"
 //"outrun"
@@ -472,7 +475,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
 nbframe++;
     // logo
-//if(nbframe == 60*20+60-4-4-4) mame_pause(1);
+// if(nbframe == 1550) mame_pause(1);
 
 // chasehq sprite prio bug:
 // if(nbframe == 60*100 && m_nbtest == 0)

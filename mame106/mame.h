@@ -218,7 +218,7 @@ struct _global_options
 	int 	antialias;		/* 1 to enable antialiasing on vectors */
 
     // krb add
-    int     vector_remanence,vector_glow;
+    int     vector_remanence,vector_glow,tf3_disblend;
 
 	int		use_artwork;	/* bitfield indicating which artwork pieces to use */
 	int		artwork_res;	/* 1 for 1x game scaling, 2 for 2x */

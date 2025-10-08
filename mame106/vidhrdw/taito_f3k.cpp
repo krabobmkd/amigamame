@@ -1,4 +1,4 @@
-
+#include <stdio.h>
 extern "C"
 {
     #include "driver.h"
@@ -1004,234 +1004,247 @@ void drawscanlinesT(drsclparams &p)
         {
             cPix val;
             val.p=*dstp;
-            if (val.p!=0xff)
-            {
-                UINT8 sprite_pri;
+            UINT8 sprite_pri;
 
-    // val.p 11110000 is never used at this level !!
-    // if((val.p>>4)!=0)
-    // {
-    //     static int yy=0;
-    //     yy++;
-    // }
+// val.p 11110000 is never used at this level !!
+// if((val.p>>4)!=0)
+// {
+//     static int yy=0;
+//     yy++;
+// }
 //                UINT8 tval;
 //                Pixt dval;
-
-                switch(skip_layer_num)
-                {
-                    case 0: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
-                                && (sprite_pri=sprite[0]&val.p))
+            const bool b_x_sprin = ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)));
+            switch(skip_layer_num)
+            {
+                case 0: if( b_x_sprin
+                            && (sprite_pri=sprite[0]&val.p))
+                        {
+                            if(!useABlendSpr) break;
+                            if(sprite_noalp_0) break;
+                            if(!f3_dpix_sp[sprite_pri]) break;
+                            if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val))
                             {
-                                if(!useABlendSpr) break;
-                                if(sprite_noalp_0) break;
-                                if(!f3_dpix_sp[sprite_pri]) break;
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val))
-                                {
-                                    // nbwr_case1++;
-                                    *dsti=val.d;
+                                // nbwr_case1++;
+                                *dsti=val.d;
 
-                                    break;
-                                }
+                                break;
                             }
-                            if (!useXplaneClip || (cx>=clip_al0 && cx<clip_ar0 && !(cx>=clip_bl0 && cx<clip_br0)))
+                        }
+                        if (!useXplaneClip || (cx>=clip_al0 && cx<clip_ar0 && !(cx>=clip_bl0 && cx<clip_br0)))
+                        {
+                            val.t=tsrcs0[x_count0>>16];
+                            if(val.t&0xf0)
                             {
-                                val.t=tsrcs0[x_count0>>16];
-                                if(val.t&0xf0)
+                                UINT32 c=clut[srcs0[x_count0>>16]];
+                                if(!useAlphaBlend)
                                 {
-                                    UINT32 c=clut[srcs0[x_count0>>16]];
-                                    if(!useAlphaBlend)
-                                    {
-                                        *dsti=c;break;
-                                    } else
-                                    {
-                                        if(f3_dpix_lp[0][val.p>>4](c,val)) {
-                                            // nbwr_case2++;
-                                            *dsti=val.d;break;
-                                        }
-                                     }
+                                    *dsti=c;break;
+                                } else
+                                {
+                                    if(f3_dpix_lp[0][val.p>>4](c,val)) {
+                                        // nbwr_case2++;
+                                        *dsti=val.d;break;
+                                    }
                                  }
-                            }
-                    case 1: if( (!useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) ))
-                                && (sprite_pri=sprite[1]&val.p))
+                             }
+                        }
+                case 1: if( b_x_sprin
+                            && (sprite_pri=sprite[1]&val.p))
+                        {
+                            if(!useABlendSpr) break;
+                            if(sprite_noalp_1) break;
+                            if(!f3_dpix_sp[sprite_pri])
                             {
-                                if(!useABlendSpr) break;
-                                if(sprite_noalp_1) break;
-                                if(!f3_dpix_sp[sprite_pri])
-                                {
-                                    if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);
-                                       //  nbwr_case3++;
-                                        *dsti=val.d;break;
-                                    }
-                                }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
-                                    // nbwr_case4++;
+                                if(!(val.p&0xf0)) break;
+                                else {dpix_1_sprite(*dsti,val);
+                                   //  nbwr_case3++;
                                     *dsti=val.d;break;
-                                    }
-                            }
-                            if (!useXplaneClip ||(cx>=clip_al1 && cx<clip_ar1 && !(cx>=clip_bl1 && cx<clip_br1)))
-                            {
-                                 val.t=tsrcs1[x_count1>>16];
-                                if(val.t&0xf0)
-                                {
-                                    UINT32 c=clut[srcs1[x_count1>>16]];
-                                    if(!useAlphaBlend)
-                                    {
-                                        *dsti=c;break;
-                                    } else
-                                    {
-                                        if(f3_dpix_lp[1][val.p>>4](c,val))
-                                        {
-                                            // nbwr_case5++;
-                                            *dsti=val.d;break;
-                                        }
-                                    }
                                 }
                             }
-                    case 2: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
-                            && (sprite_pri=sprite[2]&val.p))
+                            if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                                // nbwr_case4++;
+                                *dsti=val.d;break;
+                                }
+                        }
+                        if (!useXplaneClip ||(cx>=clip_al1 && cx<clip_ar1 && !(cx>=clip_bl1 && cx<clip_br1)))
+                        {
+                             val.t=tsrcs1[x_count1>>16];
+                            if(val.t&0xf0)
                             {
-                                if(!useABlendSpr) break;
-                                if(sprite_noalp_2) break;
-                                if(!f3_dpix_sp[sprite_pri])
+                                UINT32 c=clut[srcs1[x_count1>>16]];
+                                if(!useAlphaBlend)
                                 {
-                                    if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);
-                                       //  nbwr_case6++;
+                                    *dsti=c;break;
+                                } else
+                                {
+                                    if(f3_dpix_lp[1][val.p>>4](c,val))
+                                    {
+                                        // nbwr_case5++;
                                         *dsti=val.d;break;
                                     }
                                 }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
-                                   //  nbwr_case7++;
-                                *dsti=val.d;break;}
                             }
-                            if (!useXplaneClip || (cx>=clip_al2 && cx<clip_ar2 && !(cx>=clip_bl2 && cx<clip_br2)))
+                        }
+                case 2: if( b_x_sprin
+                        && (sprite_pri=sprite[2]&val.p))
+                        {
+                            if(!useABlendSpr) break;
+                            if(sprite_noalp_2) break;
+                            if(!f3_dpix_sp[sprite_pri])
                             {
-                                val.t=tsrcs2[x_count2>>16];
-                                if(val.t&0xf0)
+                                if(!(val.p&0xf0)) break;
+                                else {dpix_1_sprite(*dsti,val);
+                                   //  nbwr_case6++;
+                                    *dsti=val.d;break;
+                                }
+                            }
+                            if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                               //  nbwr_case7++;
+                            *dsti=val.d;break;}
+                        }
+                        if (!useXplaneClip || (cx>=clip_al2 && cx<clip_ar2 && !(cx>=clip_bl2 && cx<clip_br2)))
+                        {
+                            val.t=tsrcs2[x_count2>>16];
+                            if(val.t&0xf0)
+                            {
+                                UINT32 c=clut[srcs2[x_count2>>16]];
+                                if(!useAlphaBlend)
                                 {
-                                    UINT32 c=clut[srcs2[x_count2>>16]];
-                                    if(!useAlphaBlend)
+                                    *dsti=c;break;
+                                } else
+                                {
+                                    if(f3_dpix_lp[2][val.p>>4](c,val))
                                     {
-                                        *dsti=c;break;
-                                    } else
-                                    {
-                                        if(f3_dpix_lp[2][val.p>>4](c,val))
-                                        {
-                                          //   nbwr_case8++;
-                                            *dsti=val.d;break;
-                                        }
+                                      //   nbwr_case8++;
+                                        *dsti=val.d;break;
                                     }
                                 }
                             }
-                    case 3: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
-                            && (sprite_pri=sprite[3]&val.p))
+                        }
+                case 3: if( b_x_sprin
+                        && (sprite_pri=sprite[3]&val.p))
+                        {
+                            if(!useABlendSpr) break;
+                            if(sprite_noalp_3) break;
+                            if(!f3_dpix_sp[sprite_pri])
                             {
-                                if(!useABlendSpr) break;
-                                if(sprite_noalp_3) break;
-                                if(!f3_dpix_sp[sprite_pri])
-                                {
-                                    if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);
-                                   //   nbwr_case9++;
-                                    *dsti=val.d;break;}
-                                }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
-                              //   nbwr_case10++;
+                                if(!(val.p&0xf0)) break;
+                                else {dpix_1_sprite(*dsti,val);
+                               //   nbwr_case9++;
                                 *dsti=val.d;break;}
-
                             }
-                            if (!useXplaneClip ||(cx>=clip_al3 && cx<clip_ar3 && !(cx>=clip_bl3 && cx<clip_br3)))
+                            if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                          //   nbwr_case10++;
+                            *dsti=val.d;break;}
+
+                        }
+                        if (!useXplaneClip ||(cx>=clip_al3 && cx<clip_ar3 && !(cx>=clip_bl3 && cx<clip_br3)))
+                        {
+                            val.t=tsrcs3[x_count3>>16];
+                            if(val.t&0xf0)
                             {
-                                val.t=tsrcs3[x_count3>>16];
-                                if(val.t&0xf0)
+                                UINT32 c=clut[srcs3[x_count3>>16]];
+                                if(!useAlphaBlend)
                                 {
-                                    UINT32 c=clut[srcs3[x_count3>>16]];
-                                    if(!useAlphaBlend)
+                                    *dsti=c;break;
+                                } else
+                                {
+                                    if(f3_dpix_lp[3][val.p>>4](c,val))
                                     {
-                                        *dsti=c;break;
-                                    } else
-                                    {
-                                        if(f3_dpix_lp[3][val.p>>4](c,val))
-                                        {
-                                          //    nbwr_case11++;
-                                            *dsti=val.d;break;
-                                        }
+                                      //    nbwr_case11++;
+                                        *dsti=val.d;break;
                                     }
                                 }
                             }
+                        }
 
-                    case 4: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
-                            && (sprite_pri=sprite[4]&val.p))
+                case 4: if( b_x_sprin
+                        && (sprite_pri=sprite[4]&val.p))
+                        {
+                            if(!useABlendSpr) break;
+                            if(sprite_noalp_4) break;
+                            if(!f3_dpix_sp[sprite_pri])
                             {
-                                if(!useABlendSpr) break;
-                                if(sprite_noalp_4) break;
-                                if(!f3_dpix_sp[sprite_pri])
-                                {
-                                    if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);
-                                   //  nbwr_case12++;
+                                if(!(val.p&0xf0)) break;
+                                else {dpix_1_sprite(*dsti,val);
+                               //  nbwr_case12++;
 
-                                    *dsti=val.d;break;}
-                                }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
-                             //    nbwr_case13++;
                                 *dsti=val.d;break;}
                             }
-                            if (!useXplaneClip ||(cx>=clip_al4 && cx<clip_ar4 && !(cx>=clip_bl4 && cx<clip_br4)))
+                            if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                         //    nbwr_case13++;
+                            *dsti=val.d;break;}
+                        }
+                        if (!useXplaneClip ||(cx>=clip_al4 && cx<clip_ar4 && !(cx>=clip_bl4 && cx<clip_br4)))
+                        {
+                            val.t=tsrcs4[x_count4>>16];
+                            if(val.t&0xf0)
                             {
-                                val.t=tsrcs4[x_count4>>16];
-                                if(val.t&0xf0)
+                                UINT32 c=clut[srcs4[x_count4>>16]];
+                                if(!useAlphaBlend)
                                 {
-                                    UINT32 c=clut[srcs4[x_count4>>16]];
-                                    if(!useAlphaBlend)
-                                    {
-                                        *dsti=c;
-                                        break;
-                                    } else
-                                    {
-                                        if(f3_dpix_lp[4][val.p>>4](c,val))
-                                        {
-                                          //   nbwr_case14++;
-                                            *dsti=val.d;
-                                            break;
-                                        }
-                                    }
-
-                                }
-                            }
-
-                    case 5: if( ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)))
-                            && (sprite_pri=sprite[5]&val.p))
-                            {
-                                if(!useABlendSpr) break;
-                                if(sprite_noalp_5) break;
-                                if(!f3_dpix_sp[sprite_pri])
-                                {
-                                    if(!(val.p&0xf0)) break;
-                                    else {dpix_1_sprite(*dsti,val);
-                            //     nbwr_case15++;
-                                    *dsti=val.d;break;}
-                                }
-                                if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
-                             //    nbwr_case16++;
-                                *dsti=val.d;break;}
-                            }
-                            if(!bgcolor || !useAlphaBlend) {
-                                if(!(val.p&0xf0)) {
-                                    //    nbwr_case17++;
-                                    *dsti=0;
+                                    *dsti=c;
                                     break;
+                                } else
+                                {
+                                    if(f3_dpix_lp[4][val.p>>4](c,val))
+                                    {
+                                      //   nbwr_case14++;
+                                        *dsti=val.d;
+                                        break;
+                                    }
                                 }
+
                             }
-                            else
+                        }
+
+                case 5:
+                    // if(/*cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)
+                    //     &&*/ (sprite_pri=sprite[5]&val.p))
+                    //    {
+                    //        if(sprite_noalp_5) break;
+                    //        if(!f3_dpix_sp[sprite_pri])
+                    //        {
+                    //            if(!(val.p&0xf0)) break;
+                    //            else {dpix_1_sprite(*dsti,val);*dsti=val.d;break;}
+                    //        }
+                    //        if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {*dsti=val.d;break;}
+                    //    }
+                    //    if(!bgcolor) {if(!(val.p&0xf0)) {*dsti=0;break;}}
+                    //    else dpix_bg(bgcolor,val);
+                    //    *dsti=val.d;
+
+                    if( b_x_sprin
+                        && (sprite_pri=sprite[5]&val.p))
+                        {
+                            if(!useABlendSpr) break;
+                            if(sprite_noalp_5) break;
+                            if(!f3_dpix_sp[sprite_pri])
                             {
-                                dpix_bg(bgcolor,val);
+                                if(!(val.p&0xf0)) break;
+                                else {dpix_1_sprite(*dsti,val);
+                        //     nbwr_case15++;
+                                *dsti=val.d;break;}
                             }
-                             //    nbwr_case18++;
-                            *dsti=val.d;
-                }
-            }
+                            if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {
+                         //    nbwr_case16++;
+                            *dsti=val.d;break;}
+                        }
+                        if(!bgcolor /*|| !useAlphaBlend*/) {
+                            if(!(val.p&0xf0)) {
+                                //    nbwr_case17++;
+                                *dsti=0;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            dpix_bg(bgcolor,val);
+                        }
+                         //    nbwr_case18++;
+                        *dsti=val.d;
+            } // end switch
 
             if(!(--length)) break;
             dsti++;
@@ -1290,7 +1303,9 @@ static inline void tf3_drawscanlines_k(drsclparams &p,
     // const bool usePlaneClipxTrue = true;
     // const bool usePlaneClipxFalse = false;
 // anySpriteAlphaBlend
-    skip_layer_num |= (tf3_anyPlaneClipX<<3) | (nosprblend<<4);
+
+    skip_layer_num |= ((tf3_anyPlaneClipX<<3) | (nosprblend<<4)) & ((options.tf3_disblend)*0x18);
+
     // |((anySpriteAlphaBlend)<<4);
 // printf("has alpha:%d\n",(anySpriteAlphaBlend));
     switch(skip_layer_num)
@@ -1301,28 +1316,28 @@ static inline void tf3_drawscanlines_k(drsclparams &p,
         case 2: drawscanlinesT<2,false,false,false,false>(p); break;
         case 3: drawscanlinesT<3,false,false,false,false>(p); break;
         case 4: drawscanlinesT<4,false,false,false,false>(p); break;
-        //case 5: drawscanlinesT<5,false,false,false,false>(p); break;
+        case 5: drawscanlinesT<5,false,false,false,false>(p); break;
 
         case 0+8: drawscanlinesT<0,false,true,false,false>(p); break;
         case 1+8: drawscanlinesT<1,false,true,false,false>(p); break;
         case 2+8: drawscanlinesT<2,false,true,false,false>(p); break;
         case 3+8: drawscanlinesT<3,false,true,false,false>(p); break;
         case 4+8: drawscanlinesT<4,false,true,false,false>(p); break;
-        //case 5+8: drawscanlinesT<5,false,true,false,false>(p); break;
+        case 5+8: drawscanlinesT<5,false,true,false,false>(p); break;
 
         case 0+16: drawscanlinesT<0,false,false,true,true>(p); break;
         case 1+16: drawscanlinesT<1,false,false,true,true>(p); break;
         case 2+16: drawscanlinesT<2,false,false,true,true>(p); break;
         case 3+16: drawscanlinesT<3,false,false,true,true>(p); break;
         case 4+16: drawscanlinesT<4,false,false,true,true>(p); break;
-        //case 5+16: drawscanlinesT<5,false,false,true,true>(p); break;
+        case 5+16: drawscanlinesT<5,false,false,true,true>(p); break;
 
         case 0+8+16: drawscanlinesT<0,false,true,true,true>(p); break;
         case 1+8+16: drawscanlinesT<1,false,true,true,true>(p); break;
         case 2+8+16: drawscanlinesT<2,false,true,true,true>(p); break;
         case 3+8+16: drawscanlinesT<3,false,true,true,true>(p); break;
         case 4+8+16: drawscanlinesT<4,false,true,true,true>(p); break;
-        //case 5+8+16: drawscanlinesT<5,false,true,true,true>(p); break;
+        case 5+8+16: drawscanlinesT<5,false,true,true,true>(p); break;
 
     }
 

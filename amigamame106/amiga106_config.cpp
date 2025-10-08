@@ -703,7 +703,8 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
           OPTIMFLAGS_DIRECTWGXWIN | SERFLAG_GROUP_FLAGINT2COLUMS //def.
     ,{
         "Direct draw for RTG Windows",
-        "Use native BestCModeID()"
+        "Use native BestCModeID()",
+        "Disable TaitoF3 Shading"
       });
 
     //serializer("Missing ROMs",(ASerializable &)_missingROM);
@@ -1225,6 +1226,7 @@ void MameConfig::applyToMameOptions(_global_options &mameOptions,const game_driv
     options.vector_remanence = (int)vectorconf._remanence;
     options.vector_glow = (int)vectorconf._glow;
     options.vector_force32b = (int)((vectorconf._flags & VDISPLAYFLAGS_FORCE32B)!=0);
+    options.tf3_disblend = ((_misc._Optims & OPTIMFLAGS_TAITOF3DISABLEBLEND) ==0); // ionverted because simpler to apply
 
 #ifdef LINK_NEOGEO
     // if machine points neogeo rom list, then it's neogeo.
