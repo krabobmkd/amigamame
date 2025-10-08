@@ -340,7 +340,7 @@ static void zwackery_update_sprites(mame_bitmap *bitmap, const rectangle *clipre
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		0x00 	// priority_mask
+		0x00| (1<<31) 	// priority_mask
 	  };
 	struct drawgfxParams dgp3={
 		bitmap, 	// dest
@@ -357,7 +357,7 @@ static void zwackery_update_sprites(mame_bitmap *bitmap, const rectangle *clipre
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		0x02 	// priority_mask
+		0x02| (1<<31) 	// priority_mask
 	  };
 	for (offs = spriteram_size / 2 - 4;offs >= 0;offs -= 4)
 	{

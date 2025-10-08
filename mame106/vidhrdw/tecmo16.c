@@ -414,10 +414,10 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 			switch (priority)
 			{
 				default:
-				case 0x0: priority_mask = 0; break;
-				case 0x1: priority_mask = 0xf0; break; /* obscured by text layer */
-				case 0x2: priority_mask = 0xf0|0xcc; break;	/* obscured by foreground */
-				case 0x3: priority_mask = 0xf0|0xcc|0xaa; break; /* obscured by bg and fg */
+				case 0x0: priority_mask = 0|(1<<31); break;
+				case 0x1: priority_mask = 0xf0|(1<<31); break; /* obscured by text layer */
+				case 0x2: priority_mask = 0xf0|0xcc|(1<<31); break;	/* obscured by foreground */
+				case 0x3: priority_mask = 0xf0|0xcc|0xaa|(1<<31); break; /* obscured by bg and fg */
 			}
 
 			if (flipscreen)

@@ -150,11 +150,11 @@ draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 
 		if( attributes&0x80 )
 		{
-			priority_mask = (0xf0|0xcc );
+			priority_mask = (0xf0|0xcc )|(1<<31);
 		}
 		else
 		{
-			priority_mask = (0xf0);
+			priority_mask = (0xf0)|(1<<31);
 		}
 
 		if (flip_screen_x)

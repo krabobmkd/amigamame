@@ -101,7 +101,7 @@ static void m90_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		sprite = (m90_spriteram[offs+2] | (m90_spriteram[offs+3]<<8));
 		colour = (m90_spriteram[offs+1] >> 1) & 0x0f;
 
-        dgp0.priority_mask =  (colour & 0x08) ? 0x00 : 0x02 ;
+        dgp0.priority_mask =  (colour & 0x08) ? (0x00|(1<<31)) : (0x02|(1<<31)) ;
 
 		y = m90_spriteram[offs+0] | ((m90_spriteram[offs+1] & 0x01) << 8);
 		x = m90_spriteram[offs+4] | ((m90_spriteram[offs+5] & 0x01) << 8);

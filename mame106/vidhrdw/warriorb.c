@@ -73,7 +73,7 @@ static void warriorb_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		pri_mask 	// priority_mask
+		0 	// priority_mask
 	  };
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
 	{
@@ -89,9 +89,9 @@ static void warriorb_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 		priority = (data2 & 0x0100) >> 8; // 1 = low
 
 		if(priority)
-			pri_mask = 0xfffe;
+			pri_mask = 0xfffe | (1<<31);
 		else
-			pri_mask = 0;
+			pri_mask = 0|(1<<31);
 
 		color    = (data2 & 0x7f);
 
@@ -117,6 +117,7 @@ static void warriorb_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 		dgp0.flipy = flipy;
 		dgp0.sx = x;
 		dgp0.sy = y;
+		dgp0.priority_mask = pri_mask;
 		drawgfx(&dgp0);
 	}
 	} // end of patch paragraph

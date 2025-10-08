@@ -252,7 +252,7 @@ static void gunbustr_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 		dgpz0.sy = sprite_ptr->y;
 		dgpz0.scalex = sprite_ptr->zoomx;
 		dgpz0.scaley = sprite_ptr->zoomy;
-		dgpz0.priority_mask = sprite_ptr->primask ;
+		dgpz0.priority_mask = sprite_ptr->primask | (1<<31) ;
 
 		drawgfxzoom(&dgpz0);
 	}

@@ -141,7 +141,7 @@ static void superchs_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 				0x00010000, 	// scalex
 				0x00010000, 	// scaley
 				NULL, 	// pri_buffer
-				0 	// priority_mask
+				1<<31 	// priority_mask
 			  };
 			for (sprite_chunk=0;sprite_chunk<total_chunks;sprite_chunk++)
 			{
@@ -266,7 +266,7 @@ VIDEO_UPDATE( superchs )
 {
 	UINT8 layer[5];
 	UINT16 priority;
-	static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
+	static const int primasks[4] = {0xfffc|(1<<31), 0xfff0|(1<<31), 0xff00|(1<<31), 0x0|(1<<31)};
 
 	TC0480SCP_tilemap_update();
 

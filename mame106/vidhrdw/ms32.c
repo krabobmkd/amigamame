@@ -313,7 +313,7 @@ static void ms32_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, UI
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		pri_mask 	// priority_mask
+		0 	// priority_mask
 	  };
 	for (;ms32_reverse_sprite_order ? (source>=finish) : (source<finish); ms32_reverse_sprite_order ? (source-=4) : (source+=4))
 	{
@@ -379,13 +379,13 @@ if (code_pressed(KEYCODE_F) && (pri & 1)) color = rand();
 
 		/* TODO: priority handling is completely wrong, but better than nothing */
 		if (pri == 0x0)
-			pri_mask = 0x00;
+			pri_mask = 0x00|(1<<31);
 		else if (pri <= 0xd)
-			pri_mask = 0xf0;
+			pri_mask = 0xf0|(1<<31);
 		else if (pri <= 0xe)
-			pri_mask = 0xfc;
+			pri_mask = 0xfc|(1<<31);
 		else
-			pri_mask = 0xfe;
+			pri_mask = 0xfe|(1<<31);
 
 		
 		dgpz0.code = code;
@@ -396,6 +396,7 @@ if (code_pressed(KEYCODE_F) && (pri & 1)) color = rand();
 		dgpz0.sy = sy;
 		dgpz0.scalex = xzoom;
 		dgpz0.scaley = yzoom;
+		dgpz0.priority_mask = pri_mask;
 		drawgfxzoom(&dgpz0);
 	}
 	} // end of patch paragraph

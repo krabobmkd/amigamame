@@ -247,6 +247,7 @@ static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 			if (primasks)
 			{
 				sprite_ptr->primask = primasks[priority];
+
 				sprite_ptr++;
 			}
 			else
@@ -260,6 +261,7 @@ static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 				dgpz0.sy = sprite_ptr->y;
 				dgpz0.scalex = sprite_ptr->zoomx;
 				dgpz0.scaley = sprite_ptr->zoomy;
+				dgpz0.priority_mask = sprite_ptr->primask ;
 				//drawgfxzoom(&dgpz0);
 				drawgfxzoom_clut16_Src8_tr0_prio(&dgpz0);
 			}
@@ -285,7 +287,7 @@ static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 		dgpz0.sy = sprite_ptr->y;
 		dgpz0.scalex = sprite_ptr->zoomx;
 		dgpz0.scaley = sprite_ptr->zoomy;
-        dgpz0.priority_mask = sprite_ptr->primask  | (1<<31);
+        dgpz0.priority_mask = sprite_ptr->primask;
 		//drawgfxzoom(&dgpz0);
 		drawgfxzoom_clut16_Src8_tr0_prio(&dgpz0);
 	}
@@ -318,7 +320,7 @@ VIDEO_UPDATE( othunder )
 
 	/* Sprites can be under/over the layer below text layer */
 	{
-		static const int primasks[2] = {0xf0,0xfc};
+		static const int primasks[2] = {0xf0|(1<<31),0xfc|(1<<31)};
 		othunder_draw_sprites_16x8(bitmap,cliprect,primasks,3);
 	}
 
