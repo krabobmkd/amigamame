@@ -1538,12 +1538,12 @@ static void visible_tile_check(struct f3_playfield_line_inf *line_t,
 	int opaque_all;
 	int total_elements;
 
-	if(!(alpha_mode=line_t->alpha_mode[line])) return;
+	if(!(alpha_mode=line_t->apri[line].alpha_mode)) return;
 
 	total_elements=Machine->gfx[1]->total_elements;
 
 	tile_index=x_index_fx>>16;
-	tile_num=(((line_t->x_zoom[line]*320+(x_index_fx & 0xffff)+0xffff)>>16)+(tile_index%16)+15)/16;
+	tile_num=(((line_t->bm[line].x_zoom*320+(x_index_fx & 0xffff)+0xffff)>>16)+(tile_index%16)+15)/16;
 	tile_index/=16;
 
 	if (f3_flipscreen)
@@ -1587,15 +1587,15 @@ static void visible_tile_check(struct f3_playfield_line_inf *line_t,
 		tile_index++;
 	}
 
-	if(trans_all)	{line_t->alpha_mode[line]=0;return;}
+	if(trans_all)	{line_t->apri[line].alpha_mode=0;return;}
 
 	if(alpha_mode>1)
 	{
-		line_t->alpha_mode[line]|=alpha_type<<4;
+		line_t->apri[line].alpha_mode|=alpha_type<<4;
 	}
 
 	if(opaque_all)
-		line_t->alpha_mode[line]|=0x80;
+		line_t->apri[line].alpha_mode|=0x80;
 }
 
 /******************************************************************************/
@@ -1981,19 +1981,19 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 		{
 			//fast path todo - remove line enable
 			// KRB test if any plane Xclip here !
-			calculate_clip(y, pri&0x0330, &line_t->clip0[y], &line_t->clip1[y], &line_enable);
+			calculate_clip(y, pri&0x0330, &line_t->cl[y].clip0, &line_t->cl[y].clip1, &line_enable);
 			tf3_anyPlaneClipX = 1;
 		}
 		else
 		{
 			/* No clipping */
-			line_t->clip0[y]=0x7fff0000;
-			line_t->clip1[y]=0;
+			line_t->cl[y].clip0=0x7fff0000;
+			line_t->cl[y].clip1=0;
 		}
 
-		line_t->x_zoom[y]=0x10000 - (line_zoom&0xff00);
-		line_t->alpha_mode[y]=line_enable;
-		line_t->pri[y]=pri;
+		line_t->bm[y].x_zoom=0x10000 - (line_zoom&0xff00);
+		line_t->apri[y].alpha_mode=line_enable;
+		line_t->apri[y].pri=pri;
 
 		zoom_base+=inc;
 		line_base+=inc;
@@ -2013,25 +2013,25 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 		UINT32 x_index_fx;
 		UINT32 y_index;
 
-		if(line_t->alpha_mode[y]!=0)
+		if(line_t->apri[y].alpha_mode!=0)
 		{
 			UINT16 *src_s;
 			UINT8 *tsrc_s;
 
-			x_index_fx = (sx+_x_offset[y]-(10*0x10000)+(10*line_t->x_zoom[y]))&((width_mask<<16)|0xffff);
+			x_index_fx = (sx+_x_offset[y]-(10*0x10000)+(10*line_t->bm[y].x_zoom))&((width_mask<<16)|0xffff);
 			y_index = ((y_index_fx>>16)+_colscroll[y])&0x1ff;
 
 			/* check tile status */
 			visible_tile_check(line_t,y,x_index_fx,y_index,f3_pf_data_n);
 
 			/* If clipping enabled for this line have to disable 'all opaque' optimisation */
-			if (line_t->clip0[y]!=0x7fff0000 || line_t->clip1[y]!=0)
-				line_t->alpha_mode[y]&=~0x80;
+			if (line_t->cl[y].clip0!=0x7fff0000 || line_t->cl[y].clip1!=0)
+				line_t->apri[y].alpha_mode&=~0x80;
 
 			/* set pixmap index */
-			line_t->x_counts[y]=x_index_fx;
-			line_t->srcs[y]=(unsigned short *)srcbitmap->line[y_index];
-            line_t->tsrcs[y]= (unsigned char *)transbitmap->line[y_index];
+			line_t->bm[y].x_counts=x_index_fx;
+			line_t->bm[y].srcs=(unsigned short *)srcbitmap->line[y_index];
+            line_t->bm[y].tsrcs= (unsigned char *)transbitmap->line[y_index];
 
 			/*orig
 			line_t->x_count[y]=x_index_fx & 0xffff; // Fractional part
@@ -2107,7 +2107,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 		else
 			line_enable=1;
 
-		line_t->pri[y]=pri;
+		line_t->apri[y].pri=pri;
 
 		/* Evaluate clipping */
 		if (pri&0x0800)
@@ -2115,19 +2115,19 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 		else if (pri&0x0330)
 		{
 			//fast path todo - remove line enable
-			calculate_clip(y, pri&0x0330, &line_t->clip0[y], &line_t->clip1[y], &line_enable);
+			calculate_clip(y, pri&0x0330, &line_t->cl[y].clip0, &line_t->cl[y].clip1, &line_enable);
 		}
 		else
 		{
 			/* No clipping */
-			line_t->clip0[y]=0x7fff0000;
-			line_t->clip1[y]=0;
+			line_t->cl[y].clip0=0x7fff0000;
+			line_t->cl[y].clip1=0;
 		}
 
-		line_t->x_zoom[y]=0x10000;
-		line_t->alpha_mode[y]=line_enable;
-		if (line_t->alpha_mode[y]>1)
-			line_t->alpha_mode[y]|=0x10;
+		line_t->bm[y].x_zoom=0x10000;
+		line_t->apri[y].alpha_mode=line_enable;
+		if (line_t->apri[y].alpha_mode>1)
+			line_t->apri[y].alpha_mode|=0x10;
 
 		pri_base +=inc;
 		y +=y_inc;
@@ -2145,11 +2145,8 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 	line_t->xmask = (vram_width_mask<<16)|0x0000ffff;
 	while(y!=y_end)
 	{
-		if(line_t->alpha_mode[y]!=0)
+		if(line_t->apri[y].alpha_mode!=0)
 		{
-			UINT16 *src_s;
-			UINT8 *tsrc_s;
-
 			// These bits in control ram indicate whether the line is taken from
 			// the VRAM tilemap layer or pixel layer.
 			const int usePixelLayer=((sprite_alpha_line_t->sprite_alpha[y]&0xa000)==0xa000);
@@ -2157,16 +2154,16 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 			/* set pixmap index */
 			if (usePixelLayer)
 			{
-				line_t->srcs[y]=(unsigned short *)srcbitmap_pixel->line[sy&0xff];
-				line_t->tsrcs[y]=(unsigned char *)transbitmap_pixel->line[sy&0xff];
+				line_t->bm[y].srcs=(unsigned short *)srcbitmap_pixel->line[sy&0xff];
+				line_t->bm[y].tsrcs=(unsigned char *)transbitmap_pixel->line[sy&0xff];
             }
 			else
 			{
-				line_t->srcs[y]=(unsigned short *)srcbitmap_vram->line[sy&0x1ff];
-				line_t->tsrcs[y]=(unsigned char *)transbitmap_vram->line[sy&0x1ff];
+				line_t->bm[y].srcs=(unsigned short *)srcbitmap_vram->line[sy&0x1ff];
+				line_t->bm[y].tsrcs=(unsigned char *)transbitmap_vram->line[sy&0x1ff];
 
             }
-			line_t->x_counts[y] = (sx<<16)|0xffff;
+			line_t->bm[y].x_counts = (sx<<16)|0xffff;
 /*
 	UINT16 *srcs[256];
 	UINT16 *tsrcs[256];

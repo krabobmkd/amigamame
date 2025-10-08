@@ -782,21 +782,21 @@ void f3_init_alpha_blend_func(void)
 
 #define GET_PIXMAP_POINTER(pf_num) \
 { \
-	const struct f3_playfield_line_inf *line_tmp=line_t[pf_num]; \
-	srcs##pf_num=line_tmp->srcs[y]; \
-	tsrcs##pf_num=line_tmp->tsrcs[y]; \
-	x_count##pf_num=line_tmp->x_counts[y]; \
-	x_zoom##pf_num=line_tmp->x_zoom[y]; \
+	const struct f3_playfield_bm *lbm=&line_t[pf_num]->bm[y]; \
+	srcs##pf_num=lbm->srcs; \
+	tsrcs##pf_num=lbm->tsrcs; \
+	x_count##pf_num=lbm->x_counts; \
+	x_zoom##pf_num=lbm->x_zoom; \
 	x_count##pf_num &= x_mask##pf_num; \
 }
 
 #define GET_PIXMAP_CLIP(pf_num) \
 { \
-	const struct f3_playfield_line_inf *line_tmp=line_t[pf_num]; \
-	clip_al##pf_num=line_tmp->clip0[y]&0xffff; \
-	clip_ar##pf_num=line_tmp->clip0[y]>>16; \
-	clip_bl##pf_num=line_tmp->clip1[y]&0xffff; \
-	clip_br##pf_num=line_tmp->clip1[y]>>16; \
+	const struct f3_playfield_clip *lcl=&line_t[pf_num]->cl[y]; \
+	clip_al##pf_num=lcl->clip0&0xffff; \
+	clip_ar##pf_num=lcl->clip0>>16; \
+	clip_bl##pf_num=lcl->clip1&0xffff; \
+	clip_br##pf_num=lcl->clip1>>16; \
 }
 
 
@@ -830,8 +830,8 @@ void f3_init_alpha_blend_func(void)
 }
 
 /*============================================================================*/
-static int nbf=0;
-INLINE int shouldp() { return ((nbf & 127)==1); }
+//static int nbf=0;
+///INLINE int shouldp() { return ((nbf & 127)==1); }
 
 // int nbwr_case1=0;
 // int nbwr_case2=0;
@@ -1405,7 +1405,7 @@ void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect)
 	y_end=ye;
 	memset(draw_line,0,256);
 
-nbf++;
+//nbf++;
 
  // nbwr_case1=0;
  // nbwr_case2=0;
@@ -1457,16 +1457,21 @@ nbf++;
 
 
 		/* find same status of scanlines */
-		pri[0]=pf_line_inf[0].pri[y_start];
-		pri[1]=pf_line_inf[1].pri[y_start];
-		pri[2]=pf_line_inf[2].pri[y_start];
-		pri[3]=pf_line_inf[3].pri[y_start];
-		pri[4]=pf_line_inf[4].pri[y_start];
-		alpha_mode[0]=pf_line_inf[0].alpha_mode[y_start];
-		alpha_mode[1]=pf_line_inf[1].alpha_mode[y_start];
-		alpha_mode[2]=pf_line_inf[2].alpha_mode[y_start];
-		alpha_mode[3]=pf_line_inf[3].alpha_mode[y_start];
-		alpha_mode[4]=pf_line_inf[4].alpha_mode[y_start];
+		pri[0]       =pf_line_inf[0].apri[y_start].pri;
+		alpha_mode[0]=pf_line_inf[0].apri[y_start].alpha_mode;
+
+		pri[1]=pf_line_inf[1].apri[y_start].pri;
+		alpha_mode[1]=pf_line_inf[1].apri[y_start].alpha_mode;
+
+		pri[2]=pf_line_inf[2].apri[y_start].pri;
+		alpha_mode[2]=pf_line_inf[2].apri[y_start].alpha_mode;
+
+		pri[3]=pf_line_inf[3].apri[y_start].pri;
+		alpha_mode[3]=pf_line_inf[3].apri[y_start].alpha_mode;
+
+		pri[4]=pf_line_inf[4].apri[y_start].pri;
+		alpha_mode[4]=pf_line_inf[4].apri[y_start].alpha_mode;
+
 		alpha_level=sa_line_inf[0].alpha_level[y_start];
 		spri=sa_line_inf[0].spri[y_start];
 		sprite_alpha=sa_line_inf[0].sprite_alpha[y_start];
@@ -1479,16 +1484,16 @@ nbf++;
 		{
 			if(!draw_line[y])
 			{
-				if(pri[0]!=pf_line_inf[0].pri[y]) y_end_next=y+1;
-				else if(pri[1]!=pf_line_inf[1].pri[y]) y_end_next=y+1;
-				else if(pri[2]!=pf_line_inf[2].pri[y]) y_end_next=y+1;
-				else if(pri[3]!=pf_line_inf[3].pri[y]) y_end_next=y+1;
-				else if(pri[4]!=pf_line_inf[4].pri[y]) y_end_next=y+1;
-				else if(alpha_mode[0]!=pf_line_inf[0].alpha_mode[y]) y_end_next=y+1;
-				else if(alpha_mode[1]!=pf_line_inf[1].alpha_mode[y]) y_end_next=y+1;
-				else if(alpha_mode[2]!=pf_line_inf[2].alpha_mode[y]) y_end_next=y+1;
-				else if(alpha_mode[3]!=pf_line_inf[3].alpha_mode[y]) y_end_next=y+1;
-				else if(alpha_mode[4]!=pf_line_inf[4].alpha_mode[y]) y_end_next=y+1;
+				if(pri[0]!=pf_line_inf[0].apri[y].pri) y_end_next=y+1;
+				else if(pri[1]!=pf_line_inf[1].apri[y].pri) y_end_next=y+1;
+				else if(pri[2]!=pf_line_inf[2].apri[y].pri) y_end_next=y+1;
+				else if(pri[3]!=pf_line_inf[3].apri[y].pri) y_end_next=y+1;
+				else if(pri[4]!=pf_line_inf[4].apri[y].pri) y_end_next=y+1;
+				else if(alpha_mode[0]!=pf_line_inf[0].apri[y].alpha_mode) y_end_next=y+1;
+				else if(alpha_mode[1]!=pf_line_inf[1].apri[y].alpha_mode) y_end_next=y+1;
+				else if(alpha_mode[2]!=pf_line_inf[2].apri[y].alpha_mode) y_end_next=y+1;
+				else if(alpha_mode[3]!=pf_line_inf[3].apri[y].alpha_mode) y_end_next=y+1;
+				else if(alpha_mode[4]!=pf_line_inf[4].apri[y].alpha_mode) y_end_next=y+1;
 				else if(alpha_level!=sa_line_inf[0].alpha_level[y]) y_end_next=y+1;
 				else if(spri!=sa_line_inf[0].spri[y]) y_end_next=y+1;
 				else if(sprite_alpha!=sa_line_inf[0].sprite_alpha[y]) y_end_next=y+1;

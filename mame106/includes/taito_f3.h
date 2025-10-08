@@ -75,23 +75,30 @@ WRITE16_HANDLER(f3_es5505_bank_w);
 void f3_68681_reset(void);
 
 
+struct f3_playfield_bm
+{
+	UINT16 *srcs;
+	UINT8 *tsrcs;
+	INT32 x_counts;
+	INT32 x_zoom;
+};
+struct f3_playfield_clip
+{
+	UINT32 clip0;
+	UINT32 clip1;
+};
+struct f3_playfield_apri
+{
+	int alpha_mode;
+	int pri;
+};
 struct f3_playfield_line_inf
 {
-	int alpha_mode[256];
-	int pri[256];
-
 	/* use for draw_scanlines */
-	UINT16 *srcs[256];
-	UINT8 *tsrcs[256];
-	INT32 x_counts[256];
+	struct f3_playfield_bm bm[256];
+	struct f3_playfield_clip cl[256];
+	struct f3_playfield_apri apri[256];
     UINT32 xmask;
-
-	// UINT16 *src[256],*src_s[256],*src_e[256];
-	// UINT8 *tsrc[256],*tsrc_s[256];
-	// int x_count[256];
-	INT32 x_zoom[256];
-	UINT32 clip0[256];
-	UINT32 clip1[256];
 };
 
 struct f3_spritealpha_line_inf
