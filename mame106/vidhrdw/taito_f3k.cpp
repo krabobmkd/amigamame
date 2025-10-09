@@ -920,27 +920,7 @@ void drawscanlinesT(drsclparams &p)
         case 3: x_mask3=line_t[3]->xmask;
         case 4: x_mask4=line_t[4]->xmask;
     }
-/*
-	UINT16 *src0,*src_s0,*src_e0,clip_al0,clip_ar0,clip_bl0,clip_br0;
-	UINT8 *tsrc0,*tsrc_s0;
-	UINT32 x_count0,x_zoom0;
 
-	UINT16 *src1,*src_s1,*src_e1,clip_al1,clip_ar1,clip_bl1,clip_br1;
-	UINT8 *tsrc1,*tsrc_s1;
-	UINT32 x_count1,x_zoom1;
-
-	UINT16 *src2,*src_s2,*src_e2,clip_al2,clip_ar2,clip_bl2,clip_br2;
-	UINT8 *tsrc2,*tsrc_s2;
-	UINT32 x_count2,x_zoom2;
-
-	UINT16 *src3,*src_s3,*src_e3,clip_al3,clip_ar3,clip_bl3,clip_br3;
-	UINT8 *tsrc3,*tsrc_s3;
-	UINT32 x_count3,x_zoom3;
-
-	UINT16 *src4,*src_s4,*src_e4,clip_al4,clip_ar4,clip_bl4,clip_br4;
-	UINT8 *tsrc4,*tsrc_s4;
-	UINT32 x_count4,x_zoom4;
-*/
 	UINT16 clip_als=0, clip_ars=0, clip_bls=0, clip_brs=0;
 
 	UINT8 *dstp0,*dstp;
@@ -1006,14 +986,6 @@ void drawscanlinesT(drsclparams &p)
             val.p=*dstp;
             UINT8 sprite_pri;
 
-// val.p 11110000 is never used at this level !!
-// if((val.p>>4)!=0)
-// {
-//     static int yy=0;
-//     yy++;
-// }
-//                UINT8 tval;
-//                Pixt dval;
             const bool b_x_sprin = ( !useXspriteClip || (cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)));
             switch(skip_layer_num)
             {
@@ -1282,6 +1254,66 @@ void drawscanlinesT(drsclparams &p)
     }
 
 }
+
+
+
+void drawscanlinesFinalClean(drsclparams &p)
+{
+    INT16 *draw_line_num = p.draw_line_num;
+//    const struct f3_playfield_line_inf **line_t=p.line_t;
+//    const int *sprite= p.sprite;
+	UINT32 bgcolor=Machine->remapped_colortable[0];
+	int length;
+	const int x=46;
+
+	UINT8 *dstp0,*dstp;
+
+	int yadv = p.bitmap->rowpixels;
+	int i=0,y=p.draw_line_num[0];
+	int ty = y;
+
+    // - - - - - -  -
+    UINT32 *dsti0,*dsti;
+    dsti0 = (UINT32 *)p.bitmap->line[ty] + x;
+	dstp0 = (UINT8 *)tf3_pri_alp_bitmap->line[ty] + x;
+    while(1)
+    {
+        length=320;
+        dsti = dsti0;
+        dstp = dstp0;
+
+        // x loop
+        while (1)
+        {
+            UINT8 valp=*dstp;
+            if(!valp)  *dsti = bgcolor;
+
+            if(!(--length)) break;
+            dsti++;
+            dstp++;
+        } // end x loop
+
+        i++;
+
+        if(draw_line_num[i]<0) break;
+        if(draw_line_num[i]==y+1)
+        {
+            dsti0 += yadv;
+            dstp0 += yadv;
+            y++;
+            continue;
+        }
+        else
+        {
+            int dy=(draw_line_num[i]-y)*yadv;
+            dsti0 += dy;
+            dstp0 += dy;
+            y=draw_line_num[i];
+        }
+    }
+
+}
+
 //#undef GET_PIXMAP_POINTER
 //#undef CULC_PIXMAP_POINTER
 
@@ -1292,6 +1324,13 @@ extern int tf3_anyPlaneClipX;
 static inline void tf3_drawscanlines_k(drsclparams &p,
 		int skip_layer_num)
 {
+    if(skip_layer_num == 5)
+    {
+        // means: no layer, just background
+        drawscanlinesFinalClean(p);
+        return;
+    }
+
     UINT32 andspr= ~0;
     for(int i=skip_layer_num;i<6;i++) andspr &=p.sprite[i];
     int nosprblend =  (andspr & 0x100)==0;
@@ -1316,28 +1355,24 @@ static inline void tf3_drawscanlines_k(drsclparams &p,
         case 2: drawscanlinesT<2,false,false,false,false>(p); break;
         case 3: drawscanlinesT<3,false,false,false,false>(p); break;
         case 4: drawscanlinesT<4,false,false,false,false>(p); break;
-        case 5: drawscanlinesT<5,false,false,false,false>(p); break;
 
         case 0+8: drawscanlinesT<0,false,true,false,false>(p); break;
         case 1+8: drawscanlinesT<1,false,true,false,false>(p); break;
         case 2+8: drawscanlinesT<2,false,true,false,false>(p); break;
         case 3+8: drawscanlinesT<3,false,true,false,false>(p); break;
         case 4+8: drawscanlinesT<4,false,true,false,false>(p); break;
-        case 5+8: drawscanlinesT<5,false,true,false,false>(p); break;
 
         case 0+16: drawscanlinesT<0,false,false,true,true>(p); break;
         case 1+16: drawscanlinesT<1,false,false,true,true>(p); break;
         case 2+16: drawscanlinesT<2,false,false,true,true>(p); break;
         case 3+16: drawscanlinesT<3,false,false,true,true>(p); break;
         case 4+16: drawscanlinesT<4,false,false,true,true>(p); break;
-        case 5+16: drawscanlinesT<5,false,false,true,true>(p); break;
 
         case 0+8+16: drawscanlinesT<0,false,true,true,true>(p); break;
         case 1+8+16: drawscanlinesT<1,false,true,true,true>(p); break;
         case 2+8+16: drawscanlinesT<2,false,true,true,true>(p); break;
         case 3+8+16: drawscanlinesT<3,false,true,true,true>(p); break;
         case 4+8+16: drawscanlinesT<4,false,true,true,true>(p); break;
-        case 5+8+16: drawscanlinesT<5,false,true,true,true>(p); break;
 
     }
 
