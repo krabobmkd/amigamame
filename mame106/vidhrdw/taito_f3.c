@@ -1296,8 +1296,8 @@ UINT8 f3_add_sat[256][256];
 //}
 
 /*============================================================================*/
-static int nbf=0;
-INLINE int shouldp() { return ((nbf & 127)==1); }
+//static int nbf=0;
+//INLINE int shouldp() { return ((nbf & 127)==1); }
 
 
 //INLINE void f3_drawscanlines(
@@ -1853,7 +1853,7 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 		y_end=-1;
 		y_inc=-1;
 
-		if (f3_game_config->extend)	sx=-sx+((188-512)<<16); else sx=-sx+(188<<16); /* Adjust for flipped scroll position */
+		if (f3_game_config->extend)	sx=-sx-((512-188)<<16); else sx=-sx+(188<<16); /* Adjust for flipped scroll position */
 		y_index_fx=-sy-(256<<16); /* Adjust for flipped scroll position */
 	}
 	else
@@ -1980,8 +1980,8 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 		else if (pri&0x0330)
 		{
 			//fast path todo - remove line enable
-			// KRB test if any plane Xclip here !
 			calculate_clip(y, pri&0x0330, &line_t->cl[y].clip0, &line_t->cl[y].clip1, &line_enable);
+			// KRB test if any plane Xclip here !
 			tf3_anyPlaneClipX = 1;
 		}
 		else
@@ -2007,7 +2007,7 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 	transbitmap = tilemap_get_transparency_bitmap(tmap);
 
 	y=y_start;
-	line_t->xmask = (width_mask<<16)|0x0000ffff;
+	line_t->xmask = (width_mask<<16)|0x0000ffff; // krb
 	while(y!=y_end)
 	{
 		UINT32 x_index_fx;
@@ -2924,6 +2924,6 @@ VIDEO_UPDATE( f3 )
 	/* Draw final framebuffer */
 	f3_scanline_draw_k(bitmap,cliprect);
 
-nbf++;
+//nbf++;
 //  print_debug_info(bitmap);
 }

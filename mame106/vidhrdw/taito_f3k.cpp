@@ -22,7 +22,7 @@ struct tempsprite
     extern int f3_flipscreen;
    // void video_update_taito_f3k( mame_bitmap *bitmap, const rectangle *cliprect);
    void f3_init_alpha_blend_func(void);
-   void video_update_taito_f3k_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect);
+//   void video_update_taito_f3k_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect);
 
     void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect);
 }
@@ -234,41 +234,41 @@ INLINE void f3_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
 #undef NEXT_P
 
 
-void video_update_taito_f3k_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
-{
-	const struct tempsprite *sprite_ptr;
-	const gfx_element *sprite_gfx = Machine->gfx[2];
+//void video_update_taito_f3k_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
+//{
+//	const struct tempsprite *sprite_ptr;
+//	const gfx_element *sprite_gfx = Machine->gfx[2];
 
-	sprite_ptr = tf3_sprite_end;
-	tf3_sprite_pri_usage=0;
-	while (sprite_ptr != tf3_spritelist)
-	{
-		int pri;
-		sprite_ptr--;
+//	sprite_ptr = tf3_sprite_end;
+//	tf3_sprite_pri_usage=0;
+//	while (sprite_ptr != tf3_spritelist)
+//	{
+//		int pri;
+//		sprite_ptr--;
 
-		pri=sprite_ptr->pri;
-		tf3_sprite_pri_usage|=1<<pri;
+//		pri=sprite_ptr->pri;
+//		tf3_sprite_pri_usage|=1<<pri;
 
-		if(sprite_ptr->zoomx==16 && sprite_ptr->zoomy==16)
-			f3_drawgfx(bitmap,sprite_gfx,
-					sprite_ptr->code,
-					sprite_ptr->color,
-					sprite_ptr->flipx,sprite_ptr->flipy,
-					sprite_ptr->x,sprite_ptr->y,
-					cliprect,
-					pri);
-//		else
-//			f3_drawgfxzoom(bitmap,sprite_gfx,
+//		if(sprite_ptr->zoomx==16 && sprite_ptr->zoomy==16)
+//			f3_drawgfx(bitmap,sprite_gfx,
 //					sprite_ptr->code,
 //					sprite_ptr->color,
 //					sprite_ptr->flipx,sprite_ptr->flipy,
 //					sprite_ptr->x,sprite_ptr->y,
 //					cliprect,
-//					sprite_ptr->zoomx,sprite_ptr->zoomy,
 //					pri);
-	}
+////		else
+////			f3_drawgfxzoom(bitmap,sprite_gfx,
+////					sprite_ptr->code,
+////					sprite_ptr->color,
+////					sprite_ptr->flipx,sprite_ptr->flipy,
+////					sprite_ptr->x,sprite_ptr->y,
+////					cliprect,
+////					sprite_ptr->zoomx,sprite_ptr->zoomy,
+////					pri);
+//	}
 
-}
+//}
 
 // =============================================================================
 // the dreaded plane mixer
@@ -831,28 +831,8 @@ void f3_init_alpha_blend_func(void)
 
 /*============================================================================*/
 //static int nbf=0;
-///INLINE int shouldp() { return ((nbf & 127)==1); }
+//INLINE int shouldp() { return ((nbf & 127)==1); }
 
-// int nbwr_case1=0;
-// int nbwr_case2=0;
-// int nbwr_case3=0;
-// int nbwr_case4=0;
-// int nbwr_case5=0;
-// int nbwr_case6=0;
-
-// int nbwr_case7=0;
-// int nbwr_case8=0;
-// int nbwr_case9=0;
-// int nbwr_case10=0;
-// int nbwr_case11=0;
-// int nbwr_case12=0;
-
-// int nbwr_case13=0;
-// int nbwr_case14=0;
-// int nbwr_case15=0;
-// int nbwr_case16=0;
-// int nbwr_case17=0;
-// int nbwr_case18=0;
 typedef struct
 {
     mame_bitmap *bitmap;
@@ -1326,7 +1306,9 @@ static inline void tf3_drawscanlines_k(drsclparams &p,
 {
     if(skip_layer_num == 5)
     {
-        // means: no layer, just background
+        // means: no layer, just background and sprites.
+        //note: background "layer5" manages in drawscanlinesT<> seems to have lots of blend modes, when case5 reached, which looks bugged.
+        // yet does not let sprites as it should.
         drawscanlinesFinalClean(p);
         return;
     }
@@ -1336,16 +1318,10 @@ static inline void tf3_drawscanlines_k(drsclparams &p,
     int nosprblend =  (andspr & 0x100)==0;
 // printf("nosprblend:%d\n",nosprblend);
 
-//    skip_layer_num
-    // const bool useSprClipxTrue = true;
-    // const bool useSprClipxFalse = false;
-    // const bool usePlaneClipxTrue = true;
-    // const bool usePlaneClipxFalse = false;
 // anySpriteAlphaBlend
 
     skip_layer_num |= ((tf3_anyPlaneClipX<<3) | (nosprblend<<4)) & ((options.tf3_disblend)*0x18);
 
-    // |((anySpriteAlphaBlend)<<4);
 // printf("has alpha:%d\n",(anySpriteAlphaBlend));
     switch(skip_layer_num)
     {
@@ -1442,52 +1418,42 @@ void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect)
 	if (f3_flipscreen)
 	{
 		rot=ORIENTATION_FLIP_Y;
-		ys=0;
-		ye=232;
+		ys=0; //Machine->visible_area.min_y;
+		ye= ys + (cliprect->max_y - cliprect->min_y)+1; //232; //Machine->visible_area.max_y+1; //232;
 	}
 	else
 	{
-		ys=24;
-		ye=256;
+		//ys=24;
+		//ye= 256; // 24+224
+        // krb, this index is really the visible ones.
+        //ys = cliprect->min_y;
+        //ye = cliprect->max_y+1;
+        ys = cliprect->min_y;
+        ye = cliprect->max_y+1;
+        if(ye>256) ye=256;
+
 	}
+
+
+
 
 	y_start=ys;
 	y_end=ye;
-	memset(draw_line,0,256);
+//	memset(draw_line,0,256);
+    memset(&draw_line[ys],0,(ye-ys));
 
 //nbf++;
-
- // nbwr_case1=0;
- // nbwr_case2=0;
- // nbwr_case3=0;
- // nbwr_case4=0;
- // nbwr_case5=0;
- // nbwr_case6=0;
-
- // nbwr_case7=0;
- // nbwr_case8=0;
- // nbwr_case9=0;
- // nbwr_case10=0;
- // nbwr_case11=0;
- // nbwr_case12=0;
-
- // nbwr_case13=0;
- // nbwr_case14=0;
- // nbwr_case15=0;
- // nbwr_case16=0;
- // nbwr_case17=0;
- // nbwr_case18=0;
 
     drsclparams dslparams;
 
     dslparams.bitmap = bitmap;
     dslparams.orient = rot;
 
+
+//  if(shouldp()) printf("start main while ... flip:%d  h:%d\n",f3_flipscreen,(cliprect->max_y- cliprect->min_y));
 // int nbw=0;
 	while(1)
 	{
-  //      if(shouldp()) printf("start main while\n");
-
 		static int alpha_level_last=-1;
         anyPlaneAlphaBlend=0;
         anySpriteAlphaBlend=0;
@@ -1534,19 +1500,24 @@ void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect)
 		{
 			if(!draw_line[y])
 			{
-				if(pri[0]!=pf_line_inf[0].apri[y].pri) y_end_next=y+1;
-				else if(pri[1]!=pf_line_inf[1].apri[y].pri) y_end_next=y+1;
-				else if(pri[2]!=pf_line_inf[2].apri[y].pri) y_end_next=y+1;
-				else if(pri[3]!=pf_line_inf[3].apri[y].pri) y_end_next=y+1;
-				else if(pri[4]!=pf_line_inf[4].apri[y].pri) y_end_next=y+1;
-				else if(alpha_mode[0]!=pf_line_inf[0].apri[y].alpha_mode) y_end_next=y+1;
-				else if(alpha_mode[1]!=pf_line_inf[1].apri[y].alpha_mode) y_end_next=y+1;
-				else if(alpha_mode[2]!=pf_line_inf[2].apri[y].alpha_mode) y_end_next=y+1;
-				else if(alpha_mode[3]!=pf_line_inf[3].apri[y].alpha_mode) y_end_next=y+1;
-				else if(alpha_mode[4]!=pf_line_inf[4].apri[y].alpha_mode) y_end_next=y+1;
-				else if(alpha_level!=sa_line_inf[0].alpha_level[y]) y_end_next=y+1;
-				else if(spri!=sa_line_inf[0].spri[y]) y_end_next=y+1;
-				else if(sprite_alpha!=sa_line_inf[0].sprite_alpha[y]) y_end_next=y+1;
+				if(
+                    (pri[0]!=pf_line_inf[0].apri[y].pri) ||
+                    (pri[1]!=pf_line_inf[1].apri[y].pri)||
+                    (pri[2]!=pf_line_inf[2].apri[y].pri)||
+                    (pri[3]!=pf_line_inf[3].apri[y].pri)||
+                    (pri[4]!=pf_line_inf[4].apri[y].pri)||
+                    (alpha_mode[0]!=pf_line_inf[0].apri[y].alpha_mode)||
+                    (alpha_mode[1]!=pf_line_inf[1].apri[y].alpha_mode)||
+                    (alpha_mode[2]!=pf_line_inf[2].apri[y].alpha_mode)||
+                    (alpha_mode[3]!=pf_line_inf[3].apri[y].alpha_mode)||
+                    (alpha_mode[4]!=pf_line_inf[4].apri[y].alpha_mode)||
+                    (alpha_level!=sa_line_inf[0].alpha_level[y])||
+                    (spri!=sa_line_inf[0].spri[y])||
+                    (sprite_alpha!=sa_line_inf[0].sprite_alpha[y])
+                    )
+				{
+                    y_end_next=y+1;
+				}
 				else
 				{
 					draw_line[y]=1;
@@ -1870,31 +1841,24 @@ void f3_scanline_draw_k(mame_bitmap *bitmap, const rectangle *cliprect)
 		if(sprite[5]&sprite_alpha_check) alpha=1;
 		else if(!alpha) sprite[5]|=0x100;
 
- // 		y_end=y_end_next;
-//		y_start=y_start_next;
-// y_start
-//    if(shouldp()) printf("go dsl y_start:%d y_end:%d\n",draw_line_num[0],draw_line_num[i-2]);
-	//f3_drawscanlines(bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
+//  if(shouldp())
+//  {
+//    int yy=0;
+//    while(draw_line_num[yy]>=0)
+//    {
+//        yy++;
+//    }
+//    printf("dscl: %d -> %d  nbl:%d skipl:%d\n",draw_line_num[0],draw_line_num[yy-1], yy,count_skip_layer);
+
+//  }
 
         dslparams.draw_line_num = draw_line_num;
         dslparams.line_t = line_t;
         dslparams.sprite = sprite;
         tf3_drawscanlines_k(dslparams,count_skip_layer);
 
-
 		if(y_start<0) break;
-//		nbw++;
-		//break;
+
 	}
 
-  // if(shouldp())
-  // {
-  //       printf("draws: c1:%d \tc2:%d \tc3:%d \tc4:%d\n",nbwr_case1,nbwr_case2,nbwr_case3,nbwr_case4);
-  //       printf("draws: c5:%d \tc6:%d \tc7:%d \tc8:%d\n",nbwr_case5,nbwr_case6,nbwr_case7,nbwr_case8);
-  //       printf("draws: c9:%d \tc10:%d \tc11:%d \tc12:%d\n",nbwr_case9,nbwr_case10,nbwr_case11,nbwr_case12);
-  //       printf("draws: c13:%d \tc14:%d \tc15:%d \tc16:%d\n",nbwr_case13,nbwr_case14,nbwr_case15,nbwr_case16);
-  //       printf("draws: c17:%d \tc18:%d\n",nbwr_case17,nbwr_case18);
-  // }
-
-//        if(shouldp()) printf("end upd %d\n",nbw);
 }
