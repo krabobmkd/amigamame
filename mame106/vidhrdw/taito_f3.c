@@ -307,7 +307,7 @@ alpha_mode
 
 struct f3_playfield_line_inf *pf_line_inf;
 struct f3_spritealpha_line_inf *sa_line_inf;
-
+struct f3_playfield_apri *tf3_line_alphapri;
 
 mame_bitmap *tf3_pri_alp_bitmap;
 /*
@@ -580,6 +580,8 @@ VIDEO_START( f3 )
 	pivot_dirty = (UINT8 *)auto_malloc(2048);
 	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
 	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));
+	tf3_line_alphapri = auto_malloc(256 * sizeof(struct f3_playfield_apri));
+
 	tf3_pri_alp_bitmap = auto_bitmap_alloc_depth( Machine->drv->screen_width, Machine->drv->screen_height, -8 );
 	tf3_tile_opaque_sp = (UINT8 *)auto_malloc(Machine->gfx[2]->total_elements);
 	tile_opaque_pf = (UINT8 *)auto_malloc(Machine->gfx[1]->total_elements);
@@ -1538,6 +1540,9 @@ static void visible_tile_check(struct f3_playfield_line_inf *line_t,
 	int opaque_all;
 	int total_elements;
 
+
+
+
 	if(!(alpha_mode=line_t->apri[line].alpha_mode)) return;
 
 	total_elements=Machine->gfx[1]->total_elements;
@@ -1992,8 +1997,11 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 		}
 
 		line_t->bm[y].x_zoom=0x10000 - (line_zoom&0xff00);
-		line_t->apri[y].alpha_mode=line_enable;
-		line_t->apri[y].pri=pri;
+
+		tf3_line_alphapri[y].alpha_mode[pos] = (UINT8)line_enable;
+		tf3_line_alphapri[y].pri[pos] = pri;
+		//line_t->apri[y].alpha_mode=line_enable;
+		//line_t->apri[y].pri=pri;
 
 		zoom_base+=inc;
 		line_base+=inc;
@@ -2013,7 +2021,8 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 		UINT32 x_index_fx;
 		UINT32 y_index;
 
-		if(line_t->apri[y].alpha_mode!=0)
+        if(tf3_line_alphapri[y].alpha_mode[pos]!=0)
+//		if(line_t->apri[y].alpha_mode!=0)
 		{
 			UINT16 *src_s;
 			UINT8 *tsrc_s;
@@ -2026,7 +2035,8 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 
 			/* If clipping enabled for this line have to disable 'all opaque' optimisation */
 			if (line_t->cl[y].clip0!=0x7fff0000 || line_t->cl[y].clip1!=0)
-				line_t->apri[y].alpha_mode&=~0x80;
+				tf3_line_alphapri[y].alpha_mode[pos]&=~0x80;
+				//line_t->apri[y].alpha_mode&=~0x80;
 
 			/* set pixmap index */
 			line_t->bm[y].x_counts=x_index_fx;
@@ -2194,13 +2204,6 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 }
 
 /******************************************************************************/
-extern     void tf3_drawscanlines_k(
-		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
-		const struct f3_playfield_line_inf **line_t,
-		const int *sprite,
-		UINT32 orient,
-		int skip_layer_num);
-
 
 
 /******************************************************************************/

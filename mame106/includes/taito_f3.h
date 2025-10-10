@@ -88,18 +88,28 @@ struct f3_playfield_clip
 	UINT32 clip1;
 };
 struct f3_playfield_apri
-{
-	int alpha_mode;
-	int pri;
+{	
+	union
+	{
+		UINT8 alpha_mode[8]; // actually 5, per layers
+		UINT32 alphamodeU[2];
+	};
+	union
+	{
+		UINT16 pri[6];
+		UINT32 priU[3];
+	};
 };
 struct f3_playfield_line_inf
 {
 	/* use for draw_scanlines */
 	struct f3_playfield_bm bm[256];
 	struct f3_playfield_clip cl[256];
-	struct f3_playfield_apri apri[256];
+//	struct f3_playfield_apri apri[256];
     UINT32 xmask;
 };
+
+
 
 struct f3_spritealpha_line_inf
 {
