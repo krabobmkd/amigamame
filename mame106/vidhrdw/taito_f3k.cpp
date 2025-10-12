@@ -1152,21 +1152,6 @@ void drawscanlinesT(drsclparams &p)
                         }
 
                 case 5:
-                    // if(/*cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)
-                    //     &&*/ (sprite_pri=sprite[5]&val.p))
-                    //    {
-                    //        if(sprite_noalp_5) break;
-                    //        if(!f3_dpix_sp[sprite_pri])
-                    //        {
-                    //            if(!(val.p&0xf0)) break;
-                    //            else {dpix_1_sprite(*dsti,val);*dsti=val.d;break;}
-                    //        }
-                    //        if(f3_dpix_sp[sprite_pri][val.p>>4](*dsti,val)) {*dsti=val.d;break;}
-                    //    }
-                    //    if(!bgcolor) {if(!(val.p&0xf0)) {*dsti=0;break;}}
-                    //    else dpix_bg(bgcolor,val);
-                    //    *dsti=val.d;
-
                     if( b_x_sprin
                         && (sprite_pri=sprite[5]&val.p))
                         {
@@ -1183,7 +1168,7 @@ void drawscanlinesT(drsclparams &p)
                          //    nbwr_case16++;
                             *dsti=val.d;break;}
                         }
-                        if(!bgcolor /*|| !useAlphaBlend*/) {
+                        if(!bgcolor || !useAlphaBlend) {
                             if(!(val.p&0xf0)) {
                                 //    nbwr_case17++;
                                 *dsti=0;
@@ -1196,6 +1181,7 @@ void drawscanlinesT(drsclparams &p)
                         }
                          //    nbwr_case18++;
                         *dsti=val.d;
+
             } // end switch
 
             if(!(--length)) break;
