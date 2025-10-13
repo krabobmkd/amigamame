@@ -22,15 +22,13 @@
  - Bug Corrections:
   - Machine Taito F3 corrected:
      machine taito_f3 and anything using 68EC020 has been 100% corrected, and 10 to 20% speed optimized after weeks of work !
-     This was a cause of bugs since the early times of Minimix, and was due to specific 68000 optimisations..
-     Also the Minimix f3 specific video driver has now less bugs and is more close to original hardware than the current official MAME code.
-     Machine "Taito F3" is some kind of "super NeoGeo" with alpha blending and pixel rendering capabilities,
-     and an incredible "Ensoniq" sound chip (based on "Subtractive synthesis", and made by the same team as the C64 SID !).
+     It is some kind of "super NeoGeo" with alpha blending and pixel rendering capabilities,
+     and an incredible "Ensoniq OTTO" sound chip (based on "Subtractive synthesis", and made by the same team as the C64 SID).
      Reminding you that Taito had incredible composers and sound technicians also known as the band "Zuntata" should be enough
      to tease your ears (and if not: https://www.youtube.com/watch?v=NrZ5dn4gBWo&list=RDNrZ5dn4gBWo&start_radio=1 )
      Machine Taito_f3 supports 83 roms amongst: Bubble BobbleII (bublbob2), lots of Puzzle bobble versions, space invader 95 (spcinv95),
-     the incredible "Riding Fight" (ridingf), vertical shooter "Grid seeker" (gseeker), ...
-     Yet it is still a bit too slow because of video mixing hard to emulate, frameskip will help.
+     the incredible "Riding Fight" (ridingf), vertical shooter "Grid seeker" (gseeker), sort machine column to find out the list of
+     related games. Yet it is still a bit too slow because of video mixing hard to emulate, frameskip will help.
      It runs between 50 and 60% on a rpi4 1500Mhz emu68 1.06, it begins to be playable, but hell, no kidding: it's taito f3.
 
   - Other corrections:
@@ -45,7 +43,7 @@
 
   - Vertical shooter of that time, with lots of bullets on screens, known as the "*Danmaku*" genre, are a lot more present:
     "DonPachi"(donpachi), "DoDonPachi"(ddonpach),"ESP Ra.De."(esprade), "Gunbird"(gunbird), "Striker 1945"(s1945),
-    R-shark (rshark) and the mostly excellent "Dangun Feveron/Fever SOS"(dfeveron,feversos), and the excellent "Air Gallet"(agallet).
+    R-shark (rshark) and the mostly excellent "Dangun Feveron/Fever SOS"(dfeveron,feversos), the excellent "Air Gallet"(agallet).
     (note the "raizing" danmakus were already supported: "Armed police batrider"(batrider),"Battle Garrega"(battleg),...)
     ...filtering the list with vertical shooters and then sorting by years would give you the full list anyway !
 

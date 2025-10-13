@@ -1,4 +1,4 @@
-#define MACHINENAME "segaxbd"
+#define MACHINENAME "sega xbd"
 /***************************************************************************
 
     Sega X-board hardware

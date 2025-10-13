@@ -1,4 +1,4 @@
-#define MACHINENAME "taito_z"
+#define MACHINENAME "taito z"
 /***************************************************************************
 
 Taito Z System [twin 68K with optional Z80]

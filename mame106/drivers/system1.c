@@ -1,4 +1,4 @@
-#define MACHINENAME "system1"
+#define MACHINENAME "sega s1"
 /******************************************************************************
 
 Sega System 1 / System 2

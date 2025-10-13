@@ -1,4 +1,4 @@
-#define MACHINENAME "segas32"
+#define MACHINENAME "sega s32"
 /***************************************************************************
 
     Sega System 32/Multi 32 hardware

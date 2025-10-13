@@ -1,4 +1,4 @@
-#define MACHINENAME "segas18"
+#define MACHINENAME "sega s18"
 /***************************************************************************
 
     Sega System 18 hardware

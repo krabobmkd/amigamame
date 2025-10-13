@@ -232,7 +232,7 @@ static WRITE16_HANDLER( pigskin_protection_w )
 		protection_data[3] = protection_data[4];
 		protection_data[4] = data & 0xff;
 
-		logerror("%06X:protection_w=%02X\n", activecpu_get_previouspc(), data & 0xff);
+		//logerror("%06X:protection_w=%02X\n", activecpu_get_previouspc(), data & 0xff);
 	}
 }
 
@@ -250,8 +250,8 @@ static READ16_HANDLER( pigskin_protection_r )
 		protection_data[1] == 0x25 && protection_data[0] == 0x36)
 		return 0x00;	/* must be < 3 */
 
-	logerror("Protection read after unrecognized sequence: %02X %02X %02X %02X %02X\n",
-			protection_data[0], protection_data[1], protection_data[2], protection_data[3], protection_data[4]);
+	// logerror("Protection read after unrecognized sequence: %02X %02X %02X %02X %02X\n",
+	// 		protection_data[0], protection_data[1], protection_data[2], protection_data[3], protection_data[4]);
 
 	return 0x00;
 }

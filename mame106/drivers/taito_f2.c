@@ -1,4 +1,4 @@
-#define MACHINENAME "taito_f2"
+#define MACHINENAME "taito f2"
 /***************************************************************************
 
 Taito F2 System

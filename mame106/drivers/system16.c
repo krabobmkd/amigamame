@@ -1,4 +1,4 @@
-#define MACHINENAME "system16"
+#define MACHINENAME "sega s16"
 /*
     Sega System16 Hardware
     major cleanup in progress - still a lot to do!

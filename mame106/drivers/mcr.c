@@ -482,7 +482,7 @@ static WRITE8_HANDLER( dotron_op4_w )
 		/* bit 2 -> J1-4 = enable */
 		/* bit 1 -> J1-5 = sequence select */
 		/* bit 0 -> J1-6 = speed (0=slow, 1=fast) */
-		logerror("Lamp: en=%d seq=%d speed=%d\n", (data >> 2) & 1, (data >> 1) & 1, data & 1);
+//		logerror("Lamp: en=%d seq=%d speed=%d\n", (data >> 2) & 1, (data >> 1) & 1, data & 1);
 	}
 	last_op4 = data;
 
@@ -501,7 +501,7 @@ static WRITE8_HANDLER( dotron_op4_w )
 
 WRITE8_HANDLER( mcr_ipu_sio_transmit )
 {
-	logerror("ipu_sio_transmit: %02X\n", data);
+//	logerror("ipu_sio_transmit: %02X\n", data);
 
 	/* create a 10-bit value with a '1','0' sequence for the start bit */
 	nflfoot_serial_in_active = TRUE;
@@ -524,8 +524,8 @@ static READ8_HANDLER( nflfoot_ip2_r )
 			nflfoot_serial_in_active = FALSE;
 	}
 
-	if (activecpu_get_pc() != 0x107)
-		logerror("%04X:ip2_r = %02X\n", activecpu_get_pc(), val);
+	// if (activecpu_get_pc() != 0x107)
+	// 	logerror("%04X:ip2_r = %02X\n", activecpu_get_pc(), val);
 	return val;
 }
 
@@ -533,7 +533,7 @@ static READ8_HANDLER( nflfoot_ip2_r )
 static WRITE8_HANDLER( nflfoot_op4_w )
 {
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
-	logerror("%04X:op4_w(%d%d%d)\n", activecpu_get_pc(), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
+	//logerror("%04X:op4_w(%d%d%d)\n", activecpu_get_pc(), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
 
 	/* look for a non-zero start bit to go active */
 	if (!nflfoot_serial_out_active && (data & 0x80))
@@ -541,7 +541,7 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 		nflfoot_serial_out_active = TRUE;
 		nflfoot_serial_out_bits = 0;
 		nflfoot_serial_out_numbits = 0;
-		logerror(" -- serial active\n");
+	//	logerror(" -- serial active\n");
 	}
 
 	/* accumulate bits as they are written */
@@ -552,13 +552,13 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 		{
 			nflfoot_serial_out_bits = (nflfoot_serial_out_bits >> 1) | (~data & 0x80);
 			nflfoot_serial_out_numbits++;
-			logerror(" -- accumulated %d bits\n", nflfoot_serial_out_numbits);
+			//logerror(" -- accumulated %d bits\n", nflfoot_serial_out_numbits);
 		}
 
 		/* once we have 8, the final bit is a stop bit, feed it to the SIO */
 		else
 		{
-			logerror(" -- stop bit = %d; final value = %02X\n", (data >> 7) & 1, nflfoot_serial_out_bits);
+			//logerror(" -- stop bit = %d; final value = %02X\n", (data >> 7) & 1, nflfoot_serial_out_bits);
 			nflfoot_serial_out_active = FALSE;
 			z80sio_receive_data(0, 0, nflfoot_serial_out_bits);
 		}

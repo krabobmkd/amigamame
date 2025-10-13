@@ -1057,7 +1057,7 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
  if(config.isDriverFound(drv_indirect))
  {
      // if found: to bold
-    snprintf(driver,63,"\033b%s %s", drv->description,pnotworking);
+    snprintf(driver,63,"\033b%s %s%s", drv->description,pnotworking);
     driver[63]=0;
     pColumns->_driver = driver;
  } else
@@ -1138,14 +1138,43 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
 //   pColumns->_comment = ImperfectColorsString;
 //  else
 //   pColumns->_comment =(char*) "";
+
+    strComment.clear();
      if(drv->flags & GAME_NOT_WORKING)
-      strComment = ui->NotWorkingString;
-     else if(drv->flags & GAME_WRONG_COLORS)
-      strComment = ui->WrongColorsString;
-     else if(drv->flags & GAME_IMPERFECT_COLORS)
-      strComment = ui->ImperfectColorsString;
-     else
-        strComment.clear();
+     {
+      strComment += ui->NotWorkingString;
+      strComment += " ";
+    }
+     else if(drv->flags & (GAME_WRONG_COLORS|GAME_IMPERFECT_COLORS|GAME_NO_SOUND|GAME_IMPERFECT_SOUND|GAME_SUPPORTS_SAVE))
+     {
+         if(drv->flags & GAME_SUPPORTS_SAVE)
+         {
+            strComment += ui->SupportSaveString;
+            strComment += " ";
+         }
+
+         if(drv->flags & GAME_WRONG_COLORS)
+         {
+            strComment += ui->WrongColorsString;
+            strComment += " ";
+         }
+         if(drv->flags & GAME_IMPERFECT_COLORS)
+         {
+            strComment += ui->ImperfectColorsString;
+            strComment += " ";
+         }
+         if(drv->flags & GAME_NO_SOUND)
+         {
+            strComment += ui->NoSoundString;
+            strComment += " ";
+         }
+         if(drv->flags & GAME_IMPERFECT_SOUND)
+         {
+            strComment += ui->ImperfectSoundString;
+            strComment += " ";
+         }
+
+     }
 
      if(video_attribs & VIDEO_RGB_DIRECT)
      {
@@ -1643,7 +1672,9 @@ int MameUI::init()
     NotWorkingString         = GetMessagec("Not working");
     WrongColorsString        = GetMessagec("Wrong colors");
     ImperfectColorsString    = GetMessagec("Imperfect colors");
-
+    NoSoundString            = GetMessagec("No Sound");
+    ImperfectSoundString     = GetMessagec("Imperfect Sound");
+    SupportSaveString     = GetMessagec("Support Save");
     String_Driver=GetMessagec("Driver");
     String_Archive=GetMessagec("Archive");
     String_Parent=GetMessagec("Parent");

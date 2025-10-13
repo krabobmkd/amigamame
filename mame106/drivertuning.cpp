@@ -103,8 +103,9 @@ static map<string,sDriverTuning> _tunings={
     // cave
     {"mazinger",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
     {"agallet",{10*60,DEFMINCPUC,0}},
+    {"ddonpach",{27*60,DEFMINCPUC,0}},
 
-
+    {"rdingf",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 };
 
 sDriverTuning *getDriverTuningByName(const char *drivername)

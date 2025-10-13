@@ -1,4 +1,4 @@
-#define MACHINENAME "system24"
+#define MACHINENAME "sega s24"
 /*
  * Sega System 24
  *

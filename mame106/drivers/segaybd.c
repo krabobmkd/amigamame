@@ -1,4 +1,4 @@
-#define MACHINENAME "segaybd"
+#define MACHINENAME "sega ybd"
 /***************************************************************************
 
     Sega Y-board hardware

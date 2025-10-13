@@ -1,4 +1,4 @@
-#define MACHINENAME "sega"
+#define MACHINENAME "sega vector"
 /***************************************************************************
 
     Sega vector hardware

@@ -1,4 +1,4 @@
-#define MACHINENAME "taito_f3"
+#define MACHINENAME "taito f3"
 /***************************************************************************
 
     Taito F3 Package System (aka F3 Cybercore System)

@@ -731,7 +731,7 @@ static void generate_samples(struct ES5506Chip *chip, INT32 *left, INT32 *right,
 		/* generate from the appropriate source */
 		if (!base)
 		{
-			logerror("NULL region base %d\n",voice->control >> 14);
+			//logerror("NULL region base %d\n",voice->control >> 14);
 			generate_dummy(chip, voice, base, left, right, samples);
 		}
 		else if (voice->control & 0x2000)
@@ -742,7 +742,7 @@ static void generate_samples(struct ES5506Chip *chip, INT32 *left, INT32 *right,
 		/* does this voice have it's IRQ bit raised? */
 		if (voice->control&CONTROL_IRQ)
 		{
-logerror("IRQ raised on voice %d!!\n",v);
+//logerror("IRQ raised on voice %d!!\n",v);
 			/* only update voice vector if existing IRQ is acked by host */
 			if (chip->irqv&0x80)
 			{

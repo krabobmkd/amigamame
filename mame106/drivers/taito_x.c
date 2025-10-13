@@ -1,4 +1,4 @@
-#define MACHINENAME "taito_x"
+#define MACHINENAME "taito x"
 /***************************************************************************
 
 

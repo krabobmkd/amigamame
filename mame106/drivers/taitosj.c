@@ -1,4 +1,4 @@
-#define MACHINENAME "taitosj"
+#define MACHINENAME "taito sj"
 /***************************************************************************
 
 Taito SJ system

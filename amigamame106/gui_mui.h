@@ -50,7 +50,9 @@ struct MameUI {
     const char *NotWorkingString=NULL;
     const char *WrongColorsString=NULL;
     const char *ImperfectColorsString=NULL;
-
+    const char *NoSoundString=NULL;
+    const char *ImperfectSoundString=NULL;
+    const char *SupportSaveString=NULL;
     Object * RE_Options=NULL;
     Object * CY_Show=NULL;
     Object * BU_Scan=NULL;

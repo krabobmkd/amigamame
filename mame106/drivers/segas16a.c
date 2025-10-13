@@ -1,4 +1,4 @@
-#define MACHINENAME "segas16a"
+#define MACHINENAME "sega s16a"
 /***************************************************************************
 
     Sega pre-System 16 & System 16A hardware

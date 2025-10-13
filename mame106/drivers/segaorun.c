@@ -1,4 +1,4 @@
-#define MACHINENAME "segaorun"
+#define MACHINENAME "sega orun"
 /***************************************************************************
 
     Sega Out Run hardware

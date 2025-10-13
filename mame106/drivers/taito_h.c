@@ -1,4 +1,4 @@
-#define MACHINENAME "taito_h"
+#define MACHINENAME "taito h"
 /***************************************************************************
 
 Taito H system

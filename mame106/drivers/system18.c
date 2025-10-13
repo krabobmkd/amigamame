@@ -1,4 +1,4 @@
-#define MACHINENAME "system18"
+#define MACHINENAME "sega s18"
 /*  System18 Hardware
 **
 **  MC68000 + Z80

@@ -1,4 +1,4 @@
-#define MACHINENAME "segas16b"
+#define MACHINENAME "sega s16b"
 /***************************************************************************
 
     Sega System 16B hardware
