@@ -1,3 +1,4 @@
+#define MACHINENAME "starfire"
 /***************************************************************************
 
     Star Fire/Fire One system
@@ -431,3 +432,4 @@ GAME( 1979, starfire, 0,        starfire, starfire, starfire, ROT0, "Exidy", "St
 GAME( 1979, starfira, starfire, starfire, starfire, starfire, ROT0, "Exidy", "Star Fire (set 2)", GAME_NO_SOUND ,0,1,egg_Flying,0)
 GAME( 1979, fireone,  0,        starfire, fireone,  fireone,  ROT0, "Exidy", "Fire One", GAME_NO_SOUND ,2,0,egg_ShootEmUp,0)
 GAME( 1979, starfir2, 0,        starfire, starfire, starfire, ROT0, "Exidy", "Star Fire 2", GAME_NO_SOUND ,0,1,egg_Flying,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                 

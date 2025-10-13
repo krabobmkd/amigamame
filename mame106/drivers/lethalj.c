@@ -1,3 +1,4 @@
+#define MACHINENAME "lethalj"
 /***************************************************************************
 
     The Game Room Lethal Justice hardware
@@ -429,3 +430,4 @@ GAME( 1996, lethalj,  0,        lethalj, lethalj,  0, ROT0, "The Game Room", "Le
 GAME( 1997, eggventr, 0,        lethalj, eggventr, 0, ROT0, "The Game Room", "Egg Venture (Release 10)", 0 ,2,0,egg_LightGuns,0)
 GAME( 1997, eggvent7, eggventr, lethalj, eggventr, 0, ROT0, "The Game Room", "Egg Venture (Release 7)", 0 ,2,0,egg_LightGuns,0)
 GAME( 1997, eggvntdx, eggventr, lethalj, eggvntdx, 0, ROT0, "The Game Room", "Egg Venture Deluxe", 0 ,2,0,egg_LightGuns,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                               

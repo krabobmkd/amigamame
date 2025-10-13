@@ -1,3 +1,4 @@
+#define MACHINENAME "wink"
 /*
     Wink    -   (c) 1985 Midcoin
 
@@ -423,3 +424,4 @@ static DRIVER_INIT( wink )
 
 GAME( 1985, wink,  0,    wink, wink, wink, ROT0, "Midcoin", "Wink (set 1)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION ,0,2,egg_BallNPaddles,0)
 GAME( 1985, winka, wink, wink, wink, wink, ROT0, "Midcoin", "Wink (set 2)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION ,0,2,egg_BallNPaddles,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                         

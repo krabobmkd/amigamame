@@ -1,3 +1,4 @@
+#define MACHINENAME "dietgo"
 /*
     Diet Go Go
 
@@ -352,3 +353,4 @@ GAME( 1992, dietgo,   0,      dietgo, dietgo,  dietgo,    ROT0, "Data East Corpo
 GAME( 1992, dietgoe,  dietgo, dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.08.04)" , 0,0,0,egg_Unknown,0) // weird, still version 1.1 but different date
 GAME( 1992, dietgou,  dietgo, dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (USA v1.1 1992.09.26)", 0 ,2,0,egg_Platform,0)
 GAME( 1992, dietgoj,  dietgo, dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Japan v1.1 1992.09.26)", 0 ,2,0,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                                                  

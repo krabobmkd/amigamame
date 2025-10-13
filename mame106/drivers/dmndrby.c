@@ -1,3 +1,4 @@
+#define MACHINENAME "dmndrby"
 /*
 G4001
 Diamond Derby - Electrocoin on an SNK board
@@ -315,3 +316,4 @@ ROM_END
 
 GAME( 1986, dmndrby,  0,       dderby, dderby, 0, ROT0, "Electrocoin", "Diamond Derby (set 1)",GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
 GAME( 1986, dmndrbya, dmndrby, dderby, dderby, 0, ROT0, "Electrocoin", "Diamond Derby (set 2)",GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                    

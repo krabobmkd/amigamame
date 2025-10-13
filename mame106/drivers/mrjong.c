@@ -1,3 +1,4 @@
+#define MACHINENAME "mrjong"
 /***************************************************************************
 
 Mr.Jong
@@ -269,3 +270,4 @@ ROM_END
 GAME( 1983, mrjong,   0,      mrjong, mrjong, 0, ROT90, "Kiwako", "Mr. Jong (Japan)", 0 ,0,2,egg_Maze,0)
 GAME( 1983, crazyblk, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks", 0 ,0,2,egg_Maze,0)
 GAME( 1983, blkbustr, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "BlockBuster", 0 ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                               

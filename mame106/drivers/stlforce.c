@@ -1,3 +1,4 @@
+#define MACHINENAME "stlforce"
 /*
 
 Steel Force
@@ -388,3 +389,4 @@ DRIVER_INIT(twinbrat)
 
 GAME( 1994, stlforce, 0, stlforce, stlforce, stlforce, ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1995, twinbrat, 0, twinbrat, stlforce, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats", 0 ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                                                                                      

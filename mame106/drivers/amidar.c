@@ -1,3 +1,4 @@
+#define MACHINENAME "amidar"
 /***************************************************************************
 
  Amidar hardware
@@ -498,3 +499,4 @@ GAME( 1982, amigo,   amidar,  amidar, amidaru, amidar,       ROT90, "bootleg", "
 GAME( 1981, turtles, 0,       amidar, turtles, scramble_ppi, ROT90, "[Konami] (Stern license)", "Turtles", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
 GAME( 1981, turpin,  turtles, amidar, turpin,  scramble_ppi, ROT90, "[Konami] (Sega license)", "Turpin", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
 GAME( 1981, 600,     turtles, amidar, turtles, scramble_ppi, ROT90, "Konami", "600", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

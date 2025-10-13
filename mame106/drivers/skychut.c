@@ -1,3 +1,4 @@
+#define MACHINENAME "skychut"
 /***************************************************************************
 
   IPM Invader (M10 m10 hardware)
@@ -440,3 +441,4 @@ GAME( 1980, skychut,  0, skychut,    skychut,   0, ROT270, "Irem", "Sky Chuter",
 GAME( 1979, spacbeam, 0, greenberet, spacebeam, 0, ROT270, "Irem", "Space Beam", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS ,0,2,egg_ShootEmUp,0)
 GAME( 1979?,headoni,  0, headoni,    headoni,   0, ROT270, "Irem", "Head On (Irem, M-15 Hardware)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS ,0,2,egg_Maze,0)
 GAME( 1980, greenber, 0, greenberet, spacebeam, 0, ROT270, "Irem", "Green Beret (Irem)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING ,0,2,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          

@@ -1,3 +1,4 @@
+#define MACHINENAME "vindictr"
 /***************************************************************************
 
     Atari Vindicators hardware
@@ -560,3 +561,4 @@ GAME( 1988, vindict4, vindictr, vindictr, vindictr, vindictr, ROT0, "Atari Games
 GAME( 1988, vindice3, vindictr, vindictr, vindictr, vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 3)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1988, vindict2, vindictr, vindictr, vindictr, vindictr, ROT0, "Atari Games", "Vindicators (rev 2)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1988, vindict1, vindictr, vindictr, vindictr, vindictr, ROT0, "Atari Games", "Vindicators (rev 1)", 0 ,2,0,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

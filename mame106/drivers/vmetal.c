@@ -1,3 +1,4 @@
+#define MACHINENAME "vmetal"
 /*
 
 Varia Metal
@@ -499,3 +500,4 @@ ROM_END
 
 GAME( 1995, vmetal,  0,      varia, varia, 0, ROT270, "Excellent Systems",                        "Varia Metal",                        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ,2,0,egg_ShootEmUp,0)
 GAME( 1995, vmetaln, vmetal, varia, varia, 0, ROT270, "[Excellent Systems] New Ways Trading Co.", "Varia Metal (New Ways Trading Co.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ,2,0,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

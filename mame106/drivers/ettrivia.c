@@ -1,3 +1,4 @@
+#define MACHINENAME "ettrivia"
 /*
 
  Enerdyne Technologies Inc. (El Cajon, CA 92020) hardware
@@ -379,3 +380,4 @@ GAME( 1985, promutrv, 0,        ettrivia, ettrivia, 0, ROT270, "Enerdyne Technol
 GAME( 1985, promutra, promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 ,0,4,egg_Quizz,0)
 GAME( 1985, promutrb, promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 ,0,4,egg_Quizz,0)
 GAME( 1986, strvmstr, 0,        ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master", GAME_WRONG_COLORS ,0,4,egg_Quizz,0)
+                                                                                                                                                                                                                                                                                                                                                                                             

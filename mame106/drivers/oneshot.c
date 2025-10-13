@@ -1,3 +1,4 @@
+#define MACHINENAME "oneshot"
 /* One Shot One Kill & Maddonna
    Driver by David Haywood and Paul Priest
    Dip Switches and Inputs by Stephane Humbert
@@ -501,3 +502,4 @@ ROM_END
 GAME( 199?, oneshot,  0,        oneshot,  oneshot , 0, ROT0, "<unknown>", "One Shot One Kill", GAME_IMPERFECT_GRAPHICS ,2,0,egg_LightGuns,0)
 GAME( 1995, maddonna, 0,        maddonna, maddonna, 0, ROT0, "Tuning",  "Mad Donna (set 1)", 0 ,2,0,egg_Mature,0)
 GAME( 1995, maddonnb, maddonna, maddonna, maddonna, 0, ROT0, "Tuning",  "Mad Donna (set 2)", GAME_NOT_WORKING ,2,0,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

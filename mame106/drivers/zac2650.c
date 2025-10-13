@@ -1,3 +1,4 @@
+#define MACHINENAME "zac2650"
 /*
  * Signetics 2650 CPU Games
  *
@@ -417,3 +418,4 @@ static DRIVER_INIT( tinvader )
 GAME( 1978, sia2650,  0,       tinvader, sinvader, 0,        ROT270, "Zaccaria/Zelco", "Super Invader Attack", GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)
 GAME( 1978, tinv2650, sia2650, tinvader, tinvader, tinvader, ROT270, "Zaccaria/Zelco", "The Invaders",			GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)
 GAME( 1979, dodgem,   0,       tinvader, dodgem,   0,        ROT0,   "Zaccaria",		"Dodgem",				GAME_NO_SOUND ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                   

@@ -1,3 +1,4 @@
+#define MACHINENAME "getrivia"
 /*
 
 Trivia By Greyhound Electronics
@@ -582,3 +583,4 @@ GAME( 1985, gt102c3,  gt102c, getrivia, getrivia, 0, ROT0, "Greyhound Electronic
 
 GAME( 1985, sextriv1, 0,        getrivia, getrivia, 0, ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB set 1)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,2,egg_Mature,0)
 GAME( 1985, sextriv2, sextriv1, getrivia, getrivia, 0, ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB set 2)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,2,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

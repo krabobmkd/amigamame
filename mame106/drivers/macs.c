@@ -1,3 +1,4 @@
+#define MACHINENAME "macs"
 /*
 
 macs.c - Multi Amenity Cassette System
@@ -616,3 +617,4 @@ GAME( 1995, kisekaeh, macsbios, macs, macs, kisekaeh, ROT0, "I'Max", "Kisekae Ha
 GAME( 1996, cultname, macsbios, macs, macs, macs, ROT0, "I'Max", "Seimei-Kantei-Meimei-Ki Cult Name",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND,0,0,egg_Miscellaneous,0)
 GAME( 1999, yuka,     macsbios, macs, macs, macs, ROT0, "Yubis / T.System", "Yu-Ka",  0 ,0,1,egg_Tabletop,0)
 GAME( 1999, yujan,    macsbios, macs, macs, macs, ROT0, "Yubis / T.System", "Yu-Jan",  0 ,0,1,egg_Mahjong,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          

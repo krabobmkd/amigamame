@@ -1,3 +1,4 @@
+#define MACHINENAME "namcos10"
 /***************************************************************************
 
   Namco System 10 - Arcade PSX Hardware
@@ -512,3 +513,4 @@ GAME( 2001, mrdrilrg,  0,        namcos10, namcos10, mrdrilrg, ROT0, "Namco", "M
 GAME( 2001, knpuzzle,  0,        namcos10, namcos10, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (KPM1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ,2,0,egg_Miscellaneous,0)
 GAME( 2002, startrgn,  0,        namcos10, namcos10, startrgn, ROT0, "Namco", "Star Trigon (STT1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ,0,1,egg_Miscellaneous,0)
 GAME( 2003, gamshara,  0,        namcos10, namcos10, gamshara, ROT0, "Mitchell", "Gamshara (10021 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

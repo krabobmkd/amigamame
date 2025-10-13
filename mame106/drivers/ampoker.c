@@ -1,3 +1,4 @@
+#define MACHINENAME "ampoker"
 /*
     American Poker
 
@@ -369,3 +370,4 @@ GAME( 198?, ampoker2, 0,        ampoker2, ampoker2, ampoker2, ROT0, "Novomatic",
 GAME( 198?, ampokr2a, ampoker2, ampoker2, ampoker2, ampoker2, ROT0, "Novomatic", "American Poker II (set 2)", GAME_NOT_WORKING ,0,1,egg_CardBattle,0)
 GAME( 198?, ampokr2b, ampoker2, ampoker2, ampoker2, ampoker2, ROT0, "Novomatic", "American Poker II (set 3)", GAME_NOT_WORKING ,0,1,egg_CardBattle,0)
 GAME( 198?, ampokr2c, ampoker2, ampoker2, ampoker2, ampoker2, ROT0, "Novomatic", "American Poker II (set 4)", GAME_NOT_WORKING ,0,1,egg_CardBattle,0)
+                                                                                                                                                                                                                                                                                                                                                                                   

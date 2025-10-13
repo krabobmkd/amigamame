@@ -1,3 +1,4 @@
+#define MACHINENAME "couple"
 /*******************************************************************************************
 
 The Couples (c) 1986/1988 The Couples (?)
@@ -553,3 +554,4 @@ service mode says "6221-51 U5-0 12/02/86" */
 GAME( 1988, couple,  0,      couple, couple,  couple, ROT0, "Merit", "The Couples (Set 1)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING,0,2,egg_Mature,0)
 GAME( 1988, couplep, couple, couple, couplep, couple, ROT0, "Merit", "The Couples (Set 2)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING,0,2,egg_Mature,0)
 GAME( 1988, couplei, couple, couple, couple,  couple, ROT0, "Merit", "The Couples (Set 3)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING,0,2,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           

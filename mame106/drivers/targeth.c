@@ -1,3 +1,4 @@
+#define MACHINENAME "targeth"
 /***************************************************************************
 
 Target Hits (c) 1994 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco)
@@ -234,3 +235,4 @@ ROM_START( targeth )
 ROM_END
 
 GAME( 1994, targeth, 0, targeth,targeth, 0, ROT0, "Gaelco", "Target Hits", GAME_UNEMULATED_PROTECTION ,2,0,egg_LightGuns,0)
+                                                                                                                                                                                                                                            

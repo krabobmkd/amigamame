@@ -1,3 +1,4 @@
+#define MACHINENAME "astinvad"
 /***************************************************************************
 
 Misc early Z80 games with simple color bitmap graphics
@@ -406,3 +407,4 @@ GAME( 1979, kamikaze, astinvad, astinvad, kamikaze, 0, ROT270, "Leijac",  "Kamik
 GAME( 1979, spcking2, 0,        spcking2, spcking2, 0, ROT270, "Konami",  "Space King 2", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1980, spaceint, 0,        spaceint, spaceint, 0, ROT90,  "Shoei",   "Space Intruder", GAME_WRONG_COLORS ,0,2,egg_ShootEmUp,0)
 GAME( 1980, spaceinj, spaceint, spaceint, spaceint, 0, ROT90,  "Shoei",   "Space Intruder (Japan)", GAME_WRONG_COLORS ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                        

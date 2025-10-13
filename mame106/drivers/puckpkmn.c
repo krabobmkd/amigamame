@@ -1,3 +1,4 @@
+#define MACHINENAME "puckpkmn"
 /* Puckman Pockimon
   -- original driver by Luca Elia
 
@@ -292,3 +293,4 @@ ROM_END
 
 /* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */
 GAME( 2000, puckpkmn, 0,        puckpkmn, puckpkmn, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon", 0 ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                      

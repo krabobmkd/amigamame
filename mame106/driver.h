@@ -512,7 +512,7 @@ struct _game_driver
 #define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPSIM,NBPALT,EGENRE,GFLAGS)	\
 game_driver driver_##NAME =					\
 {											\
-	__FILE__,								\
+	MACHINENAME,							\
 	#PARENT,								\
 	#NAME,									\
 	system_bios_0,							\
@@ -533,7 +533,7 @@ game_driver driver_##NAME =					\
 #define GAMEB(YEAR,NAME,PARENT,BIOS,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPSIM,NBPALT,EGENRE,GFLAGS)	\
 game_driver driver_##NAME =					\
 {											\
-	__FILE__,								\
+	MACHINENAME,								\
 	#PARENT,								\
 	#NAME,									\
 	system_bios_##BIOS,						\

@@ -1,3 +1,4 @@
+#define MACHINENAME "cbuster"
 /***************************************************************************
 
   Crude Buster (World version FX)       (c) 1990 Data East Corporation
@@ -590,3 +591,4 @@ GAME( 1990, cbuster,  0,       twocrude, twocrude, twocrude, ROT0, "Data East Co
 GAME( 1990, cbusterw, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", 0 ,2,0,egg_Platform,0)
 GAME( 1990, cbusterj, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan)", 0 ,2,0,egg_Platform,0)
 GAME( 1990, twocrude, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East USA", "Two Crude (US)", 0 ,2,0,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

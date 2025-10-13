@@ -1,3 +1,4 @@
+#define MACHINENAME "namcond1"
 /*************************************************************
 
     Namco ND-1 Driver - Mark McDougall
@@ -411,3 +412,4 @@ GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics
 GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.1 (Japan, v1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ,2,0,egg_Compilation,0)
 GAME( 1996, ncv2,      0, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.2", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ,2,0,egg_Compilation,0)
 GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.2 (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ,2,0,egg_Compilation,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                             

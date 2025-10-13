@@ -1,3 +1,4 @@
+#define MACHINENAME "finalizr"
 /***************************************************************************
 
 Finalizer (GX523) (c) 1985 Konami
@@ -508,3 +509,4 @@ static DRIVER_INIT( finalizr )
 
 GAME( 1985, finalizr, 0,        finalizr, finalizr, finalizr, ROT90, "Konami", "Finalizer - Super Transformation", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
 GAME( 1985, finalizb, finalizr, finalizr, finalizb, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

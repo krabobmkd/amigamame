@@ -1,3 +1,4 @@
+#define MACHINENAME "rocnrope"
 /***************************************************************************
 
 Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
@@ -357,3 +358,4 @@ static DRIVER_INIT( rocnropk )
 
 GAME( 1983, rocnrope, 0,        rocnrope, rocnrope, rocnrope, ROT270, "Konami", "Roc'n Rope", 0 ,0,2,egg_Platform,0)
 GAME( 1983, rocnropk, rocnrope, rocnrope, rocnrope, rocnropk, ROT270, "Konami + Kosuka", "Roc'n Rope (Kosuka)", 0 ,0,2,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                                                       

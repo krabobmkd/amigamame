@@ -1,3 +1,4 @@
+#define MACHINENAME "astrof"
 /*
     Driver For DECO   ASTRO FIGHTER/TOMAHAWK 777
 
@@ -594,3 +595,4 @@ GAME( 1979, acombat,  astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",  
 GAME( 1979, sstarbtl, astrof,   abattle,  abattle,  sstarbtl,ROT90, "bootleg",     "Super Star Battle", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 1)", GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)
 GAME( 1980, tomahaw5, tomahawk, tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 5)", GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

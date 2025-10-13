@@ -1,3 +1,4 @@
+#define MACHINENAME "bishi"
 /***************************************************************************
 
  Bishi Bashi Champ Mini Game Senshuken
@@ -343,3 +344,4 @@ ROM_END
 
 GAME( 1996, bishi,     0,       bishi,     bishi,     0,      ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA)", GAME_IMPERFECT_GRAPHICS,3,0,egg_Compilation,0)
 GAME( 1998, sbishi,    0,       bishi,     bishi,     0,      ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA)", GAME_IMPERFECT_GRAPHICS,3,0,egg_Compilation,0)
+                                                                                                                                                                                                                                                                                                                                                         

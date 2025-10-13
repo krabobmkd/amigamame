@@ -1,3 +1,4 @@
+#define MACHINENAME "calorie"
 /*
 
 Calorie-Kun
@@ -532,3 +533,4 @@ static DRIVER_INIT( calorieb )
 /* Note: the bootleg is identical to the original once decrypted */
 GAME( 1986, calorie,  0,       calorie, calorie, calorie,  ROT0, "Sega",    "Calorie Kun vs Moguranian", 0 ,0,2,egg_Maze,0)
 GAME( 1986, calorieb, calorie, calorie, calorie, calorieb, ROT0, "bootleg", "Calorie Kun vs Moguranian (bootleg)", 0 ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

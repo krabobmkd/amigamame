@@ -1,3 +1,4 @@
+#define MACHINENAME "darkseal"
 /***************************************************************************
 
     Dark Seal (Rev 3)    (c) 1990 Data East Corporation (World version)
@@ -508,3 +509,4 @@ GAME( 1990, darksea1, darkseal, darkseal, darkseal, darkseal, ROT0, "Data East C
 GAME( 1990, darkseaj, darkseal, darkseal, darkseal, darkseal, ROT0, "Data East Corporation", "Dark Seal (Japan)", 0 ,2,0,egg_Maze,0)
 GAME( 1990, gatedoom, darkseal, darkseal, darkseal, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 4)", 0 ,2,0,egg_Maze,0)
 GAME( 1990, gatedom1, darkseal, darkseal, darkseal, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 1)", 0 ,2,0,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

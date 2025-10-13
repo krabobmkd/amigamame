@@ -1,3 +1,4 @@
+#define MACHINENAME "aquarium"
 /* Aquarium (c)1996 Excellent Systems */
 
 /* the hardware is similar to gcpinbal.c, probably should merge it at some point */
@@ -453,3 +454,4 @@ GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System",
 #else
 GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium", GAME_NO_COCKTAIL ,0,0,egg_Unknown,0)
 #endif
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

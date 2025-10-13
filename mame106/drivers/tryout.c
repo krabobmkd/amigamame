@@ -1,3 +1,4 @@
+#define MACHINENAME "tryout"
 /***************************************************************
 
  Pro Baseball Skill Tryout (JPN Ver.)
@@ -249,3 +250,4 @@ ROM_START( tryout )
 ROM_END
 
 GAME( 1985, tryout, 0, tryout, tryout, 0, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_sport_Baseball,0)
+                                                                                                                                                                                                                                                           

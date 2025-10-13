@@ -1,3 +1,4 @@
+#define MACHINENAME "exprraid"
 /***************************************************************************
 
 Express Raider - (c) 1986 Data East USA
@@ -603,3 +604,4 @@ GAME( 1986, exprrada, exprraid, exprraid, exprraid, exprraid, ROT0, "Data East U
 GAME( 1986, wexpress, exprraid, exprraid, exprraid, wexpress, ROT0, "Data East Corporation", "Western Express (World?)", 0 ,0,2,egg_Platform,0)
 GAME( 1986, wexpresb, exprraid, exprraid, exprraid, wexpresb, ROT0, "bootleg", "Western Express (bootleg set 1)", 0 ,0,2,egg_Platform,0)
 GAME( 1986, wexpresc, exprraid, exprraid, exprraid, wexpresc, ROT0, "bootleg", "Western Express (bootleg set 2)", 0 ,0,2,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

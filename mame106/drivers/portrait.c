@@ -1,3 +1,4 @@
+#define MACHINENAME "portrait"
 /**************************************************************************
  Portraits
  (c) 1983 Olympia
@@ -357,3 +358,4 @@ ROM_END
 
 GAME( 1983, portrait, 0,        portrait, portrait,  0, ROT270, "Olympia", "Portraits (set 1)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS ,0,2,egg_Miscellaneous,0)
 GAME( 1983, portrata, portrait, portrait, portrait,  0, ROT270, "Olympia", "Portraits (set 2)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS ,0,2,egg_Miscellaneous,0)
+                                                                                                                                                                                                                                                                                                                                                                       

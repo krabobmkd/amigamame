@@ -274,10 +274,10 @@ extern STRPTR ShowCycleValues[];
 
     Object *MameUI::createPanel_Drivers()
 {
-    const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,";
+    const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,BAR,";
     if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
     {
-        ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,";
+        ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,";
     }
 
     if(DriverClass!=NULL)
@@ -931,6 +931,14 @@ static int DriverCompareParent(const struct _game_driver **drv1,const  struct _g
     // else keep alphabetic
     return(stricmp((*drv1)->description, (*drv2)->description));
 }
+static int DriverCompareMachine(const struct _game_driver **drv1,const  struct _game_driver **drv2)
+{
+    int  i = (stricmp((*drv1)->source_file, (*drv2)->source_file));
+    if(i != 0) return i;
+    // else keep alphabetic
+    return(stricmp((*drv1)->description, (*drv2)->description));
+}
+
 static int DriverCompareGenre(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
     int a = (int)(*drv1)->genre;
@@ -975,6 +983,8 @@ static ULONG DriverSort(
         case 4: return DriverCompareYear(drva,drvb);
         case 5: return DriverCompareArchive(drva,drvb);
         case 6: return DriverCompareParent(drva,drvb);
+        case 7: return DriverCompareMachine(drva,drvb);
+        default: break;
     }
 
    return DriverCompareNames(drva,drvb);
@@ -989,7 +999,7 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
     const struct _game_driver *drv;
 
     struct ColumnsString {
-          char *_driver,*_players,*_screen,*_genre,*_year,*_archive,*_parent,*_comment;
+          char *_driver,*_players,*_screen,*_genre,*_year,*_archive,*_parent,*_machine,*_comment;
     };
     ColumnsString *pColumns = (ColumnsString *)array;
 
@@ -998,6 +1008,7 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
   static char archive[16];
   static char genre[24];
   static char parent[16];
+ static char smachine[16];
  static char players[16];
  static char year[12];
 //  static char comment[128];
@@ -1018,6 +1029,8 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
     players[15]=0;
     snprintf(year,11,    "\033b\033u%s", ui->String_Year);
     year[11]=0;
+    snprintf(smachine,15,    "\033b\033u%s", ui->String_Machine);
+    smachine[15]=0;
    // snprintf(comment,127,  "\033b\033u%s", String_Comment);
    // comment[127]=0;
     strComment =  "\033b\033u";
@@ -1030,6 +1043,7 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
     pColumns->_screen = screen;
     pColumns->_archive = archive;
     pColumns->_parent = parent;
+    pColumns->_machine = smachine;
     pColumns->_comment = (char *)strComment.c_str(); //comment;
     return(0);
   }
@@ -1073,13 +1087,13 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
     else
     {
         snprintf(players,7,"%d(Alt)", (int) drv->nbplayersAlt);
-
     }
    }
    else snprintf(players,7,"%d", (int) drv->nbplayersSim);
     pColumns->_players = players;
 
     pColumns->_year = (char *)drv->year;
+    pColumns->_machine = (char *)drv->source_file;
 
     int eGenre =  drv->genre;
     int fgenre =  drv->genreflag;
@@ -1637,6 +1651,7 @@ int MameUI::init()
     String_Genre=GetMessagec("Genre");
     String_Players=GetMessagec("Players");
     String_Year=GetMessagec("Year");
+    String_Machine=GetMessagec("Machine");
     String_Comment=GetMessagec("Comment");
 
     if(MUIMasterBase->lib_Version<MUI5_API_SINCE_VERSION)

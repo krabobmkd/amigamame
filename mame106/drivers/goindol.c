@@ -1,3 +1,4 @@
+#define MACHINENAME "goindol"
 /***************************************************************************
   GOINDOL
 
@@ -447,3 +448,4 @@ GAME( 1987, goindol,  0,       goindol, goindol, goindol, ROT90, "Sun a Electron
 GAME( 1987, goindolu, goindol, goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (US)",    GAME_UNEMULATED_PROTECTION ,0,2,egg_BallNPaddles,0)
 GAME( 1987, goindolj, goindol, goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (Japan)", GAME_UNEMULATED_PROTECTION ,0,2,egg_BallNPaddles,0)
 GAME( 1987, homo,     goindol, goindol, homo,    0,       ROT90, "bootleg", "Homo", 0 ,0,2,egg_BallNPaddles,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                 

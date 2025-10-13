@@ -1,3 +1,4 @@
+#define MACHINENAME "simpsons"
 /***************************************************************************
 
 The Simpsons (c) 1991 Konami Co. Ltd
@@ -476,3 +477,4 @@ GAME( 1991, simps4pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "T
 GAME( 1991, simpsn2p, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players)", 0 ,2,0,egg_BeatNUp,EGF_Funny)
 GAME( 1991, simps2pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (2 Players alt)", 0 ,2,2,egg_BeatNUp,EGF_Funny)
 GAME( 1991, simps2pj, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players Japan)", 0 ,2,0,egg_BeatNUp,EGF_Funny)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

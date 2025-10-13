@@ -1,3 +1,4 @@
+#define MACHINENAME "ambush"
 /***************************************************************************
 
 Ambush Memory Map (preliminary)
@@ -284,3 +285,4 @@ ROM_END
 GAME( 1983, ambush, 0,      ambush, ambush, 0, ROT0, "Nippon Amuse Co-Ltd", "Ambush", 0 ,0,0,egg_Unknown,0)
 GAME( 1983, ambusht,ambush, ambush, ambush, 0, ROT0, "Tecfri", "Ambush (Tecfri)", 0 ,0,0,egg_Unknown,0)
 GAME( 1983, ambushv,ambush, ambush, ambush, 0, ROT0, "Volt Elec co-ltd", "Ambush (Volt Elec co-ltd)", 0 ,0,2,egg_Flying,0)
+                                                                                                                                                                                                                                                                                              

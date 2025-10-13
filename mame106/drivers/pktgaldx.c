@@ -1,3 +1,4 @@
+#define MACHINENAME "pktgaldx"
 /*
 
 Pocket Gal Deluxe
@@ -471,3 +472,4 @@ static DRIVER_INIT( pktgaldx )
 GAME( 1992, pktgaldx, 0,        pktgaldx, pktgaldx, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", 0 ,0,2,egg_Mature,0)
 GAME( 1993, pktgaldj, pktgaldx, pktgaldx, pktgaldx, pktgaldx,  ROT0, "Nihon System",          "Pocket Gal Deluxe (Japan v3.00)", 0 ,0,2,egg_Mature,0)
 GAME( 1992, pktgaldb, pktgaldx, pktgaldb, pktgaldx, 0,         ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ,0,2,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

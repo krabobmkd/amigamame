@@ -1,3 +1,4 @@
+#define MACHINENAME "topshoot"
 
 /*
 
@@ -308,3 +309,4 @@ DRIVER_INIT(topshoot)
 
 /* Sun Mixing Hardware, very close to actual Genesis */
 GAME( 1995, topshoot,  0,        topshoot, topshoot, topshoot, ROT0, "Sun Mixing",                  "Top Shooter",GAME_NOT_WORKING ,0,1,egg_sport_Basketball,0)
+                                                                                                                                                                                                                                                                                                                      

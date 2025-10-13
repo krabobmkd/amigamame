@@ -1,3 +1,4 @@
+#define MACHINENAME "gumbo"
 /*
 
 Gumbo (c)1994 Min Corp (Main Corp written on PCB)
@@ -444,3 +445,4 @@ GAME( 1994, msbingo,  0,        mspuzzle, msbingo,  0, ROT0,  "Min Corp.", "Miss
 GAME( 1994, mspuzzle, 0,        mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle", 0 ,0,1,egg_Mature,0)
 GAME( 1994, mspuzzln, mspuzzle, mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle (Nudes)", GAME_NOT_WORKING ,0,1,egg_Mature,0)
 GAME( 1995, dblpoint, 0,        dblpoint, dblpoint, 0, ROT0,  "Dong Bang Electron", "Double Point", 0 ,2,0,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              

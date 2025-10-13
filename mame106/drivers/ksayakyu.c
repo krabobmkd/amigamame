@@ -1,3 +1,4 @@
+#define MACHINENAME "ksayakyu"
 /*
 Kusayakyuu (Sandlot Baseball)
 (c)1985 Taito
@@ -319,3 +320,4 @@ ROM_START( ksayakyu )
 ROM_END
 
 GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, 0, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu",GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS ,0,2,egg_sport_Baseball,0)
+                                                                                                                                                                                                                                                                                                                                 

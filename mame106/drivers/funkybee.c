@@ -1,3 +1,4 @@
+#define MACHINENAME "funkybee"
 /***************************************************************************
 
 Funky Bee/Sky Lancer memory map (preliminary)
@@ -388,3 +389,4 @@ ROM_END
 GAME( 1982, funkybee, 0,        funkybee, funkybee, 0, ROT90, "Orca",                           "Funky Bee", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1983, skylancr, 0,        funkybee, skylancr, 0, ROT90, "Orca",                           "Sky Lancer", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1983, skylance, skylancr, funkybee, skylance, 0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", 0 ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                      

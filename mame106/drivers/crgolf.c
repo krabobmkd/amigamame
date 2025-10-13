@@ -1,3 +1,4 @@
+#define MACHINENAME "crgolf"
 /***************************************************************************
 
     Kitco Crowns Golf hardware
@@ -573,3 +574,4 @@ GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf,  0,        ROT0, "Nasco Japan", 
 GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf,  0,        ROT0, "Nasco Japan", "Champion Golf", GAME_SUPPORTS_SAVE ,0,2,egg_sport_Golf,0)
 GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf,  0,        ROT0, "Nasco Japan", "Champion Golf (bootleg Set 1)", GAME_SUPPORTS_SAVE ,0,2,egg_sport_Golf,0)
 GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf,  crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii" , GAME_SUPPORTS_SAVE ,0,2,egg_sport_Golf,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               

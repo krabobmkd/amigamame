@@ -1,3 +1,4 @@
+#define MACHINENAME "neogeo"
 
 /***************************************************************************
     M.A.M.E. Neo Geo driver presented to you by the Shin Emu Keikaku team.

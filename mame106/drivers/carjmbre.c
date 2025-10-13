@@ -1,3 +1,4 @@
+#define MACHINENAME "carjmbre"
 /*
 Car Jamboree
 Omori Electric CAD (OEC) 1981
@@ -251,3 +252,4 @@ ROM_START( carjmbre )
 ROM_END
 
 GAME( 1983, carjmbre, 0, carjmbre, carjmbre, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", GAME_IMPERFECT_COLORS ,0,2,egg_Driving,0)
+                                                                                                                                                                                                                                                             

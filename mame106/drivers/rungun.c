@@ -1,3 +1,4 @@
+#define MACHINENAME "rungun"
 #define RNG_DEBUG 0
 
 /*
@@ -659,3 +660,4 @@ GAME( 1993, runguna,  rungun, rng, rng, rng, ROT0, "Konami", "Run and Gun (ver E
 GAME( 1993, rungunu,  rungun, rng, rng, rng, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ,4,0,egg_sport_Basketball,0)
 GAME( 1993, rungunua, rungun, rng, rng, rng, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ,4,0,egg_sport_Basketball,0)
 GAME( 1993, slmdunkj, rungun, rng, rng, rng, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ,4,0,egg_sport_Basketball,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

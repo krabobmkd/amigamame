@@ -1,3 +1,4 @@
+#define MACHINENAME "glass"
 /***************************************************************************
 
 Glass (c) 1993 Gaelco (Developed by OMK. Produced by Gaelco)
@@ -341,3 +342,4 @@ static DRIVER_INIT( glass )
 GAME( 1993, glass, 0, glass,glass, glass, ROT0, "Gaelco", "Glass (Ver 1.1)", GAME_UNEMULATED_PROTECTION ,2,0,egg_Mature,0)
 GAME( 1993, glass10 , glass, glass,glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0)", GAME_UNEMULATED_PROTECTION ,2,0,egg_Mature,0)
 GAME( 1993, glass10a, glass, glass,glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0 set 2)", GAME_UNEMULATED_PROTECTION ,2,0,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                                                                       

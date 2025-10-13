@@ -1,3 +1,4 @@
+#define MACHINENAME "nss"
 /***************************************************************************
 
   nss.c
@@ -667,3 +668,4 @@ GAME( 1992, nss_ssoc,  nss,	  snes,	     snes,    snes,		ROT0, "Human Inc.",				
 GAME( 1991, nss_smw,   nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"Super Mario World (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ,0,2,egg_Platform,0)
 GAME( 1991, nss_fzer,  nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"F-Zero (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ,0,1,egg_Driving,0)
 GAME( 199?, nss_sten,  nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"Super Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ,2,0,egg_sport_Tennis,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

@@ -44,6 +44,7 @@ struct MameUI {
     const char *String_Genre=NULL;
     const char *String_Players=NULL;
     const char *String_Year=NULL;
+    const char *String_Machine=NULL;
     const char *String_Comment=NULL;
 
     const char *NotWorkingString=NULL;

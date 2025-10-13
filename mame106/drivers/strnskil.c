@@ -1,3 +1,4 @@
+#define MACHINENAME "strnskil"
 /*****************************************************************************
 
 Strength & Skill (c) 1984 Sun Electronics
@@ -474,3 +475,4 @@ ROM_END
 GAME(  1984, strnskil, 0,        strnskil, strnskil, 0, ROT0, "Sun Electronics", "Strength & Skill", 0 ,2,0,egg_Miscellaneous,0)
 GAME(  1984, guiness,  strnskil, strnskil, strnskil, 0, ROT0, "Sun Electronics", "The Guiness (Japan)", 0 ,2,0,egg_Miscellaneous,0)
 GAME( 1984, pettanp,  0,        strnskil, pettanp,  0, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", GAME_UNEMULATED_PROTECTION ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

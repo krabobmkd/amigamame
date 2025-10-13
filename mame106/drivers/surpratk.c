@@ -1,3 +1,4 @@
+#define MACHINENAME "surpratk"
 /***************************************************************************
 
 Surprise Attack (Konami GX911) (c) 1990 Konami
@@ -350,3 +351,4 @@ static DRIVER_INIT( surpratk )
 GAME( 1990, suratk,  0,      surpratk, surpratk, surpratk, ROT0, "Konami", "Surprise Attack (World ver. K)", 0 ,0,2,egg_Platform,0)
 GAME( 1990, suratka, suratk, surpratk, surpratk, surpratk, ROT0, "Konami", "Surprise Attack (Asia ver. L)", 0 ,0,2,egg_Platform,0)
 GAME( 1990, suratkj, suratk, surpratk, surpratk, surpratk, ROT0, "Konami", "Surprise Attack (Japan ver. M)", 0 ,0,2,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                                                

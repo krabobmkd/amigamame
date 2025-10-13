@@ -1,3 +1,4 @@
+#define MACHINENAME "namcofl"
 /*
     Namco System FL
     Driver by R. Belmont and ElSemi
@@ -487,3 +488,4 @@ static DRIVER_INIT(finalapr)
 GAME( 1995, speedrcr,        0, sysfl, sysfl, speedrcr, ROT0, "Namco", "Speed Racer", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,0,1,egg_Driving,0)
 GAME( 1995, finalapr,        0, sysfl, sysfl, finalapr, ROT0, "Namco", "Final Lap R (Rev B)", GAME_IMPERFECT_SOUND ,0,1,egg_Driving,0)
 GAME( 1995, finalapo, finalapr, sysfl, sysfl, finalapr, ROT0, "Namco", "Final Lap R", GAME_IMPERFECT_SOUND ,0,1,egg_Driving,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

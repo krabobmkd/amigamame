@@ -1,3 +1,4 @@
+#define MACHINENAME "xybots"
 /***************************************************************************
 
     Atari Xybots hardware
@@ -404,3 +405,4 @@ GAME( 1987, xybotsg, xybots, xybots, xybots, xybots, ROT0, "Atari Games", "Xybot
 GAME( 1987, xybotsf, xybots, xybots, xybots, xybots, ROT0, "Atari Games", "Xybots (French, rev 3)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1987, xybots1, xybots, xybots, xybots, xybots, ROT0, "Atari Games", "Xybots (rev 1)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1987, xybots0, xybots, xybots, xybots, xybots, ROT0, "Atari Games", "Xybots (rev 0)", 0 ,2,0,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                      

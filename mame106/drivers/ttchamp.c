@@ -1,3 +1,4 @@
+#define MACHINENAME "ttchamp"
 /* Peno Cup?
 
 no idea if this is the real title, I just see a large Peno Cup logo in the 2/3 roms
@@ -364,3 +365,4 @@ static DRIVER_INIT (ttchamp)
 GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND ,2,0,egg_sport_,0)
 GAME( 199?, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND ,2,0,egg_sport_,0)
 
+                                                                                                                                                                                                                                                                                                                                                                              

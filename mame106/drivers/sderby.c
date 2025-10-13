@@ -1,3 +1,4 @@
+#define MACHINENAME "sderby"
 /*
   Playmark 'Super Derby' Hardware
 
@@ -341,3 +342,4 @@ ROM_END
 GAME( 1996, sderby, 0, sderby, sderby, 0, ROT0, "Playmark", "Super Derby", 0 ,0,1,egg_HorseRacing,0)
 GAME( 1997, pmroulet, 0, pmroulet, pmroulet, 0, ROT0, "Playmark", "Croupier (Playmark Roulette)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ,0,0,egg_Unknown,0)
 
+                                                                                                                                                                                                                                                                                                                                                       
