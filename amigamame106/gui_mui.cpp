@@ -1057,7 +1057,7 @@ static ULONG DriverDisplay(struct Hook *hook REG(a0), char **array REG(a2),const
  if(config.isDriverFound(drv_indirect))
  {
      // if found: to bold
-    snprintf(driver,63,"\033b%s %s%s", drv->description,pnotworking);
+    snprintf(driver,63,"\033b%s %s", drv->description,pnotworking);
     driver[63]=0;
     pColumns->_driver = driver;
  } else
