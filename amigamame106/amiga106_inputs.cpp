@@ -357,10 +357,10 @@ void ConfigureLowLevelLib()
             propJoysticksFlags |= PROPJOYFLAGS_PORT2 ;
            if(configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERTXY;
         }
-        if(configControls._PropJoyAxisReverse & 1)  propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERSEX ;
-        if(configControls._PropJoyAxisReverse & 2)  propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERSEY ;
-        if(configControls._PropJoyAxisReverse & 4)  propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERSEX ;
-        if(configControls._PropJoyAxisReverse & 8)  propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERSEY ;
+        if(configControls._PropJoyAxisReverseP2 & 1)  propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERSEX ;
+        if(configControls._PropJoyAxisReverseP2 & 2)  propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERSEY ;
+        if(configControls._PropJoyAxisReverseP1 & 1)  propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERSEX ;
+        if(configControls._PropJoyAxisReverseP1 & 2)  propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERSEY ;
        // printf("propJoysticksFlags:%08x\n",(int)propJoysticksFlags);
         // if something has been asked for proportional joysticks/8bits paddle        
         if(!g_PropsSticks && propJoysticksFlags != 0)

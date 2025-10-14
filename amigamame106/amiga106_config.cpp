@@ -562,40 +562,47 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         "Player 3",
         "Player 4"
     };
-    // these are the bare lowlevel managed enum types of controllers
-    static const vector<string> strLLTypes={
-        "None", //"Auto Sense",  now ask explicit config.
+
+    // these mimics the lowlevel enum types of controllers
+    vector<string> strLLTypesBasics={
+        "None", // LL enum 0 is "Auto Sense", we don't use autosense anymore (rarely work),
         "CD32 7bt Pad",
         "Mouse",
         "Joystick(2bt)"
     };
-    // this is the same, plus proportional analog controllers not managed by LL.
-    // also Amiga Prop.Stick and C64/Atari 8bits paddles are same, but with potentiometer X/Y inverted.
-    static const vector<string> strLLTypesPlusProp={
-        "None",
-        "CD32 7bt Pad",
-        "Mouse",
-        "Joystick(2bt)",
-        "Analog Joystick(2bt)",
-        "C64/Atari Paddles(2bt)",
-        "Lightgun (2bt)" // only available for one port.
-    };
+    // these mimics the lowlevel enum types of controllers
+    vector<string> strLLTypesP1 = strLLTypesBasics;
+    vector<string> strLLTypesP2 = strLLTypesBasics;
 
+    int hasPots = hasProportionalStickResource(); // some OS3 not-classic hardware will not have this.
 
-    int hasPots = hasProportionalStickResource(); // some not-classic hardware will not.
+    // if original DB9 ports hardware...
+    if(hasPots)
+    {
+        vector<string> potsv={
+            "Analog Joystick(XY,2bt)",
+            "C64/Atari Paddles(YX,2bt)"
+        };
+        strLLTypesP1.insert(strLLTypesP1.end(),potsv.begin(),potsv.end());
+        strLLTypesP2.insert(strLLTypesP2.end(),potsv.begin(),potsv.end());
+#ifdef INPUTUSELIGHTGUN
+        // only allow lightguns on port2
+        strLLTypesP2.push_back( "Lightgun (1bt)");
+#endif
+    }
 
     serializer("Mouse Port 1", (int&)_llPort_Player[0],strPlayers);
    //ok, but: serializer("Types P1", (int&)_llPort_Type[0],(hasPots)?strLLTypesPlusProp:strLLTypes);
-    serializer("Types P1", (int&)_llPort_Type[0],strLLTypes); // do not enable pots on mouse port for the moment.
+    serializer("Types P1", (int&)_llPort_Type[0],strLLTypesP1); // do not enable pots on mouse port for the moment.
 
     serializer("Joy Port 2", (int&)_llPort_Player[1],strPlayers);
-    serializer("Types P2", (int&)_llPort_Type[1],(hasPots)?strLLTypesPlusProp:strLLTypes);
+    serializer("Types P2", (int&)_llPort_Type[1],strLLTypesP2);
 
     serializer("Lowlevel Port 3", (int&)_llPort_Player[2],strPlayers);
-    serializer("Types P3", (int&)_llPort_Type[2],strLLTypes);
+    serializer("Types P3", (int&)_llPort_Type[2],strLLTypesBasics);
 
     serializer("Lowlevel Port 4", (int&)_llPort_Player[3],strPlayers);
-    serializer("Types P4", (int&)_llPort_Type[3],strLLTypes);
+    serializer("Types P4", (int&)_llPort_Type[3],strLLTypesBasics);
 
     // - - - -
 
@@ -611,31 +618,55 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         serializer("Parallel Port 4", (int&)_parallelPort_Player[1],strPlayers);
         serializer("Types Pr4", (int&)_parallel_type[1],strPrlTypes);
     }
+#ifdef INPUTUSEMIDI
+    int hasMIDI = 1;
+    if(hasMIDI)
+    {
+        static const vector<string> strSerialTypes={
+            "None",
+            "MIDI 7Bt+Analog NoteX VolY",
+        };
+        serializer("Serial Port", (int&)_serialPort_Player,strPlayers);
+        serializer("Types Serial", (int&)_serialPort_Type,strSerialTypes);
+    }
+#endif
 
+    // - -  -miscelanous actions after here
     if(hasPots)
     {
         // special options for potentiometers
-        serializer("Inverse Axis",_PropJoyAxisReverse,0,{"Joy2X","Joy2Y"});
+        serializer("Port1 Inverse Axis",_PropJoyAxisReverseP1,0,{"Joy1X","Joy1Y"});
+        serializer("Port2 Inverse Axis",_PropJoyAxisReverseP2,0,{"Joy2X","Joy2Y"});
+
         serializer.listenChange("Types P2",[](ASerializer &serializer, void *p)
         {
             if(!p) return;
             int *pPort2Type = (int *)p;
 
-            serializer.enable("Controls.Inverse Axis",
+            serializer.enable("Controls.Port2 Inverse Axis",
                         (*pPort2Type == PORT_TYPE_PROPORTIONALJOYSTICK ||
                          *pPort2Type == PORT_TYPE_C64PADDLE    )?1:0);
         });
+        serializer.listenChange("Types P1",[](ASerializer &serializer, void *p)
+        {
+            if(!p) return;
+            int *pPort1Type = (int *)p;
 
+            serializer.enable("Controls.Port1 Inverse Axis",
+                        (*pPort1Type == PORT_TYPE_PROPORTIONALJOYSTICK ||
+                         *pPort1Type == PORT_TYPE_C64PADDLE    )?1:0);
+        });
+#ifdef INPUTUSELIGHTGUN
         // special options for lightgun
         serializer("Lightgun as",_LightgunPublish,{"Lightgun(no interpolations)","Generic Analog(fit more games)"});
         serializer.listenChange("Types P2",[](ASerializer &serializer, void *p)
         {
             if(!p) return;
             int *pPort2Type = (int *)p;
-
             serializer.enable("Controls.Lightgun as",
                         (*pPort2Type == PORT_TYPE_LIGHTGUN)?1:0);
         });
+#endif
     }
 
 

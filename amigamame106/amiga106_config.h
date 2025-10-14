@@ -280,8 +280,11 @@ public:
         int _llPort_Type[4];    // LowLevel enum + proportional
         int _parallelPort_Player[2]; // value 1-4
         int _parallel_type[2];
+        int _serialPort_Player=0;
+        int _serialPort_Type=0;
 
-        ULONG_FLAGS _PropJoyAxisReverse=0;
+        ULONG_FLAGS _PropJoyAxisReverseP1=0;
+        ULONG_FLAGS _PropJoyAxisReverseP2=0;
         int _LightgunPublish=0;
     };
     Controls &controls() { return _controls; }
