@@ -889,10 +889,25 @@ static ULONG DriverSelect(struct Hook *hook REG(a0), APTR obj REG(a2), LONG *par
 static ULONG DriverDispatcher(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1));
 static ULONG DriverDispatcherMUI5(struct IClass *cclass REG(a0), Object * obj REG(a2), Msg msg REG(a1));
 
+static inline const char *minusthe(const char *pc)
+{
+    if(pc[0] == 'T' && pc[1]=='h' && pc[2]=='e' && pc[3]==' ' ) pc+=4;
+    if(pc[0] == 'S' && pc[1]=='u' && pc[2]=='p' && pc[3]=='e'&& pc[4]=='r')
+    {
+        if(pc[5]==' ' ||pc[5]=='-' ) pc+=6; // "Super-X"
+    }
+
+    return pc;
+}
 
 static int DriverCompareNames(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
-  return(stricmp((*drv1)->description, (*drv2)->description));
+    const char *pc1=(*drv1)->description;
+    const char *pc2=(*drv2)->description;
+    pc1 = minusthe(pc1);
+    pc2 = minusthe(pc2);
+
+  return(stricmp(pc1,pc2));
 }
 static int DriverCompareScreenMode(const struct _game_driver **drv1,const  struct _game_driver **drv2)
 {
