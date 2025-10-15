@@ -368,4 +368,3 @@ static DRIVER_INIT( citycon )
 GAME( 1985, citycon,  0,       citycon, citycon, citycon, ROT0, "Jaleco", "City Connection (set 1)", 0 ,0,2,egg_Platform,0)
 GAME( 1985, citycona, citycon, citycon, citycon, citycon, ROT0, "Jaleco", "City Connection (set 2)", 0 ,0,2,egg_Platform,0)
 GAME( 1985, cruisin,  citycon, citycon, citycon, citycon, ROT0, "Jaleco (Kitkorp license)", "Cruisin", 0 ,0,2,egg_Platform,0)
-                                                                                                                                                                                                                                                                                                                                                                                 

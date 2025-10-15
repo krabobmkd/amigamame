@@ -503,4 +503,3 @@ GAME( 1985, commandu, commando, commando, commandu, commando, ROT90, "Capcom (Da
 GAME( 1985, commandj, commando, commando, commando, commando, ROT90, "Capcom", "Senjou no Ookami", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1985, sinvasn,  commando, commando, commando, commando, ROT90, "Capcom", "Space Invasion (Europe)", 0 ,0,2,egg_ShootEmUp,0)
 GAME( 1985, sinvasnb, commando, commando, commando, spaceinv, ROT90, "bootleg", "Space Invasion (bootleg)", 0 ,0,2,egg_ShootEmUp,0)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

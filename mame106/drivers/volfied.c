@@ -443,4 +443,3 @@ ROM_END
 GAME( 1989, volfied,  0,       volfied, volfied,  volfied, ROT270, "Taito Corporation Japan",   "Volfied (World)", 0 ,0,2,egg_Puzzle,0)
 GAME( 1989, volfiedu, volfied, volfied, volfiedu, volfied, ROT270, "Taito America Corporation", "Volfied (US)", 0 ,0,2,egg_Puzzle,0)
 GAME( 1989, volfiedj, volfied, volfied, volfiedj, volfied, ROT270, "Taito Corporation",         "Volfied (Japan)", 0 ,0,2,egg_Puzzle,0)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                            

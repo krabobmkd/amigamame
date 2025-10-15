@@ -394,6 +394,10 @@ void MameConfig::toDefault()
     _controls._parallelPort_Player[1]=0;
     _controls._parallel_type[1]=1; // joy1 by def because the only way up to date
 
+    _controls._PropJoyAxisReverseP1 = 0;
+    _controls._PropJoyAxisReverseP2 = 0;
+    _controls._LightgunPublish = 0;
+
     _misc._romsPath = "PROGDIR:roms";
     _misc._samplesPath = "PROGDIR:samples";
  //NOT THIS ONE !! decide where configs are written:  _misc._userPath = "PROGDIR:user";
@@ -583,7 +587,9 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
             "Analog Joystick(XY,2bt)",
             "C64/Atari Paddles(YX,2bt)"
         };
+#ifdef USEPOTGOPORT1
         strLLTypesP1.insert(strLLTypesP1.end(),potsv.begin(),potsv.end());
+#endif
         strLLTypesP2.insert(strLLTypesP2.end(),potsv.begin(),potsv.end());
 #ifdef INPUTUSELIGHTGUN
         // only allow lightguns on port2
@@ -592,8 +598,7 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
     }
 
     serializer("Mouse Port 1", (int&)_llPort_Player[0],strPlayers);
-   //ok, but: serializer("Types P1", (int&)_llPort_Type[0],(hasPots)?strLLTypesPlusProp:strLLTypes);
-    serializer("Types P1", (int&)_llPort_Type[0],strLLTypesP1); // do not enable pots on mouse port for the moment.
+    serializer("Types P1", (int&)_llPort_Type[0],strLLTypesP1);
 
     serializer("Joy Port 2", (int&)_llPort_Player[1],strPlayers);
     serializer("Types P2", (int&)_llPort_Type[1],strLLTypesP2);
@@ -635,27 +640,31 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
     if(hasPots)
     {
         // special options for potentiometers
-        serializer("Port1 Inverse Axis",_PropJoyAxisReverseP1,0,{"Joy1X","Joy1Y"});
-        serializer("Port2 Inverse Axis",_PropJoyAxisReverseP2,0,{"Joy2X","Joy2Y"});
+#ifdef USEPOTGOPORT1
+        serializer("Port1 Analog Inv",_PropJoyAxisReverseP1,0,{"Joy1X","Joy1Y"});
+#endif
+        serializer("Port2 Analog Inv",_PropJoyAxisReverseP2,0,{"Joy2X","Joy2Y"});
 
         serializer.listenChange("Types P2",[](ASerializer &serializer, void *p)
         {
             if(!p) return;
             int *pPort2Type = (int *)p;
 
-            serializer.enable("Controls.Port2 Inverse Axis",
+            serializer.enable("Controls.Port2 Analog Inv",
                         (*pPort2Type == PORT_TYPE_PROPORTIONALJOYSTICK ||
                          *pPort2Type == PORT_TYPE_C64PADDLE    )?1:0);
         });
+#ifdef USEPOTGOPORT1
         serializer.listenChange("Types P1",[](ASerializer &serializer, void *p)
         {
             if(!p) return;
             int *pPort1Type = (int *)p;
 
-            serializer.enable("Controls.Port1 Inverse Axis",
+            serializer.enable("Controls.Port1 Analog Inv",
                         (*pPort1Type == PORT_TYPE_PROPORTIONALJOYSTICK ||
                          *pPort1Type == PORT_TYPE_C64PADDLE    )?1:0);
         });
+#endif
 #ifdef INPUTUSELIGHTGUN
         // special options for lightgun
         serializer("Lightgun as",_LightgunPublish,{"Lightgun(no interpolations)","Generic Analog(fit more games)"});

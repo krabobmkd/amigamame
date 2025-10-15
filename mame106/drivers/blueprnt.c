@@ -417,4 +417,3 @@ ROM_END
 GAME( 1982, blueprnt, 0,        blueprnt, blueprnt, 0, ROT270, "[Zilec Electronics] Bally Midway", "Blue Print (Midway)", 0 ,0,2,egg_Maze,0)
 GAME( 1982, blueprnj, blueprnt, blueprnt, blueprnt, 0, ROT270, "[Zilec Electronics] Jaleco", "Blue Print (Jaleco)", 0 ,0,2,egg_Maze,0)
 GAME( 1983, saturn,   0,        blueprnt, saturn,   0, ROT270, "[Zilec Electronics] Jaleco", "Saturn", 0 ,0,0,egg_Unknown,0)
-                                                                                                                                                                                                                                                                                                                                                                                                                                  

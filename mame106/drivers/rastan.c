@@ -507,4 +507,3 @@ GAME( 1987, rastan,   0,      rastan, rastan,   0, ROT0, "Taito Corporation Japa
 GAME( 1987, rastanu,  rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US set 1)", 0,0,2,egg_Platform,0)
 GAME( 1987, rastanu2, rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US set 2)", 0,0,0,egg_Platform,0)
 GAME( 1987, rastsaga, rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation", "Rastan Saga (Japan)", 0,0,0,egg_Platform,0)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

@@ -458,4 +458,3 @@ static DRIVER_INIT( storming ) { lsasquad_invertcoin = 0x0c; init_common(); }
 
 GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
 GAME( 1986, storming, lsasquad, lsasquad, lsasquad, storming, ROT270, "Taito", "Storming Party / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
