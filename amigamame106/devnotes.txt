@@ -5,16 +5,15 @@
 
   - new features:
    - MUI Game list:
-     - There's 2 new columns ! One that tells the game genre, amongst 44 genres (shootnup, platform, beatnup, sports, ...)
-      Some games also have specific tags in that column (Childish,Violent, 3D, Girly,Funny,...).
-      A column that gives you the name of the machine used for a game was also added, useful to know which games share same hardware.
-     - In the MUI interface, a menu allow you to filter the game list by genre or tags.
-     - Column sorting is way better on MUI5 and you can also sort the genre and machine columns. This is great if you're into a specific game genre.
+     - Two new columns have been added! One indicates the game's genre, from among 44 genres (shootnup, platform, beatnup, sports, ...)
+      Some games also have specific tags in this column (Childish, Violent, 3D, Girly, Funny,...).
+      A column that gives you an identifier of the machine that runs the game was also added, useful for knowing which games share the same hardware.
+     - A new menu allow you to filter the game list by genre or tags.
+     - Column sorting is way better and you can also sort the genre and machine columns. This is great if you're into a specific game genre.
      - "Number of players" information in the list is more accurate and differentiates simultaneous and alternative number of players.
 
    - During game you can "throttle" by maintaining key Shift+F10 pressed, that is to say: "accelerate the emulation so it uses 100% of the CPU".
      If a given game does not already reach 100% speed (press help to know), it will do nothing. throttle is sometimes usefull to "skip intros".
-     Note on regular MAME it's just F10 key, but we use F10 for fullscreen/window switch, so maintain Shift+F10 for this.
 
    - reading options from icon tooltips is repaired, and now you can also create "Project icons per game" with .info file in project mode,
      with no file associated, Mame106 as tool, and tooltip "ROM=myrom", so a "project icon" can directly boot a given game.
@@ -23,29 +22,28 @@
   - Machine Taito F3 corrected:
      machine taito_f3 and anything using 68EC020 has been 100% corrected, and 10 to 20% speed optimized after weeks of work !
      It is some kind of "super NeoGeo" with alpha blending and pixel rendering capabilities,
-     and an incredible "Ensoniq OTTO" sound chip (based on "Subtractive synthesis", and made by the same team as the C64 SID).
+     and an incredible Ensoniq sound chip (based on "Subtractive synthesis", and made by the same team as the C64 SID).
      Reminding you that Taito had incredible composers and sound technicians also known as the band "Zuntata" should be enough
      to tease your ears (and if not: https://www.youtube.com/watch?v=NrZ5dn4gBWo&list=RDNrZ5dn4gBWo&start_radio=1 )
-     Machine Taito_f3 supports 83 roms amongst: Bubble BobbleII (bublbob2), lots of Puzzle bobble versions, space invader 95 (spcinv95),
-     the incredible "Riding Fight" (ridingf), vertical shooter "Grid seeker" (gseeker), sort machine column to find out the list of
-     related games. Yet it is still a bit too slow because of video mixing hard to emulate, frameskip will help.
-     It runs between 50 and 60% on a rpi4 1500Mhz emu68 1.06, it begins to be playable, but hell, no kidding: it's taito f3.
+     Machine Taito_f3 supports 83 roms amongst: Bubble BobbleII (bublbob2),space invader 95 (spcinv95),
+      the incredible "Riding Fight" (ridingf), vertical shooter "Grid seeker" (gseeker). Anyway, sort the new machine column to
+      find out the list of taito F3 supported games.
+      Yet taito f3 emulation is still a bit too slow because of video mixing hard to emulate: frameskip will help.
 
-  - Other corrections:
-   - "Demon's world" enemies are back and game 100% working (Was a long way, sorry for the fans).
-   - the automatic screen mode choice (use best mode option) returns wrong modes on recent P96 versions, we have now our own version.
+   - "Demon's world" enemies are back and game 100% working (Was a long way, sorry.).
+   - The automatic screen mode choice function (used with "best mode" option) was wrong on some recent drivers, so now we use our own version.
    - Tons of games with sprite priorities issues corrected, this times very horizontaly and definitively, once for all.
-   - a random memory hit with menu in 32bit mode was corrected.
+   - a memory hit with menu in 32bit mode was corrected.
 
  - Games added in r1.7:
   Since 68EC020 is ok, Games from editors still supporting 68000 and 68020 in the 1995/2000 period were added: Cave, Psikyo, Banpresto, Dooyong...
-   There was more than 75 rom images added,of high quality with excellent graphics and musics, well emulated and tested games:
+   There is 75 more roms supported, of high quality with excellent graphics and musics, well emulated and tested games:
 
   - Vertical shooter of that time, with lots of bullets on screens, known as the "*Danmaku*" genre, are a lot more present:
     "DonPachi"(donpachi), "DoDonPachi"(ddonpach),"ESP Ra.De."(esprade), "Gunbird"(gunbird), "Striker 1945"(s1945),
     R-shark (rshark) and the mostly excellent "Dangun Feveron/Fever SOS"(dfeveron,feversos), the excellent "Air Gallet"(agallet).
     (note the "raizing" danmakus were already supported: "Armed police batrider"(batrider),"Battle Garrega"(battleg),...)
-    ...filtering the list with vertical shooters and then sorting by years would give you the full list anyway !
+    ...filtering the list with vertical shooters genre and then sorting by years would give you the full list anyway !
 
   - Support for the excellent Banpresto franchise games (MazingerZ "Goldorak" game(mazinger), Sailor Moon.(sailormn) ).
   - other excellent Psikyo and cave games: Tengai(tengai),Samurai Aces(samuraia),Battle K-road (btlkroad).
@@ -61,7 +59,8 @@
   X suprslam Super slam sprite xflip bug ugly
   X rungun plante son boot grave. polyginet too
   X test throttle IRL
-  O add column "machine"
+  X add column "machine"
+ O test MUI 3.8
 
  X bestmode fail with arabian fight 420x240
 
