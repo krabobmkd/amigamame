@@ -274,7 +274,7 @@ extern STRPTR ShowCycleValues[];
 
     Object *MameUI::createPanel_Drivers()
 {
-    const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,BAR,";
+    const char *ListFormat = "BAR,BAR,BAR,BAR,BAR,BAR,BAR,BAR,";
     if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
     {
         ListFormat = "SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,SORTABLE BAR,";
