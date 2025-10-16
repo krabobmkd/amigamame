@@ -80,7 +80,45 @@ struct sMidiController* MidiControls_create()
 }
 void MidiControls_update(struct sMidiController* p)
 {
-    if (!p) return;
+    struct sMidiControllerPrivate *sp = (struct sMidiControllerPrivate *)p;
+    if (!sp) return;
+
+    MidiMsg		msg;
+/*
+typedef union
+{
+    ULONG l[2];
+    UBYTE b[4];
+} MidiMsg;
+*/
+    while (GetMidi(midi,&msg))
+    {
+        if (noteon(&msg))
+// #if BYNOTE
+        {
+       // msg.mm_Data1
+        // int		note = ((msg.mm_Data1-36)/2) % 31;
+        //     int		velocity = msg.mm_Data2 * 39 / 127;
+
+        //     velocity = velocity * VELSCALE / 100;
+        //     if (velocity > 39) velocity = 39;
+
+        //     if (vu_levels[note] < velocity) vu_levels[note] = velocity;
+        }
+// #else
+        // {	int		channel = msg.mm_Status & 0x0f;
+        //     int		velocity = msg.mm_Data2 * 39 / 127;
+
+        //     velocity = velocity * VELSCALE / 100;
+        //     if (velocity > 39) velocity = 39;
+
+        //     if (vu_levels[channel] < velocity) vu_levels[channel] = velocity;
+        // }
+//#endif
+    }
+}
+
+
 }
 void MidiControls_close(struct sMidiController* p)
 {

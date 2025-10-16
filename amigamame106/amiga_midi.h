@@ -11,6 +11,7 @@ extern "C" {
 // manage
 struct sMidiController
 {
+    ULONG _signal;
     UWORD _analog_x,_analog_y;  // notes as _x, volume as _y.
    
 };
