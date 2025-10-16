@@ -107,7 +107,8 @@ set(AMIGA_SRC
 	amiga_lightgun.c
 	amiga_proportionaljoystick.h
 	amiga_proportionaljoystick.c
-
+	amiga_midi.h
+	amiga_midi.c
 	serializer_mamexml.cpp
 	serializer_mamexml.h
 
@@ -147,6 +148,7 @@ set(AMIGA_SRC
 #			 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -DNDEBUG>
 #	  ${AMIGA_COMPILER_OPTIONS} )
 	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/MUI38/include")
+	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/camd/include")
 	# those for mame includes
 	target_compile_definitions(Mame106AmigaO3 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 MUISERIALIZER_USES_FLOAT=1 ${CPU_DEFS} )
 
