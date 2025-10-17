@@ -9,7 +9,7 @@
 https://github.com/niklasekstrom/amiga-par-to-spi-adapter/blob/master/spi-lib/spi.c#L296
 */
 
-#include "amiga_parallelpads.h"
+#include "amiga_inputs_parallelpads.h"
 //
 
 #include <proto/exec.h>

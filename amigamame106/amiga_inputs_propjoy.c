@@ -5,7 +5,7 @@
 
 */
 
-#include "amiga_proportionaljoystick.h"
+#include "amiga_inputs_propjoy.h"
 //
 
 #include <proto/exec.h>

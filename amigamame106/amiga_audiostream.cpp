@@ -4,7 +4,7 @@
  *
  *
  *************************************************************************/
-#include "amiga106_audiostream.h"
+#include "amiga_audiostream.h"
 // from mame:
 extern "C" {
     // contains Machine definition
@@ -37,7 +37,7 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
-#include "amiga106_config.h"
+#include "amiga_config.h"
 
 
 

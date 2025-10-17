@@ -4,7 +4,7 @@
  *
  *************************************************************************/
 
-#include "amiga106_video_cgxscalepixelarray.h"
+#include "amiga_video_cgxscalepixar.h"
 #include "amiga_video_tracers_clut16.h"
 #include "amiga_video_tracers_argb32.h"
 #include "amiga_video_remap.h"

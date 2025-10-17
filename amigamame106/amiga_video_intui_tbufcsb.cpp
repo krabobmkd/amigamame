@@ -1,4 +1,4 @@
-#include "amiga106_video_intuition_tbufcsb.h"
+#include "amiga_video_intui_tbufcsb.h"
 
 #include <proto/exec.h>
 #include <proto/graphics.h>

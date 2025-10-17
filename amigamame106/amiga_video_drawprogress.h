@@ -2,7 +2,7 @@
 #define AMIGA_VIDEO_INTUITIONDP_H
 
 #include <vector>
-#include "amiga106_video_intuition.h"
+#include "amiga_video_intuition.h"
 #include <proto/graphics.h>
 
 // all these to not have progressbar glitches...

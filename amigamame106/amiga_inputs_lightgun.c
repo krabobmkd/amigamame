@@ -1,4 +1,4 @@
-#include "amiga_lightgun.h"
+#include "amiga_inputs_lightgun.h"
 
 #include <proto/exec.h>
 

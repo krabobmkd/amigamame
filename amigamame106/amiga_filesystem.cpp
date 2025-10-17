@@ -30,7 +30,7 @@ extern "C" {
 
 #include <stdio.h>
 
-#include "amiga106_config.h"
+#include "amiga_config.h"
 
 extern struct DosLibrary    *DOSBase;
 

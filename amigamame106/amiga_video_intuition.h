@@ -2,7 +2,7 @@
 #define AMIGA_VIDEO_INTUITION_H
 
 #include <vector>
-#include "amiga106_video.h"
+#include "amiga_video.h"
 #include "amiga_video_remap.h"
 
 extern "C"

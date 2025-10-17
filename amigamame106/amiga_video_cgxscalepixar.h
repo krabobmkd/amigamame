@@ -1,7 +1,7 @@
 #ifndef AMIGA_VIDEO_CGXSPA_H
 #define AMIGA_VIDEO_CGXSPA_H
 
-#include "amiga106_video_intuition.h"
+#include "amiga_video_intuition.h"
 
 // note: anything exported from amiga_video.cpp is defined in mame/osdepends.h
 #include <vector>

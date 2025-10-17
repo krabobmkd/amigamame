@@ -35,10 +35,10 @@ extern "C" {
     #include "driver.h"
     #include "memory.h"
 }
-#include "amiga106_inputs.h"
-#include "amiga106_config.h"
-#include "amiga106_video.h"
-#include "amiga106_video_intuition.h"
+#include "amiga_inputs.h"
+#include "amiga_config.h"
+#include "amiga_video.h"
+#include "amiga_video_intuition.h"
 
 /** some abstact display management */
 

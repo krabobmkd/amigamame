@@ -1,4 +1,4 @@
-#include "amiga_midi.h"
+#include "amiga_inputs_midi.h"
 
 // for atexit:
 #include <stdlib.h>
@@ -91,7 +91,7 @@ typedef union
     UBYTE b[4];
 } MidiMsg;
 */
-    while (GetMidi(midi,&msg))
+    while (GetMidi(sp->_midi,&msg))
     {
         if (noteon(&msg))
 // #if BYNOTE
@@ -115,11 +115,10 @@ typedef union
         //     if (vu_levels[channel] < velocity) vu_levels[channel] = velocity;
         // }
 //#endif
-    }
+    } // end while
 }
 
 
-}
 void MidiControls_close(struct sMidiController* p)
 {
     struct sMidiControllerPrivate *sp = (struct sMidiControllerPrivate *)p;

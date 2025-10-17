@@ -59,8 +59,8 @@ extern "C" {
 #include "video.h"
 
 #include "amiga_locale.h"
-#include "amiga106_config.h"
-#include "amiga106_inputs.h"
+#include "amiga_config.h"
+#include "amiga_inputs.h"
 #include "gui_mui.h"
 
 #define MIN_STACK (14*1024)

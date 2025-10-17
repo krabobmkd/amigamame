@@ -1,4 +1,4 @@
-#include "amiga106_video_os3.h"
+#include "amiga_video_os3.h"
 #include "amiga_video_tracers_clut16.h"
 #include "amiga_video_remap.h"
 
@@ -6,7 +6,7 @@
 #include <proto/graphics.h>
 #include <proto/intuition.h>
 
-#include "amiga_lightgun.h"
+#include "amiga_inputs_lightgun.h"
 extern "C" {
     // from mame
     #include "mame.h"

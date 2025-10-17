@@ -1,11 +1,11 @@
-#include "amiga106_video_intuition.h"
+#include "amiga_video_intuition.h"
 
-#include "amiga106_video_intuition_tbufcsb.h"
-#include "amiga106_video_os3.h"
-#include "amiga106_video_cgx.h"
-#include "amiga106_video_cgxscalepixelarray.h"
-#include "amiga106_video_drawprogress.h"
-#include "amiga106_config.h"
+#include "amiga_video_intui_tbufcsb.h"
+#include "amiga_video_os3.h"
+#include "amiga_video_cgx.h"
+#include "amiga_video_cgxscalepixar.h"
+#include "amiga_video_drawprogress.h"
+#include "amiga_config.h"
 
 #include <proto/exec.h>
 #include <proto/graphics.h>

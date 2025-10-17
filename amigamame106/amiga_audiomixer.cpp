@@ -1,4 +1,4 @@
-#include "amiga106_audiostream.h"
+#include "amiga_audiostream.h"
 #include "sound_krb.h"
 #include "streams.h"
 #include <stdio.h>

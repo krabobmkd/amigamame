@@ -1,4 +1,4 @@
-#include "amiga106_video_drawprogress.h"
+#include "amiga_video_drawprogress.h"
 
 #include <proto/exec.h>
 #include <proto/graphics.h>

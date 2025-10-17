@@ -1,4 +1,4 @@
-#include "amiga106_config.h"
+#include "amiga_config.h"
 
 #include <sstream>
 #include <algorithm>

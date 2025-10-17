@@ -31,7 +31,7 @@ extern "C" {
 
 #include <stdio.h>
 
-#include "amiga106_config.h"
+#include "amiga_config.h"
 
 void unzip_cache_clear();
 

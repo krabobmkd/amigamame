@@ -42,12 +42,12 @@ extern "C" {
 
 }
 
-#include "amiga106_inputs.h"
-#include "amiga106_config.h"
-#include "amiga106_video.h"
-#include "amiga_parallelpads.h"
-#include "amiga_proportionaljoystick.h"
-#include "amiga_lightgun.h"
+#include "amiga_inputs.h"
+#include "amiga_config.h"
+#include "amiga_video.h"
+#include "amiga_inputs_parallelpads.h"
+#include "amiga_inputs_propjoy.h"
+#include "amiga_inputs_lightgun.h"
 
 using namespace std;
 
@@ -234,7 +234,7 @@ static USHORT dddummmy = 0;
 #ifdef RJP_OPTION
 static USHORT useReadJoyPortForPads = 0; // else rawkeys, added for NewLowlevel patch for A2000.
 #endif
-void ConfigureLowLevelLib()
+void ConfigureLowLevelLibAndOtherInputs()
 {
 //printf(" ***** ConfigureLowLevelLib\n");
     MameConfig::Controls &configControls = getMainConfig().controls();
@@ -1276,7 +1276,7 @@ const os_code_info *osd_get_code_list(void)
 {
 //    printf(" * * * ** osd_get_key_list  * * * *  *\n");
 
-    ConfigureLowLevelLib();
+    ConfigureLowLevelLibAndOtherInputs();
 
     if(!rawkeymap._keymap_inited)
     {

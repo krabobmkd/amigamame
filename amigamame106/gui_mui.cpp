@@ -53,7 +53,7 @@ extern "C" {
 
     extern struct DiskObject *AppDiskObject;
 }
-#include "amiga106_config.h"
+#include "amiga_config.h"
 #include "serializer_mui.h"
 
 inline Object * MUINewObject(CONST_STRPTR cl, Tag tags, ...)

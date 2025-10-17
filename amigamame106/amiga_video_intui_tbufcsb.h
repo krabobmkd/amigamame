@@ -1,7 +1,7 @@
 #ifndef AMIGA_VIDEO_INTUITION_TBUFCSB_H
 #define AMIGA_VIDEO_INTUITION_TBUFCSB_H
 
-#include "amiga106_video_intuition.h"
+#include "amiga_video_intuition.h"
 
 /**
     \class TripleBuffer_CSB
