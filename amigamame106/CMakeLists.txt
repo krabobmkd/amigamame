@@ -100,8 +100,11 @@ set(AMIGA_SRC
 	amiga_video_intui_tbufcsb.cpp
 	amiga_video_drawprogress.h
 	amiga_video_drawprogress.cpp
+	amiga_inputs_interface.h
 	amiga_inputs.h
 	amiga_inputs.cpp
+	amiga_inputs_kbd_ll.h
+	amiga_inputs_kbd_ll.cpp
 	amiga_inputs_parallelpads.h
 	amiga_inputs_parallelpads.c
 	amiga_inputs_lightgun.h

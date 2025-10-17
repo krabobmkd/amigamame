@@ -21,6 +21,9 @@ struct sMidiController *MidiControls_create();
 void MidiControls_update(struct sMidiController*p);
 void MidiControls_close(struct sMidiController*p);
 
+struct sMameInputsInterface;
+extern struct sMameInputsInterface g_ipt_MidiIn;
+
 #ifdef __cplusplus
 }
 #endif

@@ -17,6 +17,7 @@ extern "C" {
 #include <exec/interrupts.h>
 #include <hardware/cia.h>
 
+
 // this is experimental unofficial code to gain Bt2 on parallel joystick "4", as "ACK" signal,
 //#define PARALLELJOYEXTENSION_USEPORT4BT2INTERUPT 1
 
@@ -117,6 +118,10 @@ used as:
 We add:
       J3Bt2       J4Bt2
 */
+
+struct sMameInputsInterface;
+extern struct sMameInputsInterface g_ipt_ParallelPads;
+
 #ifdef __cplusplus
 }
 #endif

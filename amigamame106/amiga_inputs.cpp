@@ -21,6 +21,7 @@
 #include "mamelog.h"
 #include "intuiuncollide.h"
 
+
 extern "C" {
     #include <libraries/lowlevel.h>
     #include <devices/keyboard.h>
@@ -45,9 +46,112 @@ extern "C" {
 #include "amiga_inputs.h"
 #include "amiga_config.h"
 #include "amiga_video.h"
+
+
+//  - - - -
+#include "amiga_inputs_interface.h"
+#include "amiga_inputs_kbd_ll.h"
 #include "amiga_inputs_parallelpads.h"
 #include "amiga_inputs_propjoy.h"
 #include "amiga_inputs_lightgun.h"
+#include "amiga_inputs_midi.h"
+
+
+
+using namespace std;
+
+struct mapkeymap {
+    std::string _name;
+    unsigned char _rawkeycode;
+};
+class RawKeyMap
+{
+    public:
+    void clear() {
+        _n.clear();
+        _kbi.clear();
+        _km.clear();
+        _keymap_inited  =false;
+        _currentInitCode = 0;
+    }
+    vector<string> _n;
+    vector<os_code_info> _kbi;
+
+    vector<mapkeymap> _km; // keep the instance of strings from keymap libs
+    bool _keymap_inited=false;
+    ULONG _currentInitCode=0;
+    void init();
+    void AddOsCode(const char *keyname, ULONG oscode ,ULONG interfcode)
+    {
+        _n.push_back(keyname);
+        _kbi.push_back({_n.back().c_str(),oscode+_currentInitCode,interfcode});
+    }
+    void OsCodeEnd()
+    {
+        _kbi.push_back(NULL,0,0});
+    }
+};
+static void AddOsCode(void *m,const char *keyname, ULONG oscode ,ULONG interfcode)
+{
+    RawKeyMap   *prk=m;
+    prk->AddOsCode(keyname,oscode,interfcode);
+}
+RawKeyMap   rawkeymap;
+// - - - - - -
+
+struct sMameInputsInterface *g_inputInterfaces[] =
+{
+    &g_ipt_Keyboard,
+    &g_ipt_LLMouses,
+    &g_ipt_ParallelPads,
+    &g_ipt_PropJoy,
+    &g_ipt_MidiIn,
+    NULL,
+};
+
+
+static vector<void *>_instances;
+
+
+static void ConfigureInputs()
+{
+    // create instances for each input module,each will do according to config.controls, will open libs...
+    _instances.clear();
+    _getCodeFunc.clear();
+    struct sMameInputsInterface *pii = &g_inputInterfaces[0];
+    ULONG startcode=0;
+    while(pii)
+    {
+        void *pinstance = pii->Create();
+        _instances.push_back(pinstance); // can be null, but keep order.
+        if(pinstance)
+        {
+            ppi->InitOsCodeMap(pinstance,&rawkeymap,&AddOsCode);
+        }
+        rawkeymap._currentInitCode += 1024;
+        pii++;
+    }
+    rawkeymap.OsCodeEnd();
+
+}
+static void CloseInputs()
+{
+    struct sMameInputsInterface *pii = &g_inputInterfaces[0];
+    int i=0;
+    while(pii && i<_instances.size())
+    {
+        void *pinstance = _instances[i];
+        if(pinstance) pii->Close(pinstance);
+        pii++;
+        i++;
+    }
+    _instances.clear();
+    _getCodeFunc.clear();
+
+}
+
+
+// - - -- -
 
 using namespace std;
 
@@ -56,13 +160,13 @@ using namespace std;
 
 #include <stdlib.h>
 
-// extend amiga os code given to mame after "lowlevel rawkey codes".
-// actually for lowlevel mouses
-#define ANALOG_CODESTART 1024
-// actually for real analog "potgo"
-#define PROPJOY_CODESTART 2048
-// actually for real analog "potgo"
-#define LIGHTGUN_CODESTART 2048+256
+//// extend amiga os code given to mame after "lowlevel rawkey codes".
+//// actually for lowlevel mouses
+//#define ANALOG_CODESTART 1024
+//// actually for real analog "potgo"
+//#define PROPJOY_CODESTART 2048
+//// actually for real analog "potgo"
+//#define LIGHTGUN_CODESTART 2048+256
 
 #ifdef USE_DIRECT_KEYBOARD_DEVICE
 struct KeyboardMatrix {
@@ -86,6 +190,7 @@ struct MameInputs
     int         _NbKeysUpStack;
     BYTE         _Keys[256*4]; // bools state for actual keyboard rawkeys + lowlevel pads code
     UWORD        _NextKeysUpStack[256]; // delay event between frame to not loose keys.
+
     // - - mouse states for 4 players, remapped from any ll ports.   
     struct LLMouse {
         ULONG _mousestate; // high bytes are sadly clamped, but would work for 2+ mouses.
@@ -112,26 +217,9 @@ struct MameInputs
 
 
 
-using namespace std;
+// - - - -
 
-struct mapkeymap {
-    std::string _name;
-    unsigned char _rawkeycode;
-};
-class RawKeyMap
-{
-    public:
-    void clear() {
-        _kbi.clear();
-        _km.clear();
-        _keymap_inited  =false;
-    }
-    vector<os_code_info> _kbi;
-    vector<mapkeymap> _km; // keep the instance of strings from keymap libs
-    bool _keymap_inited=false;
 
-    void init();
-};
 static std::vector<std::string> _keepMouseNames=
 {
     "Mouse1 X",
@@ -180,12 +268,12 @@ static const char * const _LGunNames[2][4]=
     {"Lightgun1 X","Lightgun1 Y","Lightgun1 Bt1","Lightgun1 Bt2"},
     {"Lightgun2 X","Lightgun2 Y","Lightgun2 Bt1","Lightgun2 Bt2"}
 };
-RawKeyMap   rawkeymap;
+
 
 
 MameInputs *g_pInputs=NULL;
 ParallelPads *g_pParallelPads=NULL; // createParallelPads();
-int     llPortsTypes[4]={0,0,0,0};
+//int     llPortsTypes[4]={0,0,0,0};
 
 struct ProportionalSticks *g_PropsSticks=NULL;
 struct sLightGuns *g_LightGun=NULL; //LightGun_create();
@@ -234,8 +322,13 @@ static USHORT dddummmy = 0;
 #ifdef RJP_OPTION
 static USHORT useReadJoyPortForPads = 0; // else rawkeys, added for NewLowlevel patch for A2000.
 #endif
-void ConfigureLowLevelLibAndOtherInputs()
+
+
+
+void ConfigureLowLevelLib()
 {
+
+
 //printf(" ***** ConfigureLowLevelLib\n");
     MameConfig::Controls &configControls = getMainConfig().controls();
     MameConfig::Misc &configMisc = getMainConfig().misc();
@@ -1274,14 +1367,8 @@ void RawKeyMap::init()
 */
 const os_code_info *osd_get_code_list(void)
 {
-//    printf(" * * * ** osd_get_key_list  * * * *  *\n");
+    ConfigureInputs();
 
-    ConfigureLowLevelLibAndOtherInputs();
-
-    if(!rawkeymap._keymap_inited)
-    {
-        rawkeymap.init(); // this si done once at each gamestart.
-    }
     return rawkeymap._kbi.data();
 
 }

@@ -177,6 +177,10 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop);
 const char *getProportionalStickErrorMessage(ULONG errcode);
 
 
+struct sMameInputsInterface;
+extern struct sMameInputsInterface g_ipt_PropJoy;
+
+
 #ifdef __cplusplus
 }
 #endif
