@@ -14,4 +14,7 @@ struct sMameInputsInterface;
 
 extern struct sMameInputsInterface g_ipt_Keyboard;
 extern struct sMameInputsInterface g_ipt_LLMouses;
+
+void Inputs_Keyboard_ll_Update(struct MsgPort *pMsgPort);
+
 #endif

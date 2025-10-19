@@ -1,4 +1,5 @@
 #include "amiga_inputs_midi.h"
+#include "amiga_inputs_interface.h"
 
 // for atexit:
 #include <stdlib.h>

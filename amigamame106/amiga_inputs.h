@@ -3,18 +3,16 @@
 
 extern "C" {
     #include <exec/types.h>
-    #include <utility/tagitem.h>
-    #include <devices/inputevent.h>
-    #include <devices/gameport.h>
+    #include <exec/ports.h>
 }
 
-//olde, now done in ConfigureLowLevelLib() if needed. void InitLowLevelLib();
-void ConfigureLowLevelLib();
-// r16, now to be used at each game closing.(FreeInputs)
-void CloseLowLevelLib();
+//void Inputs_AllocAndInitCodes();
+//void Inputs_PostScreenOpenInit();
 
-void AllocInputs();
-void FreeInputs();
-void UpdateInputs(struct MsgPort *pMsgPort);
+void Inputs_FrameUpdate();
+
+
+void Inputs_Free();
+
 
 #endif

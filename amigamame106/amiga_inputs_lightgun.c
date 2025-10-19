@@ -1,4 +1,6 @@
 #include "amiga_inputs_lightgun.h"
+#include "amiga_inputs_interface.h"
+
 
 #include <proto/exec.h>
 

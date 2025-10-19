@@ -8,37 +8,34 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+// Amiga types
 #include <exec/types.h>
+// Mame's types
+#include "osd_cpu.h"
+#include "osdepend.h"
 
-// some interface are one entry in an existing port
-// some interface are a new port with a ist of entries.
-//typedef void (*fAddAsEntry)(const char *pPortName,int );
-//typedef void (*fAddAsPort)(const char *pPortName,int );
+#ifndef input_code
+/* input code is used to represent an abstracted input type */
+typedef UINT32 input_code;
+#endif
 
-typedef void (*fAddOsCode)(void *m,const char *keyname,ULONG oscode ,ULONG interfcode);
+
+typedef void (*fAddOsCode)(void *registerer,os_code_info *pFirst, int nbcodes);
 
 struct sMameInputsInterface
 {
-//    const char *Name; // general interface name
-
-//    int _nbHardwareInputs; // used by config
-
-//    // for each <_nbHardwareInputs
-//    void (*AddConfig)(int iHardwareInput,fAddAsEntry addAsEntry, fAddAsPort addAsPort);
-
-//    // In order they are used
-////    void (*AddConfigSetup)();
-
-    void *(*Create)();
     // only accept 0-1023 oscode range.
-    void (*InitOsCodeMap)(void *o,void *m,fAddOsCode addOsCode);
-
-    // optional, can be null
+    // if no control for this input module, return NULL. else should register codes.
+    void *(*Create)(void *registerer,fAddOsCode addOsCode);
+    // optional, per frame.
     void (*FrameUpdate)(void *o);
     // mandatory, used by real time.
     int (*GetCode)(void *o, ULONG oscode);
     // mandatory, must free.
     void (*Close)(void *o);
+    // optional.
+    void (*PostInputPortInitCheck)(void *o);
+
 };
 
 #ifdef __cplusplus

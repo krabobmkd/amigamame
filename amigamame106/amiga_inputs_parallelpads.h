@@ -119,9 +119,6 @@ We add:
       J3Bt2       J4Bt2
 */
 
-struct sMameInputsInterface;
-extern struct sMameInputsInterface g_ipt_ParallelPads;
-
 #ifdef __cplusplus
 }
 #endif

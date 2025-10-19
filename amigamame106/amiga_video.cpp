@@ -36,6 +36,7 @@ extern "C" {
     #include "memory.h"
 }
 #include "amiga_inputs.h"
+#include "amiga_inputs_kbd_ll.h"
 #include "amiga_config.h"
 #include "amiga_video.h"
 #include "amiga_video_intuition.h"
@@ -283,7 +284,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
     }
 
 
-    AllocInputs(); // input object depends of screen or window.
+//    AllocInputs(); // input object depends of screen or window.
 
     FrameCounterUpdate = 0;
     FrameCounter = 0;
@@ -309,7 +310,7 @@ int osd_create_display(const _osd_create_params *pparams, UINT32 *rgb_components
 }
 void osd_close_display(void)
 {
-    FreeInputs();
+    Inputs_Free();
     if(g_pMameDisplay) {
         WindowGeo wgeo = g_pMameDisplay->getWindowGeometry();
 
@@ -400,7 +401,8 @@ void osd_update_video_and_audio(struct _mame_display *display)
     g_pMameDisplay->draw(display);
 
     MsgPort *userport = g_pMameDisplay->userPort();
-    if(userport) UpdateInputs(userport);
+    if(userport) Inputs_Keyboard_ll_Update(userport);
+    Inputs_FrameUpdate();
 
     // - - - -
     FrameCounterUpdate++;

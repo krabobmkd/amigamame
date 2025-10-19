@@ -133,7 +133,7 @@ int libs_init2()
     if(verbose) printf("try open asl\n");
     if(!(AslBase = OpenLibrary("asl.library", 36))) return(1);
     if(verbose) printf("try open cybergraphics\n");
-//    InitLowLevelLib();
+
     // optional:
     CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
     if(verbose && (CyberGfxBase == NULL)) printf("can't open cybergraphics\n");
@@ -177,7 +177,7 @@ void main_close()
 
     if(AppDiskObject) FreeDiskObject(AppDiskObject);
 
-    CloseLowLevelLib();
+    Inputs_Free();
 
 //    if(P96Base) CloseLibrary(P96Base);
 

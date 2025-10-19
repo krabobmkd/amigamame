@@ -10,6 +10,7 @@ https://github.com/niklasekstrom/amiga-par-to-spi-adapter/blob/master/spi-lib/sp
 */
 
 #include "amiga_inputs_parallelpads.h"
+#include "amiga_inputs_interface.h"
 //
 
 #include <proto/exec.h>
@@ -26,6 +27,8 @@ https://github.com/niklasekstrom/amiga-par-to-spi-adapter/blob/master/spi-lib/sp
 
 #include <hardware/custom.h>
 #include <hardware/intbits.h>
+
+
 
 // -> now is inited or not in main.cpp
 // struct Library *miscbase=NULL;

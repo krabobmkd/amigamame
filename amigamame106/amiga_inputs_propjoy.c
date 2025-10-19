@@ -6,6 +6,7 @@
 */
 
 #include "amiga_inputs_propjoy.h"
+#include "amiga_inputs_interface.h"
 //
 
 #include <proto/exec.h>
@@ -628,4 +629,22 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop)
 
 }
 
+// put this to last method
+void post_input_port_init_check(void *o)
+{
+    // at this level both osd_code_list and input_port_init are inited.
 
+    // if analog controler inited, but game doesnt use it :
+    if( !input_machine_has_any_analog() )
+    {
+        ui_popup_time(6, "Game uses no analog input,\nso analog controllers are useless.");
+    }
+
+}
+
+
+
+// struct sMameInputsInterface g_ipt_PropJoy=
+// {
+
+// };
