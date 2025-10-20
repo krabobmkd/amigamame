@@ -7,7 +7,9 @@
 #include <string.h>
 #include <fstream>
 #include "drivertuning.h"
-
+#ifdef USE_MIDICAMD_INPUT
+#include "amiga_inputs_midi.h"
+#endif
 // from mame
 extern "C" {
     #include "driver.h"
@@ -623,16 +625,26 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         serializer("Parallel Port 4", (int&)_parallelPort_Player[1],strPlayers);
         serializer("Types Pr4", (int&)_parallel_type[1],strPrlTypes);
     }
-#ifdef INPUTUSEMIDI
+#ifdef USE_MIDICAMD_INPUT
     int hasMIDI = 1;
     if(hasMIDI)
     {
+        // static const vector<string> strmdiPlayers={
+        //     "None",
+        //     "Any player"
+        // };
         static const vector<string> strSerialTypes={
             "None",
-            "MIDI 7Bt+Analog NoteX VolY",
+            "Just buttons",
+            "Notes are AnalogX",
+            "Sliders are AnalogXYZ"
         };
-        serializer("Serial Port", (int&)_serialPort_Player,strPlayers);
-        serializer("Types Serial", (int&)_serialPort_Type,strSerialTypes);
+void MidiControls_update_JustButtons(struct sMidiController*p);
+void MidiControls_update_NotesAreAnalogX(struct sMidiController*p);
+void MidiControls_update_SlidersAreAnalogXYZ(struct sMidiController*p);
+
+        serializer("MIDI In", (int&)_serialPort_Player,strPlayers);
+        serializer("Types MIDI", (int&)_serialPort_Type,strSerialTypes);
     }
 #endif
 

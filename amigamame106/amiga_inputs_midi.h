@@ -8,13 +8,22 @@ extern "C" {
 #endif
 #include <exec/types.h>
 
+#define MIDICONF_AllBUTTONS 1
+#define MIDICONF_NotesAreAnalogX 2
+#define MIDICONF_AllButtonsAndSliders 3
+
+
 // manage
 struct sMidiController
 {
     ULONG _signal;
-    UWORD _analog_x,_analog_y;  // notes as _x, volume as _y.
-   
-    UBYTE _keys[128];
+    UWORD _analog[12]; // 3 + 8
+    int _mapmode;
+    UBYTE _chans[4];
+    UBYTE _chanMap[16];
+    int _nbchans; // nbchans ever seen, max 4.
+    UBYTE _keys[128][4];
+
 };
 int MidiControls_hasMidi();
 
