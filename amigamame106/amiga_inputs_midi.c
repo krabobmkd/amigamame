@@ -121,7 +121,7 @@ typedef union
 
 
 void MidiControls_close(struct sMidiController* p)
-{
+{  
     struct sMidiControllerPrivate *sp = (struct sMidiControllerPrivate *)p;
     if (!sp) return;
 

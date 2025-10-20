@@ -20,7 +20,7 @@ extern "C" {
 #include "amiga_inputs_parpadsimpl.h"
 #include "amiga_inputs_propjoyimpl.h"
 //#include "amiga_inputs_lightgun.h"
-#include "amiga_inputs_midi.h"
+#include "amiga_inputs_midiimpl.h"
 
 struct sMameInputsInterface *g_inputInterfaces[] =
 {
@@ -28,7 +28,7 @@ struct sMameInputsInterface *g_inputInterfaces[] =
     &g_ipt_LLMouses,
     &g_ipt_ParallelPads,
     &g_ipt_PropJoy,
-    // &g_ipt_MidiIn,
+    &g_ipt_MidiIn,
     NULL,
 };
 

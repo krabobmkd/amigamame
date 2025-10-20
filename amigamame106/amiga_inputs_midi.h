@@ -14,15 +14,13 @@ struct sMidiController
     ULONG _signal;
     UWORD _analog_x,_analog_y;  // notes as _x, volume as _y.
    
+    UBYTE _keys[128];
 };
 int MidiControls_hasMidi();
 
 struct sMidiController *MidiControls_create();
 void MidiControls_update(struct sMidiController*p);
 void MidiControls_close(struct sMidiController*p);
-
-struct sMameInputsInterface;
-extern struct sMameInputsInterface g_ipt_MidiIn;
 
 #ifdef __cplusplus
 }

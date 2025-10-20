@@ -134,9 +134,14 @@ set(AMIGA_SRC
 
 	devnotes.txt
 	)
-	# if(USE_MIDI_AS_CONTROLER)
-	# 	list(APPEND AMIGA_SRC amiga_inputs_midi.h amiga_inputs_midi.c)
-	# endif()
+	 if(USE_MIDI_AS_CONTROLER)
+	 	list(APPEND AMIGA_SRC
+			amiga_inputs_midi.h
+			amiga_inputs_midi.c
+			amiga_inputs_midiimpl.h
+			amiga_inputs_midiimpl.cpp
+			)
+	 endif()
 # - - -have some Amiga code using O3
 	add_library(Mame106AmigaO3 STATIC
 		amiga_video_tracers.h
