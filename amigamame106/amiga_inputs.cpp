@@ -17,24 +17,17 @@ extern "C" {
 //  - - - -
 #include "amiga_inputs_interface.h"
 #include "amiga_inputs_kbd_ll.h"
-#include "amiga_inputs_parallelpads.h"
-#include "amiga_inputs_propjoy.h"
-#include "amiga_inputs_lightgun.h"
+#include "amiga_inputs_parpadsimpl.h"
+#include "amiga_inputs_propjoyimpl.h"
+//#include "amiga_inputs_lightgun.h"
 #include "amiga_inputs_midi.h"
-
-#include "amiga_config.h"
-
-//#include <stdio.h>
-extern struct sMameInputsInterface g_ipt_ParallelPads;
-
-
 
 struct sMameInputsInterface *g_inputInterfaces[] =
 {
     &g_ipt_Keyboard,
     &g_ipt_LLMouses,
     &g_ipt_ParallelPads,
-    // &g_ipt_PropJoy,
+    &g_ipt_PropJoy,
     // &g_ipt_MidiIn,
     NULL,
 };
@@ -151,38 +144,24 @@ INT32 osd_get_code_value(os_code oscode)
 int osd_readkey_unicode(int flush)
 {
    // printf("osd_readkey_unicode\n");
+   // not used in standard MAME !
     return 0;
 }
 
-
+ // we calibrate our own way !
 
 /* Joystick calibration routines BW 19981216 */
 /* Do we need to calibrate the joystick at all? */
-int osd_joystick_needs_calibration(void)
-{
-    return 0;
-}
+int osd_joystick_needs_calibration(void){ return 0;}
 /* Preprocessing for joystick calibration. Returns 0 on success */
-void osd_joystick_start_calibration(void)
-{
-
-}
+void osd_joystick_start_calibration(void){}
 /* Prepare the next calibration step. Return a description of this step. */
 /* (e.g. "move to upper left") */
-const char *osd_joystick_calibrate_next(void)
-{
-    return NULL;
-}
+const char *osd_joystick_calibrate_next(void){ return NULL;}
 /* Get the actual joystick calibration data for the current position */
-void osd_joystick_calibrate(void)
-{
-
-}
+void osd_joystick_calibrate(void){}
 /* Postprocessing (e.g. saving joystick data to config) */
-void osd_joystick_end_calibration(void)
-{
-
-}
+void osd_joystick_end_calibration(void){}
 
 /*
   inptport.c defines some general purpose defaults for key and joystick bindings.
@@ -195,9 +174,9 @@ void osd_joystick_end_calibration(void)
 */
 void osd_customize_inputport_list(input_port_default_entry *defaults)
 {
-
 }
 
+// added on osd api by krb, thrown late during inits, allow to check controllers are usable by current game.
 void osd_post_input_port_init_check()
 {
     // at this level both osd_code_list and input_port_init are inited.
@@ -213,100 +192,4 @@ void osd_post_input_port_init_check()
     }
 }
 
-
-// ------------------------
-
-// - - - - -mame minimix input module api:
-
-static const char * const parpadsbtnames[2][11]={
-    {
-        "PrPad3 Blue",
-        "PrPad3 Red",
-        "PrPad3 UP",
-        "PrPad3 DOWN",
-        "PrPad3 LEFT",
-        "PrPad3 RIGHT"
-    },
-    {
-        "PrPad4 Blue",
-        "PrPad4 Red",
-        "PrPad4 UP",
-        "PrPad4 DOWN",
-        "PrPad4 LEFT",
-        "PrPad4 RIGHT"
-    },
-};
-TODO
-static void *parpads_Create(void *registerer,fAddOsCode addOsCode)
-{
-    MameConfig::Controls &configControls = getMainConfig().controls();
-    MameConfig::Misc &configMisc = getMainConfig().misc();
-
-    // - - - - parralel port 3&4 joystick extension: init if needed.
-    // loop for parallel port
-    int useParallelExtension=0;
-    int readj4bt2 = 0;
-    for(int ipar=0 ; ipar<2 ;ipar++)
-    {
-        int iPlayer = configControls._parallelPort_Player[ipar] ;
-        if( iPlayer == 0 ) continue;
-        int type = configControls._parallel_type[ipar];
-        if(type == 0 ) continue;
-
-        useParallelExtension = 1;
-        if(ipar == 1) readj4bt2=1;
-    }
-
-    if(useParallelExtension ==0) return NULL; // no instance, no init.
-
-    struct ParallelPads *p = createParallelPads(readj4bt2); // could fail.
-    if(!p) return NULL;
-
-    // then parallel port joystick extension pr3 pr4
-    for(int ipar=0;ipar<2;ipar++) // actually 2
-    {
-        int iplayer = configControls._parallelPort_Player[ipar];
-        if(iplayer == 0) continue;
-        iplayer--;
-        int itype = configControls._parallel_type[ipar];
-        if(itype == 0) continue; //still not inited
-
-        int iport = 2+ipar; // we hack parallel pads as Lowlevel Pads3 and 4 !!!
-        int ipshft = iport<<8;
-        const int mamecodeshift =
-            ((int)JOYCODE_2_LEFT - (int)JOYCODE_1_LEFT) *iplayer ;
-
-    // joystick can only manage 1 or 2 bt pads here (2 for sega SMS pads)...
-      vector<os_code_info> kbi2={
-      // note standard parallel port extensions joysticks manages 1bt each, 2nd button only if hw hack.
-        {parpadsbtnames[ipar][0],RAWKEY_PORT0_BUTTON_BLUE+ipshft,JOYCODE_1_BUTTON2+mamecodeshift},
-        {parpadsbtnames[ipar][1],RAWKEY_PORT0_BUTTON_RED+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
-        //
-        {parpadsbtnames[ipar][2],RAWKEY_PORT0_JOY_UP+ipshft,JOYCODE_1_UP+mamecodeshift},
-        {parpadsbtnames[ipar][3],RAWKEY_PORT0_JOY_DOWN+ipshft,JOYCODE_1_DOWN+mamecodeshift},
-        {parpadsbtnames[ipar][4],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
-        {parpadsbtnames[ipar][5],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
-        };
-        //_kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
-        addOsCode(registerer,kbi2.data(),kbi2.size());
-    } // end loop per par
-
-    return p;
-}
-
-
-
-static void *parpads_Close(void *o)
-{
-    closeParallelPads((struct ParallelPads *)o);
-}
-
-struct sMameInputsInterface g_ipt_ParallelPads=
-{
-    parpads_Create,
-    parpads_FrameUpdate,
-    parpads_GetCode,
-    parpads_Close,
-    NULL //    PostInputPortInitCheck
-};
 

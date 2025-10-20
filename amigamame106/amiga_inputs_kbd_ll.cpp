@@ -36,6 +36,7 @@ struct mapkeymap {
     unsigned char _rawkeycode;
 };
 /*moved up to interface because used by mouse & parallel port and anything that sends regular buttons...
+ * */
 class kbdInput {
 public:
     int _useAnyMouse=0;

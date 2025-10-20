@@ -107,10 +107,14 @@ set(AMIGA_SRC
 	amiga_inputs_kbd_ll.cpp
 	amiga_inputs_parallelpads.h
 	amiga_inputs_parallelpads.c
+	amiga_inputs_parpadsimpl.h
+	amiga_inputs_parpadsimpl.cpp
 #	amiga_inputs_lightgun.h
 #	amiga_inputs_lightgun.c
 	amiga_inputs_propjoy.h
 	amiga_inputs_propjoy.c
+	amiga_inputs_propjoyimpl.h
+	amiga_inputs_propjoyimpl.cpp
 	amiga_locale.h
 	amiga_locale.cpp
 	serializer_mamexml.cpp
