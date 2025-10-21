@@ -54,7 +54,7 @@ struct sMidiController* MidiControls_create()
     if (!p) return NULL;
 
     ULONG tags[]={
-		MIDI_Name, "MAMEIN",
+		MIDI_Name,(ULONG)"MAMEIN",
 		MIDI_RecvSignal, SIGBREAKB_CTRL_E,
 		MIDI_MsgQueue,   100,
 		MIDI_ErrFilter, CMEF_All,
@@ -65,10 +65,10 @@ struct sMidiController* MidiControls_create()
     printf("p->_midi: %08x\n",(int)p->_midi);
 
     ULONG tagsl[]={
-		MLINK_Name, "MAMELNK",
-		MLINK_Location,	inlinkname,
+		MLINK_Name,(ULONG)"MAMELNK",
+		MLINK_Location,(ULONG)inlinkname,
 		MLINK_EventMask, /*CMF_Note*/ CMF_All,
-		MLINK_Comment,	"MAME[Input]",
+		MLINK_Comment,(ULONG)"MAME[Input]",
 		TAG_DONE};
 
         printf("Go AddMidiLinkA()\n");
@@ -77,6 +77,8 @@ struct sMidiController* MidiControls_create()
     printf("p->_link: %08x\n",(int)p->_link);
 
     for(int i=0;i<16;i++) p->_s._chanMap[i]=255;
+    p->_s._min_note = 255;
+    p->_s._max_note = 0;
 
     return (struct sMidiController*)p;
 }
@@ -111,10 +113,11 @@ void MidiControls_update(struct sMidiController*p)
                 UBYTE rchan=255;
                 if(sp->_s._chanMap[channel]==255)
                 {
-                    if(sp->_s._nbchans<4)
+                    if(sp->_s._nbchans<AI_MIDI_NBCHANMAP)
                     {
                         rchan = sp->_s._nbchans;
                         sp->_s._chanMap[channel]=rchan;
+                        sp->_s._chans[ sp->_s._nbchans]=channel;
                         sp->_s._nbchans++;
                     }
                 }else rchan= sp->_s._chanMap[channel];
@@ -127,8 +130,21 @@ void MidiControls_update(struct sMidiController*p)
             {
                 if(sp->_s._mapmode == MIDICONF_NotesAreAnalogX)
                 {
-                    sp->_s._analog[0] = (msg.b[1]&0x7f)<<11 ;
-                    sp->_s._analog[1] = (msg.b[2]&0x7f)<<11 ;
+                    // per note:
+                    UBYTE inote = msg.b[1]&0x7f;
+                    if(inote>sp->_s._max_note) sp->_s._max_note=inote;
+                    if(inote<sp->_s._min_note) sp->_s._min_note=inote;
+                    UBYTE l = sp->_s._max_note - sp->_s._min_note;
+                    if( l == 0)
+                    {
+                        sp->_s._analog[0] = (0x40)<<11 ; //center (validate !)
+                    } else
+                    {
+                         sp->_s._analog[0] = (inote<<(11+7))/l;
+                    }
+
+                    sp->_s._analog[1] = (msg.b[2]&0x7f)<<11 ; // volume
+
                 }
 
             }
@@ -140,10 +156,11 @@ void MidiControls_update(struct sMidiController*p)
                 UBYTE rchan=255;
                 if(sp->_s._chanMap[channel]==255)
                 {
-                    if(sp->_s._nbchans<4)
+                    if(sp->_s._nbchans<AI_MIDI_NBCHANMAP)
                     {
                         rchan = sp->_s._nbchans;
                         sp->_s._chanMap[channel]=rchan;
+                        sp->_s._chans[ sp->_s._nbchans]=channel;
                         sp->_s._nbchans++;
                     }
                 }else rchan= sp->_s._chanMap[channel];
@@ -155,6 +172,7 @@ void MidiControls_update(struct sMidiController*p)
         } // end if noteoff
         if(highmess == MS_Ctrl)
         {
+            // those "slider controls" are alway 0->127
             UBYTE inlg=255;
             if(msg.b[1]==2) // volume knob
             {
