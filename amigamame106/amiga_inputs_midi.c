@@ -59,10 +59,10 @@ struct sMidiController* MidiControls_create()
 		MIDI_MsgQueue,   100,
 		MIDI_ErrFilter, CMEF_All,
 		TAG_DONE};
-        printf("Go CreateMidiA()\n");
+      //  printf("Go CreateMidiA()\n");
     p->_midi = CreateMidiA((struct TagItem *)&tags[0]);
 
-    printf("p->_midi: %08x\n",(int)p->_midi);
+  //  printf("p->_midi: %08x\n",(int)p->_midi);
 
     ULONG tagsl[]={
 		MLINK_Name,(ULONG)"MAMELNK",
@@ -71,10 +71,10 @@ struct sMidiController* MidiControls_create()
 		MLINK_Comment,(ULONG)"MAME[Input]",
 		TAG_DONE};
 
-        printf("Go AddMidiLinkA()\n");
+     //   printf("Go AddMidiLinkA()\n");
 
     p->_link = AddMidiLinkA(p->_midi, MLTYPE_Receiver,(struct TagItem *)&tagsl[0]);
-    printf("p->_link: %08x\n",(int)p->_link);
+  // printf("p->_link: %08x\n",(int)p->_link);
 
     for(int i=0;i<16;i++) p->_s._chanMap[i]=255;
     p->_s._min_note = 255;
@@ -107,6 +107,8 @@ void MidiControls_update(struct sMidiController*p)
         UBYTE channel = msg.b[0]&0x0f; // usually "chan".
         UBYTE isNoteOn=0;
         UBYTE isNoteOff=0;
+
+// printf("high:%02x channel:%02x msg.b[2]:%d\n",highmess,channel,(int)msg.b[2]);
         if(highmess ==MS_NoteOn)
         {
             if(msg.b[2]>0) isNoteOn=1;
@@ -125,60 +127,59 @@ void MidiControls_update(struct sMidiController*p)
                         rchan = sp->_s._nbchans;
                         sp->_s._chanMap[channel]=rchan;
                         sp->_s._chans[ sp->_s._nbchans]=channel;
+                        //printf("set chan:%d to slot:%d\n",channel,sp->_s._nbchans);
                         sp->_s._nbchans++;
+
                     }
                 }else rchan= sp->_s._chanMap[channel];
                 if(rchan != 255)
                 {
+                   // printf("noteon:%02x slot:%d\n",(int)(msg.b[1]&0x7f),rchan);
                     sp->_s._keys[msg.b[1]&0x7f][rchan] = 1;
                 }
             } // end if min chan
             else
             {
-                if(sp->_s._mapmode == MIDICONF_NotesAreAnalogX)
+               // if(sp->_s._mapmode == MIDICONF_NotesAreAnalogX)
                 {
                     // per note:
                     UBYTE inote = msg.b[1]&0x7f;
                     if(inote>sp->_s._max_note) sp->_s._max_note=inote;
                     if(inote<sp->_s._min_note) sp->_s._min_note=inote;
                     int l = (int)sp->_s._max_note - (int)sp->_s._min_note;
+                    //printf("l:%d\n",(int)l);
                     if( l == 0)
                     {
                         sp->_s._analog[0] = 0 ; //center
                     } else
                     {
-                        int = ((((int)inote - (int)sp->_s._min_note)<<(9+8))/l)-(128<<9);
+                       // int = ((((int)inote - (int)sp->_s._min_note)<<(9+8))/l)-(128<<9);
 
-                         sp->_s._analog[0] = (((LONG)inote-sp->_s._min_note)<<(9+7))/l;
+                         sp->_s._analog[0] = ((((LONG)inote-sp->_s._min_note)<<(9+8))/l)-(128<<9);
+                       //  printf("nlg notes:%d\n", sp->_s._analog[0]);
                     }
 
-                    sp->_s._analog[1] =( (msg.b[2]&0x7f)<<(9+1))-(128<<9) ; // volume...
+                    sp->_s._analog[1] =
+                    ( (msg.b[2]&0x7f)<<(9+1))-(128<<9) ; // volume...
 
                 }
 
-            }
+            } // end if chan not used for buttons
+        } // end if noteon
 
-        } else if(isNoteOff)
+        else if(isNoteOff)
         {
             if(channel>=minimalChanAsButton)
             {
-                UBYTE rchan=255;
-                if(sp->_s._chanMap[channel]==255)
-                {
-                    if(sp->_s._nbchans<AI_MIDI_NBCHANMAP)
-                    {
-                        rchan = sp->_s._nbchans;
-                        sp->_s._chanMap[channel]=rchan;
-                        sp->_s._chans[ sp->_s._nbchans]=channel;
-                        sp->_s._nbchans++;
-                    }
-                }else rchan= sp->_s._chanMap[channel];
+                UBYTE rchan= sp->_s._chanMap[channel];
                 if(rchan != 255)
                 {
                     sp->_s._keys[msg.b[1]&0x7f][rchan] = 0;
                 }
             } // end if min chan
         } // end if noteoff
+
+
         if(highmess == MS_Ctrl)
         {
             // those "slider controls" are alway 0->127
@@ -193,6 +194,7 @@ void MidiControls_update(struct sMidiController*p)
             }
             if(inlg != 255 && inlg>=2 && inlg<AI_MIDI_NBANALOG)
             {
+           // printf("inlg:%d\n",inlg);
             // ( (msg.b[2]&0x7f)<<(9+1))-(128<<9) ;
                 sp->_s._analog[inlg]=( (msg.b[2]&0x7f)<<(9+1))-(128<<9) ;
                 // (128-msg.b[2])<<9;
@@ -217,7 +219,7 @@ void MidiControls_close(struct sMidiController* p)
 
     if(sp->_midi)
     {
-        printf("Go DeleteMidi()\n");
+       // printf("Go DeleteMidi()\n");
         DeleteMidi(sp->_midi);
     }
     FreeVec(sp);

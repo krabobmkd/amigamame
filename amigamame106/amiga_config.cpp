@@ -638,10 +638,6 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
             "Buttons and Sliders",
             "+Notes are AnalogX"
         };
-void MidiControls_update_JustButtons(struct sMidiController*p);
-void MidiControls_update_NotesAreAnalogX(struct sMidiController*p);
-void MidiControls_update_SlidersAreAnalogXYZ(struct sMidiController*p);
-
         serializer("MIDI In", (int&)_serialPort_Player,strPlayers);
         serializer("Types MIDI", (int&)_serialPort_Type,strSerialTypes);
     }

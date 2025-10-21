@@ -115,7 +115,7 @@ static void parpads_FrameUpdate(void *o)
     UWORD changed = p->_ppidata->_last_checked_changes;
     const UWORD state = p->_ppidata->_last_checked;
 
-    static const UWORD prportDirectionsBits[2]={0x0100,0x1000}; //APARJOY_J3_RIGHT, APARJOY_J4_RIGHT
+    static const UWORD prportDirectionsBits[2]={0x0800,0x8000}; //APARJOY_J3_RIGHT, APARJOY_J4_RIGHT
 
     static const UWORD prportFire1Bits[2]={APARJOY_J3_FIRE1,APARJOY_J4_FIRE1};
     static const UWORD prportFire2Bits[2]={APARJOY_J3_FIRE2,APARJOY_J4_FIRE2};
@@ -133,7 +133,7 @@ static void parpads_FrameUpdate(void *o)
             UWORD testbit=prportDirectionsBits[iparallelportJoystick];
             for(int i=0;i<4;i++) {
                 pm->_padsbt[i+iPlayer_rkshift] = (BYTE)((testbit & state)!=0); // right
-                testbit<<=1;
+                testbit>>=1;
             }
             // fire bt
             pm->_padsbt[4+iPlayer_rkshift] =

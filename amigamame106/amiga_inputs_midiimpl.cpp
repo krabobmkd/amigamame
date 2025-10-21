@@ -40,8 +40,8 @@ static void *midiin_Create(void *registerer,fAddOsCode addOsCode)
     // - - publish all midi buttons as very abstract buttons, not mapped by default.
     if(_midinames.size()==0)
     {
-        _midinames.resize(128*4);
-        for(int j=0;j<4;j++)
+        _midinames.resize(128*AI_MIDI_NBCHANMAP);
+        for(int j=0;j<AI_MIDI_NBCHANMAP;j++)
         for(int i=0;i<128;i++)
         {
             char temp[16];
@@ -49,29 +49,32 @@ static void *midiin_Create(void *registerer,fAddOsCode addOsCode)
             _midinames[(128*j)+i] = temp;
         }
     }
-    for(int j=0;j<4;j++)
+    for(int j=0;j<AI_MIDI_NBCHANMAP;j++)
     for(int i=0;i<128;i++)
     {
-        os_code_info osci={ _midinames[(128*j)+i] .c_str(),i+(j*128),CODE_OTHER_DIGITAL};
+        os_code_info osci={ _midinames[(128*j)+i].c_str(),i+(j*128),CODE_OTHER_DIGITAL};
         addOsCode(registerer,&osci,1);
     }
     // - - - then this :
 
     #define START_CODE_ANALOG 512
+  //   printf("p->_mapmode:%d\n",p->_mapmode);
     if( p->_mapmode == 2)
     {
         {
-            os_code_info osci={"MidiAnlgNotes",START_CODE_ANALOG,CODE_OTHER_ANALOG_ABSOLUTE};
+            os_code_info osci={"MidiAnlgNotes",START_CODE_ANALOG,MOUSECODE_1_ANALOG_X};
             addOsCode(registerer,&osci,1);
         }
         {
-            os_code_info osci={"MidiAnlgVel",START_CODE_ANALOG+1,CODE_OTHER_ANALOG_ABSOLUTE};
+            os_code_info osci={"MidiAnlgVel",START_CODE_ANALOG+1,MOUSECODE_1_ANALOG_Z};
             addOsCode(registerer,&osci,1);
-            os_code_info osci={"MidiAnlgVol",START_CODE_ANALOG+2,CODE_OTHER_ANALOG_ABSOLUTE};
+        }
+        {
+            os_code_info osci={"MidiAnlgVol",START_CODE_ANALOG+2,MOUSECODE_1_ANALOG_Y};
             addOsCode(registerer,&osci,1);
         }
     }
-    _midinamesA.resize(AI_MIDI_NBANALOG-3);
+    _midinamesAnalog.resize(AI_MIDI_NBANALOG-3);
     for(int i=0;i<AI_MIDI_NBANALOG-3;i++)
     {
         char temp[16];
@@ -93,7 +96,7 @@ static void midiin_FrameUpdate(void *o)
 static int midiin_GetCode(void *o, ULONG oscode)
 {
     if(oscode<START_CODE_ANALOG)
-        return ((struct sMidiController *)o)->_keys[oscode&0x7f][oscode>>7];
+        return (int)((struct sMidiController *)o)->_keys[oscode&0x7f][oscode>>7];
     oscode -=START_CODE_ANALOG;
     return ((struct sMidiController *)o)->_analog[oscode];
 }
