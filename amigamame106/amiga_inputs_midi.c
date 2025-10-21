@@ -137,10 +137,10 @@ void MidiControls_update(struct sMidiController*p)
                     UBYTE l = sp->_s._max_note - sp->_s._min_note;
                     if( l == 0)
                     {
-                        sp->_s._analog[0] = (0x40)<<11 ; //center (validate !)
+                        sp->_s._analog[0] = (128)<<9 ; //center
                     } else
                     {
-                         sp->_s._analog[0] = (inote<<(11+7))/l;
+                         sp->_s._analog[0] = (((ULONG)inote-sp->_s._min_note)<<(9+8))/l;
                     }
 
                     sp->_s._analog[1] = (msg.b[2]&0x7f)<<11 ; // volume
@@ -184,7 +184,7 @@ void MidiControls_update(struct sMidiController*p)
             }
             if(inlg != 255)
             {
-                sp->_s._analog[inlg]=msg.b[2]<<11;
+                sp->_s._analog[inlg]=(128-msg.b[2])<<9;
             }
             // vol b0 02 7f  volume knob
              // f1  b0 0e (0->7f)  00

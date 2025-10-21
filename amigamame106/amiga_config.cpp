@@ -635,9 +635,8 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         // };
         static const vector<string> strSerialTypes={
             "None",
-            "Just buttons",
-            "Notes are AnalogX",
-            "Sliders are AnalogXYZ"
+            "Buttons and Sliders",
+            "+Notes are AnalogX"
         };
 void MidiControls_update_JustButtons(struct sMidiController*p);
 void MidiControls_update_NotesAreAnalogX(struct sMidiController*p);
