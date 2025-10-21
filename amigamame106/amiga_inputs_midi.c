@@ -82,6 +82,13 @@ struct sMidiController* MidiControls_create()
 
     return (struct sMidiController*)p;
 }
+void MidiControls_FlushMessages(struct sMidiController*p)
+{
+    struct sMidiControllerPrivate *sp = (struct sMidiControllerPrivate *)p;
+    if (!sp) return;
+    MidiMsg		msg;
+    while (GetMidi(sp->_midi,&msg)) {}
+}
 void MidiControls_update(struct sMidiController*p)
 {
     struct sMidiControllerPrivate *sp = (struct sMidiControllerPrivate *)p;
@@ -90,7 +97,7 @@ void MidiControls_update(struct sMidiController*p)
     int minimalChanAsButton=0;
     if(sp->_s._mapmode == MIDICONF_NotesAreAnalogX)
     {
-        minimalChanAsButton = 3; // do not grab note keyboards as buttons. (most likely)
+        minimalChanAsButton = 3; // do not grab note keyboards as buttons. (most likely chan 0-1-2...)
     }
 
 
@@ -134,16 +141,18 @@ void MidiControls_update(struct sMidiController*p)
                     UBYTE inote = msg.b[1]&0x7f;
                     if(inote>sp->_s._max_note) sp->_s._max_note=inote;
                     if(inote<sp->_s._min_note) sp->_s._min_note=inote;
-                    UBYTE l = sp->_s._max_note - sp->_s._min_note;
+                    int l = (int)sp->_s._max_note - (int)sp->_s._min_note;
                     if( l == 0)
                     {
-                        sp->_s._analog[0] = (128)<<9 ; //center
+                        sp->_s._analog[0] = 0 ; //center
                     } else
                     {
-                         sp->_s._analog[0] = (((ULONG)inote-sp->_s._min_note)<<(9+8))/l;
+                        int = ((((int)inote - (int)sp->_s._min_note)<<(9+8))/l)-(128<<9);
+
+                         sp->_s._analog[0] = (((LONG)inote-sp->_s._min_note)<<(9+7))/l;
                     }
 
-                    sp->_s._analog[1] = (msg.b[2]&0x7f)<<11 ; // volume
+                    sp->_s._analog[1] =( (msg.b[2]&0x7f)<<(9+1))-(128<<9) ; // volume...
 
                 }
 
@@ -182,9 +191,11 @@ void MidiControls_update(struct sMidiController*p)
             {
                 inlg = 3+msg.b[1]-0x0e;
             }
-            if(inlg != 255)
+            if(inlg != 255 && inlg>=2 && inlg<AI_MIDI_NBANALOG)
             {
-                sp->_s._analog[inlg]=(128-msg.b[2])<<9;
+            // ( (msg.b[2]&0x7f)<<(9+1))-(128<<9) ;
+                sp->_s._analog[inlg]=( (msg.b[2]&0x7f)<<(9+1))-(128<<9) ;
+                // (128-msg.b[2])<<9;
             }
             // vol b0 02 7f  volume knob
              // f1  b0 0e (0->7f)  00

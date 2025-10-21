@@ -14,7 +14,7 @@ extern "C" {
 using namespace std;
 
 static vector<string> _midinames;
-static vector<string> _midinamesA;
+static vector<string> _midinamesAnalog;
 
 
 static void *midiin_Create(void *registerer,fAddOsCode addOsCode)
@@ -56,13 +56,28 @@ static void *midiin_Create(void *registerer,fAddOsCode addOsCode)
         addOsCode(registerer,&osci,1);
     }
     // - - - then this :
-    _midinamesA.resize(12);
-    for(int i=0;i<12;i++)
+
+    #define START_CODE_ANALOG 512
+    if( p->_mapmode == 2)
+    {
+        {
+            os_code_info osci={"MidiAnlgNotes",START_CODE_ANALOG,CODE_OTHER_ANALOG_ABSOLUTE};
+            addOsCode(registerer,&osci,1);
+        }
+        {
+            os_code_info osci={"MidiAnlgVel",START_CODE_ANALOG+1,CODE_OTHER_ANALOG_ABSOLUTE};
+            addOsCode(registerer,&osci,1);
+            os_code_info osci={"MidiAnlgVol",START_CODE_ANALOG+2,CODE_OTHER_ANALOG_ABSOLUTE};
+            addOsCode(registerer,&osci,1);
+        }
+    }
+    _midinamesA.resize(AI_MIDI_NBANALOG-3);
+    for(int i=0;i<AI_MIDI_NBANALOG-3;i++)
     {
         char temp[16];
-        snprintf(temp,15,"MidiAnlg%02x",i);
-        _midinamesA[i] = temp;
-         os_code_info osci={_midinamesA[i].c_str(),512+i,CODE_OTHER_ANALOG_ABSOLUTE};
+        snprintf(temp,15,"MidiAnlg%d",(i+1));
+        _midinamesAnalog[i] = temp;
+         os_code_info osci={_midinamesAnalog[i].c_str(),START_CODE_ANALOG+3+i,CODE_OTHER_ANALOG_ABSOLUTE};
          addOsCode(registerer,&osci,1);
     }
 
@@ -77,15 +92,21 @@ static void midiin_FrameUpdate(void *o)
 // mandatory, used by real time.
 static int midiin_GetCode(void *o, ULONG oscode)
 {
-    if(oscode<512)
+    if(oscode<START_CODE_ANALOG)
         return ((struct sMidiController *)o)->_keys[oscode&0x7f][oscode>>7];
-    oscode -=512;
+    oscode -=START_CODE_ANALOG;
     return ((struct sMidiController *)o)->_analog[oscode];
 }
 static void midiin_Close(void *o)
 {
     MidiControls_close((struct sMidiController *)o);
 }
+static void midiin_Post(void *o)
+{
+    // could help if midi device monkeyying...
+    MidiControls_FlushMessages((struct sMidiController *)o);
+}
+
 
 struct sMameInputsInterface g_ipt_MidiIn=
 {
@@ -93,5 +114,5 @@ struct sMameInputsInterface g_ipt_MidiIn=
     midiin_FrameUpdate,
     midiin_GetCode,
     midiin_Close,
-    NULL //    PostInputPortInitCheck
+    midiin_Post //    PostInputPortInitCheck
 };

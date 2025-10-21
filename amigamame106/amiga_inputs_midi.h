@@ -13,11 +13,13 @@ extern "C" {
 #define MIDICONF_AllButtonsAndSliders 3
 
 #define AI_MIDI_NBCHANMAP 4
+// in which 2 first are special cases:
+#define AI_MIDI_NBANALOG  16
 // manage
 struct sMidiController
 {
     ULONG _signal;
-    WORD _analog[12]; //0 is vol
+    int _analog[AI_MIDI_NBANALOG]; //0 is vol (-128 -> 127) <<9
     int _mapmode;
     UBYTE _min_note;
     UBYTE _max_note;
@@ -31,6 +33,7 @@ struct sMidiController
 int MidiControls_hasMidi();
 
 struct sMidiController *MidiControls_create();
+void MidiControls_FlushMessages(struct sMidiController*p);
 void MidiControls_update(struct sMidiController*p);
 void MidiControls_close(struct sMidiController*p);
 
