@@ -68,7 +68,7 @@
   X rungun plante son boot grave. polyginet too
   X test throttle IRL
   X add column "machine"
- O test MUI 3.8
+ X test MUI 3.8
 
  X bestmode fail with arabian fight 420x240
 

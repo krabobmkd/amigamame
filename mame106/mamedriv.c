@@ -202,7 +202,7 @@ const game_driver * const drivers[] =
 	DRIVER( dragrace ) /* 1977 "Atari" "Drag Race" */
 	DRIVER( eprom ) /* 1989 "Atari Games" "Escape from the Planet of the Robot Monsters (set 1)" */
 	DRIVER( eprom2 ) /* 1989 "Atari Games" "Escape from the Planet of the Robot Monsters (set 2)" */
-	DRIVER( esb ) /* 1985 "Atari Games" "The Empire Strikes Back" */
+	DRIVER( esb ) /* 1985 "Atari Games" "Star Wars The Empire Strikes Back" */
 	DRIVER( firetrk ) /* 1978 "Atari" "Fire Truck" */
 	DRIVER( flyball ) /* 1976 "Atari" "Flyball" */
 	DRIVER( foodf ) /* 1982 "Atari" "Food Fight (rev 3)" */
@@ -2886,7 +2886,7 @@ const game_driver * const drivers[] =
 	DRIVER( csprintf ) /* 1986 "Atari Games" "Championship Sprint (French)" */
 	DRIVER( csprintg ) /* 1986 "Atari Games" "Championship Sprint (German */
 	DRIVER( csprints ) /* 1986 "Atari Games" "Championship Sprint (Spanish */
-	DRIVER( esb ) /* 1985 "Atari Games" "The Empire Strikes Back" */
+	DRIVER( esb ) /* 1985 "Atari Games" "Star Wars The Empire Strikes Back" */
 	DRIVER( gaunt2 ) /* 1986 "Atari Games" "Gauntlet II" */
 	DRIVER( gaunt2g ) /* 1986 "Atari Games" "Gauntlet II (German)" */
 	DRIVER( gauntg ) /* 1985 "Atari Games" "Gauntlet (German */
@@ -3904,6 +3904,7 @@ const game_driver * const drivers[] =
 	DRIVER( neomrdo ) /* 1996 "Visco" "Neo Mr. Do!" */
 	DRIVER( ninjamas ) /* 1996 "ADK / SNK" "Ninja Master's - haoh-ninpo-cho" */
 	DRIVER( nitd ) /* 2000 "Eleven / Gavaking" "Nightmare in the Dark" */
+	DRIVER( nyan ) /* 2011 "Furrtek" "Neo Nyan cat" */
 	DRIVER( overtop ) /* 1996 "ADK" "Over Top" */
 	DRIVER( panicbom ) /* 1994 "Eighting / Hudson" "Panic Bomber" */
 	DRIVER( pbobbl2n ) /* 1999 "Taito (SNK license)" "Puzzle Bobble 2 / Bust-A-Move Again (Neo-Geo)" */
