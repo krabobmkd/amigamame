@@ -15,7 +15,6 @@
 // KRB added
 struct SampleFrame
 {
-//    INT16 *_finalmix;
     INT32 *_leftmix, *_rightmix;
     UINT32 _read;
     UINT32 _written;

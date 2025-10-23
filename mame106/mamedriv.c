@@ -202,7 +202,7 @@ const game_driver * const drivers[] =
 	DRIVER( dragrace ) /* 1977 "Atari" "Drag Race" */
 	DRIVER( eprom ) /* 1989 "Atari Games" "Escape from the Planet of the Robot Monsters (set 1)" */
 	DRIVER( eprom2 ) /* 1989 "Atari Games" "Escape from the Planet of the Robot Monsters (set 2)" */
-	DRIVER( esb ) /* 1985 "Atari Games" "The Empire Strikes Back" */
+	DRIVER( esb ) /* 1985 "Atari Games" "Star Wars The Empire Strikes Back" */
 	DRIVER( firetrk ) /* 1978 "Atari" "Fire Truck" */
 	DRIVER( flyball ) /* 1976 "Atari" "Flyball" */
 	DRIVER( foodf ) /* 1982 "Atari" "Food Fight (rev 3)" */
@@ -872,6 +872,34 @@ const game_driver * const drivers[] =
 	DRIVER( xmvsfr1 ) /* 1996 "Capcom" "X-Men Vs. Street Fighter (Euro 960910)" */
 	DRIVER( xmvsfu ) /* 1996 "Capcom" "X-Men Vs. Street Fighter (US 961023)" */
 	DRIVER( xmvsfur1 ) /* 1996 "Capcom" "X-Men Vs. Street Fighter (US 961004)" */
+#endif
+#ifdef LINK_CAVE
+	DRIVER( agallet ) /* 1996 "Banpresto / Gazelle" "Air Gallet" */
+	DRIVER( ddonpach ) /* 1997 "Atlus/Cave" "DoDonPachi (International)" */
+	DRIVER( ddonpchj ) /* 1997 "Atlus/Cave" "DoDonPachi (Japan)" */
+	DRIVER( dfeveron ) /* 1998 "Cave (Nihon System license)" "Dangun Feveron (Japan)" */
+	DRIVER( donpachi ) /* 1995 "Atlus/Cave" "DonPachi (US)" */
+	DRIVER( donpachj ) /* 1995 "Atlus/Cave" "DonPachi (Japan)" */
+	DRIVER( donpachk ) /* 1995 "Atlus/Cave" "DonPachi (Korea)" */
+	DRIVER( esprade ) /* 1998 "Atlus/Cave" "ESP Ra.De. (International Ver 1998 4/22)" */
+	DRIVER( espradej ) /* 1998 "Atlus/Cave" "ESP Ra.De. (Japan Ver 1998 4/21)" */
+	DRIVER( espradeo ) /* 1998 "Atlus/Cave" "ESP Ra.De. (Japan Ver 1998 4/14)" */
+	DRIVER( feversos ) /* 1998 "Cave (Nihon System license)" "Fever SOS (International)" */
+	DRIVER( gaia ) /* 1999 "Noise Factory" "Gaia Crusaders" */
+	DRIVER( guwange ) /* 1999 "Atlus/Cave" "Guwange (Japan)" */
+	DRIVER( hotdogst ) /* 1996 "Marble" "Hotdog Storm" */
+	DRIVER( korokoro ) /* 1999 "Takumi" "Koro Koro Quest (Japan)" */
+	DRIVER( mazinger ) /* 1994 "Banpresto/Dynamic Pl. Toei Animation" "Mazinger Z" */
+	DRIVER( metmqstr ) /* 1995 "Banpresto/Pandorabox" "Metamoqester" */
+	DRIVER( nmaster ) /* 1995 "Banpresto/Pandorabox" "Oni - The Ninja Master (Japan)" */
+	DRIVER( plegendj ) /* 1995 "Atlus/Cave" "Gouketsuji Ichizoku Saikyou Densetsu (Japan)" */
+	DRIVER( plegends ) /* 1995 "Atlus/Cave" "Power Instinct Legends (USA)" */
+	DRIVER( pwrins2j ) /* 1994 "Atlus/Cave" "Gouketsuji Ichizoku 2 (Japan)" */
+	DRIVER( pwrinst2 ) /* 1994 "Atlus/Cave" "Power Instinct 2 (USA)" */
+	DRIVER( sailormn ) /* 1995 "Banpresto" "Pretty Soldier Sailor Moon (95/03/22B)" */
+	DRIVER( sailormo ) /* 1995 "Banpresto" "Pretty Soldier Sailor Moon (95/03/22)" */
+	DRIVER( uopoko ) /* 1998 "Cave (Jaleco license)" "Puzzle Uo Poko (International)" */
+	DRIVER( uopokoj ) /* 1998 "Cave (Jaleco license)" "Puzzle Uo Poko (Japan)" */
 #endif
 #ifdef LINK_CINEMAT
 	DRIVER( aafb ) /* 1989 "Leland Corp." "All American Football (rev E)" */
@@ -1827,8 +1855,8 @@ const game_driver * const drivers[] =
 	DRIVER( pturn ) /* 1984 "Jaleco" "Parallel Turn" */
 	DRIVER( rockn ) /* 1999 "Jaleco" "Rock'n Tread (Japan)" */
 	DRIVER( rockn2 ) /* 1999 "Jaleco" "Rock'n Tread 2 (Japan)" */
-	DRIVER( rockn3 ) /* 1999 "Jaleco" "Rock'n 3 (Japan)" */
-	DRIVER( rockn4 ) /* 2000 "Jaleco (PCCWJ)" "Rock'n 4 (Japan */
+	DRIVER( rockn3 ) /* 1999 "Jaleco" "Rock'n Tread 3 (Japan)" */
+	DRIVER( rockn4 ) /* 2000 "Jaleco (PCCWJ)" "Rock'n Tread 4 (Japan */
 	DRIVER( rockna ) /* 1999 "Jaleco" "Rock'n Tread (Japan */
 	DRIVER( rocknms ) /* 1999 "Jaleco" "Rock'n MegaSession (Japan)" */
 	DRIVER( rodland ) /* 1990 "Jaleco" "Rod-Land (World)" */
@@ -2290,6 +2318,7 @@ const game_driver * const drivers[] =
 	DRIVER( stratgyx ) /* 1981 "Konami" "Strategy X" */
 	DRIVER( strfbomb ) /* 1981 "Omni" "Strafe Bomb" */
 	DRIVER( superbon ) /* 198? "bootleg" "Super Bond" */
+	DRIVER( suprslam ) /*    */
 	DRIVER( suratk ) /* 1990 "Konami" "Surprise Attack (World ver. K)" */
 	DRIVER( suratka ) /* 1990 "Konami" "Surprise Attack (Asia ver. L)" */
 	DRIVER( suratkj ) /* 1990 "Konami" "Surprise Attack (Japan ver. M)" */
@@ -2857,7 +2886,7 @@ const game_driver * const drivers[] =
 	DRIVER( csprintf ) /* 1986 "Atari Games" "Championship Sprint (French)" */
 	DRIVER( csprintg ) /* 1986 "Atari Games" "Championship Sprint (German */
 	DRIVER( csprints ) /* 1986 "Atari Games" "Championship Sprint (Spanish */
-	DRIVER( esb ) /* 1985 "Atari Games" "The Empire Strikes Back" */
+	DRIVER( esb ) /* 1985 "Atari Games" "Star Wars The Empire Strikes Back" */
 	DRIVER( gaunt2 ) /* 1986 "Atari Games" "Gauntlet II" */
 	DRIVER( gaunt2g ) /* 1986 "Atari Games" "Gauntlet II (German)" */
 	DRIVER( gauntg ) /* 1985 "Atari Games" "Gauntlet (German */
@@ -2997,11 +3026,15 @@ const game_driver * const drivers[] =
 #endif
 #ifdef LINK_MINIKONAMI2
 	DRIVER( blkpnthr ) /* 1987 "Konami" "Black Panther" */
+	DRIVER( bucky ) /* 1992 "Konami" "Bucky O'Hare (ver EA)" */
+	DRIVER( buckyua ) /* 1992 "Konami" "Bucky O'Hare (ver UA)" */
 	DRIVER( citybmrj ) /* 1987 "Konami" "City Bomber (Japan)" */
 	DRIVER( citybomb ) /* 1987 "Konami" "City Bomber (World)" */
 	DRIVER( cuebrick ) /* 1989 "Konami" "Cue Brick (Japan)" */
 	DRIVER( darkadv ) /* 1987 "Konami" "Dark Adventure" */
 	DRIVER( devilw ) /* 1987 "Konami" "Devil World" */
+	DRIVER( esckids ) /* 1991 "Konami" "Escape Kids (Asia */
+	DRIVER( esckidsj ) /* 1991 "Konami" "Escape Kids (Japan */
 	DRIVER( fround ) /* 1988 "Konami" "The Final Round (version M)" */
 	DRIVER( froundl ) /* 1988 "Konami" "The Final Round (version L)" */
 	DRIVER( gberet ) /* 1985 "Konami" "Green Beret" */
@@ -3025,6 +3058,9 @@ const game_driver * const drivers[] =
 	DRIVER( merlinmm ) /* 1986 "Zilec - Zenitone" "Merlins Money Maze" */
 	DRIVER( miaj ) /* 1989 "Konami" "M.I.A. - Missing in Action (Japan)" */
 	DRIVER( mimonscr ) /* 198? "bootleg" "Mighty Monkey (bootleg on Scramble hardware)" */
+	DRIVER( moo ) /* 1992 "Konami" "Wild West C.O.W.-Boys of Moo Mesa (ver EA)" */
+	DRIVER( mooaa ) /* 1992 "Konami" "Wild West C.O.W.-Boys of Moo Mesa (ver AA)" */
+	DRIVER( mooua ) /* 1992 "Konami" "Wild West C.O.W.-Boys of Moo Mesa (ver UA)" */
 	DRIVER( mrgoemon ) /* 1986 "Konami" "Mr. Goemon (Japan)" */
 	DRIVER( nemesis ) /* 1985 "Konami" "Nemesis" */
 	DRIVER( nemesuk ) /* 1985 "Konami" "Nemesis (World?)" */
@@ -3033,12 +3069,27 @@ const game_driver * const drivers[] =
 	DRIVER( parodius ) /* 1990 "Konami" "Parodius DA! (World)" */
 	DRIVER( pingpong ) /* 1985 "Konami" "Ping Pong" */
 	DRIVER( rf2 ) /* 1985 "Konami" "Konami RF2 - Red Fighter" */
+	DRIVER( rollerg ) /* 1991 "Konami" "Rollergames (US)" */
+	DRIVER( rollergj ) /* 1991 "Konami" "Rollergames (Japan)" */
 	DRIVER( rushatck ) /* 1985 "Konami" "Rush'n Attack (US)" */
 	DRIVER( salamand ) /* 1986 "Konami" "Salamander (version D)" */
 	DRIVER( salamanj ) /* 1986 "Konami" "Salamander (version J)" */
 	DRIVER( scobra ) /* 1981 "Konami" "Super Cobra" */
+	DRIVER( scontra ) /* 1988 "Konami" "Super Contra" */
+	DRIVER( scontraj ) /* 1988 "Konami" "Super Contra (Japan)" */
 	DRIVER( scramble ) /* 1981 "Konami" "Scramble" */
+	DRIVER( suprslam ) /*    */
+	DRIVER( thnderxa ) /* 1988 "Konami" "Thunder Cross (Set 2)" */
+	DRIVER( thnderxb ) /* 1988 "Konami" "Thunder Cross (Set 3)" */
+	DRIVER( thnderxj ) /* 1988 "Konami" "Thunder Cross (Japan)" */
+	DRIVER( thunderx ) /* 1988 "Konami" "Thunder Cross" */
 	DRIVER( twinbee ) /* 1985 "Konami" "TwinBee" */
+	DRIVER( vendet2p ) /* 1991 "Konami" "Vendetta (World 2 Players ver. W)" */
+	DRIVER( vendetao ) /* 1991 "Konami" "Vendetta (World 4 Players ver. R)" */
+	DRIVER( vendetas ) /* 1991 "Konami" "Vendetta (Asia 2 Players ver. U)" */
+	DRIVER( vendetta ) /* 1991 "Konami" "Vendetta (World 4 Players ver. T)" */
+	DRIVER( vendettj ) /* 1991 "Konami" "Crime Fighters 2 (Japan 2 Players ver. P)" */
+	DRIVER( vendtaso ) /* 1991 "Konami" "Vendetta (Asia 2 Players ver. D)" */
 	DRIVER( vulcan ) /* 1988 "Konami" "Vulcan Venture" */
 #endif
 #ifdef LINK_MINIKONAMI3

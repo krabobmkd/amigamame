@@ -1,3 +1,4 @@
+#define MACHINENAME "crystal"
 /*
     CRYSTAL SYSTEM by Brezzasoft (2001)
     using VRender0 System on a Chip
@@ -920,6 +921,7 @@ DRIVER_INIT(evosocc)
 	Rom[WORD_XOR_LE(0x974ED2/2)]=0x9001;	//PUSH R0
 }
 
-GAME( 2001, crysbios,		   0,  crystal, crystal,        0, ROT0, "Brezzasoft", "Crystal System BIOS", NOT_A_DRIVER ,0)
-GAME( 2001, crysking,	crysbios,  crystal, crystal, crysking, ROT0, "Brezzasoft", "The Crystal of Kings", 0 ,0)
-GAME( 2001, evosocc,   crysbios,  crystal, crystal,  evosocc, ROT0, "Evoga", "Evolution Soccer", 0 ,0)
+GAME( 2001, crysbios,		   0,  crystal, crystal,        0, ROT0, "Brezzasoft", "Crystal System BIOS", NOT_A_DRIVER ,0,0,egg_Unknown,0)
+GAME( 2001, crysking,	crysbios,  crystal, crystal, crysking, ROT0, "Brezzasoft", "The Crystal of Kings", 0 ,2,0,egg_BeatNUp,0)
+GAME( 2001, evosocc,   crysbios,  crystal, crystal,  evosocc, ROT0, "Evoga", "Evolution Soccer", 0 ,2,0,egg_sport_Soccer,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

@@ -1,3 +1,4 @@
+#define MACHINENAME "battlex"
 /* battlex.c - by David Haywood
 
 Stephh's notes :
@@ -296,4 +297,5 @@ static DRIVER_INIT( battlex )
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1982, battlex, 0, battlex, battlex, battlex, ROT180, "Omori Electric", "Battle Cross", GAME_IMPERFECT_GRAPHICS ,2)
+GAME( 1982, battlex, 0, battlex, battlex, battlex, ROT180, "Omori Electric", "Battle Cross", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                           

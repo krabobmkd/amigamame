@@ -1,3 +1,4 @@
+#define MACHINENAME "mugsmash"
 /* Mug Smashers (c)199? Electronic Devices (Italy) / 3D Games (England)
     driver by David Haywood - Dip Switches and Inputs by Stephane Humbert
 
@@ -490,4 +491,5 @@ ROM_START( mugsmash )
 	ROM_LOAD( "mugs_15.bin", 0x180000, 0x080000, CRC(82e8187c) SHA1(c7a0e1b3d90dbbe2588886a27a07a9c336447ae3) )
 ROM_END
 
-GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, 0, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", 0 ,0)
+GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, 0, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", 0 ,2,0,egg_BeatNUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

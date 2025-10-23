@@ -1,3 +1,4 @@
+#define MACHINENAME "getrivia"
 /*
 
 Trivia By Greyhound Electronics
@@ -566,19 +567,20 @@ ROM_START( gepoker3 ) /* v50.02 with control dated 9-30-84 */
 ROM_END
 
 
-GAME( 1982, gs4002,   0,       gselect,  gselect,  0, ROT0, "G.E.I.", "Selection (Version 40.02TMB) set 1", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1982, gs4002a,  gs4002,  gselect,  gselect,  0, ROT0, "G.E.I.", "Selection (Version 40.02TMB) set 2", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
+GAME( 1982, gs4002,   0,       gselect,  gselect,  0, ROT0, "G.E.I.", "Selection (Version 40.02TMB) set 1", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,1,egg_Compilation,0)
+GAME( 1982, gs4002a,  gs4002,  gselect,  gselect,  0, ROT0, "G.E.I.", "Selection (Version 40.02TMB) set 2", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,1,egg_Compilation,0)
 
-GAME( 1984, gepoker,  0,       gepoker,  gselect,  0, ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB)",              GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1984, gepoker1, 0,       gepoker,  gselect,  0, ROT0, "Greyhound Electronics", "Poker (Version 50.08 IAM)",              GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ,0)
-GAME( 1984, gepoker2, gepoker, gepoker,  gselect,  0, ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB set 2)",        GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1984, gepoker3, gepoker, gepoker,  gselect,  0, ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB set 3)",        GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
+GAME( 1984, gepoker,  0,       gepoker,  gselect,  0, ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB)",              GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,1,egg_CardBattle,0)
+GAME( 1984, gepoker1, 0,       gepoker,  gselect,  0, ROT0, "Greyhound Electronics", "Poker (Version 50.08 IAM)",              GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ,0,1,egg_CardBattle,0)
+GAME( 1984, gepoker2, gepoker, gepoker,  gselect,  0, ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB set 2)",        GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,1,egg_CardBattle,0)
+GAME( 1984, gepoker3, gepoker, gepoker,  gselect,  0, ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB set 3)",        GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,1,egg_CardBattle,0)
 
-GAME( 1984, gt102c,   0,      getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02C)",                 GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1984, gt102b,   0,      getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02B)",                 GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1985, gt102c1,  gt102c, getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02C Alt questions 1)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1985, gt102c2,  gt102c, getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02C Alt questions 2)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1985, gt102c3,  gt102c, getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02C Alt questions 3)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
+GAME( 1984, gt102c,   0,      getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02C)",                 GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
+GAME( 1984, gt102b,   0,      getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02B)",                 GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
+GAME( 1985, gt102c1,  gt102c, getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02C Alt questions 1)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
+GAME( 1985, gt102c2,  gt102c, getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02C Alt questions 2)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
+GAME( 1985, gt102c3,  gt102c, getrivia, getrivia, 0, ROT0, "Greyhound Electronics", "Trivia (Version 1.02C Alt questions 3)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)
 
-GAME( 1985, sextriv1, 0,        getrivia, getrivia, 0, ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB set 1)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
-GAME( 1985, sextriv2, sextriv1, getrivia, getrivia, 0, ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB set 2)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0)
+GAME( 1985, sextriv1, 0,        getrivia, getrivia, 0, ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB set 1)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,2,egg_Mature,0)
+GAME( 1985, sextriv2, sextriv1, getrivia, getrivia, 0, ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB set 2)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,2,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

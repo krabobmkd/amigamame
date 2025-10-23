@@ -1,3 +1,4 @@
+#define MACHINENAME "megazone"
 /**************************************************************************
 
 Based on drivers from Juno First emulator by Chris Hardy (chris@junofirst.freeserve.co.uk)
@@ -606,12 +607,13 @@ static DRIVER_INIT( megazone )
 }
 
 /* these just display a Konami copyright, no logo */
-GAME( 1983, megazone, 0,        megazone, megazone, megazone, ROT90, "Konami",                       "Mega Zone (Konami set 1)", 0 ,2)
-GAME( 1983, megazona, megazone, megazone, megazone, megazone, ROT90, "Konami",                       "Mega Zone (Konami set 2)", 0 ,2)
+GAME( 1983, megazone, 0,        megazone, megazone, megazone, ROT90, "Konami",                       "Mega Zone (Konami set 1)", 0 ,0,0,egg_Unknown,0)
+GAME( 1983, megazona, megazone, megazone, megazone, megazone, ROT90, "Konami",                       "Mega Zone (Konami set 2)", 0 ,0,0,egg_Unknown,0)
 
 /* these display Konami and Kosuka copyright, no logo */
-GAME( 1983, megazonb, megazone, megazone, megazone, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 1)", 0 ,2)
-GAME( 1983, megazonc, megazone, megazone, megazone, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 2)", 0 ,2)
+GAME( 1983, megazonb, megazone, megazone, megazone, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 1)", 0 ,0,0,egg_Unknown,0)
+GAME( 1983, megazonc, megazone, megazone, megazone, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 2)", 0 ,0,0,egg_Unknown,0)
 
 /* this displays Konami and Kosuka copyright with a Konami / Interlogic logo */
-GAME( 1983, megaznik, megazone, megazone, megazone, megazone, ROT90, "Konami / Interlogic + Kosuka", "Mega Zone (Interlogic + Kosuka)", 0 ,2)
+GAME( 1983, megaznik, megazone, megazone, megazone, megazone, ROT90, "Konami / Interlogic + Kosuka", "Mega Zone (Interlogic + Kosuka)", 0 ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

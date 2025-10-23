@@ -1,3 +1,4 @@
+#define MACHINENAME "buggychl"
 /***************************************************************************
 
 Buggy Challenge - (c) 1984 Taito Corporation
@@ -540,5 +541,5 @@ ROM_START( buggycht )
 ROM_END
 
 
-GAME( 1984, buggychl, 0,        buggychl, buggychl, 0, ROT270, "Taito Corporation", "Buggy Challenge", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ,1)
-GAME( 1984, buggycht, buggychl, buggychl, buggychl, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ,1)
+GAME( 1984, buggychl, 0,        buggychl, buggychl, 0, ROT270, "Taito Corporation", "Buggy Challenge", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,0)
+GAME( 1984, buggycht, buggychl, buggychl, buggychl, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,0)

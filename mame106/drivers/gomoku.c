@@ -1,3 +1,4 @@
+#define MACHINENAME "gomoku"
 /******************************************************************************
 
     Gomoku Narabe Renju
@@ -229,4 +230,5 @@ ROM_END
 
 
 //    YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT,    MONITOR,      COMPANY, FULLNAME
-GAME( 1981,   gomoku,        0,   gomoku,   gomoku,        0,      ROT90, "Nichibutsu", "Gomoku Narabe Renju", 0 ,0)
+GAME( 1981,   gomoku,        0,   gomoku,   gomoku,        0,      ROT90, "Nichibutsu", "Gomoku Narabe Renju", 0 ,0,2,egg_Tabletop,0)
+                                                                                                                                                                                                                                        

@@ -1,3 +1,4 @@
+#define MACHINENAME "amidar"
 /***************************************************************************
 
  Amidar hardware
@@ -490,11 +491,12 @@ ROM_END
 
 
 
-GAME( 1981, amidar,  0,       amidar, amidar,  amidar,       ROT90, "Konami", "Amidar", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, amidaru, amidar,  amidar, amidaru, amidar,       ROT90, "Konami (Stern license)", "Amidar (Stern)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, amidaro, amidar,  amidar, amidaro, amidar,       ROT90, "Konami (Olympia license)", "Amidar (Olympia)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, amidarb, amidar,  amidar, amidaru, amidar,       ROT90, "bootleg", "Amidar (Bootleg)", GAME_SUPPORTS_SAVE ,2) /* Simular to Amigo bootleg */
-GAME( 1982, amigo,   amidar,  amidar, amidaru, amidar,       ROT90, "bootleg", "Amigo", GAME_SUPPORTS_SAVE ,2)
-GAME( 1981, turtles, 0,       amidar, turtles, scramble_ppi, ROT90, "[Konami] (Stern license)", "Turtles", GAME_SUPPORTS_SAVE ,0)
-GAME( 1981, turpin,  turtles, amidar, turpin,  scramble_ppi, ROT90, "[Konami] (Sega license)", "Turpin", GAME_SUPPORTS_SAVE ,0)
-GAME( 1981, 600,     turtles, amidar, turtles, scramble_ppi, ROT90, "Konami", "600", GAME_SUPPORTS_SAVE ,0)
+GAME( 1981, amidar,  0,       amidar, amidar,  amidar,       ROT90, "Konami", "Amidar", GAME_SUPPORTS_SAVE ,0,0,egg_Unknown,0)
+GAME( 1982, amidaru, amidar,  amidar, amidaru, amidar,       ROT90, "Konami (Stern license)", "Amidar (Stern)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1982, amidaro, amidar,  amidar, amidaro, amidar,       ROT90, "Konami (Olympia license)", "Amidar (Olympia)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1982, amidarb, amidar,  amidar, amidaru, amidar,       ROT90, "bootleg", "Amidar (Bootleg)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0) /* Simular to Amigo bootleg */
+GAME( 1982, amigo,   amidar,  amidar, amidaru, amidar,       ROT90, "bootleg", "Amigo", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1981, turtles, 0,       amidar, turtles, scramble_ppi, ROT90, "[Konami] (Stern license)", "Turtles", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1981, turpin,  turtles, amidar, turpin,  scramble_ppi, ROT90, "[Konami] (Sega license)", "Turpin", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1981, 600,     turtles, amidar, turtles, scramble_ppi, ROT90, "Konami", "600", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

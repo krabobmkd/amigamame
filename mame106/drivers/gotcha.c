@@ -1,3 +1,4 @@
+#define MACHINENAME "gotcha"
 /***************************************************************************
 
 Gotcha  (c) 1997 Dongsung
@@ -391,5 +392,6 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAME( 1997, gotcha,  0,      gotcha, gotcha, 0, ROT0, "Dongsung", "Got-cha Mini Game Festival", 0 ,0)
-GAME( 1997, ppchamp, gotcha, gotcha, gotcha, 0, ROT0, "Dongsung", "Pasha Pasha Champ Mini Game Festival", 0 ,0)
+GAME( 1997, gotcha,  0,      gotcha, gotcha, 0, ROT0, "Dongsung", "Got-cha Mini Game Festival", 0 ,3,0,egg_Compilation,0)
+GAME( 1997, ppchamp, gotcha, gotcha, gotcha, 0, ROT0, "Dongsung", "Pasha Pasha Champ Mini Game Festival", 0 ,3,0,egg_Compilation,0)
+                                                                                                                                                                                                                                                                                                                                                                                                           

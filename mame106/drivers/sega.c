@@ -1,3 +1,4 @@
+#define MACHINENAME "sega vector"
 /***************************************************************************
 
     Sega vector hardware
@@ -1438,13 +1439,14 @@ DRIVER_INIT( startrek )
  *
  *************************************/
 
-GAME( 1981, elim2,	  0,        elim2,    elim2,    elim2,    ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (2 Players, set 1)", 0 ,2)
-GAME( 1981, elim2a,   elim2,    elim2,    elim2,    elim2,    ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (2 Players, set 2)", 0 ,2)
-GAME( 1981, elim2c,	  elim2,	elim2,	  elim2c,	elim2,	  ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (2 Players, cocktail)", 0 ,2)
-GAME( 1981, elim4,	  elim2,    elim2,    elim4,    elim4,    ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (4 Players)", 0 ,2)
-GAME( 1981, elim4p,	  elim2,	elim2,	  elim4,	elim4,	  ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (4 Players, prototype)", 0 ,2)
-GAME( 1981, spacfury, 0,        spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision C)", 0 ,2)
-GAME( 1981, spacfura, spacfury, spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision A)", 0 ,2)
-GAME( 1982, zektor,   0,        zektor,   zektor,   zektor,   ORIENTATION_FLIP_Y,   "Sega", "Zektor (revision B)", 0 ,0)
-GAME( 1982, tacscan,  0,        tacscan,  tacscan,  tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega", "Tac/Scan", GAME_IMPERFECT_SOUND ,0)
-GAME( 1982, startrek, 0,        startrek, startrek, startrek, ORIENTATION_FLIP_Y,   "Sega", "Star Trek", GAME_IMPERFECT_SOUND ,2)
+GAME( 1981, elim2,	  0,        elim2,    elim2,    elim2,    ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (2 Players, set 1)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1981, elim2a,   elim2,    elim2,    elim2,    elim2,    ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (2 Players, set 2)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1981, elim2c,	  elim2,	elim2,	  elim2c,	elim2,	  ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (2 Players, cocktail)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1981, elim4,	  elim2,    elim2,    elim4,    elim4,    ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (4 Players)", 0 ,4,0,egg_ShootEmUp,0)
+GAME( 1981, elim4p,	  elim2,	elim2,	  elim4,	elim4,	  ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (4 Players, prototype)", 0 ,4,0,egg_ShootEmUp,0)
+GAME( 1981, spacfury, 0,        spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision C)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, spacfura, spacfury, spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision A)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, zektor,   0,        zektor,   zektor,   zektor,   ORIENTATION_FLIP_Y,   "Sega", "Zektor (revision B)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, tacscan,  0,        tacscan,  tacscan,  tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega", "Tac/Scan", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,EGF_VER)
+GAME( 1982, startrek, 0,        startrek, startrek, startrek, ORIENTATION_FLIP_Y,   "Sega", "Star Trek", GAME_IMPERFECT_SOUND ,0,2,egg_Flying,0)
+

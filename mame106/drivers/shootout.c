@@ -1,3 +1,4 @@
+#define MACHINENAME "shootout"
 /*******************************************************************************
 
     Shoot Out (USA)             (c) 1985 Data East USA      DE-0219
@@ -466,6 +467,7 @@ static DRIVER_INIT( shootout )
 }
 
 
-GAME( 1985, shootout, 0,        shootout, shootout, shootout, ROT0, "Data East USA", "Shoot Out (US)", 0,2)
-GAME( 1985, shootouj, shootout, shootouj, shootouj, shootout, ROT0, "Data East USA", "Shoot Out (Japan)", 0 ,2)
-GAME( 1985, shootoub, shootout, shootouj, shootout, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", 0 ,2)
+GAME( 1985, shootout, 0,        shootout, shootout, shootout, ROT0, "Data East USA", "Shoot Out (US)", 0,0,2,egg_Shooter,0)
+GAME( 1985, shootouj, shootout, shootouj, shootouj, shootout, ROT0, "Data East USA", "Shoot Out (Japan)", 0 ,0,2,egg_Shooter,0)
+GAME( 1985, shootoub, shootout, shootouj, shootout, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", 0 ,0,2,egg_Shooter,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

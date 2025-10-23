@@ -308,7 +308,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		0xfff0 	// priority_mask
+		0xfff0 |(1<<31) 	// priority_mask
 	  };
 	for (priority=256-1; priority>=0; priority--)
 	{

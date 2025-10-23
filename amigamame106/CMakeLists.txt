@@ -18,6 +18,9 @@ option(AMIGA_USE_68040 " use 68040" OFF)
 option(AMIGA_USE_68060 " use 68060" ON)
 # option(DOMAMELOG " do output logs" ON)
 
+option(USE_MIDI_AS_CONTROLER " use camd.library MIDI in as conroller" ON)
+
+
 option(COMPILE_TESTS " compile extra dev tools/ test units" OFF)
 
 set(MAME_INLINE "static inline")
@@ -73,39 +76,47 @@ add_subdirectory(../mame106 MameLib)
 
 set(AMIGA_SRC
 	main.cpp
-	amiga106.cpp
-	amiga106_audiostream.h
-	amiga106_audiostream.cpp
-	amiga106_filesystem.cpp
-	amiga106_timer.cpp
-	amiga106_config.cpp
-	amiga106_config.h
-	amiga106_video.h
-	amiga106_video.cpp
+	amiga_mame106.cpp
+	amiga_audiostream.h
+	amiga_audiostream.cpp
+	amiga_filesystem.cpp
+	amiga_timer.cpp
+	amiga_config.cpp
+	amiga_config.h
+	amiga_video.h
+	amiga_video.cpp
 	amiga_video_remap.h
 	amiga_video_remap.cpp
-	amiga_video_remap_fixedpalette.c
-	amiga106_video_intuition.h
-	amiga106_video_intuition.cpp	
-	amiga106_video_os3.h
-	amiga106_video_os3.cpp
-	amiga106_video_cgx.h
-	amiga106_video_cgx.cpp
-	amiga106_video_cgxscalepixelarray.h
-	amiga106_video_cgxscalepixelarray.cpp
-	amiga106_video_intuition_tbufcsb.h
-	amiga106_video_intuition_tbufcsb.cpp
-	amiga106_video_drawprogress.h
-	amiga106_video_drawprogress.cpp
-	amiga106_inputs.h
-	amiga106_inputs.cpp
+	amiga_video_remap_fixpalt.c
+	amiga_video_intuition.h
+	amiga_video_intuition.cpp
+	amiga_video_os3.h
+	amiga_video_os3.cpp
+	amiga_video_cgx.h
+	amiga_video_cgx.cpp
+	amiga_video_cgxscalepixar.h
+	amiga_video_cgxscalepixar.cpp
+	amiga_video_intui_tbufcsb.h
+	amiga_video_intui_tbufcsb.cpp
+	amiga_video_drawprogress.h
+	amiga_video_drawprogress.cpp
+	amiga_inputs_interface.h
+	amiga_inputs.h
+	amiga_inputs.cpp
+	amiga_inputs_kbd_ll.h
+	amiga_inputs_kbd_ll.cpp
+	amiga_inputs_parallelpads.h
+	amiga_inputs_parallelpads.c
+	amiga_inputs_parpadsimpl.h
+	amiga_inputs_parpadsimpl.cpp
+#	amiga_inputs_lightgun.h
+#	amiga_inputs_lightgun.c
+	amiga_inputs_propjoy.h
+	amiga_inputs_propjoy.c
+	amiga_inputs_propjoyimpl.h
+	amiga_inputs_propjoyimpl.cpp
 	amiga_locale.h
 	amiga_locale.cpp
-	amiga_parallelpads.h
-	amiga_parallelpads.c
-	amiga_proportionaljoystick.h
-	amiga_proportionaljoystick.c
-
 	serializer_mamexml.cpp
 	serializer_mamexml.h
 
@@ -123,7 +134,14 @@ set(AMIGA_SRC
 
 	devnotes.txt
 	)
-
+	 if(USE_MIDI_AS_CONTROLER)
+	 	list(APPEND AMIGA_SRC
+			amiga_inputs_midi.h
+			amiga_inputs_midi.c
+			amiga_inputs_midiimpl.h
+			amiga_inputs_midiimpl.cpp
+			)
+	 endif()
 # - - -have some Amiga code using O3
 	add_library(Mame106AmigaO3 STATIC
 		amiga_video_tracers.h
@@ -145,6 +163,10 @@ set(AMIGA_SRC
 #			 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -DNDEBUG>
 #	  ${AMIGA_COMPILER_OPTIONS} )
 	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/MUI38/include")
+	if(USE_MIDI_AS_CONTROLER)
+		target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/camd/include")
+		target_compile_definitions(Mame106AmigaO3 PUBLIC USE_MIDICAMD_INPUT=1 )
+	endif()
 	# those for mame includes
 	target_compile_definitions(Mame106AmigaO3 PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRLF=2 MUISERIALIZER_USES_FLOAT=1 ${CPU_DEFS} )
 

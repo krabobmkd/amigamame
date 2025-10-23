@@ -1,3 +1,4 @@
+#define MACHINENAME "meijinsn"
 /*
  Meijinsen (snk/alpha)
  ---------------------
@@ -363,4 +364,4 @@ ROM_START( meijinsn )
 	ROM_LOAD( "clr", 0x00, 0x20, CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
 ROM_END
 
-GAME( 1986, meijinsn, 0, meijinsn, meijinsn, 0, ROT0, "SNK Electronics corp.", "Meijinsen", 0 ,0)
+GAME( 1986, meijinsn, 0, meijinsn, meijinsn, 0, ROT0, "SNK Electronics corp.", "Meijinsen", 0 ,0,2,egg_Tabletop,0)

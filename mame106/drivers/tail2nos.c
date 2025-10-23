@@ -1,3 +1,4 @@
+#define MACHINENAME "tail2nos"
 /***************************************************************************
 
 Tail to Nose / Super Formula - (c) 1989 Video System Co.
@@ -375,5 +376,6 @@ ROM_END
 
 
 
-GAME( 1989, tail2nos, 0,        tail2nos, tail2nos, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", GAME_NO_COCKTAIL ,0)
-GAME( 1989, sformula, tail2nos, tail2nos, tail2nos, 0, ROT90, "V-System Co.", "Super Formula (Japan)", GAME_NO_COCKTAIL ,0)
+GAME( 1989, tail2nos, 0,        tail2nos, tail2nos, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", GAME_NO_COCKTAIL ,0,0,egg_Unknown,0)
+GAME( 1989, sformula, tail2nos, tail2nos, tail2nos, 0, ROT90, "V-System Co.", "Super Formula (Japan)", GAME_NO_COCKTAIL ,0,1,egg_Driving,0)
+                                                                                                                                                                                                                                                                                                                                                                                           

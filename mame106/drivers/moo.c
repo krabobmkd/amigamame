@@ -1,3 +1,4 @@
+#define MACHINENAME "moo"
 #define MOO_DEBUG 0
 #define MOO_DMADELAY (100)
 
@@ -300,7 +301,7 @@ static WRITE16_HANDLER( moo_prot_w )
 
 static WRITE16_HANDLER( moobl_oki_bank_w )
 {
-	logerror("%x to OKI bank\n", data);
+//	logerror("%x to OKI bank\n", data);
 
 	OKIM6295_set_bank_base(0, (data & 0x0f)* 0x40000);
 }
@@ -933,9 +934,10 @@ ROM_START( moobl )
 	ROM_CONTINUE(          0x300000+0x30000, 0x010000)//bank c hi
 ROM_END
 
-GAME( 1992, moo,     0,       moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver EA)", GAME_IMPERFECT_GRAPHICS,4)
-GAME( 1992, mooua,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver UA)", GAME_IMPERFECT_GRAPHICS,4)
-GAME( 1992, mooaa,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver AA)", GAME_IMPERFECT_GRAPHICS,4)
-GAME( 1992, moobl,   moo,     moobl,   moo,     moo,      ROT0, "<unknown>", "Wild West C.O.W.-Boys of Moo Mesa (bootleg ver AA)", GAME_NOT_WORKING,4)
-GAME( 1992, bucky,   0,       bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver EA)", 0,0)
-GAME( 1992, buckyua, bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver UA)", 0,0)
+GAME( 1992, moo,     0,       moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver EA)", GAME_IMPERFECT_GRAPHICS,4,0,egg_Platform,EGF_Funny)
+GAME( 1992, mooua,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver UA)", GAME_IMPERFECT_GRAPHICS,4,0,egg_Platform,EGF_Funny)
+GAME( 1992, mooaa,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver AA)", GAME_IMPERFECT_GRAPHICS,4,0,egg_Platform,EGF_Funny)
+GAME( 1992, moobl,   moo,     moobl,   moo,     moo,      ROT0, "<unknown>", "Wild West C.O.W.-Boys of Moo Mesa (bootleg ver AA)", GAME_NOT_WORKING,4,0,egg_Platform,EGF_Funny)
+GAME( 1992, bucky,   0,       bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver EA)", 0,4,0,egg_ShootEmUp,EGF_Funny)
+GAME( 1992, buckyua, bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver UA)", 0,4,0,egg_ShootEmUp,EGF_Funny)
+

@@ -1,3 +1,4 @@
+#define MACHINENAME "dwarfd"
 /*
 
   Electro-Sport Dwarfs Den
@@ -238,4 +239,5 @@ ROM_START( dwarfd )
 ROM_END
 
 
-GAME( 198?, dwarfd, 0, dwarfd, dwarfd, 0, ROT0, "Electro-Sport", "Dwarfs Den", GAME_NO_SOUND|GAME_NOT_WORKING ,0)
+GAME( 198?, dwarfd, 0, dwarfd, dwarfd, 0, ROT0, "Electro-Sport", "Dwarfs Den", GAME_NO_SOUND|GAME_NOT_WORKING ,0,1,egg_CardBattle,0)
+                                                                                                                                                                                                                       

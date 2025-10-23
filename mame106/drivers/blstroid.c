@@ -1,3 +1,4 @@
+#define MACHINENAME "blstroid"
 /***************************************************************************
 
     Atari Blasteroids hardware
@@ -434,8 +435,9 @@ static DRIVER_INIT( blstroid )
  *
  *************************************/
 
-GAME( 1987, blstroid, 0,        blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 ,2)
-GAME( 1987, blstroi3, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 ,2)
-GAME( 1987, blstroi2, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 ,2)
-GAME( 1987, blstroig, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 ,2)
-GAME( 1987, blsthead, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 ,2)
+GAME( 1987, blstroid, 0,        blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1987, blstroi3, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1987, blstroi2, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1987, blstroig, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1987, blsthead, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 ,2,0,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                         

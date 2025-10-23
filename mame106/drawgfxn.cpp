@@ -966,8 +966,9 @@ void drawgfx_clut16_Src4_prio(struct drawgfxParams *p DGREG(a0))
 // chasehq, experimental
 #define trt_isOpaque 0
 #define trt_isTransp 1
-// very chasehq thing: invisible sprite to manage road clipping.
+// very chasehq thing: invisible sprite to manage road clipping, only .
 #define trt_fulltransp 2
+#define trt_isTransp_useclr 3
 
 template<int transptype>
 void drawgfxzoom_clut16_Src8T(struct drawgfxParams *p DGREG(a0))
@@ -1056,7 +1057,9 @@ void drawgfxzoom_clut16_Src8T(struct drawgfxParams *p DGREG(a0))
     if( ex<=sx ) return;
 
     {
-        // important for inner loop...
+        int transparent_color;
+        if(transptype == trt_isTransp_useclr ) transparent_color=p->transparent_color;
+        // important for inner loop...        
         const register UINT16 colorOfs = gfx->color_granularity * p->color;
 
         for(int y=sy; y<ey; y++ )
@@ -1079,9 +1082,19 @@ void drawgfxzoom_clut16_Src8T(struct drawgfxParams *p DGREG(a0))
                     if (((1UL <<pr ) & pri_mask) == 0)
                         *dest = colorOfs + c;
                     *pri = 31;
-                } else
+                } else if(transptype == trt_isTransp_useclr )
+                {   // transparent, any color.
+                    if( c != transparent_color )
+                    {
+                        UINT8 pr = *pri;
+                        if (((1UL <<pr ) & pri_mask) == 0)
+                            *dest = colorOfs + c;
+                        *pri = 31;
+                    }
+
+                }else
                 {   // transparent
-                    if( c /*!= transparent_color*/ )
+                    if( c  )
                     {
                         UINT8 pr = *pri;
                         if (((1UL <<pr ) & pri_mask) == 0)
@@ -1100,7 +1113,6 @@ void drawgfxzoom_clut16_Src8T(struct drawgfxParams *p DGREG(a0))
 }
 void drawgfxzoom_clut16_Src8_tr0_prio(struct drawgfxParams *p DGREG(a0))
 {
-
 	if (p->scalex == 0x10000 && p->scaley == 0x10000)
 	{
        drawgfx_clut16_Src8_prio(p); // also does opaque test
@@ -1116,6 +1128,24 @@ void drawgfxzoom_clut16_Src8_tr0_prio(struct drawgfxParams *p DGREG(a0))
 
     if(isOpaque) drawgfxzoom_clut16_Src8T<trt_isOpaque>(p);
     else drawgfxzoom_clut16_Src8T<trt_isTransp>(p);
+}
+void drawgfxzoom_clut16_Src8_tr_prio(struct drawgfxParams *p DGREG(a0))
+{
+	if (p->scalex == 0x10000 && p->scaley == 0x10000)
+	{
+       drawgfx_clut16_Src8_prio(p); // also does opaque test
+       return;
+	}
+
+    UINT32 transmask = 1UL << p->transparent_color; // always color 0 for the moment.
+    UINT32 pen_usage = p->gfx->pen_usage[p->code];
+
+	int isFullTransp = (int)((pen_usage & ~transmask) == 0);
+	if(isFullTransp) return;
+    int isOpaque = (int)((pen_usage & transmask) == 0);
+
+    if(isOpaque) drawgfxzoom_clut16_Src8T<trt_isOpaque>(p);
+    else drawgfxzoom_clut16_Src8T<trt_isTransp_useclr>(p);
 }
 
 // special optim for some chasehq calls - colors not written, just sprite code update

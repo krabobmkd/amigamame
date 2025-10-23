@@ -1,3 +1,4 @@
+#define MACHINENAME "popeye"
 /***************************************************************************
 
 Popeye  (c) 1982 Nintendo
@@ -703,8 +704,8 @@ DRIVER_INIT( popeye )
 }
 
 
-GAME( 1981, skyskipr, 0,      skyskipr, skyskipr, skyskipr, ROT0, "Nintendo", "Sky Skipper", 0 ,0)
-GAME( 1982, popeye,   0,      popeye,   popeye,   popeye,   ROT0, "Nintendo", "Popeye (revision D)", 0 ,2)
-GAME( 1982, popeyeu,  popeye, popeye,   popeye,   popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)", 0 ,2)
-GAME( 1982, popeyef,  popeye, popeye,   popeyef,  popeye,   ROT0, "Nintendo", "Popeye (revision F)", 0 ,2)
-GAME( 1982, popeyebl, popeye, popeyebl, popeye,   0,        ROT0, "bootleg",  "Popeye (bootleg)", 0 ,2)
+GAME( 1981, skyskipr, 0,      skyskipr, skyskipr, skyskipr, ROT0, "Nintendo", "Sky Skipper", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, popeye,   0,      popeye,   popeye,   popeye,   ROT0, "Nintendo", "Popeye (revision D)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, popeyeu,  popeye, popeye,   popeye,   popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, popeyef,  popeye, popeye,   popeyef,  popeye,   ROT0, "Nintendo", "Popeye (revision F)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, popeyebl, popeye, popeyebl, popeye,   0,        ROT0, "bootleg",  "Popeye (bootleg)", 0 ,0,2,egg_Platform,0)

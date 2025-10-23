@@ -54,8 +54,10 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 **************************************************************************/
 
-#include "driver.h"
+//#pragma GCC optimize ("O0")
 
+#include "driver.h"
+#include "drawgfxn.h"
 /* Variables that driver has access to: */
 
 UINT32 *psikyo_vram_0, *psikyo_vram_1, *psikyo_vregs;
@@ -300,12 +302,20 @@ Note:   Not all sprites are displayed: in the top part of spriteram
 
 ***************************************************************************/
 
+typedef void (*drawgfxzoom_f)(struct drawgfxParams *p DGREG(a0));
+
 static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int trans_pen)
 {
 	/* tile layers 0 & 1 have priorities 1 & 2 */
-	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
+	static const int pri[] = { 0| (1L<<31),
+                             0xfc| (1L<<31),
+                              0xff| (1L<<31),
+                               0xff| (1L<<31) };
 
 	int offs;
+	drawgfxzoom_f drawgfxzoomf = (trans_pen==0)?
+                            &drawgfxzoom_clut16_Src8_tr0_prio:
+                            &drawgfxzoom_clut16_Src8_tr_prio;
 
 	UINT16 *spritelist	=	(UINT16 *)(spritebuf2 + 0x1800/4);
 
@@ -326,28 +336,13 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 	}
 	offs -= 2/2;
 
+    // new drawgfx api uses excluding max cliprects.
+    rectangle fullclip = *cliprect;
+    fullclip.max_x++;
+    fullclip.max_y++;
+
 	//  fprintf(stderr, "\n");
-	
-	{ 
-	struct drawgfxParams dgp0={
-		bitmap, 	// dest
-		Machine->gfx[0], 	// gfx
-		0, 	// code
-		0, 	// color
-		0, 	// flipx
-		0, 	// flipy
-		0, 	// sx
-		0, 	// sy
-		cliprect, 	// clip
-		TRANSPARENCY_PEN, 	// transparency
-		trans_pen, 	// transparent_color
-		0, 	// scalex
-		0, 	// scaley
-		priority_bitmap, 	// pri_buffer
-		pri[(attr & 0xc0) >> 6] 	// priority_mask
-	  };
-	
-	{ 
+		
 	struct drawgfxParams dgpz0={
 		bitmap, 	// dest
 		Machine->gfx[0], 	// gfx
@@ -357,13 +352,13 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 		0, 	// flipy
 		0, 	// sx
 		0, 	// sy
-		cliprect, 	// clip
+		&fullclip,//cliprect, 	// clip
 		TRANSPARENCY_PEN, 	// transparency
 		trans_pen, 	// transparent_color
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		pri[(attr & 0xc0) >> 6] 	// priority_mask
+		(1<<31) 	// priority_mask
 	  };
 	for ( ; offs >= 0/2 ; offs -= 2/2 )
 	{
@@ -384,6 +379,8 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 		y		=	source[ 0/4 ] >> 16;
 		x		=	source[ 0/4 ] & 0xffff;
 		attr	=	source[ 4/4 ] >> 16;
+
+
 		code	=	source[ 4/4 ] & 0x1ffff;
 
 		flipx	=	attr & 0x4000;
@@ -422,41 +419,54 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 		if (flipy)	{ ystart = ny-1;  yend = -1;   yinc = -1; }
 		else		{ ystart = 0;     yend = ny;   yinc = +1; }
 
-		for (dy = ystart; dy != yend; dy += yinc)
-		{
-			for (dx = xstart; dx != xend; dx += xinc)
-			{
-				int addr	=	(code*2) & (TILES_LEN-1);
+        dgpz0.flipx = flipx;
+        dgpz0.flipy = flipy;
+        dgpz0.scalex = zoomx << 11;
+        dgpz0.scaley = zoomy << 11;
 
-				if (zoomx == 32 && zoomy == 32)
-				{
-					dgp0.code = TILES[addr+1] * 256 + TILES[addr];
-					dgp0.color = attr >> 8;
-					dgp0.flipx = flipx;
-					dgp0.flipy = flipy;
-					dgp0.sx = x + dx * 16;
-					dgp0.sy = y + dy * 16;
-					drawgfx(&dgp0);
-                }
-				else
-				{
-					dgpz0.code = TILES[addr+1] * 256 + TILES[addr];
-					dgpz0.color = attr >> 8;
-					dgpz0.flipx = flipx;
-					dgpz0.flipy = flipy;
-					dgpz0.sx = x + (dx * zoomx) / 2;
-					dgpz0.sy = y + (dy * zoomy) / 2;
-					dgpz0.scalex = zoomx << 11;
-					dgpz0.scaley = zoomy << 11;
-					drawgfxzoom(&dgpz0);
-                }
-				code++;
-			}
-		}
-	}
-	} // end of patch paragraph
+        dgpz0.priority_mask = pri[(attr & 0xc0) >> 6] ;
+        //dgpz0.color = (attr >> 8) % dgpz0.gfx->total_colors;
+        dgpz0.color = (attr >> 8) & (dgpz0.gfx->total_colors-1); // looks poweroftwo-ish.
 
-	} // end of patch paragraph
+        if (zoomx == 32 && zoomy == 32)
+        {   // no zoom
+            for (dy = ystart; dy != yend; dy += yinc)
+            {
+                dgpz0.sy = y + dy * 16;
+                for (dx = xstart; dx != xend; dx += xinc)
+                {
+                    int addr	=	(code*2) & (TILES_LEN-1);
+                    dgpz0.code = TILES[addr+1] * 256 + TILES[addr];
+                    dgpz0.sx = x + dx * 16;
+
+                    //drawgfx(&dgpz0);
+                    drawgfx_clut16_Src8_prio(&dgpz0);
+                    //drawgfx_clut16_Src8_prio_pal(&dgpz0); //ok
+
+                    code++;
+
+                } // end loopx
+            } // end loopy
+            continue;
+        }
+
+        for (dy = ystart; dy != yend; dy += yinc)
+        {
+            dgpz0.sy = y + ((dy * zoomy)>>1);
+            for (dx = xstart; dx != xend; dx += xinc)
+            {
+                int addr	=	(code*2) & (TILES_LEN-1);
+                dgpz0.code = TILES[addr+1] * 256 + TILES[addr];
+                dgpz0.sx = x + ((dx * zoomx)>>1);
+                drawgfxzoomf(&dgpz0);
+                //drawgfxzoom_clut16_Src8_tr_prio(&dgpz0);
+                //drawgfxzoom(&dgpz0);
+                code++;
+
+            } // end loopx
+        } // end loopy
+
+	} // end sprite loop
 
 }
 
@@ -633,7 +643,13 @@ VIDEO_UPDATE( psikyo )
 	tilemap_set_transparent_pen(tilemap_1_size2,(layer1_ctrl & 8 ?0:15));
 	tilemap_set_transparent_pen(tilemap_1_size3,(layer1_ctrl & 8 ?0:15));
 
-	fillbitmap(bitmap,get_black_pen(),cliprect);
+
+    int hasOpaqueTilemap = ((layer0_ctrl|layer1_ctrl) &2);
+
+    if(!hasOpaqueTilemap)
+    {
+        fillbitmap(bitmap,get_black_pen(),cliprect);
+	}
 
 	fillbitmap(priority_bitmap,0,cliprect);
 

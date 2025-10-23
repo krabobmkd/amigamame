@@ -1,3 +1,4 @@
+#define MACHINENAME "statriv2"
 /****************************************************************\
 * Status Triv Two driver by David Haywood, MooglyGuy, and Stephh *
 * Super Triv II driver by MooglyGuy                              *
@@ -872,11 +873,12 @@ ROM_START( sextriv )
 	ROM_LOAD( "sex8.bin",     0x0e000, 0x2000, CRC(d4221641) SHA1(d2c0f66c4fe3a77c73cdcc71bbd8c48342d29431) )
 ROM_END
 
-GAME( 1984, hangman,  0, hangman,  hangman,  0, ROT0, "Status Games", "Hangman", 0 ,0)
-GAME( 1984, trivquiz, 0, trivquiz, statriv2, 0, ROT0, "Status Games", "Triv Quiz", 0 ,0)
-GAME( 1984, statriv2, 0, statriv2, statriv2, 0, ROT0, "Status Games", "Triv Two", 0 ,1)
-GAME( 1985, statriv4, 0, statriv4, statriv4, 0, ROT0, "Status Games", "Triv Four", 0 ,0)
-GAME( 1985, sextriv,  0, sextriv,  sextriv,  0, ROT0, "Status Games", "Sex Triv", 0 ,0)
-GAME( 1985, quaquiz2, 0, quaquiz2, quaquiz2, 0, ROT0, "Status Games", "Quadro Quiz II", GAME_NOT_WORKING ,0)
-GAME( 1986, supertr2, 0, supertr2, supertr2, 0, ROT0, "Status Games", "Super Triv II", 0 ,0)
-GAME( 1988, supertr3, 0, supertr3, supertr2, 0, ROT0, "Status Games", "Super Triv III", GAME_IMPERFECT_GRAPHICS,0)
+GAME( 1984, hangman,  0, hangman,  hangman,  0, ROT0, "Status Games", "Hangman", 0 ,0,2,egg_Quizz,0)
+GAME( 1984, trivquiz, 0, trivquiz, statriv2, 0, ROT0, "Status Games", "Triv Quiz", 0 ,0,2,egg_Quizz,0)
+GAME( 1984, statriv2, 0, statriv2, statriv2, 0, ROT0, "Status Games", "Triv Two", 0 ,0,2,egg_Quizz,0)
+GAME( 1985, statriv4, 0, statriv4, statriv4, 0, ROT0, "Status Games", "Triv Four", 0 ,0,2,egg_Quizz,0)
+GAME( 1985, sextriv,  0, sextriv,  sextriv,  0, ROT0, "Status Games", "Sex Triv", 0 ,0,2,egg_Mature,0)
+GAME( 1985, quaquiz2, 0, quaquiz2, quaquiz2, 0, ROT0, "Status Games", "Quadro Quiz II", GAME_NOT_WORKING ,0,2,egg_Quizz,0)
+GAME( 1986, supertr2, 0, supertr2, supertr2, 0, ROT0, "Status Games", "Super Triv II", 0 ,0,2,egg_Mature,0)
+GAME( 1988, supertr3, 0, supertr3, supertr2, 0, ROT0, "Status Games", "Super Triv III", GAME_IMPERFECT_GRAPHICS,0,2,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

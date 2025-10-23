@@ -797,7 +797,7 @@ void m68k_set_cpu_type(struct m68k_cpu_instance *p68k COREREG, unsigned int cpu_
 			return;
 	}
 }
-
+//int last68kpc=0;
 /* Execute some instructions until we use up num_cycles clock cycles */
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(int num_cycles)
@@ -820,25 +820,27 @@ int m68k_execute(int num_cycles)
         do
 		{
     		REG_PPC = REG_PC;
+//   last68kpc = REG_PPC;
 			uint16 ir = m68ki_read_imm_16(p68k);
 
-#ifdef STATCPUINSTR
-//          if( ir == 0x000008b8)
-//         {
-//         printf("w");
-//         }
-//    if(activecpu == 0 && REG_PPC == 0x00000616)
-////    if(REG_PPC == 0x00001380 && activecpu == 0)
-//////sharriercpu1         if(REG_PPC == 0x00001134 && activecpu == 1)
-//         {
-//         printf("ir:%08x\n",(int)ir);
-//         exit(0);
+//#ifdef STATCPUINSTR
+////          if( ir == 0x000008b8)
+////         {
+////         printf("w");
+////         }
+//    if(activecpu == 0 && REG_PPC == 0x000ecf1e)
+//    {
+////////    if(REG_PPC == 0x00001380 && activecpu == 0)
+//////////sharriercpu1         if(REG_PPC == 0x00001134 && activecpu == 1)
+//////         {
+//////         printf("ir:%08x\n",(int)ir);
+//////         exit(0);
 //          static int uu=0;
 //          uu++;
-//         }
 
-//    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
-#endif
+//    }
+////    cpustats_add( activecpu,REG_PPC, (UINT32)ir);
+//#endif
 			m68ki_instruction_jump_table[ir](p68k,ir);
             m68k_ICount -= CYC_INSTRUCTION[ir];
 		} while(m68k_ICount > 0);
@@ -979,10 +981,14 @@ void m68k_pulse_reset(void)
 	m68ki_jump(p68k,0);
 	REG_SP = m68ki_read_imm_32(p68k);
 	REG_PC = m68ki_read_imm_32(p68k);
-	REG_PC &= opcode_mask;
+
+	// krb r18 must not be masked here, or upset the entry in memory_set_opbase
+	// (bubble bobble 2, most taito_f3)
+	//REG_PC &= opcode_mask;
 	m68ki_jump(p68k,REG_PC);
 
 	CPU_RUN_MODE = RUN_MODE_NORMAL;
+
 }
 
 /* Pulse the HALT line on the CPU */

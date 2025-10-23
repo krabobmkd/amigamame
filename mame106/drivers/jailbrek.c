@@ -1,3 +1,4 @@
+#define MACHINENAME "jailbrek"
 /***************************************************************************
 
 Jailbreak - (c) 1986 Konami
@@ -327,5 +328,6 @@ static DRIVER_INIT( jailbrek )
 }
 
 
-GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break", 0 ,2)
-GAME( 1986, manhatan, jailbrek, jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Manhattan 24 Bunsyo (Japan)", 0 ,2)
+GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break", 0 ,0,2,egg_Platform,0)
+GAME( 1986, manhatan, jailbrek, jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Manhattan 24 Bunsyo (Japan)", 0 ,0,2,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                           

@@ -1,3 +1,4 @@
+#define MACHINENAME "monzagp"
 /***************************************************************************
 RB BO ITALY - Driving game of some sort.
 MONZA GP From Leante Games (Olympia) ??
@@ -320,4 +321,5 @@ DRIVER_INIT( monzagp )
 }
 
 /*    YEAR, NAME,    PARENT,   MACHINE, INPUT,   INIT,    MONITOR, COMPANY,                   FULLNAME */
-GAME( 1981,monzagp, 0,        monzagp, monzagp, monzagp, ROT0,   "Leante Games (Olympia?)", "Monza GP", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 1981,monzagp, 0,        monzagp, monzagp, monzagp, ROT0,   "Leante Games (Olympia?)", "Monza GP", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                   

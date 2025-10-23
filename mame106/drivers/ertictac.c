@@ -1,3 +1,4 @@
+#define MACHINENAME "ertictac"
 /*********************************************************************
  Erotictac/Tactic [Sisteme 1992]
  (title depends on "Sexy Views" DIP)
@@ -374,6 +375,7 @@ static DRIVER_INIT( poizone )
 }
 
 
-GAME( 1990, ertictac, 0, ertictac, ertictac, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_NO_SOUND,0)
-GAME( 1991, poizone,  0, ertictac, ertictac, poizone,  ROT0, "Eterna" ,"Poizone" ,GAME_NO_SOUND|GAME_NOT_WORKING,0)
+GAME( 1990, ertictac, 0, ertictac, ertictac, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_NO_SOUND,2,0,egg_Mature,0)
+GAME( 1991, poizone,  0, ertictac, ertictac, poizone,  ROT0, "Eterna" ,"Poizone" ,GAME_NO_SOUND|GAME_NOT_WORKING,2,0,egg_Maze,0)
 
+                                                                                                                                                                                                                                                                                                                                                                                           

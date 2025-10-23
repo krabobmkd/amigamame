@@ -1,3 +1,4 @@
+#define MACHINENAME "stepstag"
 /*  Jaleco 'Stepping Stage'
 
  dump is incomplete, these are leftovers from an upgrade
@@ -183,4 +184,4 @@ ROM_START( stepstag )
 ROM_END
 
 
-GAME( 1999, stepstag, 0, stepstag, stepstag, 0, ROT0, "Jaleco", "Stepping Stage", GAME_NO_SOUND| GAME_NOT_WORKING,0)
+GAME( 1999, stepstag, 0, stepstag, stepstag, 0, ROT0, "Jaleco", "Stepping Stage", GAME_NO_SOUND| GAME_NOT_WORKING,0,0,egg_sport_Rythm,0)

@@ -1,3 +1,4 @@
+#define MACHINENAME "skyfox"
 /***************************************************************************
 
                         -= Sky Fox / Exerizer =-
@@ -433,5 +434,5 @@ DRIVER_INIT( skyfox )
 
 
 
-GAME( 1987, skyfox,   0,      skyfox, skyfox, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox" , 0 ,0)
-GAME( 1987, exerizrb, skyfox, skyfox, skyfox, skyfox, ROT90, "Jaleco", "Exerizer (Japan) (bootleg)", 0 ,0)
+GAME( 1987, skyfox,   0,      skyfox, skyfox, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox" , 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1987, exerizrb, skyfox, skyfox, skyfox, skyfox, ROT90, "Jaleco", "Exerizer (Japan) (bootleg)", 0 ,0,2,egg_ShootEmUp,0)

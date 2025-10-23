@@ -1,3 +1,4 @@
+#define MACHINENAME "groundfx"
 /***************************************************************************
 
     Ground Effects / Super Ground FX                    (c) 1993 Taito
@@ -567,4 +568,4 @@ DRIVER_INIT( groundfx )
 }
 
 
-GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", 0 ,0)
+GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", 0 ,0,1,egg_Driving,0)

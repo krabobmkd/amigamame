@@ -1,3 +1,4 @@
+#define MACHINENAME "phoenix"
 /***************************************************************************
 
 Phoenix hardware games
@@ -1187,20 +1188,21 @@ static DRIVER_INIT( survival )
 
 
 
-GAME( 1980, phoenix,  0,       phoenix,  phoenix,  0,        ROT90, "Amstar", "Phoenix (Amstar)", 0 ,2)
-GAME( 1980, phoenixa, phoenix, phoenix,  phoenixa, 0,        ROT90, "Amstar (Centuri license)", "Phoenix (Centuri)", 0 ,2)
-GAME( 1980, phoenixt, phoenix, phoenix,  phoenixt, 0,        ROT90, "Taito", "Phoenix (Taito)", 0 ,2)
-GAME( 1980, phoenix3, phoenix, phoenix,  phoenix3, 0,        ROT90, "bootleg", "Phoenix (T.P.N.)", 0 ,2)
-GAME( 1981, phoenixc, phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg?", "Phoenix (IRECSA, G.G.I Corp)", 0 ,2)
-GAME( 1981, condor,   phoenix, condor,   condor,   condor,   ROT90, "Sidam", "Condor", 0 ,2)
+GAME( 1980, phoenix,  0,       phoenix,  phoenix,  0,        ROT90, "Amstar", "Phoenix (Amstar)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, phoenixa, phoenix, phoenix,  phoenixa, 0,        ROT90, "Amstar (Centuri license)", "Phoenix (Centuri)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, phoenixt, phoenix, phoenix,  phoenixt, 0,        ROT90, "Taito", "Phoenix (Taito)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, phoenix3, phoenix, phoenix,  phoenix3, 0,        ROT90, "bootleg", "Phoenix (T.P.N.)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, phoenixc, phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg?", "Phoenix (IRECSA, G.G.I Corp)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, condor,   phoenix, condor,   condor,   condor,   ROT90, "Sidam", "Condor", 0 ,0,2,egg_ShootEmUp,0)
 // the following 2 were common bootlegs in england & france respectively
-GAME( 1980, falcon,   phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg", "Falcon (bootleg set 1)", 0 ,2)
-GAME( 1980, vautour,  phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg", "Vautour (set 1 - Jeutel France)", 0 ,2)
-GAME( 1980, vautour2, phoenix, condor,   condor,   condor,   ROT90, "bootleg", "Vautour (set 2)", 0 ,2)
-GAME( 1980, griffon,  phoenix, condor,   condor,   condor,   ROT90, "Videotron", "Griffon", 0 ,2)
-GAME( 1980, falcona,  phoenix, condor,   falcona,  0,        ROT90, "bootleg", "Falcon (bootleg set 2)", 0 ,2)
-GAME( 1981, pleiads,  0,       pleiads,  pleiads,  0,        ROT90, "Tehkan", "Pleiads (Tehkan)", GAME_IMPERFECT_COLORS ,2)
-GAME( 1981, pleiadbl, pleiads, pleiads,  pleiads,  0,        ROT90, "bootleg", "Pleiads (bootleg)", GAME_IMPERFECT_COLORS ,2)
-GAME( 1981, pleiadce, pleiads, pleiads,  pleiadce, 0,        ROT90, "Tehkan (Centuri license)", "Pleiads (Centuri)", GAME_IMPERFECT_COLORS ,2)
-GAME( 1981, capitol,  pleiads, phoenix,  capitol,  0,        ROT90, "Universal Video Spiel", "Capitol", GAME_IMPERFECT_COLORS ,2)
-GAME( 1982, survival, 0,       survival, survival, survival, ROT90, "Rock-ola", "Survival", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ,0)
+GAME( 1980, falcon,   phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg", "Falcon (bootleg set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, vautour,  phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg", "Vautour (set 1 - Jeutel France)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, vautour2, phoenix, condor,   condor,   condor,   ROT90, "bootleg", "Vautour (set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, griffon,  phoenix, condor,   condor,   condor,   ROT90, "Videotron", "Griffon", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, falcona,  phoenix, condor,   falcona,  0,        ROT90, "bootleg", "Falcon (bootleg set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, pleiads,  0,       pleiads,  pleiads,  0,        ROT90, "Tehkan", "Pleiads (Tehkan)", GAME_IMPERFECT_COLORS ,0,2,egg_ShootEmUp,0)
+GAME( 1981, pleiadbl, pleiads, pleiads,  pleiads,  0,        ROT90, "bootleg", "Pleiads (bootleg)", GAME_IMPERFECT_COLORS ,0,2,egg_ShootEmUp,0)
+GAME( 1981, pleiadce, pleiads, pleiads,  pleiadce, 0,        ROT90, "Tehkan (Centuri license)", "Pleiads (Centuri)", GAME_IMPERFECT_COLORS ,0,2,egg_ShootEmUp,0)
+GAME( 1981, capitol,  pleiads, phoenix,  capitol,  0,        ROT90, "Universal Video Spiel", "Capitol", GAME_IMPERFECT_COLORS ,0,2,egg_ShootEmUp,0)
+GAME( 1982, survival, 0,       survival, survival, survival, ROT90, "Rock-ola", "Survival", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      

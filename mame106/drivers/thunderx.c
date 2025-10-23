@@ -1,3 +1,4 @@
+#define MACHINENAME "thunderx"
 /***************************************************************************
 
 Super Contra / Thunder Cross
@@ -1054,9 +1055,9 @@ static DRIVER_INIT( scontra )
 
 
 
-GAME( 1988, scontra,  0,        scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra", 0 ,2)
-GAME( 1988, scontraj, scontra,  scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra (Japan)", 0 ,2)
-GAME( 1988, thunderx, 0,        thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross", 0 ,0)
-GAME( 1988, thnderxa, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (Set 2)", 0 ,0)
-GAME( 1988, thnderxb, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (Set 3)", 0 ,0)
-GAME( 1988, thnderxj, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (Japan)", 0 ,0)
+GAME( 1988, scontra,  0,        scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra", 0 ,2,0,egg_Platform,0)
+GAME( 1988, scontraj, scontra,  scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra (Japan)", 0 ,2,0,egg_Platform,0)
+GAME( 1988, thunderx, 0,        thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1988, thnderxa, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (Set 2)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1988, thnderxb, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (Set 3)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1988, thnderxj, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (Japan)", 0 ,2,0,egg_ShootEmUp,0)

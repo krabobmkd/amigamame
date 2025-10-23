@@ -1,3 +1,4 @@
+#define MACHINENAME "sshangha"
 /***************************************************************************
 
   Super Shanghai Dragon's Eye             (c) 1992 Hot-B
@@ -439,5 +440,6 @@ static DRIVER_INIT( sshangha )
 }
 
 
-GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha, ROT0, "Hot-B.",   "Super Shanghai Dragon's Eye (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND ,0)
-GAME( 1992, sshanghb, sshangha, sshangha, sshangha, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", GAME_NO_SOUND ,0)
+GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha, ROT0, "Hot-B.",   "Super Shanghai Dragon's Eye (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1992, sshanghb, sshangha, sshangha, sshangha, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", GAME_NO_SOUND ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                           

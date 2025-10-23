@@ -1,3 +1,4 @@
+#define MACHINENAME "cchasm"
 /***************************************************************************
 
     Cinematronics Cosmic Chasm hardware
@@ -269,5 +270,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cchasm,  0,      cchasm, cchasm, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", 0 ,2)
-GAME( 1983, cchasm1, cchasm, cchasm, cchasm, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", 0 ,2)
+GAME( 1983, cchasm,  0,      cchasm, cchasm, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1983, cchasm1, cchasm, cchasm, cchasm, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", 0 ,0,2,egg_ShootEmUp,0)

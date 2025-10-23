@@ -1,3 +1,4 @@
+#define MACHINENAME "yamato"
 /*
 
     T.S. 17.12.2005:
@@ -725,6 +726,7 @@ static DRIVER_INIT( toprollr )
 	toprollr_decode();
 }
 
-GAME( 1983, yamato,  0,      yamato, yamato, yamato, ROT90, "Sega", "Yamato (US)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1983, yamato2, yamato, yamato, yamato, yamato, ROT90, "Sega", "Yamato (World?)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1983, toprollr, 0, toprollr, toprollr, toprollr, ROT90, "Jaleco", "Top Roller", GAME_IMPERFECT_COLORS ,0)
+GAME( 1983, yamato,  0,      yamato, yamato, yamato, ROT90, "Sega", "Yamato (US)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1983, yamato2, yamato, yamato, yamato, yamato, ROT90, "Sega", "Yamato (World?)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1983, toprollr, 0, toprollr, toprollr, toprollr, ROT90, "Jaleco", "Top Roller", GAME_IMPERFECT_COLORS ,0,2,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          

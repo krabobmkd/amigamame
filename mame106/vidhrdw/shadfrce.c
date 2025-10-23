@@ -161,45 +161,31 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		int flipx = ((source[0] & 0x0010) >> 4);
 		int flipy = ((source[0] & 0x0008) >> 3);
 		int pal = ((source[4] & 0x003e));
-		int pri_mask = (source[4] & 0x0040) ? 0x02 : 0x00;
-
-
+		int pri_mask = (source[4] & 0x0040) ? (0x02|(1<<31)): (0x00|(1<<31));
 
 		if (pal & 0x20) pal ^= 0x60;	/* skip hole */
 
 		height++;
 		if (enable)	{
             dgp0.priority_mask = pri_mask;
+			dgp0.color = pal;
 			for (hcount=0;hcount<height;hcount++) {
 				
 				dgp0.code = tile+hcount;
-				dgp0.color = pal;
 				dgp0.flipx = flipx;
 				dgp0.flipy = flipy;
 				dgp0.sx = xpos;
 				dgp0.sy = ypos-hcount*16-16;
 				drawgfx(&dgp0);
 				
-				dgp0.code = tile+hcount;
-				dgp0.color = pal;
-				dgp0.flipx = flipx;
-				dgp0.flipy = flipy;
 				dgp0.sx = xpos-0x200;
 				dgp0.sy = ypos-hcount*16-16;
 				drawgfx(&dgp0);
 				
-				dgp0.code = tile+hcount;
-				dgp0.color = pal;
-				dgp0.flipx = flipx;
-				dgp0.flipy = flipy;
 				dgp0.sx = xpos;
 				dgp0.sy = ypos-hcount*16-16+0x200;
 				drawgfx(&dgp0);
 				
-				dgp0.code = tile+hcount;
-				dgp0.color = pal;
-				dgp0.flipx = flipx;
-				dgp0.flipy = flipy;
 				dgp0.sx = xpos-0x200;
 				dgp0.sy = ypos-hcount*16-16+0x200;
 				drawgfx(&dgp0);

@@ -1,3 +1,4 @@
+#define MACHINENAME "ladybug"
 /***************************************************************************
 
 Lady Bug memory map (preliminary)
@@ -978,11 +979,12 @@ DRIVER_INIT( sraider )
 {
 }
 
-GAME( 1981, cavenger, 0,       ladybug, cavenger, 0,       ROT0,   "Universal", "Cosmic Avenger", 0 ,2)
-GAME( 1981, ladybug,  0,       ladybug, ladybug,  0,       ROT270, "Universal", "Lady Bug", 0 ,2)
-GAME( 1981, ladybugb, ladybug, ladybug, ladybug,  0,       ROT270, "bootleg",   "Lady Bug (bootleg)", 0 ,2)
-GAME( 1981, ladybgb2, ladybug, ladybug, ladybug,  0,       ROT270, "bootleg",   "Lady Bug (bootleg Set 2)", 0 ,2)
-GAME( 1982, dorodon,  0,       ladybug, dorodon,  dorodon, ROT270, "Falcon",    "Dorodon (set 1)", 0 ,0)
-GAME( 1982, dorodon2, dorodon, ladybug, dorodon,  dorodon, ROT270, "Falcon",    "Dorodon (set 2)", 0 ,0)
-GAME( 1982, snapjack, 0,       ladybug, snapjack, 0,       ROT0,   "Universal", "Snap Jack", 0 ,2)
-GAME( 1982, sraider,  0,       sraider, sraider,  sraider, ROT270, "Universal", "Space Raider", 0 ,0)
+GAME( 1981, cavenger, 0,       ladybug, cavenger, 0,       ROT0,   "Universal", "Cosmic Avenger", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, ladybug,  0,       ladybug, ladybug,  0,       ROT270, "Universal", "Lady Bug", 0 ,0,2,egg_Maze,0)
+GAME( 1981, ladybugb, ladybug, ladybug, ladybug,  0,       ROT270, "bootleg",   "Lady Bug (bootleg)", 0 ,0,2,egg_Maze,0)
+GAME( 1981, ladybgb2, ladybug, ladybug, ladybug,  0,       ROT270, "bootleg",   "Lady Bug (bootleg Set 2)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, dorodon,  0,       ladybug, dorodon,  dorodon, ROT270, "Falcon",    "Dorodon (set 1)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, dorodon2, dorodon, ladybug, dorodon,  dorodon, ROT270, "Falcon",    "Dorodon (set 2)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, snapjack, 0,       ladybug, snapjack, 0,       ROT0,   "Universal", "Snap Jack", 0 ,0,2,egg_Platform,0)
+GAME( 1982, sraider,  0,       sraider, sraider,  sraider, ROT270, "Universal", "Space Raider", 0 ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

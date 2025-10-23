@@ -1,3 +1,4 @@
+#define MACHINENAME "prehisle"
 /***************************************************************************
 
     Prehistoric Isle in 1930 (World)        (c) 1989 SNK
@@ -411,6 +412,7 @@ static DRIVER_INIT( gensitou )
 
 /******************************************************************************/
 
-GAME( 1989, prehisle, 0,		prehisle, prehisle, prehisle, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", 0 ,0)
-GAME( 1989, prehislu, prehisle, prehisle, prehisle, prehislu, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", 0 ,0)
-GAME( 1989, gensitou, prehisle, prehisle, prehisle, gensitou, ROT0, "SNK", "Genshi-Tou 1930's", 0 ,0)
+GAME( 1989, prehisle, 0,		prehisle, prehisle, prehisle, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1989, prehislu, prehisle, prehisle, prehisle, prehislu, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1989, gensitou, prehisle, prehisle, prehisle, gensitou, ROT0, "SNK", "Genshi-Tou 1930's", 0 ,2,0,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                

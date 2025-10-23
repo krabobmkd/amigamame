@@ -1,3 +1,4 @@
+#define MACHINENAME "dotrikun"
 /***************************************************************************
 
 Dottori Kun (Head On's mini game)
@@ -106,5 +107,5 @@ ROM_START( dotriku2 )
 ROM_END
 
 
-GAME( 1990, dotrikun, 0,        dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (new version)", GAME_NO_SOUND ,0)
-GAME( 1990, dotriku2, dotrikun, dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (old version)", GAME_NO_SOUND ,0)
+GAME( 1990, dotrikun, 0,        dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (new version)", GAME_NO_SOUND ,0,1,egg_Maze,0)
+GAME( 1990, dotriku2, dotrikun, dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (old version)", GAME_NO_SOUND ,0,1,egg_Maze,0)

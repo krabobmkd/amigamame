@@ -1,3 +1,4 @@
+#define MACHINENAME "cardline"
 /*
 ************************************
  Card Line
@@ -278,4 +279,5 @@ ROM_START( cardline )
 
 ROM_END
 
-GAME( 199?, cardline,  0,       cardline,  cardline,  0, ROT0, "Veltmeijer", "Card Line" , GAME_NOT_WORKING | GAME_NO_SOUND,0)
+GAME( 199?, cardline,  0,       cardline,  cardline,  0, ROT0, "Veltmeijer", "Card Line" , GAME_NOT_WORKING | GAME_NO_SOUND,0,1,egg_CardBattle,0)
+                                                                                                                                                                                                                                                                                         

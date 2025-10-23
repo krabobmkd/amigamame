@@ -1,3 +1,4 @@
+#define MACHINENAME "pitnrun"
 /****************************************************
    Pit&Run - Taito 1984
 
@@ -400,5 +401,5 @@ ROM_START( pitnruna )
 	ROM_LOAD( "clr.3",  0x0040, 0x0020, CRC(25e70e5e) SHA1(fdb9c69e9568a725dd0e3ac25835270fb4f49280) )
 ROM_END
 
-GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run (set 1)", GAME_IMPERFECT_SOUND ,0)
-GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run (set 2)", GAME_IMPERFECT_SOUND ,0)
+GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run (set 1)", GAME_IMPERFECT_SOUND ,0,2,egg_Driving,0)
+GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run (set 2)", GAME_IMPERFECT_SOUND ,0,2,egg_Driving,0)

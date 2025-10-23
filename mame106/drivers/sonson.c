@@ -1,3 +1,4 @@
+#define MACHINENAME "sonson"
 /***************************************************************************
 
 Son Son memory map (preliminary)
@@ -340,5 +341,5 @@ ROM_START( sonsonj )
 ROM_END
 
 
-GAME( 1984, sonson,  0,      sonson, sonson, 0, ROT0, "Capcom", "Son Son", 0 ,0)
-GAME( 1984, sonsonj, sonson, sonson, sonson, 0, ROT0, "Capcom", "Son Son (Japan)", 0 ,0)
+GAME( 1984, sonson,  0,      sonson, sonson, 0, ROT0, "Capcom", "Son Son", 0 ,2,0,egg_Platform,0)
+GAME( 1984, sonsonj, sonson, sonson, sonson, 0, ROT0, "Capcom", "Son Son (Japan)", 0 ,2,0,egg_Platform,0)

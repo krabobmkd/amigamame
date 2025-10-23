@@ -16,6 +16,7 @@
 #ifndef __DRIVER_H__
 #define __DRIVER_H__
 
+#include "genredefs.h"
 
 /***************************************************************************
     MACROS (must be *before* the includes below)
@@ -229,7 +230,6 @@ struct _machine_config
 	void				(*sound_reset)(void);		/* sound reset callback */
 };
 
-
 /* In mamecore.h: typedef struct _game_driver game_driver; */
 struct _game_driver
 {
@@ -252,7 +252,13 @@ struct _game_driver
 
 	UINT32				flags;						/* orientation and other flags; see defines below */
     // krb minimix
-    INT8                nbplayers;
+    // - - -this would be 32b.
+    UINT8  nbplayersSim : 4;
+    UINT8  nbplayersAlt : 4;
+
+    UINT8 genre; // enum
+    UINT16 genreflag; // V,H,3D , ...
+    // - - -  -
 };
 
 
@@ -503,10 +509,10 @@ struct _game_driver
 
 ***************************************************************************/
 
-#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPLAYER)	\
+#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPSIM,NBPALT,EGENRE,GFLAGS)	\
 game_driver driver_##NAME =					\
 {											\
-	__FILE__,								\
+	MACHINENAME,							\
 	#PARENT,								\
 	#NAME,									\
 	system_bios_0,							\
@@ -518,13 +524,16 @@ game_driver driver_##NAME =					\
 	init_##INIT,							\
 	rom_##NAME,								\
 	(MONITOR)|(FLAGS),						\
-    NBPLAYER \
+    NBPSIM, \
+    NBPALT, \
+    EGENRE, \
+    GFLAGS \
 };
 
-#define GAMEB(YEAR,NAME,PARENT,BIOS,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPLAYER)	\
+#define GAMEB(YEAR,NAME,PARENT,BIOS,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,NBPSIM,NBPALT,EGENRE,GFLAGS)	\
 game_driver driver_##NAME =					\
 {											\
-	__FILE__,								\
+	MACHINENAME,								\
 	#PARENT,								\
 	#NAME,									\
 	system_bios_##BIOS,						\
@@ -536,7 +545,10 @@ game_driver driver_##NAME =					\
 	init_##INIT,							\
 	rom_##NAME,								\
 	(MONITOR)|(FLAGS),						\
-    NBPLAYER \
+    NBPSIM, \
+    NBPALT, \
+    EGENRE, \
+    GFLAGS \
 };
 
 /* this allows to leave the INIT field empty in the GAME() macro call */

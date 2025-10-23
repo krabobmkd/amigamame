@@ -1,3 +1,4 @@
+#define MACHINENAME "funybubl"
 /*
 
 Funny Bubble ...
@@ -285,4 +286,5 @@ ROM_START( funybubl )
 ROM_END
 
 
-GAME( 1999, funybubl, 0, funybubl, funybubl, funybubl, ROT0, "Comad", "Funny Bubble", 0 ,0)
+GAME( 1999, funybubl, 0, funybubl, funybubl, funybubl, ROT0, "Comad", "Funny Bubble", 0 ,2,0,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                

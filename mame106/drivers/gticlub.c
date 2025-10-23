@@ -1,3 +1,4 @@
+#define MACHINENAME "gticlub"
 /*  Konami GTI Club System
 
     Driver by Ville Linde
@@ -1369,8 +1370,9 @@ static DRIVER_INIT(hangplt)
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,	0,		 gticlub, gticlub, gticlub,	ROT0,	"Konami",	"GTI Club (ver AAA)", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1996, gticlubj,	gticlub, gticlub, gticlub, gticlub,	ROT0,	"Konami",	"GTI Club (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1996, thunderh,	0,		 gticlub, gticlub, gticlub,	ROT0,	"Konami",	"Thunder Hurricane (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1997, slrasslt,	0,		 gticlub, gticlub, gticlub,	ROT0,	"Konami",	"Solar Assault DR2 (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1997, hangplt,	0,		 hangplt, gticlub, hangplt, ROT0,	"Konami",	"Hang Pilot", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 1996, gticlub,	0,		 gticlub, gticlub, gticlub,	ROT0,	"Konami",	"GTI Club (ver AAA)", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1996, gticlubj,	gticlub, gticlub, gticlub, gticlub,	ROT0,	"Konami",	"GTI Club (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND ,0,1,egg_Driving,0)
+GAME( 1996, thunderh,	0,		 gticlub, gticlub, gticlub,	ROT0,	"Konami",	"Thunder Hurricane (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1997, slrasslt,	0,		 gticlub, gticlub, gticlub,	ROT0,	"Konami",	"Solar Assault DR2 (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND ,0,1,egg_Flying,0)
+GAME( 1997, hangplt,	0,		 hangplt, gticlub, hangplt, ROT0,	"Konami",	"Hang Pilot", GAME_NOT_WORKING|GAME_NO_SOUND ,0,1,egg_sport_,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

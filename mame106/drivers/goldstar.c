@@ -1,3 +1,4 @@
+#define MACHINENAME "goldstar"
 /***************************************************************************
 
 Golden Star
@@ -466,6 +467,7 @@ DRIVER_INIT(goldstar)
 
 
 
-GAME( 199?, goldstar, 0,        goldstar, goldstar, goldstar, ROT0, "IGS", "Golden Star", 0 ,0)
-GAME( 199?, goldstbl, goldstar, goldstbl, goldstar, 0,        ROT0, "IGS", "Golden Star (Blue version)", 0 ,0)
-GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "unknown", "Moon Light", 0 ,0)
+GAME( 199?, goldstar, 0,        goldstar, goldstar, goldstar, ROT0, "IGS", "Golden Star", 0 ,0,1,egg_Casino,0)
+GAME( 199?, goldstbl, goldstar, goldstbl, goldstar, 0,        ROT0, "IGS", "Golden Star (Blue version)", 0 ,0,1,egg_Casino,0)
+GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "unknown", "Moon Light", 0 ,0,1,egg_Casino,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

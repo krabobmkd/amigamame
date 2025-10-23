@@ -1,3 +1,4 @@
+#define MACHINENAME "starcrus"
 /***************************************************************************
 
 Ramtek Star Cruiser Driver
@@ -240,4 +241,5 @@ ROM_START( starcrus )
 ROM_END
 
 
-GAME( 1977, starcrus, 0, starcrus, starcrus, 0, ROT0, "RamTek", "Star Cruiser", 0 ,0)
+GAME( 1977, starcrus, 0, starcrus, starcrus, 0, ROT0, "RamTek", "Star Cruiser", 0 ,2,0,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                   

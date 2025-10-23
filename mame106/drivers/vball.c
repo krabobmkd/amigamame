@@ -1,3 +1,4 @@
+#define MACHINENAME "vball"
 /**********************************************************************************************************************
  Championship VBall
  Driver by Paul "TBBle" Hampson
@@ -543,5 +544,5 @@ ROM_START( vball2pj )
 ROM_END
 
 
-GAME( 1988, vball,    0,     vball,    vball,    0, ROT0, "Technos", "U.S. Championship V'ball (set 1)", 0 ,4)
-GAME( 1988, vball2pj, vball, vball2pj, vball2pj, 0, ROT0, "Technos", "U.S. Championship V'ball (Japan)", 0 ,4)
+GAME( 1988, vball,    0,     vball,    vball,    0, ROT0, "Technos", "U.S. Championship V'ball (set 1)", 0 ,0,0,egg_Unknown,0)
+GAME( 1988, vball2pj, vball, vball2pj, vball2pj, 0, ROT0, "Technos", "U.S. Championship V'ball (Japan)", 0 ,2,0,egg_sport_Volleyball,0)

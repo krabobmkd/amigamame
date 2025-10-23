@@ -1,3 +1,4 @@
+#define MACHINENAME "amspdwy"
 /***************************************************************************
 
                             -= American Speedway =-
@@ -380,5 +381,6 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 1)", 0 ,2)
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwy, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 2)", 0 ,2)
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 1)", 0 ,2,0,egg_Driving,0)
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwy, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 2)", 0 ,2,0,egg_Driving,0)
+                                                                                                                                                                                                                                                                                                                                                                                                

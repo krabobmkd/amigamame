@@ -1,3 +1,4 @@
+#define MACHINENAME "sbasketb"
 /***************************************************************************
 
 Super Basketball memory map (preliminary)
@@ -388,6 +389,7 @@ static DRIVER_INIT( sbasketb )
 }
 
 
-GAME( 1984, sbasketb, 0,        sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version G)", 0 ,0)
-GAME( 1984, sbasketo, sbasketb, sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version E)", 0 ,0)
-GAME( 1984, sbasketu, sbasketb, sbasketb, sbasketb, 0,        ROT90, "Konami", "Super Basketball (not encrypted)", 0 ,0)
+GAME( 1984, sbasketb, 0,        sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version G)", 0 ,0,2,egg_sport_Basketball,0)
+GAME( 1984, sbasketo, sbasketb, sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version E)", 0 ,0,2,egg_sport_Basketball,0)
+GAME( 1984, sbasketu, sbasketb, sbasketb, sbasketb, 0,        ROT90, "Konami", "Super Basketball (not encrypted)", 0 ,0,2,egg_sport_Basketball,0)
+                                                                                                                                                                                                                                                                                                                                                                                                         

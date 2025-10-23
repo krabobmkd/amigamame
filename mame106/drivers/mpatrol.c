@@ -1,3 +1,4 @@
+#define MACHINENAME "mpatrol"
 /***************************************************************************
 
 Moon Patrol memory map
@@ -450,5 +451,5 @@ ROM_END
 
 
 
-GAME( 1982, mpatrol,  0,       mpatrol, mpatrol,  0, ROT0, "Irem", "Moon Patrol", 0 ,2)
-GAME( 1982, mpatrolw, mpatrol, mpatrol, mpatrolw, 0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", 0 ,2)
+GAME( 1982, mpatrol,  0,       mpatrol, mpatrol,  0, ROT0, "Irem", "Moon Patrol", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, mpatrolw, mpatrol, mpatrol, mpatrolw, 0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", 0 ,0,2,egg_ShootEmUp,0)

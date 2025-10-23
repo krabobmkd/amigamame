@@ -1,3 +1,4 @@
+#define MACHINENAME "ssrj"
 /***********************************
  Super Speed Race Jr (c) 1985 Taito
  driver by  Tomasz Slanina
@@ -223,4 +224,4 @@ ROM_START( ssrj )
 
 ROM_END
 
-GAME( 1985, ssrj,  0,       ssrj,  ssrj,  0, ORIENTATION_FLIP_X, "Taito Corporation", "Super Speed Race Junior (Japan)",GAME_WRONG_COLORS|GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1985, ssrj,  0,       ssrj,  ssrj,  0, ORIENTATION_FLIP_X, "Taito Corporation", "Super Speed Race Junior (Japan)",GAME_WRONG_COLORS|GAME_IMPERFECT_GRAPHICS ,0,1,egg_Driving,0)

@@ -1,3 +1,4 @@
+#define MACHINENAME "aeroboto"
 /****************************************************************************
 
 Formation Z / Aeroboto
@@ -352,5 +353,5 @@ ROM_END
 
 
 
-GAME( 1984, formatz,  0,       formatz, formatz, 0, ROT0, "Jaleco", "Formation Z", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1984, aeroboto, formatz, formatz, formatz, 0, ROT0, "[Jaleco] (Williams license)", "Aeroboto", GAME_IMPERFECT_GRAPHICS ,2)
+GAME( 1984, formatz,  0,       formatz, formatz, 0, ROT0, "Jaleco", "Formation Z", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1984, aeroboto, formatz, formatz, formatz, 0, ROT0, "[Jaleco] (Williams license)", "Aeroboto", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)

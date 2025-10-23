@@ -1,3 +1,4 @@
+#define MACHINENAME "argus"
 /***************************************************************************
 
 Argus (Early NMK driver 1986-1987)
@@ -958,6 +959,6 @@ ROM_END
 
 
 /*  ( YEAR   NAME     PARENT  MACHINE   INPUT     INIT  MONITOR  COMPANY                 FULLNAME ) */
-GAME( 1986, argus,    0,      argus,    argus,    0,    ROT270,  "[NMK] (Jaleco license)", "Argus"          , 0 ,2)
-GAME( 1986, valtric,  0,      valtric,  valtric,  0,    ROT270,  "[NMK] (Jaleco license)", "Valtric"        , 0 ,0)
-GAME( 1987, butasan,  0,      butasan,  butasan,  0,    ROT0,    "[NMK] (Jaleco license)", "Butasan (Japan)", 0 ,0)
+GAME( 1986, argus,    0,      argus,    argus,    0,    ROT270,  "[NMK] (Jaleco license)", "Argus"          , 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1986, valtric,  0,      valtric,  valtric,  0,    ROT270,  "[NMK] (Jaleco license)", "Valtric"        , 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1987, butasan,  0,      butasan,  butasan,  0,    ROT0,    "[NMK] (Jaleco license)", "Butasan (Japan)", 0 ,0,0,egg_Unknown,0)

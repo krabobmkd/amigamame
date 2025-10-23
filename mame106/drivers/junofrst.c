@@ -1,3 +1,4 @@
+#define MACHINENAME "junofrst"
 /***************************************************************************
 
 Juno First :  memory map same as tutankham with some address changes
@@ -458,5 +459,6 @@ static DRIVER_INIT( junofrst )
 }
 
 
-GAME( 1983, junofrst, 0,        junofrst, junofrst, junofrst, ROT90, "Konami", "Juno First", 0 ,0)
-GAME( 1983, junofstg, junofrst, junofrst, junofrst, junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", 0 ,0)
+GAME( 1983, junofrst, 0,        junofrst, junofrst, junofrst, ROT90, "Konami", "Juno First", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1983, junofstg, junofrst, junofrst, junofrst, junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", 0 ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

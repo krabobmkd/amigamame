@@ -1,3 +1,4 @@
+#define MACHINENAME "bwing"
 /*****************************************************************************
 
 B-Wings  (c) 1984 Data East Corporation
@@ -624,9 +625,10 @@ static DRIVER_INIT( bwing )
 //****************************************************************************
 // Game Entries
 
-GAME( 1984, bwing,        0, bwing, bwing, bwing, ROT90, "Data East Corporation", "B-Wings (Japan)", 0 ,0)
-GAME( 1984, bwings,   bwing, bwing, bwing, bwing, ROT90, "Data East Corporation", "Battle Wings", 0 ,0)
-GAME( 1984, batwings, bwing, bwing, bwing, bwing, ROT90, "Data East Corporation", "Battle Wings (alt)", GAME_NOT_WORKING ,0)
+GAME( 1984, bwing,        0, bwing, bwing, bwing, ROT90, "Data East Corporation", "B-Wings (Japan)", 0 ,0,0,egg_Unknown,0)
+GAME( 1984, bwings,   bwing, bwing, bwing, bwing, ROT90, "Data East Corporation", "Battle Wings", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1984, batwings, bwing, bwing, bwing, bwing, ROT90, "Data East Corporation", "Battle Wings (alt)", GAME_NOT_WORKING ,0,0,egg_Unknown,0)
 
-GAME( 1984, zaviga,       0, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga", 0 ,0)
-GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", 0 ,0)
+GAME( 1984, zaviga,       0, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", 0 ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

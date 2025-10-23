@@ -1,3 +1,4 @@
+#define MACHINENAME "angelkds"
 /* Angel Kids / Space Position hardware driver
 
  driver by David Haywood
@@ -763,5 +764,5 @@ ROM_END
 static DRIVER_INIT( spcpostn )	{ spcpostn_decode(); }
 
 
-GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" , 0,2) /* Nasco not displayed but 'Exa Planning' is */
-GAME( 1986, spcpostn, 0, angelkds, spcpostn, spcpostn,  ROT90,  "Sega / Nasco", "Space Position (Japan)" , 0,0) /* encrypted */
+GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" , 0,0,2,egg_Climbing,0) /* Nasco not displayed but 'Exa Planning' is */
+GAME( 1986, spcpostn, 0, angelkds, spcpostn, spcpostn,  ROT90,  "Sega / Nasco", "Space Position (Japan)" , 0,2,0,egg_Driving,0) /* encrypted */

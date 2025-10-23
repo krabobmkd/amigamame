@@ -1,3 +1,4 @@
+#define MACHINENAME "spiders"
 /***************************************************************************
 
 Spiders driver by K.Wilkins May 1998
@@ -398,6 +399,7 @@ ROM_START( spinner )
 ROM_END
 
 /* this is a newer version with just one bug fix */
-GAME( 1981, spiders,  0,       spiders, spiders, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", 0,2)
-GAME( 1981, spiders2, spiders, spiders, spiders, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", 0,2)
-GAME( 1981, spinner,  spiders, spiders, spiders, 0, ROT270, "bootleg",				  "Spinner", 0,2)
+GAME( 1981, spiders,  0,       spiders, spiders, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", 0,0,2,egg_ShootEmUp,0)
+GAME( 1981, spiders2, spiders, spiders, spiders, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", 0,0,2,egg_ShootEmUp,0)
+GAME( 1981, spinner,  spiders, spiders, spiders, 0, ROT270, "bootleg",				  "Spinner", 0,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                   

@@ -1,3 +1,4 @@
+#define MACHINENAME "taito x"
 /***************************************************************************
 
 
@@ -1218,12 +1219,13 @@ DRIVER_INIT( kyustrkr )
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x900000, 0x90000f, 0, 0, kyustrkr_input_w);
 }
 
-GAME( 1988, superman, 0,        superman, superman, 0,        ROT0,   "Taito Corporation", "Superman", 0 ,2)
-GAME( 1988, suprmanj, superman, superman, suprmanj, 0,        ROT0,   "Taito Corporation", "Superman (Japan)", 0 ,2)
-GAME( 1989, twinhawk, 0,        daisenpu, twinhawk, 0,        ROT270, "Taito Corporation Japan", "Twin Hawk (World)", 0 ,0)
-GAME( 1989, twinhwku, twinhawk, daisenpu, twinhwku, 0,        ROT270, "Taito America Corporation", "Twin Hawk (US)", 0 ,0)
-GAME( 1989, daisenpu, twinhawk, daisenpu, daisenpu, 0,        ROT270, "Taito Corporation", "Daisenpu (Japan)", 0 ,0)
-GAME( 1989, gigandes, 0,        gigandes, gigandes, 0,        ROT0,   "East Technology", "Gigandes", 0 ,0)
-GAME( 1989, gigandsj, gigandes, gigandes, gigandes, 0,        ROT0,   "East Technology", "Gigandes (Japan)", 0 ,0)
-GAME( 1989, kyustrkr, 0,        ballbros, kyustrkr, kyustrkr, ROT180, "East Technology", "Last Striker / Kyuukyoku no Striker", 0 ,0)
-GAME( 1992, ballbros, 0,        ballbros, ballbros, 0,        ROT0,   "East Technology", "Balloon Brothers", 0 ,2)
+GAME( 1988, superman, 0,        superman, superman, 0,        ROT0,   "Taito Corporation", "Superman", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1988, suprmanj, superman, superman, suprmanj, 0,        ROT0,   "Taito Corporation", "Superman (Japan)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1989, twinhawk, 0,        daisenpu, twinhawk, 0,        ROT270, "Taito Corporation Japan", "Twin Hawk (World)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1989, twinhwku, twinhawk, daisenpu, twinhwku, 0,        ROT270, "Taito America Corporation", "Twin Hawk (US)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1989, daisenpu, twinhawk, daisenpu, daisenpu, 0,        ROT270, "Taito Corporation", "Daisenpu (Japan)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1989, gigandes, 0,        gigandes, gigandes, 0,        ROT0,   "East Technology", "Gigandes", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1989, gigandsj, gigandes, gigandes, gigandes, 0,        ROT0,   "East Technology", "Gigandes (Japan)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1989, kyustrkr, 0,        ballbros, kyustrkr, kyustrkr, ROT180, "East Technology", "Last Striker / Kyuukyoku no Striker", 0 ,2,0,egg_sport_Soccer,0)
+GAME( 1992, ballbros, 0,        ballbros, ballbros, 0,        ROT0,   "East Technology", "Balloon Brothers", 0 ,2,0,egg_Puzzle,0)
+

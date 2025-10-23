@@ -8,6 +8,7 @@
 extern "C" {
 	#include "mamecore.h"
 	UINT32 _bootframeskip=0;
+	UINT32 _throttleIsOn=0; // with shift+f10 key
 	UINT32 _minimumCpuCycles=DEFMINCPUC;
 }
 
@@ -26,7 +27,7 @@ static map<string,sDriverTuning> _tunings={
 	{"sgemf",{8*60,DEFMINCPUC,0}},
 	{"chasehq",{5*60,DEFMINCPUC,0}},
 	{"ghouls",{22*60,DEFMINCPUC,0}},
-
+	{"qcrayon2",{14*60,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 
 	{"outrun",{0,256,0}}, // for _minimumCpuCycles
 	{"shangon",{0,2,0}}, // for _minimumCpuCycles
@@ -92,7 +93,19 @@ static map<string,sDriverTuning> _tunings={
     {"metamrph",{16*60,DEFMINCPUC,0}},
     {"mtlchamp",{16*60,DEFMINCPUC,0}},
 
+    // test psikyo1 68020
+    {"samuraia",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+    {"gunbird",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+    {"btlkroad",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+    {"s1945",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+    {"tengai",{0,2,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 
+    // cave
+    {"mazinger",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
+    {"agallet",{10*60,DEFMINCPUC,0}},
+    {"ddonpach",{27*60,DEFMINCPUC,0}},
+
+    {"rdingf",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 };
 
 sDriverTuning *getDriverTuningByName(const char *drivername)

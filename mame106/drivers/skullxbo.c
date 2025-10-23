@@ -1,3 +1,4 @@
+#define MACHINENAME "skullxbo"
 /***************************************************************************
 
     Atari Skull & Crossbones hardware
@@ -622,8 +623,9 @@ static DRIVER_INIT( skullxbo )
  *
  *************************************/
 
-GAME( 1989, skullxbo, 0,        skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 5)", 0 ,2)
-GAME( 1989, skullxb4, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 4)", 0 ,2)
-GAME( 1989, skullxb3, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 3)", 0 ,2)
-GAME( 1989, skullxb2, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 2)", 0 ,2)
-GAME( 1989, skullxb1, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 1)", 0 ,2)
+GAME( 1989, skullxbo, 0,        skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 5)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1989, skullxb4, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 4)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1989, skullxb3, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 3)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1989, skullxb2, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 2)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1989, skullxb1, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 1)", 0 ,2,0,egg_BeatNUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

@@ -1,3 +1,4 @@
+#define MACHINENAME "renegade"
 /***************************************************************************
 
 Renegade
@@ -953,6 +954,6 @@ ROM_END
 
 
 
-GAME( 1986, renegade, 0,        renegade, renegade, renegade, ROT0, "Technos (Taito America license)", "Renegade (US)", 0 ,2)
-GAME( 1986, kuniokun, renegade, renegade, renegade, kuniokun, ROT0, "Technos", "Nekketsu Kouha Kunio-kun (Japan)", 0 ,2)
-GAME( 1986, kuniokub, renegade, renegade, renegade, 0,        ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", 0 ,2)
+GAME( 1986, renegade, 0,        renegade, renegade, renegade, ROT0, "Technos (Taito America license)", "Renegade (US)", 0 ,0,2,egg_BeatNUp,0)
+GAME( 1986, kuniokun, renegade, renegade, renegade, kuniokun, ROT0, "Technos", "Nekketsu Kouha Kunio-kun (Japan)", 0 ,0,2,egg_BeatNUp,0)
+GAME( 1986, kuniokub, renegade, renegade, renegade, 0,        ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", 0 ,0,2,egg_BeatNUp,0)

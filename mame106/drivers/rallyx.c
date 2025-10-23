@@ -1,3 +1,4 @@
+#define MACHINENAME "rallyx"
 /***************************************************************************
 
 Rally X      (c) 1980 Namco
@@ -1223,15 +1224,16 @@ ROM_END
 
 
 
-GAME( 1980, rallyx,   0,        rallyx,   rallyx,   rallyx,   ROT0, "Namco", "Rally X", 0 ,2)
-GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   rallyx,   ROT0, "[Namco] (Midway license)", "Rally X (Midway)", 0 ,2)
-GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  rallyx,   ROT0, "Namco", "New Rally X", 0 ,0)
+GAME( 1980, rallyx,   0,        rallyx,   rallyx,   rallyx,   ROT0, "Namco", "Rally X", 0 ,0,2,egg_Maze,0)
+GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   rallyx,   ROT0, "[Namco] (Midway license)", "Rally X (Midway)", 0 ,0,2,egg_Maze,0)
+GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  rallyx,   ROT0, "Namco", "New Rally X", 0 ,0,0,egg_Unknown,0)
 
-GAME( 1981, jungler,  0,        tactcian, jungler,  jungler,  ROT90, "Konami", "Jungler", 0 ,2)
-GAME( 1981, junglers, jungler,  tactcian, jungler,  jungler,  ROT90, "[Konami] (Stern license)", "Jungler (Stern)", 0 ,2)
-GAME( 1982, tactcian, 0,        tactcian, tactcian, tactcian, ROT90, "[Konami] (Sega license)", "Tactician (set 1)", 0 ,0)
-GAME( 1981, tactcan2, tactcian, tactcian, tactcian, tactcian, ROT90, "[Konami] (Sega license)", "Tactician (set 2)", 0 ,0)
-GAME( 1982, locomotn, 0,        locomotn, locomotn, locomotn, ROT90, "Konami (Centuri license)", "Loco-Motion", 0 ,2)
-GAME( 1982, gutangtn, locomotn, locomotn, locomotn, locomotn, ROT90, "Konami (Sega license)", "Guttang Gottong", 0 ,2)
-GAME( 1982, cottong,  locomotn, locomotn, locomotn, locomotn, ROT90, "bootleg", "Cotocoto Cottong", 0 ,2)
-GAME( 1983, commsega, 0,        locomotn, commsega, commsega, ROT90, "Sega", "Commando (Sega)", GAME_IMPERFECT_SOUND ,2)
+GAME( 1981, jungler,  0,        tactcian, jungler,  jungler,  ROT90, "Konami", "Jungler", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, junglers, jungler,  tactcian, jungler,  jungler,  ROT90, "[Konami] (Stern license)", "Jungler (Stern)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, tactcian, 0,        tactcian, tactcian, tactcian, ROT90, "[Konami] (Sega license)", "Tactician (set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, tactcan2, tactcian, tactcian, tactcian, tactcian, ROT90, "[Konami] (Sega license)", "Tactician (set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, locomotn, 0,        locomotn, locomotn, locomotn, ROT90, "Konami (Centuri license)", "Loco-Motion", 0 ,0,2,egg_Puzzle,0)
+GAME( 1982, gutangtn, locomotn, locomotn, locomotn, locomotn, ROT90, "Konami (Sega license)", "Guttang Gottong", 0 ,0,2,egg_Puzzle,0)
+GAME( 1982, cottong,  locomotn, locomotn, locomotn, locomotn, ROT90, "bootleg", "Cotocoto Cottong", 0 ,0,2,egg_Puzzle,0)
+GAME( 1983, commsega, 0,        locomotn, commsega, commsega, ROT90, "Sega", "Commando (Sega)", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

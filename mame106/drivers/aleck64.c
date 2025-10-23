@@ -1,3 +1,4 @@
+#define MACHINENAME "aleck64"
 /* 'Aleck64' and similar boards */
 /* N64 based hardware */
 /*
@@ -374,5 +375,6 @@ ROM_START( mtetrisc )
 	ROM_LOAD ( "at24c01.u34", 0x000000, 0x80,  CRC(ba7e503f) SHA1(454aa4fdde7d8694d1affaf25cd750fa678686bb) )
 ROM_END
 
-GAME( 1998, 11beat,   0,  aleck64, aleck64, aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1998, mtetrisc, 0,  aleck64, aleck64, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 1998, 11beat,   0,  aleck64, aleck64, aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING|GAME_NO_SOUND ,2,0,egg_sport_Soccer,0)
+GAME( 1998, mtetrisc, 0,  aleck64, aleck64, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_NO_SOUND ,2,0,egg_Puzzle,0)
+                                                                                                                                                                                                                                                                                                                                                                                          

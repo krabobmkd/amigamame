@@ -1,3 +1,4 @@
+#define MACHINENAME "combatsc"
 /***************************************************************************
 
 "Combat School" (also known as "Boot Camp") - (Konami GX611)
@@ -924,8 +925,9 @@ static DRIVER_INIT( combascb )
 
 
 
-GAME( 1988, combasc,  0,       combasc,  combasc,  combasc,  ROT0, "Konami", "Combat School (joystick)", 0 ,0)
-GAME( 1987, combasct, combasc, combasc,  combasct, combasct, ROT0, "Konami", "Combat School (trackball)", 0 ,0)
-GAME( 1987, combascj, combasc, combasc,  combasct, combasct, ROT0, "Konami", "Combat School (Japan trackball)", 0 ,0)
-GAME( 1987, bootcamp, combasc, combasc,  combasct, combasct, ROT0, "Konami", "Boot Camp", 0 ,0)
-GAME( 1988, combascb, combasc, combascb, combascb, combascb, ROT0, "bootleg", "Combat School (bootleg)", GAME_IMPERFECT_COLORS ,0)
+GAME( 1988, combasc,  0,       combasc,  combasc,  combasc,  ROT0, "Konami", "Combat School (joystick)", 0 ,0,0,egg_Unknown,0)
+GAME( 1987, combasct, combasc, combasc,  combasct, combasct, ROT0, "Konami", "Combat School (trackball)", 0 ,0,0,egg_Unknown,0)
+GAME( 1987, combascj, combasc, combasc,  combasct, combasct, ROT0, "Konami", "Combat School (Japan trackball)", 0 ,0,0,egg_Unknown,0)
+GAME( 1987, bootcamp, combasc, combasc,  combasct, combasct, ROT0, "Konami", "Boot Camp", 0 ,2,0,egg_sport_TrackNField,0)
+GAME( 1988, combascb, combasc, combascb, combascb, combascb, ROT0, "bootleg", "Combat School (bootleg)", GAME_IMPERFECT_COLORS ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   

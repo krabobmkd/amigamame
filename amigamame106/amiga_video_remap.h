@@ -6,7 +6,7 @@ extern "C"
 {
     #include <exec/types.h>
 }
-#include "amiga106_video.h"
+#include "amiga_video.h"
 #include "amiga_video_tracers.h"
 class Paletted
 {

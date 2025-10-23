@@ -1,3 +1,4 @@
+#define MACHINENAME "compgolf"
 /****************************************************************************************
 
 Competition Golf Final Round (c) 1986 / 1985 Data East
@@ -309,5 +310,6 @@ static DRIVER_INIT( compgolf )
 	compgolf_expand_bg();
 }
 
-GAME( 1986, compgolf, 0,		compgolf, compgolf, compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", 0 ,0)
-GAME( 1985, compglfo, compgolf, compgolf, compgolf, compgolf, ROT0, "Data East", "Competition Golf Final Round (old version)", 0 ,0)
+GAME( 1986, compgolf, 0,		compgolf, compgolf, compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", 0 ,0,2,egg_sport_Golf,0)
+GAME( 1985, compglfo, compgolf, compgolf, compgolf, compgolf, ROT0, "Data East", "Competition Golf Final Round (old version)", 0 ,0,2,egg_sport_Golf,0)
+                                                                                                                                                                                                                                                                                                                         

@@ -1,3 +1,4 @@
+#define MACHINENAME "othunder"
 /***************************************************************************
 
 Operation Thunderbolt  (Taito)
@@ -896,7 +897,7 @@ ROM_END
 
 
 
-GAME( 1988, othunder, 0,        othunder, othunder, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Operation Thunderbolt (World)", 0 ,2)
-GAME( 1988, othundu,  othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)", 0 ,2)
-GAME( 1988, othunduo, othunder, othunder, othundrj, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, older)", 0 ,2)
-GAME( 1988, othundrj, othunder, othunder, othundrj, 0, ORIENTATION_FLIP_X, "Taito Corporation", "Operation Thunderbolt (Japan)", 0 ,2)
+GAME( 1988, othunder, 0,        othunder, othunder, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Operation Thunderbolt (World)", 0 ,0,0,egg_LightGuns,EGF_P3D)
+GAME( 1988, othundu,  othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)", 0 ,0,0,egg_LightGuns,EGF_P3D)
+GAME( 1988, othunduo, othunder, othunder, othundrj, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, older)", 0 ,0,0,egg_LightGuns,EGF_P3D)
+GAME( 1988, othundrj, othunder, othunder, othundrj, 0, ORIENTATION_FLIP_X, "Taito Corporation", "Operation Thunderbolt (Japan)", 0 ,0,0,egg_LightGuns,EGF_P3D)

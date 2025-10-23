@@ -1,4 +1,118 @@
 
+ r1.7
+
+  Here it is: Mame106Minimix release 1.7 "*Danmaku Edition*", loaded with novelties and bug corrections:
+
+  - new features:
+   - MUI Game list:
+     - Two new columns have been added! One indicates the game's genre, from among 44 genres (shootnup, platform, beatnup, sports, ...)
+      Some games also have specific tags in this column (Childish, Violent, 3D, Girly, Funny,...).
+      A column that gives you an identifier of the machine that runs the game was also added, useful for knowing which games share the same hardware.
+     - A new menu allow you to filter the game list by genre or tags.
+     - Column sorting is way better and you can also sort the genre and machine columns. This is great if you're into a specific game genre.
+     - "Number of players" information in the list is more accurate and differentiates simultaneous and alternative number of players.
+
+   - The Control Panel, which already manages 7 buttons CD32 Pads, mouses, parallel port 4 joystick extensions and analog proportional joysticks,
+     now also manage "MIDI IN" music controllers, as infinite buttons controllers, and sliders/pots has analog entries.
+     optionally,the keyboard notes can be seen as a single analog input, or used as a set of buttons. More information in the guide.
+
+   - During game you can "throttle" by maintaining key Shift+F10 pressed, that is to say: "accelerate the emulation so it uses 100% of the CPU".
+     If a given game does not already reach 100% speed (press help to know), it will do nothing. throttle is sometimes usefull to "skip intros".
+
+   - reading options from icon tooltips is repaired, and now you can also create "Project icons per game" with .info file in project mode,
+     with no file associated, Mame106 as tool, and tooltip "ROM=myrom", so a "project icon" can directly boot a given game.
+
+ - Bug Corrections:
+  - Machine Taito F3 corrected (biggest news of the year):
+     machine taito_f3 and anything using 68EC020 has been 100% corrected, and 10 to 20% speed optimized after weeks of work !
+     It is some kind of "super NeoGeo" with alpha blending and pixel rendering capabilities,
+     and an incredible Ensoniq sound chip (based on "Subtractive synthesis", and made by the same team as the C64 SID).
+     Reminding you that Taito had incredible composers and sound technicians also known as the band "Zuntata" should be enough
+     to tease your ears (and if not: https://www.youtube.com/watch?v=NrZ5dn4gBWo&list=RDNrZ5dn4gBWo&start_radio=1 )
+     Machine Taito_f3 supports 83 roms amongst: Bubble BobbleII (bublbob2),space invader 95 (spcinv95),
+      the incredible "Riding Fight" (ridingf), vertical shooter "Grid seeker" (gseeker). Anyway, sort the new machine column to
+      find out the list of taito F3 supported games.
+      Yet taito f3 emulation is still a bit too slow because of video mixing hard to emulate: frameskip will help.
+
+   - "Demon's world" enemies are back and game 100% working (Was a long way, sorry.).
+   - The automatic screen mode choice function (used with "best mode" option) was wrong on some recent drivers, so now we use our own version.
+   - Tons of games with sprite priorities issues corrected, this times very horizontaly and definitively, once for all.
+   - a memory hit with menu in 32bit mode was corrected.
+
+ - Games added in r1.7:
+  Since 68EC020 is ok, Games from editors still supporting 68000 and 68020 in the 1995/2000 period were added: Cave, Psikyo, Banpresto,...
+   There is 75 more roms supported, of high quality with excellent graphics and musics, well emulated and tested games:
+
+  - Vertical shooter of that time, with lots of bullets on screens, known as the "*Danmaku*" genre, are a lot more present:
+    "DonPachi"(donpachi), "DoDonPachi"(ddonpach),"ESP Ra.De."(esprade), "Gunbird"(gunbird), "Striker 1945"(s1945),
+    R-shark (rshark) and the mostly excellent "Dangun Feveron/Fever SOS"(dfeveron,feversos), the excellent "Air Gallet"(agallet).
+    (note the "raizing" danmakus were already supported: "Armed police batrider"(batrider),"Battle Garrega"(battleg),...)
+    ...filtering the list with vertical shooters genre and then sorting by years would give you the full list anyway !
+
+  - Support for the excellent Banpresto franchise games (MazingerZ "Goldorak" game(mazinger), Sailor Moon.(sailormn) ).
+  - other excellent Psikyo and cave games: Tengai(tengai),Samurai Aces(samuraia),Battle K-road (btlkroad).
+  - The Dooyong games (1990/1996), sort machine dooyoog to know.
+  - also more missing konamis: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta (4p beatnup), escape kids, rollergames.
+
+ - About sources (for developpers around)
+  - Management of controllers has been heavily rewritten so it uses a plugin-like "abstract interface", amiga_inputs.cpp code
+    is way more clear and maintainable.
+
+-----------------------------
+
+ added again more missing knm: Wild cow boys of moo mesa, super contra, Thunder cross, super slam, vendetta (4p beatnup), escape kids, rollergames
+ support for game from companies that still supported 68000 and 68020 in the late 1990's: Cave Games (25 excellent games)
+ Bugs:
+  X betsmode fail with 384
+  X suprslam Super slam sprite xflip bug ugly
+  X rungun plante son boot grave. polyginet too
+  X test throttle IRL
+  X add column "machine"
+ X test MUI 3.8
+
+ X bestmode fail with arabian fight 420x240
+
+ -> add the 3 cave shooter
+  -> all psychio  LINK_PSIKYO ?
+ DDOYYONG "bluehawk"
+ LINK_NICHIBUT armedf
+ test "cyvern"
+
+ from MISC: the cave games
+ misc: ddonpach 1997 v shoot
+esprade 1998 atlus cave
+feversos
+-> any "cave"
+
+
+ r1.7
+  TODO
+  X MUI interface optimisation, and scan button doesn't rescan twice without reason (old  bug!)
+  X project icon can be used for game launch.
+  O MUI saves list column/sort states -> LOOKS NOT POSSIBLE
+  O explain how to make project icon in documentation
+  X key for throttle (shift+F10?)
+  O F4 guide in amigaguide.
+  X recode BestCModeIDTagList
+  O do a shortcut-creator on WB ?
+
+  O PHASERS !!
+
+  X genre and flags in db
+  X have genre column in MUI list
+  X have genre filter panel -> in menu.
+
+
+
+  O activate konami Moo mesa !!!
+  O ITECH ninja clowns ?
+  O activate SNK
+  O activate mrDo
+  O activate Misc Sailor moon
+    -> validate new games
+  O correct sprite prio
+
+  O have MUI icons for flags -> maybe not.
 
  New in release r1.6:
 

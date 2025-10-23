@@ -1,3 +1,4 @@
+#define MACHINENAME "bottom9"
 /***************************************************************************
 
 Bottom of the Ninth (c) 1989 Konami
@@ -623,6 +624,7 @@ static DRIVER_INIT( bottom9 )
 
 
 
-GAME( 1989, bottom9,  0,       bottom9, bottom9,  bottom9, ROT0, "Konami", "Bottom of the Ninth (version T)", 0 ,2)
-GAME( 1989, bottom9n, bottom9, bottom9, bottom9,  bottom9, ROT0, "Konami", "Bottom of the Ninth (version N)", 0 ,2)
-GAME( 1989, mstadium, bottom9, bottom9, mstadium, bottom9, ROT0, "Konami", "Main Stadium (Japan)", 0 ,2)
+GAME( 1989, bottom9,  0,       bottom9, bottom9,  bottom9, ROT0, "Konami", "Bottom of the Ninth (version T)", 0 ,2,0,egg_sport_Baseball,0)
+GAME( 1989, bottom9n, bottom9, bottom9, bottom9,  bottom9, ROT0, "Konami", "Bottom of the Ninth (version N)", 0 ,2,0,egg_sport_Baseball,0)
+GAME( 1989, mstadium, bottom9, bottom9, mstadium, bottom9, ROT0, "Konami", "Main Stadium (Japan)", 0 ,2,0,egg_sport_Baseball,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

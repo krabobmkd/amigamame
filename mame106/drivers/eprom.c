@@ -1,3 +1,4 @@
+#define MACHINENAME "eprom"
 /***************************************************************************
 
     Atari Escape hardware
@@ -568,7 +569,8 @@ static DRIVER_INIT( klaxp )
  *
  *************************************/
 
-GAME( 1989, eprom,  0,     eprom, eprom, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", 0 ,2)
-GAME( 1989, eprom2, eprom, eprom, eprom, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", 0 ,2)
-GAME( 1989, klaxp1, klax,  klaxp, klaxp, klaxp, ROT0, "Atari Games", "Klax (prototype set 1)", 0 ,1)
-GAME( 1989, klaxp2, klax,  klaxp, klaxp, klaxp, ROT0, "Atari Games", "Klax (prototype set 2)", 0 ,1)
+GAME( 1989, eprom,  0,     eprom, eprom, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1989, eprom2, eprom, eprom, eprom, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", 0 ,2,0,egg_ShootEmUp,0)
+GAME( 1989, klaxp1, klax,  klaxp, klaxp, klaxp, ROT0, "Atari Games", "Klax (prototype set 1)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1989, klaxp2, klax,  klaxp, klaxp, klaxp, ROT0, "Atari Games", "Klax (prototype set 2)", 0 ,2,0,egg_Puzzle,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

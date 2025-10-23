@@ -1,3 +1,4 @@
+#define MACHINENAME "tunhunt"
 /***************************************************************************
 
     Atari Tunnel Hunt hardware
@@ -438,5 +439,6 @@ ROM_END
  *************************************/
 
 /*         rom   parent  machine    inp         init */
-GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt,	0,  ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", 0 ,1)
-GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt,	0,  ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", 0 ,1)
+GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt,	0,  ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", 0 ,0,1,egg_Flying,0)
+GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt,	0,  ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", 0 ,0,1,egg_Flying,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          

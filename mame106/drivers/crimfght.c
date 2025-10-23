@@ -1,3 +1,4 @@
+#define MACHINENAME "crimfght"
 /***************************************************************************
 
 Crime Fighters (Konami GX821) (c) 1989 Konami
@@ -523,6 +524,7 @@ static DRIVER_INIT( crimfght )
 
 
 
-GAME( 1989, crimfght, 0,        crimfght, crimfght, crimfght, ROT0, "Konami", "Crime Fighters (US 4 players)", 0 ,4)
-GAME( 1989, crimfgt2, crimfght, crimfght, crimfgtj, crimfght, ROT0, "Konami", "Crime Fighters (World 2 Players)", 0 ,4)
-GAME( 1989, crimfgtj, crimfght, crimfght, crimfgtj, crimfght, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", 0 ,4)
+GAME( 1989, crimfght, 0,        crimfght, crimfght, crimfght, ROT0, "Konami", "Crime Fighters (US 4 players)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1989, crimfgt2, crimfght, crimfght, crimfgtj, crimfght, ROT0, "Konami", "Crime Fighters (World 2 Players)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1989, crimfgtj, crimfght, crimfght, crimfgtj, crimfght, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", 0 ,2,0,egg_BeatNUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

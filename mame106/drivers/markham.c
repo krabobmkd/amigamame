@@ -1,3 +1,4 @@
+#define MACHINENAME "markham"
 /*****************************************************************************
 
 Markham (c) 1983 Sun Electronics
@@ -286,4 +287,4 @@ ROM_START( markham )
 ROM_END
 
 
-GAME( 1983, markham, 0, markham, markham, 0, ROT0, "Sun Electronics", "Markham", 0 ,0)
+GAME( 1983, markham, 0, markham, markham, 0, ROT0, "Sun Electronics", "Markham", 0 ,0,2,egg_ShootEmUp,0)

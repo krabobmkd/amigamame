@@ -1,3 +1,4 @@
+#define MACHINENAME "sega s18"
 /*  System18 Hardware
 **
 **  MC68000 + Z80
@@ -1488,9 +1489,10 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1990, astormbl, astorm,   astormbl, astormbl, astormbl, ROT0, "bootleg", "Alien Storm (bootleg)", 0 ,3)
+GAME( 1990, astormbl, astorm,   astormbl, astormbl, astormbl, ROT0, "bootleg", "Alien Storm (bootleg)", 0 ,3,0,egg_BeatNUp,0)
 
-GAME( 1990, mwalkbl,  mwalk,    mwalkbl,  mwalkbl,  mwalkbl,  ROT0, "bootleg", "Michael Jackson's Moonwalker (bootleg)", 0 ,3)
+GAME( 1990, mwalkbl,  mwalk,    mwalkbl,  mwalkbl,  mwalkbl,  ROT0, "bootleg", "Michael Jackson's Moonwalker (bootleg)", 0 ,3,0,egg_Platform,EGF_I3D)
 
-GAME( 1989, shdancbl, shdancer, shdancbl, mwalkbl, shdancbl, ROT0, "bootleg", "Shadow Dancer (bootleg)", GAME_IMPERFECT_GRAPHICS,2)
+GAME( 1989, shdancbl, shdancer, shdancbl, mwalkbl, shdancbl, ROT0, "bootleg", "Shadow Dancer (bootleg)", GAME_IMPERFECT_GRAPHICS,0,2,egg_Platform,0)
+
 

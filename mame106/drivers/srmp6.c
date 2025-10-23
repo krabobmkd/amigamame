@@ -1,3 +1,4 @@
+#define MACHINENAME "srmp6"
 /*
     Super Real Mahjong P6 (JPN Ver.)
     (c)1996 Seta
@@ -548,6 +549,7 @@ static DRIVER_INIT( srmp6 )
     Game driver(s)
 ***************************************************************************/
 
-/*GAME( YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,0)*/
-GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", GAME_NOT_WORKING | GAME_NO_SOUND,0)
+/*GAME( YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,0,0,egg_Unknown,0)*/
+GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", GAME_NOT_WORKING | GAME_NO_SOUND,0,1,egg_Mature,0)
 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

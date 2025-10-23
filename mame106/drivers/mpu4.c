@@ -1,3 +1,4 @@
+#define MACHINENAME "mpu4"
 /***************************************************************************
 MPU4 highly preliminary driver, based on
 Bellfruit scorpion1 driver, (under heavy construction !!!)
@@ -2198,12 +2199,13 @@ ROM_END
 
 /*    YEAR   NAME    PARENT   MACHINE   INPUT     INIT   MONITOR COMPANY      FULLNAME                                                          FLAGS (0 if none)  */
 
-GAME( 199?, bctvidbs,0,       mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "MPU4 Video Firmware",												NOT_A_DRIVER ,0)
+GAME( 199?, bctvidbs,0,       mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "MPU4 Video Firmware",												NOT_A_DRIVER ,0,0,egg_Unknown,0)
 
-GAME( 1994, crmaze,  bctvidbs,mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1994, crmazea, crmaze,  mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Crystal Maze (AMLD version SWP)",								GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 1994, crmazeb, crmaze,  mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Crystal Maze - Now Featuring Ocean Zone (AMLD Version SWP)",	GAME_NOT_WORKING|GAME_NO_SOUND ,0) // unprotected?
-GAME( 1990, turnover,bctvidbs,mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "Turnover",														GAME_NOT_WORKING|GAME_NO_SOUND ,0) // unprotected?
-GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 199?, mating,  bctvidbs,mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Mating Game (Datapak)",										GAME_NOT_WORKING|GAME_NO_SOUND ,0)
-GAME( 199?, matinga, mating,  mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Mating Game (Standard)",										GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 1994, crmaze,  bctvidbs,mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1994, crmazea, crmaze,  mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Crystal Maze (AMLD version SWP)",								GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 1994, crmazeb, crmaze,  mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Crystal Maze - Now Featuring Ocean Zone (AMLD Version SWP)",	GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0) // unprotected?
+GAME( 1990, turnover,bctvidbs,mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "Turnover",														GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0) // unprotected?
+GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 199?, mating,  bctvidbs,mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Mating Game (Datapak)",										GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+GAME( 199?, matinga, mating,  mpu4_vid, mpu4_vid, 0,     ROT0,   "Barcrest", "The Mating Game (Standard)",										GAME_NOT_WORKING|GAME_NO_SOUND ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

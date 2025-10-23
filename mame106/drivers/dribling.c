@@ -1,3 +1,4 @@
+#define MACHINENAME "dribling"
 /***************************************************************************
 
     Model Racing Dribbling hardware
@@ -372,5 +373,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, dribling, 0,        dribling, dribling, 0, ROT0, "Model Racing", "Dribbling", GAME_NO_SOUND ,0)
-GAME( 1983, driblino, dribling, dribling, dribling, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", GAME_NO_SOUND ,0)
+GAME( 1983, dribling, 0,        dribling, dribling, 0, ROT0, "Model Racing", "Dribbling", GAME_NO_SOUND ,2,0,egg_sport_Soccer,0)
+GAME( 1983, driblino, dribling, dribling, dribling, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", GAME_NO_SOUND ,2,0,egg_sport_Soccer,0)
+                                                                                                                                                                                                                                                                                                                                                                                        

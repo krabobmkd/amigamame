@@ -1,3 +1,4 @@
+#define MACHINENAME "bestleag"
 /*******************************************************************************************
 
 Best League (c) 1993
@@ -402,4 +403,4 @@ ROM_END
 
 /* GAME drivers */
 
-GAME( 1993, bestleag, bigstrik, bestleag, bestleag, 0, ROT0, "bootleg", "Best League", 0 ,2)
+GAME( 1993, bestleag, bigstrik, bestleag, bestleag, 0, ROT0, "bootleg", "Best League", 0 ,2,0,egg_sport_Soccer,0)

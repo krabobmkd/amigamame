@@ -1,3 +1,4 @@
+#define MACHINENAME "mexico86"
 /***************************************************************************
 
 Kick & Run - (c) 1987 Taito
@@ -558,7 +559,7 @@ ROM_START( mexico86 )
 ROM_END
 
 
-GAME( 1986, kikikai,  0,        kikikai,  kikikai,  0, ROT90, "Taito Corporation", "KiKi KaiKai", 0 ,0)
-GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  0, ROT90, "bootleg", "Knight Boy", 0 ,0)
-GAME( 1986, kicknrun, 0,        mexico86, mexico86, 0, ROT0,  "Taito Corporation", "Kick and Run", 0 ,0)
-GAME( 1986, mexico86, kicknrun, mexico86, mexico86, 0, ROT0,  "bootleg", "Mexico 86", 0 ,0)
+GAME( 1986, kikikai,  0,        kikikai,  kikikai,  0, ROT90, "Taito Corporation", "KiKi KaiKai", 0 ,0,2,egg_ShootEmUp,EGF_Girly|EGF_Childish)
+GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  0, ROT90, "bootleg", "Knight Boy", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1986, kicknrun, 0,        mexico86, mexico86, 0, ROT0,  "Taito Corporation", "Kick and Run", 0 ,4,0,egg_sport_Soccer,0)
+GAME( 1986, mexico86, kicknrun, mexico86, mexico86, 0, ROT0,  "bootleg", "Mexico 86", 0 ,4,0,egg_sport_Soccer,0)

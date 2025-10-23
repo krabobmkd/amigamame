@@ -1,3 +1,4 @@
+#define MACHINENAME "suprloco"
 /******************************************************************************
 
 Super Locomotive
@@ -296,4 +297,4 @@ DRIVER_INIT( suprloco )
 
 
 
-GAME( 1982, suprloco, 0, suprloco, suprloco, suprloco, ROT0, "Sega", "Super Locomotive", 0 ,0)
+GAME( 1982, suprloco, 0, suprloco, suprloco, suprloco, ROT0, "Sega", "Super Locomotive", 0 ,0,0,egg_Unknown,0)

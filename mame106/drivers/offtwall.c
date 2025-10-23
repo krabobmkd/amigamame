@@ -1,3 +1,4 @@
+#define MACHINENAME "offtwall"
 /***************************************************************************
 
     Atari "Round" hardware
@@ -513,5 +514,6 @@ static DRIVER_INIT( offtwalc )
  *
  *************************************/
 
-GAME( 1991, offtwall, 0,        offtwall, offtwall, offtwall, ROT0, "Atari Games", "Off the Wall (2/3-player upright)", 0 ,0)
-GAME( 1991, offtwalc, offtwall, offtwall, offtwall, offtwalc, ROT0, "Atari Games", "Off the Wall (2-player cocktail)", 0 ,0)
+GAME( 1991, offtwall, 0,        offtwall, offtwall, offtwall, ROT0, "Atari Games", "Off the Wall (2/3-player upright)", 0 ,3,0,egg_BallNPaddles,0)
+GAME( 1991, offtwalc, offtwall, offtwall, offtwall, offtwalc, ROT0, "Atari Games", "Off the Wall (2-player cocktail)", 0 ,3,0,egg_BallNPaddles,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

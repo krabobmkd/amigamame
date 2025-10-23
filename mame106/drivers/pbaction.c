@@ -1,3 +1,4 @@
+#define MACHINENAME "pbaction"
 /***************************************************************************
 
 Pinball Action memory map (preliminary)
@@ -421,6 +422,6 @@ static DRIVER_INIT( pbactio3 )
 }
 
 
-GAME( 1985, pbaction, 0,        pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", 0 ,2)
-GAME( 1985, pbactio2, pbaction, pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", 0 ,2)
-GAME( 1985, pbactio3, pbaction, pbaction, pbaction, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", 0 ,2)
+GAME( 1985, pbaction, 0,        pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", 0 ,0,2,egg_Pinballs,0)
+GAME( 1985, pbactio2, pbaction, pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", 0 ,0,2,egg_Pinballs,0)
+GAME( 1985, pbactio3, pbaction, pbaction, pbaction, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", 0 ,0,2,egg_Pinballs,0)

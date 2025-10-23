@@ -1,3 +1,4 @@
+#define MACHINENAME "chqflag"
 /***************************************************************************
 
 Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
@@ -480,5 +481,6 @@ static DRIVER_INIT( chqflag )
 	paletteram = &RAM[0x58000];
 }
 
-GAME( 1988, chqflag,        0, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0)
-GAME( 1988, chqflagj, chqflag, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0)
+GAME( 1988, chqflag,        0, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0,1,egg_Driving,0)
+GAME( 1988, chqflagj, chqflag, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ,0,1,egg_Driving,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

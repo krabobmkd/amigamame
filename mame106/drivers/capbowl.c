@@ -1,3 +1,4 @@
+#define MACHINENAME "capbowl"
 /***************************************************************************
 
     Coors Light Bowling/Bowl-O-Rama hardware
@@ -499,9 +500,10 @@ static DRIVER_INIT( capbowl )
  *
  *************************************/
 
-GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 1)", 0 ,4)
-GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 2)", 0 ,4)
-GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 3)", 0 ,4)
-GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 4)", 0 ,4)
-GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Coors Light Bowling", 0 ,4)
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl, ROT270, "P&P Marketing", "Bowl-O-Rama", 0 ,0)
+GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 1)", 0 ,0,4,egg_sport_Bowling,0)
+GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 2)", 0 ,0,4,egg_sport_Bowling,0)
+GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 3)", 0 ,0,4,egg_sport_Bowling,0)
+GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 4)", 0 ,0,4,egg_sport_Bowling,0)
+GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Coors Light Bowling", 0 ,0,4,egg_sport_Bowling,0)
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl, ROT270, "P&P Marketing", "Bowl-O-Rama", 0 ,0,4,egg_sport_Bowling,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           

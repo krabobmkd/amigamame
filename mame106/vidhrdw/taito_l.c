@@ -323,7 +323,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		dgp0.flipy = flipy;
 		dgp0.sx = sx;
 		dgp0.sy = sy;
-        dgp0.priority_mask = (color & 0x08) ? 0xaa : 0x00 ;
+        dgp0.priority_mask = (color & 0x08) ? (0xaa|(1<<31)) : (0x00|(1<<31)) ;
 		drawgfx(&dgp0);
 	}
 	} // end of patch paragraph

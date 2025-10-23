@@ -1,3 +1,4 @@
+#define MACHINENAME "blockade"
 /****************************************************************************
 
 Blockade/Comotion/Blasto/Hustle Memory MAP
@@ -580,9 +581,9 @@ ROM_START( minesw4p )
     ROM_LOAD_NIB_LOW(  "mineswee.cls", 0x0000, 0x0200, CRC(70959755) SHA1(f62d448742da3fae8bbd96eb3a2714db500cecce) )
 ROM_END
 
-GAME( 1976, blockade, 0, blockade, blockade, blockade, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND ,2)
-GAME( 1976, comotion, 0, comotion, comotion, blockade, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND ,4)
-GAME( 1978, blasto,   0, blasto,   blasto,   blockade, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND ,2)
-GAME( 1977, hustle,   0, hustle,   hustle,   blockade, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND ,2)
-GAME( 1977, mineswpr, 0, blasto,   mineswpr, blockade, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND ,2)
-GAME( 1977, minesw4p, 0, blasto,   minesw4p, blockade, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND ,0)
+GAME( 1976, blockade, 0, blockade, blockade, blockade, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND ,2,0,egg_Maze,0)
+GAME( 1976, comotion, 0, comotion, comotion, blockade, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND ,4,0,egg_Maze,0)
+GAME( 1978, blasto,   0, blasto,   blasto,   blockade, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND ,2,0,egg_ShootEmUp,0)
+GAME( 1977, hustle,   0, hustle,   hustle,   blockade, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND ,2,0,egg_Maze,0)
+GAME( 1977, mineswpr, 0, blasto,   mineswpr, blockade, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND ,2,0,egg_Maze,0)
+GAME( 1977, minesw4p, 0, blasto,   minesw4p, blockade, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND ,0,0,egg_Unknown,0)

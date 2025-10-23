@@ -1,3 +1,4 @@
+#define MACHINENAME "n8080"
 /***************************************************************************
 
   Nintendo 8080 hardware
@@ -668,12 +669,12 @@ ROM_START( helifira )
 ROM_END
 
 
-GAME( 1979, spacefev, 0,        spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (set 1)", 0 ,0)
-GAME( 1979, spacefva, spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (set 2)", 0 ,0)
-GAME( 1979, highsplt, 0,        spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", 0 ,0)
-GAME( 1979, highspla, highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", 0 ,0)
-GAME( 1979, spacelnc, 0,        spacefev, spacelnc, 0, ROT270, "Nintendo", "Space Launcher", 0 ,2)
-GAME( 1979, sheriff,  0,        sheriff,  sheriff,  0, ROT270, "Nintendo", "Sheriff", 0 ,2)
-GAME( 1980, bandido,  sheriff,  sheriff,  bandido,  0, ROT270, "Exidy",    "Bandido", 0 ,2)
-GAME( 1980, helifire, 0,        helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ,0)
-GAME( 1980, helifira, helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ,0)
+GAME( 1979, spacefev, 0,        spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, spacefva, spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, highsplt, 0,        spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, highspla, highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, spacelnc, 0,        spacefev, spacelnc, 0, ROT270, "Nintendo", "Space Launcher", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, sheriff,  0,        sheriff,  sheriff,  0, ROT270, "Nintendo", "Sheriff", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, bandido,  sheriff,  sheriff,  bandido,  0, ROT270, "Exidy",    "Bandido", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, helifire, 0,        helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1980, helifira, helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)

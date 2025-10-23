@@ -1,3 +1,4 @@
+#define MACHINENAME "strnskil"
 /*****************************************************************************
 
 Strength & Skill (c) 1984 Sun Electronics
@@ -471,6 +472,6 @@ ROM_START( pettanp )
 	ROM_LOAD( "tvg12-16.2", 0x0000,  0x1000, CRC(3abc6ba8) SHA1(15e0b0f9d068f6094e2be4f4f1dea0ff6e85686b) )
 ROM_END
 
-GAME(  1984, strnskil, 0,        strnskil, strnskil, 0, ROT0, "Sun Electronics", "Strength & Skill", 0 ,0)
-GAME(  1984, guiness,  strnskil, strnskil, strnskil, 0, ROT0, "Sun Electronics", "The Guiness (Japan)", 0 ,0)
-GAME( 1984, pettanp,  0,        strnskil, pettanp,  0, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", GAME_UNEMULATED_PROTECTION ,0)
+GAME(  1984, strnskil, 0,        strnskil, strnskil, 0, ROT0, "Sun Electronics", "Strength & Skill", 0 ,2,0,egg_Miscellaneous,0)
+GAME(  1984, guiness,  strnskil, strnskil, strnskil, 0, ROT0, "Sun Electronics", "The Guiness (Japan)", 0 ,2,0,egg_Miscellaneous,0)
+GAME( 1984, pettanp,  0,        strnskil, pettanp,  0, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", GAME_UNEMULATED_PROTECTION ,0,2,egg_Maze,0)

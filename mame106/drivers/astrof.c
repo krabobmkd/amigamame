@@ -1,3 +1,4 @@
+#define MACHINENAME "astrof"
 /*
     Driver For DECO   ASTRO FIGHTER/TOMAHAWK 777
 
@@ -584,13 +585,14 @@ static DRIVER_INIT( sstarbtl )
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
 }
 
-GAME( 1979, astrof,   0,        astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 1)", 0 ,2)
-GAME( 1979, astrof2,  astrof,   astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 2)", 0 ,2)
-GAME( 1979, astrof3,  astrof,   astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 3)", 0 ,2)
-GAME( 1979, abattle,  astrof,	abattle,  abattle,  abattle, ROT90, "Sidam",	   "Astro Battle (set 1)", 0 ,2)
-GAME( 1979, abattle2, astrof,	abattle,  abattle,  abattle, ROT90, "Sidam",	   "Astro Battle (set 2)", 0 ,2)
-GAME( 1979, afire,    astrof,   abattle,  abattle,  afire,   ROT90, "Rene Pierre", "Astro Fire", 0 ,2)
-GAME( 1979, acombat,  astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",     "Astro Combat", 0 ,2)
-GAME( 1979, sstarbtl, astrof,   abattle,  abattle,  sstarbtl,ROT90, "bootleg",     "Super Star Battle", 0 ,2)
-GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 1)", GAME_NO_SOUND ,2)
-GAME( 1980, tomahaw5, tomahawk, tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 5)", GAME_NO_SOUND ,2)
+GAME( 1979, astrof,   0,        astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, astrof2,  astrof,   astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, astrof3,  astrof,   astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 3)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, abattle,  astrof,	abattle,  abattle,  abattle, ROT90, "Sidam",	   "Astro Battle (set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, abattle2, astrof,	abattle,  abattle,  abattle, ROT90, "Sidam",	   "Astro Battle (set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, afire,    astrof,   abattle,  abattle,  afire,   ROT90, "Rene Pierre", "Astro Fire", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, acombat,  astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",     "Astro Combat", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1979, sstarbtl, astrof,   abattle,  abattle,  sstarbtl,ROT90, "bootleg",     "Super Star Battle", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 1)", GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1980, tomahaw5, tomahawk, tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 5)", GAME_NO_SOUND ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

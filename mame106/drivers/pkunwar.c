@@ -1,3 +1,4 @@
+#define MACHINENAME "pkunwar"
 /***************************************************************************
 
 Notes:
@@ -250,5 +251,6 @@ ROM_END
 
 
 
-GAME( 1985?, pkunwar,  0,       pkunwar, pkunwar, 0, ROT0, "UPL", "Penguin-Kun Wars (US)", 0 ,0)
-GAME( 1985?, pkunwarj, pkunwar, pkunwar, pkunwar, 0, ROT0, "UPL", "Penguin-Kun Wars (Japan)", 0 ,0)
+GAME( 1985?, pkunwar,  0,       pkunwar, pkunwar, 0, ROT0, "UPL", "Penguin-Kun Wars (US)", 0 ,0,2,egg_Miscellaneous,0)
+GAME( 1985?, pkunwarj, pkunwar, pkunwar, pkunwar, 0, ROT0, "UPL", "Penguin-Kun Wars (Japan)", 0 ,0,2,egg_Miscellaneous,0)
+                                                                                                                                                                                                                                                              

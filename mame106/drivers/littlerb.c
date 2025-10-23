@@ -1,3 +1,4 @@
+#define MACHINENAME "littlerb"
 /* Little Robin */
 
 /* driver by
@@ -363,4 +364,5 @@ ROM_START( littlerb )
 ROM_END
 
 
-GAME( 1993, littlerb, 0, littlerb, littlerb, 0, ROT0, "TCH", "Little Robin", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 1993, littlerb, 0, littlerb, littlerb, 0, ROT0, "TCH", "Little Robin", GAME_NOT_WORKING|GAME_NO_SOUND ,2,0,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                                                              

@@ -1,3 +1,4 @@
+#define MACHINENAME "thoop2"
 /***************************************************************************
 
 Thunder Hoop II: Strikes Back (c) 1994 Gaelco
@@ -239,4 +240,5 @@ ROM_START( thoop2 )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
 ROM_END
 
-GAME( 1994, thoop2,  0, thoop2, thoop2,  0, ROT0, "Gaelco", "TH Strikes Back", GAME_UNEMULATED_PROTECTION ,0)
+GAME( 1994, thoop2,  0, thoop2, thoop2,  0, ROT0, "Gaelco", "TH Strikes Back", GAME_UNEMULATED_PROTECTION ,2,0,egg_Platform,0)
+                                                                                                                                                                                                                                                  

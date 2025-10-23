@@ -63,7 +63,7 @@ set(MAME_CORE_SRC
 
  # drawgfx.h drawgfxn.h drawgfx.c  drawgfxn.cpp tilemapn.cpp
 # sound_krb.c
-
+ genredefs.h
  mame.h                profiler.h   unzip.h
  cdrom.h      driver.h     mamecore.h            romload.h    usrintrf.h
  chd.h        fileio.h     md5.h                 sha1.h       video.h

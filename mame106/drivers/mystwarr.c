@@ -1,3 +1,4 @@
+#define MACHINENAME "mystwarr"
 #define MW_DEBUG     0
 
 /**************************************************************************
@@ -2129,23 +2130,23 @@ static DRIVER_INIT(metamrph)
 
 
 /*           ROM       parent    machine   inp       init */
-GAME( 1993, mystwarr, 0,        mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver EAA)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1993, mystwaru, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver UAA)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1993, mmaulers, 0,        dadandrn, dadandrn, 0,        ROT0,  "Konami", "Monster Maulers (ver EAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, dadandrn, mmaulers, dadandrn, dadandrn, 0,        ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, viostorm, 0,        viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver EAB)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, viostrmu, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, viostrmj, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver JAC)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, viostrma, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver AAC)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, metamrph, 0,        metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver EAA)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1993, metamrpu, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver UAA)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1993, metamrpj, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver JAA)", GAME_IMPERFECT_GRAPHICS ,4)
-GAME( 1993, mtlchamp, 0,        martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAB)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, mtlchmp1, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, mtlchmpu, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver UAD)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, mtlchmpj, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver JAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, mtlchmpa, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver AAA)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, gaiapols, 0,        gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver EAF)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, gaiapolu, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver UAF)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1993, gaiapolj, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver JAF)", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1993, mystwarr, 0,        mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver EAA)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_BeatNUp,0)
+GAME( 1993, mystwaru, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver UAA)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_BeatNUp,0)
+GAME( 1993, mmaulers, 0,        dadandrn, dadandrn, 0,        ROT0,  "Konami", "Monster Maulers (ver EAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,EGF_Hentai|EGF_Sexy)
+GAME( 1993, dadandrn, mmaulers, dadandrn, dadandrn, 0,        ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
+GAME( 1993, viostorm, 0,        viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver EAB)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1993, viostrmu, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1993, viostrmj, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver JAC)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1993, viostrma, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver AAC)", GAME_IMPERFECT_GRAPHICS ,0,0,egg_Unknown,0)
+GAME( 1993, metamrph, 0,        metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver EAA)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_BeatNUp,0)
+GAME( 1993, metamrpu, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver UAA)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_BeatNUp,0)
+GAME( 1993, metamrpj, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver JAA)", GAME_IMPERFECT_GRAPHICS ,4,0,egg_BeatNUp,0)
+GAME( 1993, mtlchamp, 0,        martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAB)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
+GAME( 1993, mtlchmp1, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
+GAME( 1993, mtlchmpu, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver UAD)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
+GAME( 1993, mtlchmpj, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver JAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
+GAME( 1993, mtlchmpa, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver AAA)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_Fighter,0)
+GAME( 1993, gaiapols, 0,        gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver EAF)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_BeatNUp,0)
+GAME( 1993, gaiapolu, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver UAF)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_BeatNUp,0)
+GAME( 1993, gaiapolj, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver JAF)", GAME_IMPERFECT_GRAPHICS ,2,0,egg_BeatNUp,0)
 

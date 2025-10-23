@@ -1,3 +1,4 @@
+#define MACHINENAME "munchmo"
 /***************************************************************************
   Munch Mobile
   (C) 1982 SNK
@@ -376,5 +377,6 @@ ROM_START( mnchmobl )
 ROM_END
 
 
-GAME( 1983, joyfulr,  0,       munchmo, mnchmobl, 0, ROT270, "SNK", "Joyful Road (Japan)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ,2)
-GAME( 1983, mnchmobl, joyfulr, munchmo, mnchmobl, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ,2)
+GAME( 1983, joyfulr,  0,       munchmo, mnchmobl, 0, ROT270, "SNK", "Joyful Road (Japan)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ,0,2,egg_Driving,0)
+GAME( 1983, mnchmobl, joyfulr, munchmo, mnchmobl, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ,0,2,egg_Driving,0)
+                                                                                                                                                                                                                                                                                                                                                                                            

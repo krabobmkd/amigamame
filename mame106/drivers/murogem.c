@@ -1,3 +1,4 @@
+#define MACHINENAME "murogem"
 /*
 
 note:
@@ -236,4 +237,5 @@ ROM_START( murogem )
 ROM_END
 
 
-GAME( 198?, murogem, 0, murogem, murogem, 0, ROT0, "unknown", "Muroge Monaco",GAME_NO_SOUND|GAME_WRONG_COLORS ,0)
+GAME( 198?, murogem, 0, murogem, murogem, 0, ROT0, "unknown", "Muroge Monaco",GAME_NO_SOUND|GAME_WRONG_COLORS ,0,1,egg_CardBattle,0)
+                                                                                                                                                                                                                     

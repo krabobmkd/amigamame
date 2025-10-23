@@ -1,3 +1,4 @@
+#define MACHINENAME "genesis"
 /* Some Generic Sega Genesis stuff used by Megatech / Megaplay etc. */
 
 /*

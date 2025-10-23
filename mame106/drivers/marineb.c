@@ -1,3 +1,4 @@
+#define MACHINENAME "marineb"
 /***************************************************************************
 
 Marine Boy hardware memory map (preliminary)
@@ -878,13 +879,14 @@ ROM_END
 
 
 /*    year  name      parent   machine   inputs */
-GAME( 1982, marineb,  0,       marineb,  marineb, 0, ROT0,   "Orca", "Marine Boy", 0 ,0)
-GAME( 1982, changes,  0,       changes,  changes, 0, ROT0,   "Orca", "Changes", 0 ,0)
-GAME( 1982, changesa, changes, changes,  changes, 0, ROT0,   "Orca (Eastern Micro Electronics, Inc. license)", "Changes (EME license)", 0,0)
-GAME( 1982, looper,   changes, changes,  changes, 0, ROT0,   "Orca", "Looper", 0 ,0)
-GAME( 1982, springer, 0,       springer, marineb, 0, ROT270, "Orca", "Springer", 0 ,0)
-GAME( 1983, hoccer,   0,       hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 1)", 0 ,0)
-GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 2)" , 0,0)	/* earlier */
-GAME( 1983, bcruzm12, 0,       bcruzm12, bcruzm12,0, ROT90,  "Sigma Enterprises Inc.", "Battle Cruiser M-12", 0 ,2)
-GAME( 1983, hopprobo, 0,       hopprobo, marineb, 0, ROT90,  "Sega", "Hopper Robo", 0 ,0)
-GAME( 1984, wanted,   0,       wanted,   wanted,  0, ROT90,  "Sigma Enterprises Inc.", "Wanted", 0 ,0)
+GAME( 1982, marineb,  0,       marineb,  marineb, 0, ROT0,   "Orca", "Marine Boy", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, changes,  0,       changes,  changes, 0, ROT0,   "Orca", "Changes", 0 ,0,2,egg_Maze,0)
+GAME( 1982, changesa, changes, changes,  changes, 0, ROT0,   "Orca (Eastern Micro Electronics, Inc. license)", "Changes (EME license)", 0,0,2,egg_Maze,0)
+GAME( 1982, looper,   changes, changes,  changes, 0, ROT0,   "Orca", "Looper", 0 ,0,2,egg_Maze,0)
+GAME( 1982, springer, 0,       springer, marineb, 0, ROT270, "Orca", "Springer", 0 ,0,2,egg_Platform,0)
+GAME( 1983, hoccer,   0,       hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 1)", 0 ,0,2,egg_sport_Hockey,0)
+GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 2)" , 0,0,2,egg_sport_Hockey,0)	/* earlier */
+GAME( 1983, bcruzm12, 0,       bcruzm12, bcruzm12,0, ROT90,  "Sigma Enterprises Inc.", "Battle Cruiser M-12", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1983, hopprobo, 0,       hopprobo, marineb, 0, ROT90,  "Sega", "Hopper Robo", 0 ,0,2,egg_Platform,0)
+GAME( 1984, wanted,   0,       wanted,   wanted,  0, ROT90,  "Sigma Enterprises Inc.", "Wanted", 0 ,0,2,egg_Shooter,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          

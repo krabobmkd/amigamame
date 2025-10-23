@@ -1,3 +1,4 @@
+#define MACHINENAME "missb2"
 /* Miss Bubble 2
 
 A rather odd bootleg of Bubble Bobble with level select, redesigned levels,
@@ -505,4 +506,4 @@ static DRIVER_INIT( missb2 )
 
 /* Game Drivers */
 
-GAME( 1996, missb2, bublbobl, missb2, missb2, missb2, ROT0,  "Alpha Co", "Miss Bubble 2", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,2)
+GAME( 1996, missb2, bublbobl, missb2, missb2, missb2, ROT0,  "Alpha Co", "Miss Bubble 2", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ,2,0,egg_Mature,0)

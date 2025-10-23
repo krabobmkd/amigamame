@@ -1,3 +1,4 @@
+#define MACHINENAME "dcheese"
 /***************************************************************************
 
     HAR MadMax hardware
@@ -608,6 +609,7 @@ static DRIVER_INIT( dcheese )
  *
  *************************************/
 
-GAME( 1993, dcheese, 0, dcheese, dcheese, dcheese, ROT90, "HAR", "Double Cheese", GAME_SUPPORTS_SAVE ,0)
-GAME( 1993, lottof2, 0, dcheese, lottof2, dcheese, ROT0,  "HAR", "Lotto Fun 2", GAME_SUPPORTS_SAVE ,0)
-GAME( 1994, fredmem, 0, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match", GAME_SUPPORTS_SAVE ,0)
+GAME( 1993, dcheese, 0, dcheese, dcheese, dcheese, ROT90, "HAR", "Double Cheese", GAME_SUPPORTS_SAVE ,0,1,egg_Miscellaneous,0)
+GAME( 1993, lottof2, 0, dcheese, lottof2, dcheese, ROT0,  "HAR", "Lotto Fun 2", GAME_SUPPORTS_SAVE ,0,1,egg_Casino,0)
+GAME( 1994, fredmem, 0, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match", GAME_SUPPORTS_SAVE ,0,1,egg_Puzzle,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

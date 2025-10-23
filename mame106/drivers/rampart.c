@@ -1,3 +1,4 @@
+#define MACHINENAME "rampart"
 /***************************************************************************
 
     Atari Rampart hardware
@@ -519,6 +520,6 @@ static DRIVER_INIT( rampart )
  *
  *************************************/
 
-GAME( 1990, rampart,  0,       rampart, rampart,  rampart, ROT0, "Atari Games", "Rampart (Trackball)", 0 ,3)
-GAME( 1990, ramprt2p, rampart, rampart, ramprt2p, rampart, ROT0, "Atari Games", "Rampart (Joystick)", 0 ,3)
-GAME( 1990, rampartj, rampart, rampart, rampartj, rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", 0 ,3)
+GAME( 1990, rampart,  0,       rampart, rampart,  rampart, ROT0, "Atari Games", "Rampart (Trackball)", 0 ,3,0,egg_ShootEmUp,0)
+GAME( 1990, ramprt2p, rampart, rampart, ramprt2p, rampart, ROT0, "Atari Games", "Rampart (Joystick)", 0 ,3,0,egg_ShootEmUp,0)
+GAME( 1990, rampartj, rampart, rampart, rampartj, rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", 0 ,2,0,egg_ShootEmUp,0)

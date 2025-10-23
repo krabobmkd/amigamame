@@ -1,3 +1,4 @@
+#define MACHINENAME "scregg"
 /***************************************************************************
 
 Eggs & Dommy
@@ -315,6 +316,7 @@ ROM_START( eggs )
 ROM_END
 
 
-GAME( 198?, dommy,  0,      dommy,  scregg, 0, ROT270, "Technos", "Dommy", 0 ,0)
-GAME( 1983, scregg, 0,      scregg, scregg, 0, ROT270, "Technos", "Scrambled Egg", 0 ,0)
-GAME( 1983, eggs,   scregg, scregg, scregg, 0, ROT270, "[Technos] Universal USA", "Eggs", 0 ,0)
+GAME( 198?, dommy,  0,      dommy,  scregg, 0, ROT270, "Technos", "Dommy", 0 ,0,2,egg_Maze,0)
+GAME( 1983, scregg, 0,      scregg, scregg, 0, ROT270, "Technos", "Scrambled Egg", 0 ,0,2,egg_Maze,0)
+GAME( 1983, eggs,   scregg, scregg, scregg, 0, ROT270, "[Technos] Universal USA", "Eggs", 0 ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                

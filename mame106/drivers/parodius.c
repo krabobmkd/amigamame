@@ -1,3 +1,4 @@
+#define MACHINENAME "parodius"
 /***************************************************************************
 
 Parodius (Konami GX955) (c) 1990 Konami
@@ -420,5 +421,5 @@ static DRIVER_INIT( parodius )
 
 
 
-GAME( 1990, parodius, 0,        parodius, parodius, parodius, ROT0, "Konami", "Parodius DA! (World)", 0 ,0)
-GAME( 1990, parodisj, parodius, parodius, parodius, parodius, ROT0, "Konami", "Parodius DA! (Japan)", 0 ,0)
+GAME( 1990, parodius, 0,        parodius, parodius, parodius, ROT0, "Konami", "Parodius DA! (World)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1990, parodisj, parodius, parodius, parodius, parodius, ROT0, "Konami", "Parodius DA! (Japan)", 0 ,0,2,egg_ShootEmUp,0)

@@ -1,3 +1,4 @@
+#define MACHINENAME "momoko"
 /*****************************************************************************
 
 Momoko 120% (c) 1986 Jaleco
@@ -334,4 +335,4 @@ ROM_START( momoko )
 	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
 ROM_END
 
-GAME( 1986, momoko, 0, momoko, momoko, 0, ROT0, "Jaleco", "Momoko 120%", 0 ,0)
+GAME( 1986, momoko, 0, momoko, momoko, 0, ROT0, "Jaleco", "Momoko 120%", 0 ,0,2,egg_Platform,0)

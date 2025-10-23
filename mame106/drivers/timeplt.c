@@ -1,3 +1,4 @@
+#define MACHINENAME "timeplt"
 /***************************************************************************
 
 Time Pilot memory map (preliminary)
@@ -464,8 +465,9 @@ ROM_END
 
 
 
-GAME( 1982, timeplt,  0,       timeplt, timeplt, 0, ROT90,  "Konami", "Time Pilot", 0 ,2)
-GAME( 1982, timepltc, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", 0 ,2)
-GAME( 1982, timeplta, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", 0 ,2)
-GAME( 1982, spaceplt, timeplt, timeplt, timeplt, 0, ROT90,  "bootleg", "Space Pilot", 0 ,2)
-GAME( 1988, psurge,   0,       timeplt, psurge,  0, ROT270, "<unknown>", "Power Surge", 0 ,0)
+GAME( 1982, timeplt,  0,       timeplt, timeplt, 0, ROT90,  "Konami", "Time Pilot", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, timepltc, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, timeplta, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, spaceplt, timeplt, timeplt, timeplt, 0, ROT90,  "bootleg", "Space Pilot", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1988, psurge,   0,       timeplt, psurge,  0, ROT270, "<unknown>", "Power Surge", 0 ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

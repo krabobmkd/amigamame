@@ -1,3 +1,4 @@
+#define MACHINENAME "solomon"
 /***************************************************************************
 
 Solomon's Key
@@ -288,4 +289,4 @@ ROM_END
 
 
 
-GAME( 1986, solomon, 0, solomon, solomon, 0, ROT0, "Tecmo", "Solomon's Key (Japan)", 0 ,0)
+GAME( 1986, solomon, 0, solomon, solomon, 0, ROT0, "Tecmo", "Solomon's Key (Japan)", 0 ,0,0,egg_Unknown,0)

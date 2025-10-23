@@ -1,3 +1,4 @@
+#define MACHINENAME "dlair"
 /* the way I hooked up the CTC is most likely completely wrong */
 
 #include "driver.h"
@@ -286,5 +287,5 @@ ROM_END
 
 
 
-GAME( 1983, dlair, 0, dlair, dlair, 0, ROT0, "Cinematronics", "Dragon's Lair", GAME_NOT_WORKING | GAME_NO_SOUND ,0)
+GAME( 1983, dlair, 0, dlair, dlair, 0, ROT0, "Cinematronics", "Dragon's Lair", GAME_NOT_WORKING | GAME_NO_SOUND ,0,2,egg_Platform,0)
 

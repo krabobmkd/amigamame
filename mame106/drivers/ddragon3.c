@@ -1,3 +1,4 @@
+#define MACHINENAME "ddragon3"
 /******************************************************************
 
     Double Dragon 3                     Technos Japan Corp 1990
@@ -723,7 +724,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1990, ddragon3, 0,		ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (US)", 0 ,3)
-GAME( 1990, ddrago3b, ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", 0 ,3)
-GAME( 1990, ctribe,   0,		ctribe,   ctribe,	0, ROT0, "Technos", "The Combatribes (US)", 0 ,2)
-GAME( 1990, ctribeb,  ctribe,	ctribe,   ctribe,	0, ROT0, "bootleg", "The Combatribes (bootleg)", 0 ,2)
+GAME( 1990, ddragon3, 0,		ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (US)", 0 ,3,0,egg_BeatNUp,0)
+GAME( 1990, ddrago3b, ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", 0 ,3,0,egg_BeatNUp,0)
+GAME( 1990, ctribe,   0,		ctribe,   ctribe,	0, ROT0, "Technos", "The Combatribes (US)", 0 ,3,0,egg_BeatNUp,0)
+GAME( 1990, ctribeb,  ctribe,	ctribe,   ctribe,	0, ROT0, "bootleg", "The Combatribes (bootleg)", 0 ,3,0,egg_BeatNUp,0)

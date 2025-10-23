@@ -1,3 +1,4 @@
+#define MACHINENAME "topspeed"
 /***************************************************************************
 
 Top Speed / Full Throttle    (c) Taito 1987
@@ -1016,7 +1017,7 @@ DRIVER_INIT( topspeed )
 	cpua_ctrl = 0xff;
 }
 
-GAME( 1987, topspeed, 0,        topspeed, topspeed, topspeed, ROT0, "Taito Corporation Japan", "Top Speed (World)", 0 ,1)
-GAME( 1987, topspedu, topspeed, topspeed, topspedu, topspeed, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", 0 ,1)
-GAME( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito Corporation", "Full Throttle (Japan)", 0 ,1)
+GAME( 1987, topspeed, 0,        topspeed, topspeed, topspeed, ROT0, "Taito Corporation Japan", "Top Speed (World)", 0 ,0,1,egg_Driving,EGF_P3D)
+GAME( 1987, topspedu, topspeed, topspeed, topspedu, topspeed, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", 0 ,0,1,egg_Driving,EGF_P3D)
+GAME( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito Corporation", "Full Throttle (Japan)", 0 ,0,1,egg_Driving,EGF_P3D)
 

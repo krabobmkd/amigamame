@@ -1,3 +1,4 @@
+#define MACHINENAME "warpwarp"
 /***************************************************************************
 
 Namco early 8080-based games
@@ -1136,16 +1137,17 @@ static DRIVER_INIT( warpwarp )
 
 
 /* B & W games */
-GAME( 1978, geebee,   0,        geebee,   geebee,   geebee,   ROT90, "Namco", "Gee Bee", 0 ,2)
-GAME( 1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "[Namco] (Gremlin license)", "Gee Bee (Gremlin)", 0 ,2)
-GAME( 1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND ,0)
-GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "Namco", "Kaitei Takara Sagashi", 0 ,0)
-GAME( 1980, kaiteik,  kaitei,   navarone, kaiteik,  kaiteik,  ROT90, "K.K. Tokki", "Kaitei Takara Sagashi (K'K-Tokki)", 0 ,0)
-GAME( 1980, sos,      0,        navarone, sos,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND ,0)
+GAME( 1978, geebee,   0,        geebee,   geebee,   geebee,   ROT90, "Namco", "Gee Bee", 0 ,0,2,egg_BallNPaddles,0)
+GAME( 1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "[Namco] (Gremlin license)", "Gee Bee (Gremlin)", 0 ,0,2,egg_BallNPaddles,0)
+GAME( 1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "Namco", "Kaitei Takara Sagashi", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, kaiteik,  kaitei,   navarone, kaiteik,  kaiteik,  ROT90, "K.K. Tokki", "Kaitei Takara Sagashi (K'K-Tokki)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, sos,      0,        navarone, sos,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND ,0,2,egg_Mature,0)
 
 /* Color games */
-GAME( 1979, bombbee,  0,        bombbee,  bombbee,  bombbee,  ROT90, "Namco", "Bomb Bee", 0 ,0)
-GAME( 1979, cutieq,   0,        bombbee,  cutieq,   bombbee,  ROT90, "Namco", "Cutie Q", 0 ,0)
-GAME( 1981, warpwarp, 0,        warpwarp, warpwarp, warpwarp, ROT90, "Namco", "Warp & Warp", 0 ,2)
-GAME( 1981, warpwarr, warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "[Namco] (Rock-ola license)", "Warp Warp (Rock-ola set 1)", 0 ,2)
-GAME( 1981, warpwar2, warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "[Namco] (Rock-ola license)", "Warp Warp (Rock-ola set 2)", 0 ,2)
+GAME( 1979, bombbee,  0,        bombbee,  bombbee,  bombbee,  ROT90, "Namco", "Bomb Bee", 0 ,0,2,egg_BallNPaddles,0)
+GAME( 1979, cutieq,   0,        bombbee,  cutieq,   bombbee,  ROT90, "Namco", "Cutie Q", 0 ,0,2,egg_BallNPaddles,0)
+GAME( 1981, warpwarp, 0,        warpwarp, warpwarp, warpwarp, ROT90, "Namco", "Warp & Warp", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, warpwarr, warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "[Namco] (Rock-ola license)", "Warp Warp (Rock-ola set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, warpwar2, warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "[Namco] (Rock-ola license)", "Warp Warp (Rock-ola set 2)", 0 ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               

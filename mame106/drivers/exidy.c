@@ -1,3 +1,4 @@
+#define MACHINENAME "exidy"
 /***************************************************************************
 
     Exidy 6502 hardware
@@ -1323,21 +1324,22 @@ DRIVER_INIT( fax )
  *
  *************************************/
 
-GAME( 1979, sidetrac, 0,       targ,    sidetrac, sidetrac, ROT0, "Exidy", "Side Track", 0 ,2)
-GAME( 1980, targ,     0,       targ,    targ,     targ,     ROT0, "Exidy", "Targ", 0 ,2)
-GAME( 1980, targc,    targ,    targ,    targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", 0 ,2)
-GAME( 1980, spectar,  0,       targ,    spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", 0 ,2)
-GAME( 1980, spectar1, spectar, targ,    spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 1?)", 0 ,2)
-GAME( 1980, rallys,   spectar, targ,    rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg?)", 0 ,2)
-GAME( 1980, phantoma, spectar, targ,    phantoma, phantoma, ROT0, "Jeutel","Phantomas", 0 ,2)
+GAME( 1979, sidetrac, 0,       targ,    sidetrac, sidetrac, ROT0, "Exidy", "Side Track", 0 ,0,2,egg_Maze,0)
+GAME( 1980, targ,     0,       targ,    targ,     targ,     ROT0, "Exidy", "Targ", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, targc,    targ,    targ,    targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, spectar,  0,       targ,    spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, spectar1, spectar, targ,    spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 1?)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, rallys,   spectar, targ,    rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg?)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1980, phantoma, spectar, targ,    phantoma, phantoma, ROT0, "Jeutel","Phantomas", 0 ,0,2,egg_ShootEmUp,0)
 
-GAME( 1981, mtrap,    0,       mtrap,   mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 5)", 0 ,2)
-GAME( 1981, mtrap3,   mtrap,   mtrap,   mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 3)", 0 ,2)
-GAME( 1981, mtrap4,   mtrap,   mtrap,   mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 4)", 0 ,2)
-GAME( 1981, venture,  0,       venture, venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 1)", 0 ,2)
-GAME( 1981, venture2, venture, venture, venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 2)", 0 ,2)
-GAME( 1981, venture4, venture, venture, venture,  venture,  ROT0, "Exidy", "Venture (version 4)", 0 ,2)
-GAME( 1982, pepper2,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Pepper II", 0 ,2)
-GAME( 1982, hardhat,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Hard Hat", 0 ,0)
-GAME( 1983, fax,      0,       fax,     fax,      fax,      ROT0, "Exidy", "Fax", 0 ,2)
-GAME( 1983, faxa,     fax,     fax,     fax,      fax,      ROT0, "Exidy", "Fax (alt. questions)", 0 ,2)
+GAME( 1981, mtrap,    0,       mtrap,   mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 5)", 0 ,0,2,egg_Maze,0)
+GAME( 1981, mtrap3,   mtrap,   mtrap,   mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 3)", 0 ,0,2,egg_Maze,0)
+GAME( 1981, mtrap4,   mtrap,   mtrap,   mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 4)", 0 ,0,2,egg_Maze,0)
+GAME( 1981, venture,  0,       venture, venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, venture2, venture, venture, venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, venture4, venture, venture, venture,  venture,  ROT0, "Exidy", "Venture (version 4)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, pepper2,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Pepper II", 0 ,0,2,egg_Maze,0)
+GAME( 1982, hardhat,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Hard Hat", 0 ,0,2,egg_Maze,0)
+GAME( 1983, fax,      0,       fax,     fax,      fax,      ROT0, "Exidy", "Fax", 0 ,2,0,egg_Quizz,0)
+GAME( 1983, faxa,     fax,     fax,     fax,      fax,      ROT0, "Exidy", "Fax (alt. questions)", 0 ,2,0,egg_Quizz,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               

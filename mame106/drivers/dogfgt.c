@@ -1,3 +1,4 @@
+#define MACHINENAME "dogfgt"
 /***************************************************************************
 
 Acrobatic Dog-Fight / Batten O'hara no Sucha-Raka Kuuchuu Sen
@@ -346,5 +347,5 @@ ROM_END
 
 
 
-GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, 0, ROT0, "Technos", "Acrobatic Dog-Fight", 0 ,0)
-GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, 0, ROT0, "Technos", "Dog-Fight (Japan)", 0 ,0)
+GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, 0, ROT0, "Technos", "Acrobatic Dog-Fight", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, 0, ROT0, "Technos", "Dog-Fight (Japan)", 0 ,0,2,egg_ShootEmUp,0)

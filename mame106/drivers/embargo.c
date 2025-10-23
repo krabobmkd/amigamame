@@ -1,3 +1,4 @@
+#define MACHINENAME "embargo"
 /***************************************************************************
 
 Cinematronics Embargo driver
@@ -205,4 +206,4 @@ ROM_START( embargo )
 ROM_END
 
 
-GAME( 1977, embargo, 0, embargo, embargo, 0, ROT0, "Cinematronics", "Embargo", GAME_NO_SOUND ,0)
+GAME( 1977, embargo, 0, embargo, embargo, 0, ROT0, "Cinematronics", "Embargo", GAME_NO_SOUND ,4,0,egg_Maze,0)

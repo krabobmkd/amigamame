@@ -1,3 +1,4 @@
+#define MACHINENAME "bigevglf"
 /***************************************************************************
 Big Event Golf (c) Taito 1986
 
@@ -548,4 +549,4 @@ ROM_START( bigevglf )
 	ROM_LOAD( "a67-15",   0x18000, 0x8000, CRC(1d261428) SHA1(0f3e6d83a8a462436fa414de4e1e4306db869d3e))
 ROM_END
 
-GAME( 1986, bigevglf,  0,        bigevglf,  bigevglf,  0, ROT270, "Taito America Corporation", "Big Event Golf", 0,2)
+GAME( 1986, bigevglf,  0,        bigevglf,  bigevglf,  0, ROT270, "Taito America Corporation", "Big Event Golf", 0,0,2,egg_sport_Golf,0)

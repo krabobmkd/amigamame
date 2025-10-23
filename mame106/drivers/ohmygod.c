@@ -1,3 +1,4 @@
+#define MACHINENAME "ohmygod"
 /***************************************************************************
 
 Oh My God!       (c) 1993 Atlus
@@ -412,5 +413,6 @@ static DRIVER_INIT( naname )
 }
 
 
-GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod, ROT0, "Atlus", "Oh My God! (Japan)", GAME_NO_COCKTAIL ,0)
-GAME( 1994, naname,  0, ohmygod, naname,  naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", GAME_NO_COCKTAIL ,0)
+GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod, ROT0, "Atlus", "Oh My God! (Japan)", GAME_NO_COCKTAIL ,2,0,egg_Puzzle,0)
+GAME( 1994, naname,  0, ohmygod, naname,  naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", GAME_NO_COCKTAIL ,2,0,egg_Puzzle,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                

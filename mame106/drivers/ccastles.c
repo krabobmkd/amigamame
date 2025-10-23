@@ -1,3 +1,4 @@
+#define MACHINENAME "ccastles"
 /***************************************************************************
 
     Atari Crystal Castles hardware
@@ -355,6 +356,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, ccastles, 0,        ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 4)", 0 ,2)
-GAME( 1983, ccastle3, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3)", 0 ,2)
-GAME( 1983, ccastle2, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 2)", 0 ,2)
+GAME( 1983, ccastles, 0,        ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 4)", 0 ,0,2,egg_Maze,EGF_I3D)
+GAME( 1983, ccastle3, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3)", 0 ,0,2,egg_Maze,EGF_I3D)
+GAME( 1983, ccastle2, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 2)", 0 ,0,2,egg_Maze,EGF_I3D)

@@ -1,3 +1,4 @@
+#define MACHINENAME "sgladiat"
 /*
     "Gladiator"
     (C) 1984 SNK
@@ -299,4 +300,5 @@ static DRIVER_INIT( sgladiat )
 	snk_irq_delay = 2000;
 }
 
-GAME( 1984, sgladiat, 0, sgladiat, sgladiat, sgladiat, 0, "SNK", "Gladiator 1984", GAME_NO_COCKTAIL ,0)
+GAME( 1984, sgladiat, 0, sgladiat, sgladiat, sgladiat, 0, "SNK", "Gladiator 1984", GAME_NO_COCKTAIL ,0,2,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                              

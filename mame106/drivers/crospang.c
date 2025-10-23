@@ -1,3 +1,4 @@
+#define MACHINENAME "crospang"
 /*
 
   Cross Pang (c)1998 F2 System
@@ -270,4 +271,5 @@ ROM_START( crospang )
 	ROM_LOAD( "rom2.bin", 0x40000, 0x40000, CRC(bc4381e9) SHA1(af0690c253bead3448db5ec8fb258d8284646e89) )
 ROM_END
 
-GAME( 1998, crospang, 0, crospang, crospang, 0, ROT0, "F2 System", "Cross Pang", 0 ,0)
+GAME( 1998, crospang, 0, crospang, crospang, 0, ROT0, "F2 System", "Cross Pang", 0 ,2,0,egg_Miscellaneous,0)
+                                                                                                                                                                                                                                                                                 

@@ -1,3 +1,4 @@
+#define MACHINENAME "blmbycar"
 /***************************************************************************
 
                               -= Blomby Car =-
@@ -564,6 +565,7 @@ DRIVER_INIT( blmbycar )
 
 ***************************************************************************/
 
-GAME( 1994, blmbycar, 0,        blmbycar, blmbycar, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", 0 ,0)
-GAME( 1994, blmbycau, blmbycar, blmbycar, blmbycar, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", 0 ,0)
-GAME( 1996, watrball, 0,        watrball, watrball, 0,        ROT0, "ABM", "Water Balls", 0 ,0)
+GAME( 1994, blmbycar, 0,        blmbycar, blmbycar, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", 0 ,0,2,egg_Driving,0)
+GAME( 1994, blmbycau, blmbycar, blmbycar, blmbycar, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", 0 ,0,2,egg_Driving,0)
+GAME( 1996, watrball, 0,        watrball, watrball, 0,        ROT0, "ABM", "Water Balls", 0 ,0,1,egg_Puzzle,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

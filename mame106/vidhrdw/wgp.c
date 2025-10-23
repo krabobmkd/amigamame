@@ -382,7 +382,7 @@ static void wgp_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int y
 	UINT16 code,bigsprite,map_index;
 	UINT16 rotate=0;
 	UINT16 tile_mask = (Machine->gfx[0]->total_elements) - 1;
-	static const int primasks[2] = {0x0, 0xfffc};	/* fff0 => under rhs of road only */
+	static const int primasks[2] = {0x0|(1<<31), 0xfffc|(1<<31)};	/* fff0 => under rhs of road only */
 
 	for (offs = 0x1ff;offs >= 0;offs--)
 	{
@@ -452,7 +452,7 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 					0x00010000, 	// scalex
 					0x00010000, 	// scaley
 					priority_bitmap, 	// pri_buffer
-					primasks[((priority >> 1) &1)] 	// priority_mask
+					0 	// priority_mask
 				  };
 				for (i=0;i<4;i++)
 				{
@@ -461,6 +461,9 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 
 					/* not known what controls priority */
 					priority = (wgp_spritemap[(map_index + (i << 1) + 1)] &0x70) >> 4;
+
+
+                    dgpz0.priority_mask = primasks[((priority >> 1) &1)];
 
 					flipx=0;	// no flip xy?
 					flipy=0;
@@ -507,7 +510,7 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 					0x00010000, 	// scalex
 					0x00010000, 	// scaley
 					priority_bitmap, 	// pri_buffer
-					primasks[((priority >> 1) &1)] 	// priority_mask
+					0 	// priority_mask
 				  };
 				for (i=0;i<16;i++)
 				{
@@ -538,6 +541,7 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 					dgpz1.sy = cury;
 					dgpz1.scalex = zx << 12;
 					dgpz1.scaley = zy << 12;
+					dgpz1.priority_mask = primasks[((priority >> 1) &1)];
 					drawgfxzoom(&dgpz1);	/* maybe >> 2 or 0...? */
 				}
 				} // end of patch paragraph

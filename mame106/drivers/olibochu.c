@@ -1,3 +1,4 @@
+#define MACHINENAME "olibochu"
 /***************************************************************************
 
 Oli-Boo-Chu
@@ -505,4 +506,4 @@ ROM_END
 
 
 
-GAME( 1981, olibochu, 0, olibochu, olibochu, 0, ROT270, "Irem + GDI", "Oli-Boo-Chu", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,2)
+GAME( 1981, olibochu, 0, olibochu, olibochu, 0, ROT270, "Irem + GDI", "Oli-Boo-Chu", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND ,0,2,egg_Maze,0)

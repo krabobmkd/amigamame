@@ -1,3 +1,4 @@
+#define MACHINENAME "ladyfrog"
 /*
 Lady Frog (c) 1990 Mondial Games
 (there's  "(c) Alfa Tecnology" in the ROM)
@@ -338,4 +339,5 @@ ROM_START( ladyfrog )
 	ROM_LOAD( "8.10",   0x20000, 0x10000, CRC(8c73baa1) SHA1(50fb408be181ef3c125dee23b04daeb010c9f276) )
 ROM_END
 
-GAME( 1990, ladyfrog, 0,       ladyfrog,  ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", 0,0)
+GAME( 1990, ladyfrog, 0,       ladyfrog,  ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", 0,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                     

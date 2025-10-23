@@ -95,7 +95,7 @@ static void groundfx_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 	int zoomx, zoomy, zx, zy;
 	int sprite_chunk,map_offset,code,j,k,px,py;
 	int dimension,total_chunks,bad_chunks;
-	static const int primasks[4] = {0xffff, 0xfffc, 0xfff0, 0xff00 };
+	static const int primasks[4] = {0xffff|(1UL<<31), 0xfffc|(1UL<<31), 0xfff0|(1UL<<31), 0xff00|(1UL<<31) };
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
        while processing sprite ram and then draw them all at the end */
@@ -214,7 +214,7 @@ static void groundfx_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 		0x00010000, 	// scalex
 		0x00010000, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		primasks[sprite_ptr->pri] 	// priority_mask
+		0,//primasks[sprite_ptr->pri] 	// priority_mask
 	  };
 	while (sprite_ptr != spritelist)
 	{
@@ -237,6 +237,7 @@ static void groundfx_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
         dgpz0.clip = clipper;
 		dgpz0.scalex = sprite_ptr->zoomx;
 		dgpz0.scaley = sprite_ptr->zoomy;
+        dgpz0.priority_mask = primasks[sprite_ptr->pri];
 		drawgfxzoom(&dgpz0);
 	}
 	} // end of patch paragraph

@@ -1,3 +1,4 @@
+#define MACHINENAME "lkage"
 /***************************************************************************
 
 Legend of Kage
@@ -556,7 +557,7 @@ DRIVER_INIT( lkageb )
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf062, 0xf062, 0, 0, fake_mcu_w );
 }
 
-GAME( 1984, lkage,   0,     lkage,  lkage, 0,       ROT0, "Taito Corporation", "The Legend of Kage", 0 ,2)
-GAME( 1984, lkageb,  lkage, lkageb, lkage, lkageb,  ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", 0 ,2)
-GAME( 1984, lkageb2, lkage, lkageb, lkage, lkageb,  ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", 0 ,2)
-GAME( 1984, lkageb3, lkage, lkageb, lkage, lkageb,  ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", 0 ,2)
+GAME( 1984, lkage,   0,     lkage,  lkage, 0,       ROT0, "Taito Corporation", "The Legend of Kage", 0 ,0,0,egg_Unknown,0)
+GAME( 1984, lkageb,  lkage, lkageb, lkage, lkageb,  ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", 0 ,0,0,egg_Unknown,0)
+GAME( 1984, lkageb2, lkage, lkageb, lkage, lkageb,  ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", 0 ,0,0,egg_Unknown,0)
+GAME( 1984, lkageb3, lkage, lkageb, lkage, lkageb,  ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", 0 ,0,0,egg_Unknown,0)

@@ -1,3 +1,4 @@
+#define MACHINENAME "psychic5"
 /**************************
  *** PSYCHIC 5 hardware ***     (by Roberto Ventura)
  **************************
@@ -620,4 +621,4 @@ ROM_END
 
 
 
-GAME( 1987, psychic5, 0, psychic5, psychic5, 0, ROT270, "Jaleco", "Psychic 5", 0 ,0)
+GAME( 1987, psychic5, 0, psychic5, psychic5, 0, ROT270, "Jaleco", "Psychic 5", 0 ,0,0,egg_Platform,0)

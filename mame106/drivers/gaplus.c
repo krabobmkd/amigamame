@@ -1,3 +1,4 @@
+#define MACHINENAME "gaplus"
 /***************************************************************************
 
 Gaplus (c) 1984 Namco
@@ -1045,9 +1046,9 @@ static void unpack_gfx(void)
 }
 
 
-GAME( 1984, gaplus,   0,        gaplus,   gaplus,   56_58l, ROT90, "Namco", "Gaplus (rev. D)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   56_58l, ROT90, "Namco", "Galaga 3 (rev. C)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1984, gapluso,  gaplus,   gaplus,   gapluso,  56_58,  ROT90, "Namco", "Gaplus (rev. B)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1984, gaplusa,  gaplus,   gaplus,   gapluso,  58_56,  ROT90, "Namco", "Gaplus (alternate hardware)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1984, galaga3a, gaplus,   gaplus,   galaga3a, 56_58l, ROT90, "Namco", "Galaga 3 (set 2)", GAME_IMPERFECT_GRAPHICS ,2)
-GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, 56_58l, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_GRAPHICS ,2)
+GAME( 1984, gaplus,   0,        gaplus,   gaplus,   56_58l, ROT90, "Namco", "Gaplus (rev. D)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   56_58l, ROT90, "Namco", "Galaga 3 (rev. C)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1984, gapluso,  gaplus,   gaplus,   gapluso,  56_58,  ROT90, "Namco", "Gaplus (rev. B)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1984, gaplusa,  gaplus,   gaplus,   gapluso,  58_56,  ROT90, "Namco", "Gaplus (alternate hardware)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1984, galaga3a, gaplus,   gaplus,   galaga3a, 56_58l, ROT90, "Namco", "Galaga 3 (set 2)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)
+GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, 56_58l, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_ShootEmUp,0)

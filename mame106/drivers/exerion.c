@@ -1,3 +1,4 @@
+#define MACHINENAME "exerion"
 /***************************************************************************
 
     Jaleco Exerion hardware
@@ -516,6 +517,6 @@ static DRIVER_INIT( exerionb )
  *
  *************************************/
 
-GAME( 1983, exerion,  0,       exerion, exerion, exerion,  ROT90, "Jaleco", "Exerion", 0 ,2)
-GAME( 1983, exeriont, exerion, exerion, exerion, exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", 0 ,2)
-GAME( 1983, exerionb, exerion, exerion, exerion, exerionb, ROT90, "Jaleco", "Exerion (bootleg)", 0 ,2)
+GAME( 1983, exerion,  0,       exerion, exerion, exerion,  ROT90, "Jaleco", "Exerion", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1983, exeriont, exerion, exerion, exerion, exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1983, exerionb, exerion, exerion, exerion, exerionb, ROT90, "Jaleco", "Exerion (bootleg)", 0 ,0,2,egg_ShootEmUp,0)

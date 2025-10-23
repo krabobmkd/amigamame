@@ -1,3 +1,4 @@
+#define MACHINENAME "battlnts"
 /***************************************************************************
 
 Konami Battlantis Hardware
@@ -485,9 +486,10 @@ static DRIVER_INIT( rackemup )
 
 
 
-GAME( 1987, battlnts, 0,        battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis", 0 ,2)
-GAME( 1987, battlntj, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan)", 0 ,2)
-GAME( 1987, rackemup, 0,        battlnts, thehustj, rackemup, ROT90, "Konami", "Rack 'em Up", GAME_NO_COCKTAIL ,0)
-GAME( 1987, thehustl, rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version M)", GAME_NO_COCKTAIL ,0)
-GAME( 1987, thehustj, rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version J)", GAME_NO_COCKTAIL ,0)
+GAME( 1987, battlnts, 0,        battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis", 0 ,0,2,egg_Shooter,0)
+GAME( 1987, battlntj, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan)", 0 ,0,2,egg_Shooter,0)
+GAME( 1987, rackemup, 0,        battlnts, thehustj, rackemup, ROT90, "Konami", "Rack 'em Up", GAME_NO_COCKTAIL ,0,2,egg_PoolNDart,0)
+GAME( 1987, thehustl, rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version M)", GAME_NO_COCKTAIL ,0,2,egg_PoolNDart,0)
+GAME( 1987, thehustj, rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version J)", GAME_NO_COCKTAIL ,0,2,egg_PoolNDart,0)
 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

@@ -1,3 +1,4 @@
+#define MACHINENAME "deadang"
 /***************************************************************************
 
     Dead Angle                          (c) 1988 Seibu Kaihatsu
@@ -455,5 +456,6 @@ static DRIVER_INIT( ghunter )
 
 /* Game Drivers */
 
-GAME( 1988, deadang, 0,       deadang, deadang, deadang, ROT0, "Seibu Kaihatsu", "Dead Angle", 0 ,2)
-GAME( 1988, ghunter, deadang, deadang, ghunter, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter (Spain)", 0 ,2)
+GAME( 1988, deadang, 0,       deadang, deadang, deadang, ROT0, "Seibu Kaihatsu", "Dead Angle", 0 ,0,2,egg_Shooter,0)
+GAME( 1988, ghunter, deadang, deadang, ghunter, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter (Spain)", 0 ,0,2,egg_Shooter,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           

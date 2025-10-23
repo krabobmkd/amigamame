@@ -1,3 +1,4 @@
+#define MACHINENAME "rockrage"
 /***************************************************************************
 
 Rock'n'Rage(GX620) (c) 1986 Konami
@@ -422,6 +423,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1986, rockrage, 0,        rockrage, rockrage, 0, ROT0, "Konami", "Rock 'n Rage (World?)", 0 ,0)
-GAME( 1986, rockraga, rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock 'n Rage (Prototype?)", 0 ,0)
-GAME( 1986, rockragj, rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", 0 ,0)
+GAME( 1986, rockrage, 0,        rockrage, rockrage, 0, ROT0, "Konami", "Rock 'n Rage (World?)", 0 ,2,0,egg_Maze,0)
+GAME( 1986, rockraga, rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock 'n Rage (Prototype?)", 0 ,2,0,egg_Maze,0)
+GAME( 1986, rockragj, rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", 0 ,2,0,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                           

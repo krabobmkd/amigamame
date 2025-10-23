@@ -1,3 +1,4 @@
+#define MACHINENAME "pkscram"
 /*
 
 PCB# -   ANIMAL-01  Cosmo Electronics Corporation
@@ -283,4 +284,5 @@ ROM_START( pkscram )
 ROM_END
 
 
-GAME( 1993, pkscram, 0, pkscramble, pkscramble, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", 0,0)
+GAME( 1993, pkscram, 0, pkscramble, pkscramble, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", 0,0,1,egg_sport_Soccer,0)
+                                                                                                                                                                                                                                                                                              

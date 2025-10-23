@@ -1,3 +1,4 @@
+#define MACHINENAME "exidy440"
 /***************************************************************************
 
     Exidy 440 hardware
@@ -1800,15 +1801,16 @@ static DRIVER_INIT( showdown )
  *
  *************************************/
 
-GAME( 1983, crossbow, 0,        exidy440, crossbow, crossbow, ROT0, "Exidy", "Crossbow (version 2.0)", 0 ,1)
-GAME( 1984, cheyenne, 0,        exidy440, cheyenne, cheyenne, ROT0, "Exidy", "Cheyenne (version 1.0)", 0 ,1)
-GAME( 1985, combat,   0,        exidy440, combat,   combat,   ROT0, "Exidy", "Combat (version 3.0)", 0 ,1)
-GAME( 1985, catch22,  combat,   exidy440, catch22,  combat,   ROT0, "Exidy", "Catch-22 (version 8.0)", 0 ,1)
-GAME( 1985, cracksht, 0,        exidy440, cracksht, cracksht, ROT0, "Exidy", "Crackshot (version 2.0)", 0 ,2)
-GAME( 1986, claypign, 0,        exidy440, claypign, claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)", 0 ,0)
-GAME( 1986, chiller,  0,        exidy440, chiller,  chiller,  ROT0, "Exidy", "Chiller (version 3.0)", 0 ,2)
-GAME( 1986, topsecex, 0,        exidy440, topsecex, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 ,0)
-GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, hitnmiss, ROT0, "Exidy", "Hit 'n Miss (version 3.0)", 0 ,0)
-GAME( 1987, hitnmis2, hitnmiss, exidy440, hitnmiss, hitnmiss, ROT0, "Exidy", "Hit 'n Miss (version 2.0)", 0 ,0)
-GAME( 1988, whodunit, 0,        exidy440, whodunit, whodunit, ROT0, "Exidy", "Who Dunit (version 8.0)", 0 ,2)
-GAME( 1988, showdown, 0,        exidy440, showdown, showdown, ROT0, "Exidy", "Showdown (version 5.0)", 0 ,0)
+GAME( 1983, crossbow, 0,        exidy440, crossbow, crossbow, ROT0, "Exidy", "Crossbow (version 2.0)", 0 ,0,1,egg_LightGuns,0)
+GAME( 1984, cheyenne, 0,        exidy440, cheyenne, cheyenne, ROT0, "Exidy", "Cheyenne (version 1.0)", 0 ,0,1,egg_LightGuns,0)
+GAME( 1985, combat,   0,        exidy440, combat,   combat,   ROT0, "Exidy", "Combat (version 3.0)", 0 ,0,1,egg_LightGuns,0)
+GAME( 1985, catch22,  combat,   exidy440, catch22,  combat,   ROT0, "Exidy", "Catch-22 (version 8.0)", 0 ,0,1,egg_LightGuns,0)
+GAME( 1985, cracksht, 0,        exidy440, cracksht, cracksht, ROT0, "Exidy", "Crackshot (version 2.0)", 0 ,0,2,egg_LightGuns,0)
+GAME( 1986, claypign, 0,        exidy440, claypign, claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)", 0 ,0,2,egg_LightGuns,0)
+GAME( 1986, chiller,  0,        exidy440, chiller,  chiller,  ROT0, "Exidy", "Chiller (version 3.0)", 0 ,0,1,egg_LightGuns,0)
+GAME( 1986, topsecex, 0,        exidy440, topsecex, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, hitnmiss, ROT0, "Exidy", "Hit 'n Miss (version 3.0)", 0 ,0,2,egg_LightGuns,0)
+GAME( 1987, hitnmis2, hitnmiss, exidy440, hitnmiss, hitnmiss, ROT0, "Exidy", "Hit 'n Miss (version 2.0)", 0 ,0,2,egg_LightGuns,0)
+GAME( 1988, whodunit, 0,        exidy440, whodunit, whodunit, ROT0, "Exidy", "Who Dunit (version 8.0)", 0 ,0,0,egg_Unknown,0)
+GAME( 1988, showdown, 0,        exidy440, showdown, showdown, ROT0, "Exidy", "Showdown (version 5.0)", 0 ,0,1,egg_CardBattle,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      

@@ -1,3 +1,4 @@
+#define MACHINENAME "magic10"
 /*
     Magic's 10     (c) 1995 AWP Games
     Magic's 10 2   (c) 1997 ABM Games
@@ -482,6 +483,7 @@ DRIVER_INIT( magic102 )
 	layer2_offset[1] = 20;
 }
 
-GAME( 1995, magic10,   0,       magic10,   magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.55)", 0 ,0)
-GAME( 1995, magic10a,  magic10, magic10a,  magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.45)", 0 ,0)
-GAME( 1997, magic102,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",    "Magic's 10 2 (ver 1.1)", GAME_NOT_WORKING ,0)
+GAME( 1995, magic10,   0,       magic10,   magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.55)", 0 ,0,1,egg_CardBattle,0)
+GAME( 1995, magic10a,  magic10, magic10a,  magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.45)", 0 ,0,1,egg_CardBattle,0)
+GAME( 1997, magic102,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",    "Magic's 10 2 (ver 1.1)", GAME_NOT_WORKING ,0,1,egg_CardBattle,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

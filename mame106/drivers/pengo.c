@@ -1,3 +1,4 @@
+#define MACHINENAME "pengo"
 /***************************************************************************
 
     Sega Pengo
@@ -686,11 +687,11 @@ static DRIVER_INIT( penta )
  *
  *************************************/
 
-GAME( 1982, pengo,    0,     pengo, pengo, pengo,    ROT90, "Sega", "Pengo (set 1 rev c)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, pengo2,   pengo, pengo, pengo, pengo,    ROT90, "Sega", "Pengo (set 2)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, pengo2u,  pengo, pengo, pengo, 0,        ROT90, "Sega", "Pengo (set 2 not encrypted)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, pengo3u,  pengo, pengo, pengo, 0,        ROT90, "Sega", "Pengo (set 3 not encrypted)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, pengo4,   pengo, pengo, pengo, pengo,    ROT90, "Sega", "Pengo (set 4)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, pengob,   pengo, pengo, pengo, penta,    ROT90, "bootleg", "Pengo (bootleg)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1982, penta,    pengo, pengo, pengo, penta,    ROT90, "bootleg", "Penta", GAME_SUPPORTS_SAVE ,2)
-GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, 0, ROT90, "bootleg", "Jr. Pac-Man (Pengo hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ,2)
+GAME( 1982, pengo,    0,     pengo, pengo, pengo,    ROT90, "Sega", "Pengo (set 1 rev c)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1982, pengo2,   pengo, pengo, pengo, pengo,    ROT90, "Sega", "Pengo (set 2)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1982, pengo2u,  pengo, pengo, pengo, 0,        ROT90, "Sega", "Pengo (set 2 not encrypted)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1982, pengo3u,  pengo, pengo, pengo, 0,        ROT90, "Sega", "Pengo (set 3 not encrypted)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1982, pengo4,   pengo, pengo, pengo, pengo,    ROT90, "Sega", "Pengo (set 4)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1982, pengob,   pengo, pengo, pengo, penta,    ROT90, "bootleg", "Pengo (bootleg)", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1982, penta,    pengo, pengo, pengo, penta,    ROT90, "bootleg", "Penta", GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)
+GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, 0, ROT90, "bootleg", "Jr. Pac-Man (Pengo hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ,0,2,egg_Maze,0)

@@ -3,4 +3,4 @@
 #define REVTIME  __TIME__
 #define AUTHOR   "krb"
 #define VERNUM   106
-#define REVNUM   05
+#define REVNUM   07

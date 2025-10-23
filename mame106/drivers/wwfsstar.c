@@ -1,3 +1,4 @@
+#define MACHINENAME "wwfsstar"
 /*******************************************************************************
  WWF Superstars (C) 1989 Technos Japan  (drivers/wwfsstar.c)
 ********************************************************************************
@@ -620,7 +621,7 @@ ROM_END
 
 
 
-GAME( 1989, wwfsstar, 0,        wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", 0 ,2)
-GAME( 1989, wwfsstau, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (US)", 0 ,2)
-GAME( 1989, wwfsstaa, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", 0 ,2)
-GAME( 1989, wwfsstaj, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)",GAME_NOT_WORKING ,2) // missing a program rom
+GAME( 1989, wwfsstar, 0,        wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", 0 ,2,0,egg_sport_Wrestling,0)
+GAME( 1989, wwfsstau, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (US)", 0 ,2,0,egg_sport_Wrestling,0)
+GAME( 1989, wwfsstaa, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", 0 ,2,0,egg_sport_Wrestling,0)
+GAME( 1989, wwfsstaj, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)",GAME_NOT_WORKING ,2,0,egg_sport_Wrestling,0) // missing a program rom

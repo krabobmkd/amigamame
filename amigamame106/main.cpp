@@ -50,6 +50,8 @@ extern "C" {
     // all C amiga stuffs should be included from C++ in extern "C" paragraph
     #include <cybergraphx/cybergraphics.h>
     #include <resources/misc.h>
+    #include <workbench/startup.h>
+
     #include "asmmacros.h"
 }
 
@@ -57,8 +59,8 @@ extern "C" {
 #include "video.h"
 
 #include "amiga_locale.h"
-#include "amiga106_config.h"
-#include "amiga106_inputs.h"
+#include "amiga_config.h"
+#include "amiga_inputs.h"
 #include "gui_mui.h"
 
 #define MIN_STACK (14*1024)
@@ -131,7 +133,7 @@ int libs_init2()
     if(verbose) printf("try open asl\n");
     if(!(AslBase = OpenLibrary("asl.library", 36))) return(1);
     if(verbose) printf("try open cybergraphics\n");
-//    InitLowLevelLib();
+
     // optional:
     CyberGfxBase  = OpenLibrary("cybergraphics.library", 1);
     if(verbose && (CyberGfxBase == NULL)) printf("can't open cybergraphics\n");
@@ -175,7 +177,7 @@ void main_close()
 
     if(AppDiskObject) FreeDiskObject(AppDiskObject);
 
-    CloseLowLevelLib();
+    Inputs_Free();
 
 //    if(P96Base) CloseLibrary(P96Base);
 
@@ -282,25 +284,24 @@ int main(int argc, char **argv)
     }
 
     int idriver=0; // romToLaunch;
-    STRPTR userdir = NULL;
-    STRPTR cheatfiletofilter= NULL;
-
+    std::string userdir;
+    std::string cheatfiletofilter;
+    std::string rom;
     int romlist=0;
     int dohelp=0;
-    int version=0; 
-    if(argc>1)
-    {
-        // test if just "mame romname".
-        int itest = getMainConfig().driverIndex().index(argv[1]);
-        if(itest>0) idriver= itest;
+    int version=0;
 
+
+    // this manages both command line args, and App icon tooltips... (if argc==0)
+    // this is the "amiga.lib" way and actually uses icon.library.
+    {
         // this manages both args by command line and args by icon tooltips.
         STRPTR *args = ArgArrayInit(argc,(const char **)argv);
-        STRPTR rom = ArgString((CONST_STRPTR*)args,"ROM","");
-        if(rom && *rom != 0)  idriver = getMainConfig().driverIndex().index(rom);
+        rom = ArgString((CONST_STRPTR*)args,"ROM","");
 
         userdir =  ArgString((CONST_STRPTR*)args,"USERDIR","PROGDIR:user");
         verbose = (ArgInt((CONST_STRPTR*)args,"VERBOSE",2)!=2);
+
         version = (ArgInt((CONST_STRPTR*)args,"VERSION",2)!=2);
         romlist = (ArgInt((CONST_STRPTR*)args,"-listfull",2)!=2);
         if(!romlist) romlist = (ArgInt((CONST_STRPTR*)args,"-ll",2)!=2);
@@ -313,17 +314,56 @@ int main(int argc, char **argv)
         cheatfiletofilter = ArgString((CONST_STRPTR*)args,"FILTERCHEAT",NULL);
         ArgArrayDone();
     }
+    // this extra circus is to manage external project icons tooltips...
+    // when launch from a "Project" icon, with tool set to "Mame106".
+    // I though ArgArrayInit() would also take care of this.... but no.
+    // we do it after main app icon so we can "override" values.
+    if(argc ==0 && argv != 0)
+    {
+        struct WBStartup *WBenchMsg = (struct WBStartup *)argv; // Amiga C startup magic.
+        struct WBArg *wbarg=WBenchMsg->sm_ArgList;
+        for(int i=0 ;
+            i < WBenchMsg->sm_NumArgs;
+            i++, wbarg++)
+        {
+            struct DiskObject *dobj;
+
+            if((*wbarg->wa_Name) && (dobj=GetDiskObject(wbarg->wa_Name)))
+            {
+                const char **toolarray = (const char **)dobj->do_ToolTypes;
+                char *s;
+                if(s=(char *)FindToolType(toolarray,"ROM")) rom = s;
+                if(s=(char *)FindToolType(toolarray,"USERDIR")) userdir = s;
+                if(s=(char *)FindToolType(toolarray,"VERBOSE")) verbose = 1;
+                /* Free the diskobject we got */
+                FreeDiskObject(dobj);
+            }
+        } // end loop by wbarg
+
+    }
+
+    // open extra libs that could fails
     if(libs_init2()!=0) exit(1);
 
     if(verbose) log_enableStdOut(1);
 
-    if(verbose) printf("try read user/main.cfg\n");
-    getMainConfig().init(argc,argv); // init drivers map.
-    if(verbose) printf("after user/main.cfg\n");
 
-    if(cheatfiletofilter)
+    getMainConfig().init(argc,argv); // init drivers map and read conf.
+
+
+     // test if just "mame romname".
+    if(argc>1)
     {
-        getMainConfig().filterCheatFile(cheatfiletofilter);
+        int itest = getMainConfig().driverIndex().index(argv[1]);
+        if(itest>=0) idriver= itest;
+    }
+    // test if romname in arg:
+    if(rom.length()>0)  idriver = getMainConfig().driverIndex().index(rom.c_str());
+
+
+    if(cheatfiletofilter.length()>0)
+    {
+        getMainConfig().filterCheatFile(cheatfiletofilter.c_str());
     }
     // command line things...
     if(version)
@@ -350,10 +390,10 @@ int main(int argc, char **argv)
     }
 
 
-    if(userdir) getMainConfig().setUserDir(userdir);
-
+    if(userdir.length()) getMainConfig().setUserDir(userdir.c_str());
+    if(verbose) printf("try read main.cfg\n");
     getMainConfig().load();
-
+    if(verbose) printf("after main.cfg\n");
     //  if game was explicit, no GUI
     if(idriver>0)
     {

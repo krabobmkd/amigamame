@@ -1199,19 +1199,15 @@ char* m68ki_disassemble_quick( struct m68k_cpu_instance *p68k COREREG,unsigned i
 INLINE uint m68ki_read_imm_16( struct m68k_cpu_instance *p68k COREREG)
 {
     #ifdef LSB_FIRST
-
-        uint v= program_read_word_16be(ADDRESS_68K(REG_PC));
-        REG_PC+=2;
-        return v;
+        UINT16 v= (*(UINT16 *)&opcode_base[(p68k->m_cpu.pc ^ p68k->mem.opcode_xor) & opcode_mask]);
     #else
         // what m68k_read_immediate_16 actually does:
-        //  this is "direct rom reading"
-	// opcode mask only needed for thunderforceac !
-        UINT16 v= (*(UINT16 *)&opcode_base[p68k->m_cpu.pc /*& opcode_mask*/]);
+        // opcode mask only needed for thunderforceac !
+        UINT16 v= (*(UINT16 *)&opcode_base[p68k->m_cpu.pc & opcode_mask]);
 
-        REG_PC+=2;
-        return (uint)v;
     #endif
+    REG_PC+=2;
+    return v;
 }
 
 UINT32 readlong_d16(offs_t address REGM(d0));
@@ -1219,14 +1215,37 @@ void writelong_d16(offs_t address REGM(d0), UINT32 data REGM(d1));
 
 INLINE uint m68ki_read_imm_32( struct m68k_cpu_instance *p68k COREREG)
 {
-
     #ifdef LSB_FIRST
-        uint v= readlong_d16(ADDRESS_68K(REG_PC));
-        REG_PC+=4;
-        return v;
+        // on intel and other LE
+        // 32b 16 swap...
+        UINT16 *opbase16 = (UINT16 *)opcode_base;
+        uint adr = REG_PC  & opcode_mask;
+        REG_PC +=4;
+        adr>>=1;
+        if(p68k->mem.opcode_xor == 2)
+        {   // if xor==2 means _d32 interface where mame keeps memory by 32b block
+            // so we have to manage strange inversions...
+            UINT32 h,l;
+            if(adr & 1)
+            {   // unaligned
+                h = opbase16[adr-1];
+                l = opbase16[adr+2];
+                return (h<<16)|l;
+            } else
+            {
+                h = opbase16[adr+1];
+                l = opbase16[adr];
+            }
+            return (h<<16)|l;
+        }
+        // else 16 bit bus ordering, big endian at 16b level
+        UINT32 h = opbase16[adr];
+        UINT32 l = opbase16[adr+1];
+        return (h<<16)|l;
+
     #else
         //  this is "direct rom reading"
-        uint v= (*(uint *)&opcode_base[(REG_PC) /*& opcode_mask*/]);
+        uint v= (*(uint *)&opcode_base[(REG_PC) & opcode_mask]);
         REG_PC+=4;
         return v;
     #endif
@@ -1415,10 +1434,13 @@ INLINE uint m68ki_get_ea_ix( struct m68k_cpu_instance *p68k COREREG, uint An)
 
 	/* Postindex */
 	if(BIT_2(extension))                /* I/IS:  0 = preindex, 1 = postindex */
-		return m68ki_read_32(An + bd) + Xn + od;
-
+	{
+        uint a = m68ki_read_32(An + bd);
+		return (a + Xn + od);
+    }
 	/* Preindex */
-	return m68ki_read_32(An + bd + Xn) + od;
+	 uint a = m68ki_read_32(An + bd + Xn);
+	return a + od;
 }
 
 
@@ -1434,7 +1456,11 @@ INLINE uint OPER_AY_PI_16(M68KOPT_PARAMS) {
     return m68ki_read_16(ea);
 }
 INLINE uint OPER_AY_PI_32(M68KOPT_PARAMS)
-    {uint ea = EA_AY_PI_32(); return m68ki_read_32(ea);}
+    { //uint ea = EA_AY_PI_32();
+    uint ea = p68k->m_cpu.dar[8+(REG_IR & 7)];
+    p68k->m_cpu.dar[8+(REG_IR & 7)] = ea+4;
+    return m68ki_read_32(ea);
+    }
 INLINE uint OPER_AY_PD_8(M68KOPT_PARAMS)  {uint ea = EA_AY_PD_8();  return m68ki_read_8(ea); }
 INLINE uint OPER_AY_PD_16(M68KOPT_PARAMS) {uint ea = EA_AY_PD_16(); return m68ki_read_16(ea);}
 INLINE uint OPER_AY_PD_32(M68KOPT_PARAMS) {uint ea = EA_AY_PD_32(); return m68ki_read_32(ea);}

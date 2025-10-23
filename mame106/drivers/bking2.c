@@ -1,3 +1,4 @@
+#define MACHINENAME "bking2"
 /***************************************************************************
 
 
@@ -699,6 +700,6 @@ ROM_START( bking3 )
 
 ROM_END
 
-GAME( 1982, bking,  0, bking2, bking,  0, ROT270, "Taito Corporation", "Birdie King", 0 ,2)
-GAME( 1983, bking2, 0, bking2, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 2", 0 ,2)
-GAME( 1984, bking3, 0, bking2, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 3", 0 ,2)
+GAME( 1982, bking,  0, bking2, bking,  0, ROT270, "Taito Corporation", "Birdie King", 0 ,0,2,egg_sport_Golf,0)
+GAME( 1983, bking2, 0, bking2, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 2", 0 ,0,2,egg_sport_Golf,0)
+GAME( 1984, bking3, 0, bking2, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 3", 0 ,0,2,egg_sport_Golf,0)

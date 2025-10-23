@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-static map<string,string> _locale;
+//re static map<string,string> _locale;
 
 /*
 "Quit","Quitter"
@@ -21,7 +21,8 @@ void initLocale()
 
 const char *GetMessagec(const char *pEnglishOrKey)
 {
-    map<string,string>::iterator fit = _locale.find(pEnglishOrKey);
-    if(fit == _locale.end()) return pEnglishOrKey;
-    return fit->second.c_str();
+    return pEnglishOrKey;
+//    map<string,string>::iterator fit = _locale.find(pEnglishOrKey);
+//    if(fit == _locale.end()) return pEnglishOrKey;
+//    return fit->second.c_str();
 }

@@ -1,3 +1,4 @@
+#define MACHINENAME "cntsteer"
 /*******************************************************************************
 
     Counter Steer                   (c) 1985 Data East Corporation
@@ -993,6 +994,7 @@ DRIVER_INIT( zerotrgt )
 
 /***************************************************************************/
 
-GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT270, "Data East Corporation", "Counter Steer", GAME_NO_SOUND|GAME_NOT_WORKING ,0)
-GAME( 1985, zerotrgt, 0,        zerotrgt,  cntsteer, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World)", GAME_NO_SOUND|GAME_NOT_WORKING ,0)
-GAME( 1985, gekitsui, zerotrgt, zerotrgt,  cntsteer, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", GAME_NO_SOUND|GAME_NOT_WORKING ,0)
+GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT270, "Data East Corporation", "Counter Steer", GAME_NO_SOUND|GAME_NOT_WORKING ,0,0,egg_Motorcycle,0)
+GAME( 1985, zerotrgt, 0,        zerotrgt,  cntsteer, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World)", GAME_NO_SOUND|GAME_NOT_WORKING ,0,0,egg_Unknown,0)
+GAME( 1985, gekitsui, zerotrgt, zerotrgt,  cntsteer, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", GAME_NO_SOUND|GAME_NOT_WORKING ,0,0,egg_Flying,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   

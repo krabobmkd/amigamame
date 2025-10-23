@@ -1,3 +1,4 @@
+#define MACHINENAME "powerins"
 /***************************************************************************
 
                           -= Power Instinct =-
@@ -727,7 +728,8 @@ ROM_END
 
 
 /* all supported sets give a 93.10.20 date */
-GAME( 1993, powerins, 0,        powerins, powerins, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", 0 ,0)
-GAME( 1993, powerina, powerins, powerina, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 1)", 0 ,0)
-GAME( 1993, powerinb, powerins, powerinb, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 2)", 0 ,0)
-GAME( 1993, powernjb, powerins, powerinb, powerins, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan, bootleg)", 0 ,0)
+GAME( 1993, powerins, 0,        powerins, powerins, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", 0 ,0,0,egg_Unknown,0)
+GAME( 1993, powerina, powerins, powerina, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 1)", 0 ,0,0,egg_Unknown,0)
+GAME( 1993, powerinb, powerins, powerinb, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 2)", 0 ,0,0,egg_Unknown,0)
+GAME( 1993, powernjb, powerins, powerinb, powerins, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan, bootleg)", 0 ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

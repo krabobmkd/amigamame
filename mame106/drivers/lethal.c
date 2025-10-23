@@ -1,3 +1,4 @@
+#define MACHINENAME "lethal"
 /***************************************************************************
 
  Lethal Enforcers
@@ -723,5 +724,6 @@ static DRIVER_INIT( lethalen )
 	konami_rom_deinterleave_2(REGION_GFX4);
 }
 
-GAME( 1992, lethalen, 0,        lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE)", GAME_IMPERFECT_GRAPHICS,2)
-GAME( 1992, lethalej, lethalen, lethalej, lethalen, lethalen, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD)", GAME_NOT_WORKING,2)
+GAME( 1992, lethalen, 0,        lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE)", GAME_IMPERFECT_GRAPHICS,2,0,egg_LightGuns,0)
+GAME( 1992, lethalej, lethalen, lethalej, lethalen, lethalen, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD)", GAME_NOT_WORKING,2,0,egg_LightGuns,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

@@ -1,3 +1,4 @@
+#define MACHINENAME "tutankhm"
 /***************************************************************************
 
 Tutankham :  memory map (preliminary)
@@ -444,5 +445,6 @@ ROM_END
 
 
 
-GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, 0, ROT90, "Konami", "Tutankham", 0 ,2)
-GAME( 1982, tutankst, tutankhm, tutankhm, tutankhm, 0, ROT90, "[Konami] (Stern license)", "Tutankham (Stern)", 0 ,2)
+GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, 0, ROT90, "Konami", "Tutankham", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, tutankst, tutankhm, tutankhm, tutankhm, 0, ROT90, "[Konami] (Stern license)", "Tutankham (Stern)", 0 ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                

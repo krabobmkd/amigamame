@@ -1,3 +1,4 @@
+#define MACHINENAME "itech8"
 /***************************************************************************
 
     Incredible Technologies/Strata system
@@ -2659,42 +2660,43 @@ static DRIVER_INIT( rimrockn )
  *************************************/
 
 /* Wheel of Fortune-style PCB */
-GAME( 1989, wfortune, 0,        wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune", 0 ,3)
-GAME( 1989, wfortuna, wfortune, wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune (alternate)", 0 ,3)
+GAME( 1989, wfortune, 0,        wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune", 0 ,0,3,egg_Quizz,0)
+GAME( 1989, wfortuna, wfortune, wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune (alternate)", 0 ,0,3,egg_Quizz,0)
 
 /* Strata Bowling-style PCB */
-GAME( 1990, stratab,  0,        stratab_hi,        stratab,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ,4)
-GAME( 1990, stratab1, stratab,  stratab_hi,        stratab,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 ,4)
-GAME( 1990, gtg,      0,        stratab_hi,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 ,0)
-GAME( 1989, gtgt,     gtg,      stratab_hi,        gtgt,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 ,0)
-GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t,    0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 ,2)
-GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 ,2)
+GAME( 1990, stratab,  0,        stratab_hi,        stratab,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ,0,4,egg_sport_Bowling,0)
+GAME( 1990, stratab1, stratab,  stratab_hi,        stratab,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 ,0,4,egg_sport_Bowling,0)
+GAME( 1990, gtg,      0,        stratab_hi,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 ,0,0,egg_Unknown,0)
+GAME( 1989, gtgt,     gtg,      stratab_hi,        gtgt,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 ,0,0,egg_Unknown,0)
+GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t,    0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 ,0,4,egg_sport_Golf,0)
+GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 ,0,4,egg_sport_Golf,0)
 
 /* Slick Shot-style PCB */
-GAME( 1990, slikshot, 0,        slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", 0 ,2)
-GAME( 1990, sliksh17, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", 0 ,2)
-GAME( 1990, sliksh16, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", 0 ,2)
-GAME( 1990, dynobop,  0,        slikshot_hi,       dynobop,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", 0 ,0)
-GAME( 1990, sstrike,  0,        slikshot_lo,       sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", 0 ,2)
-GAME( 1991, pokrdice, 0,        slikshot_lo_noz80, pokrdice, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 ,0)
+GAME( 1990, slikshot, 0,        slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, sliksh17, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, sliksh16, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, dynobop,  0,        slikshot_hi,       dynobop,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, sstrike,  0,        slikshot_lo,       sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", 0 ,0,0,egg_Unknown,0)
+GAME( 1991, pokrdice, 0,        slikshot_lo_noz80, pokrdice, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 ,0,1,egg_Miscellaneous,0)
 
 /* Hot Shots Tennis-style PCB */
-GAME( 1990, hstennis, 0,        hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 ,2)
-GAME( 1990, hstenn10, hstennis, hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 ,2)
-GAME( 1991, arlingtn, 0,        hstennis_hi,       arlingtn, arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 ,2)
-GAME( 1991, peggle,   0,        hstennis_lo,       peggle,   peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 ,0)
-GAME( 1991, pegglet,  peggle,   hstennis_lo,       pegglet,  peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 ,0)
-GAME( 1992, neckneck, 0,        hstennis_lo,       neckneck, neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 ,6)
+GAME( 1990, hstennis, 0,        hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 ,2,0,egg_sport_Tennis,0)
+GAME( 1990, hstenn10, hstennis, hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 ,2,0,egg_sport_Tennis,0)
+GAME( 1991, arlingtn, 0,        hstennis_hi,       arlingtn, arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 ,0,1,egg_HorseRacing,0)
+GAME( 1991, peggle,   0,        hstennis_lo,       peggle,   peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 ,0,2,egg_BallNPaddles,0)
+GAME( 1991, pegglet,  peggle,   hstennis_lo,       pegglet,  peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 ,0,2,egg_BallNPaddles,0)
+GAME( 1992, neckneck, 0,        hstennis_lo,       neckneck, neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 ,6,0,egg_HorseRacing,0)
 
 /* Rim Rockin' Basketball-style PCB */
-GAME( 1991, rimrockn, 0,        rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 ,0)
-GAME( 1991, rimrck20, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 ,0)
-GAME( 1991, rimrck16, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 ,0)
-GAME( 1991, rimrck12, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 ,0)
+GAME( 1991, rimrockn, 0,        rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 ,4,0,egg_sport_Basketball,0)
+GAME( 1991, rimrck20, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 ,4,0,egg_sport_Basketball,0)
+GAME( 1991, rimrck16, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 ,4,0,egg_sport_Basketball,0)
+GAME( 1991, rimrck12, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 ,4,0,egg_sport_Basketball,0)
 
 /* Ninja Clowns-style PCB */
-GAME( 1991, ninclown, 0,        ninclown,          ninclown, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (08/27/91)", 0 ,0)
+GAME( 1991, ninclown, 0,        ninclown,          ninclown, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (08/27/91)", 0 ,2,0,egg_BeatNUp,0)
 
 /* Golden Tee Golf II-style PCB */
-GAME( 1992, gpgolf,   0,        gtg2,              gpgolf,   0,        ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 ,0)
-GAME( 1992, gtg2,     0,        gtg2,              gtg2,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 ,2)
+GAME( 1992, gpgolf,   0,        gtg2,              gpgolf,   0,        ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 ,0,4,egg_sport_Golf,0)
+GAME( 1992, gtg2,     0,        gtg2,              gtg2,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 ,0,4,egg_sport_Golf,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

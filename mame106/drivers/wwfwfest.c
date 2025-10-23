@@ -1,3 +1,4 @@
+#define MACHINENAME "wwfwfest"
 /*******************************************************************************
  WWF Wrestlefest (C) 1991 Technos Japan  (drivers/wwfwfest.c)
 ********************************************************************************
@@ -600,7 +601,7 @@ ROM_START( wwfwfstj )
 	ROM_LOAD( "wf_02.rom",    0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
 
-GAME( 1991, wwfwfest, 0,        wwfwfest, wwfwfest, 0, ROT0, "Technos Japan", "WWF WrestleFest (US set 1)", 0 ,4)
-GAME( 1991, wwfwfsta, wwfwfest, wwfwfest, wwfwfest, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (US Tecmo)", 0 ,4)
-GAME( 1991, wwfwfstb, wwfwfest, wwfwfstb, wwfwfest, 0, ROT0, "bootleg", "WWF WrestleFest (US bootleg)", 0 ,4)
-GAME( 1991, wwfwfstj, wwfwfest, wwfwfest, wwfwfest, 0, ROT0, "Technos Japan", "WWF WrestleFest (Japan)", 0 ,4)
+GAME( 1991, wwfwfest, 0,        wwfwfest, wwfwfest, 0, ROT0, "Technos Japan", "WWF WrestleFest (US set 1)", 0 ,4,0,egg_sport_Wrestling,0)
+GAME( 1991, wwfwfsta, wwfwfest, wwfwfest, wwfwfest, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (US Tecmo)", 0 ,4,0,egg_sport_Wrestling,0)
+GAME( 1991, wwfwfstb, wwfwfest, wwfwfstb, wwfwfest, 0, ROT0, "bootleg", "WWF WrestleFest (US bootleg)", 0 ,4,0,egg_sport_Wrestling,0)
+GAME( 1991, wwfwfstj, wwfwfest, wwfwfest, wwfwfest, 0, ROT0, "Technos Japan", "WWF WrestleFest (Japan)", 0 ,4,0,egg_sport_Wrestling,0)

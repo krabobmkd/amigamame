@@ -1,0 +1,296 @@
+@DATABASE
+@NODE MAIN "MAME106 MiniMix 1.x User Documentation"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +------------------------------------------+
+ /  MAME106 MiniMix 1.x User Documentation  /
++------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+This is a fork of the Multiple Arcade Machine Emulator v106, for 68060 FPU compatible Amiga, started in 2024.@{LINE}The licence is GPL, sources at https://github.com/krabobmkd/amigamame.@{LINE}@{b}This application needs roms that are all strictly copyrighted. @{ub}@{LINE}@{LINE}This version tries to focus on speed over accuracy to target a Pistorm rPi3 speed (or slower) and the integration of specific Amiga functions and controllers for up to 4 players.@{LINE}@{LINE}Manual:@{LINE}@{LINDENT 3}@{LINE}- @{" Prerequesite and installation " LINK prerequesite-and-installation}@{LINE}
+- @{" General use " LINK general-use}@{LINE}
+- @{" Display Configuration Panel " LINK display-configuration-panel}@{LINE}
+- @{" Display Configuration for Vector Games " LINK display-configuration-for-vector-games}@{LINE}
+- @{" Audio Configuration Panel " LINK audio-configuration-panel}@{LINE}
+- @{" Controllers Panel " LINK controllers-panel}@{LINE}
+- @{" More buttons on parallel port joystick extension " LINK more-buttons-on-parallel-port-joystick-extension}@{LINE}
+- @{" Amiga proportional Joysticks and analog controllers " LINK amiga-proportional-joysticks-and-analog-controllers}@{LINE}
+- @{" Using MIDI IN instruments and devices as game controllers " LINK using-midi-in-instruments-and-devices-as-game-controllers}@{LINE}
+- @{" Controllers Panel Examples " LINK controllers-panel-examples}@{LINE}
+- @{" Miscellaneous Configuration " LINK miscellaneous-configuration}@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}Best Usage and Hints:@{LINE}@{LINDENT 3}@{LINE}- @{" Create adapted Screen Modes " LINK create-adapted-screen-modes}@{LINE}
+- @{" Using a rotated screen for Vertical Shooters " LINK using-a-rotated-screen-for-vertical-shooters}@{LINE}
+- @{" Finetuning audio with AHIPrefs " LINK finetuning-audio-with-ahiprefs}@{LINE}
+- @{" AGA and OCS Amiga native display " LINK aga-and-ocs-amiga-native-display}@{LINE}
+- @{" Running 68060 version on Amiga OS4 PPC " LINK running-68060-version-on-amiga-os4-ppc}@{LINE}
+- @{" Installing free Demoscene Demo ROMs " LINK installing-free-demoscene-demo-roms}@{LINE}
+@{LINE}@{LINE}
+@ENDNODE
+@NODE prerequesite-and-installation "Prerequesite and installation"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +---------------------------------+
+ /  Prerequesite and installation  /
++---------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}@{LINDENT 5}@{LINE}- This needs a 68060 compatible CPU with Floating-Point-Unit.@{LINE}
+- You need a RTG driver (old P96 or CGX) for better display. Yet on AGA we can remap any color mode to 256c 8bit screens.@{LINE}
+- You will need an AHI Audio driver, else games will be mute. (Amiga Hardware Interface is free and very useful.)@{LINE}
+- You will need MUI for the interface. If MUI is not found you can still use command line with  "Mame106 archivename". Also this App takes the best advantages of MUI5, you can download it at: https://github.com/amiga-mui/muidev/releases@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}To install, just copy the directory. The main executable will search its resources around itself by default.@{LINE}This program will write and read many configuration files in a "user" directory.@{LINE}The App's icon tooltips can handle some options, select the icon and go to information, move to the tooltip page:@{LINE}You can set USERDIR=mypath to any place, else by default it will be aside the App (PROGDIR:user).@{LINE}@{LINE}
+@{LINE}@{LINE}
+@ENDNODE
+@NODE general-use "General use"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +---------------+
+ /  General use  /
++---------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+This emulator needs zipped roms in "roms" directory. You can change the roms directory in Miscellaneous panel.@{LINE}@{LINE}@{b} You have to use roms from Mame106 romset , or MameAdvance romset. Most rom archives from other MAME version will not work@{ub}@{LINE}@{LINE}@{" Display: Game driver list interface " SYSTEM "multiview guideimg/mmdriverlist.gif"}@{LINE}@{LINE}Each game has an 8 character name that identifies their archive. A lot of games need a "parent rom" archive to run. The interface list indicates the parents.@{LINE}@{LINE}When you launch the App the first time, you have the list of all rom archives known. Press "Scan" button to search what you installed:@{LINE}then found games are noted in bold, and the list "Show mode" will switch to "Display only found games".@{LINE}@{LINE}Then double click a game, or select it and press "Start", to launch it.@{LINE}@{LINE}The default screen settings will try to open the best screen mode, default input control settings defines arrow key Alt/shift keyboard keys and joystick/CD32 pads in port2 for player1. Also if the game uses analog inputs you can use your mouse in mouse port1.@{LINE}@{b} Coins key are 5/6/7/8 in the upper row, Start button are 1/2/3/4 in the upper row, not in the numeric pad.@{ub}@{LINE}@{LINE}Your panels preferences are saved in file user/main.cfg in xml format.@{LINE}Mame's internal configuration system will write a xml configuration file for each game started, also in user dir.@{LINE}Delete these files will bring back default settings.@{LINE}@{LINE}Once game is launch you can use key P to switch pause,@{LINE}@{b}Tab key@{ub} will open MAME's internal preference panel. Then You can change keys attributions and things there. @{" Read controllers page about it " LINK controllers-panel} . We recommand you to be familiar with the internal config panel and keyboard shortcuts.@{LINE}@{b}Tilde key@{ub} upon the tab key, open and close a tuning menu during game that you manipulate with arrows. You can change brightness, but also can boost the sound volume per sound chip, which can be useful.@{LINE}@{" Display: MAME internal preference panel with Tab key " SYSTEM "multiview guideimg/internal.gif"}@{LINE}@{LINE}Other in-game keys are:@{LINE}@{LINDENT 3}@{LINE}- Esc Quit game back to game list. Also Quit internal tab config panel to game.@{LINE}
+- F3 reset@{LINE}
+- F4 show palette (use arrows to see the tilemaps base on some games)@{LINE}
+- F7 and Shift-F7 : load save state, then press a numeric pad number for slots.@{LINE}
+- F10 switch Workbench Window / Fullscreen.@{LINE}
+- Help Key displays performance.@{LINE}
+@{LINE}
+@{LINE}
+@ENDNODE
+@NODE display-configuration-panel "Display configuration Panel"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +-------------------------------+
+ /  Display configuration Panel  /
++-------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+First of all:@{LINE}@{b}Don't use a "Screen Mode Promotion tool": Each game needs a specific resolution and color depth.@{ub}@{LINE}Screen mode is choosen automatically at game start, else you can choose it explicitly here, each games sharing the same resolution and depth will use that mode.@{LINE}@{LINE}@{" Display: The display settings panel " SYSTEM "multiview guideimg/mmdisplay.gif"}@{LINE}@{LINE}The first settings in Display Panel will be applied to all games:@{LINE}@{LINDENT 3}@{LINE}- Draw Engine@{LINE}
+@{LINDENT 5}@{LINE}- @{b}CGX Direct CPU@{ub} Direct CPU pixel copy. This is the fastest choice for most video drivers when no scale is needed.@{LINE}
+- @{b}CPU Remap+ScalePixelArray  @{ub} This will use Cybergraphics ScalePixelArray function, which in theory is GPU accelerated with fast scaling, (it's not the case in the current piStorm VCore driver, but it may evolve)@{LINE}
+@{LINDENT 3}@{LINE}- Screen Buffer@{LINE}
+@{LINDENT 5}@{LINE}- @{b}Single@{ub} Will draw on visible video memory, which can do horizontal lines glitches when fast. Yet your fastest option for current drivers.@{LINE}
+- @{b}Triple Buffer CSB@{ub} The official Amiga way of doing multiple asynchronous, synched, screen buffer swapping, using ChangeScreenBuffer() of intuition. Unfortunately, current pistorm video driver implementation occurs huge cpu slowdown (it may evolve, I hope seriously.) If you use only AGA this is your best choice.@{LINE}
+- @{b}Double Buffer SVP@{ub} uses the very old graphics trick for doing double buffers before OS3, by using graphics's ScrollViewPort(). Unfortunately, most modern video driver implementations tested will also not support this.@{LINE}
+@{LINDENT 3}@{LINE}- @{b}On Workbench @{ub} Use a Workbench Windows instead of full screen at start. When game is running, you can switch that with F10 key.@{LINE}
+- @{b}Bad Frameskip@{ub} Do not emulate video chip one frame on two. Can only accelerate games in which slowings are due to Video emulation. Can only gain a few percentage of the emulated speed, and divide the frame rate by 2. CPU emulation can't be bypassed and does 80% of the job on most games.@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}Then there is the preferences applied for games that share a specific resolution:@{LINE}@{LINDENT 3}@{LINE}- @{b}Screen Mode Selection@{ub} Specify explicitly Screen mode instead of using automatic choice. Sometimes there is "no good" resolution available and if you have RTG drivers, it is an excellent idea to @{b}create resolutions that fits your favorite game with the tool in sys:prefs.@{ub} Then automatic selection should select it. Look at: @{" Create adapted Screen Modes " LINK create-adapted-screen-modes}@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}...@{LINE}@{LINE}
+@{LINE}
+@ENDNODE
+@NODE display-configuration-for-vector-games "Display Configuration for Vector Games"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +------------------------------------------+
+ /  Display Configuration for Vector Games  /
++------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}Since release 1.5, vector games are implemented. Of course they have no defined screen mode or resolution. These games have just "vector" as resolution string in the game list,and you can sort them by sorting with the resolution column. If you select a vector game, the Vector screen configuration will be enabled in the Display panel. There you can choose the applied rendering resolution, amongst other things (antialias, glow effect). Then if you let "Find Best" Screen Mode, it will choose a mode according to the applied screen vector resolution. By default rendering use 15bit RGB, you can select 32b RGB with option "HighColor", which will also be used by "Find Best" screen mode.@{LINE}@{LINE}
+@{LINE}
+@ENDNODE
+@NODE audio-configuration-panel "Audio Configuration Panel"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +-----------------------------+
+ /  Audio Configuration Panel  /
++-----------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}You can enable or disable Audio, and change frequency.@{LINE}You need to install AHI, the "Audio Hardware Interface" on your AmigaOS.@{LINE}22Khz gives a very good quality, but it is important that your default AHI mode is also at least configured for 22Khz.@{LINE}If you have sound problems, use AHI configuration tool in Sys:Prefs/AHI .@{LINE}@{LINE}Sound volume is most often low, but mixing is done per game according to measured data on real arcade machines. You may turn up your volume, but you can also use @{b}Tilde key@{ub} menu during game, and with arrows you can reach and boost volume per Sound chip. This preference is saved in user/game.cfg, per game.@{LINE}@{LINE}@{b} Allow Extra Sample@{ub}@{LINE}A few early games sound emulation can use a base of sound samples (basically QBert , dkong,...). If you want QBert to talk you need to enable that, and install a qbert.zip containing wav file in a samples directory. Watch out: roms/qbert.zip and samples/qbert.zip are two different files, and you can @{b}NOT@{ub} use the same directory for roms and samples.@{LINE}You can change the samples path in Misc panel.@{LINE}@{LINE}
+@{LINE}
+@ENDNODE
+@NODE controllers-panel "Controllers Panel"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +---------------------+
+ /  Controllers Panel  /
++---------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{" Some Games need special controls " LINK some-games-need-special-controls}@{LINE}@{" Mapping multiple keys or Mouse or Pad Buttons to a single emulated input " LINK mapping-multiple-keys-or-mouse-or-pad-buttons-to-a-single-emulated-input}@{LINE}@{" The 6 Amiga classic Hardware ports and possible other extensions " LINK the-6-amiga-classic-hardware-ports-and-possible-other-extensions}@{LINE}@{" More buttons on parallel port joystick extension " LINK more-buttons-on-parallel-port-joystick-extension}@{LINE}@{" Amiga proportional Joysticks and analog controllers " LINK amiga-proportional-joysticks-and-analog-controllers}@{LINE}@{" Using MIDI IN instruments and devices as game controllers " LINK using-midi-in-instruments-and-devices-as-game-controllers}@{LINE}@{LINE}@{b}Bad news: Most "Mitsumi" keyboards on Amiga classics (A1200,A500, ...) have most keys "interblocking" other keys on the keyboard@{ub}. This is a hardware limitation. It is said that Amigas with other keyboard models could have many more keys tested at the same time, but it is rare. If you keep a letter key pressed on A1200, all other keys on the same rows will not be seen. That's why you can only use Keyboard for one player using arrows and alt+shift. Mame MiniMix is preconfigured for this, and a second player on keys SDFE, but it would only be for rare hardware configurations. We recommand you to use primarily a CD32 7Button pad, greatly supported. Some compatible CD32 pads are currently produced:@{LINE}@{LINDENT 5}@{LINE}- there is something called "Boomerang B432" in stores.@{LINE}
+- Amigakit used to produce their own CD32 pad model.@{LINE}
+- You can build one by using a SNES-like Usb pad and change the PCB like described here: https://www.daemonbite.com/ktrl/ktrl-cd32.html@{LINE}
+- adapter "Amega 32" (Mega Drive Gamepad to AmigaCD32 adapter) allows to use Sega Megadrive/Genesis 3 or 6 buttons pads, not mentioning it works with the dreaded "Sega Arcade Power Sticks (I&II)". (edited note: For having the chance to test some Megadrive 6bt controllers with Amega32, it is clearly my favorite now.)@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}MAME MiniMix support 2 CD32 pads plugged in the 2 first ports.@{LINE}@{LINE}Additionally, Sega Master System pads with 2 buttons will also be OK on Port1 and 2, and Sega Megadrive/Genesis should also support 2 buttons without adapter: Sega used to wire the second button the same way as amiga mouses and CD32 pads, But be warned: @{b}Never use an Amstrad+ or MSX2 2 button pads: the second button is wired to the 5v pin of the Amiga.@{ub} On Amiga 500 this is known to short circuit your CIA timer and kill things. Inform yourself and know what you do when you plug things, there were @{b}no@{ub} Joystick standard and controllers are not necessarily "Plug and play". Particularly, Do not unplug a CD32 pad when the game is running.@{LINE}@{LINE}@{" Display: Controls by default for one player " SYSTEM "multiview guideimg/mmcontrolsdef.gif"}@{LINE}@{LINE}Mame106 MiniMix allows 1 to 4 simultaneous players and makes a point to adapts a variety of Amiga controllers to specifics arcade controllers.@{LINE}A very configurable matrix can decide to which player and with which hardware a port will be used. It@{LINE}must be used in coordination with the internal "Inputs for this game" configuration in the game menu with tab key, when game is running.@{LINE}@{LINE}@{b}Note:@{ub} The default configuration works well with both mouse and joystick for Player1 because Mame see the mouse as the Analog Controller which is different than joyticks or pads. Declaring more than one joystick to the same player will not work and one port will "steal" the controls of the other port in that case. Just redirect one hardware port to a player, and consider mouses can then be added. (This is true for the current version, it may evolve so many joyticks stands for the same player).@{LINE}@{LINE}@{LINE}
+@ENDNODE
+@NODE some-games-need-special-controls "Some Games need special controls"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +------------------------------------+
+ /  Some Games need special controls  /
++------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+Most arcade machines would need 8 directions joysticks per players, paired with 1 to 8 buttons according to games, but you must realize@{LINE}some MAME games need Analog controllers:@{LINE}@{LINDENT 3}@{LINE}- Wheel for car games uses "Analog X 1". In such case, acceleration and brakes pedals also ask other Analogs inputs.@{LINE}
+- Rotative pads for breakouts, (like arkanoid) uses  "Analog X"@{LINE}
+- Lightguns games (opwolf/thunderbold) use  "Analog X" and "Analog Y"@{LINE}
+- Some folkloric games have strange inputs:@{LINE}
+@{LINDENT 5}@{LINE}- forgotten world is a very special 2 player game where each players have a joystick paired with an analog rotative pad. You may use both joystick and mouse for one player, or use internal per game configuration (Tab) to use Analog Dec X Analog Inc X as button 2 and 3 (this is what the console ports was doing.)@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}When Analog input is needed , MAME will offer the possibility to use both a real analog device (Analog X) or just 2 keys noted (Analog Dec X, Analog Inc X)  in the internal preference. For example in car games the wheel can be moved both by mouse and joystick and keyboard arrows.@{LINE}@{LINE}
+@ENDNODE
+@NODE mapping-multiple-keys-or-mouse-or-pad-buttons-to-a-single-emulated-input "Mapping multiple keys or Mouse or Pad Buttons to a single emulated input"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +----------------------------------------------------------------------------+
+ /  Mapping multiple keys or Mouse or Pad Buttons to a single emulated input  /
++----------------------------------------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+In a general way, the internal "inputs for this games" configuration with tab key during game allows using multiple keys, joystick or mouse, to simulate a single machine button.@{LINE}To change which "OR" list of input is used to manage a simulated input, select an entry and press enter, then type your key or joy button or any-what, then press enter again, choose another key, it will be added with a "OR", displaying things like : "R or H or Joypad Left". To erase all keys for an entry , press enter 3 times fast, the entry will be empty: then you can remake your list.@{LINE}@{LINE}@{b} The default configuration@{ub}@{LINE}@{LINE}The input configuration can look complex, but in most cases you don't have to change anything for just one player:@{LINE}On MAME106 MiniMix, By default, player1 joystick directions are redirected both to keyboard arrows and CD32 pads or joystick plugged in joyport. The 3 first buttons are redirected both to CD32 buttons red blue yellow, to keyboard Right Alt/Shift, and to mouse buttons Left&Right.@{b} Player1 Analog X and Analog Y are redirected to mouse in mouse port.@{ub}@{LINE}@{LINE}This way, without modifying any configuration, you can directly profit most games, using joyticks in joyport or mouse in mouse port.@{LINE}You can use mouse for Arkanoid, and use the left mouse button to shot when you get laser mode, without configuring anything.@{LINE}@{LINE}One or two Amiga mouse or trackballs can be used for Analog X and Analog Y.  ( So a stock Amiga classic have potentially 4 analog inputs.) You can also play "Operation Thunderblot" with 2 players using 2 mouses , to mimic 2 lightguns.@{LINE}@{LINE}
+@ENDNODE
+@NODE the-6-amiga-classic-hardware-ports-and-possible-other-extensions "The 6 Amiga classic Hardware ports and possible other extensions"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +--------------------------------------------------------------------+
+ /  The 6 Amiga classic Hardware ports and possible other extensions  /
++--------------------------------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}Mame106 MiniMix uses the lowlevel.library to get controller states. "Lowlevel" was introduced with AmigaOS3.1 and Amiga CD32 consoles,@{LINE}with the aim of helping game developpers create modern games on Amiga with modern controllers. Thus, this allows reading the 7 buttons@{LINE}of 2 CD32 pads plugged in the DB9 mouse and joy port, known as lowlevel port 1 and 2, like it would be for a CD32.@{LINE}@{LINE}@{b}The elusive Lowlevel Port 3 and 4, and USB extension.@{ub}@{LINE}Whereas CD32 and all Amiga have only 2 DB9 controllers inputs, the lowlevel documentation and SDK defines 4 ports, which is some kind of a mystery. "Lowlevel Port 3 and 4" are not the "parallel ports joysticks 3 & 4".@{LINE}( commodore may have prepared some CD32 joystick doubler, but it doesn't exist.)@{LINE}@{LINE}That said, Poseidon USB stack for Amiga classic patches lowlevel to redirect standard USB pads as CD32 lowlevel pads. It is untested, but connecting 4 USB pads with Poseidon may use the 4 lowlevel ports. In a general way, Anything that patch Lowlevel to send port3 and port4 rawkeys will be be able to be used by MAME Minimix as CD32 pads with 7 buttons.@{LINE}@{LINE}@{b}The official parallel Port 3 and 4 extension.@{ub}@{LINE}Commodore used to support a common format for an adapter that allows 2 additionnals Joystick in the parallel port.@{LINE}You can use them with port noted "Pr Port3" and "Pr Port4".@{LINE}Such devices are always produced and can be found at your favorite Amiga store. But it allows only one button joysticks in that case.@{LINE}Remember You can always use MAME's internal configuration to eventually redirect both port buttons for the same player.@{LINE}@{LINE}
+@ENDNODE
+@NODE more-buttons-on-parallel-port-joystick-extension "More buttons on parallel port joystick extension"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +----------------------------------------------------+
+ /  More buttons on parallel port joystick extension  /
++----------------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}As said, commodore officially supported joystick 3 & 4, and defined which joystick pin would correspond to which parallel port pin,@{LINE}so all produced parallel port extensions you'll find support only 1 button per joystick.@{LINE}@{LINE}1 button is ok with such 4 players game sas "bomberman" and "gauntlet", but for "Simpsons", "tmnt1&2", and "cadillac", you absolutely need 2 buttons to jump and attack. So, as the second button is just one more wire in the adapter, since version r1.6 Minimix propose you to just weld 2 more wires to your adapter. For port 3 "Bt2" it was easy because there was one signal left at parallel port pin 12 (signal PE or POUT). This was validated.@{LINE}For port4 Bt2, only the ACK signal is left (pin 10), so there is an experimental code to try to have the value with an interupt, for the moment (r1.6) it doesn't work jor joy4/bt2.@{LINE}They have each to be soldered with pin 9 of each DB9 ports output , which is the pin for second button".@{LINE}@{" Display: Image of Parallel Port Pins to Solder " SYSTEM "multiview guideimg/parportBt2.gif"}@{LINE}@{LINE}
+@ENDNODE
+@NODE amiga-proportional-joysticks-and-analog-controllers "Amiga proportional Joysticks and analog controllers"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +-------------------------------------------------------+
+ /  Amiga proportional Joysticks and analog controllers  /
++-------------------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}Since version r1.6, Amiga analog controllers are supported, on joystick DB9 port 2 only (for the moment, port1 is also possible). You have to select "Proportional Joystick", or "C64/Atari Paddles" in the controller type list, for port2, in the MUI control panel. The difference between the 2 is just the X and Y axis are inverted. So you may try one or another for a given device. Also, some devices need to have their axis direction inverted, there are checkboxes for this in the control panel.@{LINE}@{LINE}@{LINE}@{LINDENT 3}@{LINE}- Important note: The Analog port initialisation fights with the system libraries to acquire and reconfigure the port. If you just plugged something else before, the initialisation could silently fail. The best rule is to switch off the Amiga, plug your analog controller, and switch on, to make sure nothing would acquire the ports. *@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}Supported analog devices are:@{LINE}@{LINDENT 5}@{LINE}- a few legit Flight simulator looking joysticks were produced, using potentiometers, around 1988. So rare a few photo exists.@{LINE}
+- The Excellent Atari 8Bit version of the Beeshu "Zoomer" yoke in analog mode will work perfectly with 2 axis, has 2 buttons, and is not rare.@{LINE}
+- C64 Paddles (the thing with 2 big separated rotating knobs) and Atari 8Bits Paddles (same thing), and actually any Atari 8Bit potentiometer based controller are supported and ultra common and easy to find.@{LINE}
+- 1990 era PC Gaming flight simulator joystick, or other controller using "DB15 PC gameport" with analog pins can be supported with a simple adapter cable like described here (french page): http://obligement.free.fr/articles/utiliser_manette_pc_amiga.php . These contollers are also ultra common, cheap, and easy to find.@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}Here is the DB25 DB9 Analog adapter. Watch out, digital adapter is something else:@{LINE}@{LINE}@{LINE}@{" Display: Image of PC gameport to Amiga Analog adapter " SYSTEM "multiview guideimg/pcgameport2amigaanalog.gif"}@{LINE}@{LINE}When game is launch, @{b}such devices needs recalibration@{ub} . This is done easily by going far in all directions, for all axis, at the begining of the game. Some popup will tell you that.@{LINE}@{LINE}Important note: in MAME you can use a digital joystick for an emulated analog input, but you can't use an analog joystick for an emulated digital input. If you launch a game that needs no analog input, your device will not be used. You check if game needs analog in tab key menu during game, then entry "Input (This Games)". For Any driving game with wheels, cabinet simulators and arkanoids: Analog input is needed, and will be automatically selected.@{LINE}@{LINE}@{" Display: Analog Absolute device used a wheel " SYSTEM "multiview guideimg/absoluteanalog.gif"}@{LINE}@{LINE}Note: An anlog wheel looking device is perfect to mimic steering wheel in car games. Mouses and trackballs movements had to be "recentered" each time, so this is the first time we can use actual "Absolute analog" real steering wheel controller for a car game, and it's way better in that case.@{LINE}@{LINE}To finish, note "Amiga Analog controllers" have no pins in common with classic joysticks, ports are reconfigured with different circuitry when used.@{LINE}@{LINE}
+@ENDNODE
+@NODE using-midi-in-instruments-and-devices-as-game-controllers "Using MIDI IN instruments and devices as game controllers"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +-------------------------------------------------------------+
+ /  Using MIDI IN instruments and devices as game controllers  /
++-------------------------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}@{LINE}Since version r1.7, it is possible to use any MIDI device, intended for music, as game controller.@{LINE}On Amiga classic you usually use a serial port adapter to have MIDI IN/OUT ports. You will also need to install some version of camd.library.@{LINE}Then any MIDI device with 5-pin DIN "MIDI OUT" can be plugged to the "MIDI IN" port of the Amiga. Keyboards, Button matrix pads, or anything that sends "NoteOn/NoteOff" signals, can be mapped as game controller button. If a device has slider controls or digital potentiometers, it will be mapped to MAME "Abstract Analog controls".@{LINE}@{LINE}@{LINE}Then there's a big difference with CD32 pads or mouses: buttons and sliders will not be mapped as default controller for a given player,@{LINE}the mapping has to be done explicitly during game the usual way: press P for pause, then TAB to reach ingame menu, then use the "Input For This Game" or "General Inputs", to map your keys as buttons, and sliders as analog inputs. press esc and P to return to game. These settings are saved in user dir.@{LINE}@{LINE}@{LINE}A menu in control panel allow you to decide if something keys looking like a keyboard (chan0-1-2) will be used as buttons, or mapped as if the whole keyboard notes were a single analog input. I personnaly use this with a Theremin and a sonuus G2M guitar-to-MIDI converter, so the notes of the theremin gives the X axis.@{LINE}@{LINE}@{LINE}
+@ENDNODE
+@NODE controllers-panel-examples "Controllers Panel Examples"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +------------------------------+
+ /  Controllers Panel Examples  /
++------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{" Best configuration for Street Fighters " LINK best-configuration-for-street-fighters}@{LINE}@{" Best configuration for Operation Thunderbolt. " LINK best-configuration-for-operation-thunderbolt.}@{LINE}@{" Suggestion of controls for Bomberman " LINK suggestion-of-controls-for-bomberman}@{LINE}@{" Suggestion of controls for Forgotten Worlds " LINK suggestion-of-controls-for-forgotten-worlds}@{LINE}@{" How to play Silkworm alone with the Jeep ? " LINK how-to-play-silkworm-alone-with-the-jeep-?}@{LINE}@{LINE}
+@ENDNODE
+@NODE best-configuration-for-street-fighters "Best configuration for Street Fighters"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +------------------------------------------+
+ /  Best configuration for Street Fighters  /
++------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+Street Fighters are games for 1 or 2 players with 6 buttons each.@{LINE}2 CD32 pads are perfect for this and control panel should look like this:@{LINE}@{LINE}@{" Display: Image of controls for sf2 " SYSTEM "multiview guideimg/inputsforsf2.gif"}@{LINE}@{LINE}
+@ENDNODE
+@NODE best-configuration-for-operation-thunderbolt. "Best configuration for Operation Thunderbolt."
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +-------------------------------------------------+
+ /  Best configuration for Operation Thunderbolt.  /
++-------------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+Operation Thunderbolt was a cooperative 2 players game with 2 lightguns with 2 buttons each.@{LINE}2 Amiga mouse or trackballs are perfect for this, your second buttons will launch bomb.@{LINE}@{LINE}Control panel should look like this:@{LINE}@{LINE}@{" Display: Image of controls for opthunder " SYSTEM "multiview guideimg/inputsforopthnder.gif"}@{LINE}@{LINE}
+@ENDNODE
+@NODE suggestion-of-controls-for-bomberman "Suggestion of controls for Bomberman"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +----------------------------------------+
+ /  Suggestion of controls for Bomberman  /
++----------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+Bomberman arcade is a 4 players game which just need 4 joystick with one button each.@{LINE}This is the perfect time to use your Parallel port joystick expander and plug 4 joysticks !@{LINE}(note the neogeo version is just for 2 players)@{LINE}Watch out, control panel must look like this:@{LINE}@{LINE}@{" Display: Image of controls for bomberman " SYSTEM "multiview guideimg/inputsforbbman.gif"}@{LINE}@{LINE}
+@ENDNODE
+@NODE suggestion-of-controls-for-forgotten-worlds "Suggestion of controls for Forgotten Worlds"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +-----------------------------------------------+
+ /  Suggestion of controls for Forgotten Worlds  /
++-----------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+Excellent case this one: it's a 2 players game with very particular inputs, as each player have a joystick, but the button is also a rotative pad, that decide the direction of the shoot.@{LINE}This time you can either use CD32pads and configure inc/dec buttons to mimic the rotation, or...@{LINE}with a parallel port extension, use the joystick from the extension, and the 2 first ports as analog inputs to micmic the rotation.@{LINE}in which case the control panel must look like this:@{LINE}@{LINE}@{" Display: Image of controls for fgworld " SYSTEM "multiview guideimg/inputsforfgworld.gif"}@{LINE}@{LINE}
+@ENDNODE
+@NODE how-to-play-silkworm-alone-with-the-jeep-? "How to play Silkworm alone with the Jeep ?"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +----------------------------------------------+
+ /  How to play Silkworm alone with the Jeep ?  /
++----------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}Silkworm is an excellent ShootEmUp with 2 cooperative players, Player 1 being always an helicopter, and Player 2 being always a Jeep.@{LINE}If you are a single player with a joystick in port 2, you just have to select "Player 2" instead of player 1 in the control panel for this port, then in game press "start 2" (key 2 on upper line) ...and you will control the Jeep in single player mode. Yes, that's how powerfull is the Control panel.@{LINE}@{LINE}
+@{LINE}
+@ENDNODE
+@NODE miscellaneous-configuration "Miscellaneous Configuration"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +-------------------------------+
+ /  Miscellaneous Configuration  /
++-------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}@{LINDENT 3}@{LINE}- @{b}Roms Dir@{ub} you can change the directory where roms are read here. If you change this, press Scan again.@{LINE}
+- You can activate a @{b}cheat file@{ub}, which is a text file with a list of hacks per games. If you select a 13Mb long file, be warned it will be completely read each times you load a game, to just search a few lines in it. This can double the loading time. You should create a short file adapted to your needs. Cheats are then activated in MAME internal menu, in the game (Tab key).@{LINE}
+- @{b}Skip disclaimer@{ub}: boot directly to game at end of load. Informations are still availables in Tab key Menu. You are totally meant to read disclaimers.@{LINE}
+- @{b} Speed limit@{ub}: Allow to slow down or accelerate regarding to the speed of the original machine. Used for debug.@{LINE}
+- @{b}NeoGeo Bios@{ub}: Choose roms from neogeo.zip for neogeo games. Different versions of the NeoGeo Hardware had different ROMS.@{LINE}
+
+@{LINDENT 1}@{LINE}The third party unibios doesnt work. No idea why.@{LINE}@{LINE}
+@{LINE}
+@ENDNODE
+@NODE create-adapted-screen-modes "Create adapted Screen Modes"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +-------------------------------+
+ /  Create adapted Screen Modes  /
++-------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}Some arcade games have non-standard resolution, and none of your Screen Mode would really fit. Intuition will choose a larger resolution that will make your game appear little. You can either configure streight-to-border scaling, but that will slow down. The best solution is to create an adapted screen mode with the tool installed by your Retargetable graphics library.@{LINE}Mame will then be able to choose those new modes after reboot.@{LINE}@{LINE}Games that usually have unadapted screens and modes OK for a 16x9 screen:@{LINE}@{LINE}Capcom CPS1 machines (street fighterII,strider,3wonders,shoulsnghost,...) is almost 16/9. it will need @{b}mode "384x224 HiColor".@{ub}@{LINE}@{LINE}midTUnit (Mortal Kombat,NBA Jam) will need @{b} mode "456x256 HiColor"@{ub}.@{LINE}@{LINE}Gauntlet and lots of atari games  will need  @{b}mode "426x240 HiColor"@{ub}.@{LINE}@{LINE}(For a 5/4 screen or other screen ratio, consider a missing resolution should have same height as emulated screen, then compute the width with a rule of 3, and round it to the next 16 multiple. Hey, easy math ! ask your AI if you can't do that.)@{LINE}@{LINE}About the retargetable library version:@{LINE}We don't recommend that you install the last supported version, as numberous new bugs appeared on recent ones, with no corrections of the bugs we reported. Anyway, it doesn't matter much as you may be using either cafeineOS or amikit, your version is probably already the best possible, and workarounds has been found for most problems.@{LINE}@{LINE}@{" Display: Image of P96 screen mode tool " SYSTEM "multiview guideimg/p96prefs.png"}@{LINE}@{LINE}@{LINDENT 3}@{LINE}- 1. Create a new resolution: In the “Resolutions” section, create a new entry by dragging the “New Item” icon to the “Resolutions” area.@{LINE}
+- 2. Configure the resolution: Fill in the resolution details, such as width, height,.@{LINE}
+- 3. Add color modes: For each resolution, you must add color modes also by dragging New button on the right list, then select color mode in cycle menu. Note 256 colors correspond to 8bit Mame screens, HiColor to 15 or 16Bit, TrueColor to 32 bits.You should create the 3 color Modes.@{LINE}
+- 4. Test the resolution: Once you’ve created and configured the new resolution, press the “Test” button to see the result on your HDMI output.@{LINE}
+- 5. You May have to unselect "doubleScan" if pixels are too narrow.@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}Save your settings, reboot, and you should have excellent fast fullscreen display for most games.@{LINE}@{LINE}
+@{LINE}
+@ENDNODE
+@NODE using-a-rotated-screen-for-vertical-shooters "Using a rotated screen for Vertical Shooters"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +------------------------------------------------+
+ /  Using a rotated screen for Vertical Shooters  /
++------------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+A lot of arcade games had vertical screens, which were actually rotated CRT screens, with the Beam going left to right instead of Up to Down. This was the case for Vertical Shooters. Mame MiniMix allows you to choose any rotation in the Display Panel. With a monitor that allows rotation (like iiYama Xub), you can play Vertical shooters with a vertical screen.@{LINE}@{" Display: Using an Amiga1200 with a vertical shooter and vertical screen " SYSTEM "multiview guideimg/vertical.gif"}@{LINE}@{LINE}
+@{LINE}
+@ENDNODE
+@NODE finetuning-audio-with-ahiprefs "Finetuning audio with AHIPrefs"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +----------------------------------+
+ /  Finetuning audio with AHIPrefs  /
++----------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+MAME106Minimix uses the default AHI Mode for audio output.@{LINE}@{LINE}With tool Sys:prefs/AHI you can choose this default mixing mode, and configure it.@{LINE}@{LINE}An audio mixer can use the Amiga native Paula sound chip, or another chip using a sound card if you own that.@{LINE}If your AHI installation is well configured, you can achieve an excellent sound even with Paula, and you will also be able to launch several apps using AHI at the same times and listen all of them, which is impossible without AHI.@{LINE}@{LINE}This is a very well known thing amongst Amiga users:@{LINE}@{LINE}AHI provide a 14Bits mixer that theorically push ups the classic 8Bit rendering to 14Bit precision using hardware trick.@{LINE}MAME106Minimix sends 16bit precision audio Data to AHI, so the 14Bit mixer may benefit from that. You should also at least ask for 22050 Khz of frequency, which gives actually good quality. Paula can't reach the modern CD-like 44Khz, its limit is 27Khz (or 33Khz if...).@{LINE}You may also choose the number of Channels available. This is said that choosing more channels lower the volume down on some drivers and AHI implementations (untested).@{LINE}@{LINE}@{" Display: Image of AHIPrefs screen mode tool " SYSTEM "multiview guideimg/ahiprefs.gif"}@{LINE}@{LINE}
+@ENDNODE
+@NODE aga-and-ocs-amiga-native-display "AGA and OCS Amiga native display"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +------------------------------------+
+ /  AGA and OCS Amiga native display  /
++------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}From version 1.3 if you don't have any P96 or CGX video driver installed, MAME Minimix will be able to choose a 256,32 or 16 color screen mode. Now color remap is more precise, and original screen size will be adapted.@{LINE}You can choose explicitly a PAL or NTSC video mode, now the color depth is selectable (8b,7b,6b,5b,4b,...).@{LINE}With PiStorm, video memory writing is all the more slow that the sound thread is also using the bus to write audio.@{LINE}@{LINE}Finetune your AHI to use short audio buffers. You should install patch "BlazeWCP" (WCP for WriteChunkyPixels() ) from aminet.net, that will accelerate native rendering by 15 or 20% and accelerate all your OS. Do not install obsolete patch NewWPA8.@{LINE}You can also use Frameskip option.@{LINE}@{LINE}@{LINE}
+@{LINE}
+@ENDNODE
+@NODE running-68060-version-on-amiga-os4-ppc "Running 68060 version on Amiga OS4 PPC"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +------------------------------------------+
+ /  Running 68060 version on Amiga OS4 PPC  /
++------------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}The executable is compiled for 68060 with FPU with double float support, and the OS4 68k emulation stack called Petunia does not support it in JIT mode. Disabling JIT with tool SYS/Prefs/Compatibility has been reported to make it work ( This should be a bug report at Hyperion, remember anything can be corrected if correctly reported. ).@{LINE}Also Minimix r1.4 has a nasty bitmap copy optimization that doesn't work on OS4, this code should be now automatically disabled since r1.5 if layers.library version is (>=50).  else disable optimisation in Misc Panel. A better idea would be to port Minimix on OS4, it just wouldn't benefit the 68k specific optimisations. Note there are many other MAME ports on Amiga OS4 available at os4depot.@{LINE}@{LINE}@{LINE}
+@{LINE}
+@ENDNODE
+@NODE installing-free-demoscene-demo-roms "Installing free Demoscene Demo ROMs"
+@SMARTWRAP
+@{CODE}@{FG Shine}@{b}  +---------------------------------------+
+ /  Installing free Demoscene Demo ROMs  /
++---------------------------------------+
+@{ub}@{FG Text}@{PAR}@{BODY}@{LINDENT 1 }
+@{LINE}Demoscene productions are third party homebrew ROMS you can install without any legal issues, they are usually not games but nice visual effects with music, and art. *MAME106Minimix* is the only version of MAME with (currently) 3 demos internally registered as known roms in its internal database:@{LINE}@{LINE}@{LINDENT 5}@{LINE}- arkcrsn5.zip is provided in directory roms with the official MAME106Minimix package, it could be done because it weight a few kilobytes. This "Cruisin 5 roms by Abyss (2024)" demo uses the 8Bit hardware emulation of original Taito "Arkanoid" machine from 1985. This demo was originaly made because the coder actually own such hardware, and created this by replacing the 5 roms.@{LINE}
+@{LINE}- Demo "Vaporous" by TTE was made in 2025, won a competition at Revision party, and is an extra neogeo romset. It is quite big, so unlike "cruisin'5" you have to download it at: https://files.scene.org/view/parties/2025/revision25/oldskool-demo/tte25-vaporous.zip . To install the demo:  unzip tte25-vaporous, rename file mame/mslug2.zip as vaporous.zip and copy it to roms: it uses same rom mapping as mslug2, but we do have a slot name as "vaporous" with correct rom hash and information in list, so you can have both vaporous and mslug2 in the same roms directory, that way.@{LINE}
+@{LINE}- We also officialy support Oxygene's neogeo3D demo from 2012 (sound not working at the moment, but still impressive). Download it at https://www.pouet.net/prod.php?which=59253 , rename puzzledp.zip as neogeo3d.zip (so you can enjoy both and have correct name display) and copy it to roms/ .@{LINE}
+@{LINE}
+@{LINDENT 1}@{LINE}And that's it, you have demos on your arcade emulator.@{LINE}@{LINE}
+@{LINE}@{LINE}
+@ENDNODE

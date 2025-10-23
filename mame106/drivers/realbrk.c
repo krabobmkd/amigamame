@@ -1,3 +1,4 @@
+#define MACHINENAME "realbrk"
 /***************************************************************************
 
                       -= Billiard Academy Real Break =-
@@ -1026,9 +1027,10 @@ ROM_START( realbrkk )
 ROM_END
 
 
-GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1998, realbrk,  0,       realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Europe)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Japan)", GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Korea)", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Mature,0)
+GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)", GAME_IMPERFECT_GRAPHICS ,0,1,egg_Mature,0)
+GAME( 1998, realbrk,  0,       realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Europe)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_Mature,0)
+GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Japan)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_Mature,0)
+GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Korea)", GAME_IMPERFECT_GRAPHICS ,0,2,egg_Mature,0)
 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          

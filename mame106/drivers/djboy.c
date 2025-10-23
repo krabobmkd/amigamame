@@ -1,3 +1,4 @@
+#define MACHINENAME "djboy"
 /*
 DJ Boy (c)1989 Kanako
 
@@ -679,5 +680,5 @@ INPUT_PORTS_START( djboy )
 INPUT_PORTS_END
 
 /*     YEAR, NAME,  PARENT, MACHINE, INPUT, INIT, MNTR,  COMPANY, FULLNAME, FLAGS */
-GAME( 1989, djboy,  0,      djboy,   djboy, 0,    ROT0, "Sammy / Williams [Kaneko]", "DJ Boy", GAME_NOT_WORKING ,0) // Sammy & Williams logos in FG ROM
-GAME( 1989, djboyj, djboy,  djboy,   djboy, 0,    ROT0, "Sega [Kaneko]", "DJ Boy (Japan)", GAME_NOT_WORKING ,0) // Sega logo in FG ROM
+GAME( 1989, djboy,  0,      djboy,   djboy, 0,    ROT0, "Sammy / Williams [Kaneko]", "DJ Boy", GAME_NOT_WORKING ,0,0,egg_Unknown,0) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboyj, djboy,  djboy,   djboy, 0,    ROT0, "Sega [Kaneko]", "DJ Boy (Japan)", GAME_NOT_WORKING ,2,0,egg_BeatNUp,0) // Sega logo in FG ROM

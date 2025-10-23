@@ -1,3 +1,4 @@
+#define MACHINENAME "zerozone"
 /***************************************************************************
 
 Zero Zone memory map
@@ -276,5 +277,6 @@ ROM_START( lvgirl94 )
 ROM_END
 
 
-GAME( 1993, zerozone, 0, zerozone, zerozone, 0, ROT0, "Comad", "Zero Zone", 0 ,2)
-GAME( 1994, lvgirl94, 0, zerozone, zerozone, 0, ROT0, "Comad", "Las Vegas Girl (Girl '94)", 0 ,0)
+GAME( 1993, zerozone, 0, zerozone, zerozone, 0, ROT0, "Comad", "Zero Zone", 0 ,2,0,egg_Mature,0)
+GAME( 1994, lvgirl94, 0, zerozone, zerozone, 0, ROT0, "Comad", "Las Vegas Girl (Girl '94)", 0 ,2,0,egg_Mature,0)
+                                                                                                                                                                                                                                                                                        

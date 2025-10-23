@@ -1,3 +1,4 @@
+#define MACHINENAME "nmg5"
 /*
 
  Title                          Copyright            PCB - ID
@@ -1021,9 +1022,10 @@ DRIVER_INIT( prot_val_40 )
 	prot_val = 0x40;
 }
 
-GAME( 1998, nmg5,     0,       nmg5,    nmg5,      prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5", GAME_SUPPORTS_SAVE ,0)
-GAME( 1999, searchey, 0,       nmg5,    searchey,  prot_val_10, ROT0, "Yun Sung", "Search Eye", GAME_SUPPORTS_SAVE ,0)
-GAME( 2000, pclubys,  0,       pclubys, pclubys,   prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung - set 1)", GAME_SUPPORTS_SAVE ,0)
-GAME( 2000, pclubysa, pclubys, pclubys, pclubys,   prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung - set 2)", GAME_SUPPORTS_SAVE ,0)
-GAME( 2000, garogun,  0,       garogun, garogun,   prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", GAME_SUPPORTS_SAVE ,0)
-GAME( ????, wondstck, 0,       nmg5,    wondstck,  prot_val_00, ROT0, "Yun Sung", "Wonder Stick", GAME_SUPPORTS_SAVE ,0)
+GAME( 1998, nmg5,     0,       nmg5,    nmg5,      prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5", GAME_SUPPORTS_SAVE ,2,0,egg_Mature,0)
+GAME( 1999, searchey, 0,       nmg5,    searchey,  prot_val_10, ROT0, "Yun Sung", "Search Eye", GAME_SUPPORTS_SAVE ,0,0,egg_Unknown,0)
+GAME( 2000, pclubys,  0,       pclubys, pclubys,   prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung - set 1)", GAME_SUPPORTS_SAVE ,2,0,egg_Mature,0)
+GAME( 2000, pclubysa, pclubys, pclubys, pclubys,   prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung - set 2)", GAME_SUPPORTS_SAVE ,2,0,egg_Mature,0)
+GAME( 2000, garogun,  0,       garogun, garogun,   prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", GAME_SUPPORTS_SAVE ,0,1,egg_Quizz,0)
+GAME( ????, wondstck, 0,       nmg5,    wondstck,  prot_val_00, ROT0, "Yun Sung", "Wonder Stick", GAME_SUPPORTS_SAVE ,2,0,egg_Mature,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

@@ -1,3 +1,4 @@
+#define MACHINENAME "ssozumo"
 /***************************************************************************
 
 Syusse Oozumou
@@ -330,4 +331,4 @@ ROM_END
 
 
 
-GAME( 1984, ssozumo, 0, ssozumo, ssozumo, 0, ROT270, "Technos", "Syusse Oozumou (Japan)", 0 ,0)
+GAME( 1984, ssozumo, 0, ssozumo, ssozumo, 0, ROT270, "Technos", "Syusse Oozumou (Japan)", 0 ,0,2,egg_sport_,0)

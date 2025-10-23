@@ -1,3 +1,4 @@
+#define MACHINENAME "stfight"
 /*****************************          (by Mark McDougall)
  *** STREET FIGHT hardware ***  This has been adapted from the excellent
  *****************************  Psychic 5 description (by Roberto Ventura)
@@ -803,8 +804,9 @@ ROM_START( stfighta )
 	ROM_LOAD( "sf04.bin",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
-GAME( 1986, empcity,  0,       stfight, stfight, empcity, ROT0, "Seibu Kaihatsu", "Empire City: 1931 (bootleg?)", 0 ,0)
-GAME( 1986, empcityu, empcity, stfight, stfight, stfight, ROT0, "[Seibu Kaihatsu] (Taito / Romstar license)", "Empire City: 1931 (US)", 0 ,0)
-GAME( 1986, empcityj, empcity, stfight, stfight, stfight, ROT0, "[Seibu Kaihatsu] (Taito license)", "Empire City: 1931 (Japan)", 0 ,0)
-GAME( 1986, stfight,  empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu", "Street Fight (Germany)", 0 ,0)
-GAME( 1986, stfighta, empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu", "Street Fight", 0 ,0)
+GAME( 1986, empcity,  0,       stfight, stfight, empcity, ROT0, "Seibu Kaihatsu", "Empire City: 1931 (bootleg?)", 0 ,0,2,egg_Shooter,0)
+GAME( 1986, empcityu, empcity, stfight, stfight, stfight, ROT0, "[Seibu Kaihatsu] (Taito / Romstar license)", "Empire City: 1931 (US)", 0 ,0,2,egg_Shooter,0)
+GAME( 1986, empcityj, empcity, stfight, stfight, stfight, ROT0, "[Seibu Kaihatsu] (Taito license)", "Empire City: 1931 (Japan)", 0 ,0,2,egg_Shooter,0)
+GAME( 1986, stfight,  empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu", "Street Fight (Germany)", 0 ,0,2,egg_Shooter,0)
+GAME( 1986, stfighta, empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu", "Street Fight", 0 ,0,2,egg_Shooter,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          

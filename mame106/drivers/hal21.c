@@ -1,3 +1,4 @@
+#define MACHINENAME "hal21"
 /*
     Hal21
     ASO
@@ -1019,7 +1020,8 @@ ROM_START( alphamis )
 	ROM_LOAD( "up02_f14.rom",  0x800, 0x00400, CRC(c3fd1dd3) SHA1(c48030cc458f0bebea0ffccf3d3c43260da6a7fb) )
 ROM_END
 
-GAME( 1985, aso,      0,     aso,   aso,   aso,   ROT270, "SNK", "ASO - Armored Scrum Object", GAME_NO_COCKTAIL ,2)
-GAME( 1985, alphamis, aso,   aso,   aso,   aso,   ROT270, "SNK", "Alpha Mission", GAME_NO_COCKTAIL ,2)
-GAME( 1985, hal21,    0,     hal21, hal21, hal21, ROT270, "SNK", "HAL21", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL ,0)
-GAME( 1985, hal21j,   hal21, hal21, hal21, hal21, ROT270, "SNK", "HAL21 (Japan)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL ,0)
+GAME( 1985, aso,      0,     aso,   aso,   aso,   ROT270, "SNK", "ASO - Armored Scrum Object", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1985, alphamis, aso,   aso,   aso,   aso,   ROT270, "SNK", "Alpha Mission", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1985, hal21,    0,     hal21, hal21, hal21, ROT270, "SNK", "HAL21", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL ,2,0,egg_ShootEmUp,0)
+GAME( 1985, hal21j,   hal21, hal21, hal21, hal21, ROT270, "SNK", "HAL21 (Japan)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL ,2,0,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

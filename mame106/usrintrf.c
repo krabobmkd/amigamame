@@ -4383,7 +4383,7 @@ static void render_ui(mame_bitmap *dest)
 
 				} else
 				{
-                        dgp.color = elem->color;
+                        dgp.color = 0; // elem->color; was crashing on 32bit new colors
                         drawgfx(&dgp);
 				}
 				//drawgfx(dest, uirotfont, elem->type, elem->color ? 0 : 1, 0, 0, bounds.min_x, bounds.min_y, &uirawbounds, TRANSPARENCY_PEN, 0);

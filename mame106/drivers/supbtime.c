@@ -1,3 +1,4 @@
+#define MACHINENAME "supbtime"
 /***************************************************************************
 
   Super Burger Time     (c) 1990 Data East Corporation (DE-0343)
@@ -508,6 +509,6 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1990, supbtime, 0,        supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (World)", 0 ,0)
-GAME( 1990, supbtimj, supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", 0 ,0)
-GAME( 1991, chinatwn, 0,        chinatwn, chinatwn, 0, ROT0, "Data East Corporation", "China Town (Japan)", 0 ,0)
+GAME( 1990, supbtime, 0,        supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (World)", 0 ,2,0,egg_Platform,0)
+GAME( 1990, supbtimj, supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", 0 ,2,0,egg_Platform,0)
+GAME( 1991, chinatwn, 0,        chinatwn, chinatwn, 0, ROT0, "Data East Corporation", "China Town (Japan)", 0 ,2,0,egg_Puzzle,0)

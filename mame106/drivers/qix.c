@@ -1,3 +1,4 @@
+#define MACHINENAME "qix"
 /***************************************************************************
 
     Taito Qix hardware
@@ -3267,19 +3268,19 @@ static DRIVER_INIT( slither )
  *
  *************************************/
 
-GAME( 1981, qix,      0,        qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix (set 1)", 0 ,2)
-GAME( 1981, qixa,     qix,      qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix (set 2)", 0 ,2)
-GAME( 1981, qixb,     qix,      qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix (set 3)", 0 ,2)
-GAME( 1981, qix2,     qix,      qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", 0 ,2)
-GAME( 1981, sdungeon, 0,        mcu,      sdungeon, 0,        ROT270, "Taito America Corporation", "Space Dungeon", 0 ,0)
-GAME( 1982, elecyoyo, 0,        elecyoyo, elecyoyo, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", 0 ,2)
-GAME( 1982, elecyoy2, elecyoyo, elecyoyo, elecyoyo, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", 0 ,2)
-GAME( 1982, kram,     0,        mcu,      kram,     kram,     ROT0,   "Taito America Corporation", "Kram (set 1)", 0 ,2)
-GAME( 1982, kram2,    kram,     mcu,      kram,     kram,     ROT0,   "Taito America Corporation", "Kram (set 2)", 0 ,2)
-GAME( 1982, kram3,    kram,     qix,      kram,     kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", 0 ,2)
-GAME( 1982, zookeep,  0,        zookeep,  zookeep,  zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", 0 ,2)
-GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", 0 ,2)
-GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep,  zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", 0 ,2)
-GAME( 1982, slither,  0,        slither,  slither,  slither,  ROT270, "Century II",                "Slither (set 1)", 0 ,2)
-GAME( 1982, slithera, slither,  slither,  slither,  slither,  ROT270, "Century II",                "Slither (set 2)", 0 ,2)
-GAME( 1984, complexx, 0,        qix,      complexx, 0,        ROT270, "Taito America Corporation", "Complex X", 0 ,0)
+GAME( 1981, qix,      0,        qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix (set 1)", 0 ,0,2,egg_Puzzle,0)
+GAME( 1981, qixa,     qix,      qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix (set 2)", 0 ,0,2,egg_Puzzle,0)
+GAME( 1981, qixb,     qix,      qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix (set 3)", 0 ,0,2,egg_Puzzle,0)
+GAME( 1981, qix2,     qix,      qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", 0 ,0,2,egg_Puzzle,0)
+GAME( 1981, sdungeon, 0,        mcu,      sdungeon, 0,        ROT270, "Taito America Corporation", "Space Dungeon", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, elecyoyo, 0,        elecyoyo, elecyoyo, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, elecyoy2, elecyoyo, elecyoyo, elecyoyo, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, kram,     0,        mcu,      kram,     kram,     ROT0,   "Taito America Corporation", "Kram (set 1)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, kram2,    kram,     mcu,      kram,     kram,     ROT0,   "Taito America Corporation", "Kram (set 2)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, kram3,    kram,     qix,      kram,     kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, zookeep,  0,        zookeep,  zookeep,  zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep,  zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", 0 ,0,2,egg_Platform,0)
+GAME( 1982, slither,  0,        slither,  slither,  slither,  ROT270, "Century II",                "Slither (set 1)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, slithera, slither,  slither,  slither,  slither,  ROT270, "Century II",                "Slither (set 2)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1984, complexx, 0,        qix,      complexx, 0,        ROT270, "Taito America Corporation", "Complex X", 0 ,0,2,egg_Platform,0)

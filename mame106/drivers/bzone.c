@@ -1,3 +1,4 @@
+#define MACHINENAME "bzone"
 /***************************************************************************
 
     Atari Battlezone hardware
@@ -790,8 +791,8 @@ static DRIVER_INIT( redbaron )
  *
  *************************************/
 
-GAME( 1980, bzone,    0,     bzone,    bzone,    bzone,    ROT0, "Atari", "Battle Zone (set 1)", 0 ,1)
-GAME( 1980, bzone2,   bzone, bzone,    bzone,    bzone,    ROT0, "Atari", "Battle Zone (set 2)", 0 ,1)
-GAME( 1980, bzonec,   bzone, bzone,    bzone,    bzone,    ROT0, "Atari", "Battle Zone (cocktail)", GAME_NO_COCKTAIL ,1)
-GAME( 1980, bradley,  0,     bradley,  bradley,  bradley,  ROT0, "Atari", "Bradley Trainer", 0 ,1)
-GAME( 1980, redbaron, 0,     redbaron, redbaron, redbaron, ROT0, "Atari", "Red Baron", 0 ,0)
+GAME( 1980, bzone,    0,     bzone,    bzone,    bzone,    ROT0, "Atari", "Battle Zone (set 1)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1980, bzone2,   bzone, bzone,    bzone,    bzone,    ROT0, "Atari", "Battle Zone (set 2)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1980, bzonec,   bzone, bzone,    bzone,    bzone,    ROT0, "Atari", "Battle Zone (cocktail)", GAME_NO_COCKTAIL ,0,1,egg_ShootEmUp,0)
+GAME( 1980, bradley,  0,     bradley,  bradley,  bradley,  ROT0, "Atari", "Bradley Trainer", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1980, redbaron, 0,     redbaron, redbaron, redbaron, ROT0, "Atari", "Red Baron", 0 ,0,1,egg_Flying,0)

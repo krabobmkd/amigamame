@@ -1213,7 +1213,11 @@ do {																					\
 	if (active_address_space[ADDRESS_SPACE_PROGRAM].readlookup[LEVEL1_INDEX((pc) & active_address_space[ADDRESS_SPACE_PROGRAM].addrmask)] != opcode_entry)	\
 		memory_set_opbase(pc);															\
 } while (0)																				\
+//krb test
+//#define change_pc(pc) { if(pc<opcode_memory_min || pc>opcode_memory_max) memory_set_opbase(pc); }
 
+extern offs_t			opcode_memory_min;			/* opcode memory minimum */
+extern offs_t			opcode_memory_max;			/* opcode memory maximum */
 // krb for instance
 //#define change_pc_cpu(pc,popcode,icpu)																	\
 //do {																					\

@@ -1,3 +1,4 @@
+#define MACHINENAME "homerun"
 /*
  Moero Pro Yakyuu Homerun - (c) 1988 Jaleco
  Driver by Tomasz Slanina
@@ -212,5 +213,5 @@ ROM_START( homerun )
 
 ROM_END
 
-GAME( 1988, homerun, 0, homerun, homerun, 0, ROT0, "Jaleco", "Moero Pro Yakyuu Homerun",GAME_IMPERFECT_GRAPHICS,0)
+GAME( 1988, homerun, 0, homerun, homerun, 0, ROT0, "Jaleco", "Moero Pro Yakyuu Homerun",GAME_IMPERFECT_GRAPHICS,0,1,egg_sport_Baseball,0)
 

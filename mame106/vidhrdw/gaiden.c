@@ -557,7 +557,7 @@ static void drgnbowl_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		0, 	// scalex
 		0, 	// scaley
 		priority_bitmap, 	// pri_buffer
-		priority_mask 	// priority_mask
+		0 	// priority_mask
 	  };
 	for( i = 0; i < 0x800/2; i += 4 )
 	{
@@ -574,10 +574,9 @@ static void drgnbowl_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		x += 256;
 
 		if(spriteram16[i + 3] & 0x20)
-			priority_mask = 0xf0 | 0xcc; /* obscured by foreground */
+			priority_mask = (0xf0 | 0xcc)|(1<<31); /* obscured by foreground */
 		else
-			priority_mask = 0;
-
+			priority_mask = 0|(1<<31);
 		
 		dgp2.code = code;
 		dgp2.color = color;
@@ -585,16 +584,11 @@ static void drgnbowl_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		dgp2.flipy = flipy;
 		dgp2.sx = x;
 		dgp2.sy = y;
+		dgp2.priority_mask = priority_mask;
 		drawgfx(&dgp2);
 
 		/* wrap x*/
-		
-		dgp2.code = code;
-		dgp2.color = color;
-		dgp2.flipx = flipx;
-		dgp2.flipy = flipy;
 		dgp2.sx = x-512;
-		dgp2.sy = y;
 		drawgfx(&dgp2);
 
 	}

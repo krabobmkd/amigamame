@@ -1,3 +1,4 @@
+#define MACHINENAME "rockola"
 /***************************************************************************
 
     Sasuke vs. Commander
@@ -1577,17 +1578,18 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1980, sasuke,   0,        sasuke,   sasuke,   0, ROT90, "SNK", "Sasuke vs. Commander", 0 ,0)
-GAME( 1981, satansat, 0,        satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn", GAME_IMPERFECT_SOUND ,2)
-GAME( 1981, zarzon,   satansat, satansat, satansat, 0, ROT90, "[SNK] (Taito America license)", "Zarzon", GAME_IMPERFECT_SOUND ,2)
-GAME( 1981, vanguard, 0,        vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (SNK)", 0 ,2)
-GAME( 1981, vangrdce, vanguard, vanguard, vanguard, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", 0 ,2)
-GAME( 1981, vanguarj,  vanguard, vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (Japan)", 0 ,2)
-GAME( 1981, fantasy,  0,        fantasy,  fantasy,  0, ROT90, "SNK", "Fantasy (World)", 0 ,2)
-GAME( 1981, fantasyu, fantasy,  fantasy,  fantasy,  0, ROT90, "[SNK] (Rock-Ola license)", "Fantasy (US)", 0 ,2)
-GAME( 1981, fantasyj, fantasy,  fantasy,  fantasy,  0, ROT90, "SNK", "Fantasy (Japan)", 0 ,2)
-GAME( 1982, pballoon, 0,        pballoon, pballoon, 0, ROT90, "SNK", "Pioneer Balloon", 0 ,0)
-GAME( 1982, nibbler,  0,        nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 1)", 0 ,2)
-GAME( 1982, nibblera, nibbler,  nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 2)", 0 ,2)
-GAME( 1982, nibblerb, nibbler,  nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 3)", 0 ,2)
-GAME( 1983, nibblero, nibbler,  nibbler,  nibbler,  0, ROT90, "Olympia",  "Nibbler (Olympia)", 0 ,2)
+GAME( 1980, sasuke,   0,        sasuke,   sasuke,   0, ROT90, "SNK", "Sasuke vs. Commander", 0 ,0,2,egg_Shooter,0)
+GAME( 1981, satansat, 0,        satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1981, zarzon,   satansat, satansat, satansat, 0, ROT90, "[SNK] (Taito America license)", "Zarzon", GAME_IMPERFECT_SOUND ,0,2,egg_ShootEmUp,0)
+GAME( 1981, vanguard, 0,        vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (SNK)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, vangrdce, vanguard, vanguard, vanguard, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, vanguarj,  vanguard, vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (Japan)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1981, fantasy,  0,        fantasy,  fantasy,  0, ROT90, "SNK", "Fantasy (World)", 0 ,0,0,egg_Unknown,0)
+GAME( 1981, fantasyu, fantasy,  fantasy,  fantasy,  0, ROT90, "[SNK] (Rock-Ola license)", "Fantasy (US)", 0 ,0,2,egg_Maze,0)
+GAME( 1981, fantasyj, fantasy,  fantasy,  fantasy,  0, ROT90, "SNK", "Fantasy (Japan)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, pballoon, 0,        pballoon, pballoon, 0, ROT90, "SNK", "Pioneer Balloon", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1982, nibbler,  0,        nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 1)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, nibblera, nibbler,  nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 2)", 0 ,0,2,egg_Maze,0)
+GAME( 1982, nibblerb, nibbler,  nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 3)", 0 ,0,2,egg_Maze,0)
+GAME( 1983, nibblero, nibbler,  nibbler,  nibbler,  0, ROT90, "Olympia",  "Nibbler (Olympia)", 0 ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

@@ -7565,14 +7565,16 @@ void m68k_op_swap_32(M68KOPT_PARAMS)
         "\tswap d0\n"
         "\tmove.l d0,(a0)\n"
         "\tmove.l d0,%c[not_z_flag](%1)\n"
-        "\trol.l #8,d0\n"
+        "\tmoveq #24,d1\n"
+        "\tlsr.l d1,d0\n"
+//        "\trol.l #8,d0\n"
         "\tmove.l d0,%c[n_flag](%1)\n"
         :
         : "d"(regir), "a"(p68k),
          [dar] "n" (offsetof(struct m68ki_cpu_core, dar)),
          [n_flag] "n" (offsetof(struct m68ki_cpu_core, n_flag)),
          [not_z_flag] "n" (offsetof(struct m68ki_cpu_core, not_z_flag))
-        :  "d0","a0"
+        :  "d0","d1","a0"
         );
     /*
     move.l d2,-(sp)
@@ -7599,8 +7601,8 @@ void m68k_op_swap_32(M68KOPT_PARAMS)
 	FLAG_Z = *r_dst;
 	FLAG_N = NFLAG_32(*r_dst);
 #endif
-//	FLAG_C = CFLAG_CLEAR;
-//	FLAG_V = VFLAG_CLEAR;
+	FLAG_C = CFLAG_CLEAR;
+	FLAG_V = VFLAG_CLEAR;
 }
 
 

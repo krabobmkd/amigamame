@@ -217,7 +217,7 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
         {
             string line = rgetline(ifssrc);
             trim(line);
-            size_t isComment = line.find("//");            
+            size_t isComment = line.find("//");
             if(isComment == 0) continue; // quick escape
 
             // simply parse official mame macros to know machine dfinition
@@ -354,7 +354,7 @@ int searchDrivers(TMachine &machine, map<string,vector<string>> &vars)
                     if(soundh=="PSX") soundh="PSXSPU";
                     if(soundh=="GAELCO") soundh="GAELCO_GAE1";
                     //
-                    bool isInDefs = false;                 
+                    bool isInDefs = false;
                     for(const string &sounditem : sounds )
                     {
                         if(sounditem == soundh) {isInDefs = true; break;}
@@ -567,12 +567,12 @@ int patchMiniMachines(
 
             "drivers/gauntlet.c",
             "vidhrdw/gauntlet.c",
-
-            // "machine/harddriv.c",  dontwork
-            // "drivers/harddriv.c",
-            // "sndhrdw/harddriv.c",
-            // "vidhrdw/harddriv.c",
-
+//--------------------- test
+//             "machine/harddriv.c",
+//             "drivers/harddriv.c",
+//             "sndhrdw/harddriv.c",
+//             "vidhrdw/harddriv.c",
+//----------------
             "drivers/rampart.c",
             "vidhrdw/rampart.c",
 
@@ -614,11 +614,11 @@ int patchMiniMachines(
 // they don't work
 //        "harddriv","harddrvc",
 //        "stunrun","stunrunp",
-        // "racedriv","racedrvc",
-        // "steeltal",
-        // "strtdriv",
-        // "hdrivair",
-
+//         "racedriv","racedrvc",
+//         "steeltal",
+//         "strtdriv",
+//         "hdrivair",
+//------------
         // atarisy1
         "marble","marble2","marble3","marble4",
         "peterpak","indytemp","indytem2","indytem3","indytem4","indytemd",
@@ -818,6 +818,30 @@ int patchMiniMachines(
 
     }
     {
+        TMachine  &src=machinetargets["misc"];
+        string mname=string("cave");
+        TMachine  &m=machinetargets[mname];
+
+        copyDrivers(m,src,{
+            "pwrinst2","pwrins2j","mazinger","donpachi","donpachj",
+            "donpachk","metmqstr","nmaster","plegends","plegendj",
+            "sailormn","sailormo","agallet","hotdogst","ddonpach",
+            "ddonpchj","dfeveron","feversos","esprade","espradej",
+            "espradeo","uopoko","uopokoj","guwange","gaia",
+            "korokoro"
+            });
+        m._sources = {
+            "drivers/cave.c","vidhrdw/cave.c"
+        };
+        m._cpu_defs["M68000"]=1;
+        m._cpu_defs["Z80"]=1;
+        // YMZ280B OKIM6295 YM2203 YM2151
+        m._sound_defs["YMZ280B"]=1;
+        m._sound_defs["OKIM6295"]=1;
+        m._sound_defs["YM2203"]=1;
+        m._sound_defs["YM2151"]=1;
+    }
+    {
         TMachine  &src=machinetargets["konami"];
         string mname=string("minikonami");
         TMachine  &m=machinetargets[mname];
@@ -938,12 +962,33 @@ int patchMiniMachines(
             "drivers/parodius.c","vidhrdw/parodius.c",
             // r1.6 added: (scramble & super cobra)
             "drivers/scobra.c","drivers/scramble.c",
-            "machine/scramble.c","sndhrdw/scramble.c"
-
+            "machine/scramble.c","sndhrdw/scramble.c",
+            // r1.7
+            "drivers/moo.c","vidhrdw/moo.c",
+            "drivers/thunderx.c","vidhrdw/thunderx.c",
+            "drivers/suprslam.c","vidhrdw/suprslam.c",
+      //DOESNTWORK      "drivers/rungun.c","vidhrdw/rungun.c",
+      //DOESNWORK      "drivers/plygonet.c",
+            "drivers/rollerg.c","vidhrdw/rollerg.c",
+            "drivers/vendetta.c","vidhrdw/vendetta.c"
         };
+        copyDrivers(m,src,{"moo","mooua","mooaa","bucky","buckyua" });
+        copyDrivers(m,src,{"scontra","scontraj","thunderx","thnderxa","thnderxb","thnderxj" });
+        copyDrivers(m,src,{"suprslam" });
+
+//        copyDrivers(m,src,{"","","","","" });
+        copyDrivers(m,src,{"rollerg","rollergj" });
+
+        copyDrivers(m,src,{"vendetta","vendetao","vendet2p","vendetas","vendtaso","vendettj" });
+        copyDrivers(m,src,{"esckids","esckidsj" });
+
+
         m._gamedrivers["scobra"] = src._gamedrivers["scobra"];
         m._gamedrivers["scramble"] = src._gamedrivers["scramble"];
         m._gamedrivers["mimonscr"] = src._gamedrivers["mimonscr"];
+
+        m._gamedrivers["mimonscr"] = src._gamedrivers["mimonscr"];
+
 
 //        m._gamedrivers["parodisj"] = src._gamedrivers["parodisj"];
 
@@ -1280,10 +1325,14 @@ int createCmake(map<string,TMachine> machinetargets,
         if(upname == "SHARED") onShouldBeDefault=true;
         // this is optional
         if(upname == "SEGA" ) onShouldBeDefault = true;
+
+        if(upname == "PSIKYO" ) onShouldBeDefault = true;
+        if(upname == "DOOYONG" ) onShouldBeDefault = true;
+         if(upname == "CAVE") onShouldBeDefault=true;
          // pacmania,...
          if(upname == "MININAMCOS1") onShouldBeDefault=true;
          if(upname == "MINIATARI") onShouldBeDefault=true;
-if(upname == "NINTENDO") onShouldBeDefault=true;		 
+if(upname == "NINTENDO") onShouldBeDefault=true;
         // if(upname == "JUSTDKONG") onShouldBeDefault=true;
          if(upname == "JALECO") onShouldBeDefault=true;
          if(upname == "SUN") onShouldBeDefault=true;
@@ -1853,10 +1902,6 @@ void completeDefinitionsByHand(
     removeSegaModel23(machinetargets["sega"]);
 
 
-
-    machinetargets["neogeo"]._sound_defs["YM2610B"]=1;
-
-    machinetargets["capcom"]._sound_defs["YM2610B"]=1;
     machinetargets["capcom"]._cpu_defs["PSXCPU"]=1;
 
     // original makefile set that in general sources, link it has it is due:
@@ -1869,6 +1914,9 @@ void completeDefinitionsByHand(
     machinetargets["taito"]._sound_defs["YM2610B"]=1;
     machinetargets["taito"]._sound_defs["YM3526"]=1; // bubblbobbl
    machinetargets["taito"]._cpu_defs["M68705"]=1; // arkanoid need this controller
+
+// this is added by krb:
+machinetargets["taito"]._sources.push_back("vidhrdw/taito_f3k.cpp");
 
     //
     machinetargets["taito"]._sources.push_back("drivers/seta.c"); // needed by taito_x.c
@@ -1949,6 +1997,18 @@ void completeDefinitionsByHand(
         machinetargets[pkgname]._gamedrivers["tmnt"] = src._gamedrivers["tmnt"];
         machinetargets[pkgname]._gamedrivers["tmnt2"] = src._gamedrivers["tmnt2"];
     }*/
+
+    // some rules...
+    map<string,TMachine>::iterator mait = machinetargets.begin();
+    while(mait != machinetargets.end())
+    {
+        pair<const string,TMachine> &p = *mait++;
+        TMachine &m = p.second;
+        // "if got YM2610, must have YM2610B too or will not compile"
+        if(m._sound_defs.find("YM2610") != m._sound_defs.end())  m._sound_defs["YM2610B"]=1;
+    }
+
+
 }
 
 int recurseEverWork(std::string drv,
@@ -2040,7 +2100,7 @@ void removeUselessDrivers(
                 drv._useful = recurseEverWork(p.first,driverMap,reverseDependencies);
             }
             if(drv._useful) machine._useful = 1;
-        }                              
+        }
     }
     // - - - machine level
 

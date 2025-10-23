@@ -1,3 +1,4 @@
+#define MACHINENAME "stvhacks"
 /* ST-V SpeedUp Hacks */
 
 /*

@@ -1,3 +1,4 @@
+#define MACHINENAME "tugboat"
 /****************************************************************************
 
 Tug Boat
@@ -486,5 +487,6 @@ ROM_START( noahsark )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat,  0, ROT90, "ETM", "Tugboat",    GAME_IMPERFECT_GRAPHICS ,0)
-GAME( 1983, noahsark, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech", "Noah's Ark", GAME_IMPERFECT_GRAPHICS ,0)
+GAME( 1982, tugboat,  0, tugboat, tugboat,  0, ROT90, "ETM", "Tugboat",    GAME_IMPERFECT_GRAPHICS ,0,2,egg_Driving,0)
+GAME( 1983, noahsark, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech", "Noah's Ark", GAME_IMPERFECT_GRAPHICS ,0,2,egg_Puzzle,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

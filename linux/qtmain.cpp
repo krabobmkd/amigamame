@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <sstream>
 #include <fstream>
-
+#include <QKeyEvent>
 extern "C" {
     #include "osdepend.h"
     #include "mamecore.h"
@@ -130,6 +130,8 @@ void StartGame(int idriver)
     options.pause_bright = 1.0f;
 options.samplerate = 22050;
 
+options.tf3_disblend = 1;
+
     // vector things
     options.beam = 0x0001c000;               /* vector beam width */
     options.vector_flicker = 0.0f;     /* float vector beam flicker effect control */
@@ -157,9 +159,9 @@ options.samplerate = 22050;
 //    osd_fclose(options.record);
 }
 int nbframe=0;
-int w = 320;
-int h = 224;
-vector<uint8_t> bm(w * h * 3, 128);
+int w = 0;
+int h = 0;
+vector<uint8_t> bm;
 QProc *proc=nullptr;
 QThread *qthread = nullptr;
 struct _mame_display *_display=nullptr;
@@ -187,20 +189,28 @@ void QProc::process()
     {
         int idriver = getMainConfig().driverIndex().index(
 
-       //"nightstr"
-      //  "bigrun"
+//       "nightstr"
+//        "bigrun"
      // "cischeat"
     // "sci"
       //"sharrier"
 //      "arkanoid"
- "starwars"
-//"cchasm"
+// "starwars"
+//"btlkroad"
+//"samuraia"
+//"tengai"
+"bublbob2"
+//"ridingf"
+//"gseeker"
+//"gunbustr"
+//"gekirido"
+//"outrun"
 //"startrek"
 //"tacscan"
  //     "othunder"
-      // "thndrbld"
-      // "chasehq"
-//"gforce2"
+//       "thndrbld"
+//       "chasehq"
+//"gaxeduel"
         );
         if(idriver>0)
         {
@@ -237,9 +247,10 @@ QWin::QWin() : QLabel()
     emit startproc();
     connect(&m_timer,&QTimer::timeout,this,&QWin::updateWin);
     m_timer.setSingleShot(false);
-    m_timer.start(1000/40);
+    m_timer.start(1000/60);
     show();
     setMouseTracking(true);
+    grabKeyboard();
 
 }
 extern "C" {
@@ -266,6 +277,19 @@ void QWin::paintEvent(QPaintEvent *event)
 
 //    p.drawText(60,60,QString("woot:")+QString::number(nbframe));
 }
+std::map<int,int> keystates;
+
+void QWin::keyPressEvent(QKeyEvent *event)
+{
+    keystates[event->key()] = 1;
+  //cout << "p:"<<event->key() << endl;
+}
+void QWin::keyReleaseEvent(QKeyEvent *event)
+{
+    keystates[event->key()] = 0;
+//  cout << "r:"<<event->key() << endl;
+}
+
 void QWin::updateWin()
 {
 
@@ -277,7 +301,7 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        int izoom = 1;
+        int izoom = 3;
     QPixmap qpx = QPixmap::fromImage(_image).scaled(QSize(w * izoom, h * izoom));
     _imageMutex.unlock();
 
@@ -412,24 +436,25 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
             }
         }
-    } 
-
-    for(int y=0;y<realHeight;y++)
+    } else
     {
-        uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
-        pline += x1;
-        for(int x=0;x<realWidth;x++)
+        for(int y=0;y<realHeight;y++)
         {
-            uint16_t c = *pline++;
-            uint32_t rgb=0;
-            if(c<display->game_palette_entries)
-            rgb = display->game_palette[c];
+            uint16_t *pline = (uint16_t *)display->game_bitmap->line[y+y1];
+            pline += x1;
+            for(int x=0;x<realWidth;x++)
+            {
+                uint16_t c = *pline++;
+                uint32_t rgb=0;
+                if(c<display->game_palette_entries)
+                rgb = display->game_palette[c];
 
-            int i = (x+y*w)*3;
-            bm[i]= rgb>>16;
-            bm[i+1]= rgb>>8;
-            bm[i+2]= rgb;
+                int i = (x+y*w)*3;
+                bm[i]= rgb>>16;
+                bm[i+1]= rgb>>8;
+                bm[i+2]= rgb;
 
+            }
         }
     }
 
@@ -450,7 +475,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 
 nbframe++;
     // logo
-//if(nbframe == 60*20+60-4-4-4) mame_pause(1);
+// if(nbframe == 1550) mame_pause(1);
 
 // chasehq sprite prio bug:
 // if(nbframe == 60*100 && m_nbtest == 0)
@@ -510,16 +535,17 @@ void osd_sound_enable(int enable)
 const os_code_info *osd_get_code_list(void)
 {
     static os_code_info l[]={
-        {"5",34,KEYCODE_5},
-        {"1",35,KEYCODE_1},
-        {"A",32,KEYCODE_A},
-        {"TAB",33,KEYCODE_TAB},
-        {"SPACE",65,KEYCODE_SPACE},
-        {"M1AX",1024,MOUSECODE_1_ANALOG_X},
-        {"M1AY",1025,MOUSECODE_1_ANALOG_Y},
-        {"M1ABT1",1026,MOUSECODE_1_BUTTON1},
-        {"M1ABT2",1027,MOUSECODE_1_BUTTON2},
-        {"bt4",100,JOYCODE_1_BUTTON4},
+       {"tab",16777217,KEYCODE_TAB},
+
+       {"Up",16777235,KEYCODE_UP},
+       {"Down",16777237,KEYCODE_DOWN},
+       {"Left",16777234,KEYCODE_LEFT},
+       {"Right",16777236,KEYCODE_RIGHT},
+
+       {"5",40,KEYCODE_5},
+       {"1",38,KEYCODE_1},
+       {"bt1",16777249,JOYCODE_1_BUTTON1},
+
         {NULL,0,0},
     };
     return &l[0];
@@ -527,6 +553,9 @@ const os_code_info *osd_get_code_list(void)
 int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
+    if(keystates[oscode] !=0) return 1;
+    return 0;
+
 // to open menu
     //if(oscode == 33 && nbframe>2*60)
     //{
@@ -639,5 +668,8 @@ int osd_is_bad_read_ptr(const void *ptr, size_t size)
 {
     return 0;
 }
+void osd_post_input_port_init_check()
+{
 
+}
 

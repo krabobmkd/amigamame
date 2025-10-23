@@ -1,3 +1,4 @@
+#define MACHINENAME "ddragon"
 /***************************************************************************
 
 Double Dragon     (c) 1987 Technos Japan
@@ -1781,20 +1782,20 @@ static DRIVER_INIT( toffy )
 
 }
 
-GAME( 1987, ddragon,  0,        ddragon,  ddragon,  0, ROT0, "Technos", "Double Dragon (Japan)", 0 ,2)
-GAME( 1987, ddragonw, ddragon,  ddragon,  ddragon,  0, ROT0, "[Technos] (Taito license)", "Double Dragon (World Set 1)", 0 ,2)
-GAME( 1987, ddragnw1, ddragon,  ddragon,  ddragon,  0, ROT0, "[Technos] (Taito license)", "Double Dragon (World Set 2)", 0 ,2)
-GAME( 1987, ddragonu, ddragon,  ddragon,  ddragon,  0, ROT0, "[Technos] (Taito America license)", "Double Dragon (US)", 0 ,2)
-GAME( 1987, ddragonb, ddragon,  ddragonb, ddragon,  0, ROT0, "bootleg", "Double Dragon (bootleg)", 0 ,2)
-GAME( 1988, ddragon2, 0,        ddragon2, ddragon2, 0, ROT0, "Technos", "Double Dragon II - The Revenge (World)", 0 ,2)
-GAME( 1988, ddragn2u, ddragon2, ddragon2, ddragon2, 0, ROT0, "Technos", "Double Dragon II - The Revenge (US)", 0 ,2)
+GAME( 1987, ddragon,  0,        ddragon,  ddragon,  0, ROT0, "Technos", "Double Dragon (Japan)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1987, ddragonw, ddragon,  ddragon,  ddragon,  0, ROT0, "[Technos] (Taito license)", "Double Dragon (World Set 1)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1987, ddragnw1, ddragon,  ddragon,  ddragon,  0, ROT0, "[Technos] (Taito license)", "Double Dragon (World Set 2)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1987, ddragonu, ddragon,  ddragon,  ddragon,  0, ROT0, "[Technos] (Taito America license)", "Double Dragon (US)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1987, ddragonb, ddragon,  ddragonb, ddragon,  0, ROT0, "bootleg", "Double Dragon (bootleg)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1988, ddragon2, 0,        ddragon2, ddragon2, 0, ROT0, "Technos", "Double Dragon II - The Revenge (World)", 0 ,2,0,egg_BeatNUp,0)
+GAME( 1988, ddragn2u, ddragon2, ddragon2, ddragon2, 0, ROT0, "Technos", "Double Dragon II - The Revenge (US)", 0 ,2,0,egg_BeatNUp,0)
 
 /* these were conversions of double dragon */
-GAME( 1991, tstrike,   0,        darktowr,  tstrike,   0, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Newer)", 0 ,0)
-GAME( 1991, tstrikea,  tstrike,  darktowr,  tstrike,   0, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Older)", 0 ,0)
-GAME( 1992, ddungeon,  0,        darktowr,  ddungeon,  0, ROT0, "East Coast Coin Company (Melbourne)", "Dangerous Dungeons", 0 ,0)
-GAME( 1992, darktowr,  0,        darktowr,  darktowr,  0, ROT0, "Game Room", "Dark Tower", 0 ,0)
+GAME( 1991, tstrike,   0,        darktowr,  tstrike,   0, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Newer)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1991, tstrikea,  tstrike,  darktowr,  tstrike,   0, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Older)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1992, ddungeon,  0,        darktowr,  ddungeon,  0, ROT0, "East Coast Coin Company (Melbourne)", "Dangerous Dungeons", 0 ,0,0,egg_Platform,0)
+GAME( 1992, darktowr,  0,        darktowr,  darktowr,  0, ROT0, "Game Room", "Dark Tower", 0 ,2,0,egg_Platform,0)
 
 /* these run on their own board, but are basically the same game. Toffy even has 'dangerous dungeons' text in it */
-GAME( 1993, toffy,  0, toffy, toffy, toffy, ROT0, "Midas",                 "Toffy", 0 ,0)
-GAME( 1994, stoffy, 0, toffy, toffy, toffy, ROT0, "Midas (Unico license)", "Super Toffy", 0 ,0)
+GAME( 1993, toffy,  0, toffy, toffy, toffy, ROT0, "Midas",                 "Toffy", 0 ,2,0,egg_Maze,0)
+GAME( 1994, stoffy, 0, toffy, toffy, toffy, ROT0, "Midas (Unico license)", "Super Toffy", 0 ,0,0,egg_Maze,0)

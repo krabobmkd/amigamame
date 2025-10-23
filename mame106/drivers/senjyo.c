@@ -1,3 +1,4 @@
+#define MACHINENAME "senjyo"
 /***************************************************************************
 
 Senjyo / Star Force / Baluba-louk
@@ -841,8 +842,8 @@ ROM_END
 
 
 
-GAME( 1983, senjyo,   0,        senjyo, senjyo,   senjyo,   ROT90, "Tehkan", "Senjyo", 0 ,0)
-GAME( 1984, starforc, 0,        senjyo, starforc, starforc, ROT90, "Tehkan", "Star Force", 0 ,2)
-GAME( 1984, starfore, starforc, senjyo, starforc, starfore, ROT90, "Tehkan", "Star Force (encrypted)", 0 ,2)
-GAME( 1985, megaforc, starforc, senjyo, starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 ,2)
-GAME( 1986, baluba,   0,        senjyo, baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu", GAME_IMPERFECT_COLORS ,2)
+GAME( 1983, senjyo,   0,        senjyo, senjyo,   senjyo,   ROT90, "Tehkan", "Senjyo", 0 ,0,2,egg_Shooter,0)
+GAME( 1984, starforc, 0,        senjyo, starforc, starforc, ROT90, "Tehkan", "Star Force", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1984, starfore, starforc, senjyo, starforc, starfore, ROT90, "Tehkan", "Star Force (encrypted)", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1985, megaforc, starforc, senjyo, starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 ,0,2,egg_ShootEmUp,0)
+GAME( 1986, baluba,   0,        senjyo, baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu", GAME_IMPERFECT_COLORS ,0,2,egg_Platform,0)

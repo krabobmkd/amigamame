@@ -850,11 +850,11 @@ static void recompute_fps(int skipped_it)
     plus updating the screen during normal
     operations
 -------------------------------------------------*/
-
+int throttleIsOn=0;
 void updatescreen(void)
 {
     /* update sound */
-	if(Machine->sample_rate>0 && soundMixerIsOn() && _frame>=_bootframeskip)  sound_frame_update();
+	if(Machine->sample_rate>0 && soundMixerIsOn() && _frame>=_bootframeskip && (throttleIsOn==0))  sound_frame_update();
 
 
 	/* if we're not skipping this frame, draw the screen */

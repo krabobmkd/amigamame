@@ -1,3 +1,4 @@
+#define MACHINENAME "mrjong"
 /***************************************************************************
 
 Mr.Jong
@@ -266,6 +267,7 @@ ROM_START( blkbustr )
 	ROM_LOAD( "clr.g5", 0x0020, 0x0100, CRC(bcb1e2e3) SHA1(c09731836a9d4e50316a84b86f61b599a1ef944d) )
 ROM_END
 
-GAME( 1983, mrjong,   0,      mrjong, mrjong, 0, ROT90, "Kiwako", "Mr. Jong (Japan)", 0 ,0)
-GAME( 1983, crazyblk, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks", 0 ,0)
-GAME( 1983, blkbustr, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "BlockBuster", 0 ,0)
+GAME( 1983, mrjong,   0,      mrjong, mrjong, 0, ROT90, "Kiwako", "Mr. Jong (Japan)", 0 ,0,2,egg_Maze,0)
+GAME( 1983, crazyblk, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks", 0 ,0,2,egg_Maze,0)
+GAME( 1983, blkbustr, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "BlockBuster", 0 ,0,2,egg_Maze,0)
+                                                                                                                                                                                                                                                                               

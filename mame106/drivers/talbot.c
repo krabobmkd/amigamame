@@ -1,3 +1,4 @@
+#define MACHINENAME "talbot"
 /*
     Talbot (c) 1982 Volt Electronics
 
@@ -310,4 +311,4 @@ ROM_START( talbot )
 	ROM_LOAD( "mb7052.5e", 0x0020, 0x0100, CRC(a3189986) SHA1(f113c1253ba2f8f213c600e93a39c0957a933306) )
 ROM_END
 
-GAME( 1982, talbot, 0, talbot, talbot, 0, ROT90, "Volt Electronics (Alpha license)", "Talbot", 0 ,0)
+GAME( 1982, talbot, 0, talbot, talbot, 0, ROT90, "Volt Electronics (Alpha license)", "Talbot", 0 ,2,0,egg_Maze,0)

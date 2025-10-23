@@ -1,3 +1,4 @@
+#define MACHINENAME "macs"
 /*
 
 macs.c - Multi Amenity Cassette System
@@ -609,10 +610,11 @@ static DRIVER_INIT(kisekaem)
 }
 
 
-GAME( 1995, macsbios,  0,       macs, macs, macs, ROT0, "I'Max", "Multi Amenity Cassette System BIOS", NOT_A_DRIVER | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ,0)
-GAME( 1995, macs2bios, 0,       macs, macs, macs, ROT0, "I'Max", "Multi Amenity Cassette System 2 BIOS", NOT_A_DRIVER | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ,0)
-GAME( 1995, kisekaem, macsbios, macs, macs, kisekaem, ROT0, "I'Max", "Kisekae Mahjong",  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND ,0)
-GAME( 1995, kisekaeh, macsbios, macs, macs, kisekaeh, ROT0, "I'Max", "Kisekae Hanafuda",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND,0)
-GAME( 1996, cultname, macsbios, macs, macs, macs, ROT0, "I'Max", "Seimei-Kantei-Meimei-Ki Cult Name",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND,0)
-GAME( 1999, yuka,     macsbios, macs, macs, macs, ROT0, "Yubis / T.System", "Yu-Ka",  0 ,0)
-GAME( 1999, yujan,    macsbios, macs, macs, macs, ROT0, "Yubis / T.System", "Yu-Jan",  0 ,0)
+GAME( 1995, macsbios,  0,       macs, macs, macs, ROT0, "I'Max", "Multi Amenity Cassette System BIOS", NOT_A_DRIVER | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ,0,0,egg_Unknown,0)
+GAME( 1995, macs2bios, 0,       macs, macs, macs, ROT0, "I'Max", "Multi Amenity Cassette System 2 BIOS", NOT_A_DRIVER | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ,0,0,egg_Unknown,0)
+GAME( 1995, kisekaem, macsbios, macs, macs, kisekaem, ROT0, "I'Max", "Kisekae Mahjong",  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND ,0,0,egg_Mahjong,0)
+GAME( 1995, kisekaeh, macsbios, macs, macs, kisekaeh, ROT0, "I'Max", "Kisekae Hanafuda",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND,0,0,egg_Tabletop,0)
+GAME( 1996, cultname, macsbios, macs, macs, macs, ROT0, "I'Max", "Seimei-Kantei-Meimei-Ki Cult Name",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND,0,0,egg_Miscellaneous,0)
+GAME( 1999, yuka,     macsbios, macs, macs, macs, ROT0, "Yubis / T.System", "Yu-Ka",  0 ,0,1,egg_Tabletop,0)
+GAME( 1999, yujan,    macsbios, macs, macs, macs, ROT0, "Yubis / T.System", "Yu-Jan",  0 ,0,1,egg_Mahjong,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          

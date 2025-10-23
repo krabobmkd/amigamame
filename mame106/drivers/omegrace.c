@@ -1,3 +1,4 @@
+#define MACHINENAME "omegrace"
 /***************************************************************************
 
     Midway Omega Race hardware
@@ -602,5 +603,6 @@ static DRIVER_INIT( omegrace )
  *
  *************************************/
 
-GAME( 1981, omegrace, 0,        omegrace, omegrace, omegrace, ROT0, "Midway",         "Omega Race", GAME_NO_COCKTAIL ,2)
-GAME( 1981, deltrace, omegrace, omegrace, omegrace, omegrace, ROT0, "Allied Leisure", "Delta Race", GAME_NO_COCKTAIL ,2)
+GAME( 1981, omegrace, 0,        omegrace, omegrace, omegrace, ROT0, "Midway",         "Omega Race", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+GAME( 1981, deltrace, omegrace, omegrace, omegrace, omegrace, ROT0, "Allied Leisure", "Delta Race", GAME_NO_COCKTAIL ,0,2,egg_ShootEmUp,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

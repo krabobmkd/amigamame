@@ -1,3 +1,4 @@
+#define MACHINENAME "quizdna"
 /*****************************************************************************
 
 Quiz DNA no Hanran (c) 1992 Face
@@ -590,6 +591,7 @@ ROM_START( gekiretu )
 
 ROM_END
 
-GAME( 1991, gakupara, 0, gakupara, gakupara, 0, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)", 0 ,0)
-GAME( 1992, quizdna,  0, quizdna,  quizdna,  0, ROT0, "Face", "Quiz DNA no Hanran (Japan)", 0 ,0)
-GAME( 1992, gekiretu, 0, gekiretu, gekiretu, 0, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)", 0 ,0)
+GAME( 1991, gakupara, 0, gakupara, gakupara, 0, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)", 0 ,2,0,egg_Quizz,0)
+GAME( 1992, quizdna,  0, quizdna,  quizdna,  0, ROT0, "Face", "Quiz DNA no Hanran (Japan)", 0 ,2,0,egg_Quizz,0)
+GAME( 1992, gekiretu, 0, gekiretu, gekiretu, 0, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)", 0 ,2,0,egg_Quizz,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   

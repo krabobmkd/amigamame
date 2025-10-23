@@ -6,11 +6,12 @@ option(OPT_ATARI "" OFF)
 option(OPT_ATLUS "" OFF)
 option(OPT_BFM "" OFF)
 option(OPT_CAPCOM "" ON)
+option(OPT_CAVE "" ON)
 option(OPT_CINEMAT "" ON)
 option(OPT_COMAD "" OFF)
 option(OPT_CVS "" OFF)
 option(OPT_DATAEAST "" OFF)
-option(OPT_DOOYONG "" OFF)
+option(OPT_DOOYONG "" ON)
 option(OPT_DYNAX "" OFF)
 option(OPT_EDEVICES "" OFF)
 option(OPT_EOLITH "" OFF)
@@ -61,7 +62,7 @@ option(OPT_PACIFIC "" OFF)
 option(OPT_PACMAN "" ON)
 option(OPT_PHOENIX "" OFF)
 option(OPT_PLAYMARK "" OFF)
-option(OPT_PSIKYO "" OFF)
+option(OPT_PSIKYO "" ON)
 option(OPT_RAMTEK "" OFF)
 option(OPT_RARE "" OFF)
 option(OPT_SANRITSU "" OFF)
@@ -321,6 +322,22 @@ if(OPT_CAPCOM)
 	list(APPEND CPU_DEFS
 		HAS_M68000=1 HAS_M6809=1 HAS_PSXCPU=1 HAS_SH2=1 
 		HAS_Z80=1 	)
+endif()
+if(OPT_CAVE)
+	add_compile_definitions(LINK_CAVE=1)
+	list(APPEND MAME_DRIVERS_SRC
+		drivers/cave.c vidhrdw/cave.c 	)
+	set(MSND_OKIM6295 ON)
+	set(MSND_YM2151 ON)
+	set(MSND_YM2203 ON)
+	set(MSND_YMZ280B ON)
+	set(MCPU_M68000 ON)
+	set(MCPU_Z80 ON)
+	list(APPEND CPU_DEFS
+		HAS_OKIM6295=1 HAS_YM2151=1 HAS_YM2203=1 HAS_YMZ280B=1 
+	)
+	list(APPEND CPU_DEFS
+		HAS_M68000=1 HAS_Z80=1 	)
 endif()
 if(OPT_CINEMAT)
 	add_compile_definitions(LINK_CINEMAT=1)
@@ -990,6 +1007,7 @@ if(OPT_METRO)
 	set(MSND_YM2151 ON)
 	set(MSND_YM2413 ON)
 	set(MSND_YM2610 ON)
+	set(MSND_YM2610B ON)
 	set(MSND_YMF278B ON)
 	set(MCPU_M68000 ON)
 	set(MCPU_M68EC020 ON)
@@ -997,7 +1015,7 @@ if(OPT_METRO)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
 		HAS_OKIM6295=1 HAS_YM2151=1 HAS_YM2413=1 HAS_YM2610=1 
-		HAS_YMF278B=1 	)
+		HAS_YM2610B=1 HAS_YMF278B=1 	)
 	list(APPEND CPU_DEFS
 		HAS_M68000=1 HAS_M68EC020=1 HAS_UPD7810=1 HAS_Z80=1 
 	)
@@ -1212,7 +1230,9 @@ if(OPT_MINIKONAMI2)
 		drivers/gradius3.c vidhrdw/gradius3.c drivers/nemesis.c vidhrdw/nemesis.c 
 		drivers/twin16.c vidhrdw/twin16.c drivers/parodius.c vidhrdw/parodius.c 
 		drivers/scobra.c drivers/scramble.c machine/scramble.c sndhrdw/scramble.c 
-	)
+		drivers/moo.c vidhrdw/moo.c drivers/thunderx.c vidhrdw/thunderx.c 
+		drivers/suprslam.c vidhrdw/suprslam.c drivers/rollerg.c vidhrdw/rollerg.c 
+		drivers/vendetta.c vidhrdw/vendetta.c 	)
 	set(MSND_AY8910 ON)
 	set(MSND_DAC ON)
 	set(MSND_K005289 ON)
@@ -1319,6 +1339,7 @@ if(OPT_MISC)
 	set(MSND_YM2151 ON)
 	set(MSND_YM2203 ON)
 	set(MSND_YM2610 ON)
+	set(MSND_YM2610B ON)
 	set(MSND_YM3812 ON)
 	set(MSND_YMZ280B ON)
 	set(MCPU_8080 ON)
@@ -1357,8 +1378,8 @@ if(OPT_MISC)
 		HAS_AY8910=1 HAS_BSMT2000=1 HAS_CUSTOM=1 HAS_DAC=1 
 		HAS_MSM5232=1 HAS_OKIM6295=1 HAS_SAMPLES=1 HAS_SN76477=1 
 		HAS_SN76496=1 HAS_UPD7759=1 HAS_VRENDER0=1 HAS_Y8950=1 
-		HAS_YM2151=1 HAS_YM2203=1 HAS_YM2610=1 HAS_YM3812=1 
-		HAS_YMZ280B=1 	)
+		HAS_YM2151=1 HAS_YM2203=1 HAS_YM2610=1 HAS_YM2610B=1 
+		HAS_YM3812=1 HAS_YMZ280B=1 	)
 	list(APPEND CPU_DEFS
 		HAS_8080=1 HAS_8085A=1 HAS_ARM=1 HAS_ARM7=1 
 		HAS_E116T=1 HAS_E132XT=1 HAS_H83002=1 HAS_I8051=1 
@@ -1685,12 +1706,13 @@ if(OPT_PSIKYO)
 		drivers/psikyo.c vidhrdw/psikyo.c drivers/psikyo4.c vidhrdw/psikyo4.c 
 		drivers/psikyosh.c vidhrdw/psikyosh.c 	)
 	set(MSND_YM2610 ON)
+	set(MSND_YM2610B ON)
 	set(MSND_YMF278B ON)
 	set(MCPU_M68EC020 ON)
 	set(MCPU_SH2 ON)
 	set(MCPU_Z80 ON)
 	list(APPEND CPU_DEFS
-		HAS_YM2610=1 HAS_YMF278B=1 	)
+		HAS_YM2610=1 HAS_YM2610B=1 HAS_YMF278B=1 	)
 	list(APPEND CPU_DEFS
 		HAS_M68EC020=1 HAS_SH2=1 HAS_Z80=1 	)
 endif()
@@ -1942,6 +1964,7 @@ if(OPT_SNK)
 	set(MSND_Y8950 ON)
 	set(MSND_YM2608 ON)
 	set(MSND_YM2610 ON)
+	set(MSND_YM2610B ON)
 	set(MSND_YM3526 ON)
 	set(MSND_YM3812 ON)
 	set(MCPU_M6502 ON)
@@ -1952,8 +1975,8 @@ if(OPT_SNK)
 	list(APPEND CPU_DEFS
 		HAS_AY8910=1 HAS_CUSTOM=1 HAS_DAC=1 HAS_NAMCO=1 
 		HAS_SAMPLES=1 HAS_SN76477=1 HAS_SN76496=1 HAS_UPD7759=1 
-		HAS_Y8950=1 HAS_YM2608=1 HAS_YM2610=1 HAS_YM3526=1 
-		HAS_YM3812=1 	)
+		HAS_Y8950=1 HAS_YM2608=1 HAS_YM2610=1 HAS_YM2610B=1 
+		HAS_YM3526=1 HAS_YM3812=1 	)
 	list(APPEND CPU_DEFS
 		HAS_M6502=1 HAS_M68000=1 HAS_R4600BE=1 HAS_V30=1 
 		HAS_Z80=1 	)
@@ -2073,7 +2096,8 @@ if(OPT_TAITO)
 		vidhrdw/tsamurai.c drivers/undrfire.c vidhrdw/undrfire.c drivers/volfied.c 
 		machine/volfied.c vidhrdw/volfied.c drivers/warriorb.c vidhrdw/warriorb.c 
 		drivers/wgp.c vidhrdw/wgp.c machine/mb87078.c sndhrdw/taitosnd.c 
-		vidhrdw/taitoic.c drivers/seta.c vidhrdw/seta.c 	)
+		vidhrdw/taitoic.c vidhrdw/taito_f3k.cpp drivers/seta.c vidhrdw/seta.c 
+	)
 	set(MSND_AY8910 ON)
 	set(MSND_CUSTOM ON)
 	set(MSND_DAC ON)
@@ -2417,6 +2441,7 @@ if(OPT_VSYSTEM)
 	set(MSND_YM2413 ON)
 	set(MSND_YM2608 ON)
 	set(MSND_YM2610 ON)
+	set(MSND_YM2610B ON)
 	set(MSND_YM3812 ON)
 	set(MCPU_M68000 ON)
 	set(MCPU_M6809 ON)
@@ -2424,7 +2449,7 @@ if(OPT_VSYSTEM)
 	list(APPEND CPU_DEFS
 		HAS_AY8910=1 HAS_MSM5205=1 HAS_OKIM6295=1 HAS_UPD7759=1 
 		HAS_YM2151=1 HAS_YM2413=1 HAS_YM2608=1 HAS_YM2610=1 
-		HAS_YM3812=1 	)
+		HAS_YM2610B=1 HAS_YM3812=1 	)
 	list(APPEND CPU_DEFS
 		HAS_M68000=1 HAS_M6809=1 HAS_Z80=1 	)
 endif()

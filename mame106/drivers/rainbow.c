@@ -1,3 +1,4 @@
+#define MACHINENAME "rainbow"
 /***************************************************************************
 
 Rainbow Islands  (c) Taito 1987   + Jumping
@@ -795,7 +796,7 @@ static DRIVER_INIT( jumping )
 }
 
 
-GAME( 1987, rainbow,  0,       rainbow, rainbow, rainbow,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", 0 ,2)
-GAME( 1987, rainbowo, rainbow, rainbow, rainbow, rainbow,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", 0 ,2)
-GAME( 1988, rainbowe, rainbow, rainbow, rainbow, rainbowe, ROT0, "Taito Corporation", "Rainbow Islands (Extra)", 0 ,2)
-GAME( 1989, jumping,  rainbow, jumping, jumping, jumping,  ROT0, "bootleg", "Jumping", 0 ,2)
+GAME( 1987, rainbow,  0,       rainbow, rainbow, rainbow,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", 0 ,0,0,egg_Platform,EGF_Childish)
+GAME( 1987, rainbowo, rainbow, rainbow, rainbow, rainbow,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", 0 ,0,0,egg_Platform,EGF_Childish)
+GAME( 1988, rainbowe, rainbow, rainbow, rainbow, rainbowe, ROT0, "Taito Corporation", "Rainbow Islands (Extra)", 0 ,0,0,egg_Platform,EGF_Childish)
+GAME( 1989, jumping,  rainbow, jumping, jumping, jumping,  ROT0, "bootleg", "Jumping", 0 ,0,2,egg_Platform,0)

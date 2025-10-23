@@ -1,3 +1,4 @@
+#define MACHINENAME "mcr68"
 /***************************************************************************
 
     Midway MCR-68k system
@@ -231,7 +232,7 @@ static WRITE16_HANDLER( pigskin_protection_w )
 		protection_data[3] = protection_data[4];
 		protection_data[4] = data & 0xff;
 
-		logerror("%06X:protection_w=%02X\n", activecpu_get_previouspc(), data & 0xff);
+		//logerror("%06X:protection_w=%02X\n", activecpu_get_previouspc(), data & 0xff);
 	}
 }
 
@@ -249,8 +250,8 @@ static READ16_HANDLER( pigskin_protection_r )
 		protection_data[1] == 0x25 && protection_data[0] == 0x36)
 		return 0x00;	/* must be < 3 */
 
-	logerror("Protection read after unrecognized sequence: %02X %02X %02X %02X %02X\n",
-			protection_data[0], protection_data[1], protection_data[2], protection_data[3], protection_data[4]);
+	// logerror("Protection read after unrecognized sequence: %02X %02X %02X %02X %02X\n",
+	// 		protection_data[0], protection_data[1], protection_data[2], protection_data[3], protection_data[4]);
 
 	return 0x00;
 }
@@ -1378,12 +1379,13 @@ static DRIVER_INIT( trisport )
  *
  *************************************/
 
-GAME( 1984, zwackery, 0,        zwackery, zwackery, zwackery, ROT0,   "Bally Midway", "Zwackery", GAME_SUPPORTS_SAVE ,2)
-GAME( 1987, xenophob, 0,        xenophob, xenophob, xenophob, ROT0,   "Bally Midway", "Xenophobe", GAME_SUPPORTS_SAVE ,3)
-GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 2)", GAME_SUPPORTS_SAVE ,0)
-GAME( 1987, spyhnt2a, spyhunt2, spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 1)", GAME_SUPPORTS_SAVE ,0)
-GAME( 1988, blasted,  0,        xenophob, blasted,  blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE ,2)
-GAME( 1989, archrivl, 0,        archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1989, archriv2, archrivl, archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0)", GAME_SUPPORTS_SAVE ,2)
-GAME( 1989, trisport, 0,        trisport, trisport, trisport, ROT270, "Bally Midway", "Tri-Sports", GAME_SUPPORTS_SAVE ,4)
-GAME( 1990, pigskin,  0,        pigskin,  pigskin,  pigskin,  ROT0,   "Midway", "Pigskin 621AD", GAME_SUPPORTS_SAVE ,2)
+GAME( 1984, zwackery, 0,        zwackery, zwackery, zwackery, ROT0,   "Bally Midway", "Zwackery", GAME_SUPPORTS_SAVE ,0,1,egg_Platform,0)
+GAME( 1987, xenophob, 0,        xenophob, xenophob, xenophob, ROT0,   "Bally Midway", "Xenophobe", GAME_SUPPORTS_SAVE ,3,0,egg_Platform,EGF_Hentai)
+GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 2)", GAME_SUPPORTS_SAVE ,2,0,egg_ShootEmUp,0)
+GAME( 1987, spyhnt2a, spyhunt2, spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 1)", GAME_SUPPORTS_SAVE ,2,0,egg_ShootEmUp,0)
+GAME( 1988, blasted,  0,        xenophob, blasted,  blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE ,2,0,egg_Shooter,0)
+GAME( 1989, archrivl, 0,        archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0)", GAME_SUPPORTS_SAVE ,2,0,egg_sport_Basketball,0)
+GAME( 1989, archriv2, archrivl, archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0)", GAME_SUPPORTS_SAVE ,2,0,egg_sport_Basketball,0)
+GAME( 1989, trisport, 0,        trisport, trisport, trisport, ROT270, "Bally Midway", "Tri-Sports", GAME_SUPPORTS_SAVE ,0,4,egg_Compilation,0)
+GAME( 1990, pigskin,  0,        pigskin,  pigskin,  pigskin,  ROT0,   "Midway", "Pigskin 621AD", GAME_SUPPORTS_SAVE ,2,0,egg_sport_Rugby,EGF_Funny)
+

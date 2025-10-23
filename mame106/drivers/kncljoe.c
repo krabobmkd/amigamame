@@ -1,3 +1,4 @@
+#define MACHINENAME "kncljoe"
 /***************************************************************************
 
 Knuckle Joe - (c) 1985 Seibu Kaihatsu ( Taito License )
@@ -305,6 +306,7 @@ ROM_END
 
 
 
-GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, 0, ROT0, "[Seibu Kaihatsu] (Taito license)", "Knuckle Joe (set 1)", 0 ,0)
-GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, 0, ROT0, "[Seibu Kaihatsu] (Taito license)", "Knuckle Joe (set 2)", 0 ,0)
-GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, 0, ROT0, "bootleg",                          "Bone Crusher", 0 ,0)
+GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, 0, ROT0, "[Seibu Kaihatsu] (Taito license)", "Knuckle Joe (set 1)", 0 ,0,2,egg_Platform,0)
+GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, 0, ROT0, "[Seibu Kaihatsu] (Taito license)", "Knuckle Joe (set 2)", 0 ,0,2,egg_Platform,0)
+GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, 0, ROT0, "bootleg",                          "Bone Crusher", 0 ,0,2,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                      

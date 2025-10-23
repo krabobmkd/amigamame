@@ -1,3 +1,4 @@
+#define MACHINENAME "airbustr"
 /***************************************************************************
 
                                 Air Buster
@@ -729,5 +730,5 @@ DRIVER_INIT( airbustj )
 
 /* Game Drivers */
 
-GAME( 1990, airbustr, 0,        airbustr, airbustr, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)" , 0,2)	// 891220
-GAME( 1990, airbustj, airbustr, airbustr, airbustj, airbustj, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)" , 0,2)	// 891229
+GAME( 1990, airbustr, 0,        airbustr, airbustr, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)" , 0,2,0,egg_ShootEmUp,0)	// 891220
+GAME( 1990, airbustj, airbustr, airbustr, airbustj, airbustj, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)" , 0,2,0,egg_ShootEmUp,0)	// 891229

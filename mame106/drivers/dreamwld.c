@@ -1,3 +1,4 @@
+#define MACHINENAME "dreamwld"
 /*
 
 Dream World
@@ -470,4 +471,5 @@ ROM_START( dreamwld )
 ROM_END
 
 
-GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld, ROT0,  "SemiCom", "Dream World", GAME_NOT_WORKING|GAME_NO_SOUND ,0)
+GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld, ROT0,  "SemiCom", "Dream World", GAME_NOT_WORKING|GAME_NO_SOUND ,2,0,egg_Platform,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                

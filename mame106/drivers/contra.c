@@ -1,3 +1,4 @@
+#define MACHINENAME "contra"
 /***************************************************************************
 
 Contra/Gryzor (c) 1987 Konami
@@ -425,8 +426,9 @@ ROM_END
 
 
 
-GAME( 1987, contra,   0,      contra, contra, 0, ROT90, "Konami", "Contra (US)", 0 ,2)
-GAME( 1987, contrab,  contra, contra, contra, 0, ROT90, "bootleg", "Contra (US bootleg)", 0 ,2)
-GAME( 1987, contraj,  contra, contra, contra, 0, ROT90, "Konami", "Contra (Japan)", 0 ,2)
-GAME( 1987, contrajb, contra, contra, contra, 0, ROT90, "bootleg", "Contra (Japan bootleg)", 0 ,2)
-GAME( 1987, gryzor,   contra, contra, contra, 0, ROT90, "Konami", "Gryzor", 0 ,2)
+GAME( 1987, contra,   0,      contra, contra, 0, ROT90, "Konami", "Contra (US)", 0 ,0,0,egg_Unknown,0)
+GAME( 1987, contrab,  contra, contra, contra, 0, ROT90, "bootleg", "Contra (US bootleg)", 0 ,2,0,egg_Platform,0)
+GAME( 1987, contraj,  contra, contra, contra, 0, ROT90, "Konami", "Contra (Japan)", 0 ,2,0,egg_Platform,0)
+GAME( 1987, contrajb, contra, contra, contra, 0, ROT90, "bootleg", "Contra (Japan bootleg)", 0 ,0,0,egg_Unknown,0)
+GAME( 1987, gryzor,   contra, contra, contra, 0, ROT90, "Konami", "Gryzor", 0 ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                

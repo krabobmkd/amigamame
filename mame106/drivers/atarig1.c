@@ -1,3 +1,4 @@
+#define MACHINENAME "atarig1"
 /***************************************************************************
 
     Atari G1 hardware
@@ -961,12 +962,13 @@ static DRIVER_INIT( pitfighb ) { init_g1_common(0x038000,  -1, 1); }
  *
  *************************************/
 
-GAME( 1990, hydra,    0,        atarig1, hydra,    hydra,    ROT0, "Atari Games", "Hydra", 0 ,0)
-GAME( 1990, hydrap,   hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", 0 ,0)
-GAME( 1990, hydrap2,  hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", 0 ,0)
+GAME( 1990, hydra,    0,        atarig1, hydra,    hydra,    ROT0, "Atari Games", "Hydra", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1990, hydrap,   hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", 0 ,0,1,egg_ShootEmUp,0)
+GAME( 1990, hydrap2,  hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", 0 ,0,1,egg_ShootEmUp,0)
 
-GAME( 1990, pitfight, 0,        atarig1, pitfight, pitfighj, ROT0, "Atari Games", "Pit Fighter (rev 5)", 0 ,3)
-GAME( 1990, pitfigh4, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 4)", 0 ,3)
-GAME( 1990, pitfigh3, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 3)", 0 ,3)
-GAME( 1990, pitfighj, pitfight, atarig1, pitfighj, pitfighj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", 0 ,3)
-GAME( 1990, pitfighb, pitfight, atarig1, pitfight, pitfighb, ROT0, "Atari Games", "Pit Fighter (bootleg)", 0 ,3)
+GAME( 1990, pitfight, 0,        atarig1, pitfight, pitfighj, ROT0, "Atari Games", "Pit Fighter (rev 5)", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, pitfigh4, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 4)", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, pitfigh3, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 3)", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, pitfighj, pitfight, atarig1, pitfighj, pitfighj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", 0 ,0,0,egg_Unknown,0)
+GAME( 1990, pitfighb, pitfight, atarig1, pitfight, pitfighb, ROT0, "Atari Games", "Pit Fighter (bootleg)", 0 ,0,0,egg_Unknown,0)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

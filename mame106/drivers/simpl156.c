@@ -1,3 +1,4 @@
+#define MACHINENAME "simpl156"
 /* Data East Hardware
  'Simple' 156 based board  (PCB DE-0409-1)
 
@@ -1135,13 +1136,14 @@ static DRIVER_INIT (candance)
 	simpl156_default_eeprom = candance_eeprom;
 }
 
-GAME( 1996, osman,   0,        mitchell156,    simpl156, osman,         ROT0, "Mitchell", "Osman (World)", 0 ,0)
-GAME( 1996, candance,osman,    mitchell156,    simpl156, candance,      ROT0, "Mitchell (Atlus License)", "Cannon Dancer (Japan)", 0 ,0)
-GAME( 1995, chainrec,0,        chainrec,       simpl156, chainrec,      ROT0, "Data East","Chain Reaction (World, Version 2.2, 1995.09.25)", 0 ,0)
-GAME( 1995, magdrop, chainrec, magdrop,        simpl156, chainrec,      ROT0, "Data East","Magical Drop (Japan, Version 1.1, 1995.06.21)", 0 ,0)
-GAME( 1995, magdropp,chainrec, magdropp,       simpl156, chainrec,      ROT0, "Data East","Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", 0 ,0)
-GAME( 1995, charlien,0,        mitchell156,    simpl156, charlien,      ROT0, "Mitchell", "Charlie Ninja" , 0,0) // language in service mode
-GAME( 1994, joemacr, 0,        joemacr,        simpl156, joemacr,       ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", 0 ,0)
-GAME( 1994, joemacra,joemacr,  joemacr,        simpl156, joemacr,       ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", 0 ,0)
-GAME( 1995, prtytime,0,        mitchell156,    simpl156, prtytime,      ROT90,"Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", 0,0) // language is in service mode
-GAME( 1995, gangonta,prtytime, mitchell156,    simpl156, gangonta,      ROT90,"Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", 0,0) // language is in service mode
+GAME( 1996, osman,   0,        mitchell156,    simpl156, osman,         ROT0, "Mitchell", "Osman (World)", 0 ,0,1,egg_Platform,0)
+GAME( 1996, candance,osman,    mitchell156,    simpl156, candance,      ROT0, "Mitchell (Atlus License)", "Cannon Dancer (Japan)", 0 ,0,1,egg_Platform,0)
+GAME( 1995, chainrec,0,        chainrec,       simpl156, chainrec,      ROT0, "Data East","Chain Reaction (World, Version 2.2, 1995.09.25)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1995, magdrop, chainrec, magdrop,        simpl156, chainrec,      ROT0, "Data East","Magical Drop (Japan, Version 1.1, 1995.06.21)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1995, magdropp,chainrec, magdropp,       simpl156, chainrec,      ROT0, "Data East","Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", 0 ,2,0,egg_Puzzle,0)
+GAME( 1995, charlien,0,        mitchell156,    simpl156, charlien,      ROT0, "Mitchell", "Charlie Ninja" , 0,2,0,egg_Platform,0) // language in service mode
+GAME( 1994, joemacr, 0,        joemacr,        simpl156, joemacr,       ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", 0 ,2,0,egg_Platform,0)
+GAME( 1994, joemacra,joemacr,  joemacr,        simpl156, joemacr,       ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", 0 ,2,0,egg_Platform,0)
+GAME( 1995, prtytime,0,        mitchell156,    simpl156, prtytime,      ROT90,"Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", 0,0,1,egg_Mature,0) // language is in service mode
+GAME( 1995, gangonta,prtytime, mitchell156,    simpl156, gangonta,      ROT90,"Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", 0,0,1,egg_Mature,0) // language is in service mode
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
