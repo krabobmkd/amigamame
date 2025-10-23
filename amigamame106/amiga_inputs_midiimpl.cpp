@@ -61,16 +61,20 @@ static void *midiin_Create(void *registerer,fAddOsCode addOsCode)
   //   printf("p->_mapmode:%d\n",p->_mapmode);
     if( p->_mapmode == 2)
     {
+        int iplayer = configControls._serialPort_Player -1; // known >0.
+        int analogshift = (MOUSECODE_2_ANALOG_X-MOUSECODE_1_ANALOG_X)*iplayer;
+        // note: mapping to MOUSECODE_XX_ANALOG_X
+        // makes it automatic to be mapped on most analog games.
         {
-            os_code_info osci={"MidiAnlgNotes",START_CODE_ANALOG,MOUSECODE_1_ANALOG_X};
+            os_code_info osci={"MidiAnlgNotes",START_CODE_ANALOG,MOUSECODE_1_ANALOG_X+(analogshift)};
             addOsCode(registerer,&osci,1);
         }
         {
-            os_code_info osci={"MidiAnlgVel",START_CODE_ANALOG+1,MOUSECODE_1_ANALOG_Z};
+            os_code_info osci={"MidiAnlgVel",START_CODE_ANALOG+1,MOUSECODE_1_ANALOG_Z+(analogshift)};
             addOsCode(registerer,&osci,1);
         }
         {
-            os_code_info osci={"MidiAnlgVol",START_CODE_ANALOG+2,MOUSECODE_1_ANALOG_Y};
+            os_code_info osci={"MidiAnlgVol",START_CODE_ANALOG+2,MOUSECODE_1_ANALOG_Y+(analogshift)};
             addOsCode(registerer,&osci,1);
         }
     }
