@@ -401,7 +401,7 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
 
         return NULL;
     }
-
+// printf("alloc bits ok\n");
     // note: it's to allow further calls to WritePotgo()
 
 /*

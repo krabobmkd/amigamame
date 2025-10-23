@@ -9,8 +9,8 @@
 #include <filesystem>
 using namespace std;
 
-//string sourcebase("../../../mame106/");
-string sourcebase("../mame106/");
+string sourcebase("../../../mame106/");
+//string sourcebase("../mame106/");
 
 class TGameDriver {
     public:

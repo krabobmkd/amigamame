@@ -3,6 +3,7 @@
 #include "amiga_config.h"
 #include "amiga_inputs_propjoy.h"
 
+#include <stdio.h>
 #include <proto/exec.h>
 extern "C" {
     // from MAME
@@ -45,8 +46,12 @@ static void *propjoy_Create(void *registerer,fAddOsCode addOsCode)
         propJoysticksFlags |= PROPJOYFLAGS_PORT2 ;
        if(configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERTXY;
     }
+
+//     printf("propjoy_Create flag:%08x\n",propJoysticksFlags);
     // if not asked, exit.
     if((propJoysticksFlags & (PROPJOYFLAGS_PORT1|PROPJOYFLAGS_PORT2))==0) return NULL;
+//     printf("flag ok\n");
+
 
     if(configControls._PropJoyAxisReverseP2 & 1)  propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERSEX ;
     if(configControls._PropJoyAxisReverseP2 & 2)  propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERSEY ;
@@ -58,12 +63,13 @@ static void *propjoy_Create(void *registerer,fAddOsCode addOsCode)
                     0/*PROPJOYTIMER_LOWLEVEL_ADDTIMER*/, // try cia timer
                     &result,loginfo2); // could fail.
 
+
     if(!p || (result != PROPJOYRET_OK))
     {
         logerror(getProportionalStickErrorMessage(result));
         return NULL;
     }
-
+//     printf("after createProportionalSticks\n");
     ui_popup_time(5, "Analog controllers:\nGo far in all directions to calibrate.");
 
     // Map...
@@ -120,6 +126,10 @@ static int propjoy_GetCode(void *o, ULONG oscode)
 
     return 0;
 }
+// static void propjoy_Update(void *o)
+// {
+//     closeProportionalSticks(((struct ProportionalSticks *)o));
+// }
 static void propjoy_Close(void *o)
 {
     closeProportionalSticks(((struct ProportionalSticks *)o));
@@ -137,7 +147,7 @@ static void propjoy_PostInputPortInitCheck(void *o)
 struct sMameInputsInterface g_ipt_PropJoy=
 {
     propjoy_Create,
-    NULL,
+    ( void (*)(void *o))&ProportionalSticksUpdate,
     propjoy_GetCode,
     propjoy_Close,
     propjoy_PostInputPortInitCheck

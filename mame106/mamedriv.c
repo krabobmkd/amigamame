@@ -3904,7 +3904,6 @@ const game_driver * const drivers[] =
 	DRIVER( neomrdo ) /* 1996 "Visco" "Neo Mr. Do!" */
 	DRIVER( ninjamas ) /* 1996 "ADK / SNK" "Ninja Master's - haoh-ninpo-cho" */
 	DRIVER( nitd ) /* 2000 "Eleven / Gavaking" "Nightmare in the Dark" */
-	DRIVER( nyan ) /* 2011 "Furrtek" "Neo Nyan cat" */
 	DRIVER( overtop ) /* 1996 "ADK" "Over Top" */
 	DRIVER( panicbom ) /* 1994 "Eighting / Hudson" "Panic Bomber" */
 	DRIVER( pbobbl2n ) /* 1999 "Taito (SNK license)" "Puzzle Bobble 2 / Bust-A-Move Again (Neo-Geo)" */
