@@ -4,6 +4,7 @@
   and some DevelopperCD2.1 reference.
 
 */
+#pragma GCC optimize ("O1")
 
 #include "amiga_inputs_propjoy.h"
 #include "amiga_inputs_interface.h"
@@ -500,6 +501,7 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
 {
     if(!pprops) return;
 
+// printf("closeProportionalSticks\n");
 #ifdef PPJSCODE_ALLOWLOWLEVELTIMER
     // close ll cia timer if needed
     if(pprops->_ll_intHandler && (LowLevelBase != NULL))
@@ -509,17 +511,19 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
         pprops->_ll_intHandler = NULL;
     }
 #endif
+// printf("RemIntServer\n");
     // close vblank interupt, if using it
     if(pprops->_rbfint)
     {
         RemIntServer(INTB_VERTB,pprops->_rbfint);
         FreeVec(pprops->_rbfint);
     }
+// printf("FreeVec\n");
     if( pprops->_pintdata) FreeVec(pprops->_pintdata);
     //if(pprops->_signr != -1) FreeSignal(pprops->_signr);
 
     //closetimer? ->no just using vbl at the moment.
-
+// printf("FreePotBits\n");
     //free potgo
     if(pprops->_allocatedBits != 0)
     {
@@ -532,6 +536,7 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
     //free joyport devices
     for(int iportunit=0 ;iportunit<2 ; iportunit++)
     {
+// printf("CloseDevice:%d\n",iportunit);
         struct PStickDevice *ppsd = &(pprops->_ports[iportunit]);
         if(ppsd->_deviceresult != 0 ) continue;
 
@@ -547,7 +552,7 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
     // order is important
     makeInputDeviceUseMousePortBack(pprops);
 #endif
-
+// printf("RemPort:\n");
     // remove gameport messagerie
     if( pprops->_portAdded)
     {
@@ -555,7 +560,7 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
        // pprops->_portAdded = 0;
     }
 
-
+// printf("FreeVec final:\n");
     FreeVec(pprops);
 }
 

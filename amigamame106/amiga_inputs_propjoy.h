@@ -39,7 +39,7 @@ struct PPSticksValues {
 };
 // implement or not in code at compilation
 //#define PPJSCODE_TAKEPORT0CONTROL 1
-#define PPJSCODE_ALLOWLOWLEVELTIMER 1
+//#define PPJSCODE_ALLOWLOWLEVELTIMER 1
 
 // internal use, just the data exchanged between interupt and process.
 struct PPSticksInteruptData {
