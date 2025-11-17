@@ -733,6 +733,9 @@ static inline void clipxmin(int &x1,int &y1,int & clipbits1,
     if (c < 1) c = 1;
     y2 = y1 + (((y2 - y1) >> 8) * ((x1 -vector_xminfp ) >> 8)) / c;
 
+    if(y2<vector_yminfp) y2 =vector_yminfp;
+   else if(y2>=vector_ymaxfp) y2 =vector_ymaxfp-1;
+
     x2 = vector_xminfp;
 
 }
@@ -744,6 +747,9 @@ static inline void clipxmax(int& x1, int& y1, int& clipbits1,
     int c = (x2 - x1) >> 16;
     if (c < 1) c = 1;
     y2 = y1 + (((y2 - y1) >> 8) * (( xmax -x1) >> 8)) / c;
+
+    if(y2<vector_yminfp) y2 =vector_yminfp;
+   else if(y2>=vector_ymaxfp) y2 =vector_ymaxfp-1;
 
     x2 = xmax;
 
@@ -782,7 +788,7 @@ template<class pixel,bool b_antialias>
 void vector_draw_toT(pixel &pix, point* curpoint)
 {
     int x2 = curpoint->x;
-    int y2 = curpoint->y;
+    int y2 = curpoint->y;    
     int intensity = curpoint->intensity;
     rgb_t(*color_callback)(void) = curpoint->callback;
 
@@ -792,13 +798,31 @@ void vector_draw_toT(pixel &pix, point* curpoint)
     int xx, yy;
      int oredcb;
 
-    x2 = (int)(vector_scale_x * x2);
-    y2 = (int)(vector_scale_y * y2);
+
+ // static int flip=0;
+ // flip ^=1;
+ // if(flip)
+ // {
+ //    x2 =119*65536/vector_scale_x;
+ //    y2 =-202*65536/vector_scale_y;
+ // } else
+ // {
+ //    x2 =-4*65536/vector_scale_x;
+ //    y2 = 310*65536/vector_scale_y;
+ // }
+
+     x2 = (int)(vector_scale_x * x2);
+     y2 = (int)(vector_scale_y * y2);
 
  int _kept_x1 = x1>>16;
  int _kept_x2 = x2>>16;
  int _kept_yy1 = yy1>>16;
  int _kept_y2 = y2>>16;
+
+    // x1 = 119*65536;
+    // yy1 = -202*65536;
+    // x2 = -4*65536;
+    // y2 = 310*65536;
 
     if (!b_antialias)
     {    /* [2] adjust cords if needed */
@@ -841,7 +865,7 @@ void vector_draw_toT(pixel &pix, point* curpoint)
         else if (clipbits2 & 2) clipxmax(prev_x1, prev_yy1, clipbits1, x2, y2, clipbits2);
 
     }
-
+// printf("x1:%d yy1:%d x2:%d y2:%d\n",x1>>16,yy1>>16,x2>>16,y2>>16);
     pix.setcol(Tinten(intensity, curpoint->col)); 
 
     /* [4] draw line */
@@ -876,13 +900,15 @@ void vector_draw_toT(pixel &pix, point* curpoint)
 
                 a1 = (dx >> 8);   /* calc remainder pixel */
                 dx >>= 16;                   /* adjust to pixel (solid) count */
-                if(dx<=0 || dx>16) {
+                if(dx<0 || dx>16) {
                     printf("x al line: x1:%d y1:%d x2:%d y2:%d  dx:%08x\n",_kept_x1,_kept_yy1, _kept_x2,_kept_y2,dx);
                     exit(0);
                 }
-                if(dx<0)
-                while (dx--)                 /* plot rest of pixels */
+                while (dx)                 /* plot rest of pixels */
+                {
                     pix.aa_pixel(x1, dy++);
+                    dx--;
+                }
                 pix.tint(a1);
                 pix.aa_pixeltint(x1, dy);
                 if (x1 == xx) break;
@@ -918,13 +944,14 @@ void vector_draw_toT(pixel &pix, point* curpoint)
                 dy -= 0x10000 - (0xffff & x1); /* take off amount plotted */
                 a1 = (dy >> 8);   /* remainder pixel */
                 dy >>= 16;                   /* adjust to pixel (solid) count */
-                if(dy<=0 || dy>16) {
+                if(dy<0 || dy>16) {
                     printf("y al line: x1:%d y1:%d x2:%d y2:%d  dy:%08x\n",_kept_x1,_kept_yy1, _kept_x2,_kept_y2,dy);
                     exit(0);
                 }
-                while (dy--)                 /* plot rest of pixels */
+                while (dy)                 /* plot rest of pixels */
                 {
                     pix.aa_pixel(dx++, yy1);
+                    dy--;
                 }
                 pix.tint(a1);
                 pix.aa_pixeltint(dx, yy1);

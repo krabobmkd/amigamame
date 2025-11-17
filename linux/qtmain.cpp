@@ -199,7 +199,8 @@ void QProc::process()
 //"btlkroad"
 //"samuraia"
 //"tengai"
-"bublbob2"
+//"bublbob2"
+"starwars"
 //"ridingf"
 //"gseeker"
 //"gunbustr"
@@ -282,12 +283,12 @@ std::map<int,int> keystates;
 void QWin::keyPressEvent(QKeyEvent *event)
 {
     keystates[event->key()] = 1;
-  //cout << "p:"<<event->key() << endl;
+  cout << "p:"<<event->key() << endl;
 }
 void QWin::keyReleaseEvent(QKeyEvent *event)
 {
     keystates[event->key()] = 0;
-//  cout << "r:"<<event->key() << endl;
+  cout << "r:"<<event->key() << endl;
 }
 
 void QWin::updateWin()
@@ -301,7 +302,7 @@ void QWin::updateWin()
     _imageMutex.lock();
         int w = _image.width();
         int h = _image.height();
-        int izoom = 3;
+        int izoom = 2;
     QPixmap qpx = QPixmap::fromImage(_image).scaled(QSize(w * izoom, h * izoom));
     _imageMutex.unlock();
 
@@ -536,6 +537,8 @@ const os_code_info *osd_get_code_list(void)
 {
     static os_code_info l[]={
        {"tab",16777217,KEYCODE_TAB},
+       {"return",16777220,KEYCODE_ENTER},
+       {"return",16777216,KEYCODE_ESC},
 
        {"Up",16777235,KEYCODE_UP},
        {"Down",16777237,KEYCODE_DOWN},
@@ -545,16 +548,17 @@ const os_code_info *osd_get_code_list(void)
        {"5",40,KEYCODE_5},
        {"1",38,KEYCODE_1},
        {"bt1",16777249,JOYCODE_1_BUTTON1},
+       {"bt1",16781571,JOYCODE_1_BUTTON2},
 
-        {NULL,0,0},
+       {NULL,0,0},
     };
     return &l[0];
 }
 int opened=0;
 INT32 osd_get_code_value(os_code oscode)
 {
-    if(keystates[oscode] !=0) return 1;
-    return 0;
+    if(keystates.find(oscode)== keystates.end()) return 0;
+    return keystates[oscode];
 
 // to open menu
     //if(oscode == 33 && nbframe>2*60)

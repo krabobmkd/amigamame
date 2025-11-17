@@ -151,7 +151,6 @@ protected:
 };
 
 
-
 int get_path_info(const char *fullpath)
 {
     BPTR hdl = Open(fullpath, MODE_OLDFILE);
