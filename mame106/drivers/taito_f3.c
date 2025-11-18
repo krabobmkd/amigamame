@@ -3538,7 +3538,7 @@ GAME( 1995, pbobble2, 0,        f3,      f3, pbobble2, ROT0,   "Taito Corporatio
 GAME( 1995, pbobbl2j, pbobble2, f3,      f3, pbobble2, ROT0,   "Taito Corporation",         "Puzzle Bobble 2 (Ver 2.2J 1995/07/20)", 0 ,0,0,egg_Puzzle,EGF_Childish)
 GAME( 1995, pbobbl2u, pbobble2, f3,      f3, pbobble2, ROT0,   "Taito America Corporation", "Bust-A-Move Again (Ver 2.3A 1995/07/31)", 0 ,0,0,egg_Puzzle,EGF_Childish)
 GAME( 1995, pbobbl2x, pbobble2, f3,      f3, pbobbl2x, ROT0,   "Taito Corporation",         "Puzzle Bobble 2X (Ver 2.2J 1995/11/11)", 0 ,0,0,egg_Puzzle,EGF_Childish)
-GAME( 1995, gekirido, 0,        f3,      f3, gekirido, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3J 1995/09/21)", 0 ,0,0,egg_Unknown,EGF_VER)
+GAME( 1995, gekirido, 0,        f3,      f3, gekirido, ROT90, "Taito Corporation",         "Gekirindan (Ver 2.3J 1995/09/21)", 0 ,0,0,egg_Unknown,EGF_VER)
 GAME( 1995, tcobra2,  0,        f3,      f3, ktiger2,  ROT270, "Taito Corporation Japan",   "Twin Cobra II (Ver 2.1O 1995/11/30)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1995, tcobra2u, tcobra2,  f3,      f3, ktiger2,  ROT270, "Taito America Corporation", "Twin Cobra II (Ver 2.1A 1995/11/30)", 0 ,2,0,egg_ShootEmUp,0)
 GAME( 1995, ktiger2,  tcobra2,  f3,      f3, ktiger2,  ROT270, "Taito Corporation",         "Kyukyoku Tiger II (Ver 2.1J 1995/11/30)", 0 ,2,0,egg_ShootEmUp,0)

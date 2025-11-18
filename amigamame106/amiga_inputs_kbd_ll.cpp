@@ -505,16 +505,42 @@ static int kbd_GetCode(void *o, ULONG oscode)
 void kbd_Close(void *o)
 {
     kbdInput *p = (kbdInput *)o;
+    // if(LowLevelBase)
+    // {
+    //     for(int iLLPort=0;iLLPort<4;iLLPort++) // 2 hardware DB9 port, +the elusive mysterious 3&4 lowlevel ports.
+    //     {
+    //         int iPlayer = configControls._llPort_Player[iLLPort] ;
+    //         if( iPlayer == 0) continue;
+    //         iPlayer--;
 
+    //         int lowlevelState = configControls._llPort_Type[iLLPort];
+    //         if(lowlevelState<=0 || lowlevelState>3) continue;
+
+    //         SystemControl( SCON_AddCreateKeys,iLLPort, TAG_END,0);
+
+    //         // configure port as mouse,jostick or CD32 pads...
+    //         SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
+    MameConfig::Controls &configControls = getMainConfig().controls();
     if(LowLevelBase)
     {
-        for(int i=0;i<2;i++)
-        {
-            SystemControl(
-                // stops rawkey codes for the joystick/game
-                SCON_RemCreateKeys,i,
-                TAG_END,0
-                );
+        for(int i=0;i<4;i++)
+        {        
+            int iPlayer = configControls._llPort_Player[i] ;
+            int lowlevelState = configControls._llPort_Type[i];
+            if(iPlayer>0 &&
+            (lowlevelState>0 && lowlevelState<=3))
+            {
+                SetJoyPortAttrs(i,SJA_Reinitialize,0,TAG_DONE);
+            }
+            if(i<2)
+            {
+                SystemControl(
+                    // stops rawkey codes for the joystick/game
+                    SCON_RemCreateKeys,i,
+                    TAG_END,0
+                    );
+            }
+
         }
         CloseLibrary(LowLevelBase);
     }
