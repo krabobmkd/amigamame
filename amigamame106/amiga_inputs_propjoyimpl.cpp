@@ -34,14 +34,18 @@ static void *propjoy_Create(void *registerer,fAddOsCode addOsCode)
     MameConfig::Controls &configControls = getMainConfig().controls();
 
     ULONG propJoysticksFlags=0;
-    if( configControls._llPort_Type[0] == PORT_TYPE_PROPORTIONALJOYSTICK ||
-        configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE)
+    if(( configControls._llPort_Type[0] == PORT_TYPE_PROPORTIONALJOYSTICK ||
+        configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE) &&
+        configControls._llPort_Player[0] >0
+        )
     {
         propJoysticksFlags |= PROPJOYFLAGS_PORT1 ;
         if(configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERTXY;
     }
-    if( configControls._llPort_Type[1] == PORT_TYPE_PROPORTIONALJOYSTICK ||
-        configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE)
+    if(( configControls._llPort_Type[1] == PORT_TYPE_PROPORTIONALJOYSTICK ||
+        configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE) &&
+        configControls._llPort_Player[1] >0
+        )
     {
         propJoysticksFlags |= PROPJOYFLAGS_PORT2 ;
        if(configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERTXY;
