@@ -93,8 +93,8 @@ static int CiaParInteruptfunc()
 
 #endif
 
-/** a simple VBL interupt function to just read parallel ports pins at 50 or 60Hz,
-    whatever the main thread is doing.( If you check that on a slow main thread, clicks may be missed.)
+/** A simple VBL interrupt function to read parallel port pins at 50 or 60Hz,
+    whatever the main thread is doing. (If you check that on a slow main thread, clicks may be missed.)
 */
 //D0 - scratch
 //D1 - scratch

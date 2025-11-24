@@ -2,7 +2,7 @@
 #define AMIGA_PARPADSIMPL_H
 
 /**
-    Link the independant c parralel pads extension controller source
+    Link the independent C parallel pads extension controller source
     as a C++ inputs module.
 */
 

@@ -2,7 +2,7 @@
 #define AMIGA_MIDIIMPL_H
 
 /**
-    Link the independant midi in extension controller source
+    Link the independent MIDI input extension controller source
     as a C++ inputs module.
 */
 

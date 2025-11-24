@@ -2,7 +2,7 @@
 #define AMIGA_PROPJOYIMPL_H
 
 /**
-    Link the independant c proportional joystick extension controller source
+    Link the independent C proportional joystick extension controller source
     as a C++ inputs module.
 */
 

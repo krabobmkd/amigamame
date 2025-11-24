@@ -1,7 +1,7 @@
 #ifndef AMIGA_PROPORTIONALJOYSTICK_H
 #define AMIGA_PROPORTIONALJOYSTICK_H
 /**
-    Things to read Proportional Analog Josticks and paddles.
+    Code to read Proportional Analog Joysticks and paddles.
     The "C64/Atari8Bit" way...
 
     Moving a paddle will make the voltage varies...
@@ -12,7 +12,7 @@
     So we got here:
     software resource accaparation + timer management and interupts + reading direct hardware value.
     Also, need something for calibration of leftmost/rightmost (and center?) values.
-    then we just let game engine read the last value cheked.
+    then we just let game engine read the last value checked.
 
     - Can Manage Amiga classic DB9 Port1 and Port2, or both.
     - Need calibration because of devices, but also internal timers can change.
