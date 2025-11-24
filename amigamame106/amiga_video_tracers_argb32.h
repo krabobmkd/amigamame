@@ -10,7 +10,7 @@
 
 extern "C" {
 
-// added for ARGB32 modes (only games RGB highcolor, not using clut.
+// added for ARGB32 modes (only for RGB highcolor games, not using CLUT).
 // manage all CGX screen pixel modes
 
 void directDraw_RGB15_ARGB32(directDrawParams *p);

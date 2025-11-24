@@ -36,7 +36,7 @@ protected:
 
 };
 
-// thinhy got to manage own ressource...
+// This has to manage its own resource...
 class IntuiProgressBar : public IDrawProgress, public IntuiBufferedDrawing
 {
 public:

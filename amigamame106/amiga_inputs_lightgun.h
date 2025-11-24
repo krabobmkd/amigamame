@@ -2,7 +2,7 @@
 #define AMIGA_LIGHTGUN_H
 /**
     lightpen/lightgun reading
-    just set one more interupt.
+    just sets one more interrupt.
 
 */
 #ifdef __cplusplus

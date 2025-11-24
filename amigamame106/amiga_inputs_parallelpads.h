@@ -2,7 +2,7 @@
 #define AMIGA_PARALLELPADS_H
 /**
     Parallel pad reading
-    Alloc resource and use vblank interupt to to not miss pressings.
+    Allocates resource and uses vblank interrupt to not miss button presses.
 
     Values are to be read in UWORD (16b)
     ->_ppidata->_last_checked
@@ -94,7 +94,7 @@ void prptrace();
 #define APARJOY_J4_FIRE1 0x0001 // CIAF_PRTRBUSY
 
 // = = == = winning Sega SMS pads "Button2" on the parallel port Joystick extensions:
-// this is an unofficial way, but anyway there's only 2 input pins left on parallel port:
+// This is an unofficial method, but there are only 2 input pins left on parallel port:
 // software supporting this is... anything using this source !
 // CIAF_PRTRPOUT,  available and easy to add, and I just tested it works.
 // solder one more wire for joy3 bt2:

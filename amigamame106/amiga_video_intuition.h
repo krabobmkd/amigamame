@@ -22,7 +22,7 @@ struct ScreenBuffer;
 #define VIDEO_NEEDS_6BITS_PER_GUN		0x0008
 
 
-// tool: test if RastPort currently need layer lib clippings.
+// tool: Test if RastPort currently needs layer lib clipping.
 bool isRastPortComplete(RastPort *rp,WORD w, WORD h);
 
 /** \class IntuitionDrawable

@@ -493,8 +493,8 @@ bool Intuition_Screen_CGX::open()
 {
     if(_flags & DISPFLAG_LIGHTGUN)
     {
-       loginfo(1,"Lightguns can't be used with RTG screens !\nIt needs AGA/OCS screen with Cathode Ray Tube !");
-       ui_popup_time(5, "Lightguns can't be used with RTG screens !\nIt needs AGA/OCS screen with Cathode Ray Tube monitors !");
+       loginfo(1,"Lightguns can't be used with RTG screens!\nThey need AGA/OCS screens with Cathode Ray Tube monitors!");
+       ui_popup_time(5, "Lightguns can't be used with RTG screens!\nThey need AGA/OCS screens with Cathode Ray Tube monitors!");
     }
     bool ok = Intuition_Screen::open();
     if(!ok) return false;

@@ -195,8 +195,8 @@ void Drawable_OS3::draw_c2p(_mame_display *display)
 
     int c2phh = hh;
      if(c2phh>_drawable.heightPhys()) c2phh = _drawable.heightPhys();
-    // - - get a 8bit bitmap for pixel conversion and then c2p - -
-    const int bmsize = ww*(c2phh+4); // +2 becaus of zoom trick but well.
+    // - - get an 8-bit bitmap for pixel conversion and then c2p - -
+    const int bmsize = ww*(c2phh+4); // +2 because of zoom trick but well.
     if(bmsize != _wpatempbm.size()) _wpatempbm.resize(bmsize);
 
     directDrawScreen ddscreen={
@@ -230,10 +230,10 @@ void Drawable_OS3::initRemapTable()
 {
     if(_useIntuitionPalette) // cases where we set a private screen palette with LOADRGB32.
     {
-        // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
+        // 8-bit screen colors will be managed with LoadRGB32 and direct pixel copy (no CLUT).
         // if(_colorsIndexLength<=258)
         //     _pRemap = new Paletted_Screen8(_drawable.screen());
-        // 8Bits screens will have a fixed 256c palette and  16b index color remap to this.        
+        // 8-bit screens will have a fixed 256c palette and 16b index color remap to this.        
         if(_video_attributes & VIDEO_RGB_DIRECT)
         {
             if(_video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)

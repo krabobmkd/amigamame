@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 
-// this are used to describe source & destination bitmaps for all tracers
+// These are used to describe source & destination bitmaps for all tracers
 struct directDrawScreen {
     void *_base;
     ULONG _bpr;

@@ -780,7 +780,7 @@ _[5] ="Switch Window / Fullscreen";
     serializer("F10 : ",_[5]);
 
 _[6] ="Throttle when kept pressed";
-    serializer("Shit+F10 : ",_[6]);
+    serializer("Shift+F10 : ",_[6]);
 
 _[7] ="Show / Hide Statistics";
     serializer("Help : ",_[7]);

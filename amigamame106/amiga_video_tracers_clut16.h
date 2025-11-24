@@ -21,7 +21,7 @@ void directDraw_UBYTE_UBYTE_UWORD(directDrawParams *p);
 
 void directDrawClut_UBYTE_UBYTE_UWORD(directDrawParams *p,UBYTE *lut);
 
-// special one, target screen is 8b, mame sreen is ARGB32, and use 15b long clut.
+// Special case: target screen is 8-bit, MAME screen is ARGB32, and uses 15-bit long CLUT.
 void directDrawClut_UBYTE_UBYTE_ARGB32(directDrawParams *p,UBYTE *lut);
 
 }

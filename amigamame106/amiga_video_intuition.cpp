@@ -279,7 +279,7 @@ bool Intuition_Screen::open()
                     WA_SizeGadget,0,
                     WA_DepthGadget,0,
                     WA_CloseGadget,0,
-                    WA_DragBar,0,                    WA_RptQueue,0, // empeach key repeat messages
+                    WA_DragBar,0,                    WA_RptQueue,0, // prevent key repeat messages
                     WA_GimmeZeroZero,FALSE, 
                     WA_IDCMP,IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY ,
                     0 );

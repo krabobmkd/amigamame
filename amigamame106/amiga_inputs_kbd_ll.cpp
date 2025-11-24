@@ -425,10 +425,10 @@ void Inputs_Keyboard_ll_Update(struct MsgPort *pMsgPort)
                // printf("key:%04x\n",finalkeycode);
 
                 if(imcode & IECODE_UP_PREFIX)
-                {                   // if many down/up happens in one frame, we must see it has pressed, then up next frame.
+                {                   // if many down/up happens in one frame, we must see it as pressed, then up next frame.
                    //printf("Up:%04x\n",finalkeycode);
 
-                    // if many down/up happens in one frame, we must see it has pressed, then up next frame.
+                    // if many down/up happens in one frame, we must see it as pressed, then up next frame.
                    if(g_pInputs->_NbKeysUpStack<256)
                    {
                         g_pInputs->_NextKeysUpStack[g_pInputs->_NbKeysUpStack] = finalkeycode;
@@ -445,7 +445,7 @@ void Inputs_Keyboard_ll_Update(struct MsgPort *pMsgPort)
                     UBYTE prev = g_pInputs->_Keys[finalkeycode];
                     if(prev != 0 && prev == fcounter )
                     {   // means down->up->down for same key in the same frame,
-                        // which is common is just 8fps and player is blasting a key...
+                        // which is common at just 8fps and player is blasting a key...
                         // in that case remove previous delayed down we just put, because
                         // next up could happen next frame.
                         for(int i=0;i<g_pInputs->_NbKeysUpStack;i++) // just a few there

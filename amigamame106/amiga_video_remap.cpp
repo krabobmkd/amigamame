@@ -649,7 +649,7 @@ void Paletted_Screen8ForcePalette::initFixedPalette(const UBYTE *prgb,ULONG nbc)
         if(iend>(nbc-j)) iend=(nbc-j);
         const UBYTE *gpal = prgb+(j*stride);
         ULONG *pc = &paletteRGB32[0];
-        *pc++ = (((ULONG)iend)<<16) | j; // nbumber of colors to change / palette shift.
+        *pc++ = (((ULONG)iend)<<16) | j; // number of colors to change / palette shift.
 
         for(USHORT i=0;i<iend;i++) {
             *pc++= (((ULONG)gpal[0])<<24) ;
@@ -712,7 +712,7 @@ void Paletted_Screen8ForcePalette_32b::directDraw(directDrawParams *p)
      initRemapCube(); // will loadrgb32 at first draw.
     }
     if(_clut8.size()==0) return;
-    // same as 15 bit, but use this function that does RGB32 to RGB15 conversion.   
+    // same as 15 bit, but uses this function that does RGB32 to RGB15 conversion.
     directDrawClut_UBYTE_UBYTE_ARGB32(p,_clut8.data());
 }
 

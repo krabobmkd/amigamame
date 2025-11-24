@@ -37,7 +37,7 @@ protected:
 
     int _pixFmt,_bytesPerPix;
 };
-/* When target is a 8Bit screen and game 8bit, use LoadRGB32() and no clut.  */
+/* When target is an 8-bit screen and game is 8-bit, use LoadRGB32() and no CLUT.  */
 class Paletted_Screen8 : public Paletted
 {
  public:
@@ -51,8 +51,8 @@ protected:
 
 
 
-/* Whe target screen pixels is 8bit but palette is imposed by OS.
-* then Use CLUT
+/* When target screen pixels are 8-bit but palette is imposed by OS,
+* then use CLUT.
 */
 class Paletted_Pens8 : public Paletted
 {
@@ -94,7 +94,7 @@ protected:
 };
 
 // =========================================================================
-/* When target is a 8Bit screen and game 16bit, use fixed palette and pens remap */
+/* When target is an 8-bit screen and game is 16-bit, use fixed palette and pens remap */
 class Paletted_Screen8ForcePalette : public Paletted_Pens8
 {
 public:

@@ -290,7 +290,7 @@ static void AHISStaticThread()
 		} // end of io paragraph
 	} // end of life loop
 
-	}// enmainprocessd of paragraph for thread loop & data
+	}// end of paragraph for thread loop & data
 //    //PutStr("  thread die, close AHI\n");
 //    //Flush(Output());
 //	// assume thread is dead if we reach here:

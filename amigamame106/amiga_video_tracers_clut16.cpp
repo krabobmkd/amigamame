@@ -1,11 +1,11 @@
 #include "amiga_video_tracers_clut16.h"
 
-// this files is just to implement template calls...
+// this file is just to implement template calls...
 
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
-// to manage 24 bits mode pixel copy without any arse,
-// assume there is a 3 byte length type than can copy its value from a 4 byte type.
+// to manage 24 bits mode pixel copy without any hassle,
+// assume there is a 3 byte length type that can copy its value from a 4 byte type.
 // this is finely used by following templates for 24bits mode.
 struct type24{
     type24(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
@@ -396,7 +396,7 @@ void directDraw_UBYTE_UBYTE_UWORD(directDrawParams *p)
 }
 
 // - - - -
-// special one, target screen is 8b, mame sreen is ARGB32, and use  long clut.
+// Special case: target screen is 8-bit, MAME screen is ARGB32, and uses long CLUT.
 void directDrawClut_UBYTE_UBYTE_ARGB32(directDrawParams *p,UBYTE *lut)
 {
 //< SCREENPIXTYPE, CLUTTYPE, SOURCEBMTYPE,SOURCEBMCLUTCONVERT,bool useClut>

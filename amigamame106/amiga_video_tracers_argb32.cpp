@@ -1,6 +1,6 @@
 #include "amiga_video_tracers_argb32.h"
 
-// this files is just to implement template calls...
+// this file is just to implement template calls...
 
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
@@ -10,8 +10,8 @@ template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 #endif
 
 
-// to manage 24 bits mode pixel copy without any arse,
-// assume there is a 3 byte length type than can copy its value from a 4 byte type.
+// to manage 24 bits mode pixel copy without any hassle,
+// assume there is a 3 byte length type that can copy its value from a 4 byte type.
 // this is finely used by following templates for 24bits mode.
 struct type24{
     type24(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
@@ -55,9 +55,9 @@ struct typeBGR15PC{
 };
 //  NOTE: RGB16PC is the only one pistorm picasso actually use for 16bits pixels.
 /* works, version 1, generate 2 bfins + 1 bfextu,
- * which, as I understand, are possibly "remanaged by the OS 68040 library" thus does horrible code
- * before being remapped by emu68, if I get it. fine bitswapping is problemtaic on this hardware.
-  normaly R8G8B8A to A8R8G8B8 should be very fine.
+ * which, as I understand, are possibly "remanaged by the OS 68040 library" thus producing horrible code
+ * before being remapped by emu68, if I get it. Fine bitswapping is problematic on this hardware.
+  Normally R8G8B8A to A8R8G8B8 should be very fine.
 */
 //struct typeRGB16PC{
 //    typeRGB16PC(ULONG argb) : a(argb){
