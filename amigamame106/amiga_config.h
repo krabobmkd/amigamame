@@ -1,3 +1,27 @@
+/******************************************************************************
+ * amiga_config.h
+ *
+ *      ╔═══════════════════════════════════╗
+ *      ║   ⚙  CONFIG MANAGER  ⚙         ║
+ *      ║  ┌───────────────────────────┐    ║
+ *      ║  │ Video:  ✓                 │    ║
+ *      ║  │ Audio:  ✓                 │    ║
+ *      ║  │ Input:  ✓                 │    ║
+ *      ║  │ Paths:  ✓                 │    ║
+ *      ║  └───────────────────────────┘    ║
+ *      ║    All settings under control!    ║
+ *      ╚═══════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_MAME_CONFIG_H
 #define AMIGA_MAME_CONFIG_H
 extern "C"
@@ -218,7 +242,7 @@ public:
     {
         Display();
         void serialize(ASerializer &serializer) override;
-        DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;        
+        DrawEngine _drawEngine = DrawEngine::CgxDirectCpuOrWPA8;
 #define CONFDISPLAYFLAGS_ONWORKBENCH 1
 #define CONFDISPLAYFLAGS_FORCEDEPTH16 2
 
@@ -302,12 +326,12 @@ public:
     struct Misc : public ASerializable
     {
         Misc();
-        void serialize(ASerializer &serializer) override;        
+        void serialize(ASerializer &serializer) override;
         std::string _romsPath,_samplesPath,_userPath;
         bool    _useCheatCodeFile = false;
         std::string _cheatFilePath="PROGDIR:cheat.dat";
         float     _speedlimit = 100.0f;
-        ULONG_FLAGS  _skipflags = 0;       
+        ULONG_FLAGS  _skipflags = 0;
         int         _neogeo_bios = 0;
 //        ULONG_FLAGS  _MiscFlags = 0;
 
@@ -377,8 +401,8 @@ protected:
 
     // - - - - - scanned roms zip or dir for UI.
     // mui like a ptr to ptr list, to insert in one blow.
-    // this is meant to be sorted a way or another    
-    std::vector<const _game_driver *const*> _romsFound;    
+    // this is meant to be sorted a way or another
+    std::vector<const _game_driver *const*> _romsFound;
     std::vector<UBYTE> _romsFoundReverse;
     bool            _romsFoundTouched; // should save or not on exit.
 
@@ -405,3 +429,10 @@ MameConfig &getMainConfig();
 
 
 #endif
+
+/* Configuration loaded! Everything tuned to perfection!
+ *      ^..^
+ *     /o  o\  <-- Wise mouse configured everything
+ *    (  ==  )
+ *     )    (
+ */

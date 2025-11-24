@@ -1,3 +1,37 @@
+/*
+ * amiga_audiomixer.cpp
+ * Purpose: Audio mixing and buffer management for sound output
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║                   🔊 AUDIO MIXER ENGINE 🎧                            ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │  [Stream1] ───┐                                              │    ║
+ * ║  │  [Stream2] ───┤                                              │    ║
+ * ║  │  [Stream3] ───┤►  MIXER  ─► [Buffer] ─► 🔈 Speakers         │    ║
+ * ║  │  [Stream4] ───┤                                              │    ║
+ * ║  │  [StreamN] ───┘                                              │    ║
+ * ║  │                                                               │    ║
+ * ║  │   ♫ Blends multiple audio sources into one stream ♫          │    ║
+ * ║  │   Handles frame synchronization & buffer management           │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║             Crystal clear audio, perfectly timed!                     ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_audiostream.h"
 #include "sound_krb.h"
 #include "streams.h"
@@ -418,6 +452,13 @@ void resample_input_stream(struct stream_input *input, int samples)
 	input->resample_in_pos = dest - input->resample;
 	input->source_frac = pos;
 }
+
+/*
+ * Mix it up! Perfect harmony achieved! 🎵
+ *     __QQ
+ *    (_)_">  <- This dolphin loves the sound waves!
+ *    _)
+ */
 
 
 

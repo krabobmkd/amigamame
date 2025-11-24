@@ -1,3 +1,26 @@
+/******************************************************************************
+ * amiga_inputs_parallelpads.h
+ *
+ *       ╔════════════════════════════════╗
+ *       ║  PARALLEL PORT JOYSTICKS       ║
+ *       ║  ═══════════════════           ║
+ *       ║  [J3] ─┬─ DB25 ─┬─ [J4]        ║
+ *       ║        │  Port   │             ║
+ *       ║   Up/Down/L/R/Fire             ║
+ *       ║   3 & 4 Player Support!        ║
+ *       ║   Sega SMS pad compatible!     ║
+ *       ╚════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_PARALLELPADS_H
 #define AMIGA_PARALLELPADS_H
 /**
@@ -45,7 +68,7 @@ struct ParallelPads // : public AParallelPads
     BYTE _d;
     WORD _dd;
 
-    // - - - -    
+    // - - - -
     struct Interrupt _rbfint,_ciaint;
     UWORD _vertbintOk,_ciaintOk;
     // must be allocated in MEMF_PUBLIC
@@ -124,3 +147,10 @@ We add:
 #endif
 
 #endif
+
+/* Parallel pads hooked up! 4-player action ready!
+ *        .---.
+ *       /     \  <-- Snake slithers through all ports
+ *      /       \
+ *     (  o   o  )
+ */

@@ -1,3 +1,38 @@
+/*
+ * amiga_inputs_propjoyimpl.cpp
+ * Purpose: Proportional joystick implementation and MAME integration
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║       🕹️  PROPORTIONAL JOYSTICK IMPLEMENTATION 🎮                     ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │    ╭───╮     POT0DAT/POT1DAT                                 │    ║
+ * ║  │    │ ◉ │ ◄── X/Y analog values (0-255)                       │    ║
+ * ║  │    ╰─┬─╯     Auto-calibrating ranges                          │    ║
+ * ║  │      │                                                        │    ║
+ * ║  │      └─────► MAME Analog Inputs                              │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Supports: Analog joysticks, C64 paddles, trackballs        │    ║
+ * ║  │   Features: Auto-calibration, axis inversion, XY swap        │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║         Silky smooth analog control!                                  ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include <vector>
 #include "amiga_inputs_interface.h"
 #include "amiga_config.h"
@@ -156,3 +191,12 @@ struct sMameInputsInterface g_ipt_PropJoy=
     propjoy_Close,
     propjoy_PostInputPortInitCheck
 };
+
+/*
+ * Analog perfection! Every tiny movement captured! 🎯
+ *        ^
+ *       / \
+ *      /   \  <- This snail moves smoothly with analog precision!
+ *     /     \
+ *    @~~~~~~~@
+ */

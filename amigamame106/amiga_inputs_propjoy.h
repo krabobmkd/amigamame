@@ -1,3 +1,27 @@
+/******************************************************************************
+ * amiga_inputs_propjoy.h
+ *
+ *      ╔═══════════════════════════════════╗
+ *      ║   ANALOG JOYSTICK HEAVEN!         ║
+ *      ║        ╭────╮                     ║
+ *      ║       ╱  ↑  ╲                     ║
+ *      ║      ╱ ←   → ╲   Proportional!    ║
+ *      ║     ╱    ↓    ╲  Smooth Control!  ║
+ *      ║     ╲         ╱                   ║
+ *      ║      ╲  [◯] ╱   C64 Paddles too! ║
+ *      ║       ╰────╯                      ║
+ *      ╚═══════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_PROPORTIONALJOYSTICK_H
 #define AMIGA_PROPORTIONALJOYSTICK_H
 /**
@@ -186,3 +210,10 @@ extern struct sMameInputsInterface g_ipt_PropJoy;
 #endif
 
 #endif
+
+/* Analog is king! Smooth movements all the way!
+ *      ___
+ *     {o,o}  <-- Sleepy owl tested every axis
+ *     |)__)
+ *     --"--
+ */

@@ -1,3 +1,38 @@
+/*
+ * amiga_inputs_kbd_ll.cpp
+ * Purpose: Keyboard and mouse input via lowlevel.library
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║              ⌨️  KEYBOARD & MOUSE HANDLER 🖱️                          ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌─────────────────────────────────┐                        │    ║
+ * ║  │   │  A B C ... X Y Z  [KEYS]        │◄── Raw Key Events     │    ║
+ * ║  │   └─────────────────────────────────┘                        │    ║
+ * ║  │                                                               │    ║
+ * ║  │         🖱️ ══► [Mouse Movement & Buttons]                     │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Lowlevel.library provides direct hardware access           │    ║
+ * ║  │   Perfect for games requiring immediate response!            │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║          Lightning-fast input with zero latency!                      ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
@@ -747,3 +782,11 @@ struct sMameInputsInterface g_ipt_LLMouses=
     mouse_Close,
     NULL //    PostInputPortInitCheck
 };
+
+/*
+ * Keys pressed, mouse moved, all captured instantly! ⚡
+ *       /\___/\
+ *      ( @   @ )  <- This raccoon is quick with those paws!
+ *       \  W  /
+ *       /     \
+ */

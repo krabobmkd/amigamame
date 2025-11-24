@@ -1,3 +1,37 @@
+/*
+ * amiga_inputs_midi.c
+ * Purpose: MIDI controller input support via CAMD library
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║                   🎹 MIDI CONTROLLER HANDLER 🎵                       ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │  ┌─────────────────────────────────────────────────────┐     │    ║
+ * ║  │  │ ♫ ♪ ♫ ♪  MIDI KEYBOARD  ♪ ♫ ♪ ♫                   │     │    ║
+ * ║  │  │ █░█░█░█░░█░█░░█░█░█░░█░█░░█░█░█░░█░█░░█░░         │     │    ║
+ * ║  │  │ ██ ██ ██  ██  ██ ██  ██  ██ ██  ██  ██           │     │    ║
+ * ║  │  └─────────────────────────────────────────────────────┘     │    ║
+ * ║  │                      │                                        │    ║
+ * ║  │                      ▼  CAMD.LIBRARY                          │    ║
+ * ║  │              [Note On/Off Events]                             │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║        Maps MIDI notes & controllers to game inputs!                  ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_inputs_midi.h"
 #include "amiga_inputs_interface.h"
 
@@ -281,3 +315,11 @@ Control Change (0xB0) controller number, controller value.
 Pitch Bend (0xE0)    7 least-significant bits of the value,MM  7 most-significant bits of the value (14b)
         center is  (0x2000).
 */
+
+/*
+ * Every note you play brings joy! Make some music! 🎶
+ *       ___
+ *      (o o)  <- This songbird loves MIDI too!
+ *      ((_))
+ *       " "
+ */

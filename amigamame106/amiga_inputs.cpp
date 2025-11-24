@@ -1,9 +1,39 @@
-/**************************************************************************
+/*
+ * amiga_inputs.cpp
+ * Purpose: Main input system coordinator for all input devices
  *
- * Copyright (C) 2025 Vic Ferry (http://github.com/krabobmkd)
- * License is LGPL
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║                   🎮 INPUT SYSTEM COORDINATOR 🕹️                      ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   ⌨️ Keyboard  ──┐                                            │    ║
+ * ║  │   🖱️ Mouse      ──┤                                            │    ║
+ * ║  │   🕹️ Joysticks  ──┤                                            │    ║
+ * ║  │   🎹 MIDI       ──┤──►  INPUT MANAGER  ──► MAME Core         │    ║
+ * ║  │   🔫 Light Gun  ──┤                                            │    ║
+ * ║  │   📌 ParPort    ──┤                                            │    ║
+ * ║  │   🎚️ Analog     ──┘                                            │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Aggregates & routes input from all sources                  │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║          Universal input handling - every device supported!           ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
  *
- *************************************************************************/
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_inputs.h"
 
 #include <vector>
@@ -191,5 +221,13 @@ void osd_post_input_port_init_check()
         i++;
     }
 }
+
+/*
+ * All inputs captured and routed! Every button, every move! 🎮
+ *      /\_/\
+ *     ( o.o )  <- This cat has reflexes fast enough for any input!
+ *      > ^ <
+ *     /|   |\
+ */
 
 

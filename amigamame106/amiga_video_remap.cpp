@@ -1,8 +1,22 @@
-/**************************************************************************
+/*
+ * amiga_video_remap.cpp
+ * Purpose: Palette remapping and color space conversion
  *
- * Copyright (C) 2024 Vic Krb Ferry
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║              🎨 PALETTE REMAPPER & COLOR CONVERTER 🌈                 ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │  MAME Palette ──► Remap ──► Amiga Palette                    │    ║
+ * ║  │  [R8 G8 B8] ─────────────► [Native Format]                   │    ║
+ * ║  │                                                               │    ║
+ * ║  │  Handles CLUT8, CLUT16, and true-color conversions            │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
  *
- *************************************************************************/
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ */
+
 //#define LOADPALETTE 1
 #include "amiga_video_remap.h"
 #include <stdio.h>
@@ -715,4 +729,12 @@ void Paletted_Screen8ForcePalette_32b::directDraw(directDrawParams *p)
     // same as 15 bit, but uses this function that does RGB32 to RGB15 conversion.
     directDrawClut_UBYTE_UBYTE_ARGB32(p,_clut8.data());
 }
+
+/*
+ * Colors remapped perfectly! Every shade matched! 🎨
+ *      ,___,
+ *     [O.o]  <- This parrot knows all the colors!
+ *     /)__)
+ *    -"--"-
+ */
 

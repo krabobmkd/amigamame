@@ -1,5 +1,34 @@
 
-
+/*
+ * amiga_video_remap_fixpalt.c
+ * Purpose: Fixed 8-bit palette color table for video remapping
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║                    🎨 FIXED PALETTE TABLE 🎨                          ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │ ▓▓▓ ░░░ ▒▒▒ ███ RGB RGB RGB RGB RGB RGB RGB RGB RGB RGB      │    ║
+ * ║  │ ▓▓▓ ░░░ ▒▒▒ ███ [256 Colors of Rainbow Glory]              │    ║
+ * ║  │ ▓▓▓ ░░░ ▒▒▒ ███ Red Green Blue - All Mixed Up!              │    ║
+ * ║  │ ▓▓▓ ░░░ ▒▒▒ ███ Like a giant box of Crayola crayons         │    ║
+ * ║  │ ▓▓▓ ░░░ ▒▒▒ ███ But in computer format!                     │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║                  [768 bytes of pure color data]                       ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 const unsigned char fixedpal8[768]=
     {
@@ -21,3 +50,9 @@ const unsigned char fixedpal8[768]=
     215,239,255,239,206,193,254,240,206,235,238,234,234,236,251,255,245,225,253,255,252,17,0,51,34,0,51,34,0,51,51,0,51,51,0,34,51,0,34,51,0,17,51,0,17,51,0,0
 };
 
+/*
+ * That's all folks! 768 bytes of colorful goodness.
+ *    /\_/\
+ *   ( o.o ) <- This chameleon approves of all these colors!
+ *    > ^ <
+ */

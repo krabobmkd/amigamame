@@ -1,3 +1,26 @@
+/******************************************************************************
+ * amiga_audiostream.h
+ *
+ *       ╔════════════════════════════════╗
+ *       ║  ♫♪  AUDIO STREAM  ♪♫          ║
+ *       ║  ┌─────────────────┐           ║
+ *       ║  │  ▂▃▅▆█ SOUND █▆▅▃▂│           ║
+ *       ║  │ Stereo Mixing!  │           ║
+ *       ║  └─────────────────┘           ║
+ *       ║   AHI Sound System             ║
+ *       ║   Crystal Clear Audio!         ║
+ *       ╚════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_AUDIOSTREAM_H_
 #define AMIGA_AUDIOSTREAM_H_
 
@@ -34,3 +57,9 @@ ULONG soundMixOnThread( sSoundToWrite *pSoundToWrite);
 
 
 #endif
+
+/* Sound streaming perfectly! Hear that quality!
+ *        ()_()
+ *       (='.'=)  <-- Musical bunny approves
+ *       (")_(")
+ */

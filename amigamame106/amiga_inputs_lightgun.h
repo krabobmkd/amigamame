@@ -1,3 +1,27 @@
+/******************************************************************************
+ * amiga_inputs_lightgun.h
+ *
+ *       ╔════════════════════════════════╗
+ *       ║  ═╦═  LIGHT GUN!  ═╦═          ║
+ *       ║   ║                ║           ║
+ *       ║   ╚════════════════╝           ║
+ *       ║   Point and Shoot!             ║
+ *       ║   ┌────────────┐               ║
+ *       ║   │  (X, Y) → BANG!  │         ║
+ *       ║   └────────────┘               ║
+ *       ║   Lightpen Precision!          ║
+ *       ╚════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_LIGHTGUN_H
 #define AMIGA_LIGHTGUN_H
 /**
@@ -29,3 +53,9 @@ void LightGun_close(struct sLightGuns *plg);
 #endif
 
 #endif
+
+/* Targeting complete! Bulls-eye every time!
+ *       (\/)
+ *      ( •.•)  <-- Eagle-eyed crab never misses
+ *      (")_(")
+ */

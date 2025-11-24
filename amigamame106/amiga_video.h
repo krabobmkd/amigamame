@@ -1,3 +1,22 @@
+/******************************************************************************
+ * amiga_video.h
+ *
+ *     ╔══════════════════════════════════════╗
+ *     ║                                      ║
+ *     ║   [===CRT MONITOR===]                ║
+ *     ║   Scan lines never looked so good!   ║
+ *     ╚══════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_VIDEO_H
 #define AMIGA_VIDEO_H
 
@@ -75,3 +94,11 @@ bool SwitchWindowFullscreen();
 void ResetWatchTimer();
 
 #endif
+
+/* EOF - Pixels perfectly placed, frame by frame!
+ *     /\___/\
+ *    /  o o  \  <-- Wise owl watched every scan line
+ *   ( ==  ^  == )
+ *    )         (
+ *   (           )
+ */

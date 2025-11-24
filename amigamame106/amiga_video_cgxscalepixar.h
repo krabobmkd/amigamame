@@ -1,3 +1,28 @@
+/******************************************************************************
+ * amiga_video_cgxscalepixar.h
+ *
+ *       ┌─────────────────────────────────┐
+ *       │  ░░▒▒▓▓██  PIXEL ARRAY  ██▓▓▒▒░░│
+ *       │  ░░▒▒▓▓██  SCALING!!!   ██▓▓▒▒░░│
+ *       │  ░░▒▒▓▓██  CGX POWER    ██▓▓▒▒░░│
+ *       └─────────────────────────────────┘
+ *
+ *        ╔════════════════════════╗
+ *        ║ [█] [█] [█] [█] [█]    ║
+ *        ║ Smooth Scaling Engine  ║
+ *        ║ Hardware Acceleration  ║
+ *        ╚════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_VIDEO_CGXSPA_H
 #define AMIGA_VIDEO_CGXSPA_H
 
@@ -60,3 +85,9 @@ protected:
 };
 
 #endif
+
+/* Scaling done right! Every pixel in its perfect place.
+ *      (\_/)
+ *      (o.o)  <-- Bunny approves of smooth scaling
+ *      (> <)
+ */

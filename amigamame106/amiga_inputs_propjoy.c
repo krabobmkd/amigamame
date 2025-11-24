@@ -1,9 +1,38 @@
 /*
-  more or less adapted from:
-  aminet "AnalogMouse" asm source
-  and some DevelopperCD2.1 reference.
+ * amiga_inputs_propjoy.c
+ * Purpose: Proportional/analog joystick support via potgo.resource
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║            🕹️  PROPORTIONAL JOYSTICK HANDLER 🎮                      ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │         ╭─────╮                                               │    ║
+ * ║  │         │  ◉  │  <- Analog stick with smooth 360° control    │    ║
+ * ║  │         ╰──┬──╯                                               │    ║
+ * ║  │            │                                                  │    ║
+ * ║  │      POT0DAT/POT1DAT                                          │    ║
+ * ║  │      X/Y Analog Readings                                      │    ║
+ * ║  │      Auto-calibrates on the fly!                              │    ║
+ * ║  │                                                               │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║   Adapted from aminet AnalogMouse & DeveloperCD 2.1 reference        ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
-*/
 #pragma GCC optimize ("O1")
 
 #include "amiga_inputs_propjoy.h"
@@ -653,3 +682,12 @@ void post_input_port_init_check(void *o)
 // {
 
 // };
+
+/*
+ * Smooth analog control - the way gaming was meant to be!
+ *     ___
+ *    /o o\   <- This sloth moves smoothly with analog sticks
+ *   |  ~  |
+ *    \___/
+ *     |||
+ */
