@@ -91,6 +91,11 @@ static void *parpads_Create(void *registerer,fAddOsCode addOsCode)
         {parpadsbtnames[ipar][4],4+ipshft,JOYCODE_1_BUTTON1+mamecodeshift},
         {parpadsbtnames[ipar][5],5+ipshft,JOYCODE_1_BUTTON2+mamecodeshift}
         };
+
+#define ASBTRACT_KEYS 4
+        if(iplayer == ASBTRACT_KEYS)
+            for(os_code_info &oci : kbi2) oci.inputcode = CODE_OTHER_DIGITAL;
+
         //_kbi.insert(_kbi.end(),kbi2.begin(),kbi2.end());
         addOsCode(registerer,kbi2.data(),kbi2.size());
     } // end loop per par

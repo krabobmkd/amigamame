@@ -332,7 +332,7 @@ static void *kbd_Create(void *registerer,fAddOsCode addOsCode)
             int iPlayer = configControls._llPort_Player[iLLPort] ;
             if( iPlayer == 0) continue;
             iPlayer--;
-
+           #define ASBTRACT_KEYS 4
             int lowlevelState = configControls._llPort_Type[iLLPort];
             if(lowlevelState<=0 || lowlevelState>3) continue;
 
@@ -361,6 +361,10 @@ static void *kbd_Create(void *registerer,fAddOsCode addOsCode)
                     {padsbtnames[iLLPort][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
                     {padsbtnames[iLLPort][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
                 };
+
+                if(iPlayer == ASBTRACT_KEYS)
+                    for(os_code_info &oci : kbi2) oci.inputcode = CODE_OTHER_DIGITAL;
+
                 addOsCode(registerer,kbi2.data(),kbi2.size());
             } else
             if(lowlevelState == SJA_TYPE_JOYSTK )
@@ -373,6 +377,9 @@ static void *kbd_Create(void *registerer,fAddOsCode addOsCode)
                     {padsbtnames[iLLPort][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
                     {padsbtnames[iLLPort][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
                 };
+                if(iPlayer == ASBTRACT_KEYS)
+                    for(os_code_info &oci : kbi2) oci.inputcode = CODE_OTHER_DIGITAL;
+
                 addOsCode(registerer,kbi2.data(),kbi2.size());
             }
 
@@ -633,27 +640,33 @@ static void *mouse_Create(void *registerer,fAddOsCode addOsCode)
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+0],
                             (iport*8)+0,MOUSECODE_1_ANALOG_X+(iplayer*mameAnlgSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_ANALOG_RELATIVE;
+
                 addOsCode(registerer,&osci,1);
             }
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+1],
                             (iport*8)+1,MOUSECODE_1_ANALOG_Y+(iplayer*mameAnlgSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_ANALOG_RELATIVE;
                 addOsCode(registerer,&osci,1);
             }
             // mouse buttons
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+2],
                             (iport*8)+2,MOUSECODE_1_BUTTON1+(iplayer*mameMouseBtSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_DIGITAL;
                 addOsCode(registerer,&osci,1);
             }
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+3],
                             (iport*8)+3,MOUSECODE_1_BUTTON2+(iplayer*mameMouseBtSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_DIGITAL;
                 addOsCode(registerer,&osci,1);
             }
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+4],
                             (iport*8)+4,MOUSECODE_1_BUTTON3+(iplayer*mameMouseBtSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_DIGITAL;
                 addOsCode(registerer,&osci,1);
             }
         } // end if LL mouse

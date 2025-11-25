@@ -103,8 +103,15 @@ static void *propjoy_Create(void *registerer,fAddOsCode addOsCode)
             {_AnalogNames[ispad][iport][0], (iport*8)+0,JOYCODE_1_ANALOG_X+analogmamecodeshift},
             {_AnalogNames[ispad][iport][1], (iport*8)+1,JOYCODE_1_ANALOG_Y+analogmamecodeshift},
                 };
-
-                addOsCode(registerer,kbi2.data(),kbi2.size());
+#define ASBTRACT_KEYS 4
+        if(iplayer == ASBTRACT_KEYS)
+        {
+            kbi2[0].inputcode = CODE_OTHER_DIGITAL;
+            kbi2[1].inputcode = CODE_OTHER_DIGITAL;
+            kbi2[2].inputcode = CODE_OTHER_ANALOG_ABSOLUTE;
+            kbi2[3].inputcode = CODE_OTHER_ANALOG_ABSOLUTE;
+        }
+              addOsCode(registerer,kbi2.data(),kbi2.size());
         } // end if pots.
     } // loop by player
 

@@ -566,7 +566,8 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         "Player 1",
         "Player 2",
         "Player 3",
-        "Player 4"
+        "Player 4",
+        "Abstract keys",
     };
 
     // these mimics the lowlevel enum types of controllers
