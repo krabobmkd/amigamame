@@ -1,8 +1,38 @@
-/**************************************************************************
+/*
+ * amiga_video_cgxscalepixar.cpp
+ * Purpose: CyberGraphX hardware-accelerated ScalePixelArray implementation
  *
- * Copyright (C) 2024 Vic Krb Ferry
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║         ⚡ CGX SCALEPIXELARRAY - HARDWARE SCALING 🚀                  ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   MAME Buffer  ──►  Format Convert  ──►  Hardware Scale     │    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌──────────┐       ┌──────────┐       ┌──────────┐        │    ║
+ * ║  │   │ 320x240  │  ───► │  ARGB32  │  ───► │ 1920x1080│        │    ║
+ * ║  │   │  Source  │       │  Buffer  │       │  Scaled  │        │    ║
+ * ║  │   └──────────┘       └──────────┘       └──────────┘        │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Leverages RTG graphics card for smooth, fast scaling!      │    ║
+ * ║  │   Supports rotation, CLUT→RGB, and direct ARGB32 passthrough│    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║      GPU-powered scaling - smooth pixels at any resolution!           ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
  *
- *************************************************************************/
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 #include "amiga_video_cgxscalepixar.h"
 #include "amiga_video_tracers_clut16.h"
@@ -255,3 +285,13 @@ void Intuition_Window_CGXScale::close()
     Intuition_Window::close();
     Drawable_CGXScalePixelArray::close();
 }
+
+/*
+ * Scaled to perfection by the graphics card! ⚡
+ *      ___
+ *     /   \___
+ *    |   O    \  <- This cheetah runs at GPU speed!
+ *     \____    )
+ *      |   |  /
+ *      |___|_/
+ */

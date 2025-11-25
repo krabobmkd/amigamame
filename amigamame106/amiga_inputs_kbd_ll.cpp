@@ -1,3 +1,38 @@
+/*
+ * amiga_inputs_kbd_ll.cpp
+ * Purpose: Keyboard and mouse input via lowlevel.library
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║              ⌨️  KEYBOARD & MOUSE HANDLER 🖱️                          ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌─────────────────────────────────┐                        │    ║
+ * ║  │   │  A B C ... X Y Z  [KEYS]        │◄── Raw Key Events     │    ║
+ * ║  │   └─────────────────────────────────┘                        │    ║
+ * ║  │                                                               │    ║
+ * ║  │         🖱️ ══► [Mouse Movement & Buttons]                     │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Lowlevel.library provides direct hardware access           │    ║
+ * ║  │   Perfect for games requiring immediate response!            │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║          Lightning-fast input with zero latency!                      ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
@@ -432,10 +467,10 @@ void Inputs_Keyboard_ll_Update(struct MsgPort *pMsgPort)
                // printf("key:%04x\n",finalkeycode);
 
                 if(imcode & IECODE_UP_PREFIX)
-                {                   // if many down/up happens in one frame, we must see it has pressed, then up next frame.
+                {                   // if many down/up happens in one frame, we must see it as pressed, then up next frame.
                    //printf("Up:%04x\n",finalkeycode);
 
-                    // if many down/up happens in one frame, we must see it has pressed, then up next frame.
+                    // if many down/up happens in one frame, we must see it as pressed, then up next frame.
                    if(g_pInputs->_NbKeysUpStack<256)
                    {
                         g_pInputs->_NextKeysUpStack[g_pInputs->_NbKeysUpStack] = finalkeycode;
@@ -452,7 +487,7 @@ void Inputs_Keyboard_ll_Update(struct MsgPort *pMsgPort)
                     UBYTE prev = g_pInputs->_Keys[finalkeycode];
                     if(prev != 0 && prev == fcounter )
                     {   // means down->up->down for same key in the same frame,
-                        // which is common is just 8fps and player is blasting a key...
+                        // which is common at just 8fps and player is blasting a key...
                         // in that case remove previous delayed down we just put, because
                         // next up could happen next frame.
                         for(int i=0;i<g_pInputs->_NbKeysUpStack;i++) // just a few there
@@ -760,3 +795,11 @@ struct sMameInputsInterface g_ipt_LLMouses=
     mouse_Close,
     NULL //    PostInputPortInitCheck
 };
+
+/*
+ * Keys pressed, mouse moved, all captured instantly! ⚡
+ *       /\___/\
+ *      ( @   @ )  <- This raccoon is quick with those paws!
+ *       \  W  /
+ *       /     \
+ */

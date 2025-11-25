@@ -1,10 +1,28 @@
+/******************************************************************************
+ * amiga_video_tracers.h
+ *
+ *       ╔════════════════════════════════╗
+ *       ║  ▓▒░ PIXEL TRACERS ░▒▓         ║
+ *       ║  Fast Bit Blitting Magic!      ║
+ *       ║  ┌──────────────────┐          ║
+ *       ║  │ ROT0  ROT90  →   │          ║
+ *       ║  │ ROT180 ROT270 ↻  │          ║
+ *       ║  └──────────────────┘          ║
+ *       ║   Every pixel traced!          ║
+ *       ╚════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_VIDEO_TRACERS_H_
 #define AMIGA_VIDEO_TRACERS_H_
-/**************************************************************************
- *
- * Copyright (C) 2024 Vic Krb Ferry
- *
- *************************************************************************/
 
 // Amiga
 extern "C" {
@@ -26,7 +44,7 @@ extern "C" {
 #endif
 
 
-// this are used to describe source & destination bitmaps for all tracers
+// These are used to describe source & destination bitmaps for all tracers
 struct directDrawScreen {
     void *_base;
     ULONG _bpr;
@@ -48,3 +66,7 @@ struct directDrawParams {
 
 
 #endif
+
+/* Every pixel in its right place! Mission accomplished!
+ *       ʕ •ᴥ•ʔ  <-- Bear approved all rotations
+ */

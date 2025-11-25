@@ -1,5 +1,39 @@
-// Vic Krb Ferry, Feb 2024
-// from amiga
+/*
+ * amiga_filesystem.cpp
+ * Purpose: File I/O abstraction layer for MAME file operations
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║                  📁 FILESYSTEM INTERFACE 💾                           ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   MAME Core                                                   │    ║
+ * ║  │        │                                                      │    ║
+ * ║  │        ▼                                                      │    ║
+ * ║  │   [File API Layer]                                            │    ║
+ * ║  │        │                                                      │    ║
+ * ║  │        ├──► ROMs    📦                                        │    ║
+ * ║  │        ├──► Samples 🎵                                        │    ║
+ * ║  │        ├──► Config  ⚙️                                         │    ║
+ * ║  │        └──► NVRAM   💾                                        │    ║
+ * ║  │                                                               │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║        AmigaDOS file operations with ZIP support!                     ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 #ifndef __stdargs
 #define __stdargs
@@ -338,4 +372,11 @@ int osd_create_directory(int pathtype, int pathindex, const char *dirname)
     assumeDirectory(spath.c_str());
     return 0;
 }
+
+/*
+ * All files found and loaded! Perfect filesystem harmony! 📁
+ *     (\_/)
+ *     (•_•)  <- This squirrel knows where all the nuts... er, files are!
+ *     />🥜
+ */
 

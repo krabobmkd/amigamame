@@ -1,9 +1,38 @@
-/**************************************************************************
+/*
+ * amiga_audiostream.cpp
+ * Purpose: AHI audio hardware interface and streaming management
  *
- * Copyright (C) 2024 Vic Ferry (http://github.com/krabobmkd)
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║                 🎶 AHI AUDIO STREAM HANDLER 🔉                        ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │    MAME Audio Engine                                          │    ║
+ * ║  │           │                                                   │    ║
+ * ║  │           ▼                                                   │    ║
+ * ║  │    [Double Buffer] ◄─► AHI Device                            │    ║
+ * ║  │           │                  │                                │    ║
+ * ║  │           └──────────────────┴──► Paula/Soundcard            │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Manages threaded audio output via AHI subsystem             │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║         Real-time audio streaming with double buffering!              ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
  *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
  *
- *************************************************************************/
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_audiostream.h"
 // from mame:
 extern "C" {
@@ -290,7 +319,7 @@ static void AHISStaticThread()
 		} // end of io paragraph
 	} // end of life loop
 
-	}// enmainprocessd of paragraph for thread loop & data
+	}// end of paragraph for thread loop & data
 //    //PutStr("  thread die, close AHI\n");
 //    //Flush(Output());
 //	// assume thread is dead if we reach here:
@@ -480,3 +509,10 @@ void osd_sound_enable(int enable)
 {
    // printf(" **** osd_sound_enable:%d\n",enable);
 }
+
+/*
+ * Streaming audio perfection through AHI! 🎵
+ *      /)/)
+ *     ( ^.^)  <- This bunny hops to the beat!
+ *     (")_(")
+ */

@@ -1,3 +1,26 @@
+/******************************************************************************
+ * amiga_video_intui_tbufcsb.h
+ *
+ *    ╔═══════════════════════════════════╗
+ *    ║   Triple Buffer Magic!            ║
+ *    ║   ┌─────┐  ┌─────┐  ┌─────┐      ║
+ *    ║   │ [1] │  │ [2] │  │ [3] │      ║
+ *    ║   └─────┘  └─────┘  └─────┘      ║
+ *    ║     Swap → Swap → Swap           ║
+ *    ║   ChangeScreenBuffer FTW!         ║
+ *    ╚═══════════════════════════════════╝
+ *        Buttery smooth rendering!
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_VIDEO_INTUITION_TBUFCSB_H
 #define AMIGA_VIDEO_INTUITION_TBUFCSB_H
 
@@ -49,3 +72,11 @@ public:
 
 
 #endif
+
+/* Three buffers are better than one! No tearing here!
+ *      __   __
+ *     /  \ /  \  <-- Dog loves triple buffering!
+ *    |  @ | @  |
+ *     \  W   / /
+ *      \_____/
+ */

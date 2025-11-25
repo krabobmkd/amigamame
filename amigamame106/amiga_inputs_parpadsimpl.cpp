@@ -1,3 +1,38 @@
+/*
+ * amiga_inputs_parpadsimpl.cpp
+ * Purpose: Parallel port gamepad implementation and MAME integration
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║          📌 PARALLEL PORT PADS IMPLEMENTATION 🎮🎮                    ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   Parallel Port DB-25                                         │    ║
+ * ║  │         │                                                     │    ║
+ * ║  │         ├──► Joy3 [▲◄▼►] + Buttons                           │    ║
+ * ║  │         └──► Joy4 [▲◄▼►] + Buttons                           │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Reads CIA port registers via VBlank interrupt               │    ║
+ * ║  │   Enables 4-player gaming on classic Amiga!                   │    ║
+ * ║  │                                                               │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║        Party time with 4 players! 🎉                                  ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include <vector>
 #include "amiga_inputs_interface.h"
 #include "amiga_config.h"
@@ -175,3 +210,11 @@ struct sMameInputsInterface g_ipt_ParallelPads=
     parpads_Close,
     NULL //    PostInputPortInitCheck
 };
+
+/*
+ * Four players ready! Let the multiplayer madness begin! 🎮🎮🎮🎮
+ *      ___
+ *     {o,o}  <- This koala brought three friends!
+ *     |)__)
+ *     -"-"-
+ */

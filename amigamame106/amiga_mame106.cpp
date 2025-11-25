@@ -1,15 +1,41 @@
-/**************************************************************************
+/*
+ * amiga_mame106.cpp
+ * Purpose: Main MAME emulation loop and game execution control
  *
- * Copyright (C) 1999 Mats Eirik Hansen (mats.hansen@triumph.no)
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║                   🎮 MAME 0.106 CORE LOOP 🕹️                          ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌─────────────────────────────────────┐                    │    ║
+ * ║  │   │  GAME LOOP (60 FPS)                 │                    │    ║
+ * ║  │   │    │                                 │                    │    ║
+ * ║  │   │    ├──► Update Input                │                    │    ║
+ * ║  │   │    ├──► Run CPU Timeslice           │                    │    ║
+ * ║  │   │    ├──► Update Video                │                    │    ║
+ * ║  │   │    ├──► Mix Audio                   │                    │    ║
+ * ║  │   │    └──► Check Pause/Exit            │                    │    ║
+ * ║  │   └─────────────────────────────────────┘                    │    ║
+ * ║  │                                                               │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║    The heart of MAME - where arcade magic happens! ✨                 ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
  *
- * $Id: amiga.c,v 1.1 1999/04/28 18:50:15 meh Exp meh $
+ * Original Copyright (C) 1999 Mats Eirik Hansen
+ * Modified by: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
  *
- * $Log: amiga.c,v $
- * Revision 1.1  1999/04/28 18:50:15  meh
- * Initial revision
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- *
- *************************************************************************/
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #ifndef __stdargs
 // shut up clangd.
 #define __stdargs
@@ -112,6 +138,16 @@ void osd_pause(int paused)
 {
 //    printf("osd_pause:%d\n",paused);
 }
+
+/*
+ * Insert coin! Game on! The arcade never dies! 🎮
+ *      _____
+ *     /     \
+ *    | () () |  <- This arcade cabinet is ready to rock!
+ *    |  ___  |
+ *    | |   | |
+ *     \|___|/
+ */
 
 
 

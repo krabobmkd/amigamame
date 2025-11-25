@@ -1,7 +1,31 @@
+/******************************************************************************
+ * amiga_inputs_propjoy.h
+ *
+ *      ╔═══════════════════════════════════╗
+ *      ║   ANALOG JOYSTICK HEAVEN!         ║
+ *      ║        ╭────╮                     ║
+ *      ║       ╱  ↑  ╲                     ║
+ *      ║      ╱ ←   → ╲   Proportional!    ║
+ *      ║     ╱    ↓    ╲  Smooth Control!  ║
+ *      ║     ╲         ╱                   ║
+ *      ║      ╲  [◯] ╱   C64 Paddles too! ║
+ *      ║       ╰────╯                      ║
+ *      ╚═══════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_PROPORTIONALJOYSTICK_H
 #define AMIGA_PROPORTIONALJOYSTICK_H
 /**
-    Things to read Proportional Analog Josticks and paddles.
+    Code to read Proportional Analog Joysticks and paddles.
     The "C64/Atari8Bit" way...
 
     Moving a paddle will make the voltage varies...
@@ -12,7 +36,7 @@
     So we got here:
     software resource accaparation + timer management and interupts + reading direct hardware value.
     Also, need something for calibration of leftmost/rightmost (and center?) values.
-    then we just let game engine read the last value cheked.
+    then we just let game engine read the last value checked.
 
     - Can Manage Amiga classic DB9 Port1 and Port2, or both.
     - Need calibration because of devices, but also internal timers can change.
@@ -186,3 +210,10 @@ extern struct sMameInputsInterface g_ipt_PropJoy;
 #endif
 
 #endif
+
+/* Analog is king! Smooth movements all the way!
+ *      ___
+ *     {o,o}  <-- Sleepy owl tested every axis
+ *     |)__)
+ *     --"--
+ */

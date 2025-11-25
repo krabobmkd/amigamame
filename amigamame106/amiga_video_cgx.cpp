@@ -1,8 +1,45 @@
-/**************************************************************************
+/*
+ * amiga_video_cgx.cpp
+ * Purpose: CyberGraphX (RTG) video driver - Main implementation
  *
- * Copyright (C) 2024 Vic Krb Ferry
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║            🖥️ CYBERGRAPHX RTG VIDEO DRIVER 🎮                         ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   MAME Bitmap  ──►  Pixel Convert  ──►  RTG Framebuffer     │    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌──────────┐      ┌──────────┐      ┌──────────┐          │    ║
+ * ║  │   │ Game Src │ ───► │  Tracer  │ ───► │  Screen  │          │    ║
+ * ║  │   │ CLUT/RGB │      │ Engine   │      │ RGB15/32 │          │    ║
+ * ║  │   └──────────┘      └──────────┘      └──────────┘          │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Features:                                                  │    ║
+ * ║  │   • Direct CPU rendering to locked bitmaps                   │    ║
+ * ║  │   • 16-bit and 32-bit optimized paths                        │    ║
+ * ║  │   • Automatic screen mode selection (OwnCGXBestModeID)       │    ║
+ * ║  │   • Palette remapping for CLUT games                         │    ║
+ * ║  │   • Rotation support (90°/180°/270°)                         │    ║
+ * ║  │   • Fullscreen and windowed modes                            │    ║
+ * ║  │   • Triple buffering support                                 │    ║
+ * ║  │   • Works with Picasso96, CyberGraphX, SAGA                  │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║      Bringing arcade pixels to RTG cards since 2025! 🚀               ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
  *
- *************************************************************************/
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 #include "amiga_video_cgx.h"
 #include "amiga_video_tracers_clut16.h"
@@ -493,8 +530,8 @@ bool Intuition_Screen_CGX::open()
 {
     if(_flags & DISPFLAG_LIGHTGUN)
     {
-       loginfo(1,"Lightguns can't be used with RTG screens !\nIt needs AGA/OCS screen with Cathode Ray Tube !");
-       ui_popup_time(5, "Lightguns can't be used with RTG screens !\nIt needs AGA/OCS screen with Cathode Ray Tube monitors !");
+       loginfo(1,"Lightguns can't be used with RTG screens!\nThey need AGA/OCS screens with Cathode Ray Tube monitors!");
+       ui_popup_time(5, "Lightguns can't be used with RTG screens!\nThey need AGA/OCS screens with Cathode Ray Tube monitors!");
     }
     bool ok = Intuition_Screen::open();
     if(!ok) return false;
@@ -669,3 +706,14 @@ BitMap *Intuition_Window_CGX::bitmap()
 {
     return _sWbWinSBitmap;
 }
+
+/*
+ * Pixels rendered at lightning speed on your RTG card! ⚡
+ *       ___
+ *      /   \___
+ *     |  ^  ^  |  <- This falcon sees every pixel perfectly!
+ *     |   >    |
+ *      \_____/
+ *        | |
+ *       _| |_
+ */

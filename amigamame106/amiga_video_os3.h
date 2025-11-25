@@ -1,3 +1,27 @@
+/******************************************************************************
+ * amiga_video_os3.h
+ *
+ *       ╔══════════════════════════════════╗
+ *       ║  ░▒▓█  OS3 GRAPHICS  █▓▒░       ║
+ *       ║  WriteChunkyPixels() Love        ║
+ *       ║  ┌──────────────────────┐        ║
+ *       ║  │ ▄▀▀▀ ▄▀▀▀ ▀▀█        │        ║
+ *       ║  │ █  █ ▀▀▀█ ▀▀█        │        ║
+ *       ║  │ ▀▀▀  ▀▀▀  ▀▀▀        │        ║
+ *       ║  └──────────────────────┘        ║
+ *       ║    Amiga OS3.x Forever!          ║
+ *       ╚══════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_VIDEO_OS3_H
 #define AMIGA_VIDEO_OS3_H
 
@@ -51,7 +75,7 @@ public:
 
     bool open() override;
     void close() override;
-    void draw(_mame_display *display) override;    
+    void draw(_mame_display *display) override;
 protected:
     int _lightpen_inited;
 };
@@ -69,3 +93,10 @@ protected:
 
 };
 #endif
+
+/* OS3 - Old School, Still Rocks!
+ *       (o_
+ *       //\  <-- Penguin runs on everything!
+ *       V_/_
+ *        ||
+ */

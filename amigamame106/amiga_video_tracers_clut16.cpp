@@ -1,11 +1,46 @@
+/*
+ * amiga_video_tracers_clut16.cpp
+ * Purpose: 16-bit CLUT (Color Look-Up Table) pixel format tracer implementation
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║              🎨 CLUT16 PIXEL TRACER - 16-BIT COLORS 🖌️                ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   MAME Pixels  ──►  CLUT Conversion  ──►  16-bit Screen     │    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌────────────┐       ┌────────────┐       ┌────────────┐  │    ║
+ * ║  │   │  UWORD/    │  ───► │   Lookup   │  ───► │  RGB15/16  │  │    ║
+ * ║  │   │  ARGB32    │       │   Table    │       │   Output   │  │    ║
+ * ║  │   └────────────┘       └────────────┘       └────────────┘  │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Handles scaling, rotation (90°/180°/270°), and clipping   │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║      High-performance templated pixel conversion for Amiga!           ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_video_tracers_clut16.h"
 
-// this files is just to implement template calls...
+// this file is just to implement template calls...
 
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
-// to manage 24 bits mode pixel copy without any arse,
-// assume there is a 3 byte length type than can copy its value from a 4 byte type.
+// to manage 24 bits mode pixel copy without any hassle,
+// assume there is a 3 byte length type that can copy its value from a 4 byte type.
 // this is finely used by following templates for 24bits mode.
 struct type24{
     type24(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
@@ -396,7 +431,7 @@ void directDraw_UBYTE_UBYTE_UWORD(directDrawParams *p)
 }
 
 // - - - -
-// special one, target screen is 8b, mame sreen is ARGB32, and use  long clut.
+// Special case: target screen is 8-bit, MAME screen is ARGB32, and uses long CLUT.
 void directDrawClut_UBYTE_UBYTE_ARGB32(directDrawParams *p,UBYTE *lut)
 {
 //< SCREENPIXTYPE, CLUTTYPE, SOURCEBMTYPE,SOURCEBMCLUTCONVERT,bool useClut>
@@ -404,6 +439,10 @@ void directDrawClut_UBYTE_UBYTE_ARGB32(directDrawParams *p,UBYTE *lut)
 
 }
 
-
-
-
+/*
+ * All pixels traced and converted perfectly! 🎨
+ *      /\___/\
+ *     ( =^.^= )  <- This chameleon changes colors with every pixel!
+ *      (") (")_/
+ *        U U
+ */
