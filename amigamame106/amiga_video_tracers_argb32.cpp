@@ -1,3 +1,39 @@
+/*
+ * amiga_video_tracers_argb32.cpp
+ * Purpose: 32-bit ARGB pixel format tracer implementation with optimizations
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║             🌈 ARGB32 PIXEL TRACER - TRUE COLOR 🎨                    ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   MAME ARGB32  ──►  Format Conversion  ──►  Screen Output   │    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌──────────┐      ┌────────────────┐      ┌────────────┐  │    ║
+ * ║  │   │  32-bit  │  ──► │  RGB15/16      │  ──► │  Display   │  │    ║
+ * ║  │   │  ARGB    │      │  RGB24/ARGB32  │      │  Pixels    │  │    ║
+ * ║  │   └──────────┘      │  BGR variants  │      └────────────┘  │    ║
+ * ║  │                     └────────────────┘                       │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Optimized with inline assembly for 68k performance!        │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║      Handles all color depths: 15/16/24/32-bit with swizzling!        ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_video_tracers_argb32.h"
 
 // this file is just to implement template calls...
@@ -489,8 +525,11 @@ void directDrawRGBA32_ARGB32(directDrawParams *p)
     directDrawRGB32T<typeRGBA32>(p);
 }
 
-
-
-
-
-
+/*
+ * True color pixels flowing like a rainbow! 🌈
+ *        __
+ *     __(  )__
+ *    (  \__/  )  <- This parrot displays all 16 million colors!
+ *     \      /
+ *      ||  ||
+ */
