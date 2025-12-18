@@ -376,7 +376,9 @@ void MameConfig::serialize(ASerializer &serializer)
 
     std::string controlPanelComments =
         "Describe what is plugged (Joystick,Pads,Mouses)\n and to which player it belongs.\n"
-        "Keyboard is configured during game with Tab Key menu.";
+        "Abstract keys means: not preconfigured to a player:\n"
+        "Keyboard and abstract keys must be configured\n"
+        " during game with Tab Key menu / .";
     if(hasProportionalStickResource()) // unrelated bu tells we are on Amiga classic.
     {   // if classic hardware ports...
         controlPanelComments += "\nAnalog controllers must be plugged when switched off.";
