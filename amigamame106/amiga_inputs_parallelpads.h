@@ -1,8 +1,31 @@
+/******************************************************************************
+ * amiga_inputs_parallelpads.h
+ *
+ *       ╔════════════════════════════════╗
+ *       ║  PARALLEL PORT JOYSTICKS       ║
+ *       ║  ═══════════════════           ║
+ *       ║  [J3] ─┬─ DB25 ─┬─ [J4]        ║
+ *       ║        │  Port   │             ║
+ *       ║   Up/Down/L/R/Fire             ║
+ *       ║   3 & 4 Player Support!        ║
+ *       ║   Sega SMS pad compatible!     ║
+ *       ╚════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_PARALLELPADS_H
 #define AMIGA_PARALLELPADS_H
 /**
     Parallel pad reading
-    Alloc resource and use vblank interupt to to not miss pressings.
+    Allocates resource and uses vblank interrupt to not miss button presses.
 
     Values are to be read in UWORD (16b)
     ->_ppidata->_last_checked
@@ -45,7 +68,7 @@ struct ParallelPads // : public AParallelPads
     BYTE _d;
     WORD _dd;
 
-    // - - - -    
+    // - - - -
     struct Interrupt _rbfint,_ciaint;
     UWORD _vertbintOk,_ciaintOk;
     // must be allocated in MEMF_PUBLIC
@@ -94,7 +117,7 @@ void prptrace();
 #define APARJOY_J4_FIRE1 0x0001 // CIAF_PRTRBUSY
 
 // = = == = winning Sega SMS pads "Button2" on the parallel port Joystick extensions:
-// this is an unofficial way, but anyway there's only 2 input pins left on parallel port:
+// This is an unofficial method, but there are only 2 input pins left on parallel port:
 // software supporting this is... anything using this source !
 // CIAF_PRTRPOUT,  available and easy to add, and I just tested it works.
 // solder one more wire for joy3 bt2:
@@ -124,3 +147,10 @@ We add:
 #endif
 
 #endif
+
+/* Parallel pads hooked up! 4-player action ready!
+ *        .---.
+ *       /     \  <-- Snake slithers through all ports
+ *      /       \
+ *     (  o   o  )
+ */

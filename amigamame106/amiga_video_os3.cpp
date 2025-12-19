@@ -1,3 +1,39 @@
+/*
+ * amiga_video_os3.cpp
+ * Purpose: AmigaOS 3.x native video implementation (OCS/ECS/AGA chipsets)
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║            🖥️  AMIGA OS3 VIDEO DRIVER - NATIVE CHIPSETS 🎮           ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   MAME Display ──► Palette Remap ──► Chunky-to-Planar       │    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌──────────────┐    ┌──────────────┐    ┌────────────┐   │    ║
+ * ║  │   │ WPA8         │───►│  C2P Asm     │───►│  Screen    │   │    ║
+ * ║  │   │ ChunkyPixels │    │  Conversion  │    │  BitMap    │   │    ║
+ * ║  │   └──────────────┘    └──────────────┘    └────────────┘   │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Supports: OCS (4-bit), ECS (6-bit), AGA (8-bit)           │    ║
+ * ║  │   Features: Light pen, triple buffering, palette remapping  │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║      Classic Amiga graphics - hardware sprites and copper lists!      ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_video_os3.h"
 #include "amiga_video_tracers_clut16.h"
 #include "amiga_video_remap.h"
@@ -195,8 +231,8 @@ void Drawable_OS3::draw_c2p(_mame_display *display)
 
     int c2phh = hh;
      if(c2phh>_drawable.heightPhys()) c2phh = _drawable.heightPhys();
-    // - - get a 8bit bitmap for pixel conversion and then c2p - -
-    const int bmsize = ww*(c2phh+4); // +2 becaus of zoom trick but well.
+    // - - get an 8-bit bitmap for pixel conversion and then c2p - -
+    const int bmsize = ww*(c2phh+4); // +2 because of zoom trick but well.
     if(bmsize != _wpatempbm.size()) _wpatempbm.resize(bmsize);
 
     directDrawScreen ddscreen={
@@ -230,10 +266,10 @@ void Drawable_OS3::initRemapTable()
 {
     if(_useIntuitionPalette) // cases where we set a private screen palette with LOADRGB32.
     {
-        // 8bits screen colors will be managed with LoadRGB32 and direct pixel copy (no clut).
+        // 8-bit screen colors will be managed with LoadRGB32 and direct pixel copy (no CLUT).
         // if(_colorsIndexLength<=258)
         //     _pRemap = new Paletted_Screen8(_drawable.screen());
-        // 8Bits screens will have a fixed 256c palette and  16b index color remap to this.        
+        // 8-bit screens will have a fixed 256c palette and 16b index color remap to this.
         if(_video_attributes & VIDEO_RGB_DIRECT)
         {
             if(_video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)
@@ -265,7 +301,7 @@ void Drawable_OS3::initRemapTable()
         //printf("_colorsIndexLength:%d\n",_colorsIndexLength);
         // windows on Workbench 8Bit will remap 8&16bits to the palette given by workbench.
         if(_video_attributes & VIDEO_RGB_DIRECT)
-        {            
+        {
             if(_video_attributes & VIDEO_NEEDS_6BITS_PER_GUN)
             {
                 _pRemap = new Paletted_Pens8_src32b(_drawable.screen());
@@ -422,7 +458,7 @@ void Intuition_Screen_OS3::draw(_mame_display *display)
    // double buffer that use scroll is patched here:
    if(_flags & DISPFLAG_USEHEIGHTBUFFER) {
         if(_pScreen)
-        {          
+        {
             _pScreen->ViewPort.DyOffset = ((_heightBufferSwitch)?_heightBufferSwitchApplied:0);
             ScrollVPort(&(_pScreen->ViewPort));
         }
@@ -485,3 +521,12 @@ void Intuition_Window_OS3::draw(_mame_display *display)
     }
 
 }
+
+/*
+ * Classic Amiga graphics at their finest! 🖥️
+ *      ___
+ *     /   \
+ *    | O O |  <- This dolphin swims through planar bitmaps!
+ *     \___/
+ *      / \
+ */

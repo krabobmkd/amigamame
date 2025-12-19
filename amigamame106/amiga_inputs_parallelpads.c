@@ -1,13 +1,37 @@
 /*
-    By Krb, most codes from examples.
-
-    from:
-     https://wiki.amigaos.net/wiki/Exec_Interrupts
-    and from amiga developper CD 2.1 read34.asm
-
-
-https://github.com/niklasekstrom/amiga-par-to-spi-adapter/blob/master/spi-lib/spi.c#L296
-*/
+ * amiga_inputs_parallelpads.c
+ * Purpose: Parallel port gamepad/joystick extension support
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║              📌 PARALLEL PORT PADS HANDLER 🎮                         ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   ╔════════╗                                                  │    ║
+ * ║  │   ║ PARA- ║░░░░░░░░░░░░ [Joy3] [Joy4]                       │    ║
+ * ║  │   ║ LLEL  ║════════════════════════════╗                     │    ║
+ * ║  │   ║ PORT  ║  D0-D7 + Control Signals   ║                     │    ║
+ * ║  │   ╚════════╝════════════════════════════╝                     │    ║
+ * ║  │        │                                                      │    ║
+ * ║  │        └─> Reads CIA ports via VBlank interrupt              │    ║
+ * ║  │             Enables 4-player games!                           │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║   Adapted from wiki.amigaos.net and amiga-par-to-spi-adapter         ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 #include "amiga_inputs_parallelpads.h"
 #include "amiga_inputs_interface.h"
@@ -93,8 +117,8 @@ static int CiaParInteruptfunc()
 
 #endif
 
-/** a simple VBL interupt function to just read parallel ports pins at 50 or 60Hz,
-    whatever the main thread is doing.( If you check that on a slow main thread, clicks may be missed.)
+/** A simple VBL interrupt function to read parallel port pins at 50 or 60Hz,
+    whatever the main thread is doing. (If you check that on a slow main thread, clicks may be missed.)
 */
 //D0 - scratch
 //D1 - scratch
@@ -401,3 +425,11 @@ void closeParallelPads(struct ParallelPads *pparpads)
     FreeVec(pparpads);
 
 }
+
+/*
+ * More players = more fun! Parallel port to the rescue!
+ *     /\_/\
+ *    ( ^.^ ) <- This octopus can handle 8 controllers at once!
+ *     >"<
+ *    ~(,,)~
+ */

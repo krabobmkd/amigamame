@@ -1,3 +1,55 @@
+/*
+ * amiga_video_intuition.cpp
+ * Purpose: Intuition screen and window management - Core display layer
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║          🪟 INTUITION DISPLAY MANAGEMENT 🎯                           ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   Display Factory  ──►  Screen/Window  ──►  Draw Engine      │    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌─────────────────────────────────────────────────┐        │    ║
+ * ║  │   │         Polymorphic Display System              │        │    ║
+ * ║  │   ├─────────────────────────────────────────────────┤        │    ║
+ * ║  │   │  Intuition_Screen                               │        │    ║
+ * ║  │   │    ├─► OS3  (OCS/ECS/AGA native)                │        │    ║
+ * ║  │   │    ├─► CGX  (RTG graphics cards)                │        │    ║
+ * ║  │   │    └─► CGXScale (Hardware scaling)              │        │    ║
+ * ║  │   │                                                  │        │    ║
+ * ║  │   │  Intuition_Window                               │        │    ║
+ * ║  │   │    ├─► WB Window OS3                            │        │    ║
+ * ║  │   │    ├─► WB Window CGX                            │        │    ║
+ * ║  │   │    └─► WB Window CGXScale                       │        │    ║
+ * ║  │   └─────────────────────────────────────────────────┘        │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Features:                                                  │    ║
+ * ║  │   • Automatic driver selection (OS3/CGX/ScalePixArray)       │    ║
+ * ║  │   • Fullscreen/windowed mode switching                       │    ║
+ * ║  │   • Triple buffering support                                 │    ║
+ * ║  │   • Geometry management (scale/center/rotate)                │    ║
+ * ║  │   • Window position persistence                              │    ║
+ * ║  │   • Direct rendering optimization for unoccluded windows     │    ║
+ * ║  │   • Progress bar during ROM loading                          │    ║
+ * ║  │   • Custom blank mouse pointer                               │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║      The heart of MAME's Amiga display system! ❤️                     ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_video_intuition.h"
 
 #include "amiga_video_intui_tbufcsb.h"
@@ -279,7 +331,7 @@ bool Intuition_Screen::open()
                     WA_SizeGadget,0,
                     WA_DepthGadget,0,
                     WA_CloseGadget,0,
-                    WA_DragBar,0,                    WA_RptQueue,0, // empeach key repeat messages
+                    WA_DragBar,0,                    WA_RptQueue,0, // prevent key repeat messages
                     WA_GimmeZeroZero,FALSE, 
                     WA_IDCMP,IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY ,
                     0 );
@@ -833,3 +885,13 @@ bool isRastPortComplete(RastPort *rp,WORD w, WORD h)
 //    ReleaseSemaphore(&(lr->Lock));
     return isComplete;
 }
+
+/*
+ * Windows and screens managed with Intuition magic! ✨
+ *        ___
+ *       /o o\
+ *      ( =^= )  <- This wise cat knows all display modes!
+ *       )   (
+ *      /|   |\
+ *     (_|   |_)
+ */

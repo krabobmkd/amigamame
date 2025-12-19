@@ -1,3 +1,26 @@
+/******************************************************************************
+ * amiga_video_intuition.h
+ *
+ *       ╔════════════════════════════════╗
+ *       ║  INTUITION DISPLAY SYSTEM      ║
+ *       ║  ┌──────────────────┐          ║
+ *       ║  │ Screen & Window  │          ║
+ *       ║  │ Management Magic │          ║
+ *       ║  └──────────────────┘          ║
+ *       ║  [■]  [ ]  [X]                 ║
+ *       ║  Amiga OS Graphics Layer       ║
+ *       ╚════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_VIDEO_INTUITION_H
 #define AMIGA_VIDEO_INTUITION_H
 
@@ -22,7 +45,7 @@ struct ScreenBuffer;
 #define VIDEO_NEEDS_6BITS_PER_GUN		0x0008
 
 
-// tool: test if RastPort currently need layer lib clippings.
+// tool: Test if RastPort currently needs layer lib clipping.
 bool isRastPortComplete(RastPort *rp,WORD w, WORD h);
 
 /** \class IntuitionDrawable
@@ -197,3 +220,9 @@ protected:
 
 
 #endif
+
+/* Intuition harnessed! Windows and screens under control!
+ *       .-""-.
+ *      /[] _ _\  <-- Hippo manages all displays
+ *     _|_o__0_|_
+ */

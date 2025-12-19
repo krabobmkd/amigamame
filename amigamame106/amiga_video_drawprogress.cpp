@@ -1,3 +1,41 @@
+/*
+ * amiga_video_drawprogress.cpp
+ * Purpose: ROM loading progress bar and boot screen with MAME logo
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║           📊 PROGRESS BAR - LOADING SCREEN DISPLAY 🎯                 ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌────────────────────────────────────────────────┐         │    ║
+ * ║  │   │  🎮 MAME LOGO                                  │         │    ║
+ * ║  │   └────────────────────────────────────────────────┘         │    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌──────────────────────────────────────┐                   │    ║
+ * ║  │   │ ███████████████░░░░░░░░░░░░░ 65%    │  Progress Bar    │    ║
+ * ║  │   └──────────────────────────────────────┘                   │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Loading ROMs... Decrypting... Initializing...              │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Uses buffered drawing with layers for flicker-free UI     │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║      Smooth progress tracking during game initialization!             ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_video_drawprogress.h"
 
 #include <proto/exec.h>
@@ -375,3 +413,13 @@ A B C BitPos in minterm
 1 1 1 7
 */
 }
+
+/*
+ * Loading complete, ready to play! 🎮
+ *        _
+ *       / \
+ *      / | \  <- This hourglass counts every loading tick!
+ *     /  |  \
+ *    /   |   \
+ *   /____|____\
+ */

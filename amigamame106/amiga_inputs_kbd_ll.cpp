@@ -1,3 +1,38 @@
+/*
+ * amiga_inputs_kbd_ll.cpp
+ * Purpose: Keyboard and mouse input via lowlevel.library
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║              ⌨️  KEYBOARD & MOUSE HANDLER 🖱️                          ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌─────────────────────────────────┐                        │    ║
+ * ║  │   │  A B C ... X Y Z  [KEYS]        │◄── Raw Key Events     │    ║
+ * ║  │   └─────────────────────────────────┘                        │    ║
+ * ║  │                                                               │    ║
+ * ║  │         🖱️ ══► [Mouse Movement & Buttons]                     │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Lowlevel.library provides direct hardware access           │    ║
+ * ║  │   Perfect for games requiring immediate response!            │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║          Lightning-fast input with zero latency!                      ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
@@ -332,7 +367,7 @@ static void *kbd_Create(void *registerer,fAddOsCode addOsCode)
             int iPlayer = configControls._llPort_Player[iLLPort] ;
             if( iPlayer == 0) continue;
             iPlayer--;
-
+           #define ASBTRACT_KEYS 4
             int lowlevelState = configControls._llPort_Type[iLLPort];
             if(lowlevelState<=0 || lowlevelState>3) continue;
 
@@ -361,6 +396,10 @@ static void *kbd_Create(void *registerer,fAddOsCode addOsCode)
                     {padsbtnames[iLLPort][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
                     {padsbtnames[iLLPort][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
                 };
+
+                if(iPlayer == ASBTRACT_KEYS)
+                    for(os_code_info &oci : kbi2) oci.inputcode = CODE_OTHER_DIGITAL;
+
                 addOsCode(registerer,kbi2.data(),kbi2.size());
             } else
             if(lowlevelState == SJA_TYPE_JOYSTK )
@@ -373,6 +412,9 @@ static void *kbd_Create(void *registerer,fAddOsCode addOsCode)
                     {padsbtnames[iLLPort][9],RAWKEY_PORT0_JOY_LEFT+ipshft,JOYCODE_1_LEFT+mamecodeshift},
                     {padsbtnames[iLLPort][10],RAWKEY_PORT0_JOY_RIGHT+ipshft,JOYCODE_1_RIGHT+mamecodeshift}
                 };
+                if(iPlayer == ASBTRACT_KEYS)
+                    for(os_code_info &oci : kbi2) oci.inputcode = CODE_OTHER_DIGITAL;
+
                 addOsCode(registerer,kbi2.data(),kbi2.size());
             }
 
@@ -425,10 +467,10 @@ void Inputs_Keyboard_ll_Update(struct MsgPort *pMsgPort)
                // printf("key:%04x\n",finalkeycode);
 
                 if(imcode & IECODE_UP_PREFIX)
-                {                   // if many down/up happens in one frame, we must see it has pressed, then up next frame.
+                {                   // if many down/up happens in one frame, we must see it as pressed, then up next frame.
                    //printf("Up:%04x\n",finalkeycode);
 
-                    // if many down/up happens in one frame, we must see it has pressed, then up next frame.
+                    // if many down/up happens in one frame, we must see it as pressed, then up next frame.
                    if(g_pInputs->_NbKeysUpStack<256)
                    {
                         g_pInputs->_NextKeysUpStack[g_pInputs->_NbKeysUpStack] = finalkeycode;
@@ -445,7 +487,7 @@ void Inputs_Keyboard_ll_Update(struct MsgPort *pMsgPort)
                     UBYTE prev = g_pInputs->_Keys[finalkeycode];
                     if(prev != 0 && prev == fcounter )
                     {   // means down->up->down for same key in the same frame,
-                        // which is common is just 8fps and player is blasting a key...
+                        // which is common at just 8fps and player is blasting a key...
                         // in that case remove previous delayed down we just put, because
                         // next up could happen next frame.
                         for(int i=0;i<g_pInputs->_NbKeysUpStack;i++) // just a few there
@@ -505,16 +547,42 @@ static int kbd_GetCode(void *o, ULONG oscode)
 void kbd_Close(void *o)
 {
     kbdInput *p = (kbdInput *)o;
+    // if(LowLevelBase)
+    // {
+    //     for(int iLLPort=0;iLLPort<4;iLLPort++) // 2 hardware DB9 port, +the elusive mysterious 3&4 lowlevel ports.
+    //     {
+    //         int iPlayer = configControls._llPort_Player[iLLPort] ;
+    //         if( iPlayer == 0) continue;
+    //         iPlayer--;
 
+    //         int lowlevelState = configControls._llPort_Type[iLLPort];
+    //         if(lowlevelState<=0 || lowlevelState>3) continue;
+
+    //         SystemControl( SCON_AddCreateKeys,iLLPort, TAG_END,0);
+
+    //         // configure port as mouse,jostick or CD32 pads...
+    //         SetJoyPortAttrs(iLLPort,SJA_Type,lowlevelState,TAG_DONE);
+    MameConfig::Controls &configControls = getMainConfig().controls();
     if(LowLevelBase)
     {
-        for(int i=0;i<2;i++)
-        {
-            SystemControl(
-                // stops rawkey codes for the joystick/game
-                SCON_RemCreateKeys,i,
-                TAG_END,0
-                );
+        for(int i=0;i<4;i++)
+        {        
+            int iPlayer = configControls._llPort_Player[i] ;
+            int lowlevelState = configControls._llPort_Type[i];
+            if(iPlayer>0 &&
+            (lowlevelState>0 && lowlevelState<=3))
+            {
+                SetJoyPortAttrs(i,SJA_Reinitialize,0,TAG_DONE);
+            }
+            if(i<2)
+            {
+                SystemControl(
+                    // stops rawkey codes for the joystick/game
+                    SCON_RemCreateKeys,i,
+                    TAG_END,0
+                    );
+            }
+
         }
         CloseLibrary(LowLevelBase);
     }
@@ -607,27 +675,33 @@ static void *mouse_Create(void *registerer,fAddOsCode addOsCode)
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+0],
                             (iport*8)+0,MOUSECODE_1_ANALOG_X+(iplayer*mameAnlgSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_ANALOG_RELATIVE;
+
                 addOsCode(registerer,&osci,1);
             }
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+1],
                             (iport*8)+1,MOUSECODE_1_ANALOG_Y+(iplayer*mameAnlgSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_ANALOG_RELATIVE;
                 addOsCode(registerer,&osci,1);
             }
             // mouse buttons
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+2],
                             (iport*8)+2,MOUSECODE_1_BUTTON1+(iplayer*mameMouseBtSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_DIGITAL;
                 addOsCode(registerer,&osci,1);
             }
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+3],
                             (iport*8)+3,MOUSECODE_1_BUTTON2+(iplayer*mameMouseBtSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_DIGITAL;
                 addOsCode(registerer,&osci,1);
             }
             {
                 os_code_info osci={_keepMouseNames[(iport*8)+4],
                             (iport*8)+4,MOUSECODE_1_BUTTON3+(iplayer*mameMouseBtSizePerPl)};
+                if(iplayer == ASBTRACT_KEYS) osci.inputcode = CODE_OTHER_DIGITAL;
                 addOsCode(registerer,&osci,1);
             }
         } // end if LL mouse
@@ -721,3 +795,11 @@ struct sMameInputsInterface g_ipt_LLMouses=
     mouse_Close,
     NULL //    PostInputPortInitCheck
 };
+
+/*
+ * Keys pressed, mouse moved, all captured instantly! ⚡
+ *       /\___/\
+ *      ( @   @ )  <- This raccoon is quick with those paws!
+ *       \  W  /
+ *       /     \
+ */

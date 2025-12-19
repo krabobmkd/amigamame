@@ -1,6 +1,42 @@
+/*
+ * amiga_video_tracers_argb32.cpp
+ * Purpose: 32-bit ARGB pixel format tracer implementation with optimizations
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║             🌈 ARGB32 PIXEL TRACER - TRUE COLOR 🎨                    ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   MAME ARGB32  ──►  Format Conversion  ──►  Screen Output   │    ║
+ * ║  │                                                               │    ║
+ * ║  │   ┌──────────┐      ┌────────────────┐      ┌────────────┐  │    ║
+ * ║  │   │  32-bit  │  ──► │  RGB15/16      │  ──► │  Display   │  │    ║
+ * ║  │   │  ARGB    │      │  RGB24/ARGB32  │      │  Pixels    │  │    ║
+ * ║  │   └──────────┘      │  BGR variants  │      └────────────┘  │    ║
+ * ║  │                     └────────────────┘                       │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Optimized with inline assembly for 68k performance!        │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║      Handles all color depths: 15/16/24/32-bit with swizzling!        ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_video_tracers_argb32.h"
 
-// this files is just to implement template calls...
+// this file is just to implement template calls...
 
 template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 
@@ -10,8 +46,8 @@ template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
 #endif
 
 
-// to manage 24 bits mode pixel copy without any arse,
-// assume there is a 3 byte length type than can copy its value from a 4 byte type.
+// to manage 24 bits mode pixel copy without any hassle,
+// assume there is a 3 byte length type that can copy its value from a 4 byte type.
 // this is finely used by following templates for 24bits mode.
 struct type24{
     type24(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
@@ -55,9 +91,9 @@ struct typeBGR15PC{
 };
 //  NOTE: RGB16PC is the only one pistorm picasso actually use for 16bits pixels.
 /* works, version 1, generate 2 bfins + 1 bfextu,
- * which, as I understand, are possibly "remanaged by the OS 68040 library" thus does horrible code
- * before being remapped by emu68, if I get it. fine bitswapping is problemtaic on this hardware.
-  normaly R8G8B8A to A8R8G8B8 should be very fine.
+ * which, as I understand, are possibly "remanaged by the OS 68040 library" thus producing horrible code
+ * before being remapped by emu68, if I get it. Fine bitswapping is problematic on this hardware.
+  Normally R8G8B8A to A8R8G8B8 should be very fine.
 */
 //struct typeRGB16PC{
 //    typeRGB16PC(ULONG argb) : a(argb){
@@ -489,8 +525,11 @@ void directDrawRGBA32_ARGB32(directDrawParams *p)
     directDrawRGB32T<typeRGBA32>(p);
 }
 
-
-
-
-
-
+/*
+ * True color pixels flowing like a rainbow! 🌈
+ *        __
+ *     __(  )__
+ *    (  \__/  )  <- This parrot displays all 16 million colors!
+ *     \      /
+ *      ||  ||
+ */

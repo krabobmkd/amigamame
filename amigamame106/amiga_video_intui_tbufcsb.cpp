@@ -1,3 +1,39 @@
+/*
+ * amiga_video_intui_tbufcsb.cpp
+ * Purpose: Triple buffering implementation using ChangeScreenBuffer (CSB)
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║          📺 TRIPLE BUFFERING - SCREEN BUFFER SWAPPING 🔄              ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │   Draw Buffer  ──►  Display Buffer  ──►  Ready Buffer       │    ║
+ * ║  │       │                   │                    │             │    ║
+ * ║  │   ┌───▼────┐          ┌───▼────┐          ┌───▼────┐        │    ║
+ * ║  │   │Buffer 1│────────► │Buffer 2│────────► │Buffer 3│───┐    │    ║
+ * ║  │   └────────┘          └────────┘          └────────┘   │    │    ║
+ * ║  │       ▲                                                 │    │    ║
+ * ║  │       └─────────────────────────────────────────────────┘    │    ║
+ * ║  │                                                               │    ║
+ * ║  │   VSync'd buffer switching for tear-free gaming!             │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║      Smooth as butter - 3 buffers, 0 tearing, pure Amiga magic!      ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_video_intui_tbufcsb.h"
 
 #include <proto/exec.h>
@@ -11,7 +47,7 @@ extern "C" {
     #include <intuition/screens.h>
 }
 
-TripleBuffer_CSB::TripleBuffer_CSB(Intuition_Screen &screen)
+ TripleBuffer_CSB::TripleBuffer_CSB(Intuition_Screen &screen)
  : TripleBuffer(), _screen(screen),_dbufport(NULL),_isSignalToWait(0)
 {
     //    printf(" TripleBuffer_CSB alloc\n");
@@ -107,7 +143,7 @@ void TripleBuffer_CSB::waitFrame()
         // Wait only if previius screen never displayed.
         // only happens when we goes very fast.
         // theorically does best vertical synch.
-        // this would do a perfect 60Hz timer, with Process sleep.        
+        // this would do a perfect 60Hz timer, with Process sleep.
         Wait(1<<_dbufport->mp_SigBit);
 
         // flush the Amiga message this way. ReplyMsg() actually hangs in that case.
@@ -152,3 +188,12 @@ void TripleBuffer_CSB::afterBufferDrawn()
     }
 
 }
+
+/*
+ * Buffers swapped faster than you can blink! ⚡
+ *       __
+ *      (oo)
+ *   ___\  /___ <- This owl sees all 3 buffers at once!
+ *  |  ___  |
+ *  | |   | |
+ */

@@ -36,7 +36,8 @@ Notes:
 
 #include "driver.h"
 #include "sound/ymz280b.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 UINT16 tetrisp2_systemregs[0x10];
 UINT16 rocknms_sub_systemregs[0x10];
 
@@ -227,11 +228,25 @@ static WRITE16_HANDLER( rockn_soundvolume_w )
 
 ***************************************************************************/
 
+static int rndstate;
+static int privrand()
+{
+    rndstate *= 0x78138713;
+    rndstate += 0x1876185A;
+    return rndstate;
+}
+
+static int inport=-2;
 static READ16_HANDLER( tetrisp2_ip_1_word_r )
 {
-	return	( readinputportbytag("IN1") &  0xfcff ) |
-			(           rand() & ~0xfcff ) |
-			(      1 << (8 + (rand()&1)) );
+    if(inport<0) {
+        inport = port_tag_to_index("IN1");
+        if(inport<0) return 0;
+    }
+    UINT32 v = readinputport(inport);
+	return	( v &  0xfcff ) |
+			(           privrand() & ~0xfcff ) |
+			(      1 << (8 + (privrand()&1)) );
 }
 
 
@@ -1026,6 +1041,11 @@ void rockn_timer_sub_level1_callback(int param)
 	cpunum_set_input_line(1, 1, HOLD_LINE);
 }
 
+DRIVER_INIT( tetrisp2 )
+{
+    rndstate = 0x12374854;
+}
+
 DRIVER_INIT( rockn_timer )
 {
 	timer_pulse(TIME_IN_MSEC(32), 0, rockn_timer_level1_callback);
@@ -1617,8 +1637,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, tetrisp2, 0,        tetrisp2, tetrisp2, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World?)", GAME_SUPPORTS_SAVE ,2,0,egg_Puzzle,0)
-GAME( 1997, teplus2j, tetrisp2, tetrisp2, teplus2j, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan)", GAME_SUPPORTS_SAVE ,2,0,egg_Puzzle,0)
+GAME( 1997, tetrisp2, 0,        tetrisp2, tetrisp2, tetrisp2,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World?)", GAME_SUPPORTS_SAVE ,2,0,egg_Puzzle,0)
+GAME( 1997, teplus2j, tetrisp2, tetrisp2, teplus2j, tetrisp2,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan)", GAME_SUPPORTS_SAVE ,2,0,egg_Puzzle,0)
 
 GAME( 1999, rockn,    0,        rockn,    rockn,   rockn,    ROT270, "Jaleco", "Rock'n Tread (Japan)", GAME_SUPPORTS_SAVE,0,1,egg_sport_Rythm,0)
 GAME( 1999, rockna,   rockn,    rockn,    rockn,   rockn1,   ROT270, "Jaleco", "Rock'n Tread (Japan, alternate)", GAME_SUPPORTS_SAVE,0,1,egg_sport_Rythm,0)

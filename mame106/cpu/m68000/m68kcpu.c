@@ -823,6 +823,39 @@ int m68k_execute(int num_cycles)
 //   last68kpc = REG_PPC;
 			uint16 ir = m68ki_read_imm_16(p68k);
 
+
+    // static int cc=0;
+    // if((cc & 0xffff)==0)
+    // {
+    //     printf("%08x ",(int)REG_PPC);
+    //     static int nbc=0;
+    //     if((nbc&3)==3) printf("\n");
+    //     nbc++;
+    //     if(nbc==48) exit(0);
+    // }
+    // cc++;
+
+
+    // static unsigned int cc=0;
+    // if(cc>=0)
+    // { printf("PC:%08x cc:%d \n",REG_PPC, cc);
+    //     printf("D0:%08x D1:%08x D2:%08x D3:%08x\n",REG_D[0],REG_D[1],REG_D[2],REG_D[3]);
+    //     printf("D4:%08x D5:%08x D6:%08x D7:%08x\n",REG_D[4],REG_D[5],REG_D[6],REG_D[7]);
+    //     printf("A0:%08x A1:%08x A2:%08x A3:%08x\n",REG_A[0],REG_A[1],REG_A[2],REG_A[3]);
+    //     printf("A4:%08x A5:%08x A6:%08x A7:%08x\n",REG_A[4],REG_A[5],REG_A[6],REG_A[7]);
+
+    //     if(cc ==24)
+    //     {
+    //      printf("wut?\n");
+
+    //     }
+
+    //     if(cc==34) exit(0);
+    // }
+
+    // cc++;
+
+
 //#ifdef STATCPUINSTR
 ////          if( ir == 0x000008b8)
 ////         {

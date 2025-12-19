@@ -1,3 +1,26 @@
+/******************************************************************************
+ * amiga_inputs_midi.h
+ *
+ *      ╔═════════════════════════════════╗
+ *      ║  ♪♫  MIDI CONTROLLER  ♫♪        ║
+ *      ║  ┌─────────────────────┐        ║
+ *      ║  │  🎹 🎹 🎹 🎹 🎹     │        ║
+ *      ║  │  Notes & CC to Game │        ║
+ *      ║  └─────────────────────┘        ║
+ *      ║   C4 D4 E4 F4 G4 A4 B4          ║
+ *      ║   Music meets Gaming!           ║
+ *      ╚═════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_MIDI_H
 #define AMIGA_MIDI_H
 /**
@@ -42,3 +65,10 @@ void MidiControls_close(struct sMidiController*p);
 #endif
 
 #endif
+
+/* Play those notes! MIDI magic in action!
+ *       /\  /\
+ *      ( °° )  <-- Frog croaks in MIDI
+ *       )  (
+ *      (    )
+ */

@@ -1,9 +1,39 @@
 /*
-  more or less adapted from:
-  aminet "AnalogMouse" asm source
-  and some DevelopperCD2.1 reference.
+ * amiga_inputs_propjoy.c
+ * Purpose: Proportional/analog joystick support via potgo.resource
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║            🕹️  PROPORTIONAL JOYSTICK HANDLER 🎮                      ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │         ╭─────╮                                               │    ║
+ * ║  │         │  ◉  │  <- Analog stick with smooth 360° control    │    ║
+ * ║  │         ╰──┬──╯                                               │    ║
+ * ║  │            │                                                  │    ║
+ * ║  │      POT0DAT/POT1DAT                                          │    ║
+ * ║  │      X/Y Analog Readings                                      │    ║
+ * ║  │      Auto-calibrates on the fly!                              │    ║
+ * ║  │                                                               │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║   Adapted from aminet AnalogMouse & DeveloperCD 2.1 reference        ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
-*/
+#pragma GCC optimize ("O1")
 
 #include "amiga_inputs_propjoy.h"
 #include "amiga_inputs_interface.h"
@@ -40,7 +70,7 @@
 
 const char *getProportionalStickErrorMessage(ULONG errcode)
 {
-    if(errcode == PROPJOYRET_NOHARDWARE) return "Harware is not proportionnal joystick capable.\n";
+    if(errcode == PROPJOYRET_NOHARDWARE) return "Hardware is not proportional joystick capable.\n";
     if(errcode == PROPJOYRET_ALLOC) return "analog joystick: can't alloc.\n";
     if(errcode == PROPJOYRET_GAMEPORTU0FAIL) return "analog joystick: can't open gameport 1.\n";
     if(errcode == PROPJOYRET_GAMEPORTU1FAIL) return "analog joystick: can't open gameport 2.\n";
@@ -91,7 +121,7 @@ static inline void inline_interuptfunc(register struct PPSticksInteruptData *ppi
     // as fast as possible.
     WritePotgo(1,ppi->_allocatedbits); // value, mask of what is to write.
 
-    // yet the 2bt click buttons are there - not same place as classic digital sticks ! it's all inverted.
+    // The 2-button click buttons are there - not same place as classic digital sticks! It's all inverted.
     ppi->_last_joyxdat[0] = custom.joy0dat; // port1 JOY1DAT $DFF00C
     ppi->_last_joyxdat[1] = custom.joy1dat; // port1
     // for propjoy it's then bit 1 and 9, unlike standard joy.
@@ -387,7 +417,7 @@ struct ProportionalSticks *createProportionalSticks(ULONG flags, ULONG timerMeth
     // In  all cases, configuration would make either DB9 ports managed
     // by lowlevel or by "potgo", but not both.
     //re? -> yes. sometimes something doesnt free them, hard to know why.
-    FreePotBits(potsBitsToAlloc);
+    //test FreePotBits(potsBitsToAlloc);
 
 //printf("try allocate bits:%08x\n",(int)potsBitsToAlloc);
     pprops->_allocatedBits = AllocPotBits(potsBitsToAlloc | PGBIT_START); // #0b0101 0000 00000001
@@ -500,6 +530,7 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
 {
     if(!pprops) return;
 
+// printf("closeProportionalSticks\n");
 #ifdef PPJSCODE_ALLOWLOWLEVELTIMER
     // close ll cia timer if needed
     if(pprops->_ll_intHandler && (LowLevelBase != NULL))
@@ -509,17 +540,19 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
         pprops->_ll_intHandler = NULL;
     }
 #endif
+// printf("RemIntServer\n");
     // close vblank interupt, if using it
     if(pprops->_rbfint)
     {
         RemIntServer(INTB_VERTB,pprops->_rbfint);
         FreeVec(pprops->_rbfint);
     }
+// printf("FreeVec\n");
     if( pprops->_pintdata) FreeVec(pprops->_pintdata);
     //if(pprops->_signr != -1) FreeSignal(pprops->_signr);
 
     //closetimer? ->no just using vbl at the moment.
-
+// printf("FreePotBits\n");
     //free potgo
     if(pprops->_allocatedBits != 0)
     {
@@ -532,6 +565,7 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
     //free joyport devices
     for(int iportunit=0 ;iportunit<2 ; iportunit++)
     {
+// printf("CloseDevice:%d\n",iportunit);
         struct PStickDevice *ppsd = &(pprops->_ports[iportunit]);
         if(ppsd->_deviceresult != 0 ) continue;
 
@@ -547,7 +581,7 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
     // order is important
     makeInputDeviceUseMousePortBack(pprops);
 #endif
-
+// printf("RemPort:\n");
     // remove gameport messagerie
     if( pprops->_portAdded)
     {
@@ -555,7 +589,7 @@ void closeProportionalSticks(struct ProportionalSticks *pprops)
        // pprops->_portAdded = 0;
     }
 
-
+// printf("FreeVec final:\n");
     FreeVec(pprops);
 }
 
@@ -648,3 +682,12 @@ void post_input_port_init_check(void *o)
 // {
 
 // };
+
+/*
+ * Smooth analog control - the way gaming was meant to be!
+ *     ___
+ *    /o o\   <- This sloth moves smoothly with analog sticks
+ *   |  ~  |
+ *    \___/
+ *     |||
+ */

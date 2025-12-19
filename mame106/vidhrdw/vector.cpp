@@ -733,6 +733,9 @@ static inline void clipxmin(int &x1,int &y1,int & clipbits1,
     if (c < 1) c = 1;
     y2 = y1 + (((y2 - y1) >> 8) * ((x1 -vector_xminfp ) >> 8)) / c;
 
+    if(y2<vector_yminfp) y2 =vector_yminfp;
+   else if(y2>=vector_ymaxfp) y2 =vector_ymaxfp-1;
+
     x2 = vector_xminfp;
 
 }
@@ -744,6 +747,9 @@ static inline void clipxmax(int& x1, int& y1, int& clipbits1,
     int c = (x2 - x1) >> 16;
     if (c < 1) c = 1;
     y2 = y1 + (((y2 - y1) >> 8) * (( xmax -x1) >> 8)) / c;
+
+    if(y2<vector_yminfp) y2 =vector_yminfp;
+   else if(y2>=vector_ymaxfp) y2 =vector_ymaxfp-1;
 
     x2 = xmax;
 
@@ -867,8 +873,11 @@ void vector_draw_toT(pixel &pix, point* curpoint)
                 dx -= 0x10000 - (0xffff & yy1); /* take off amount plotted */
                 a1 = (dx >> 8);   /* calc remainder pixel */
                 dx >>= 16;                   /* adjust to pixel (solid) count */
-                while (dx--)                 /* plot rest of pixels */
+                while (dx)                 /* plot rest of pixels */
+                {
                     pix.aa_pixel(x1, dy++);
+                    dx--;
+                }
                 pix.tint(a1);
                 pix.aa_pixeltint(x1, dy);
                 if (x1 == xx) break;
@@ -897,9 +906,10 @@ void vector_draw_toT(pixel &pix, point* curpoint)
                 dy -= 0x10000 - (0xffff & x1); /* take off amount plotted */
                 a1 = (dy >> 8);   /* remainder pixel */
                 dy >>= 16;                   /* adjust to pixel (solid) count */
-                while (dy--)                 /* plot rest of pixels */
+                while (dy)                 /* plot rest of pixels */
                 {
                     pix.aa_pixel(dx++, yy1);
+                    dy--;
                 }
                 pix.tint(a1);
                 pix.aa_pixeltint(dx, yy1);

@@ -1,3 +1,38 @@
+/*
+ * amiga_inputs_propjoyimpl.cpp
+ * Purpose: Proportional joystick implementation and MAME integration
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║       🕹️  PROPORTIONAL JOYSTICK IMPLEMENTATION 🎮                     ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │                                                               │    ║
+ * ║  │    ╭───╮     POT0DAT/POT1DAT                                 │    ║
+ * ║  │    │ ◉ │ ◄── X/Y analog values (0-255)                       │    ║
+ * ║  │    ╰─┬─╯     Auto-calibrating ranges                          │    ║
+ * ║  │      │                                                        │    ║
+ * ║  │      └─────► MAME Analog Inputs                              │    ║
+ * ║  │                                                               │    ║
+ * ║  │   Supports: Analog joysticks, C64 paddles, trackballs        │    ║
+ * ║  │   Features: Auto-calibration, axis inversion, XY swap        │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║         Silky smooth analog control!                                  ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include <vector>
 #include "amiga_inputs_interface.h"
 #include "amiga_config.h"
@@ -34,14 +69,18 @@ static void *propjoy_Create(void *registerer,fAddOsCode addOsCode)
     MameConfig::Controls &configControls = getMainConfig().controls();
 
     ULONG propJoysticksFlags=0;
-    if( configControls._llPort_Type[0] == PORT_TYPE_PROPORTIONALJOYSTICK ||
-        configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE)
+    if(( configControls._llPort_Type[0] == PORT_TYPE_PROPORTIONALJOYSTICK ||
+        configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE) &&
+        configControls._llPort_Player[0] >0
+        )
     {
         propJoysticksFlags |= PROPJOYFLAGS_PORT1 ;
         if(configControls._llPort_Type[0] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT1_INVERTXY;
     }
-    if( configControls._llPort_Type[1] == PORT_TYPE_PROPORTIONALJOYSTICK ||
-        configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE)
+    if(( configControls._llPort_Type[1] == PORT_TYPE_PROPORTIONALJOYSTICK ||
+        configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE) &&
+        configControls._llPort_Player[1] >0
+        )
     {
         propJoysticksFlags |= PROPJOYFLAGS_PORT2 ;
        if(configControls._llPort_Type[1] == PORT_TYPE_C64PADDLE ) propJoysticksFlags |= PROPJOYFLAGS_PORT2_INVERTXY;
@@ -99,8 +138,15 @@ static void *propjoy_Create(void *registerer,fAddOsCode addOsCode)
             {_AnalogNames[ispad][iport][0], (iport*8)+0,JOYCODE_1_ANALOG_X+analogmamecodeshift},
             {_AnalogNames[ispad][iport][1], (iport*8)+1,JOYCODE_1_ANALOG_Y+analogmamecodeshift},
                 };
-
-                addOsCode(registerer,kbi2.data(),kbi2.size());
+#define ASBTRACT_KEYS 4
+        if(iplayer == ASBTRACT_KEYS)
+        {
+            kbi2[0].inputcode = CODE_OTHER_DIGITAL;
+            kbi2[1].inputcode = CODE_OTHER_DIGITAL;
+            kbi2[2].inputcode = CODE_OTHER_ANALOG_ABSOLUTE;
+            kbi2[3].inputcode = CODE_OTHER_ANALOG_ABSOLUTE;
+        }
+              addOsCode(registerer,kbi2.data(),kbi2.size());
         } // end if pots.
     } // loop by player
 
@@ -152,3 +198,12 @@ struct sMameInputsInterface g_ipt_PropJoy=
     propjoy_Close,
     propjoy_PostInputPortInitCheck
 };
+
+/*
+ * Analog perfection! Every tiny movement captured! 🎯
+ *        ^
+ *       / \
+ *      /   \  <- This snail moves smoothly with analog precision!
+ *     /     \
+ *    @~~~~~~~@
+ */

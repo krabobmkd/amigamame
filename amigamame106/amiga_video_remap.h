@@ -1,3 +1,26 @@
+/******************************************************************************
+ * amiga_video_remap.h
+ *
+ *       ╔════════════════════════════════╗
+ *       ║  PALETTE REMAPPING ENGINE      ║
+ *       ║  ┌──────────────────┐          ║
+ *       ║  │ 256 →  8bit      │          ║
+ *       ║  │ 32K → 16bit      │          ║
+ *       ║  │ 16M → 32bit      │          ║
+ *       ║  └──────────────────┘          ║
+ *       ║  Color space transformation!   ║
+ *       ╚════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_VIDEO_REMAP_H
 #define AMIGA_VIDEO_REMAP_H
 
@@ -37,7 +60,7 @@ protected:
 
     int _pixFmt,_bytesPerPix;
 };
-/* When target is a 8Bit screen and game 8bit, use LoadRGB32() and no clut.  */
+/* When target is an 8-bit screen and game is 8-bit, use LoadRGB32() and no CLUT.  */
 class Paletted_Screen8 : public Paletted
 {
  public:
@@ -51,8 +74,8 @@ protected:
 
 
 
-/* Whe target screen pixels is 8bit but palette is imposed by OS.
-* then Use CLUT
+/* When target screen pixels are 8-bit but palette is imposed by OS,
+* then use CLUT.
 */
 class Paletted_Pens8 : public Paletted
 {
@@ -94,7 +117,7 @@ protected:
 };
 
 // =========================================================================
-/* When target is a 8Bit screen and game 16bit, use fixed palette and pens remap */
+/* When target is an 8-bit screen and game is 16-bit, use fixed palette and pens remap */
 class Paletted_Screen8ForcePalette : public Paletted_Pens8
 {
 public:
@@ -124,3 +147,9 @@ protected:
 
 };
 #endif
+
+/* Palettes remapped! Colors transformed flawlessly!
+ *       /\___/\
+ *      (  o.o  )  <-- Raccoon remaps all the colors
+ *       > ^ ^ <
+ */

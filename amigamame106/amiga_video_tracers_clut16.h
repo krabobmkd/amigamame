@@ -1,10 +1,29 @@
+/******************************************************************************
+ * amiga_video_tracers_clut16.h
+ *
+ *       ╔════════════════════════════════╗
+ *       ║  ▓▒░ CLUT16 TRACERS ░▒▓        ║
+ *       ║  Color Lookup Table Magic!     ║
+ *       ║  ┌──────────────────┐          ║
+ *       ║  │ INDEX → COLOR    │          ║
+ *       ║  │   0   → #FF0000  │          ║
+ *       ║  │   1   → #00FF00  │          ║
+ *       ║  │   ...            │          ║
+ *       ║  └──────────────────┘          ║
+ *       ╚════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ *****************************************************************************/
+
 #ifndef AMIGA_VIDEO_TRACERS_CLUT16_H_
 #define AMIGA_VIDEO_TRACERS_CLUT16_H_
-/**************************************************************************
- *
- * Copyright (C) 2024 Vic Krb Ferry
- *
- *************************************************************************/
 
 #include "amiga_video_tracers.h"
 
@@ -21,8 +40,15 @@ void directDraw_UBYTE_UBYTE_UWORD(directDrawParams *p);
 
 void directDrawClut_UBYTE_UBYTE_UWORD(directDrawParams *p,UBYTE *lut);
 
-// special one, target screen is 8b, mame sreen is ARGB32, and use 15b long clut.
+// Special case: target screen is 8-bit, MAME screen is ARGB32, and uses 15-bit long CLUT.
 void directDrawClut_UBYTE_UBYTE_ARGB32(directDrawParams *p,UBYTE *lut);
 
 }
 #endif
+
+/* CLUT indexed perfectly! Palette perfection!
+ *        /\
+ *       /  \
+ *      / || \  <-- Deer leaps through palettes
+ *     |  ||  |
+ */

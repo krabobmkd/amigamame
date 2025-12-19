@@ -1,3 +1,39 @@
+/*
+ * amiga_config.cpp
+ * Purpose: Configuration file management and game settings serialization
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║                ⚙️  CONFIGURATION MANAGER 📝                           ║
+ * ║  ┌──────────────────────────────────────────────────────────────┐    ║
+ * ║  │   ┌──────────────────────────────────────┐                   │    ║
+ * ║  │   │  CONFIG.XML                           │                   │    ║
+ * ║  │   │  ┌─────────────────────────────────┐  │                   │    ║
+ * ║  │   │  │ <game name="pacman">            │  │                   │    ║
+ * ║  │   │  │   <video width="640"/>          │  │                   │    ║
+ * ║  │   │  │   <audio rate="44100"/>         │  │                   │    ║
+ * ║  │   │  │   <input device="joy"/>         │  │                   │    ║
+ * ║  │   │  └─────────────────────────────────┘  │                   │    ║
+ * ║  │   └──────────────────────────────────────┘                   │    ║
+ * ║  │   Loads/Saves user preferences & game-specific settings       │    ║
+ * ║  └──────────────────────────────────────────────────────────────┘    ║
+ * ║          XML-based configuration with smart defaults!                 ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * Author: krb
+ * Copyright (C) 2025
+ * Licensed under GPL v2
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 #include "amiga_config.h"
 
 #include <sstream>
@@ -340,7 +376,9 @@ void MameConfig::serialize(ASerializer &serializer)
 
     std::string controlPanelComments =
         "Describe what is plugged (Joystick,Pads,Mouses)\n and to which player it belongs.\n"
-        "Keyboard is configured during game with Tab Key menu.";
+        "Abstract keys means: not configured for a player:\n"
+        "Keyboard and abstract keys must be configured\n"
+        " during game with Tab Key menu:General/This game input.";
     if(hasProportionalStickResource()) // unrelated bu tells we are on Amiga classic.
     {   // if classic hardware ports...
         controlPanelComments += "\nAnalog controllers must be plugged when switched off.";
@@ -566,7 +604,8 @@ void MameConfig::Controls::serialize(ASerializer &serializer)
         "Player 1",
         "Player 2",
         "Player 3",
-        "Player 4"
+        "Player 4",
+        "Abstract keys",
     };
 
     // these mimics the lowlevel enum types of controllers
@@ -780,7 +819,7 @@ _[5] ="Switch Window / Fullscreen";
     serializer("F10 : ",_[5]);
 
 _[6] ="Throttle when kept pressed";
-    serializer("Shit+F10 : ",_[6]);
+    serializer("Shift+F10 : ",_[6]);
 
 _[7] ="Show / Hide Statistics";
     serializer("Help : ",_[7]);
@@ -1300,4 +1339,13 @@ unsigned int GetDisplayGoodiesFlags()
    return (unsigned int )c.misc()._Goodies;
 }
 }
+
+/*
+ * Configuration saved! All your settings preserved perfectly! ⚙️
+ *       _____
+ *      /     \
+ *     | () () | <- This owl wisely remembers all settings!
+ *      \  ^  /
+ *       |||||
+ */
 
