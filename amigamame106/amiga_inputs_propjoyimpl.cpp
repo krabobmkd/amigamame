@@ -180,7 +180,9 @@ static void propjoy_Close(void *o)
 {
     closeProportionalSticks(((struct ProportionalSticks *)o));
 }
-
+//extern "C" {
+//    int input_machine_has_any_analog();
+//};
 // this is thrown later at init, after machine inputs are inited.
 static void propjoy_PostInputPortInitCheck(void *o)
 {

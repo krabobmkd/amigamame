@@ -69,7 +69,7 @@ void xboard_set_road_priority(int priority)
  *  Video update
  *
  *************************************/
-
+extern void krb_thndrbld_patch_cpu_synchro();
 extern int postscreentoclean;
 extern int 	nbdecryptDone;
 //extern void fd1094_krb_preclean();

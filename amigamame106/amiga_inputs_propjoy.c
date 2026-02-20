@@ -37,7 +37,8 @@
 
 #include "amiga_inputs_propjoy.h"
 #include "amiga_inputs_interface.h"
-//
+// from MAME for the input_machine_has_any_analog() we added
+#include "inptport.h"
 
 #include <proto/exec.h>
 #define ALIB_HARDWARE_CIA
