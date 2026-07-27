@@ -64,7 +64,11 @@ if(AMIGA)
 	# or between libs that uses structs not completely 4b aligned.
 	# -mnobitfield
 	# test -msep-data
-	#list(APPEND AMIGA_COMPILER_OPTIONS -mnobitfield)
+	# testing: 68060 has no hardware support for the BFxxx bit-field instructions
+	# (bftst/bfextu/bfins/...), they trap and rely on software emulation of
+	# "unimplemented integer instructions"; disabling them here to check whether
+	# that trap-emulation fidelity is the cause of the wb32/fd1094 instability.
+#	list(APPEND AMIGA_COMPILER_OPTIONS -mnobitfield)
 endif()
 #if(DOMAMELOG)
 #	list(APPEND AMIGA_COMPILER_OPTIONS -DDOMAMELOG=1)

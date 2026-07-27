@@ -145,6 +145,12 @@ target_compile_definitions(mamecore PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE=1 CRL
 # -fpermissive -Wno-narrowing
 
  target_compile_options(mamecore PRIVATE ${AMIGA_COMPILER_OPTIONS} )
+# testing: 68060 has no hardware support for the BFxxx bit-field instructions,
+# disable them explicitly here too in case this library is ever configured
+# without inheriting AMIGA_COMPILER_OPTIONS from amigamame106/CMakeLists.txt.
+# if(AMIGA)
+#  target_compile_options(mamecore PRIVATE -mnobitfield)
+# endif()
 #it's all O3 for release only
 if(AMIGA)
  target_compile_options(mamecore PRIVATE
@@ -163,6 +169,9 @@ target_compile_definitions(mamecoreUNROLL PUBLIC INLINE=${MAME_INLINE} ZIP_CACHE
 # -fpermissive -Wno-narrowing
 
  target_compile_options(mamecoreUNROLL PRIVATE ${AMIGA_COMPILER_OPTIONS} )
+# if(AMIGA)
+#  target_compile_options(mamecoreUNROLL PRIVATE -mnobitfield)
+# endif()
 #it's all O3 for release only
 if(AMIGA)
  target_compile_options(mamecoreUNROLL PRIVATE
