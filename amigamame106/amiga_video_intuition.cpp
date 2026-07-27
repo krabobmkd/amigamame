@@ -666,7 +666,7 @@ bool IntuitionDisplay::open(const AbstractDisplay::params &pparams)
     } else
     {   // open full screen
         // if cgx present
-        bool useCgx = Intuition_Screen_CGX::useForThisMode(pparams._forcedModeID);
+        bool useCgx = Intuition_Screen_CGX::useForThisMode(pparams._forcedModeID,pparams._flags);
 
         if(useCgx)
         {

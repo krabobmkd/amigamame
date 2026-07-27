@@ -55,7 +55,6 @@ extern "C" {
     #include "asmmacros.h"
 }
 
-#include "version.h"
 #include "video.h"
 
 #include "amiga_locale.h"

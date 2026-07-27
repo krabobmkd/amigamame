@@ -13,7 +13,7 @@ extern "C" {
 #include <proto/dos.h>
 #include <proto/graphics.h>
 #include <proto/intuition.h>
-
+#include <proto/muimaster.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -23,7 +23,11 @@ extern "C" {
 #define REG(r)
 #endif
 
-
+Object * __attribute__((noinline))
+MUINewObjectB(const char *cl, Tag tags, ...)
+{
+    return MUI_NewObjectA((char*)cl, (struct TagItem *) &tags);
+}
 
 extern "C" {
     #include <libraries/mui.h>
@@ -34,7 +38,7 @@ extern "C" {
 typedef ULONG (*RE_HOOKFUNC)(); // because C++ type issue.
 
 #define OString(contents,maxlen)\
-	MUI_NewObject(MUIC_String,\
+	MUINewObjectB(MUIC_String,\
 		StringFrame,\
 		MUIA_String_MaxLen  , maxlen,\
 		MUIA_String_Contents, contents,\
@@ -516,10 +520,10 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
 
     if(_flgs & SERFLAG_GROUP_SCROLLER)
     {
-        Object *ob = MUI_NewObject(MUIC_Virtgroup,VirtualFrame,
+        Object *ob = MUINewObjectB(MUIC_Virtgroup,VirtualFrame,
                 MUIA_Background, MUII_TextBack,
                Child, (ULONG)HVSpace,
-               Child, (ULONG)MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+               Child, (ULONG)MUINewObjectB(MUIC_Group,MUIA_Group_Horiz,TRUE,
                                      Child, (ULONG)HSpace(0),
                                      Child,(ULONG)pinnerGroup,
                                      Child, (ULONG)HSpace(0),
@@ -532,7 +536,7 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
 
 
         Object *scrollgroup  =
-            MUI_NewObject(MUIC_Scrollgroup,
+            MUINewObjectB(MUIC_Scrollgroup,
              MUIA_Scrollgroup_FreeHoriz, TRUE,
              MUIA_Scrollgroup_FreeVert, TRUE,
              MUIA_Scrollgroup_Contents, (ULONG)ob,
@@ -541,11 +545,11 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
     }
     if(_flgs & SERFLAG_GROUP_SUB)
     {
-        return MUI_NewObject(MUIC_Group,
+        return MUINewObjectB(MUIC_Group,
             GroupFrameT((ULONG)""),
               MUIA_Disabled, TRUE,
               Child, (ULONG)HVSpace,
-              Child, (ULONG)MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+              Child, (ULONG)MUINewObjectB(MUIC_Group,MUIA_Group_Horiz,TRUE,
                                     Child, (ULONG)HSpace(0),
                                     Child,(ULONG)pinnerGroup,
                                     Child, (ULONG)HSpace(0),
@@ -564,11 +568,11 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
     ULONG lastitemp = TAG_DONE;
     if(_flgs & SERFLAG_GROUP_HASCOMMENT)
     {
-        Object *commentObj = MUI_NewObject(MUIC_Text,
+        Object *commentObj = MUINewObjectB(MUIC_Text,
                     MUIA_Text_Contents,(ULONG)_comment.c_str(),
                   TAG_DONE);
 
-        Object *hgroup = MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+        Object *hgroup = MUINewObjectB(MUIC_Group,MUIA_Group_Horiz,TRUE,
                   Child, (ULONG)HSpace(0),
                   Child, (ULONG)commentObj,
                   Child, (ULONG)HSpace(0),
@@ -579,9 +583,9 @@ Object *MUISerializer::LGroup::compileOuterFrame(Object *pinnerGroup)
         lastitemp = (ULONG)hgroup;
     }
 
-   return MUI_NewObject(MUIC_Group,
+   return MUINewObjectB(MUIC_Group,
                   Child, (ULONG)HVSpace,
-                  Child, (ULONG)MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+                  Child, (ULONG)MUINewObjectB(MUIC_Group,MUIA_Group_Horiz,TRUE,
                                         Child, (ULONG)HSpace(0),
                                         Child,(ULONG)pinnerGroup,
                                         Child, (ULONG)HSpace(0),
@@ -655,7 +659,7 @@ void MUISerializer::LFlags::compile()
     for(int iflag=0;iflag<(int)_flagNames.size() ;iflag++)
     {
         _buttons[iflag] =
-                MUI_NewObject(MUIC_Image,
+                MUINewObjectB(MUIC_Image,
                                 ImageButtonFrame,
                                 MUIA_InputMode        , MUIV_InputMode_Toggle,
                                 MUIA_Image_Spec       , MUII_CheckMark,
@@ -720,12 +724,12 @@ MUISerializer::LSwitchGroup::LSwitchGroup(MUISerializer &ser,ASerializable *pcon
 Object *MUISerializer::LSwitchGroup::compileOuterFrame(Object *pinnerGroup)
 {
 #ifndef USEGROUPTITLE
-    _SelectedItemText = MUI_NewObject(MUIC_Text,
+    _SelectedItemText = MUINewObjectB(MUIC_Text,
                  //   TextFrame,
                   //  MUIA_Background, MUII_TextBack,
                     MUIA_Text_Contents,(ULONG)"...",
                   TAG_DONE);
-    Object *obj = MUI_NewObject(MUIC_Group,
+    Object *obj = MUINewObjectB(MUIC_Group,
             GroupFrameT((ULONG)_displayName.c_str()),
             MUIA_Disabled, TRUE,
             Child,(ULONG)(_SelectedItemText),
@@ -733,7 +737,7 @@ Object *MUISerializer::LSwitchGroup::compileOuterFrame(Object *pinnerGroup)
         TAG_DONE
         );
 #else
-     Object *obj = MUI_NewObject(MUIC_Group,
+     Object *obj = MUINewObjectB(MUIC_Group,
             GroupFrameT((ULONG)_displayName.c_str()),
             MUIA_Disabled, TRUE,
             Child,(ULONG)pinnerGroup,
@@ -794,7 +798,7 @@ void MUISerializer::LString::compile()
     if(_flgs & (SERFLAG_STRING_ISPATH|SERFLAG_STRING_ISFILE))
     {
         // if manage path, have a requester and all.
-        _Object = MUI_NewObject(MUIC_Popasl,
+        _Object = MUINewObjectB(MUIC_Popasl,
                   MUIA_Popstring_String,(ULONG)(_STRING_Path = OString(0, 2048)),
                   MUIA_Popstring_Button, (ULONG)(_popBt= PopButton(MUII_PopDrawer)),
                   ASLFR_DrawersOnly, ( _flgs & SERFLAG_STRING_ISPATH )?TRUE:FALSE,
@@ -847,7 +851,7 @@ MUISerializer::LSlider::LSlider(MUISerializer &ser,int &value,int min,int max): 
 }
 void MUISerializer::LSlider::compile()
 {
-    _Object = MUI_NewObject(MUIC_Slider,
+    _Object = MUINewObjectB(MUIC_Slider,
               MUIA_Slider_Min,    _min,
               MUIA_Slider_Max,    _max,
               MUIA_CycleChain, TRUE,
@@ -914,7 +918,7 @@ MUISerializer::LSliderF::LSliderF(MUISerializer &ser,float &value,float min,floa
 }
 void MUISerializer::LSliderF::compile()
 {
-    _Slider = MUI_NewObject(MUIC_Slider,
+    _Slider = MUINewObjectB(MUIC_Slider,
               MUIA_Slider_Min, 0  /* _min*/,
               MUIA_Slider_Max,    _nbsteps,
               MUIA_Slider_Quiet, TRUE, // we don't display the int value.
@@ -926,7 +930,7 @@ void MUISerializer::LSliderF::compile()
     _pDefBt =  SimpleButton((ULONG)"Default");
     if(_pDefBt) { SetAttrs(_pDefBt,MUIA_CycleChain, TRUE,TAG_DONE); }
 
-   _Object =MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+   _Object =MUINewObjectB(MUIC_Group,MUIA_Group_Horiz,TRUE,
             Child,(ULONG)_Slider,
             Child,(ULONG)_pValueLabel,
             Child,(ULONG)_pDefBt,
@@ -1003,7 +1007,7 @@ ULONG MUISerializer::LCycle::HNotify(struct Hook *hook REG(a0), APTR obj REG(a2)
 
 void MUISerializer::LCycle::compile()
 {
-    _Object = MUI_NewObject(MUIC_Cycle,
+    _Object = MUINewObjectB(MUIC_Cycle,
         MUIA_CycleChain, TRUE,
         MUIA_Cycle_Entries,(ULONG)_valuesptr.data(),TAG_DONE);
     if(_Object)
@@ -1046,7 +1050,7 @@ MUISerializer::LCheckBox::LCheckBox(MUISerializer &ser,bool &value): Level(ser)
 }
 void MUISerializer::LCheckBox::compile()
 {
-    _Button = MUI_NewObject(MUIC_Image,
+    _Button = MUINewObjectB(MUIC_Image,
                 ImageButtonFrame,
                 MUIA_InputMode        , MUIV_InputMode_Toggle,
                 MUIA_Image_Spec       , MUII_CheckMark,
@@ -1057,7 +1061,7 @@ void MUISerializer::LCheckBox::compile()
                 MUIA_CycleChain, TRUE,
                 TAG_DONE);
 
- _Object = MUI_NewObject(MUIC_Group,MUIA_Group_Horiz,TRUE,
+ _Object = MUINewObjectB(MUIC_Group,MUIA_Group_Horiz,TRUE,
             Child,(ULONG)_Button,
             Child, (ULONG)HSpace(0),
             TAG_DONE
@@ -1118,9 +1122,9 @@ void MUISerializer::LScreenModeReq::compile()
     _ScreenModeStopHook.h_Entry = (RE_HOOKFUNC) PopupStop;
     _ScreenModeStopHook.h_Data = this;
 
-     _Object = MUI_NewObject(MUIC_Popasl,
+     _Object = MUINewObjectB(MUIC_Popasl,
               MUIA_CycleChain, TRUE,
-              MUIA_Popstring_String,(ULONG)( _DisplayName = MUI_NewObject(MUIC_Text,
+              MUIA_Popstring_String,(ULONG)( _DisplayName = MUINewObjectB(MUIC_Text,
                     TextFrame,
                     MUIA_Background, MUII_TextBack,
                   TAG_DONE)),
@@ -1230,7 +1234,7 @@ MUISerializer::LInfoText::LInfoText(MUISerializer &ser,strText &str, int flgs)
 {}
 void MUISerializer::LInfoText::compile()
 {
-    _Object = MUI_NewObject(MUIC_Text,
+    _Object = MUINewObjectB(MUIC_Text,
                     MUIA_Text_Contents,(ULONG)"...",
                   TAG_DONE);
     if(_Object && _str)

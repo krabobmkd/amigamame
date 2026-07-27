@@ -41,6 +41,7 @@
  * GNU General Public License for more details.
  */
 
+
 #include "amiga_video_cgx.h"
 #include "amiga_video_tracers_clut16.h"
 #include "amiga_video_tracers_argb32.h"
@@ -157,23 +158,35 @@ ULONG OwnCGXBestModeID(int w,int h,int depth)
     return INVALID_ID;
 }
 
-bool Intuition_Screen_CGX::useForThisMode(ULONG modeID)
+bool Intuition_Screen_CGX::useForThisMode(ULONG modeID REGUFT(d0), int flags REGUFT(d1))
 {
-    if(!CyberGfxBase) return false;
+    ULONG someModeId;
+
+    if(!CyberGfxBase)
+    {
+        return false;
+     }
     if (modeID != INVALID_ID)
-    {   // if screen Id explicit, we know if native or cgx.
+    {
+        // if screen Id explicit, we know if native or cgx.
         return (bool)IsCyberModeID(modeID);
     }
     // case where some p96 or cgx installed but no monitor activated.
     // check a standard resolution
-    struct TagItem cgxtags[]={
-            CYBRBIDTG_NominalWidth,320,
-            CYBRBIDTG_NominalHeight,240,
+    if((flags & DISPFLAG_USEOWNCGXBESTMODE)!=0) {
+        someModeId = OwnCGXBestModeID(320,240,8);
+    } else
+    {
+        struct TagItem cgxtags[]={
+            CYBRBIDTG_NominalHeight,320,
+            CYBRBIDTG_NominalWidth,240,
             CYBRBIDTG_Depth,8,
             TAG_DONE,0 };
-    ULONG someModeId = BestCModeIDTagList(cgxtags);
 
-    if( someModeId== INVALID_ID) return false;
+        someModeId = BestCModeIDTagList(cgxtags);
+    }
+
+    if( someModeId == INVALID_ID) return false;
     return (bool)IsCyberModeID(someModeId);
 }
 bool Intuition_Window_CGX::useForWbWindow()

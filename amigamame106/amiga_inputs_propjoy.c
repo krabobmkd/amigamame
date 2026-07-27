@@ -37,7 +37,8 @@
 
 #include "amiga_inputs_propjoy.h"
 #include "amiga_inputs_interface.h"
-//
+// from MAME for the input_machine_has_any_analog() we added
+#include "inptport.h"
 
 #include <proto/exec.h>
 #define ALIB_HARDWARE_CIA
@@ -49,7 +50,6 @@
 // for atexit()
 #include    <stdlib.h>
 #include <stdio.h>
-
 
 // this one has custom.pot1dat
 #include <hardware/custom.h>
@@ -662,6 +662,9 @@ void ProportionalSticksUpdate(struct ProportionalSticks *prop)
     } // end iport loop
 
 }
+
+void ui_popup_time(int seconds, const char *text,...);
+
 
 // put this to last method
 void post_input_port_init_check(void *o)

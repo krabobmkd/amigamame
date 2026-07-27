@@ -34,6 +34,16 @@ extern "C"
     #include <graphics/rastport.h>
 }
 
+#ifndef REGUFT
+
+#ifdef __GNUC__
+#define REGUFT(r) __asm(#r)
+//#define REGUFT(r)
+#else
+
+#endif
+#endif
+
 struct directDrawParams;
 
 class Drawable_CGX {
@@ -69,7 +79,7 @@ class Intuition_Screen_CGX : public Intuition_Screen, public Drawable_CGX
 {
 public:
     Intuition_Screen_CGX(const AbstractDisplay::params &params);
-    static bool useForThisMode(ULONG modeID);
+    static bool useForThisMode(ULONG modeID REGUFT(d0), int flags REGUFT(d1));
     bool open() override;
     void close() override;
     void draw(_mame_display *display) override;
