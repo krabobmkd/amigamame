@@ -22,6 +22,100 @@
 #define COUNT_CYCLES(x)	tms34010_ICount -= x
 #define COUNT_UNKNOWN_CYCLES(x) COUNT_CYCLES(x)
 
+/***************************************************************************
+    DIVS/DIVU HELPERS
+
+    The TMS34010's DIVS/DIVU opcodes divide a 64-bit dividend by a 32-bit
+    divisor (like x86 IDIV/DIV), which the generic C path below implements
+    with plain INT64/UINT64 '/' and '%' - on m68k that lowers to a call to
+    libgcc's __divdi3/__moddi3, a fully generic (and fully software) 64/64
+    long division. That shows up as one of the hottest symbols in the whole
+    emulator on this port.
+
+    m68020+ has a single hardware instruction for exactly this shape:
+    DIVSL.L/DIVUL.L take a 64-bit dividend in a Dr:Dq register pair and a
+    32-bit divisor, producing a 32-bit quotient (Dq) and 32-bit remainder
+    (Dr) directly, reporting overflow (quotient doesn't fit in 32 bits) via
+    the V flag - which is also exactly the TMS34010 opcode's own overflow
+    semantics, down to leaving the destination registers unchanged when it
+    overflows. So this is a drop-in replacement for the whole COMBINE/DIV/
+    MOD/HI32 dance below, not just a faster stand-in for one piece of it.
+
+    Not touched: osd_cpu.h's DIV_64_64_32() etc are shared with other CPU
+    cores (e132xs, scudsp) whose call sites haven't been checked against
+    this contract, so this stays local to the one core it was profiled in.
+***************************************************************************/
+#ifdef AMIGA
+
+/* returns nonzero (overflow) and leaves *quotient/*remainder untouched if the
+   division overflows, matching the DIVS opcode's own semantics exactly. */
+INLINE int tms34010_divs_dispatch(INT32 rd1, INT32 rd2, INT32 rs, INT32 *quotient, INT32 *remainder)
+{
+	INT32 hi = rd1, lo = rd2;
+	UINT8 overflow;
+	__asm__ __volatile__ (
+		"divsl.l %3,%1:%0\n\t"
+		"svs %2"
+		: "+d" (lo), "+d" (hi), "=dm" (overflow)
+		: "dm" (rs)
+		: "cc"
+	);
+	if (!overflow)
+	{
+		*quotient = lo;
+		*remainder = hi;
+	}
+	return overflow;
+}
+
+INLINE int tms34010_divu_dispatch(UINT32 rd1, UINT32 rd2, UINT32 rs, UINT32 *quotient, UINT32 *remainder)
+{
+	UINT32 hi = rd1, lo = rd2;
+	UINT8 overflow;
+	__asm__ __volatile__ (
+		"divul.l %3,%1:%0\n\t"
+		"svs %2"
+		: "+d" (lo), "+d" (hi), "=dm" (overflow)
+		: "dm" (rs)
+		: "cc"
+	);
+	if (!overflow)
+	{
+		*quotient = lo;
+		*remainder = hi;
+	}
+	return overflow;
+}
+
+#else
+
+/* portable fallback - same generic COMBINE/DIV/MOD/HI32 approach the macros
+   used to spell out inline, just factored into a function. */
+INLINE int tms34010_divs_dispatch(INT32 rd1, INT32 rd2, INT32 rs, INT32 *quotient, INT32 *remainder)
+{
+	INT64 dividend = COMBINE_64_32_32(rd1, rd2);
+	INT64 q = DIV_64_64_32(dividend, rs);
+	UINT32 signbits = (INT32)q >> 31;
+	if (HI32_32_64(q) != signbits)
+		return 1;
+	*quotient = (INT32)q;
+	*remainder = MOD_32_64_32(dividend, rs);
+	return 0;
+}
+
+INLINE int tms34010_divu_dispatch(UINT32 rd1, UINT32 rd2, UINT32 rs, UINT32 *quotient, UINT32 *remainder)
+{
+	UINT64 dividend = COMBINE_U64_U32_U32(rd1, rd2);
+	UINT64 q = DIV_U64_U64_U32(dividend, rs);
+	if (HI32_U32_U64(q) != 0)
+		return 1;
+	*quotient = (UINT32)q;
+	*remainder = MOD_U32_U64_U32(dividend, rs);
+	return 0;
+}
+
+#endif
+
 #define CORRECT_ODD_PC(x)	do { if (PC & 0x0f) logerror("%s to PC=%08X\n", x, PC); PC &= ~0x0f; } while (0)
 
 
@@ -463,11 +557,8 @@ static void dint(void)
 		else												\
 		{													\
 			INT32 *rd2 = &R##REG(R##DSTREG+N);				\
-			INT64 dividend  = COMBINE_64_32_32(*rd1, *rd2); \
-			INT64 quotient  = DIV_64_64_32(dividend, *rs); 	\
-			INT32 remainder = MOD_32_64_32(dividend, *rs); 	\
-			UINT32 signbits = (INT32)quotient >> 31;	 	\
-			if (HI32_32_64(quotient) != signbits)			\
+			INT32 quotient, remainder;						\
+			if (tms34010_divs_dispatch(*rd1, *rd2, *rs, &quotient, &remainder)) \
 			{												\
 				V_FLAG = 1;									\
 			}												\
@@ -512,10 +603,8 @@ static void divs_b(void) { DIVS(B,0x10); }
 		else												\
 		{													\
 			INT32 *rd2 = &R##REG(R##DSTREG+N);				\
-			UINT64 dividend  = COMBINE_U64_U32_U32(*rd1, *rd2);	\
-			UINT64 quotient  = DIV_U64_U64_U32(dividend, *rs);	\
-			UINT32 remainder = MOD_U32_U64_U32(dividend, *rs); 	\
-			if (HI32_U32_U64(quotient) != 0)				\
+			UINT32 quotient, remainder;						\
+			if (tms34010_divu_dispatch((UINT32)*rd1, (UINT32)*rd2, (UINT32)*rs, &quotient, &remainder)) \
 			{												\
 				V_FLAG = 1;									\
 			}												\
@@ -586,22 +675,27 @@ static void exgf1_b(void) { EXGF(1,B); }
 static void lmo_a(void) { LMO(A); }
 static void lmo_b(void) { LMO(B); }
 
+/* position (0=LSB..15=MSB) of the highest set bit of a nonzero 16-bit value.
+   lowers to a single bfffo on 68020+ targets (verified on -m68060); portable
+   fallback (32-bit clz) used elsewhere. */
+INLINE int tms34010_msb16(UINT16 l)
+{
+	return 31 - __builtin_clz((unsigned int)l);
+}
+
 #define MMFM(R,N)			       		       			    	\
 {																\
-	INT32 i;													\
 	UINT16 l = (UINT16) PARAM_WORD();							\
 	COUNT_CYCLES(3);											\
 	{															\
 		INT32 rd = R##DSTREG;									\
-		for (i = 15; i >= 0 ; i--)								\
+		while (l)												\
 		{														\
-			if (l & 0x8000)										\
-			{													\
-				R##REG(i*N) = RLONG(R##REG(rd));				\
-				R##REG(rd) += 0x20;								\
-				COUNT_CYCLES(4);								\
-			}													\
-			l <<= 1;											\
+			int bit = tms34010_msb16(l);						\
+			R##REG(bit*N) = RLONG(R##REG(rd));					\
+			R##REG(rd) += 0x20;									\
+			COUNT_CYCLES(4);									\
+			l &= ~(1 << bit);									\
 		}														\
 	}															\
 }
@@ -610,21 +704,19 @@ static void mmfm_b(void) { MMFM(B,0x10); }
 
 #define MMTM(R,N)			       		       			    	\
 {			  													\
-	UINT32 i;													\
 	UINT16 l = (UINT16) PARAM_WORD();							\
 	COUNT_CYCLES(2);											\
 	{															\
 		INT32 rd = R##DSTREG;									\
 		SET_N(R##REG(rd)^0x80000000);							\
-		for (i = 0; i  < 16; i++)								\
+		while (l)												\
 		{														\
-			if (l & 0x8000)										\
-			{													\
-				R##REG(rd) -= 0x20;								\
-				WLONG(R##REG(rd),R##REG(i*N));					\
-				COUNT_CYCLES(4);								\
-			}													\
-			l <<= 1;											\
+			int bit = tms34010_msb16(l);						\
+			int i = 15 - bit;									\
+			R##REG(rd) -= 0x20;									\
+			WLONG(R##REG(rd),R##REG(i*N));						\
+			COUNT_CYCLES(4);									\
+			l &= ~(1 << bit);									\
 		}														\
 	}															\
 }

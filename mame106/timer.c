@@ -143,7 +143,7 @@ static inline void timer_list_insert(mame_timer *timer)
 	for (t = timer_head; t; lt = t, t = t->next)
 	{
 		/* if the current list entry expires after us, we should be inserted before it */
-		if (compare_mame_times(t->expire, expire) > 0)
+		if (compare_mame_times_GT(t->expire, expire) )
 		{
 			/* link the new guy in before the current list entry */
 			timer->prev = t->prev;
@@ -301,13 +301,14 @@ void mame_timer_set_global_time(mame_time newbase)
 	LOG(("mame_timer_set_global_time: new=%.9f head->expire=%.9f\n", mame_time_to_double(newbase), mame_time_to_double(timer_head->expire)));
 
 	/* now process any timers that are overdue */
-	while (compare_mame_times(timer_head->expire, global_basetime) <= 0)
+	while (compare_mame_times_LE(timer_head->expire, global_basetime))
 	{
 		int was_enabled = timer_head->enabled;
 
 		/* if this is a one-shot timer, disable it now */
 		timer = timer_head;
-		if (compare_mame_times(timer->period, time_zero) == 0 || compare_mame_times(timer->period, time_never) == 0)
+		if (timer->period._t == 0LL  ||
+		    compare_mame_times_EQ(timer->period, time_never) )
 			timer->enabled = FALSE;
 
 		/* set the global state of which callback we're in */

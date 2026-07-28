@@ -9,6 +9,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms34010/34010ops.h"
 #include "midtunit.h"
+#include "midtunit_dma.h"
 
 
 /* compile-time options */
@@ -51,35 +52,12 @@ static pen_t *	pen_map;
 
 /* videoram-related variables */
 static UINT32 	gfxbank_offset[2];
-static UINT16 *	local_videoram;
+UINT16 *	local_videoram;			/* shared with midtunit.cpp, see midtunit_dma.h */
 static UINT8	videobank_select=0;
 
 /* DMA-related variables */
 static UINT16	dma_register[18];
-static struct
-{
-	UINT32		offset;			/* source offset, in bits */
-	INT32 		rowbits;		/* source bits to skip each row */
-	INT32 		xpos;			/* x position, clipped */
-	INT32		ypos;			/* y position, clipped */
-	INT32		width;			/* horizontal pixel count */
-	INT32		height;			/* vertical pixel count */
-	UINT16		palette;		/* palette base */
-	UINT16		color;			/* current foreground color with palette */
-
-	UINT8		yflip;			/* yflip? */
-	UINT8		bpp;			/* bits per pixel */
-	UINT8		preskip;		/* preskip scale */
-	UINT8		postskip;		/* postskip scale */
-	INT32		topclip;		/* top clipping scanline */
-	INT32		botclip;		/* bottom clipping scanline */
-	INT32		leftclip;		/* left clipping column */
-	INT32		rightclip;		/* right clipping column */
-	INT32		startskip;		/* pixels to skip at start */
-	INT32		endskip;		/* pixels to skip at end */
-	UINT16		xstep;			/* 8.8 fixed number scale x factor */
-	UINT16		ystep;			/* 8.8 fixed number scale y factor */
-} dma_state;
+struct midtunit_dma_state_t dma_state;	/* shared with midtunit.cpp, see midtunit_dma.h */
 
 
 
@@ -343,270 +321,14 @@ READ16_HANDLER( midxunit_paletteram_r )
  *
  *  DMA drawing routines
  *
+ *  The actual pixel-pushing blitters used to live here as a wall of
+ *  macro-generated C functions (DMA_DRAW_FUNC/DMA_DRAW_FUNC_BODY). They
+ *  now live in midtunit.cpp as C++ templates (easier to read/debug, and
+ *  lets the compiler specialize/optimize each variant properly), exposed
+ *  through the single midtunit_dma_draw() entry point declared in
+ *  midtunit_dma.h. See that file for XPOSMASK/YPOSMASK, still used below.
+ *
  *************************************/
-
-/*** constant definitions ***/
-#define	PIXEL_SKIP		0
-#define PIXEL_COLOR		1
-#define PIXEL_COPY		2
-
-#define XFLIP_NO		0
-#define XFLIP_YES		1
-
-#define SKIP_NO			0
-#define SKIP_YES		1
-
-#define SCALE_NO		0
-#define SCALE_YES		1
-
-#define XPOSMASK		0x3ff
-#define YPOSMASK		0x1ff
-
-
-typedef void (*dma_draw_func)(void);
-
-
-/*** fast pixel extractors ***/
-#if !defined(ALIGN_SHORTS) && defined(LSB_FIRST)
-#define EXTRACTGEN(m)	((*(UINT16 *)&base[o >> 3] >> (o & 7)) & (m))
-#elif defined(powerc)
-#define EXTRACTGEN(m)	((__lhbrx(base, o >> 3) >> (o & 7)) & (m))
-#else
-#define EXTRACTGEN(m)	(((base[o >> 3] | (base[(o >> 3) + 1] << 8)) >> (o & 7)) & (m))
-#endif
-
-/*** core blitter routine macro ***/
-#define DMA_DRAW_FUNC_BODY(name, bitsperpixel, extractor, xflip, skip, scale, zero, nonzero) \
-{																				\
-	int height = dma_state.height << 8;											\
-	UINT8 *base = midyunit_gfx_rom;													\
-	UINT32 offset = dma_state.offset;											\
-	UINT16 pal = dma_state.palette;												\
-	UINT16 color = pal | dma_state.color;										\
-	int sy = dma_state.ypos, iy = 0, ty;										\
-	int bpp = bitsperpixel;														\
-	int mask = (1 << bpp) - 1;													\
-	int xstep = scale ? dma_state.xstep : 0x100;								\
-																				\
-	/* loop over the height */													\
-	while (iy < height)															\
-	{																			\
-		int startskip = dma_state.startskip << 8;								\
-		int endskip = dma_state.endskip << 8;									\
-		int width = dma_state.width << 8;										\
-		int sx = dma_state.xpos, ix = 0, tx;									\
-		UINT32 o = offset;														\
-		int pre, post;															\
-		UINT16 *d;																\
-																				\
-		/* handle skipping */													\
-		if (skip)																\
-		{																		\
-			UINT8 value = EXTRACTGEN(0xff);										\
-			o += 8;																\
-																				\
-			/* adjust for preskip */											\
-			pre = (value & 0x0f) << (dma_state.preskip + 8);					\
-			tx = pre / xstep;													\
-			if (xflip)															\
-				sx = (sx - tx) & XPOSMASK;										\
-			else																\
-				sx = (sx + tx) & XPOSMASK;										\
-			ix += tx * xstep;													\
-																				\
-			/* adjust for postskip */											\
-			post = ((value >> 4) & 0x0f) << (dma_state.postskip + 8);			\
-			width -= post;														\
-			endskip -= post;													\
-		}																		\
-																				\
-		/* handle Y clipping */													\
-		if (sy < dma_state.topclip || sy > dma_state.botclip)					\
-			goto clipy;															\
-																				\
-		/* handle start skip */													\
-		if (ix < startskip)														\
-		{																		\
-			tx = ((startskip - ix) / xstep) * xstep;							\
-			ix += tx;															\
-			o += (tx >> 8) * bpp;												\
-		}																		\
-																				\
-		/* handle end skip */													\
-		if ((width >> 8) > dma_state.width - dma_state.endskip)					\
-			width = (dma_state.width - dma_state.endskip) << 8;					\
-																				\
-		/* determine destination pointer */										\
-		d = &local_videoram[sy * 512];											\
-																				\
-		/* loop until we draw the entire width */								\
-		while (ix < width)														\
-		{																		\
-			/* only process if not clipped */									\
-			if (sx >= dma_state.leftclip && sx <= dma_state.rightclip)			\
-			{																	\
-				/* special case similar handling of zero/non-zero */			\
-				if (zero == nonzero)											\
-				{																\
-					if (zero == PIXEL_COLOR)									\
-						d[sx] = color;											\
-					else if (zero == PIXEL_COPY)								\
-						d[sx] = (extractor(mask)) | pal;						\
-				}																\
-																				\
-				/* otherwise, read the pixel and look */						\
-				else															\
-				{																\
-					int pixel = (extractor(mask));								\
-																				\
-					/* non-zero pixel case */									\
-					if (pixel)													\
-					{															\
-						if (nonzero == PIXEL_COLOR)								\
-							d[sx] = color;										\
-						else if (nonzero == PIXEL_COPY)							\
-							d[sx] = pixel | pal;								\
-					}															\
-																				\
-					/* zero pixel case */										\
-					else														\
-					{															\
-						if (zero == PIXEL_COLOR)								\
-							d[sx] = color;										\
-						else if (zero == PIXEL_COPY)							\
-							d[sx] = pal;										\
-					}															\
-				}																\
-			}																	\
-																				\
-			/* update pointers */												\
-			if (xflip) 															\
-				sx = (sx - 1) & XPOSMASK;										\
-			else 																\
-				sx = (sx + 1) & XPOSMASK;										\
-																				\
-			/* advance to the next pixel */										\
-			if (!scale)															\
-			{																	\
-				ix += 0x100;													\
-				o += bpp;														\
-			}																	\
-			else																\
-			{																	\
-				tx = ix >> 8;													\
-				ix += xstep;													\
-				tx = (ix >> 8) - tx;											\
-				o += bpp * tx;													\
-			}																	\
-		}																		\
-																				\
-	clipy:																		\
-		/* advance to the next row */											\
-		if (dma_state.yflip)													\
-			sy = (sy - 1) & YPOSMASK;											\
-		else																	\
-			sy = (sy + 1) & YPOSMASK;											\
-		if (!scale)																\
-		{																		\
-			iy += 0x100;														\
-			width = dma_state.width;											\
-			if (skip)															\
-			{																	\
-				offset += 8;													\
-				width -= (pre + post) >> 8;										\
-				if (width > 0) offset += width * bpp;							\
-			}																	\
-			else																\
-				offset += width * bpp;											\
-		}																		\
-		else																	\
-		{																		\
-			ty = iy >> 8;														\
-			iy += dma_state.ystep;												\
-			ty = (iy >> 8) - ty;												\
-			if (!skip)															\
-				offset += ty * dma_state.width * bpp;							\
-			else if (ty--)														\
-			{																	\
-				o = offset + 8;													\
-				width = dma_state.width - ((pre + post) >> 8);					\
-				if (width > 0) o += width * bpp;								\
-				while (ty--)													\
-				{																\
-					UINT8 value = EXTRACTGEN(0xff);								\
-					o += 8;														\
-					pre = (value & 0x0f) << dma_state.preskip;					\
-					post = ((value >> 4) & 0x0f) << dma_state.postskip;			\
-					width = dma_state.width - pre - post;						\
-					if (width > 0) o += width * bpp;							\
-				}																\
-				offset = o;														\
-			}																	\
-		}																		\
-	}																			\
-}
-
-
-/*** slightly simplified one for most blitters ***/
-#define DMA_DRAW_FUNC(name, bpp, extract, xflip, skip, scale, zero, nonzero)	\
-static void name(void)															\
-{																				\
-	DMA_DRAW_FUNC_BODY(name, bpp, extract, xflip, skip, scale, zero, nonzero)	\
-}
-
-/*** empty blitter ***/
-static void dma_draw_none(void)
-{
-}
-
-/*** super macro for declaring an entire blitter family ***/
-#define DECLARE_BLITTER_SET(prefix, bpp, extract, skip, scale)										\
-DMA_DRAW_FUNC(prefix##_p0,      bpp, extract, XFLIP_NO,  skip, scale, PIXEL_COPY,  PIXEL_SKIP)		\
-DMA_DRAW_FUNC(prefix##_p1,      bpp, extract, XFLIP_NO,  skip, scale, PIXEL_SKIP,  PIXEL_COPY)		\
-DMA_DRAW_FUNC(prefix##_c0,      bpp, extract, XFLIP_NO,  skip, scale, PIXEL_COLOR, PIXEL_SKIP)		\
-DMA_DRAW_FUNC(prefix##_c1,      bpp, extract, XFLIP_NO,  skip, scale, PIXEL_SKIP,  PIXEL_COLOR)		\
-DMA_DRAW_FUNC(prefix##_p0p1,    bpp, extract, XFLIP_NO,  skip, scale, PIXEL_COPY,  PIXEL_COPY)		\
-DMA_DRAW_FUNC(prefix##_c0c1,    bpp, extract, XFLIP_NO,  skip, scale, PIXEL_COLOR, PIXEL_COLOR)		\
-DMA_DRAW_FUNC(prefix##_c0p1,    bpp, extract, XFLIP_NO,  skip, scale, PIXEL_COLOR, PIXEL_COPY)		\
-DMA_DRAW_FUNC(prefix##_p0c1,    bpp, extract, XFLIP_NO,  skip, scale, PIXEL_COPY,  PIXEL_COLOR)		\
-																									\
-DMA_DRAW_FUNC(prefix##_p0_xf,   bpp, extract, XFLIP_YES, skip, scale, PIXEL_COPY,  PIXEL_SKIP)		\
-DMA_DRAW_FUNC(prefix##_p1_xf,   bpp, extract, XFLIP_YES, skip, scale, PIXEL_SKIP,  PIXEL_COPY)		\
-DMA_DRAW_FUNC(prefix##_c0_xf,   bpp, extract, XFLIP_YES, skip, scale, PIXEL_COLOR, PIXEL_SKIP)		\
-DMA_DRAW_FUNC(prefix##_c1_xf,   bpp, extract, XFLIP_YES, skip, scale, PIXEL_SKIP,  PIXEL_COLOR)		\
-DMA_DRAW_FUNC(prefix##_p0p1_xf, bpp, extract, XFLIP_YES, skip, scale, PIXEL_COPY,  PIXEL_COPY)		\
-DMA_DRAW_FUNC(prefix##_c0c1_xf, bpp, extract, XFLIP_YES, skip, scale, PIXEL_COLOR, PIXEL_COLOR)		\
-DMA_DRAW_FUNC(prefix##_c0p1_xf, bpp, extract, XFLIP_YES, skip, scale, PIXEL_COLOR, PIXEL_COPY)		\
-DMA_DRAW_FUNC(prefix##_p0c1_xf, bpp, extract, XFLIP_YES, skip, scale, PIXEL_COPY,  PIXEL_COLOR)		\
-																											\
-static dma_draw_func prefix[32] =																			\
-{																											\
-/*  B0:N / B1:N         B0:Y / B1:N         B0:N / B1:Y         B0:Y / B1:Y */								\
-	dma_draw_none,		prefix##_p0,		prefix##_p1,		prefix##_p0p1,		/* no color */ 			\
-	prefix##_c0,		prefix##_c0,		prefix##_c0p1,		prefix##_c0p1,		/* color 0 pixels */ 	\
-	prefix##_c1,		prefix##_p0c1,		prefix##_c1,		prefix##_p0c1,		/* color non-0 pixels */\
-	prefix##_c0c1,		prefix##_c0c1,		prefix##_c0c1,		prefix##_c0c1,		/* fill */ 				\
-																											\
-	dma_draw_none,		prefix##_p0_xf,		prefix##_p1_xf,		prefix##_p0p1_xf,	/* no color */ 			\
-	prefix##_c0_xf,		prefix##_c0_xf,		prefix##_c0p1_xf,	prefix##_c0p1_xf,	/* color 0 pixels */ 	\
-	prefix##_c1_xf,		prefix##_p0c1_xf,	prefix##_c1_xf,		prefix##_p0c1_xf,	/* color non-0 pixels */\
-	prefix##_c0c1_xf,	prefix##_c0c1_xf,	prefix##_c0c1_xf,	prefix##_c0c1_xf	/* fill */ 				\
-};
-
-
-/* allow for custom blitters */
-#ifdef midtunit_CUSTOM_BLITTERS
-#include "midtblit.c"
-#endif
-
-
-/*** blitter family declarations ***/
-DECLARE_BLITTER_SET(dma_draw_skip_scale,       dma_state.bpp, EXTRACTGEN,   SKIP_YES, SCALE_YES)
-DECLARE_BLITTER_SET(dma_draw_noskip_scale,     dma_state.bpp, EXTRACTGEN,   SKIP_NO,  SCALE_YES)
-DECLARE_BLITTER_SET(dma_draw_skip_noscale,     dma_state.bpp, EXTRACTGEN,   SKIP_YES, SCALE_NO)
-DECLARE_BLITTER_SET(dma_draw_noskip_noscale,   dma_state.bpp, EXTRACTGEN,   SKIP_NO,  SCALE_NO)
-
-
 
 /*************************************
  *
@@ -803,23 +525,15 @@ WRITE16_HANDLER( midtunit_dma_w )
 	}
 
 	/* then draw */
-	if (dma_state.xstep == 0x100 && dma_state.ystep == 0x100)
 	{
-		if (command & 0x80)
-			(*dma_draw_skip_noscale[command & 0x1f])();
-		else
-			(*dma_draw_noskip_noscale[command & 0x1f])();
+		int use_scale = !(dma_state.xstep == 0x100 && dma_state.ystep == 0x100);
+		int use_skip = (command & 0x80) ? 1 : 0;
 
-		pixels = dma_state.width * dma_state.height;
-	}
-	else
-	{
-		if (command & 0x80)
-			(*dma_draw_skip_scale[command & 0x1f])();
-		else
-			(*dma_draw_noskip_scale[command & 0x1f])();
+		midtunit_dma_draw(command, use_skip, use_scale);
 
-		if (dma_state.xstep && dma_state.ystep)
+		if (!use_scale)
+			pixels = dma_state.width * dma_state.height;
+		else if (dma_state.xstep && dma_state.ystep)
 			pixels = ((dma_state.width << 8) / dma_state.xstep) * ((dma_state.height << 8) / dma_state.ystep);
 		else
 			pixels = 0;

@@ -309,7 +309,7 @@ void cpunum_set_input_line_and_vector(int cpunum, int line, int state, int vecto
 			input_event_index[cpunum][line]--;
 			cpunum_empty_event_queue(cpunum | (line << 8));
 			event_index = input_event_index[cpunum][line]++;
-			loginfo(2,"Exceeded pending input line event queue on CPU %d!\n", cpunum);
+		//	loginfo(2,"Exceeded pending input line event queue on CPU %d!\n", cpunum);
 		}
 
 		/* enqueue the event */

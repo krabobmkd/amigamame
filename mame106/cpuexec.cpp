@@ -572,16 +572,16 @@ void cpuexec_timesliceT(void)
             /* account for these cycles */
             cpu[cpunum].totalcycles += ran;
             cpu[cpunum].localtime = add_mame_times(cpu[cpunum].localtime, MAME_TIME_IN_CYCLES(ran, cpunum));
-            LOG(("         %d ran, %d total, time = %.9f\n", ran, (INT32)cpu[cpunum].totalcycles, mame_time_to_double(cpu[cpunum].localtime)));
+         //   LOG(("         %d ran, %d total, time = %.9f\n", ran, (INT32)cpu[cpunum].totalcycles, mame_time_to_double(cpu[cpunum].localtime)));
 
             /* if the new local CPU time is less than our target, move the target up */
-            if (compare_mame_times(cpu[cpunum].localtime, target) < 0)
+            if (compare_mame_times_LT(cpu[cpunum].localtime, target) )
             {
-                if (compare_mame_times(cpu[cpunum].localtime, base) > 0)
+                if (compare_mame_times_GT(cpu[cpunum].localtime, base))
                     target = cpu[cpunum].localtime;
                 else
                     target = base;
-                LOG(("         (new target)\n"));
+               // LOG(("         (new target)\n"));
             }
 		}
 	}
@@ -590,20 +590,20 @@ void cpuexec_timesliceT(void)
 	for (cpunum = 0; Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum++)
 	{
 		/* if we're suspended and counting, process */
-		if (cpu[cpunum].suspend && cpu[cpunum].eatcycles && compare_mame_times(cpu[cpunum].localtime, target) < 0)
+		if (cpu[cpunum].suspend && cpu[cpunum].eatcycles && compare_mame_times_LT(cpu[cpunum].localtime, target) )
 		{
 			/* compute how long to run */
 			cycles_running = MAME_TIME_TO_CYCLES(cpunum, sub_mame_times(target, cpu[cpunum].localtime));
-			LOG(("  cpu %d: %d cycles (suspended)\n", cpunum, cycles_running));
+//			LOG(("  cpu %d: %d cycles (suspended)\n", cpunum, cycles_running));
 
 			cpu[cpunum].totalcycles += cycles_running;
 			cpu[cpunum].localtime = add_mame_times(cpu[cpunum].localtime, MAME_TIME_IN_CYCLES(cycles_running, cpunum));
-			LOG(("         %d skipped, %d total, time = %.9f\n", cycles_running, (INT32)cpu[cpunum].totalcycles, mame_time_to_double(cpu[cpunum].localtime)));
+//			LOG(("         %d skipped, %d total, time = %.9f\n", cycles_running, (INT32)cpu[cpunum].totalcycles, mame_time_to_double(cpu[cpunum].localtime)));
 		}
 
 		/* update the suspend state */
-		if (cpu[cpunum].suspend != cpu[cpunum].nextsuspend)
-			LOG(("--> updated CPU%d suspend from %X to %X\n", cpunum, cpu[cpunum].suspend, cpu[cpunum].nextsuspend));
+		// if (cpu[cpunum].suspend != cpu[cpunum].nextsuspend)
+		// 	LOG(("--> updated CPU%d suspend from %X to %X\n", cpunum, cpu[cpunum].suspend, cpu[cpunum].nextsuspend));
 		cpu[cpunum].suspend = cpu[cpunum].nextsuspend;
 		cpu[cpunum].eatcycles = cpu[cpunum].nexteatcycles;
 	}
@@ -634,7 +634,7 @@ void activecpu_abort_timeslice(void)
 	int current_icount;
 
 	VERIFY_EXECUTINGCPU(activecpu_abort_timeslice);
-	LOG(("activecpu_abort_timeslice (CPU=%d, cycles_left=%d)\n", cpu_getexecutingcpu(), activecpu_get_icount() + 1));
+	//LOG(("activecpu_abort_timeslice (CPU=%d, cycles_left=%d)\n", cpu_getexecutingcpu(), activecpu_get_icount() + 1));
 
 	/* swallow the remaining cycles */
 	current_icount = activecpu_get_icount() + 1;
@@ -681,7 +681,7 @@ mame_time cpunum_get_localtime(int cpunum)
 void cpunum_suspend(int cpunum, int reason, int eatcycles)
 {
 	VERIFY_CPUNUM(cpunum_suspend);
-	LOG(("cpunum_suspend (CPU=%d, r=%X, eat=%d)\n", cpunum, reason, eatcycles));
+//	LOG(("cpunum_suspend (CPU=%d, r=%X, eat=%d)\n", cpunum, reason, eatcycles));
 
 	/* set the pending suspend bits, and force a resync */
 	cpu[cpunum].nextsuspend |= reason;
@@ -702,7 +702,7 @@ void cpunum_suspend(int cpunum, int reason, int eatcycles)
 void cpunum_resume(int cpunum, int reason)
 {
 	VERIFY_CPUNUM(cpunum_resume);
-	LOG(("cpunum_resume (CPU=%d, r=%X)\n", cpunum, reason));
+//	LOG(("cpunum_resume (CPU=%d, r=%X)\n", cpunum, reason));
 
 	/* clear the pending suspend bits, and force a resync */
 	cpu[cpunum].nextsuspend &= ~reason;
@@ -832,10 +832,10 @@ void cpu_boost_interleave(double _timeslice_time, double _boost_duration)
 	mame_time boost_duration = double_to_mame_time(_boost_duration);
 
 	/* if you pass 0 for the timeslice_time, it means pick something reasonable */
-	if (compare_mame_times(timeslice_time, perfect_interleave) < 0)
+	if (compare_mame_times_LT(timeslice_time, perfect_interleave) )
 		timeslice_time = perfect_interleave;
 
-	LOG(("cpu_boost_interleave(%.9f, %.9f)\n", mame_time_to_double(timeslice_time), mame_time_to_double(boost_duration)));
+//	LOG(("cpu_boost_interleave(%.9f, %.9f)\n", mame_time_to_double(timeslice_time), mame_time_to_double(boost_duration)));
 
 	/* adjust the interleave timer */
 	mame_timer_adjust(interleave_boost_timer, timeslice_time, 0, timeslice_time);
@@ -847,10 +847,10 @@ void cpu_boost_interleave(double _timeslice_time, double _boost_duration)
 void cpu_boost_interleave2(mame_time timeslice_time, mame_time boost_duration)
 {
 	/* if you pass 0 for the timeslice_time, it means pick something reasonable */
-	if (compare_mame_times(timeslice_time, perfect_interleave) < 0)
+	if (compare_mame_times_LT(timeslice_time, perfect_interleave) )
 		timeslice_time = perfect_interleave;
 
-	LOG(("cpu_boost_interleave(%.9f, %.9f)\n", mame_time_to_double(timeslice_time), mame_time_to_double(boost_duration)));
+//	LOG(("cpu_boost_interleave(%.9f, %.9f)\n", mame_time_to_double(timeslice_time), mame_time_to_double(boost_duration)));
 
 	/* adjust the interleave timer */
 	mame_timer_adjust(interleave_boost_timer, timeslice_time, 0, timeslice_time);
@@ -1180,9 +1180,8 @@ mame_time cpu_getscanlinetime_mt(int scanline)
  //  printf("scantime:%.9f abstime:%.9f\n",mame_time_to_double(scantime),mame_time_to_double(abstime));
 
 	/* if we're already past the computed time, count it for the next frame */
-	int icp = compare_mame_times(abstime, scantime) ;
-	//printf("icp:%d\n",icp);
-	if (icp >= 0)
+
+	if (compare_mame_times_GE(abstime, scantime) )
 	{
       //  printf("do the add\n");
 		scantime = add_mame_times(scantime, refresh_period);
@@ -1679,7 +1678,7 @@ static void cpu_timeslicecallback(int param)
 static void end_interleave_boost(int param)
 {
 	mame_timer_adjust(interleave_boost_timer, time_never, 0, time_never);
-	LOG(("end_interleave_boost\n"));
+	//LOG(("end_interleave_boost\n"));
 }
 
 
@@ -1715,7 +1714,7 @@ static void compute_perfect_interleave(void)
 	if (perfect_interleave.subseconds == MAX_SUBSECONDSM)
 		perfect_interleave.subseconds = subseconds_per_cycle[0];
 
-	LOG(("Perfect interleave = %.9f, smallest = %.9f\n", mame_time_to_double(perfect_interleave), SUBSECONDS_TO_DOUBLE(smallest)));
+//	LOG(("Perfect interleave = %.9f, smallest = %.9f\n", mame_time_to_double(perfect_interleave), SUBSECONDS_TO_DOUBLE(smallest)));
 }
 
 
@@ -1820,7 +1819,7 @@ static void cpu_inittimers(void)
        immediately; instead, we back up one VBLANK period, and inch forward until we hit
        positive time. That time will be the time of the first VBLANK timer callback */
 	first_time = add_mame_times(double_to_mame_time(-TIME_IN_USEC(Machine->drv->vblank_duration)), vblank_period);
-	while (compare_mame_times(first_time, time_zero) < 0)
+	while (compare_mame_times_LT(first_time, time_zero) )
 	{
 		cpu_vblankcallback(-1);
 		first_time = add_mame_times(first_time, vblank_period);

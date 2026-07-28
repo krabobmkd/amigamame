@@ -335,21 +335,36 @@ static inline mame_time sub_subseconds_from_mame_time(mame_time _time1, subsecon
 static inline int compare_mame_times(mame_time _time1, mame_time _time2)
 {
     //printf("compare_mame_times:\n");
+    INT64 diff = _time1._t - _time2._t;
+    if(diff<0LL) return -1;
+    else if(diff>0LL) return 1;
+    else return 0;
+}
 
-    INT64 dif = _time1._t - _time2._t;
-	if (dif > 0LL)
-		return 1;
-	if (dif< 0LL)
-		return -1;
-	return 0;
+static inline int compare_mame_times_GT(mame_time _time1, mame_time _time2)
+{
+    INT64 diff = _time1._t - _time2._t;
+    return (int)(diff>0LL);
+}
+static inline int compare_mame_times_GE(mame_time _time1, mame_time _time2)
+{
+    INT64 diff = _time1._t - _time2._t;
+    return (int)(diff>=0LL);
+}
+static inline int compare_mame_times_LE(mame_time _time1, mame_time _time2)
+{
+    INT64 diff = _time1._t - _time2._t;
+    return (int)(diff<=0LL);
+}
+static inline int compare_mame_times_LT(mame_time _time1, mame_time _time2)
+{
+    INT64 diff = _time1._t - _time2._t;
+    return (int)(diff<0LL);
+}
 
-   // if(dif != 0) return dif;
-    //return (int)_time1.subseconds - (int)_time2.subseconds;
-	// if (_time1.subseconds > _time2.subseconds)
-	// 	return 1;
-	// if (_time1.subseconds < _time2.subseconds)
-	// 	return -1;
-	//return 0;
+static inline int compare_mame_times_EQ(mame_time _time1, mame_time _time2)
+{
+    return (int)(_time1._t == _time2._t);
 }
 
 
