@@ -76,14 +76,14 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
        	{ 
        	struct drawgfxParams dgpz0={
        		bitmap, 	// dest
-       		gfx, 	// gfx
+       		NULL,//gfx, 	// gfx
        		0, 	// code
        		0, 	// color
        		0, 	// flipx
        		0, 	// flipy
        		0, 	// sx
        		0, 	// sy
-       		sy, 	// clip
+       		0, 	// clip
        		cliprect, 	// transparency
        		TRANSPARENCY_PEN, 	// transparent_color
        		0x00010000, 	// scalex
@@ -117,7 +117,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			int index_x;
         for(index_x=0; index_x<8; index_x++)
         {
-
+            const gfx_element *gfx;
           /* Index into the object lookup table */
 
           int ROM_LUT_HI = object_ram[offs+5] << 8;
@@ -143,16 +143,17 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
           int color = 1;
 
-          const gfx_element *gfx = Machine->gfx[bank];
+          gfx = Machine->gfx[bank];
 
-			
+            dgpz0.gfx = gfx;
 			dgpz0.code = index;
 			dgpz0.color = color;
 			dgpz0.flipx = flip_x;
 			dgpz0.flipy = flip_y;
-			dgpz0.sx = // FlipX;
-			dgpz0.sy = flipY				sx;
-			dgpz0.scaley = scale_x;
+			dgpz0.sx = sx; // FlipX;
+			dgpz0.sy = sy; // flipY
+			dgpz0.scalex = scale_x;
+			dgpz0.scaley = scale_y;
 			drawgfxzoom(&dgpz0);
           }
         }

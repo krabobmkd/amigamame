@@ -74,6 +74,7 @@ static UINT8 *z80_ram;	/* Main 8086/Z80 shared RAM   */
 UINT8 *bb_objram;
 UINT8 *bb_sky;		/* Sky register */
 UINT8 *bb_rcram;
+UINT8 *bb_math_ram;	/* Slave RAM also decoded through the AU's /SPCS chip select */
 
 size_t tx1_objectram_size;
 size_t bb_objectram_size;
@@ -84,14 +85,20 @@ tilemap *buggyboy_tilemap;
 tilemap *buggyb1_tilemap;
 
 /* machine/tx1.c */
-void MMI_74S516(int ins, UINT16 *data);
 READ8_HANDLER( BB_AU_R );
 WRITE8_HANDLER( BB_AU_W );
+READ8_HANDLER( BB_SPCS_RAM_R );
+WRITE8_HANDLER( BB_SPCS_RAM_W );
+READ8_HANDLER( BB_SPCS_ROM_R );
+void bb_math_reset(void);
 
 /* vidhrdw/tx1.c */
 WRITE8_HANDLER( tx1_vram_w );
 VIDEO_START( tx1 );
 VIDEO_UPDATE( tx1 );
+void bb_gas_w(int base_offset, UINT16 data);
+void bb_scolst_w(UINT16 data);
+void bb_slincs_w(int word_index, UINT16 data);
 
 PALETTE_INIT( buggyboy );
 WRITE8_HANDLER( buggyboy_vram_w );
@@ -101,10 +108,32 @@ VIDEO_UPDATE( buggyboy );
 VIDEO_START( buggyb1 );
 VIDEO_UPDATE( buggyb1 );
 
+static WRITE8_HANDLER(SCOLST_w);
+static WRITE8_HANDLER(SLINCS_w);
+
 
 static INTERRUPT_GEN( main_irq )
 {
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x80/4);
+}
+
+/*
+   Buggy Boy's /CUDISP interrupt: on real hardware (and in the MAME 0.144
+   driver) this is a precise CRTC-position interrupt near the bottom of the
+   frame, so the main CPU's per-frame register update (road curve/speed
+   registers via GAS_w) always completes before the next frame is drawn.
+   The old MDRV_CPU_PERIODIC_INT(TIME_IN_HZ(46)) approximation has no
+   relation to scan position, so it can fire mid-frame relative to
+   VIDEO_UPDATE and get the CPU caught mid-update - observed as the road
+   registers being torn/inconsistent on roughly every other frame. One
+   scanline-position timer per frame (not a full raster scheme) fixes this,
+   following the same cpu_getscanlinetime()/timer_set() idiom already used
+   elsewhere in this codebase (see drivers/atetris.c, centiped.c).
+*/
+static void buggyboy_cudisp_irq(int scanline)
+{
+	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x80/4);
+	timer_set(cpu_getscanlinetime(239), 239, buggyboy_cudisp_irq);
 }
 
 /* Periodic Z80 interrupt */
@@ -536,8 +565,8 @@ static ADDRESS_MAP_START( buggyb1_master, ADDRESS_SPACE_PROGRAM, 8 )
         AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&bb_rcram) AM_SIZE(&bb_rcram_size)     /* Road/common RAM - 1800-18ff & 1c00-1cff are read by road H/W */
         AM_RANGE(0x0b000, 0x0b000) AM_READWRITE (input_port_1A_r, z80_busreq)     /* Dipswitches and Z80 busreq */
         AM_RANGE(0x0b001, 0x0b001) AM_READWRITE (input_port_0_r, MWA8_NOP)
-        AM_RANGE(0x0c000, 0x0c001) AM_RAM                                         /* /SCOLW  */
-        AM_RANGE(0x0d000, 0x0d003) AM_RAM                                         /* /SLINCS */
+        AM_RANGE(0x0c000, 0x0c001) AM_READWRITE (MRA8_NOP, SCOLST_w)              /* /SCOLW  */
+        AM_RANGE(0x0d000, 0x0d003) AM_READWRITE (MRA8_NOP, SLINCS_w)              /* /SLINCS */
         AM_RANGE(0x0e000, 0x0e001) AM_RAM AM_BASE(&bb_sky)                        /* /SKYCS  */
         AM_RANGE(0x0f000, 0x0f003) AM_READWRITE (MRA8_NOP, resume_slave)          /* Watchdog and slave resume */
         AM_RANGE(0x10000, 0x17fff) AM_ROM                                         /* Z80 ROM */
@@ -554,8 +583,8 @@ static ADDRESS_MAP_START( buggyboy_master, ADDRESS_SPACE_PROGRAM, 8 )
         AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&bb_rcram) AM_SIZE(&bb_rcram_size)            /* Road/common RAM */
         AM_RANGE(0x0b000, 0x0b000) AM_READWRITE (input_port_1A_r, z80_busreq)     /* Dipswitches and Z80 busreq */
         AM_RANGE(0x0b001, 0x0b001) AM_READWRITE (input_port_0_r, MWA8_NOP)
-        AM_RANGE(0x0c000, 0x0c001) AM_RAM                                         /* /SCOLW  */
-        AM_RANGE(0x0d000, 0x0d003) AM_RAM                                         /* /SLINCS */
+        AM_RANGE(0x0c000, 0x0c001) AM_READWRITE (MRA8_NOP, SCOLST_w)              /* /SCOLW  */
+        AM_RANGE(0x0d000, 0x0d003) AM_READWRITE (MRA8_NOP, SLINCS_w)              /* /SLINCS */
         AM_RANGE(0x0e000, 0x0e001) AM_RAM AM_BASE(&bb_sky)                        /* /SKYCS  */
         AM_RANGE(0x0f000, 0x0f003) AM_READWRITE (MRA8_NOP, resume_slave)          /* Watchdog and slave resume */
         AM_RANGE(0x10000, 0x17fff) AM_ROM                                         /* Z80 ROM */
@@ -586,9 +615,45 @@ static READ8_HANDLER(GAS_r)
        return 0;
 }
 
+static UINT16 gas_w_latch;
+
 static WRITE8_HANDLER(GAS_w)
 {
        if(offset >= 0xe0)  halt_slave();
+
+       if (!(offset & 1))
+            gas_w_latch = data;
+       else
+       {
+            gas_w_latch |= data << 8;
+            bb_gas_w(offset & ~1, gas_w_latch);
+       }
+}
+
+static UINT16 scolst_w_latch;
+
+static WRITE8_HANDLER(SCOLST_w)
+{
+       if (!(offset & 1))
+            scolst_w_latch = data;
+       else
+       {
+            scolst_w_latch |= data << 8;
+            bb_scolst_w(scolst_w_latch);
+       }
+}
+
+static UINT16 slincs_w_latch;
+
+static WRITE8_HANDLER(SLINCS_w)
+{
+       if (!(offset & 1))
+            slincs_w_latch = data;
+       else
+       {
+            slincs_w_latch |= data << 8;
+            bb_slincs_w((offset & ~1) >> 1, slincs_w_latch);
+       }
 }
 
 
@@ -620,12 +685,14 @@ TZ0311 IC88 (PAL10L8) (protection fuse was set, yet it read)
 
 /* Memory map and ROM contents are the same for both versions */
 static ADDRESS_MAP_START( buggyboy_slave, ADDRESS_SPACE_PROGRAM, 8 )
-      AM_RANGE(0x00000, 0x00fff) AM_RAM                           /* 4kB RAM */
+      AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE(&bb_math_ram)      /* 2kB RAM */
+      AM_RANGE(0x00800, 0x00fff) AM_READWRITE (BB_SPCS_RAM_R, BB_SPCS_RAM_W)  /* Same RAM, decoded through /SPCS - feeds the AU */
       AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE(1)               /* Road/Common RAM */
       AM_RANGE(0x02000, 0x022ff) AM_RAM AM_BASE(&bb_objram) AM_SIZE(&bb_objectram_size)    /* RAM A10-A8 are grounded */
       AM_RANGE(0x02400, 0x024ff) AM_READWRITE (GAS_r, GAS_w)      /* Road control registers */
       AM_RANGE(0x03000, 0x03fff) AM_READWRITE (BB_AU_R, BB_AU_W)  /* SN74S516 arithmetic unit */
-      AM_RANGE(0x04000, 0x07fff) AM_ROM                           /* ROM mirror */
+      AM_RANGE(0x04000, 0x04fff) AM_ROM                           /* ROM mirror */
+      AM_RANGE(0x05000, 0x07fff) AM_READ (BB_SPCS_ROM_R)          /* Same ROM, decoded through /SPCS - feeds the AU */
       AM_RANGE(0x08000, 0x0bfff) AM_ROM                           /* ROM mirror */
       AM_RANGE(0x0c000, 0x0ffff) AM_ROM                           /* ROM mirror */
       AM_RANGE(0xfc000, 0xfffff) AM_ROM                           /* ROM */
@@ -841,6 +908,9 @@ static MACHINE_RESET( buggyb1 )
 {
        UINT8 *rom = (UINT8 *)memory_region(REGION_CPU1);
 
+       bb_math_reset();
+       timer_set(cpu_getscanlinetime(239), 239, buggyboy_cudisp_irq);
+
 /*
     The main CPU /TEST line is connected to the /BUSAK output of the Z80.
 
@@ -857,6 +927,8 @@ static MACHINE_RESET( buggyboy )
 {
        UINT8 *rom = (UINT8 *)memory_region(REGION_CPU1);
 
+       bb_math_reset();
+       timer_set(cpu_getscanlinetime(239), 239, buggyboy_cudisp_irq);
        ppi8255_init(&buggyboy_ppi8255_intf);
 
 #ifdef ROM_PATCHES
@@ -948,7 +1020,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( buggyboy )
         MDRV_CPU_ADD(I86,5000000 )
         MDRV_CPU_PROGRAM_MAP(buggyboy_master,0)
-        MDRV_CPU_PERIODIC_INT(main_irq, TIME_IN_HZ(46) )    /* To do: measure HD46505 CUDISP output rate */
+        /* /CUDISP: scanline-position interrupt kicked off from MACHINE_RESET, see buggyboy_cudisp_irq */
 //      MDRV_WATCHDOG_TIME_INIT(5)                  /* To do: measure watchdog time interval */
 
         MDRV_CPU_ADD(I86,5000000 )
@@ -995,7 +1067,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( buggyb1 )
         MDRV_CPU_ADD(I86,5000000 )
         MDRV_CPU_PROGRAM_MAP(buggyb1_master,0)
-        MDRV_CPU_PERIODIC_INT(main_irq, TIME_IN_HZ(46) )    /* To do: measure HD46505 CUDISP output rate */
+        /* /CUDISP: scanline-position interrupt kicked off from MACHINE_RESET, see buggyboy_cudisp_irq */
 //      MDRV_WATCHDOG_TIME_INIT(5)                  /* To do: measure watchdog time interval */
 
         MDRV_CPU_ADD(I86,5000000 )
@@ -1207,7 +1279,11 @@ ROM_START( buggyb1 )
 	ROM_LOAD( "bug35s.21", 0x00000, 0x4000, CRC(65d9af57) SHA1(17b09404942d17e7254550c43b56ae96a8c55680) )
 
 	/* 8x8 characters */
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	/* No ROMREGION_DISPOSE: buggyb1's character layer is now a direct port of
+	   0.144's per-pixel buggyboy_draw_char (bb_draw_chars in vidhrdw/tx1.c),
+	   which needs raw byte access to this region - it no longer goes through
+	   gfx_decode/drawgfx at all. */
+	ROM_REGION( 0x20000, REGION_GFX1, 0 )
 	ROM_LOAD( "bug34s.46", 0x00000, 0x4000, CRC(8ea8fec4) SHA1(75e67c9a59a86fcdedf2a70fafd303baa552aa18) )
 	ROM_LOAD( "bug33s.47", 0x04000, 0x4000, CRC(459c2b03) SHA1(ff62a86195042a349fbe799c638cf590fe9572bb) )
 
@@ -1227,31 +1303,32 @@ ROM_START( buggyb1 )
 	ROM_LOAD( "bug23s.142", 0x8000, 0x8000, CRC(015db5d8) SHA1(39ef8b44f2eb9399fb1555cffa6763e06d59c181) )
 
 	/* Road */
+	/* Road ROM/PROMs, laid out to match MAME 0.144's combined "road" region
+	   exactly (same physical ROMs) so bb_draw_road in vidhrdw/tx1.c can
+	   index it with the reference's addressing directly:
+	     0x0000-0x3fff : bug11s.225 (road gfx chunks)
+	     0x4000-0x41ff : bb3s (prom0)
+	     0x4200-0x43ff : bb4s (prom1)
+	     0x4400-0x45ff : bb5s (prom2)
+	     0x4600-0x47ff : bb6.224 (vprom) */
 	ROM_REGION( 0x40000, REGION_GFX6, 0)
-	ROM_LOAD( "bb3s", 0x000, 0x200, CRC(2ab3d5ff) SHA1(9f8359cb4ba2e7d15dbb9dc21cd71c0902cd2153) )
-	ROM_LOAD( "bb4s", 0x200, 0x200, CRC(630f68a4) SHA1(d730f050353c688f81d090e33e00cd35e7b7b6fa) )
-	ROM_LOAD( "bb5s", 0x400, 0x200, CRC(65925c9e) SHA1(d1ff1cb9f83c09e52a96632945e4edfedc335fd4) )
-	ROM_LOAD( "bug11s.225", 0x1000, 0x4000, CRC(771af4e1) SHA1(a42b164dd0567c78c0d308ee48d63e5a284897bb) ) /* Road Lookup */
+	ROM_LOAD( "bug11s.225", 0x0000, 0x4000, CRC(771af4e1) SHA1(a42b164dd0567c78c0d308ee48d63e5a284897bb) ) /* Road Lookup */
+	ROM_LOAD( "bb3s", 0x4000, 0x200, CRC(2ab3d5ff) SHA1(9f8359cb4ba2e7d15dbb9dc21cd71c0902cd2153) )
+	ROM_LOAD( "bb4s", 0x4200, 0x200, CRC(630f68a4) SHA1(d730f050353c688f81d090e33e00cd35e7b7b6fa) )
+	ROM_LOAD( "bb5s", 0x4400, 0x200, CRC(65925c9e) SHA1(d1ff1cb9f83c09e52a96632945e4edfedc335fd4) )
+	ROM_LOAD( "bb6.224", 0x4600, 0x200, CRC(ad43e02a) SHA1(c50a398020508f52ddf8d45881f211d17d096fa1) )
 
 	/* Arithmetic Unit Function Data ROMs */
+	/* AU function-data ROMs + instruction PROM, word-interleaved (matches
+	   MAME 0.144's "au_data" region layout exactly, same physical ROMs) so
+	   machine/tx1.c can index it directly as 16-bit words:
+	     word 0x0000-0x3fff : function data (bug9.138 low byte, bug10.95 high byte)
+	     word 0x4000-0x41ff : instruction PROM (bb1.163 low byte, bb2.162 high byte) */
 	ROM_REGION( 0x10000, REGION_USER1, 0 )
-	ROM_LOAD( "bug9.138",  0x0800, 0x800, CRC(7d84135b) SHA1(3c669c4e796e83672aceeb6de1aeea28f9f2fef0) )
-	ROM_CONTINUE(          0x1800, 0x800 )
-	ROM_CONTINUE(          0x2800, 0x800 )
-	ROM_CONTINUE(          0x3800, 0x800 )
-	ROM_CONTINUE(          0x4800, 0x800 )
-	ROM_CONTINUE(          0x5800, 0x800 )
-	ROM_CONTINUE(          0x6800, 0x800 )
-	ROM_CONTINUE(          0x7800, 0x800 )
-
-	ROM_LOAD( "bug10.95",  0x0000, 0x800, CRC(b518dd6f) SHA1(7cefa2f9438306c81dc83cd260928c835eb9b712) )
-	ROM_CONTINUE(          0x1000, 0x800 )
-	ROM_CONTINUE(          0x2000, 0x800 )
-	ROM_CONTINUE(          0x3000, 0x800 )
-	ROM_CONTINUE(          0x4000, 0x800 )
-	ROM_CONTINUE(          0x5000, 0x800 )
-	ROM_CONTINUE(          0x6000, 0x800 )
-	ROM_CONTINUE(          0x7000, 0x800 )
+	ROM_LOAD16_BYTE( "bug9.138",  0x0000, 0x4000, CRC(7d84135b) SHA1(3c669c4e796e83672aceeb6de1aeea28f9f2fef0) )
+	ROM_LOAD16_BYTE( "bug10.95",  0x0001, 0x4000, CRC(b518dd6f) SHA1(7cefa2f9438306c81dc83cd260928c835eb9b712) )
+	ROM_LOAD16_BYTE( "bb1.163",   0x8000, 0x0200, CRC(0ddbd36d) SHA1(7a08901a350c315d46ab8d0aa881db384b9f37d2) )
+	ROM_LOAD16_BYTE( "bb2.162",   0x8001, 0x0200, CRC(71d47de1) SHA1(2da9aeb3f2ebb1114631c8042a37c4f4c18e741b) )
 
 	ROM_REGION( 0x100000, REGION_USER2, 0 )
 	ROM_LOAD( "bug16s.139", 0x0000, 0x8000, CRC(1903a9ad) SHA1(526c404c15e3f04b4afb27dee66e9deb0a6b9704) ) /* Object chunk sequence LUT */
@@ -1307,7 +1384,11 @@ ROM_START( buggyboy )
 	ROM_LOAD( "bug35.11", 0x00000, 0x4000,  CRC(7aa16e9e) SHA1(ea54e56270f70351a62a78fa32027bb41ef9861e) )
 
 	/* 8x8 Characters */
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	/* No ROMREGION_DISPOSE: buggyb1's character layer is now a direct port of
+	   0.144's per-pixel buggyboy_draw_char (bb_draw_chars in vidhrdw/tx1.c),
+	   which needs raw byte access to this region - it no longer goes through
+	   gfx_decode/drawgfx at all. */
+	ROM_REGION( 0x20000, REGION_GFX1, 0 )
 	ROM_LOAD( "bug34s.46", 0x00000, 0x4000, CRC(8ea8fec4) SHA1(75e67c9a59a86fcdedf2a70fafd303baa552aa18) )
 	ROM_LOAD( "bug33s.47", 0x04000, 0x4000, CRC(459c2b03) SHA1(ff62a86195042a349fbe799c638cf590fe9572bb) )
 
@@ -1333,31 +1414,32 @@ ROM_START( buggyboy )
 	ROM_LOAD( "bug18s.141", 0x10000, 0x4000, CRC(67786327) SHA1(32cc1f5bc654497c968ddcd4af29720c6d659482) )
 
 	/* Road */
+	/* Road ROM/PROMs, laid out to match MAME 0.144's combined "road" region
+	   exactly (same physical ROMs) so bb_draw_road in vidhrdw/tx1.c can
+	   index it with the reference's addressing directly:
+	     0x0000-0x3fff : bug11s.225 (road gfx chunks)
+	     0x4000-0x41ff : bb3s (prom0)
+	     0x4200-0x43ff : bb4s (prom1)
+	     0x4400-0x45ff : bb5s (prom2)
+	     0x4600-0x47ff : bb6.224 (vprom) */
 	ROM_REGION( 0x40000, REGION_GFX6, 0)
-	ROM_LOAD( "bb3s", 0x000, 0x200, CRC(2ab3d5ff) SHA1(9f8359cb4ba2e7d15dbb9dc21cd71c0902cd2153) )
-	ROM_LOAD( "bb4s", 0x200, 0x200, CRC(630f68a4) SHA1(d730f050353c688f81d090e33e00cd35e7b7b6fa) )
-	ROM_LOAD( "bb5s", 0x400, 0x200, CRC(65925c9e) SHA1(d1ff1cb9f83c09e52a96632945e4edfedc335fd4) )
-	ROM_LOAD( "bug11s.225", 0x1000, 0x4000, CRC(771af4e1) SHA1(a42b164dd0567c78c0d308ee48d63e5a284897bb) ) /* Road Lookup */
+	ROM_LOAD( "bug11s.225", 0x0000, 0x4000, CRC(771af4e1) SHA1(a42b164dd0567c78c0d308ee48d63e5a284897bb) ) /* Road Lookup */
+	ROM_LOAD( "bb3s", 0x4000, 0x200, CRC(2ab3d5ff) SHA1(9f8359cb4ba2e7d15dbb9dc21cd71c0902cd2153) )
+	ROM_LOAD( "bb4s", 0x4200, 0x200, CRC(630f68a4) SHA1(d730f050353c688f81d090e33e00cd35e7b7b6fa) )
+	ROM_LOAD( "bb5s", 0x4400, 0x200, CRC(65925c9e) SHA1(d1ff1cb9f83c09e52a96632945e4edfedc335fd4) )
+	ROM_LOAD( "bb6.224", 0x4600, 0x200, CRC(ad43e02a) SHA1(c50a398020508f52ddf8d45881f211d17d096fa1) )
 
 	/* Arithmetic Unit Function Data ROMs */
+	/* AU function-data ROMs + instruction PROM, word-interleaved (matches
+	   MAME 0.144's "au_data" region layout exactly, same physical ROMs) so
+	   machine/tx1.c can index it directly as 16-bit words:
+	     word 0x0000-0x3fff : function data (bug9.138 low byte, bug10.95 high byte)
+	     word 0x4000-0x41ff : instruction PROM (bb1.163 low byte, bb2.162 high byte) */
 	ROM_REGION( 0x10000, REGION_USER1, 0 )
-	ROM_LOAD( "bug9.138",  0x0800, 0x800, CRC(7d84135b) SHA1(3c669c4e796e83672aceeb6de1aeea28f9f2fef0) )
-	ROM_CONTINUE(          0x1800, 0x800 )
-	ROM_CONTINUE(          0x2800, 0x800 )
-	ROM_CONTINUE(          0x3800, 0x800 )
-	ROM_CONTINUE(          0x4800, 0x800 )
-	ROM_CONTINUE(          0x5800, 0x800 )
-	ROM_CONTINUE(          0x6800, 0x800 )
-	ROM_CONTINUE(          0x7800, 0x800 )
-
-	ROM_LOAD( "bug10.95",  0x0000, 0x800, CRC(b518dd6f) SHA1(7cefa2f9438306c81dc83cd260928c835eb9b712) )
-	ROM_CONTINUE(          0x1000, 0x800 )
-	ROM_CONTINUE(          0x2000, 0x800 )
-	ROM_CONTINUE(          0x3000, 0x800 )
-	ROM_CONTINUE(          0x4000, 0x800 )
-	ROM_CONTINUE(          0x5000, 0x800 )
-	ROM_CONTINUE(          0x6000, 0x800 )
-	ROM_CONTINUE(          0x7000, 0x800 )
+	ROM_LOAD16_BYTE( "bug9.138",  0x0000, 0x4000, CRC(7d84135b) SHA1(3c669c4e796e83672aceeb6de1aeea28f9f2fef0) )
+	ROM_LOAD16_BYTE( "bug10.95",  0x0001, 0x4000, CRC(b518dd6f) SHA1(7cefa2f9438306c81dc83cd260928c835eb9b712) )
+	ROM_LOAD16_BYTE( "bb1.163",   0x8000, 0x0200, CRC(0ddbd36d) SHA1(7a08901a350c315d46ab8d0aa881db384b9f37d2) )
+	ROM_LOAD16_BYTE( "bb2.162",   0x8001, 0x0200, CRC(71d47de1) SHA1(2da9aeb3f2ebb1114631c8042a37c4f4c18e741b) )
 
 	ROM_REGION( 0x100000, REGION_USER2, 0 )
 	ROM_LOAD( "bug16s.139", 0x0000, 0x8000, CRC(1903a9ad) SHA1(526c404c15e3f04b4afb27dee66e9deb0a6b9704) ) /* Object chunk sequence LUT */
