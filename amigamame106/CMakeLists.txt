@@ -126,6 +126,8 @@ set(AMIGA_SRC
 
 	gui_mui.h
 	gui_mui.cpp
+	mui_bitmap_dt.h
+	mui_bitmap_dt.c
 	audio.h
 
 	serializer.h

@@ -37,8 +37,8 @@ extern "C"
 #ifndef REGUFT
 
 #ifdef __GNUC__
-#define REGUFT(r) __asm(#r)
-//#define REGUFT(r)
+//#define REGUFT(r) __asm(#r)
+#define REGUFT(r)
 #else
 
 #endif

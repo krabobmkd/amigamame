@@ -38,12 +38,10 @@ extern "C" {
 
     // this one has bugs with -O2
     #include <proto/muimaster.h>
-    // we point MUI50 in amigacommonlibs repository ....
-    #include <../../MUI50/include/mui/Guigfx_mcc.h>
-    #include <../../MUI50/include/mui/GIFAnim_mcc.h>
 
     #include <devices/timer.h>
 }
+#include "mui_bitmap_dt.h"
 extern "C" {
     #include "driver.h"
     #include "mamecore.h"
@@ -582,22 +580,11 @@ int MameUI::MainGUI(void)
             if(!MainWin)
             {
 
-                if(MUIMasterBase->lib_Version>=MUI5_API_SINCE_VERSION)
-                {
-#define SCALEMODEMASK(u, d, p, s)	(((u) ? NISMF_SCALEUP : 0) | ((d) ? NISMF_SCALEDOWN : 0) | ((p) ? NISMF_KEEPASPECT_PICTURE : 0) | ((s) ? NISMF_KEEPASPECT_SCREEN : 0))
-#define TRANSMASK(m, r)				(((m) ? NITRF_MASK : 0 ) | ((r) ? NITRF_RGB : 0))
-                    // will be NULL if MUI<5, but just invalid if file not found.
-                    const char *giffilepath = "PROGDIR:skin/cornerlogo.gif";
-                    int exists=0;
-                    BPTR hdl = Open(giffilepath, MODE_OLDFILE);
-                    exists = (hdl!=NULL);
-                    if(hdl) Close(hdl);
-                    if(exists)
-                    {
-                        GIF_cornerlogo =
-                            MUINewObject(MUIC_GIFAnim,MUIA_GIFAnim_File,(ULONG) giffilepath, TAG_DONE);
-                    }
-                }
+                // corner logo, decoded via picture.datatype and wrapped as a MUIC_Bitmap
+                // object (see mui_bitmap_dt.c) -- MUIC_GIFAnim and MUIC_Image's "5:<file>"
+                // datatype spec were both seen writing past allocated memory under a
+                // memory-hit tool.
+                GIF_cornerlogo = MUIBitmapDT_Load("PROGDIR:skin/cornerlogo.gif");
                 ULONG Child_Gif = (GIF_cornerlogo)?Child:TAG_DONE;
 
                 Object *windowContent = MUINewObject(MUIC_Group, // vertical group because no horiz. specified.

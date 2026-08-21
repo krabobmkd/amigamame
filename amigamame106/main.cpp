@@ -61,6 +61,7 @@ extern "C" {
 #include "amiga_config.h"
 #include "amiga_inputs.h"
 #include "gui_mui.h"
+#include "mui_bitmap_dt.h"
 
 #define MIN_STACK (14*1024)
 
@@ -138,6 +139,10 @@ int libs_init2()
     if(verbose && (CyberGfxBase == NULL)) printf("can't open cybergraphics\n");
 //    P96Base  = OpenLibrary("Picasso96API.library", 0);
 
+    // optional, used by gui_mui.cpp to load the transparent corner logo
+    // via picture.datatype (see mui_bitmap_dt.c):
+    if(!MUIBitmapDT_OpenLibrary() && verbose) printf("can't open datatypes.library\n");
+
     // mui is done elsewhere.
 
     // also, optional, used for parallel pads:
@@ -173,6 +178,11 @@ void main_close()
     closeTimers();
 
     FreeGUI();
+
+    // must run after FreeGUI() disposed MUI's Bitmap object(s): the
+    // retained picture.datatype object(s) own the struct BitMap they point
+    // at (see mui_bitmap_dt.c).
+    MUIBitmapDT_CloseLibrary();
 
     if(AppDiskObject) FreeDiskObject(AppDiskObject);
 
@@ -282,6 +292,7 @@ int main(int argc, char **argv)
      exit(1);
     }
 
+
     int idriver=0; // romToLaunch;
     std::string userdir;
     std::string cheatfiletofilter;
@@ -304,15 +315,18 @@ int main(int argc, char **argv)
         version = (ArgInt((CONST_STRPTR*)args,"VERSION",2)!=2);
         romlist = (ArgInt((CONST_STRPTR*)args,"-listfull",2)!=2);
         if(!romlist) romlist = (ArgInt((CONST_STRPTR*)args,"-ll",2)!=2);
+
         dohelp = (ArgInt((CONST_STRPTR*)args,"?",2)!=2);
         if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"HELP",2)!=2);
         if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"-h",2)!=2);
         if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"--help",2)!=2);
         if(!dohelp) dohelp = (ArgInt((CONST_STRPTR*)args,"-v",2)!=2);
 
-        cheatfiletofilter = ArgString((CONST_STRPTR*)args,"FILTERCHEAT",NULL);
+        cheatfiletofilter = ArgString((CONST_STRPTR*)args,"FILTERCHEAT","");
+
         ArgArrayDone();
     }
+
     // this extra circus is to manage external project icons tooltips...
     // when launch from a "Project" icon, with tool set to "Mame106".
     // I though ArgArrayInit() would also take care of this.... but no.
@@ -346,9 +360,7 @@ int main(int argc, char **argv)
 
     if(verbose) log_enableStdOut(1);
 
-
     getMainConfig().init(argc,argv); // init drivers map and read conf.
-
 
      // test if just "mame romname".
     if(argc>1)
