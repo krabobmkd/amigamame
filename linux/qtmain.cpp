@@ -270,6 +270,10 @@ void QWin::mouseMoveEvent(QMouseEvent* event)
   //  dbg_nbt = event->x()<<1;
 
 }
+
+extern "C" {
+extern UINT8 *bb_sky;
+}
 void QWin::paintEvent(QPaintEvent *event)
 {
     QLabel::paintEvent(event);
@@ -277,6 +281,12 @@ void QWin::paintEvent(QPaintEvent *event)
 // dbg_nbt
     p.setPen(QPen(Qt::white));
     p.drawText(60,60,QString("woot:")+QString::number(nbframe));
+    if(bb_sky)
+    {
+    p.drawText(60,80,QString("bbsky:")+QString::number(*bb_sky,16));
+    }
+
+
 
 //    p.drawText(60,60,QString("woot:")+QString::number(nbframe));
 }
@@ -479,6 +489,7 @@ void osd_update_video_and_audio(struct _mame_display *display)
 nbframe++;
     // logo
 // if(nbframe == 1550) mame_pause(1);
+// if(nbframe == 2500) mame_pause(1); // didn't actually freeze rendering in this Qt harness
 
 // chasehq sprite prio bug:
 // if(nbframe == 60*100 && m_nbtest == 0)

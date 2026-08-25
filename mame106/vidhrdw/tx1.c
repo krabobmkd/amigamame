@@ -451,7 +451,7 @@ static void bb_draw_objects(mame_bitmap *bitmap,const rectangle *cliprect)
 /*  | rcsd0_3 (range 0x40-0x7f) - which is exactly what 0.106's own   */
 /*  untouched PALETTE_INIT(buggyboy) already built for "colours       */
 /*  64-127" (its four colortable[256+8192+...] blocks are the same    */
-/*  four wave/dirt bit combinations). So we can plot_pixel() straight */
+/*  four wave/dirt bit combinations). So we can write the pen straight */
 /*  into the final bitmap, same as draw_sky() already does, with no   */
 /*  new buffers needed.                                              */
 /*===================================================================*/
@@ -474,12 +474,38 @@ typedef struct
 	UINT8	wa8;
 	UINT8	wa4;
 
-	UINT16	wave_lfsr;
 	UINT16	gas;
 	UINT8	shift;
 } bb_vregs_t;
 
 static bb_vregs_t bb_vregs;
+
+/* The 'wave' road-surface LFSR (see bb_draw_road_ref) resets to the same seed
+   (0) every frame and its recurrence depends on nothing but its own prior
+   value, so the entire 240*256 sequence of bits it produces is identical
+   frame after frame. Precompute it once instead of re-running the
+   shift/xor/bit-test cascade for every pixel of every frame. Packed byte
+   per pixel index: bits 0-3 = (lfsr>>8)&0xf, bit4 = BIT(lfsr,0),
+   bit5 = BIT(lfsr,3), bit6 = BIT(lfsr,5) && !BIT(lfsr,15) && BIT(lfsr,11)
+   && BIT(lfsr,13) (the part of the wave test with no per-frame/per-line
+   dependency). */
+#define BB_WAVE_LUT_SIZE (240*256)
+static UINT8 bb_wave_lut[BB_WAVE_LUT_SIZE];
+
+static void bb_build_wave_lut(void)
+{
+	UINT16 lfsr = 0;
+	int i;
+
+	for (i = 0; i < BB_WAVE_LUT_SIZE; ++i)
+	{
+		UINT8 statand = BIT(lfsr, 5) && !BIT(lfsr, 15) && BIT(lfsr, 11) && BIT(lfsr, 13);
+
+		bb_wave_lut[i] = ((lfsr >> 8) & 0xf) | (BIT(lfsr, 0) << 4) | (BIT(lfsr, 3) << 5) | (statand << 6);
+
+		lfsr = (UINT16)((lfsr << 1) | (BIT(lfsr, 6) ^ !BIT(lfsr, 15)));
+	}
+}
 
 #define BB_RDFLAG_WAVE1		7
 #define BB_RDFLAG_WAVE0		6
@@ -498,21 +524,83 @@ static UINT16 rcram_word(int byte_off)
 	return bb_rcram[byte_off & (bb_rcram_size-1)] | (bb_rcram[(byte_off+1) & (bb_rcram_size-1)] << 8);
 }
 
-static void buggyboy_get_roadpix(int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_rorev,
-				  UINT8 *rc0, UINT8 *rc1, UINT8 *rc2, UINT8 *rc3,
-				  const UINT8 *rom, const UINT8 *prom0, const UINT8 *prom1, const UINT8 *prom2)
+// static inline void buggyboy_get_roadpix(int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_rorev,
+// 				  UINT8 *rc0, UINT8 *rc1, UINT8 *rc2, UINT8 *rc3,
+// 				  const UINT8 *rom, const UINT8 *prom0, const UINT8 *prom1, const UINT8 *prom2)
+// {
+// 	/* Counter Q10-7 are added to 384 (screen=1: centre screen only, matches buggybjr) */
+// 	UINT16 ls283_159 = (ls161 & 0x780) + 128 + 256;
+// 	UINT32 ls283_159_co = ls283_159 & 0x800;
+// 	UINT32 rom_flip = ls283_159 & 0x200 ? 0 : 1;
+// 	UINT32 rom_en = !(ls283_159 & 0x400) && !(ls283_159_co ^ (ls161 & 0x800));
+// 	UINT8 d0 = 0;
+// 	UINT8 d1 = 0;
+
+// 	*_rorev = !( (rom_en && rom_flip) || (!rom_en && (ls161 & 0x4000)) );
+
+// 	if (rom_en)
+// 	{
+// 		UINT8  rom_data;
+// 		UINT16 prom_addr;
+
+// 		UINT16 rha = (ls283_159 & 0x180) | (ls161 & 0x78);
+
+// 		if (rom_flip)
+// 			rha ^= 0x1f8;
+
+// 		rom_data = rom[(1 << 13) | (rha << 4) | rva0_6];
+// 		prom_addr = (rom_flip ? 0x80 : 0) | (rom_data & 0x7f);
+
+// 		*rc0 = prom0[prom_addr];
+// 		*rc1 = prom1[prom_addr];
+// 		*rc2 = prom2[prom_addr];
+
+// 		rom_data = rom[(rha << 4) | rva0_6];
+// 		prom_addr = 0x100 | rom_data;
+
+// 		d0 = prom0[prom_addr];
+// 		d1 = prom1[prom_addr];
+// 	}
+// 	else
+// 	{
+// 		*rc0 = *rc1 = *rc2 = *rc3 = 0;
+// 	}
+// /* that parts does the little darker lines on the ground */
+// 	if (BIT(sld, 4))
+// 	{
+// 		if (BIT(sld, 5))
+// 			d1 = ~d1;
+
+// 		*rc3 = d0 & d1;
+
+// 		if (rom_flip)
+// 			*rc3 = BITSWAP8(*rc3, 0, 1, 2, 3, 4, 5, 6, 7);
+
+// 	}
+// 	else
+// 		*rc3 = 0;
+
+// }
+static  const UINT8 *bbrom = NULL;
+static inline void buggyboy_get_roadpix_fast(int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_rorev,
+				  UINT8 *rc)
 {
 	/* Counter Q10-7 are added to 384 (screen=1: centre screen only, matches buggybjr) */
 	UINT16 ls283_159 = (ls161 & 0x780) + 128 + 256;
 	UINT32 ls283_159_co = ls283_159 & 0x800;
 	UINT32 rom_flip = ls283_159 & 0x200 ? 0 : 1;
-	UINT32 rom_en = !(ls283_159 & 0x400) && !(ls283_159_co ^ (ls161 & 0x800));
+
+    UINT32 rom_en = !(ls283_159 & 0x400) && !(ls283_159_co ^ (ls161 & 0x800));
 	UINT8 d0 = 0;
 	UINT8 d1 = 0;
 
+#define OFSROM0 0x4000
+#define OFSROM1 0x4200
+#define OFSROM2 0x4400
+
 	*_rorev = !( (rom_en && rom_flip) || (!rom_en && (ls161 & 0x4000)) );
 
-	if (rom_en)
+	//if (rom_en)
 	{
 		UINT8  rom_data;
 		UINT16 prom_addr;
@@ -522,25 +610,27 @@ static void buggyboy_get_roadpix(int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_ro
 		if (rom_flip)
 			rha ^= 0x1f8;
 
-		rom_data = rom[(1 << 13) | (rha << 4) | rva0_6];
+		rom_data = bbrom[(1 << 13) | (rha << 4) | rva0_6];
 		prom_addr = (rom_flip ? 0x80 : 0) | (rom_data & 0x7f);
 
-		*rc0 = prom0[prom_addr];
-		*rc1 = prom1[prom_addr];
-		*rc2 = prom2[prom_addr];
+		rc[0] = bbrom[OFSROM0+prom_addr];
+		rc[1] = bbrom[OFSROM1+prom_addr];
+		rc[2] = bbrom[OFSROM2+prom_addr];
 
-		rom_data = rom[(rha << 4) | rva0_6];
+		rom_data = bbrom[(rha << 4) | rva0_6];
 		prom_addr = 0x100 | rom_data;
 
-		d0 = prom0[prom_addr];
-		d1 = prom1[prom_addr];
+		d0 = bbrom[OFSROM0+prom_addr];
+		d1 = bbrom[OFSROM1+prom_addr];
 	}
-	else
+	/* does nt happen on bubbyboyb1 */
+	/*else
 	{
 		*rc0 = *rc1 = *rc2 = *rc3 = 0;
-	}
-
-	if (BIT(sld, 4))
+	}*/
+/* that parts does the little darker lines on the ground */
+/*re
+    if (BIT(sld, 4))
 	{
 		if (BIT(sld, 5))
 			d1 = ~d1;
@@ -549,10 +639,14 @@ static void buggyboy_get_roadpix(int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_ro
 
 		if (rom_flip)
 			*rc3 = BITSWAP8(*rc3, 0, 1, 2, 3, 4, 5, 6, 7);
+
 	}
 	else
-		*rc3 = 0;
+	*/
+    rc[3] = 0;
+
 }
+
 
 #define LOAD_HPOS_COUNTER(NUM)													\
 	ram_val = rcram_word(rva_offs + 0x1f8 + (2*NUM));							\
@@ -573,7 +667,364 @@ static void buggyboy_get_roadpix(int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_ro
 			hp##NUM = hp##NUM + 1;		\
 	}
 
-static void bb_draw_road(mame_bitmap *bitmap)
+/* Archived reference implementation - gate-level port kept intact and
+   unoptimized (beyond the wave LUT) as a known-correct baseline to diff
+   against while bb_draw_road_fast (the bit-count-reduced version) is
+   developed. Not called from VIDEO_UPDATE once bb_draw_road_fast takes
+   over - keep it compiling but do not further optimize it here. */
+// static void bb_draw_road_ref(mame_bitmap *bitmap)
+// {
+// 	INT32 x;
+// 	UINT32 y;
+// 	UINT16 rva_offs;
+// 	UINT32 tnlmd0, tnlmd1, linf, tnlf, wangl, tcmd, wave0, wave1, rva20_6;
+
+// 	const UINT8 *rcols = (const UINT8 *)memory_region(REGION_PROMS) + 0x1500;
+// 	const UINT8 *rom   = (const UINT8 *)memory_region(REGION_GFX6);
+// 	const UINT8 *prom0 = rom + 0x4000;
+// 	const UINT8 *prom1 = rom + 0x4200;
+// 	const UINT8 *prom2 = rom + 0x4400;
+// 	const UINT8 *vprom = rom + 0x4600;
+
+// 	UINT32 wave_idx = 0;
+// 	static int wave_lut_ready = 0;
+
+// 	if (!wave_lut_ready)
+// 	{
+// 		bb_build_wave_lut();
+// 		wave_lut_ready = 1;
+// 	}
+
+// 	/* Once-per-frame accumulator updates (real hardware does this at
+// 	   /VSYNC; we only draw once per frame here too, so it's equivalent
+// 	   whether done at the top or bottom of the frame) */
+// 	bb_vregs.slin_val += bb_vregs.slin_inc;
+
+// 	tcmd	 = ((bb_vregs.scol & 0xc000) >> 12) | ((bb_vregs.scol & 0x00c0) >> 6);
+// 	tnlmd0   = BIT(bb_vregs.flags, BB_RDFLAG_TNLMD0);
+// 	tnlmd1   = BIT(bb_vregs.flags, BB_RDFLAG_TNLMD1);
+// 	linf     = BIT(bb_vregs.flags, BB_RDFLAG_LINF);
+// 	tnlf     = BIT(bb_vregs.flags, BB_RDFLAG_TNLF);
+// 	wangl    = BIT(bb_vregs.flags, BB_RDFLAG_WANGL);
+// 	wave0    = BIT(bb_vregs.flags, BB_RDFLAG_WAVE0);
+// 	wave1    = BIT(bb_vregs.flags, BB_RDFLAG_WAVE1);
+// 	rva_offs = BIT(bb_vregs.flags, BB_RDFLAG_RVA7) ? 0x800 : 0xc00;
+
+// 	for (y = 0; y < 240; ++y)
+// 	{
+// 		UINT16	*dest = (UINT16 *)bitmap->line[y];
+// 		UINT8	rva0_6;
+// 		UINT8	ram_addr;
+// 		UINT16	rcrdb0_15;
+// 		UINT16	rcrs10;
+// 		UINT16	ls161_156_a;
+// 		UINT16	ls161;
+// 		UINT8	sld;
+// 		UINT32	rva8;
+// 		UINT32	rm0, rm1;
+// 		UINT32	rcmd;
+// 		UINT32	bnkcs = 1;
+// 		UINT8	sf;
+
+// 		UINT32	ram_val;
+// 		UINT32	hp;
+// 		UINT32	vp1, vp2, vp3, vp4, vp5, vp6, vp7;
+
+// 		UINT32	ic4_o12, ic4_o13, ic149_o15, ic151_o14;
+
+// 		UINT32	hp0, hp1, hp2, hp3;
+// 		UINT8	hps00, hps01, hps02;
+// 		UINT8	hps10, hps11, hps12;
+// 		UINT8	hps20, hps21, hps22;
+// 		UINT8	hps30, hps31, hps32;
+
+// 		UINT8	rc0 = 0, rc1 = 0, rc2 = 0, rc3 = 0;
+
+// 		UINT8	hp0_cy = 0, hp1_cy = 0, hp2_cy = 0, hp3_cy = 0;
+
+// 		UINT32	bank_cnt;
+// 		UINT32	_rorevcs = 0;
+
+// 		rva8 = (bb_vregs.h_val & 0x8000) || !(bb_vregs.shift & 0x80);
+// 		rva0_6 = (bb_vregs.h_val >> 7) & 0x7f;
+// 		rva20_6 = ((rva0_6 >> 3) & 0xe) | ((rva0_6 & 2) >> 1);
+// 		ram_addr = (~rva0_6 & 0x7f) << 1;
+
+// 		rcrdb0_15 = rcram_word(rva_offs + ram_addr);
+
+// 		rcrs10 = rcrdb0_15 & 0xfc00 ? 0x0400 : 0x0000;
+// 		ls161_156_a = (rcrdb0_15 & 0xfc00) == 0xfc00 ? 0x800 : 0x0000;
+// 		ls161 =  ((rcrdb0_15 & 0x8000) >> 1) | ls161_156_a | rcrs10 | (rcrdb0_15 & 0x03ff);
+
+// 		sld = (vprom[rva0_6] + bb_vregs.slin_val) & 0x38;
+
+// 		vp1 = rcram_word(rva_offs + 0x1e2) >= y ? 0 : 1;
+// 		vp2 = rcram_word(rva_offs + 0x1e4) >= y ? 0 : 1;
+// 		vp3 = rcram_word(rva_offs + 0x1e6) >= y ? 0 : 1;
+// 		vp4 = rcram_word(rva_offs + 0x1e8) >= y ? 0 : 1;
+// 		vp5 = rcram_word(rva_offs + 0x1ea) >= y ? 0 : 1;
+// 		vp6 = rcram_word(rva_offs + 0x1ec) >= y ? 0 : 1;
+// 		vp7 = rcram_word(rva_offs + 0x1ee) >= y ? 0 : 1;
+
+// 		rm0 = vp7 ? BIT(bb_vregs.scol, 4) : BIT(bb_vregs.scol, 12);
+// 		rm1 = vp7 ? BIT(bb_vregs.scol, 5) : BIT(bb_vregs.scol, 13);
+// 		rcmd = (vp7 ? bb_vregs.scol : bb_vregs.scol >> 8) & 0xf;
+
+// 		LOAD_HPOS_COUNTER(0);
+// 		LOAD_HPOS_COUNTER(1);
+// 		LOAD_HPOS_COUNTER(2);
+// 		LOAD_HPOS_COUNTER(3);
+
+// 		ic4_o12 = (!vp1 && !vp2 && !vp6) || (!vp1 && !vp2 && vp7) || (vp4 && !vp6) || (vp4 && vp7);
+// 		ic4_o13 = (!vp1 && !vp2 && !vp5) || (!vp1 && !vp2 && vp7) || (vp3 && !vp5) || (vp3 && vp7);
+// 		ic149_o15 = (!vp5 && !vp6) || vp7 || !linf;
+// 		ic151_o14 = !BIT(sld, 3) || tnlmd0 || tnlmd1 || ic149_o15;
+
+// 		bank_cnt = (bb_vregs.ba_val >> 5) & 0x3ff;
+
+// 		if (ls161 & 7)
+// 			buggyboy_get_roadpix(ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3, rom, prom0, prom1, prom2);
+
+// 		for (x = 0; x < 256; ++x)
+// 		{
+// 			UINT32	pix;
+// 			UINT32	hp0_en, hp1_en, hp2_en, hp3_en;
+// 			UINT32	ic149_o16;
+// 			UINT32	ic4_o18;
+// 			UINT32	ic3_o15;
+// 			UINT32	ic150_o12 = 0;
+// 			UINT32	ic150_o16;
+// 			UINT32	ic150_o17;
+// 			UINT32	ic150_o18;
+// 			UINT32	ic150_o19;
+// 			UINT32	ic151_o15;
+// 			UINT32	ic151_o16;
+// 			UINT32	ic151_o17;
+// 			UINT32	rcsd0_3 = 0;
+// 			UINT32	sld5 = BIT(sld, 5);
+// 			UINT32	sld4 = BIT(sld, 4);
+// 			UINT32	mux;
+// 			UINT32	cprom_addr;
+// 			UINT8	px0, px1, px2, px3;
+
+// 			pix = (ls161 & 7) ^ 7;
+
+// 			hp0_en = !(hp0_cy || hps02);
+// 			hp1_en = !(hp1_cy || hps12);
+// 			hp2_en = !(hp2_cy || hps22);
+// 			hp3_en = !(hp3_cy || hps32);
+
+// 			 if (!(ls161 & 7))
+// 			 	buggyboy_get_roadpix(ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3, rom, prom0, prom1, prom2);
+
+// 			if (bb_vregs.bank_mode == 0)
+// 			{
+// 				if (BIT(bb_vregs.ba_val, 23))
+// 					bnkcs = 1;
+// 				else if (bb_vregs.ba_val & 0x007f8000)
+// 					bnkcs = 0;
+// 				else
+// 					bnkcs = bank_cnt < 0x300;
+// 			}
+// 			else
+// 			{
+// 				if (BIT(bb_vregs.ba_val, 23))
+// 					bnkcs = 0;
+// 				else if (bb_vregs.ba_val & 0x007f8000)
+// 					bnkcs = 1;
+// 				else
+// 					bnkcs = bank_cnt >= 0x300;
+// 			}
+
+// 			px0 = BIT(rc0, pix);
+// 			px1 = BIT(rc1, pix);
+// 			px2 = BIT(rc2, pix);
+// 			px3 = BIT(rc3, pix);
+
+// 			if (vp2)
+// 				ic4_o18 = (hps00 && hps01 && hp3_en && !hps30)		||
+// 					  (!hp0_en && hps01 && hp3_en && !hps30)	||
+// 					  (hps00 && hps01 && !hps31)			||
+// 					  (!hp0_en && hps01 && !hps31)			||
+// 					  vp7;
+// 			else
+// 				ic4_o18 = !vp1;
+
+// 			if (tnlf)
+// 				ic3_o15 = (vp4 && !vp6 && !hp2_en && hps21)		||
+// 					  (vp4 && !vp6 && hps20 && hps21)		||
+// 					  (vp1 && !vp4 && !tnlmd1 && !tnlmd0)		||
+// 					  (vp1 && !vp3 && !tnlmd1 && !tnlmd0)		||
+// 					  (hp1_en && !hps10 && vp3 && !vp5)		||
+// 					  (!hps11 && vp3 && !vp5);
+// 			else
+// 				ic3_o15 = !ic4_o18;
+
+// 			ic151_o17 = (_rorevcs && !tnlmd1 && tnlmd0)		||
+// 				    (!_rorevcs && tnlmd1 && !tnlmd0)		||
+// 				    (_rorevcs && ic4_o12)			||
+// 				    (!_rorevcs && ic4_o13);
+
+// 			if (!ic3_o15)
+// 				ic151_o15 = (px0 && (bnkcs && wangl))	||
+// 					    (px1 && (bnkcs && wangl))	||
+// 					    ic151_o17			||
+// 					    px2				||
+// 					    !tnlf;
+// 			else
+// 				ic151_o15 = !tnlf;
+
+// 			ic151_o16 = (px1 && !px0 && tnlmd1 && !tnlmd0)	||
+// 				    (px2 && tnlmd1 && tnlmd0)		||
+// 				    ic149_o15;
+
+// 			mux = BIT(tcmd, 3) ? ic149_o15 : ic151_o16;
+
+// 			ic150_o19 = (px2 && !rva8)	||
+// 				    !bnkcs			||
+// 				    !mux			||
+// 				    !ic151_o15;
+
+// 			if (ic150_o19)
+// 			{
+// 				UINT32 pen;
+
+// 				ic149_o16 = (_rorevcs && !px2 && ic151_o15)								||
+// 					    (tnlf && vp5 && !vp7 && px2 && !tnlmd0 && !tnlmd1 && ic151_o15)		||
+// 					    (tnlf && vp6 && !vp7 && px2 && !tnlmd0 && !tnlmd1 && ic151_o15)		||
+// 					    (tnlf && !ic4_o18);
+
+// 				ic150_o16 = (px2 && mux && rm1)		||
+// 					    (mux && rva8 && ic151_o15)		||
+// 					    (!px0 && mux)			||
+// 					    !ic151_o15;
+
+// 				{
+// 					UINT32 a = mux && ic151_o15;
+
+// 					ic150_o17 = (a && !rm0 && px0)	||
+// 						    (a && !px1)		||
+// 						    (rva8 && a);
+
+// 					ic150_o18 = (a && !px2) ||
+// 						    (rva8 && a);
+// 				}
+
+// 				if (ic151_o14)
+// 					ic150_o12 = rva8 || !mux || !ic151_o15			||
+// 						    (px2 && px1 && px0 && rm1 && !rm0)		||
+// 						    (!px2 && px1 && px0 && !sld4 && rm0)	||
+// 						    (px2 && px0 && !sld5 && !rm1 && !rm0)	||
+// 						    (px2 && !px1 && px0 && !sld5 && !rm1)	||
+// 						    (px2 && px1 && px0 && !sld5 && !sld4)	||
+// 						    (px2 && px1 && px0 && !sld4 && rm1)	||
+// 						    (!px2 && !px3 && !rm0)			||
+// 						    (!px1 && !px3 && rm1)			||
+// 						    (!px2 && !px1 && !px3)			||
+// 						    (!px0 && !px3);
+// 				else
+// 					ic150_o12 = 0;
+
+// 				if (vp6 || ic151_o16)
+// 				{
+// 					UINT32 ic150_i5 = BIT(tcmd, 3) ? ic149_o15 : ic151_o16;
+
+// 					if (!(ic151_o15 && ic150_i5))
+// 						cprom_addr = (tcmd & 0x7) | (ic151_o16 ? 0x08 : 0);
+// 					else
+// 						cprom_addr = rcmd;
+
+// 					cprom_addr = ((~cprom_addr) & 0xf) << 4;
+// 				}
+// 				else
+// 					cprom_addr = 0xf0;
+
+// 				cprom_addr |= (ic149_o16 ? 0x8 : 0) |
+// 					      (ic150_o18 ? 0x4 : 0) |
+// 					      (ic150_o17 ? 0x2 : 0) |
+// 					      (ic150_o16 ? 0x1 : 0);
+
+// 				rcsd0_3 = rcols[cprom_addr] & 0xf;
+
+// 				{
+// 					UINT8 w = bb_wave_lut[wave_idx];
+// 					UINT32 wave =
+// 						(wave0 ^ ((w >> 4) & 1))	&&
+// 						(wave1 ^ ((w >> 5) & 1))	&&
+// 						(w & 0x40)			&&
+// 						(rva20_6 < (w & 0xf));
+
+// 					pen = 0x40 | (wave ? 0 : 0x20) | (ic150_o12 ? 0x10 : 0) | rcsd0_3;
+// 					*dest = Machine->pens[pen];
+// 				}
+// 			}
+// 			/* else: no road pixel here - leave whatever was drawn underneath (sky) */
+// 			++dest;
+
+// 			UPDATE_HPOS(0);
+// 			UPDATE_HPOS(1);
+// 			UPDATE_HPOS(2);
+// 			UPDATE_HPOS(3);
+
+// 			++wave_idx;
+
+// 			bank_cnt = (bank_cnt + 1) & 0x7ff;
+// 			ls161 = (ls161 + 1) & 0x7fff;
+// 		}
+
+// 		if (wangl)
+// 		{
+// 			if (BIT(bb_vregs.flags, BB_RDFLAG_TNLMD0))
+// 				--bb_vregs.wa8;
+// 			else
+// 				++bb_vregs.wa8;
+// 		}
+
+// 		if (bb_vregs.wa4 != 0xf)
+// 			++bb_vregs.wa4;
+// 		else
+// 		{
+// 			if (wangl)
+// 			{
+// 				if (BIT(bb_vregs.flags, BB_RDFLAG_TNLMD0))
+// 					--bb_vregs.wa8;
+// 				else
+// 					++bb_vregs.wa8;
+// 			}
+// 			bb_vregs.wa4 = 1;
+// 		}
+
+// 		bb_vregs.h_val += bb_vregs.h_inc;
+
+// 		sf = bb_vregs.shift;
+
+// 		if ((bb_vregs.shift & 0x80) == 0)
+// 		{
+// 			bb_vregs.shift <<= 1;
+
+// 			if ((sf & 0x08) == 0)
+// 				bb_vregs.shift |= BIT(bb_vregs.h_val, 15);
+// 		}
+
+// 		if ((sf & 0x08) && !(bb_vregs.shift & 0x08))
+// 			bb_vregs.h_inc = bb_vregs.gas;
+
+// 		bb_vregs.ba_val = (bb_vregs.ba_val + bb_vregs.ba_inc) & 0x00ffffff;
+// 	}
+// }
+
+/* Optimized road renderer. Bit-exact vs. bb_draw_road_ref, restructured
+   from the analysis that only 5 bits (px0-3, wave) are genuinely fresh
+   every pixel; rc0-3/_rorevcs only change every 8 pixels (unchanged
+   below); and hp0-3_en/bnkcs - which the reference tracks with running
+   counters and carry latches - are each just a single step function of x
+   across the whole line (hp*_cy latches once when its counter would wrap;
+   ba_val is constant during the line so bank_cnt is a plain unwrapped
+   ramp). Both are replaced here with a threshold computed once per line,
+   collapsing 4 conditional-increment ops (UPDATE_HPOS) and a branchy
+   bank_mode/ba_val re-test into one comparison each, per pixel, with no
+   running state. See conversation/session notes for the derivation. */
+static void bb_draw_road_fast(mame_bitmap *bitmap)
 {
 	INT32 x;
 	UINT32 y;
@@ -582,16 +1033,25 @@ static void bb_draw_road(mame_bitmap *bitmap)
 
 	const UINT8 *rcols = (const UINT8 *)memory_region(REGION_PROMS) + 0x1500;
 	const UINT8 *rom   = (const UINT8 *)memory_region(REGION_GFX6);
-	const UINT8 *prom0 = rom + 0x4000;
-	const UINT8 *prom1 = rom + 0x4200;
-	const UINT8 *prom2 = rom + 0x4400;
+	bbrom = rom;
+	// const UINT8 *prom0 = rom + 0x4000;
+	// const UINT8 *prom1 = rom + 0x4200;
+	// const UINT8 *prom2 = rom + 0x4400;
 	const UINT8 *vprom = rom + 0x4600;
+
+	UINT32 wave_idx = 0;
+	static int wave_lut_ready = 0;
+
+	if (!wave_lut_ready)
+	{
+		bb_build_wave_lut();
+		wave_lut_ready = 1;
+	}
 
 	/* Once-per-frame accumulator updates (real hardware does this at
 	   /VSYNC; we only draw once per frame here too, so it's equivalent
 	   whether done at the top or bottom of the frame) */
 	bb_vregs.slin_val += bb_vregs.slin_inc;
-	bb_vregs.wave_lfsr = 0;
 
 	tcmd	 = ((bb_vregs.scol & 0xc000) >> 12) | ((bb_vregs.scol & 0x00c0) >> 6);
 	tnlmd0   = BIT(bb_vregs.flags, BB_RDFLAG_TNLMD0);
@@ -605,6 +1065,7 @@ static void bb_draw_road(mame_bitmap *bitmap)
 
 	for (y = 0; y < 240; ++y)
 	{
+		UINT16	*dest = (UINT16 *)bitmap->line[y];
 		UINT8	rva0_6;
 		UINT8	ram_addr;
 		UINT16	rcrdb0_15;
@@ -615,7 +1076,6 @@ static void bb_draw_road(mame_bitmap *bitmap)
 		UINT32	rva8;
 		UINT32	rm0, rm1;
 		UINT32	rcmd;
-		UINT32	bnkcs = 1;
 		UINT8	sf;
 
 		UINT32	ram_val;
@@ -630,12 +1090,17 @@ static void bb_draw_road(mame_bitmap *bitmap)
 		UINT8	hps20, hps21, hps22;
 		UINT8	hps30, hps31, hps32;
 
-		UINT8	rc0 = 0, rc1 = 0, rc2 = 0, rc3 = 0;
 
-		UINT8	hp0_cy = 0, hp1_cy = 0, hp2_cy = 0, hp3_cy = 0;
+		UINT8	rc[4];
 
-		UINT32	bank_cnt;
+
 		UINT32	_rorevcs = 0;
+
+		/* hp*_en(x) and bnkcs(x) closed forms - see function comment */
+		int	hp_thresh0, hp_thresh1, hp_thresh2, hp_thresh3;
+		int	bnk_thresh;
+		UINT32	bnk_invert;
+		UINT32	bank_cnt_init;
 
 		rva8 = (bb_vregs.h_val & 0x8000) || !(bb_vregs.shift & 0x80);
 		rva0_6 = (bb_vregs.h_val >> 7) & 0x7f;
@@ -667,20 +1132,39 @@ static void bb_draw_road(mame_bitmap *bitmap)
 		LOAD_HPOS_COUNTER(2);
 		LOAD_HPOS_COUNTER(3);
 
+		hp_thresh0 = hps02 ? 0 : (256 - (int)hp0);
+		hp_thresh1 = hps12 ? 0 : (256 - (int)hp1);
+		hp_thresh2 = hps22 ? 0 : (256 - (int)hp2);
+		hp_thresh3 = hps32 ? 0 : (256 - (int)hp3);
+
 		ic4_o12 = (!vp1 && !vp2 && !vp6) || (!vp1 && !vp2 && vp7) || (vp4 && !vp6) || (vp4 && vp7);
 		ic4_o13 = (!vp1 && !vp2 && !vp5) || (!vp1 && !vp2 && vp7) || (vp3 && !vp5) || (vp3 && vp7);
 		ic149_o15 = (!vp5 && !vp6) || vp7 || !linf;
 		ic151_o14 = !BIT(sld, 3) || tnlmd0 || tnlmd1 || ic149_o15;
 
-		bank_cnt = (bb_vregs.ba_val >> 5) & 0x3ff;
+		bank_cnt_init = (bb_vregs.ba_val >> 5) & 0x3ff;
+
+		if (bb_vregs.bank_mode == 0)
+		{
+			if (BIT(bb_vregs.ba_val, 23))		{ bnk_thresh = 256; bnk_invert = 0; }
+			else if (bb_vregs.ba_val & 0x007f8000)	{ bnk_thresh = 0;   bnk_invert = 0; }
+			else					{ bnk_thresh = 0x300 - (int)bank_cnt_init; bnk_invert = 0; }
+		}
+		else
+		{
+			if (BIT(bb_vregs.ba_val, 23))		{ bnk_thresh = 0;   bnk_invert = 0; }
+			else if (bb_vregs.ba_val & 0x007f8000)	{ bnk_thresh = 256; bnk_invert = 0; }
+			else					{ bnk_thresh = 0x300 - (int)bank_cnt_init; bnk_invert = 1; }
+		}
 
 		if (ls161 & 7)
-			buggyboy_get_roadpix(ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3, rom, prom0, prom1, prom2);
+			buggyboy_get_roadpix_fast(ls161, rva0_6, sld, &_rorevcs, rc);
 
 		for (x = 0; x < 256; ++x)
 		{
 			UINT32	pix;
 			UINT32	hp0_en, hp1_en, hp2_en, hp3_en;
+			UINT32	bnkcs;
 			UINT32	ic149_o16;
 			UINT32	ic4_o18;
 			UINT32	ic3_o15;
@@ -701,37 +1185,27 @@ static void bb_draw_road(mame_bitmap *bitmap)
 
 			pix = (ls161 & 7) ^ 7;
 
-			hp0_en = !(hp0_cy || hps02);
-			hp1_en = !(hp1_cy || hps12);
-			hp2_en = !(hp2_cy || hps22);
-			hp3_en = !(hp3_cy || hps32);
+			hp0_en = (x < hp_thresh0);
+			hp1_en = (x < hp_thresh1);
+			hp2_en = (x < hp_thresh2);
+			hp3_en = (x < hp_thresh3);
 
-			if (!(ls161 & 7))
-				buggyboy_get_roadpix(ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3, rom, prom0, prom1, prom2);
+			 if (!(ls161 & 7)) //7
+			 	buggyboy_get_roadpix_fast(ls161, rva0_6, sld, &_rorevcs, rc);
 
-			if (bb_vregs.bank_mode == 0)
-			{
-				if (BIT(bb_vregs.ba_val, 23))
-					bnkcs = 1;
-				else if (bb_vregs.ba_val & 0x007f8000)
-					bnkcs = 0;
-				else
-					bnkcs = bank_cnt < 0x300;
-			}
-			else
-			{
-				if (BIT(bb_vregs.ba_val, 23))
-					bnkcs = 0;
-				else if (bb_vregs.ba_val & 0x007f8000)
-					bnkcs = 1;
-				else
-					bnkcs = bank_cnt >= 0x300;
-			}
+			bnkcs = bnk_invert ^ (UINT32)(x < bnk_thresh);
 
-			px0 = BIT(rc0, pix);
-			px1 = BIT(rc1, pix);
-			px2 = BIT(rc2, pix);
-			px3 = BIT(rc3, pix);
+            /*the start red white poistion on groung is just color change ?*/
+/*
+ 0000 out of road
+ 0010 center lane
+ 1010 lane border
+
+*/
+			px0 = BIT(rc[0], pix);
+			px1 = BIT(rc[1], pix);
+			px2 = BIT(rc[2], pix);
+			px3 = BIT(rc[3], pix);
 
 			if (vp2)
 				ic4_o18 = (hps00 && hps01 && hp3_en && !hps30)		||
@@ -839,30 +1313,24 @@ static void bb_draw_road(mame_bitmap *bitmap)
 				rcsd0_3 = rcols[cprom_addr] & 0xf;
 
 				{
-					UINT32 lfsr = bb_vregs.wave_lfsr;
+				/*
+					UINT8 w = bb_wave_lut[wave_idx];
 					UINT32 wave =
-						(wave0 ^ BIT(lfsr, 0))	&&
-						(wave1 ^ BIT(lfsr, 3))	&&
-						BIT(lfsr, 5)		&&
-						!BIT(lfsr, 15)		&&
-						BIT(lfsr, 11)		&&
-						BIT(lfsr, 13)		&&
-						(rva20_6 < ((lfsr >> 8) & 0xf));
+						(wave0 ^ ((w >> 4) & 1))	&&
+						(wave1 ^ ((w >> 5) & 1))	&&
+						(w & 0x40)			&&
+						(rva20_6 < (w & 0xf));
+                    */
+					pen = 0x40 /*| (wave ? 0 : 0x20)*/ | (ic150_o12 ? 0x10 : 0) | rcsd0_3;
 
-					pen = 0x40 | (wave ? 0 : 0x20) | (ic150_o12 ? 0x10 : 0) | rcsd0_3;
-					plot_pixel(bitmap, x, y, Machine->pens[pen]);
+					//test if (!(ls161 & 7)) pen = 0;
+					*dest = Machine->pens[pen];
 				}
 			}
 			/* else: no road pixel here - leave whatever was drawn underneath (sky) */
+			++dest;
 
-			UPDATE_HPOS(0);
-			UPDATE_HPOS(1);
-			UPDATE_HPOS(2);
-			UPDATE_HPOS(3);
-
-			bb_vregs.wave_lfsr = (bb_vregs.wave_lfsr << 1) | (BIT(bb_vregs.wave_lfsr, 6) ^ !BIT(bb_vregs.wave_lfsr, 15));
-
-			bank_cnt = (bank_cnt + 1) & 0x7ff;
+			++wave_idx;
 			ls161 = (ls161 + 1) & 0x7fff;
 		}
 
@@ -1017,6 +1485,7 @@ static void bb_draw_chars(mame_bitmap *bitmap, int opaque)
 
 	for (y = 0; y < 240; ++y)
 	{
+		UINT16 *dest = (UINT16 *)bitmap->line[y];
 		UINT32 d0 = 0, d1 = 0;
 		UINT32 colour = 0;
 		UINT32 y_offs, x_offs, y_gran;
@@ -1074,8 +1543,9 @@ static void bb_draw_chars(mame_bitmap *bitmap, int opaque)
 			if (opaque || (char_val & 3))
 			{
 				pen = 192 + ((char_val & 0xc0) >> 2) + (chr_pal[char_val] & 0xf);
-				plot_pixel(bitmap, x, y, Machine->pens[pen]);
+				*dest = Machine->pens[pen];
 			}
+			++dest;
 
 			x_offs = (x_offs + 1) & 0x1ff;
 		}
@@ -1102,13 +1572,14 @@ VIDEO_START( buggyboy )
 /* Gradient sky - 'scrolls' up and down */
 static void draw_sky(mame_bitmap *bitmap)
 {
-	int x,y,colour;
+	int x,y;
 	for (y = 0; y < 256; y++)
 	{
+		UINT16 *dest = (UINT16 *)bitmap->line[y];
+		UINT16 pen = Machine->pens[0x80 + ((((*bb_sky & 0x7f) + y)>>2)&0x3f)];
 		for (x = 0; x <= Machine->visible_area.max_x; x++)
 		{
-		        colour = (((*bb_sky & 0x7f) + y)>>2)&0x3f;
-			plot_pixel(bitmap,x,y,Machine->pens[0x80 + colour]);
+			*dest++ = pen;
 		}
 	}
 }
@@ -1127,7 +1598,33 @@ See schematic page 11 for mixing logic.
 
 VIDEO_UPDATE( buggyb1 )
 {
-            if(*bb_sky & 0x80)
+            static int bb1_frame = 0;
+            static int bb1_last_sky80 = -1;
+            int sky80 = (*bb_sky & 0x80) ? 1 : 0;
+            if (sky80 != bb1_last_sky80)
+            {
+                printf("bb1 frame %d: *bb_sky=%02x -> road/sky %s\n", bb1_frame, *bb_sky, sky80 ? "ON" : "OFF");
+                bb1_last_sky80 = sky80;
+            }
+            bb1_frame++;
+
+            /* bb_draw_road() advances several hardware accumulators (h_val,
+               shift, wa8, wa4, ba_val, slin_val) by a full scanline sweep as
+               a side effect of painting - correct if VIDEO_UPDATE is called
+               exactly once per emulated frame, which is true while running,
+               but MAME keeps calling VIDEO_UPDATE on every redraw tick while
+               paused (CPU/sound frozen, video not). Each extra call was
+               re-advancing those accumulators with no corresponding hardware
+               time having passed, visibly drifting the road's vertical read
+               position. Skip the repaint entirely while paused - scrbitmap
+               isn't cleared between calls (see video.c force_partial_update),
+               so the last real frame's pixels just stay put. */
+            if (mame_is_paused())
+                return;
+
+          //  if(*bb_sky & 0x80)
+          /* after test */
+            if(*bb_sky != 0)
             {
                /* Character/background layer goes behind the road - confirmed live
                   that drawing it after bb_draw_road (the original order, back when
@@ -1135,7 +1632,10 @@ VIDEO_UPDATE( buggyb1 )
                   tiles right over ~70% of the road. */
                draw_sky(bitmap);
                bb_draw_chars(bitmap, 0);
-               bb_draw_road(bitmap);
+               /* bb_draw_road_fast() is the active renderer - bb_draw_road_ref()
+                  above is kept intact as a known-good fallback, swap this call
+                  back to it if bb_draw_road_fast ever needs to be ruled out. */
+               bb_draw_road_fast(bitmap);
                bb_draw_objects(bitmap,cliprect);
             }
             else
