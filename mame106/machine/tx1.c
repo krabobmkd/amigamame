@@ -1,713 +1,811 @@
 /*===================================================================*/
 /*               TX-1/Buggy Boy (Tatsumi) Hardware                   */
 /*         SN74S516 Arithmetic Unit and Interface Emulation          */
-/*                       VERY PRELIMINARY!                           */
+/*                                                                    */
+/*  Buggy Boy port: the sequencer/state-machine algorithm below is   */
+/*  ported from the completed MAME 0.144 tx1 driver (Phil Bennett),  */
+/*  reimplemented against 0.106's byte-wide handler / global-static  */
+/*  style instead of 0.144's 16-bit-bus / state-class style.         */
+/*  TX-1 itself is not wired to this code (still plain AM_RAM in     */
+/*  tx1_slave) - only Buggy Boy/Buggy Boy Jr use it so far.          */
 /*===================================================================*/
 
 #include "driver.h"
 
-static INT16 AU_DATA;
-static INT16 *AU_PTR = &AU_DATA;
-static int inst_index;
-
-/* Internal registers and so forth */
-static struct Regs
-{
-      INT16 X;    /* Multiplicand and divisor */
-      INT16 X1;   /* Previous X */
-      INT16 Y;    /* Multiplier */
-
-      INT16 Operand2;
-
-      union       /* 32-bit accumulator */
-      {
-         #ifdef LSB_FIRST
-         struct { UINT16 W; INT16 Z;} ZW_16;
-         #else
-         struct { INT16 Z; UINT16 W;} ZW_16;
-         #endif
-         INT32 ZW_32;
-      } acc;
-
-     INT16 ins_seq;  /* Instruciton sequence */
-} AU_Regs;
-
-
-/* Main portion of the arithmetic unit emulation. Accessed by AU_R and AU_W */
-/* Only a few instructions implemented currently */
-
-void MMI_74S516(int ins, UINT16 *data)
-{
-
-   if ((ins!=7) && ((AU_Regs.ins_seq & 0xf)==7))   /* If last instruction was a reading operation, clear sequence. */
-      AU_Regs.ins_seq = 0;
-
-   /* Take INS and append to instruction */
-   AU_Regs.ins_seq <<=4;
-   AU_Regs.ins_seq = AU_Regs.ins_seq | (ins & 0xf);
-
-      switch ( AU_Regs.ins_seq )
-      {
-        /* X1 . Y */
-         case 0x0: AU_Regs.Y = *data;
-                  AU_Regs.ins_seq = 0;
-                  break;
-
-        /* -X1 . Y */
-         case 0x1: AU_Regs.Y = *data;
-                AU_Regs.ins_seq = 0;
-                break;
-
-        /* X1 . Y + Kz.Kw */
-         case 0x2: AU_Regs.Y = *data;
-                AU_Regs.ins_seq = 0;
-                break;
-
-        /* -X1 . Y + Kz.Kw */
-         case 0x3: AU_Regs.Y = *data;
-                AU_Regs.ins_seq = 0;
-                break;
-
-        /* Partial: Load X */
-         case 0x5:  AU_Regs.X = *data;
-                   break;
-         case 0x6:  AU_Regs.X = *data;
-                   break;
-
-
-        /* X * Y (Fractional) */
-         case 0x50: AU_Regs.Y = *data;
-                   AU_Regs.ins_seq = 0;
-                   break;
-
-        /* X * Y (Integer) */                                           // Ok
-         case 0x60: AU_Regs.Y = *data;
-                   AU_Regs.acc.ZW_32 = ((INT16)AU_Regs.X * (INT16)AU_Regs.Y);
-                   AU_Regs.X1 = AU_Regs.X;
-                   AU_Regs.ins_seq = 0;
-                   break;
-
-        /* -X * Y (Fractional) */
-         case 0x51: AU_Regs.Y = *data;
-                   AU_Regs.ins_seq = 0;
-                   break;
-
-        /* -X * Y (Integer) */                                               // Ok
-         case 0x61: AU_Regs.Y = *data;
-                   AU_Regs.acc.ZW_32 = (-(INT16)AU_Regs.X * (INT16)AU_Regs.Y);
-                   AU_Regs.X1 = AU_Regs.X;
-                   AU_Regs.ins_seq = 0;
-                   break;
-
-
-        /* X * Y + Kz.Kw (Fractional) */
-         case 0x52: AU_Regs.Y = *data;
-                   AU_Regs.ins_seq = 0;
-                   break;
-
-        /* X * Y + Kz.Kw (Integer) */                                       // Ok
-         case 0x62: AU_Regs.Y = *data;
-                   AU_Regs.acc.ZW_32 += ((INT16)AU_Regs.X * (INT16)AU_Regs.Y);
-                   AU_Regs.X1 = AU_Regs.X;
-                   AU_Regs.ins_seq = 0;
-                   break;
-
-
-        /* -X * Y + Kz.Kw (Fractional) */
-         case 0x53: AU_Regs.Y = *data;
-                   AU_Regs.ins_seq = 0;
-                   break;
-
-        /* -X * Y + Kz.Kw (Integer) */                                       // Ok
-         case 0x63: AU_Regs.Y = *data;
-                   AU_Regs.acc.ZW_32 += (-(INT16)AU_Regs.X * (INT16)AU_Regs.Y);
-                   AU_Regs.X1 = AU_Regs.X;
-                   AU_Regs.ins_seq = 0;
-                   break;
-
-
-
-        /* Kw / X (Fractional) Nothing Loaded */
-         case 0x54: AU_Regs.ins_seq = 0;
-                   break;
-
-        /* Kw / X (Integer) Nothing Loaded */
-         case 0x64: AU_Regs.acc.ZW_32 /= (INT16)AU_Regs.X;
-                   AU_Regs.X1 = AU_Regs.X;
-                   AU_Regs.ins_seq = 0;
-                   break;
-
-        /* Kz / X (Fractional) Nothing Loaded */
-         case 0x55: AU_Regs.ins_seq = 0;
-                   break;
-
-
-        /* Kz / X (Integer) Nothing Loaded */
-         case 0x65: AU_Regs.acc.ZW_32=AU_Regs.ins_seq;
-                   AU_Regs.ins_seq=0;
-                   break;
-
-
-        /* This can either load Z,Nothing or 0? */
-         case 0x56: AU_Regs.Operand2 = *data;
-                   break;
-
-
-         case 0x560: AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x561: AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x562: AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x563: AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x564: AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x565: AU_Regs.ins_seq = 0;
-                    break;
-
-        // Not complete instruction
-         case 0x566:
-                    AU_Regs.ins_seq = 0;
-                    break;
-
-
-         case 0x660: AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x661: AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x662: AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x663: AU_Regs.ins_seq = 0;
-                    break;
-
-        /* Z,W /X */
-        // result in Z, remainder in W
-         case 0x664: AU_Regs.acc.ZW_16.W = *data;
-                    AU_Regs.acc.ZW_16.Z = AU_Regs.Operand2;
-                    AU_Regs.acc.ZW_16.Z = (INT16)((INT32)AU_Regs.acc.ZW_32 / (INT16)AU_Regs.X);     // wrong :(
-                    AU_Regs.acc.ZW_16.W = (INT16)((INT32)AU_Regs.acc.ZW_32 % (INT16)AU_Regs.X);      //correct!
-                    AU_Regs.X1 = AU_Regs.X;
-                    AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x665: AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x5660:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x5661:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x5662:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x5663:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x5664:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x5665:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x5666:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x5667:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x6660:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x6661:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x6662:AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x6663:AU_Regs.ins_seq = 0;
-                    break;
-
-         /* W/X */
-         case 0x6664:AU_Regs.acc.ZW_32 = (INT16)AU_Regs.acc.ZW_16.W / (INT16)AU_Regs.X;
-                    AU_Regs.X1 = AU_Regs.X;
-                    AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x6665:
-                    AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x6666:
-                    AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x6667:
-                    AU_Regs.ins_seq = 0;
-                    break;
-
-         case 0x66: AU_Regs.Operand2 = *data;
-                   break;
-
-         case 0x4: AU_Regs.ins_seq = 0;
-                   break;
-
-       /* Reading Operations */
-
-         case 0x7:    *data = AU_Regs.acc.ZW_16.Z;
-                      break;
-
-         case 0x77:   *data = AU_Regs.acc.ZW_16.W;
-                      break;
-
-         case 0x777:  *data = AU_Regs.acc.ZW_16.Z;
-                      break;
-
-         case 0x7777: *data = AU_Regs.acc.ZW_16.W;
-                      break;
-
-         default:     break;
-      }
-
-}
-
-
-
-/******************************************************/
-/*                                                    */
-/*     MMI SN74S516T Arithmetic Unit and Interface    */
-/*                                                    */
-/******************************************************/
+/* Shared with drivers/tx1.c: slave RAM backing both the plain
+   0x0000-0x07ff window and its /SPCS-decoded mirror at 0x0800-0x0fff. */
+extern UINT8 *bb_math_ram;
 
 /*
-The arithmetic unit is used extensively to calculate both object and road attributes in both games.
-It can take instructions directly from slave address bus A1-A3 or from a pair of PROMS (BB1.163 and BB2.162).
-Two 16KB function data ROMs are accessible by the chip and the slave CPU (via a hardware index and pointer).
-
-The interface between the arithmetic unit and the slave CPU is different between Buggy Boy and TX-1.
-
-In the case of an Buggy Boy PCB:
-Without AU: No objects visible, road is unchanging in direction.
-Without instruction PROMS: Hand/Go is displayed correctly as well as the end of race animation sequence (buggy spins and goes up in smoke).
-
-Therfore, once enough simple instructions are implemented, it should be possible do display some objects correctly.
-
-/MLPCS  =  !A10.!A11.A12.A13.!A14.!A15
-/DPRCS  =  A10.A11.A12.A13.!A14.!A15
-/INSALD =  /AT3RD.!AT3WDRART + !AT3WDRART.A15 + !AT3WDRART.!A13 + !AT3WDRART.A14 + !AT3WDRART.!A12 + !A8
-/CNTST  =  /AT3RD.!AT3WDRART + !AT3WDRART.A15 + !AT3WDRART.!A13 + !AT3WDRART.A14 + !AT3WDRART.!A12 + !A7
-/SPCS  =  !A15.!A14.!A13.A12 + A14.!A13.!A12 + !A14.A12.A9 + !A14.A13.!A12 + !A14.!A11 + A15
-
-3000-31ff = Direct instruction input (AAB1-AAB3 connect to I0-2 of AU).
-
-3c00-3cff
-3d00-3dff
-3e00-3eff
-3f00-3fff = DATA ROM output enable.
-
-/SPCS  = 0800-0fff
-         3800-39ff
-         3c00-3dff
-         5000-7fff
-
-
-When CPU A8=1, the counters are loaded with an address (e.g. [3754] and [3120]).
-
-The counters are enabled on:
-
-* A7=1 (e.g. [3680] and [3A80]).
-* Read access to locations asserting /SPCS (e.g. [7a72] - those ROM mirror accesses have some significance afterall!)
-* BB2.162 bit 7 = 0 (/CUDEN).
-
-Writes to [36XX] and [37XX] load a value into the AU ROM address shift-registers .
-Reads from [36XX] (and [37xx] presumably) returns this value.
-Writes to [3A00] loads a shift value/direction.
-
-The AU ROM address shifting is governed by DSEL0-1 (BB2.162):
-
-00 = Invalid
-01 = >> 4
-10 = << 4
-11 = Shift direction and magnitude specified by 4-bit data value written to [3A00]:
-    A13-11 =  000 ->  << by A10-7
-    A13-11 != 000 ->  >> by A13-11 (LSB=0)
-
-    The shift magnitude is specified by the number of number of 0s between the LSB (inclusive) and the '1'. Shifting is circular.
-
-Examples:
-
-13 [3754] <- 2DB5
-   [3A00] <- 0100
-   [3600] == B6D4 ? // 0x2DB5 << 2 == 0xB6D4
-
-14 [3600] <- 2DB5
-   [3A00] <- 0200
-   [3600] == 5B6A ? // 0x2DB5 << 1 == 0x5B6A
-
-15 [3600] <- 2DB5
-   [3A00] <- 0400
-   [3600] == 2DB5   // No shift.
-
-16 [3600] <- 2DB5
-   [3A00] <- 0800
-   [3600] == 96DA ? // 0x2DB5 >> 1 == 0x96DA
-
-17 [3600] <- 2DB5
-   [3A00] <- 1000
-   [3600] =  4B6D ? // 0x2DB5 >> 2 == 0x4B6D
-
-18 [3600] <- 2DB5
-   [3A00] <- 2000
-   [3600] =  A5B6 ? // 0x2DB5 >> 3 == 0xA5B6
-
-19 [3600] <- 1568
-   [3A00] <- 2000
-   [3E00] =  1BF2 ? // 0x1568 >> 3 == 0x02AD -> AU_ROM[0x02AD] == 0x1BF2
-
-
-The 14-bit AU ROM address is formed from:
-
-A13-11 =  TFAD13-11 (BB2.162 D4-2)
-A10-8  =  If RADCHG = 1: AU PROM address bits 7-5
-      If RADCHG = 0: Bits 10-8 of shift registers
-A7-0   =  Bits 7-0 of shift registers.
-
-The current implementation of accessing the AU ROM is wrong (it's based on software behaviour rather than the actual hardware )
-
-Here's the full list of AU tests performed during test mode:
-
-ST
-   [300C] <- AA55
-   [3000] <- 55AA
-04 [300E] =  E355 ?
-04 [300E] =  5572 ?
-
-   [300C] <- AA55
-   [3002] <- 55AA
-05 [300E] =  1CAA ?
-05 [300E] =  AA8E ?
-
-   [300C] <- 5A5A
-   [3004] <- A5A5
-06 [300E] =  FCC6 ?
-06 [300E] =  E890 ?
-
-   [300C] <- AA55
-   [3006] <- 55AA
-07 [300E] =  1971 ?
-07 [300E] =  931E ?
-
-   [300C] <- 1000
-   [300C] <- 5678
-   [3008] <- 8765
-08 [300E] =  ff88 ?
-08 [300E] =  0765 ?
-
-   [300C] <- 0200
-   [300C] <- FFFF
-   [300C] <- 55AA
-   [3008] <- FFFF
-09 [300E] =  002a ?
-09 [300E] =  01aa ?
-
-   [3752] <- AA55
-10 [3600] =  AA55 ?
-
-   [3600] <- 55AA
-10 [3680] =  55AA ?
-
-11 [3680] =  A55A ?
-12 [3600] =  55AA ?
-
-   [3754] <- 2DB5
-   [3A00] <- 0100
-13 [3600] =  B6D4 ?
-
-   [3600] <- 2DB5
-   [3A00] <- 0200
-14 [3600] =  5B6A ?
-
-15 [3600] <- 2DB5
-   [3A00] <- 0400
-   [3600] =  2DB5 ?
-
-16 [3600] <- 2DB5
-   [3A00] <- 0800
-   [3600] =  96DA ?
-
-17 [3600] <- 2DB5
-   [3A00] <- 1000
-   [3600] =  4B6D ?
-
-18 [3600] <- 2DB5
-   [3A00] <- 2000
-   [3600] =  A5B6 ?
-
-19 [3600] <- 1568
-   [3A00] <- 2000
-   [3E00] =  1BF2 ?
-
-1A [7A68] =  0000 ?
-
-1B [3680] <- AA55
-   [7A6A] =  55AA ?
-
-1C [3200] <- AA55
-   [300E] =  E355 ?
-
-1D [3754] <- AA55
-   [7A6A] =  55AA ?
-
-1E [3680] <- AA55
-   [7A6A] =  55AA ?
-
-1F [7A6C] =  AA55 ?
-
-20 [300E] =  1CAA ?
-
-21 [300C] <- 55AA
-   [3200] <- AA55
-   [300E] =  E355 ?
-
-22 [3E00] =  14D5 ?
-23 [308C] <- 55AA
-   [7A70] =  15AA ?
-
-24 [7A6E] =  2000 ?
-25 [3600] =  42B5 ?
-26 [3E80] =  1CC2 ?
-27 [308E] =  099F ?
-28 [3680] =  4099 ?
-29 [3680] =  2D40 ?
-2A [3C00] =  5Cf4 ?
-2B [3600] =  5Cf4 ?
-2C [300C] <- 55AA
-   [3A80] =  FFFF ?
-2D [300E] =  FFFF ?
-2E [300E] =  AA56 ?
-   [3600] <- 0000
-2F [4000] =  00BC ?
-30 [3600] =  0000 ?
-
-   [310C] <- 0078
-   [308C] <- 3F70
-40 [3680] =  0087 ?
-
-   [3600] <- 0020
-41 [3680] =  0100 ?
-
-   [3680] <- 533f
-42 [300e] =  0058 ?
-
-   [315c] <- 0020
-43 [7a72] =  0087 ?
-
-44 [3700] =  0080 ?
-
-   [300c] <- 00cc
-   [3000] <- 0074
-45 [308e] =  0000 ?
-
-46 [7a74] =  0078 ?
-   [308c] <- 0000
-47 [300e] =  00c5 ?
-
-   [300c] <- 0074
-   [3000] <- 008c
-48 [311e] =  0000 ?
-
-   [300c] <- 0224
-   [308c] <- 0000
-49 [300e] =  001c ?
-
-   [3724] <- 000c
-   [3000] <- 0078
-4a [300e] =  007c
-
-   [3728] <- 0023
-4b [3e80] =  0055 ?
-4c [3e00] =  0045 ?
-
-   [3600] <- fca2
-   [313c] <- 0118
-   [308c] <- ff42
-4d [300e] =  007e ?
-
-   [312c] <- 0040
-   [308c] <- 00f8
-4e [300e] =  0080 ?
-
-   [300c] <- 0261
-   [3130] <- 2000
-4f [3680] =  004c ?
-
-   [300c] <- 000f
-   [3008] <- e440
-50 [300e] =  0111 ?
-
-51 [7a7a] =  41fd ?
-   [3740] <- 010e
-
-52 [7a76] =  4000 ?
-53 [7a78] =  03a9 ?
-
-   [3280] <- 0800
-54 [3e00] =  ff52 ?
-
-   [3680] <- 001e
-55 [3680] =  ffcd ?
-
-56 [3600] =  fff0 ?
-
-   [314c] <- 0091
-   [3680] <- 0300
-
-57 [3680] =  015e ?
-
-   [3680] <- 00d5
-   [3704] <- 0002
-58 [3600] =  0015 ?
-
-   [3600] <- 0086
-   [317c] <- 0013
-59 [300e] =  09f2 ?
-
-   [300c] <- 0010
-   [3120] <- 011c
-5a [300e] =  11c0 ?
-
+    SN74S516 16x16 multiplier/divider
 */
-
-READ8_HANDLER(BB_AU_R)
+typedef struct
 {
-UINT8 *AU_instr = (UINT8 *)memory_region(REGION_USER1);
-//UINT8 *AU_PROM1 = (UINT8 *)memory_region(REGION_PROMS) + 0x1700;
-//UINT8 *AU_PROM2 = (UINT8 *)memory_region(REGION_PROMS) + 0x1900;
+	INT16 X;
+	INT16 Y;
 
-INT8 value = 0;
+	union
+	{
+		#ifdef LSB_FIRST
+		struct { UINT16 W; INT16 Z; } ZW16;
+		#else
+		struct { INT16 Z; UINT16 W; } ZW16;
+		#endif
+		INT32 ZW32;
+	} ZW;
 
-      switch (offset)
-      {
-        case 0x0:
-        case 0x1:
-        case 0x2:
-        case 0x3:
-        case 0x4:
-        case 0x5:
-        case 0x6:
-        case 0x7:
-        case 0x8:
-        case 0x9:
-        case 0xa:
-        case 0xb:
-        case 0xc:
-        case 0xd:
-        case 0xe:    MMI_74S516(offset>>1, (UINT16*)AU_PTR);   /* Typically Instruction 7 - read result(s) */
-                     value = *AU_PTR;
-                     break;
+	int code;
+	int state;
+	int ZWfl;
+} sn74s516_t;
 
-        case 0xf:    value = (*AU_PTR)>>8;
-                     break;
+/* Buggy Boy AU sequencer state */
+typedef struct
+{
+	UINT16 cpulatch;
+	UINT16 promaddr;
+	UINT16 inslatch;
+	int    mux;
+	UINT16 ppshift;
+	UINT32 i0ff;
+	UINT16 retval;
+} math_t;
 
-        case 0x0e00:
-        case 0x0e01: value = AU_instr[inst_index];
-                     break;
+static sn74s516_t SN74S516;
+static math_t math;
 
-        case 0x0680:
-                     break;                       /* Use to change upper ROM address portion? */
+/*
+    Combined function-data + instruction PROM image, built by
+    ROM_START(buggyb1)/(buggyboy) into REGION_USER1 (mirrors 0.144's
+    single "au_data" region layout exactly, same physical ROM files):
 
-        case 0x0726:
-                     break;
+      word 0x0000-0x3fff : function data ROMs (bug9.138 low byte, bug10.95 high byte)
+      word 0x4000-0x41ff : instruction PROM   (bb1.163 low byte,  bb2.162 high byte)
 
-        default:     value = 0;
-                     break;
-      }
+    Read as separate bytes (not a UINT16* cast) so this doesn't depend
+    on host endianness.
+*/
+#define AU_INS_PROM_BASE	0x4000	/* word index of instruction PROM within REGION_USER1 */
 
-    return value;
-
+static UINT16 au_word(const UINT8 *rom, int word_index)
+{
+	int off = word_index * 2;
+	return rom[off] | (rom[off + 1] << 8);
 }
 
-WRITE8_HANDLER(BB_AU_W)
+#define INC_PROM_ADDR		( math.promaddr = (math.promaddr + 1) & 0x1ff )
+#define ROR16(val, shift)	( ((UINT16)(val) >> (shift)) | ((UINT16)(val) << (16 - (shift))) )
+#define ROL16(val, shift)	( ((UINT16)(val) << (shift)) | ((UINT16)(val) >> (16 - (shift))) )
+#define SWAP16(val)		( (((UINT16)(val) << 8) & 0xff00) | ((UINT16)(val) >> 8) )
+/* BIT(x,n) already provided by mamecore.h */
+
+static UINT8 reverse_nibble(UINT8 nibble)
 {
-//UINT8 *AU_PROM1 = (UINT8 *)memory_region(REGION_PROMS) + 0x1700;
-//UINT8 *AU_PROM2 = (UINT8 *)memory_region(REGION_PROMS) + 0x1900;
-
-      switch (offset)
-      {
-
-        case 0x0:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x1:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR); /* Load values */
-                     break;
-
-        case 0x2:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x3:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
-                     break;
-
-        case 0x4:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x5:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
-                     break;
-
-        case 0x6:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x7:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
-                     break;
-
-        case 0x8:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x9:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
-                     break;
-
-        case 0xa:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0xb:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
-                     break;
-
-        case 0xc:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0xd:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
-                     break;
-
-        case 0xe:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0xf:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
-                     break;
-
-       /* Accessing FN ROMs */
-        case 0x0600:
-                     inst_index &= 0xff00;      /* clear lower byte */
-                     inst_index |= data;
-
-                     break;
-
-        case 0x0601:
-                     inst_index &= 0x00ff;     /* clear upper byte */
-                     inst_index |=(data << 8); /* upper */
-                     break;
-
-
-        case 0x0680: break;                       /* Increment instruction PROM address */
-        case 0x0726: break;
-      }
+	return	(nibble & 1) << 3 |
+		(nibble & 2) << 1 |
+		(nibble & 4) >> 1 |
+		(nibble & 8) >> 3;
 }
 
+/*
+    State transition table.
+
+    A little different to the real thing in that there are no states
+    between final input and multiplication/division.
+*/
+static const INT8 state_table[16][8] =
+{
+	{  4,  4,  4,  4,  5,  1,  1,  0 },
+	{  4,  4,  4,  4,  5,  5,  3,  0 },
+	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{  4,  4,  4,  4,  5,  5, 11,  0 },
+	{  8,  8,  8,  8,  8,  8,  8,  8 },
+	{ 10, 10, 10, 10, 10, 10, 10, 10 },
+	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{  4,  4,  4,  4,  5,  0,  1,  0 },
+	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{  4,  4,  4,  4,  4,  5,  1,  0 },
+	{  4,  4,  4,  4,  5,  5,  1,  0 },
+	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+};
+
+static void sn_multiply(void)
+{
+	switch (SN74S516.code)
+	{
+		case 0:
+			SN74S516.ZW.ZW32 = SN74S516.X * SN74S516.Y;
+			break;
+
+		case 2:
+			SN74S516.ZW.ZW32 += SN74S516.X * SN74S516.Y;
+			break;
+
+		case 3:
+			SN74S516.ZW.ZW32 += -SN74S516.X * SN74S516.Y;
+			break;
+
+		case 0x60:
+			SN74S516.ZW.ZW32 = SN74S516.X * SN74S516.Y;
+			break;
+
+		case 0x61:
+			SN74S516.ZW.ZW32 = -SN74S516.X * SN74S516.Y;
+			break;
+
+		case 0x62:
+			SN74S516.ZW.ZW32 += SN74S516.X * SN74S516.Y;
+			break;
+
+		case 0x63:
+			SN74S516.ZW.ZW32 += -SN74S516.X * SN74S516.Y;
+			break;
+
+		case 0x660:
+			SN74S516.ZW.ZW32 = (SN74S516.X * SN74S516.Y) + (SN74S516.ZW.ZW32 & 0xffff0000);
+			break;
+
+		case 0x661:
+			SN74S516.ZW.ZW32 = (-SN74S516.X * SN74S516.Y) + (SN74S516.ZW.ZW32 & 0xffff0000);
+			break;
+
+		case 0x662:
+			SN74S516.ZW.ZW32 = (-SN74S516.X * SN74S516.Y) + (SN74S516.ZW.ZW32 & 0xffff0000);
+			break;
+
+		case 0x6660:
+			SN74S516.ZW.ZW32 += (SN74S516.X * SN74S516.Y);
+			break;
+
+		default:
+			break;
+	}
+
+	/* Seems a good enough place to clear it. */
+	SN74S516.ZWfl = 0;
+}
+
+static void sn_divide(void)
+{
+	INT32 Z = 0;
+	INT32 W = 0;
+
+	if (SN74S516.X == 0)
+	{
+		SN74S516.ZW.ZW16.Z = (INT16)0xffff;
+		SN74S516.ZW.ZW16.W = 0xffff;
+		SN74S516.ZWfl = 0;
+		return;
+	}
+
+	switch (SN74S516.code)
+	{
+		case 4:
+			Z = SN74S516.ZW.ZW32 / SN74S516.X;
+			W = SN74S516.ZW.ZW32 % SN74S516.X;
+			break;
+
+		case 0x664:
+			Z = SN74S516.ZW.ZW32 / SN74S516.X;
+			W = SN74S516.ZW.ZW32 % SN74S516.X;
+			break;
+
+		case 0x6664:
+			Z = SN74S516.ZW.ZW16.W / SN74S516.X;
+			W = SN74S516.ZW.ZW16.W % SN74S516.X;
+			break;
+
+		default:
+			break;
+	}
+
+	/* Divide overflow. Only happens during chip test anyway */
+	if (Z > 0xffff)
+		Z |= 0xff00;
+
+	SN74S516.ZW.ZW16.Z = (INT16)Z;
+	SN74S516.ZW.ZW16.W = (UINT16)W;
+	SN74S516.ZWfl = 0;
+}
+
+static void sn74s516_update(int ins)
+{
+	SN74S516.state = state_table[SN74S516.state][ins];
+
+	if (SN74S516.state == 4)
+	{
+		sn_multiply();
+		SN74S516.state = 8;
+	}
+	else if (SN74S516.state == 5)
+	{
+		sn_divide();
+		SN74S516.state = 10;
+	}
+}
+
+static void kick_sn74s516(UINT16 *data, int ins)
+{
+#define LOAD_X		(SN74S516.X = *data)
+#define LOAD_Y		(SN74S516.Y = *data)
+#define LOAD_Z		(SN74S516.ZW.ZW16.Z = *data)
+#define LOAD_W		(SN74S516.ZW.ZW16.W = *data)
+#define READ_ZW		*data = SN74S516.ZWfl ? SN74S516.ZW.ZW16.W : SN74S516.ZW.ZW16.Z; \
+			SN74S516.ZWfl ^= 1;
+
+#define UPDATE_SEQUENCE (SN74S516.code = (SN74S516.code << 4) | ins)
+#define CLEAR_SEQUENCE	(SN74S516.code = 0)
+
+	switch (SN74S516.state)
+	{
+		case 0:
+			CLEAR_SEQUENCE;
+			UPDATE_SEQUENCE;
+
+			if (ins < 4)
+			{
+				LOAD_Y;
+				sn74s516_update(ins);
+			}
+			else if (ins == 4)
+			{
+				sn74s516_update(ins);
+			}
+			else if (ins < 7)
+			{
+				LOAD_X;
+				sn74s516_update(ins);
+			}
+			else if (ins == 7)
+			{
+				READ_ZW;
+			}
+			break;
+
+		case 8:
+		case 10:
+			CLEAR_SEQUENCE;
+			UPDATE_SEQUENCE;
+
+			if (ins < 4)
+			{
+				LOAD_Y;
+				sn74s516_update(ins);
+			}
+			else if (ins == 4)
+			{
+				sn74s516_update(ins);
+			}
+			else if (ins == 5)
+			{
+				/* Rounding operation */
+				sn74s516_update(ins);
+			}
+			else if (ins == 6)
+			{
+				LOAD_X;
+				sn74s516_update(ins);
+			}
+			else if (ins == 7)
+			{
+				READ_ZW;
+				sn74s516_update(ins);
+			}
+			break;
+
+		case 1:
+			/* 6666 represents an incomplete state - clear it. */
+			if (SN74S516.code == 0x6666)
+				CLEAR_SEQUENCE;
+
+			UPDATE_SEQUENCE;
+			if (ins < 4)
+			{
+				LOAD_Y;
+				sn74s516_update(ins);
+			}
+			else if (ins < 6)
+			{
+				sn74s516_update(ins);
+			}
+			else if (ins == 6)
+			{
+				LOAD_Z;
+				sn74s516_update(ins);
+			}
+			else if (ins == 7)
+			{
+				/* Pointless operation. */
+				sn74s516_update(ins);
+			}
+			break;
+
+		case 3:
+			UPDATE_SEQUENCE;
+			if (ins < 4)
+			{
+				LOAD_Y;
+				sn74s516_update(ins);
+			}
+			else if (ins == 4)
+			{
+				LOAD_W;
+				sn74s516_update(ins);
+			}
+			else if (ins == 5)
+			{
+				sn74s516_update(ins);
+			}
+			else if (ins == 6)
+			{
+				LOAD_W;
+				sn74s516_update(ins);
+			}
+			else if (ins == 7)
+			{
+				READ_ZW;
+				sn74s516_update(ins);
+			}
+			break;
+
+		case 11:
+			UPDATE_SEQUENCE;
+			if (ins < 4)
+			{
+				LOAD_Y;
+				sn74s516_update(ins);
+			}
+			else if (ins < 6)
+			{
+				sn74s516_update(ins);
+			}
+			else if (ins == 6)
+			{
+				sn74s516_update(ins);
+			}
+			else if (ins == 7)
+			{
+				/* 6667 = Load X, Load Z, Load W, Clear Z */
+				SN74S516.ZW.ZW16.Z = 0;
+				sn74s516_update(ins);
+			}
+			break;
+
+		default:
+			break;
+	}
+}
+
+
+/****************************/
+/*    Buggy Boy AU wiring   */
+/****************************/
+
+#define BB_INSLD	0x100
+#define BB_CNTST	0x80
+#define BB_RADCHG	0x20
+#define BB_DSEL		0x03
+
+enum
+{
+	BB_MUX_MULEN = 0x00,
+	BB_MUX_PPSEN,
+	BB_MUX_PSSEN,
+	BB_MUX_LMSEL,
+	BB_MUX_DPROE,
+	BB_MUX_PPOE,
+	BB_MUX_INSCL,
+	BB_MUX_ILDEN
+};
+
+#define BB_SET_INS0_BIT		do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff; } while (0)
+
+static UINT16 get_bb_datarom_addr(void)
+{
+	UINT16 addr;
+
+	addr = ((math.inslatch & 0x1c00) << 1) | (math.ppshift & 0xff);
+
+	if ((math.inslatch >> 8) & BB_RADCHG)
+		addr |= (math.ppshift & 0x0700);
+	else
+		addr |= (math.promaddr << 3) & 0x0700;
+
+	return addr & 0x3fff;
+}
+
+static void buggyboy_update_state(void)
+{
+#define LHIEN(a)	!((a) & 0x80)
+#define LLOEN(a)	!((a) & 0x40)
+#define GO_EN(a)	!((a) & 0x4000)
+
+	const UINT8 *au_rom = (const UINT8 *)memory_region(REGION_USER1);
+
+	for (;;)
+	{
+		int go = 0;
+		UINT16 prom_word = au_word(au_rom, AU_INS_PROM_BASE + math.promaddr);
+
+		if (!GO_EN(math.inslatch) && GO_EN(prom_word))
+			go = 1;
+		else if ((GO_EN(math.inslatch) && GO_EN(prom_word)) && (LHIEN(math.inslatch) && LLOEN(prom_word)))
+			go = 1;
+
+		/* Now update the latch */
+		math.inslatch = prom_word & 0x7fff;
+		math.mux = (math.inslatch >> 3) & 7;
+
+		if (math.mux == BB_MUX_INSCL)
+			math.i0ff = 0;
+
+		if (go)
+		{
+			int ins = math.inslatch & 7;
+
+			BB_SET_INS0_BIT;
+
+			if (math.mux == BB_MUX_DPROE)
+			{
+				UINT16 addr = get_bb_datarom_addr();
+				UINT16 data = au_word(au_rom, addr);
+				kick_sn74s516(&data, ins);
+			}
+			else if (math.mux == BB_MUX_PPOE)
+			{
+				kick_sn74s516(&math.ppshift, ins);
+			}
+			else if (LHIEN(math.inslatch) || LLOEN(math.inslatch))
+			{
+				UINT16 data;
+
+				kick_sn74s516(&data, ins);
+
+				if (LHIEN(math.inslatch) && LLOEN(math.inslatch))
+				{
+					math.ppshift = data;
+				}
+				else if (math.mux == BB_MUX_LMSEL)
+				{
+					if (LLOEN(math.inslatch))
+					{
+						math.ppshift &= 0x000f;
+						math.ppshift |= data & 0xfff0;
+					}
+					else if (LHIEN(math.inslatch))
+					{
+						math.ppshift &= 0xfff0;
+						math.ppshift |= data & 0x000f;
+					}
+				}
+				else
+				{
+					if (LLOEN(math.inslatch))
+					{
+						math.ppshift &= 0x0fff;
+						math.ppshift |= data & 0xf000;
+					}
+					else if (LHIEN(math.inslatch))
+					{
+						math.ppshift &= 0xf000;
+						math.ppshift |= data & 0x0fff;
+					}
+				}
+			}
+			else
+			{
+				if (math.mux == BB_MUX_PPSEN)
+				{
+					kick_sn74s516(&math.ppshift, ins);
+				}
+				else
+				{
+					/* Bus pullups give 0xffff */
+					UINT16 data = 0xffff;
+					kick_sn74s516(&data, ins);
+				}
+			}
+		}
+
+		/* Handle rotation */
+		if (((math.inslatch >> 8) & BB_DSEL) == 1)
+			math.ppshift = ROR16(math.ppshift, 4);
+		else if (((math.inslatch >> 8) & BB_DSEL) == 2)
+			math.ppshift = ROL16(math.ppshift, 4);
+
+		/* Is there another instruction in the sequence? */
+		if (au_word(au_rom, AU_INS_PROM_BASE + math.promaddr) & 0x8000)
+			break;
+		else
+			INC_PROM_ADDR;
+	}
+}
+
+/* 0x3000-0x3fff: /MLPCS, /PPSEN, /PSSEN, /DPROE (word_offset: 0-0x7ff) */
+static UINT16 bb_math_r(int word_offset)
+{
+	int offset = word_offset << 1;
+
+	/* /MLPCS */
+	if (offset < 0x400)
+	{
+		int ins;
+
+		if (offset & 0x200)
+		{
+			ins = math.inslatch & 7;
+			BB_SET_INS0_BIT;
+		}
+		else
+		{
+			ins = (offset >> 1) & 7;
+		}
+
+		kick_sn74s516(&math.retval, ins);
+	}
+	/* /PPSEN */
+	else if (offset < 0x800)
+	{
+		math.retval = math.ppshift;
+	}
+	/* /DPROE */
+	else if ((offset & 0xc00) == 0xc00)
+	{
+		const UINT8 *au_rom = (const UINT8 *)memory_region(REGION_USER1);
+		UINT16 addr = get_bb_datarom_addr();
+
+		math.retval = au_word(au_rom, addr);
+
+		if (math.mux == BB_MUX_PPSEN)
+			math.ppshift = math.retval;
+
+		if (offset < 0xe00)
+		{
+			if (math.mux != BB_MUX_ILDEN)
+			{
+				INC_PROM_ADDR;
+				buggyboy_update_state();
+			}
+		}
+	}
+	else
+	{
+		if (math.mux == BB_MUX_PPSEN)
+			math.retval = math.ppshift;
+		else
+			math.retval = 0xffff;
+	}
+
+	if (offset & BB_INSLD)
+	{
+		math.promaddr = (offset << 2) & 0x1ff;
+		buggyboy_update_state();
+	}
+	else if (offset & BB_CNTST)
+	{
+		INC_PROM_ADDR;
+		buggyboy_update_state();
+	}
+
+	return math.retval;
+}
+
+static void bb_math_w(int word_offset, UINT16 data)
+{
+	int offset = word_offset << 1;
+
+	math.cpulatch = data;
+
+	/* /MLPCS */
+	if (offset < 0x400)
+	{
+		int ins;
+
+		if (offset & 0x200)
+		{
+			ins = math.inslatch & 7;
+			BB_SET_INS0_BIT;
+		}
+		else
+		{
+			ins = (offset >> 1) & 7;
+		}
+
+		kick_sn74s516(&math.cpulatch, ins);
+	}
+	/* /PPSEN */
+	else if ((offset & 0xc00) == 0x400)
+	{
+		math.ppshift = math.cpulatch;
+	}
+	/* /PSSEN */
+	else if ((offset & 0xc00) == 0x800)
+	{
+		if (((math.inslatch >> 8) & BB_DSEL) == 3)
+		{
+			int shift;
+			UINT16 val = math.ppshift;
+
+			if (math.cpulatch & 0x3800)
+			{
+				shift = (math.cpulatch >> 11) & 0x7;
+				while (shift)
+				{
+					val = ROR16(val, 1);
+					shift >>= 1;
+				}
+			}
+			else
+			{
+				shift = (math.cpulatch >> 7) & 0xf;
+				shift = reverse_nibble((UINT8)shift);
+				shift >>= 1;
+				while (shift)
+				{
+					val = ROL16(val, 1);
+					shift >>= 1;
+				}
+			}
+			math.ppshift = val;
+		}
+	}
+
+	if (offset & BB_INSLD)
+	{
+		math.promaddr = (offset << 2) & 0x1ff;
+		buggyboy_update_state();
+	}
+	else if (offset & BB_CNTST)
+	{
+		INC_PROM_ADDR;
+		buggyboy_update_state();
+	}
+}
+
+/*
+    /SPCS RAM (0x0800-0x0fff) and /SPCS ROM (0x5000-0x7fff): the slave
+    CPU's own RAM and ROM, decoded a second time through the AU's chip
+    select so that reading them also feeds math.cpulatch into the AU
+    pipeline (real PCB behaviour, not a MAME modelling artifact).
+*/
+static UINT16 bb_spcs_apply(UINT16 data)
+{
+	math.cpulatch = data;
+
+	if (math.mux == BB_MUX_ILDEN)
+	{
+		math.i0ff = (math.cpulatch & (1 << 14)) ? 1 : 0;
+	}
+	else if (math.mux == BB_MUX_MULEN)
+	{
+		int ins = math.inslatch & 7;
+		BB_SET_INS0_BIT;
+		kick_sn74s516(&math.cpulatch, ins);
+	}
+	else if (math.mux == BB_MUX_PPSEN)
+	{
+		math.ppshift = math.cpulatch;
+	}
+	else if (math.mux == BB_MUX_PSSEN)
+	{
+		if (((math.inslatch >> 8) & BB_DSEL) == 3)
+		{
+			int shift;
+			UINT16 val = math.ppshift;
+
+			if (math.cpulatch & 0x3800)
+			{
+				shift = (math.cpulatch >> 11) & 0x7;
+				while (shift)
+				{
+					val = ROR16(val, 1);
+					shift >>= 1;
+				}
+			}
+			else
+			{
+				shift = (math.cpulatch >> 7) & 0xf;
+				shift = reverse_nibble((UINT8)shift);
+				shift >>= 1;
+				while (shift)
+				{
+					val = ROL16(val, 1);
+					shift >>= 1;
+				}
+			}
+			math.ppshift = val;
+		}
+	}
+
+	if (math.mux != BB_MUX_ILDEN)
+	{
+		INC_PROM_ADDR;
+		buggyboy_update_state();
+	}
+
+	return math.cpulatch;
+}
+
+/* Public byte-wide handlers, wired into buggyboy_slave in drivers/tx1.c.
+
+   The master/slave 8086s here issue 16-bit word accesses; 0.106's byte-wide
+   ADDRESS_SPACE_PROGRAM (see mame106/cpu/i86/i86.h ReadWord/WriteWord) always
+   splits those into two byte accesses, low byte (even offset) first, then
+   high byte (odd offset) second. So: writes accumulate into a latch and only
+   perform the real 16-bit operation once the high byte lands; reads perform
+   the operation once (low-byte access) and cache the result for the
+   following high-byte access. */
+
+static UINT16 au_r_latch;
+static UINT16 au_w_latch;
+
+READ8_HANDLER( BB_AU_R )
+{
+	int word_offset = offset >> 1;
+
+	if (!(offset & 1))
+	{
+		au_r_latch = bb_math_r(word_offset);
+		return au_r_latch & 0xff;
+	}
+
+	return au_r_latch >> 8;
+}
+
+WRITE8_HANDLER( BB_AU_W )
+{
+	if (!(offset & 1))
+	{
+		au_w_latch = data & 0xff;
+	}
+	else
+	{
+		au_w_latch |= data << 8;
+		bb_math_w(offset >> 1, au_w_latch);
+	}
+}
+
+static UINT16 spcs_r_latch;
+
+READ8_HANDLER( BB_SPCS_RAM_R )
+{
+	int base = offset & ~1;
+
+	if (!(offset & 1))
+	{
+		UINT16 word = bb_math_ram[base] | (bb_math_ram[base + 1] << 8);
+		spcs_r_latch = bb_spcs_apply(word);
+		return spcs_r_latch & 0xff;
+	}
+
+	return spcs_r_latch >> 8;
+}
+
+WRITE8_HANDLER( BB_SPCS_RAM_W )
+{
+	bb_math_ram[offset] = data;
+}
+
+READ8_HANDLER( BB_SPCS_ROM_R )
+{
+	const UINT8 *rom = (const UINT8 *)memory_region(REGION_CPU2);
+	int base = 0xfd000 + (offset & ~1);
+
+	if (!(offset & 1))
+	{
+		UINT16 word = rom[base] | (rom[base + 1] << 8);
+		spcs_r_latch = bb_spcs_apply(word);
+		return spcs_r_latch & 0xff;
+	}
+
+	return spcs_r_latch >> 8;
+}
+
+void bb_math_reset(void)
+{
+	memset(&math, 0, sizeof(math));
+}
