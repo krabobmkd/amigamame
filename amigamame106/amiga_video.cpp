@@ -37,6 +37,8 @@
 // Amiga includes, proto manages __cplusplus__
 //#include <proto/alib.h>
 #include <proto/exec.h>
+// SIGBREAKF_CTRL_C: no longer pulled in transitively in this NDK
+#include <dos/dos.h>
 #include <proto/graphics.h>
 //#include <proto/cybergraphics.h>
 #include <proto/intuition.h>

@@ -326,7 +326,7 @@ void m68k_pulse_halt(void);
 unsigned int m68k_context_size(void);
 
 /* Get a cpu context */
-unsigned int m68k_get_context(void* dst);
+void m68k_get_context(void* dst);
 
 /* set the current cpu context */
 void m68k_set_context(void* dst);

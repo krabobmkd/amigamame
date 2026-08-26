@@ -1,4 +1,5 @@
 #define MACHINENAME "dec0"
+
 /***************************************************************************
 
   Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk
@@ -994,6 +995,7 @@ static MACHINE_DRIVER_START( baddudes )
 	MDRV_VIDEO_UPDATE(baddudes)
 
 	/* sound hardware */
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(YM2203, 1500000)

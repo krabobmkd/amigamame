@@ -1039,12 +1039,11 @@ unsigned int m68k_context_size()
 	return sizeof(struct m68ki_cpu_core);
 }
 
-unsigned int m68k_get_context(void* dst)
+void m68k_get_context(void* dst)
 {    
     struct m68k_cpu_instance *p68k = m68k_getActivecpu();
 	if(dst && p68k) *(struct m68ki_cpu_core*)dst = p68k->m_cpu;  // nasty struct copy that can happens  a lot.
-	return sizeof(struct m68ki_cpu_core);
-
+	//return sizeof(struct m68ki_cpu_core);
 }
 
 void m68k_set_context(void* src)

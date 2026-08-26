@@ -59,8 +59,11 @@ extern "C" {
 #include "amiga_inputs_kbd_ll.h"
 #include "amiga_inputs_interface.h"
 
+// LowLevelBase must not be wrapped in extern "C": proto/lowlevel.h declares
+// it with plain C++ linkage, and gcc16 rejects a linkage mismatch between
+// the declaration and this definition.
+struct Library *LowLevelBase = NULL;
 extern "C" {
-    struct Library *LowLevelBase = NULL;
 	extern UINT32 _throttleIsOn; // with shift+f10 key
 }
 

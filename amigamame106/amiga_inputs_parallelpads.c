@@ -334,7 +334,10 @@ struct ParallelPads *createParallelPads(int readJ4Bt2WithInterupt)
        // rbfint->is_Node.ln_Name = ppidata->rd_Name;
         rbfint->is_Node.ln_Name = (char *)"parpads";
         rbfint->is_Data = (APTR)ppidata;
-        rbfint->is_Code = &VBLinteruptfunc;
+        // is_Code is old-style VOID(*)(); VBLinteruptfunc's register/asm
+        // parameter (a1) is the real Amiga interrupt-server ABI, cast needed
+        // since gcc16 now hard-errors on this pointer-type mismatch.
+        rbfint->is_Code = (void (*)())&VBLinteruptfunc;
 
         AddIntServer(INTB_VERTB,rbfint);
         pparpads->_vertbintOk = 1;

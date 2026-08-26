@@ -40,6 +40,8 @@
 #include <algorithm>
 #include <proto/exec.h>
 #include <proto/dos.h>
+// INVALID_ID: no longer pulled in transitively via proto/graphics.h in this NDK
+#include <graphics/modeid.h>
 #include <string.h>
 #include <fstream>
 #include "drivertuning.h"

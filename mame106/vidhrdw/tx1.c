@@ -25,6 +25,8 @@ extern UINT8 *tx1_object_ram;
 extern tilemap *tx1_tilemap;
 extern size_t tx1_objectram_size;
 
+//vf added
+int debugy=0;
 /*********/
 /* TX-1 */
 /********/
@@ -591,6 +593,8 @@ static inline void buggyboy_get_roadpix_fast(int ls161, UINT8 rva0_6, UINT8 sld,
 	UINT32 rom_flip = ls283_159 & 0x200 ? 0 : 1;
 
     UINT32 rom_en = !(ls283_159 & 0x400) && !(ls283_159_co ^ (ls161 & 0x800));
+
+
 	UINT8 d0 = 0;
 	UINT8 d1 = 0;
 
@@ -600,6 +604,11 @@ static inline void buggyboy_get_roadpix_fast(int ls161, UINT8 rva0_6, UINT8 sld,
 
 	*_rorev = !( (rom_en && rom_flip) || (!rom_en && (ls161 & 0x4000)) );
 
+    /* trace a line where we know there is road*/
+ if(debugy == (240-64) || debugy == (240-63))
+ {
+     printf("rp:ls161:%04x rva0_6:%d sld:%d --- rflip:%d rom_en:%d rorev:%d\n",ls161,rva0_6,sld,rom_flip,rom_en,*_rorev );
+    }
 	//if (rom_en)
 	{
 		UINT8  rom_data;
@@ -629,20 +638,19 @@ static inline void buggyboy_get_roadpix_fast(int ls161, UINT8 rva0_6, UINT8 sld,
 		*rc0 = *rc1 = *rc2 = *rc3 = 0;
 	}*/
 /* that parts does the little darker lines on the ground */
-/*re
+
     if (BIT(sld, 4))
 	{
 		if (BIT(sld, 5))
 			d1 = ~d1;
 
-		*rc3 = d0 & d1;
+		 rc[3] = d0 & d1;
 
 		if (rom_flip)
-			*rc3 = BITSWAP8(*rc3, 0, 1, 2, 3, 4, 5, 6, 7);
+			 rc[3] = BITSWAP8(rc[3], 0, 1, 2, 3, 4, 5, 6, 7);
 
 	}
 	else
-	*/
     rc[3] = 0;
 
 }
@@ -1096,6 +1104,8 @@ static void bb_draw_road_fast(mame_bitmap *bitmap)
 
 		UINT32	_rorevcs = 0;
 
+        debugy = y;
+
 		/* hp*_en(x) and bnkcs(x) closed forms - see function comment */
 		int	hp_thresh0, hp_thresh1, hp_thresh2, hp_thresh3;
 		int	bnk_thresh;
@@ -1313,15 +1323,20 @@ static void bb_draw_road_fast(mame_bitmap *bitmap)
 				rcsd0_3 = rcols[cprom_addr] & 0xf;
 
 				{
-				/*
+
 					UINT8 w = bb_wave_lut[wave_idx];
 					UINT32 wave =
 						(wave0 ^ ((w >> 4) & 1))	&&
 						(wave1 ^ ((w >> 5) & 1))	&&
 						(w & 0x40)			&&
 						(rva20_6 < (w & 0xf));
-                    */
-					pen = 0x40 /*| (wave ? 0 : 0x20)*/ | (ic150_o12 ? 0x10 : 0) | rcsd0_3;
+
+					pen = 0x40 |
+                            (wave ? 0 : 0x20) | /* just effect on water ?*/
+                           // (ic150_o12 ? 0x10 : 0) |  /* road vertical movement */
+                           // rcsd0_3 | /* road vertical lines */
+                           0
+                            ;
 
 					//test if (!(ls161 & 7)) pen = 0;
 					*dest = Machine->pens[pen];

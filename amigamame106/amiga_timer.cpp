@@ -42,11 +42,12 @@ extern "C" {
     #include "osdepend.h"
 }
 
-extern "C" {
-    struct Device *TimerBase = NULL;
-    struct timerequest    *TimerIO=NULL;
-    struct MsgPort *timer_msgport=NULL;
-}
+// TimerBase must not be wrapped in extern "C": proto/timer.h declares it with
+// plain C++ linkage, and gcc16 rejects a linkage mismatch between the
+// declaration and this definition.
+struct Device *TimerBase = NULL;
+struct timerequest    *TimerIO=NULL;
+struct MsgPort *timer_msgport=NULL;
 
 void initTimers()
 {

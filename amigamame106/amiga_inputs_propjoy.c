@@ -517,7 +517,10 @@ VOID  __stdargs WritePotgo( ULONG word, ULONG mask );
         //    pintdata->_Signal = 1L << signr;
         rbfint->is_Node.ln_Name = (char *)"MAMEpotgo";
         rbfint->is_Data = (APTR)pintdata;
-        rbfint->is_Code = &interuptfunc_addIntServer;
+        // is_Code is old-style VOID(*)(); interuptfunc_addIntServer's register/asm
+        // parameter (a1) is the real Amiga interrupt-server ABI, cast needed
+        // since gcc16 now hard-errors on this pointer-type mismatch.
+        rbfint->is_Code = (void (*)())&interuptfunc_addIntServer;
 
         AddIntServer(INTB_VERTB,rbfint);
         if(logFunc) logFunc(0,"Analog joystick use VBlank interupt.\n");

@@ -1,4 +1,6 @@
 // dec0n.cpp
+// baddudes test -> crash with O2 and O3 !!!
+#pragma GCC optimize ("O1")
 extern "C" {
     #include "mame.h"
     #include "driver.h"
@@ -13,6 +15,7 @@ extern "C" {
 								const UINT16 *control1,
 								int flags);
 }
+
 
 typedef struct {
     tilemap *tilemap_ptr;

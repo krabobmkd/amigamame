@@ -1,6 +1,6 @@
 /**************************************************************************
  *
- * Copyright (C) 2025 Krb
+ * Copyright (C) 2026 Krb
  *
  *
  *
@@ -81,7 +81,10 @@ struct _game_driver **Drivers;
 LONG        MenuSelect[NUM_ITEMS];
 
 
-extern "C" {
+// these must NOT be wrapped in extern "C": the ndk-include proto/*.h headers
+// declare them with plain C++ linkage, and gcc16 rejects a linkage mismatch
+// between declaration and definition (variables aren't name-mangled in C++
+// either way, so this doesn't change the linked symbol names).
 #ifdef USE_OWN_DOSBASE
 struct DosLibrary   *DOSBase    = NULL;
 #endif
@@ -99,7 +102,6 @@ struct Library    *MiscBase=NULL;
 struct DiskObject *AppDiskObject = NULL;
 //struct Library      *P96Base = NULL;
  int verbose=0;
-}
 
 struct FileRequester  *FileRequester  = NULL;
 

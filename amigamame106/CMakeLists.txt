@@ -55,6 +55,11 @@ if(AMIGA)
 #  -fsingle-precision-constant -> dont use that need double precs for timer.h/.c !!
 	if(MAME_USE_HARDFLOAT)
 		list(APPEND AMIGA_COMPILER_OPTIONS -mhard-float -ffast-math)
+		# this toolchain's libm has no exp2(); under -ffast-math gcc folds any
+		# remaining pow(2.0, x) into exp2(x), which then fails to link.
+		# -fno-builtin-pow stops gcc recognizing pow() as the builtin it
+		# rewrites from (pow.o does exist in libm, so keep that call as-is).
+		list(APPEND AMIGA_COMPILER_OPTIONS -fno-builtin-pow)
 	else()
 		list(APPEND AMIGA_COMPILER_OPTIONS -msoft-float)
 	endif()
@@ -121,6 +126,7 @@ set(AMIGA_SRC
 	amiga_inputs_propjoyimpl.cpp
 	amiga_locale.h
 	amiga_locale.cpp
+#	amiga_libc_xpg_strerror_r.c
 	serializer_mamexml.cpp
 	serializer_mamexml.h
 
@@ -169,6 +175,9 @@ set(AMIGA_SRC
 #			 $<$<CONFIG:RELEASE>:-O3 -funroll-loops -ftree-loop-ivcanon -ftree-loop-im -DNDEBUG>
 #	  ${AMIGA_COMPILER_OPTIONS} )
 	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/MUI38/include")
+	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/CGX/include")
+	target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/AHI/include")
+
 	if(USE_MIDI_AS_CONTROLER)
 		target_include_directories(Mame106AmigaO3 PUBLIC "${COMMONLIBS}/extrasdk/camd/include")
 		target_compile_definitions(Mame106AmigaO3 PUBLIC USE_MIDICAMD_INPUT=1 )

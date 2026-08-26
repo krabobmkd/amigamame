@@ -55,6 +55,10 @@ static void writelong_d8(offs_t address REGM(d0), UINT32 data REGM(d1))
 	program_write_byte_8(address + 3, data);
 }
 
+
+typedef void		(*write8_t)(offs_t a REGM(d0), UINT32 d REGM(d1) );		// Write 8 bit
+typedef	void		(*write16_t)(offs_t a REGM(d0), UINT32 d REGM(d1) );	// Write 16 bit
+
 /* interface for 20/22-bit address bus, 8-bit data bus (68008) */
 static const struct m68k_memory_interface interface_d8 =
 {
@@ -62,8 +66,8 @@ static const struct m68k_memory_interface interface_d8 =
 	program_read_byte_8,
 	readword_d8,
 	readlong_d8,
-	program_write_byte_8,
-	writeword_d8,
+	(write8_t)program_write_byte_8,
+	(write16_t)writeword_d8,
 	writelong_d8
 };
 
@@ -93,8 +97,8 @@ static const struct m68k_memory_interface interface_d16 =
 	program_read_byte_16be,
 	program_read_word_16be,
 	readlong_d16,
-	program_write_byte_16be,
-	program_write_word_16be,
+	(write8_t)program_write_byte_16be,
+	(write16_t)program_write_word_16be,
 	writelong_d16,
     NULL, // changepc
     memory_readmovem32_wr16,
@@ -368,8 +372,8 @@ static const struct m68k_memory_interface interface_d32 =
 	program_read_byte_32be,
 	readword_d32,
 	readlong_d32,
-	program_write_byte_32be,
-	writeword_d32,
+	(write8_t)program_write_byte_32be,
+	(write16_t)writeword_d32,
 	writelong_d32,
     NULL, // changepc
     memory_readmovem32_wr16,
@@ -420,8 +424,8 @@ static const struct m68k_memory_interface interface_fast32 =
 	program_read_byte_32be,
 	program_read_word_32be,//readword_d32,
 	readlong_d32,
-	program_write_byte_32be,
-	program_write_word_32be, //writeword_d32,
+	(write8_t)program_write_byte_32be,
+	(write16_t)program_write_word_32be, //writeword_d32,
 	writelong_d32,
     NULL,
     memory_readmovem32_wr16,
