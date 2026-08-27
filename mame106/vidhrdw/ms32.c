@@ -491,6 +491,10 @@ VIDEO_UPDATE( ms32 )
 {
 	int scrollx,scrolly;
 
+    return;
+
+ //test
+
 	/* TODO: registers 0x04/4 and 0x10/4 are used too; the most interesting case
        is gametngk, where they are *usually*, but not always, copies of 0x00/4
        and 0x0c/4 (used for scrolling).

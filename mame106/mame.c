@@ -309,12 +309,12 @@ int run_game(int game)
 //			printf("init_machine\n");
 			/* then finish setting up our local machine */
 			init_machine();
-//			printf("init_machine ok \n");
+
 			/* load the configuration settings and NVRAM */
 			settingsloaded = config_load_settings();
-//			printf("after config_load_settings\n");
+
 			nvram_load();
-//			printf("after nvram_load \n");
+
 			/* initialize the UI and display the startup screens */
 			if (ui_init(!settingsloaded && !options.skip_disclaimer, !options.skip_warnings, !options.skip_gameinfo) != 0)
 				fatalerror("User cancelled");
@@ -1208,16 +1208,13 @@ static void init_machine(void)
 	if (Machine->gamedrv->driver_init != NULL)
 		(*Machine->gamedrv->driver_init)();
 
-
-
     bootlog_setprogress(eSoundVideo);
-	/* start the audio system */
 
+	/* start the audio system */
 	if (sound_init() != 0)
 		fatalerror("sound_init failed");
 
 	/* start the video hardware */
-
 	if (video_init() != 0)
 		fatalerror("video_init failed");
 
@@ -1231,8 +1228,10 @@ static void init_machine(void)
 	/* call the driver's _START callbacks */
 	if (Machine->drv->machine_start != NULL && (*Machine->drv->machine_start)() != 0)
 		fatalerror("Unable to start machine emulation");
+
 	if (Machine->drv->sound_start != NULL && (*Machine->drv->sound_start)() != 0)
 		fatalerror("Unable to start sound emulation");
+
 	if (Machine->drv->video_start != NULL && (*Machine->drv->video_start)() != 0)
 		fatalerror("Unable to start video emulation");
 

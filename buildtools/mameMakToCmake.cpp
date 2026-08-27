@@ -442,6 +442,17 @@ int patchMiniMachines(
 //        machinetargets[pkgname]._gamedrivers["tmnt"] = src._gamedrivers["tmnt"];
 //        machinetargets[pkgname]._gamedrivers["tmnt2"] = src._gamedrivers["tmnt2"];
 
+
+    {
+       TMachine  &tat=machinetargets["tatsumi"];
+        string mname=string("justbboyjr");
+        TMachine  &m=machinetargets[mname];
+        copyDrivers(m,tat,{"buggyb1"});
+        m._sources={
+        "drivers/tx1.c","machine/tx1.c","vidhrdw/tx1.c"
+        };
+    }
+
     {
         TMachine  &namco=machinetargets["namco"];
         string mname=string("justgalaga");
@@ -545,6 +556,30 @@ int patchMiniMachines(
                             "dkong3","dkong3j"
                             });
 
+
+    }
+
+    {   /*remove non working ms32 from jaleco - would be some work */
+
+        TMachine  &tar=machinetargets["jaleco"];
+         std::remove(tar._sources.begin(), tar._sources.end(), "drivers/ms32.c");
+         std::remove(tar._sources.begin(), tar._sources.end(), "vidhrdw/ms32.c");
+
+
+        tar._gamedrivers.erase("hayaosi1");
+        tar._gamedrivers.erase("bbbxing");
+        tar._gamedrivers.erase("47pie2");
+        tar._gamedrivers.erase("47pie2o");
+        tar._gamedrivers.erase("desertwr");
+        tar._gamedrivers.erase("gametngk");
+        tar._gamedrivers.erase("tetrisp");
+        tar._gamedrivers.erase("p47aces");
+        tar._gamedrivers.erase("akiss");
+        tar._gamedrivers.erase("gratia");
+        tar._gamedrivers.erase("gratiaa");
+        tar._gamedrivers.erase("kirarast");
+        tar._gamedrivers.erase("tp2m32");
+        tar._gamedrivers.erase("f1superb");
 
     }
 
@@ -1126,9 +1161,8 @@ int patchMiniMachines(
          m._gamedrivers["totcarn"] = src._gamedrivers["totcarn"];
          m._gamedrivers["totcarnp"] = src._gamedrivers["totcarnp"];
 
-
          m._sources = {
-             "drivers/midtunit.c","machine/midtunit.c","vidhrdw/midtunit.c",
+             "drivers/midtunit.c","machine/midtunit.c","vidhrdw/midtunit.c","vidhrdw/midtunit.cpp",
              "drivers/midyunit.c","machine/midyunit.c","vidhrdw/midyunit.c",
              "machine/midwayic.c",
              //"drivers/williams.c","machine/williams.c",
@@ -1356,6 +1390,7 @@ if(upname == "NINTENDO") onShouldBeDefault=true;
         if(upname == "GOTTLIEB" ) onShouldBeDefault = true;
         // just for buggy boy :) ->DOESNT WORK On 0.106 :(
 //        if(upname == "TATSUMI" ) onShouldBeDefault = true; // tested ok
+        if(upname == "JUSTBBOYJR" ) onShouldBeDefault = true; // tested ok
 
 //        // just for double dragon1/2/3
         if(upname == "TECHNOS" ) onShouldBeDefault = true; // tested ok

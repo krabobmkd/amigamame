@@ -605,10 +605,10 @@ static inline void buggyboy_get_roadpix_fast(int ls161, UINT8 rva0_6, UINT8 sld,
 	*_rorev = !( (rom_en && rom_flip) || (!rom_en && (ls161 & 0x4000)) );
 
     /* trace a line where we know there is road*/
- if(debugy == (240-64) || debugy == (240-63))
- {
-     printf("rp:ls161:%04x rva0_6:%d sld:%d --- rflip:%d rom_en:%d rorev:%d\n",ls161,rva0_6,sld,rom_flip,rom_en,*_rorev );
-    }
+ // if(debugy == (240-64) || debugy == (240-63))
+ // {
+ //     printf("rp:ls161:%04x rva0_6:%d sld:%d --- rflip:%d rom_en:%d rorev:%d\n",ls161,rva0_6,sld,rom_flip,rom_en,*_rorev );
+ //    }
 	//if (rom_en)
 	{
 		UINT8  rom_data;
@@ -1323,19 +1323,19 @@ static void bb_draw_road_fast(mame_bitmap *bitmap)
 				rcsd0_3 = rcols[cprom_addr] & 0xf;
 
 				{
-
+/*
 					UINT8 w = bb_wave_lut[wave_idx];
 					UINT32 wave =
 						(wave0 ^ ((w >> 4) & 1))	&&
 						(wave1 ^ ((w >> 5) & 1))	&&
 						(w & 0x40)			&&
 						(rva20_6 < (w & 0xf));
-
+*/
 					pen = 0x40 |
-                            (wave ? 0 : 0x20) | /* just effect on water ?*/
-                           // (ic150_o12 ? 0x10 : 0) |  /* road vertical movement */
-                           // rcsd0_3 | /* road vertical lines */
-                           0
+                           // (wave ? 0 : 0x20) | /* just effect on water ?*/
+                            (ic150_o12 ? 0x10 : 0) |  /* road vertical movement */
+                            rcsd0_3  /* road vertical lines */
+
                             ;
 
 					//test if (!(ls161 & 7)) pen = 0;

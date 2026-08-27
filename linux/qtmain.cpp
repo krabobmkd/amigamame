@@ -202,7 +202,8 @@ void QProc::process()
 //"bublbob2"
 //"tetrisp2"
 //"mk"
-"buggyb1"
+"kirarast"
+//"buggyb1"
 //"ridingf"
 //"gseeker"
 //"gunbustr"
@@ -271,9 +272,9 @@ void QWin::mouseMoveEvent(QMouseEvent* event)
 
 }
 
-extern "C" {
-extern UINT8 *bb_sky;
-}
+// extern "C" {
+// extern UINT8 *bb_sky;
+// }
 void QWin::paintEvent(QPaintEvent *event)
 {
     QLabel::paintEvent(event);
@@ -281,10 +282,10 @@ void QWin::paintEvent(QPaintEvent *event)
 // dbg_nbt
     p.setPen(QPen(Qt::white));
     p.drawText(60,60,QString("woot:")+QString::number(nbframe));
-    if(bb_sky)
-    {
-    p.drawText(60,80,QString("bbsky:")+QString::number(*bb_sky,16));
-    }
+    // if(bb_sky)
+    // {
+    // p.drawText(60,80,QString("bbsky:")+QString::number(*bb_sky,16));
+    // }
 
 
 

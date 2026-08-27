@@ -1,6 +1,8 @@
 // dec0n.cpp
 // baddudes test -> crash with O2 and O3 !!!
 #pragma GCC optimize ("O1")
+//#pragma GCC optimize ("O2","no-strict-aliasing","no-ipa-icf","no-ipa-sra")
+
 extern "C" {
     #include "mame.h"
     #include "driver.h"

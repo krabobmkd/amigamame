@@ -59,7 +59,7 @@ if(AMIGA)
 		# remaining pow(2.0, x) into exp2(x), which then fails to link.
 		# -fno-builtin-pow stops gcc recognizing pow() as the builtin it
 		# rewrites from (pow.o does exist in libm, so keep that call as-is).
-		list(APPEND AMIGA_COMPILER_OPTIONS -fno-builtin-pow)
+		# list(APPEND AMIGA_COMPILER_OPTIONS -fno-builtin-pow)
 	else()
 		list(APPEND AMIGA_COMPILER_OPTIONS -msoft-float)
 	endif()

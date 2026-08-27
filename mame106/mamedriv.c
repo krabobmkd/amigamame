@@ -1791,17 +1791,13 @@ const game_driver * const drivers[] =
 	DRIVER( wfortune ) /* 1989 "GameTek" "Wheel Of Fortune" */
 #endif
 #ifdef LINK_JALECO
-	DRIVER( 47pie2 ) /* 1994 "Jaleco" "Idol Janshi Su-Chi-Pie 2 (v1.1)" */
-	DRIVER( 47pie2o ) /* 1994 "Jaleco" "Idol Janshi Su-Chi-Pie 2 (v1.0)" */
 	DRIVER( 64streej ) /* 1991 "Jaleco" "64th. Street - A Detective Story (Japan)" */
 	DRIVER( 64street ) /* 1991 "Jaleco" "64th. Street - A Detective Story (World)" */
 	DRIVER( aeroboto ) /* 1984 "[Jaleco] (Williams license)" "Aeroboto" */
-	DRIVER( akiss ) /* 1995 "Jaleco" "Mahjong Angel Kiss" */
 	DRIVER( argus ) /* 1986 "[NMK] (Jaleco license)" "Argus" */
 	DRIVER( armchmp2 ) /* 1992 "Jaleco" "Arm Champs II" */
 	DRIVER( astyanax ) /* 1989 "Jaleco" "The Astyanax" */
 	DRIVER( avspirit ) /* 1991 "Jaleco" "Avenging Spirit" */
-	DRIVER( bbbxing ) /* 1994 "Jaleco" "Best Bout Boxing" */
 	DRIVER( bestleag ) /* 1993 "bootleg" "Best League" */
 	DRIVER( bigrun ) /* 1989 "Jaleco" "Big Run (11th Rallye version)" */
 	DRIVER( bigstrik ) /* 1992 "Jaleco" "Big Striker" */
@@ -1817,7 +1813,6 @@ const game_driver * const drivers[] =
 	DRIVER( cybattlr ) /* 1993 "Jaleco" "Cybattler" */
 	DRIVER( ddayjlc ) /* 1984 "Jaleco" "D-Day (Jaleco - set 1)" */
 	DRIVER( ddayjlca ) /* 1984 "Jaleco" "D-Day (Jaleco - set 2)" */
-	DRIVER( desertwr ) /* 1995 "Jaleco" "Desert War / Wangan Sensou" */
 	DRIVER( edf ) /* 1991 "Jaleco" "E.D.F. : Earth Defense Force" */
 	DRIVER( edfu ) /* 1991 "Jaleco" "E.D.F. : Earth Defense Force (North America)" */
 	DRIVER( exerion ) /* 1983 "Jaleco" "Exerion" */
@@ -1828,25 +1823,19 @@ const game_driver * const drivers[] =
 	DRIVER( f1gpstr2 ) /* 1993 "Jaleco" "F-1 Grand Prix Star II" */
 	DRIVER( fcombat ) /* 1985 "Jaleco" "Field Combat" */
 	DRIVER( formatz ) /* 1984 "Jaleco" "Formation Z" */
-	DRIVER( gametngk ) /* 1995 "Jaleco" "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise" */
 	DRIVER( gingania ) /* 1987 "Jaleco" "Ginga NinkyouDen (set 2)" */
 	DRIVER( ginganin ) /* 1987 "Jaleco" "Ginga NinkyouDen (set 1)" */
-	DRIVER( gratia ) /* 1996 "Jaleco" "Gratia - Second Earth (92047-01 version)" */
-	DRIVER( gratiaa ) /* 1996 "Jaleco" "Gratia - Second Earth (91022-10 version)" */
 	DRIVER( hachoo ) /* 1989 "Jaleco" "Hachoo!" */
-	DRIVER( hayaosi1 ) /* 1994 "Jaleco" "Hayaoshi Quiz Ouza Ketteisen" */
 	DRIVER( homerun ) /* 1988 "Jaleco" "Moero Pro Yakyuu Homerun" */
 	DRIVER( iganinju ) /* 1988 "Jaleco" "Iga Ninjyutsuden (Japan)" */
 	DRIVER( jitsupro ) /* 1989 "Jaleco" "Jitsuryoku!! Pro Yakyuu (Japan)" */
 	DRIVER( kazan ) /* 1988 "Jaleco" "Ninja Kazan (World)" */
 	DRIVER( kickoff ) /* 1988 "Jaleco" "Kick Off (Japan)" */
-	DRIVER( kirarast ) /* 1996 "Jaleco" "Ryuusei Janshi Kirara Star" */
 	DRIVER( lomakai ) /* 1988 "Jaleco" "Legend of Makai (World)" */
 	DRIVER( lordofk ) /* 1989 "Jaleco" "The Lord of King (Japan)" */
 	DRIVER( makaiden ) /* 1988 "Jaleco" "Makai Densetsu (Japan)" */
 	DRIVER( momoko ) /* 1986 "Jaleco" "Momoko 120%" */
 	DRIVER( p47 ) /* 1988 "Jaleco" "P-47 - The Phantom Fighter (World)" */
-	DRIVER( p47aces ) /* 1995 "Jaleco" "P-47 Aces" */
 	DRIVER( p47j ) /* 1988 "Jaleco" "P-47 - The Freedom Fighter (Japan)" */
 	DRIVER( peekaboo ) /* 1993 "Jaleco" "Peek-a-Boo!" */
 	DRIVER( phantasm ) /* 1990 "Jaleco" "Phantasm (Japan)" */
@@ -1868,13 +1857,14 @@ const game_driver * const drivers[] =
 	DRIVER( soldamj ) /* 1992 "Jaleco" "Soldam (Japan)" */
 	DRIVER( stdragon ) /* 1989 "Jaleco" "Saint Dragon" */
 	DRIVER( teplus2j ) /* 1997 "Jaleco / The Tetris Company" "Tetris Plus 2 (Japan)" */
-	DRIVER( tetrisp ) /* 1995 "Jaleco / BPS" "Tetris Plus" */
 	DRIVER( tetrisp2 ) /* 1997 "Jaleco / The Tetris Company" "Tetris Plus 2 (World?)" */
-	DRIVER( tp2m32 ) /* 1997 "Jaleco" "Tetris Plus 2 (MegaSystem 32 Version)" */
 	DRIVER( tshingen ) /* 1988 "Jaleco" "Takeda Shingen (Japan */
 	DRIVER( tshingna ) /* 1988 "Jaleco" "Shingen Samurai-Fighter (Japan */
 	DRIVER( valtric ) /* 1986 "[NMK] (Jaleco license)" "Valtric" */
 	DRIVER( wildplt ) /* 1992 "Jaleco" "Wild Pilot" */
+#endif
+#ifdef LINK_JUSTBBOYJR
+	DRIVER( buggyb1 ) /* 1986 "Tatsumi" "Buggy Boy (Single Monitor)" */
 #endif
 #ifdef LINK_JUSTDKONG
 	DRIVER( dkong ) /* 1981 "Nintendo of America" "Donkey Kong (US set 1)" */
