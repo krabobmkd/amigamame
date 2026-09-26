@@ -2497,6 +2497,8 @@ static void segaic16_road_hangon_decode(struct road_info *info)
 }
 
 
+#if 0
+// original MAME per-pixel simulation, replaced by the krb version below (bit-exact).
 static void segaic16_road_hangon_draw(struct road_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	UINT16 *roadram = info->roadram;
@@ -2673,6 +2675,130 @@ static void segaic16_road_hangon_draw(struct road_info *info, mame_bitmap *bitma
 		}
 	}
 }
+#endif
+
+/* krb: optimized version of the hangon/sharrier road, bit-exact with the per-pixel
+   hardware simulation (kept under #if 0 above).
+   The flip-flop at 9J (lower half) "f" is a step function along the line:
+   1 until pixel T where counters 9P/9N reach 0xff, then 0 forever (or constant).
+   The shift register 8J is just the history of f, so for pixel i (starting at x=-24):
+     byte bit order = f(i-1), select = f(i-4), ff9j2 = !(!f(i-1) && f(i-9)), f(<0)=0.
+   The 9P/9N counter only changes every 8 pixels and has a closed form each side of T.
+   So a line is drawn as runs of pixels sharing the same attributes, through a
+   16 entries color LUT [ff9j2][select][md]. */
+#define ROAD_NOT (0x7fffffff)
+#define ROAD_F(j) (((j) >= 0) && ((j) < T))
+static void segaic16_road_hangon_draw(struct road_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+{
+	UINT16 *roadram = info->roadram;
+	int y;
+	const int ihangon = (info->type == SEGAIC16_ROAD_HANGON);
+	const int nbpix = cliprect->max_x + 25; /* pixel index i = x + 24 */
+
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		UINT16 *dest;
+		const int control = roadram[0x000 + y];
+		const int hpos = roadram[0x100 + (control & 0xff)];
+		const int color0 = roadram[0x200 + (control & 0xff)];
+		const int color1 = roadram[0x300 + (control & 0xff)];
+		const int plycont = (control >> 10) & 3;
+		const UINT8 *src;
+		UINT16 lut[2][2][4];
+		int bp[6], nbp, T, m0, c0, cT, i, k, roadoff, forcej2;
+
+		/* skip layers we aren't supposed to be drawing */
+		if ((plycont == 0 && priority != SEGAIC16_ROAD_BACKGROUND) ||
+			(plycont != 0 && priority != SEGAIC16_ROAD_FOREGROUND))
+			continue;
+
+		dest = (UINT16 *)bitmap->line[y];
+		src = info->gfx + (control & 0xff) * 512;
+		m0 = hpos & 7;
+		c0 = (hpos >> 3) & 0xff;
+
+		/* first pixel where 9J lower half is 0 */
+		if (!(control & 0x100)) T = ROAD_NOT;
+		else if (!((hpos >> 11) & 1) || c0 == 0xff) T = 0;
+		else T = ((0xff - c0) << 3) - m0;
+		cT = (T == ROAD_NOT) ? 0 : c0 + (((m0 + T) >> 3) << 1);
+
+		/* pixels where f(i-1), f(i-4), f(i-9) change */
+		nbp = 0;
+		if (T > 0)
+		{
+			bp[nbp++] = 1; bp[nbp++] = 4; bp[nbp++] = 9;
+			if (T != ROAD_NOT) { bp[nbp++] = T + 1; bp[nbp++] = T + 4; bp[nbp++] = T + 9; }
+		}
+
+		roadoff = (info->type == SEGAIC16_ROAD_SHARRIER && (control & 0x200));
+		forcej2 = (ihangon && !(control & 0x200));
+
+		/* color LUT */
+		{
+			int j2, s, md;
+			for (j2 = 0; j2 < 2; j2++)
+			for (s = 0; s < 2; s++)
+			for (md = 0; md < 4; md++)
+			{
+				int color;
+				if (j2 && md == 3)
+					color = ((color0 >> (s ? 0 : 8)) & 0x3f) | info->colorbase2;
+				else
+				{
+					int mdd = ((color1 & 0x80) && md == 3) ? 0 : md;
+					color = ((color1 >> ((mdd << 1) | s)) & 1) | (s << 3) | (mdd << 1) | info->colorbase1;
+				}
+				lut[j2][s][md] = color;
+			}
+		}
+
+		i = cliprect->min_x + 24;
+		dest += cliprect->min_x;
+		while (i < nbpix)
+		{
+			const int m = (m0 + i) & 7;
+			int end = i + 8 - m;
+			int ctr, bo, sel, j2, n;
+			const UINT16 *lutp;
+			if (end > nbpix) end = nbpix;
+			for (k = 0; k < nbp; k++)
+				if (bp[k] > i && bp[k] < end) end = bp[k];
+
+			bo = ROAD_F(i - 1);
+			sel = ROAD_F(i - 4);
+			j2 = forcej2 ? 1 : !(!bo && ROAD_F(i - 9));
+			lutp = lut[j2][sel];
+			n = end - i;
+
+			if (i <= T) ctr = c0 + ((m0 + i) >> 3);
+			else ctr = cT - ((m0 + i) >> 3);
+
+			if (roadoff || (ctr & 0xc0) != 0xc0)
+			{
+				const UINT16 c = lutp[3];
+				do { *dest++ = c; } while (--n);
+			}
+			else
+			{
+				const UINT8 *s = src + ((ctr & 0x3f) << 3);
+				if (bo)
+				{
+					s += m;
+					do { *dest++ = lutp[*s++]; } while (--n);
+				}
+				else
+				{
+					s += m ^ 7;
+					do { *dest++ = lutp[*s--]; } while (--n);
+				}
+			}
+			i = end;
+		}
+	}
+}
+#undef ROAD_F
+#undef ROAD_NOT
 
 
 

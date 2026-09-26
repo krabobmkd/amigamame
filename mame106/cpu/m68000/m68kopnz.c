@@ -8557,6 +8557,36 @@ void m68k_op_tst_8_al(M68KOPT_PARAMS)
 	FLAG_V = VFLAG_CLEAR;
 	FLAG_C = CFLAG_CLEAR;
 }
+// enduror main cpu: tst.b abs.l + beq waiting loop.
+void krb_enduror_m68k_op_tst_8_al(M68KOPT_PARAMS)
+{
+	uint res = OPER_AL_8(M68KOPT_PASSPARAMS);
+
+	FLAG_N = NFLAG_8(res);
+	FLAG_Z = res;
+	FLAG_V = VFLAG_CLEAR;
+	FLAG_C = CFLAG_CLEAR;
+    if(res == 0)
+    {
+    	SET_CYCLES(0); // busy wait, quit cpu slice and let other cpu work.
+    }
+}
+// enduror sub cpu: tst.b $12(a5) + bpl waiting loop.
+void krb_enduror_m68k_op_tst_8_di(M68KOPT_PARAMS)
+{
+    // opcode was redirected to a free slot, restore original for AY.
+    regir = 0x4a2d;
+	uint res = OPER_AY_DI_8(M68KOPT_PASSPARAMS);
+
+	FLAG_N = NFLAG_8(res);
+	FLAG_Z = res;
+	FLAG_V = VFLAG_CLEAR;
+	FLAG_C = CFLAG_CLEAR;
+    if(!(res & 0x80))
+    {
+    	SET_CYCLES(0); // busy wait, quit cpu slice and let other cpu work.
+    }
+}
 
 
 void m68k_op_tst_8_pcdi(M68KOPT_PARAMS)

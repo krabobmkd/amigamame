@@ -8584,6 +8584,19 @@ void m68k_op_btst_8_s_ai(M68KOPT_PARAMS)
 
 	FLAG_Z = OPER_AY_AI_8(M68KOPT_PASSPARAMS) & (1 << bit);
 }
+//krb patch: enduror sub cpu btst #5,(a5) + beq waiting loop.
+void krb_enduror_m68k_op_btst_8_s_ai(M68KOPT_PARAMS)
+{
+    // opcode was redirected to a free slot, restore original for AY.
+    regir = 0x0815;
+	uint bit = OPER_I_8(p68k) & 7;
+
+	FLAG_Z = OPER_AY_AI_8(M68KOPT_PASSPARAMS) & (1 << bit);
+	if(!FLAG_Z)
+	{
+    	SET_CYCLES(0); // busy wait, quit cpu slice and let other cpu work.
+	}
+}
 
 
 void m68k_op_btst_8_s_pi(M68KOPT_PARAMS)

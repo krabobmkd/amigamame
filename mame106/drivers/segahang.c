@@ -1567,6 +1567,74 @@ static void krb_sharrier_patch_cpu_synchro()
 
 }
 
+/*
+krb cpustats hangon (coin+start, 2400 frames):
+ ----- cpu 0 -----
+ adr:000017e0 nbr:00146e2b regir:00004a79  tst.w $20c400
+ adr:000017e6 nbr:00146e2b regir:000067f8  beq.s -> 17e0
+ adr:00003ea0 nbr:000617e8 regir:000051c8
+ ----- cpu 1 -----
+ adr:00000f60 nbr:001f7b43 regir:00004a79  tst.w $c7f000
+ adr:00000f66 nbr:001f7b42 regir:000067f8  beq.s -> f60
+ adr:00000bac nbr:00040f10 regir:00006b00
+*/
+static void krb_hangon_patch_cpu_synchro()
+{
+	UINT16 *pcodemain = (UINT16 *)memory_region(REGION_CPU1);
+    if(pcodemain[0x000017e0>>1] == 0x4a79 && pcodemain[0x000017e6>>1] == 0x67f8)
+    {   // replace that tst.w call by a patch, on an unused opcode.
+        m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
+        pcodemain[0x000017e0>>1] = 8;
+    }
+
+	UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+    if(pcodesub[0x00000f60>>1] == 0x4a79 && pcodesub[0x00000f66>>1] == 0x67f8)
+    {
+        m68ki_instruction_jump_table[8] = krb_outrun_m68k_op_tst_16_al;
+        pcodesub[0x00000f60>>1] = 8;
+    }
+}
+
+/*
+krb cpustats enduror (coin+start, 2400 frames):
+ ----- cpu 0 -----
+ adr:0000186c nbr:005b94d5 regir:00004a39  tst.b abs.l
+ adr:00001872 nbr:005b94d4 regir:000067f8  beq.s -> 186c
+ adr:000022a8 nbr:00061dd0 regir:000051c8
+ ----- cpu 1 -----
+ adr:000004aa nbr:005c7af6 regir:00004a2d  tst.b $12(a5)
+ adr:000004ae nbr:005c7af4 regir:00006afa  bpl.s -> 4aa
+ adr:000004c0 nbr:001b62ba regir:00000815  btst #5,(a5)
+ adr:000004c4 nbr:001b62b8 regir:000067fa  beq.s -> 4c0
+ adr:000007c0 nbr:00056a9c regir:00006ad6
+*/
+void krb_enduror_m68k_op_tst_8_al(M68KOPT_PARAMS);
+void krb_enduror_m68k_op_tst_8_di(M68KOPT_PARAMS);
+void krb_enduror_m68k_op_btst_8_s_ai(M68KOPT_PARAMS);
+static void krb_enduror_patch_cpu_synchro()
+{
+    // main cpu is FD1089 encrypted: patch the decrypted opcodes.
+    void *fd1089_get_decrypted_base(void);
+	UINT16 *pcodemain = (UINT16 *)fd1089_get_decrypted_base();
+    if(pcodemain && pcodemain[0x0000186c>>1] == 0x4a39 && pcodemain[0x00001872>>1] == 0x67f8)
+    {
+        m68ki_instruction_jump_table[0x0a] = krb_enduror_m68k_op_tst_8_al;
+        pcodemain[0x0000186c>>1] = 0x0a;
+    }
+
+	UINT16 *pcodesub = (UINT16 *)memory_region(REGION_CPU2);
+    if(pcodesub[0x000004aa>>1] == 0x4a2d && pcodesub[0x000004ae>>1] == 0x6afa)
+    {
+        m68ki_instruction_jump_table[0x0b] = krb_enduror_m68k_op_tst_8_di;
+        pcodesub[0x000004aa>>1] = 0x0b;
+    }
+    if(pcodesub[0x000004c0>>1] == 0x0815 && pcodesub[0x000004c4>>1] == 0x67fa)
+    {
+        m68ki_instruction_jump_table[0x0c] = krb_enduror_m68k_op_btst_8_s_ai;
+        pcodesub[0x000004c0>>1] = 0x0c;
+    }
+}
+
 /*************************************
  *
  *  Driver initialization
@@ -1576,6 +1644,7 @@ static void krb_sharrier_patch_cpu_synchro()
 static DRIVER_INIT( hangon )
 {
 	hangon_generic_init();
+	krb_hangon_patch_cpu_synchro();
 }
 
 
@@ -1592,6 +1661,7 @@ static DRIVER_INIT( enduror )
 	void fd1089_decrypt_0013A(void);
 	hangon_generic_init();
 	fd1089_decrypt_0013A();
+	krb_enduror_patch_cpu_synchro();
 }
 
 
