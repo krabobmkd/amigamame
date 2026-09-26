@@ -152,7 +152,7 @@ static READ16_HANDLER( hangon_io_r )
 			return readinputport(4 + adc_select);
 	}
 
-	loginfo(2,"%06X:hangon_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	//loginfo(2,"%06X:hangon_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(0,0);
 }
 
@@ -196,7 +196,7 @@ static READ16_HANDLER( sharrier_io_r )
 			return readinputport(4 + adc_select);
 	}
 
-	loginfo(2,"%06X:sharrier_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	//loginfo(2,"%06X:sharrier_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(0,0);
 }
 

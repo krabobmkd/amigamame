@@ -626,13 +626,14 @@ WRITE8_HANDLER( williams_blitter_w )
 	activecpu_adjust_icount(-((estimated_clocks_at_4MHz + 3) / 4));
 
 	/* Log blits */
-	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
+/*	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
 			activecpu_get_pc(), cpu_getscanline(),
 			blitterram[2], blitterram[3],
 			blitterram[4], blitterram[5],
 			blitterram[6], blitterram[7],
 			blitterram[1], blitterram[0],
 			((estimated_clocks_at_4MHz + 3) / 4), williams_blitter_window_enable);
+    */
 }
 
 

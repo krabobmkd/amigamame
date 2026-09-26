@@ -30,8 +30,8 @@ static map<string,sDriverTuning> _tunings={
 	{"qcrayon2",{14*60,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 
 	{"outrun",{0,256,0}}, // for _minimumCpuCycles
-	{"shangon",{0,2,0}}, // for _minimumCpuCycles
-	{"sharrier",{0,384,0}}, // for _minimumCpuCycles
+//	{"shangon",{0,2,0}}, // for _minimumCpuCycles
+//	{"sharrier",{0,384,0}}, // for _minimumCpuCycles
 
 	{"gforce2",{0,512+128,0}},
 //	{"thndrbld",{0,2048,0}},
@@ -57,7 +57,7 @@ static map<string,sDriverTuning> _tunings={
     {"arkanoid",{11*60,DEFMINCPUC,0}},
     {"arkretrn",{12*60,DEFMINCPUC,0}},
     {"ashura",{3*60,DEFMINCPUC,0}},
-    {"slapfigh",{13*60,DEFMINCPUC,0}},
+    {"slapfigh",{15*60,DEFMINCPUC,0}},
 
     {"bbakraid",{16*60,DEFMINCPUC,0}},
     {"battleg",{20*60,DEFMINCPUC,0}},
@@ -72,6 +72,8 @@ static map<string,sDriverTuning> _tunings={
  	{"sfa2",{8*60,DEFMINCPUC,0}},
 	{"sfa3",{8*60,DEFMINCPUC,0}},
 	{"ssf2",{15*60,DEFMINCPUC,0}},
+    {"ffight",{11*60,DEFMINCPUC,0}},
+
 
 	{"galaga",{14*60,DEFMINCPUC,0}},
 
@@ -104,6 +106,8 @@ static map<string,sDriverTuning> _tunings={
     {"mazinger",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
     {"agallet",{10*60,DEFMINCPUC,0}},
     {"ddonpach",{27*60,DEFMINCPUC,0}},
+
+    {"dfeveron",{14*60,DEFMINCPUC,0}},
 
     {"rdingf",{0,DEFMINCPUC,MDTF_M68K_SAFE_MOVEMWRITE|MDTF_M68K_SAFE_MOVEMREAD}},
 };

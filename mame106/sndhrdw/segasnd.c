@@ -230,7 +230,7 @@ WRITE8_HANDLER( sega_speech_data_w )
 
 WRITE8_HANDLER( sega_speech_control_w )
 {
-	logerror("Speech control = %X\n", data);
+//	logerror("Speech control = %X\n", data);
 }
 
 
@@ -330,7 +330,7 @@ void sega_usb_reset(UINT8 t1_clock_mask)
 
 READ8_HANDLER( sega_usb_status_r )
 {
-	logerror("%04X:usb_data_r = %02X\n", activecpu_get_pc(), (usb.out_latch & 0x81) | (usb.in_latch & 0x7e));
+	//logerror("%04X:usb_data_r = %02X\n", activecpu_get_pc(), (usb.out_latch & 0x81) | (usb.in_latch & 0x7e));
 
 	activecpu_adjust_icount(-200);
 
@@ -356,7 +356,7 @@ static void delayed_usb_data_w(int data)
 
 WRITE8_HANDLER( sega_usb_data_w )
 {
-	logerror("%04X:usb_data_w = %02X\n", activecpu_get_pc(), data);
+	//logerror("%04X:usb_data_w = %02X\n", activecpu_get_pc(), data);
 	timer_set(TIME_NOW, data, delayed_usb_data_w);
 
 	/* boost the interleave so that sequences can be sent */
@@ -374,8 +374,9 @@ WRITE8_HANDLER( sega_usb_ram_w )
 {
 	if (usb.in_latch & 0x80)
 		usb.program_ram[offset] = data;
-	else
+	/*else
 		logerror("%04X:sega_usb_ram_w(%03X) = %02X while /LOAD disabled\n", activecpu_get_pc(), offset, data);
+		*/
 }
 
 
@@ -389,8 +390,9 @@ WRITE8_HANDLER( sega_usb_ram_w )
 static READ8_HANDLER( usb_p1_r )
 {
 	/* bits 0-6 are inputs and map to bits 0-6 of the input latch */
-	if ((usb.in_latch & 0x7f) != 0)
+	/*if ((usb.in_latch & 0x7f) != 0)
 		logerror("%03X: P1 read = %02X\n", activecpu_get_pc(), usb.in_latch & 0x7f);
+    */
 	return usb.in_latch & 0x7f;
 }
 
@@ -399,7 +401,7 @@ static WRITE8_HANDLER( usb_p1_w )
 {
 	/* bit 7 maps to bit 0 on the output latch */
 	usb.out_latch = (usb.out_latch & 0xfe) | (data >> 7);
-	logerror("%03X: P1 write = %02X\n", activecpu_get_pc(), data);
+	//logerror("%03X: P1 write = %02X\n", activecpu_get_pc(), data);
 }
 
 
@@ -421,7 +423,7 @@ static WRITE8_HANDLER( usb_p2_w )
 	if ((old & 0x80) && !(data & 0x80))
 		usb.t1_clock = 0;
 
-	logerror("%03X: P2 write -> bank=%d ready=%d clock=%d\n", activecpu_get_pc(), data & 3, (data >> 6) & 1, (data >> 7) & 1);
+//	logerror("%03X: P2 write -> bank=%d ready=%d clock=%d\n", activecpu_get_pc(), data & 3, (data >> 6) & 1, (data >> 7) & 1);
 }
 
 

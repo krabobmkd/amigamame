@@ -796,7 +796,7 @@ int toaplan2_videoram16_r(offs_t offset, int controller)
 				break;
 		default:
 				video_data = toaplan2_overflow_vram;
-				loginfo(2,"Hmmm, reading %04x from unknown VC:%01x layer address %06x  Offset:%01x !!!\n",video_data,controller,toaplan2_voffs[controller],offset);
+			//	loginfo(2,"Hmmm, reading %04x from unknown VC:%01x layer address %06x  Offset:%01x !!!\n",video_data,controller,toaplan2_voffs[controller],offset);
 				break;
 	}
 	toaplan2_voffs[controller]++;
@@ -878,12 +878,12 @@ void toaplan2_scroll_reg_select_w(offs_t offset, UINT16 data, UINT32 mem_mask, i
 	if (ACCESSING_LSB)
 	{
 		toaplan2_scroll_reg[controller] = data & 0x8f;
-		if (data & 0x70)
-			loginfo(2,"Hmmm, selecting unknown LSB video control register (%04x)  Video controller %01x  \n",toaplan2_scroll_reg[controller],controller);
+		/*if (data & 0x70)
+			loginfo(2,"Hmmm, selecting unknown LSB video control register (%04x)  Video controller %01x  \n",toaplan2_scroll_reg[controller],controller);*/
 	}
 	else
 	{
-		loginfo(2,"Hmmm, selecting unknown MSB video control register (%04x)  Video controller %01x  \n",toaplan2_scroll_reg[controller],controller);
+		//loginfo(2,"Hmmm, selecting unknown MSB video control register (%04x)  Video controller %01x  \n",toaplan2_scroll_reg[controller],controller);
 	}
 }
 

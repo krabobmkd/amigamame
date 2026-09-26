@@ -41,7 +41,8 @@ if(AMIGA)
 	# add your generic options here:
 	#add_compile_options( -save-temps )
 	# this is to have assember .s files in the build.
-	list(APPEND AMIGA_COMPILER_OPTIONS -save-temps )
+	# emu68 68060 better support bitfield instructions so no -mnobitfield
+	list(APPEND AMIGA_COMPILER_OPTIONS -save-temps  )
 
 	if(AMIGA_USE_68030)
 		list(APPEND AMIGA_COMPILER_OPTIONS -m68030)

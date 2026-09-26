@@ -105,7 +105,7 @@ INLINE unsigned int m68kx_read_immediate_32(unsigned int address REGM(d0))
 #ifdef LSB_FIRST
 	return ((m68k_read_immediate_16(address) << 16) | m68k_read_immediate_16((address)+2));
 #else
-    return (*(uint *)&opcode_base[address & opcode_mask]);
+    return (*(unsigned int *)&opcode_base[address & opcode_mask]);
 #endif
 
 

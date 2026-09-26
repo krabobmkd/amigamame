@@ -27,7 +27,7 @@ static int readzoomroms;
 
 static WRITE8_HANDLER( rollerg_0010_w )
 {
-logerror("%04x: write %02x to 0010\n",activecpu_get_pc(),data);
+//logerror("%04x: write %02x to 0010\n",activecpu_get_pc(),data);
 
 	/* bits 0/1 are coin counters */
 	coin_counter_w(0,data & 0x01);

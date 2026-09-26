@@ -998,12 +998,12 @@ void sndti_set_output_gain(int type, int index, int output, float gain)
 
 	if (sndnum < 0)
 	{
-		loginfo(2,"sndti_set_output_gain called for invalid sound type %d, index %d\n", type, index);
+		//loginfo(2,"sndti_set_output_gain called for invalid sound type %d, index %d\n", type, index);
 		return;
 	}
 	if (output >= sound[sndnum].outputs)
 	{
-		loginfo(2,"sndti_set_output_gain called for invalid sound output %d (type %d, index %d)\n", output, type, index);
+		//loginfo(2,"sndti_set_output_gain called for invalid sound output %d (type %d, index %d)\n", output, type, index);
 		return;
 	}
 	stream_set_output_gain(sound[sndnum].output[output].stream, sound[sndnum].output[output].output, gain);

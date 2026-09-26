@@ -137,8 +137,9 @@ READ32_HANDLER( stv_vdp1_regs_r )
 //  static int x;
 
 //  x ^= 0x00020000;
-
+/*flood
 	loginfo (2, "cpu #%d (PC=%08X) VDP1: Read from Registers, Offset %04x\n",cpu_getactivecpu(), activecpu_get_pc(), offset);
+*/
 //  if (offset == 0x04) return x;
 
 	return stv_vdp1_regs[offset];
@@ -146,7 +147,7 @@ READ32_HANDLER( stv_vdp1_regs_r )
 
 static void stv_clear_framebuffer( int which_framebuffer )
 {
-	if ( vdp1_sprite_log ) loginfo(2, "Clearing %d framebuffer\n", stv_vdp1_current_draw_framebuffer );
+//	if ( vdp1_sprite_log ) loginfo(2, "Clearing %d framebuffer\n", stv_vdp1_current_draw_framebuffer );
 	memset( stv_framebuffer[ which_framebuffer ], 0, 1024 * 256 * sizeof(UINT16) * 2 );
 }
 
@@ -222,7 +223,7 @@ static void stv_vdp1_change_framebuffers( void )
 {
 	stv_vdp1_current_display_framebuffer ^= 1;
 	stv_vdp1_current_draw_framebuffer ^= 1;
-	if ( vdp1_sprite_log ) loginfo(2, "Changing framebuffers: %d - draw, %d - display\n", stv_vdp1_current_draw_framebuffer, stv_vdp1_current_display_framebuffer );
+//	if ( vdp1_sprite_log ) loginfo(2, "Changing framebuffers: %d - draw, %d - display\n", stv_vdp1_current_draw_framebuffer, stv_vdp1_current_display_framebuffer );
 	stv_prepare_framebuffers();
 }
 
@@ -231,7 +232,7 @@ static void stv_set_framebuffer_config( void )
 	if ( stv_framebuffer_mode == STV_VDP1_TVM &&
 		 stv_framebuffer_double_interlace == STV_VDP1_DIE ) return;
 
-	if ( vdp1_sprite_log ) loginfo(2, "Setting framebuffer config\n" );
+//	if ( vdp1_sprite_log ) loginfo(2, "Setting framebuffer config\n" );
 	stv_framebuffer_mode = STV_VDP1_TVM;
 	stv_framebuffer_double_interlace = STV_VDP1_DIE;
 	switch( stv_framebuffer_mode )
@@ -241,7 +242,9 @@ static void stv_set_framebuffer_config( void )
 		case 2: stv_framebuffer_width = 512; stv_framebuffer_height = 256; break;
 		case 3: stv_framebuffer_width = 512; stv_framebuffer_height = 512; break;
 		case 4: stv_framebuffer_width = 512; stv_framebuffer_height = 256; break;
-		default: loginfo(2, "Invalid framebuffer config %x\n", STV_VDP1_TVM ); stv_framebuffer_width = 512; stv_framebuffer_height = 256; break;
+		default:
+		//loginfo(2, "Invalid framebuffer config %x\n", STV_VDP1_TVM );
+		stv_framebuffer_width = 512; stv_framebuffer_height = 256; break;
 	}
 	if ( STV_VDP1_DIE ) stv_framebuffer_height *= 2; /* double interlace */
 
@@ -258,12 +261,12 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 		stv_set_framebuffer_config();
 		if ( ACCESSING_LSW32 )
 		{
-			if ( vdp1_sprite_log ) loginfo(2, "VDP1: Access to register FBCR = %1X\n", STV_VDP1_FBCR );
+			//if ( vdp1_sprite_log ) loginfo(2, "VDP1: Access to register FBCR = %1X\n", STV_VDP1_FBCR );
 			stv_vdp1_fbcr_accessed = 1;
 		}
 		else
 		{
-			if ( vdp1_sprite_log ) loginfo(2, "VDP1: Access to register TVMR = %1X\n", STV_VDP1_TVMR );
+			//if ( vdp1_sprite_log ) loginfo(2, "VDP1: Access to register TVMR = %1X\n", STV_VDP1_TVMR );
 			if ( STV_VDP1_VBE && stv_vblank )
 			{
 				stv_vdp1_clear_framebuffer_on_next_frame = 1;
@@ -282,23 +285,24 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 		{
 			if ( STV_VDP1_PTMR == 1 )
 			{
-				if ( vdp1_sprite_log ) loginfo(2, "VDP1: Access to register PTMR = %1X\n", STV_VDP1_PTMR );
+				//if ( vdp1_sprite_log ) loginfo(2, "VDP1: Access to register PTMR = %1X\n", STV_VDP1_PTMR );
 				stv_vdp1_process_list( NULL, &Machine->visible_area );
 
 				if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
 				{
-					loginfo(2, "Interrupt: Sprite draw end, Vector 0x4d, Level 0x02\n" );
+					//loginfo(2, "Interrupt: Sprite draw end, Vector 0x4d, Level 0x02\n" );
 					cpunum_set_input_line_and_vector(0, 2, HOLD_LINE , 0x4d);
 				}
 			}
 		}
 		else if ( ACCESSING_LSW32 )
 		{
-			if ( vdp1_sprite_log ) loginfo(2, "VDP1: Erase data set %08X\n", data );
+			//if ( vdp1_sprite_log ) loginfo(2, "VDP1: Erase data set %08X\n", data );
 		}
 	}
 	else if ( offset == 2 )
 	{
+	/*
 		if ( ACCESSING_MSW32 )
 		{
 			if ( vdp1_sprite_log ) loginfo(2, "VDP1: Erase upper-left coord set: %08X\n", data );
@@ -307,6 +311,7 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 		{
 			if ( vdp1_sprite_log ) loginfo(2, "VDP1: Erase lower-right coord set: %08X\n", data );
 		}
+		*/
 	}
 
 }
@@ -1480,36 +1485,36 @@ void stv_vdp1_process_list(mame_bitmap *bitmap, const rectangle *cliprect)
 		switch (stv2_current_sprite.CMDCTRL & 0x7000)
 		{
 			case 0x0000: // jump next
-				if (vdp1_sprite_log) loginfo (2, "Sprite List Process + Next (Normal)\n");
+				//if (vdp1_sprite_log) loginfo (2, "Sprite List Process + Next (Normal)\n");
 				position++;
 				break;
 			case 0x1000: // jump assign
-				if (vdp1_sprite_log) loginfo (2, "Sprite List Process + Jump Old %06x New %06x\n", position, (stv2_current_sprite.CMDLINK>>2));
+				//if (vdp1_sprite_log) loginfo (2, "Sprite List Process + Jump Old %06x New %06x\n", position, (stv2_current_sprite.CMDLINK>>2));
 				position= (stv2_current_sprite.CMDLINK>>2);
 				break;
 			case 0x2000: // jump call
 				if (vdp1_nest == -1)
 				{
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Process + Call Old %06x New %06x\n",position, (stv2_current_sprite.CMDLINK>>2));
+				//	if (vdp1_sprite_log) loginfo (2, "Sprite List Process + Call Old %06x New %06x\n",position, (stv2_current_sprite.CMDLINK>>2));
 					vdp1_nest = position+1;
 					position = (stv2_current_sprite.CMDLINK>>2);
 				}
 				else
 				{
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Nested Call, ignoring\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Nested Call, ignoring\n");
 					position++;
 				}
 				break;
 			case 0x3000:
 				if (vdp1_nest != -1)
 				{
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Process + Return\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Process + Return\n");
 					position = vdp1_nest;
 					vdp1_nest = -1;
 				}
 				else
 				{
-					if (vdp1_sprite_log) loginfo (2, "Attempted return from no subroutine, aborting\n");
+					//if (vdp1_sprite_log) loginfo (2, "Attempted return from no subroutine, aborting\n");
 					position++;
 					goto end; // end of list
 				}
@@ -1519,7 +1524,7 @@ void stv_vdp1_process_list(mame_bitmap *bitmap, const rectangle *cliprect)
 				position++;
 				break;
 			case 0x5000:
-				if (vdp1_sprite_log) loginfo (2, "Sprite List Skip + Jump Old %06x New %06x\n", position, (stv2_current_sprite.CMDLINK>>2));
+				//if (vdp1_sprite_log) loginfo (2, "Sprite List Skip + Jump Old %06x New %06x\n", position, (stv2_current_sprite.CMDLINK>>2));
 				draw_this_sprite = 0;
 				position= (stv2_current_sprite.CMDLINK>>2);
 
@@ -1528,14 +1533,14 @@ void stv_vdp1_process_list(mame_bitmap *bitmap, const rectangle *cliprect)
 				draw_this_sprite = 0;
 				if (vdp1_nest == -1)
 				{
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Skip + Call To Subroutine Old %06x New %06x\n",position, (stv2_current_sprite.CMDLINK>>2));
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Skip + Call To Subroutine Old %06x New %06x\n",position, (stv2_current_sprite.CMDLINK>>2));
 
 					vdp1_nest = position+1;
 					position = (stv2_current_sprite.CMDLINK>>2);
 				}
 				else
 				{
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Nested Call, ignoring\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Nested Call, ignoring\n");
 					position++;
 				}
 				break;
@@ -1543,14 +1548,14 @@ void stv_vdp1_process_list(mame_bitmap *bitmap, const rectangle *cliprect)
 				draw_this_sprite = 0;
 				if (vdp1_nest != -1)
 				{
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Skip + Return from Subroutine\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Skip + Return from Subroutine\n");
 
 					position = vdp1_nest;
 					vdp1_nest = -1;
 				}
 				else
 				{
-					if (vdp1_sprite_log) loginfo (2, "Attempted return from no subroutine, aborting\n");
+					//if (vdp1_sprite_log) loginfo (2, "Attempted return from no subroutine, aborting\n");
 					position++;
 					goto end; // end of list
 				}
@@ -1563,13 +1568,13 @@ void stv_vdp1_process_list(mame_bitmap *bitmap, const rectangle *cliprect)
 			switch (stv2_current_sprite.CMDCTRL & 0x000f)
 			{
 				case 0x0000:
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Normal Sprite\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Normal Sprite\n");
 					stv2_current_sprite.ispoly = 0;
 					stv_vpd1_draw_normal_sprite(bitmap,cliprect, 0);
 					break;
 
 				case 0x0001:
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Scaled Sprite\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Scaled Sprite\n");
 					stv2_current_sprite.ispoly = 0;
 					stv_vpd1_draw_scaled_sprite(bitmap,cliprect);
 					break;
@@ -1580,7 +1585,7 @@ void stv_vdp1_process_list(mame_bitmap *bitmap, const rectangle *cliprect)
 						//turn off Gouraud shading atm
 						stv2_current_sprite.CMDPMOD &= 0xfff8;
 					}
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Distorted Sprite\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Distorted Sprite\n");
 					stv2_current_sprite.ispoly = 0;
 					stv_vpd1_draw_distorted_sprite(bitmap,cliprect);
 					break;
@@ -1591,37 +1596,37 @@ void stv_vdp1_process_list(mame_bitmap *bitmap, const rectangle *cliprect)
 						//turn off Gouraud shading atm
 						stv2_current_sprite.CMDPMOD &= 0xfff8;
 					}
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Polygon\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Polygon\n");
 					stv2_current_sprite.ispoly = 1;
 					stv_vpd1_draw_distorted_sprite(bitmap,cliprect);
 					break;
 
 				case 0x0005:
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Polyline\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Polyline\n");
 					break;
 
 				case 0x0006:
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Line\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Line\n");
 					stv2_current_sprite.ispoly = 1;
 					stv_vdp1_draw_line(bitmap,cliprect);
 					break;
 
 				case 0x0008:
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Set Command for User Clipping\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Set Command for User Clipping\n");
 					break;
 
 				case 0x0009:
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Set Command for System Clipping\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Set Command for System Clipping\n");
 					break;
 
 				case 0x000a:
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Local Co-Ordinate Set\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Local Co-Ordinate Set\n");
 					stvvdp1_local_x = (INT16)stv2_current_sprite.CMDXA;
 					stvvdp1_local_y = (INT16)stv2_current_sprite.CMDYA;
 					break;
 
 				default:
-					if (vdp1_sprite_log) loginfo (2, "Sprite List Illegal!\n");
+					//if (vdp1_sprite_log) loginfo (2, "Sprite List Illegal!\n");
 					break;
 
 
@@ -1643,7 +1648,7 @@ void stv_vdp1_process_list(mame_bitmap *bitmap, const rectangle *cliprect)
 //  if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
 //      cpunum_set_input_line_and_vector(0, 2, HOLD_LINE , 0x4d);
 
-	if (vdp1_sprite_log) loginfo (2, "End of list processing!\n");
+	//if (vdp1_sprite_log) loginfo (2, "End of list processing!\n");
 }
 
 void video_update_vdp1(mame_bitmap *bitmap, const rectangle *cliprect)
@@ -1665,8 +1670,8 @@ void video_update_vdp1(mame_bitmap *bitmap, const rectangle *cliprect)
 //          fclose(fp);
 //      }
 //  }
-	if (vdp1_sprite_log) loginfo(2,"video_update_vdp1 called\n");
-	if (vdp1_sprite_log) loginfo(2, "FBCR = %0x, accessed = %d\n", STV_VDP1_FBCR, stv_vdp1_fbcr_accessed );
+	//if (vdp1_sprite_log) loginfo(2,"video_update_vdp1 called\n");
+	//if (vdp1_sprite_log) loginfo(2, "FBCR = %0x, accessed = %d\n", STV_VDP1_FBCR, stv_vdp1_fbcr_accessed );
 
 	if ( stv_vdp1_clear_framebuffer_on_next_frame )
 	{
@@ -1707,7 +1712,7 @@ void video_update_vdp1(mame_bitmap *bitmap, const rectangle *cliprect)
 	}
 	stv_vdp1_fbcr_accessed = 0;
 
-	if (vdp1_sprite_log) loginfo(2, "PTM = %0x, TVM = %x\n", STV_VDP1_PTM, STV_VDP1_TVM );
+	//if (vdp1_sprite_log) loginfo(2, "PTM = %0x, TVM = %x\n", STV_VDP1_PTM, STV_VDP1_TVM );
 	switch(STV_VDP1_PTM & 3)
 	{
 		case 0:/*Idle Mode*/
@@ -1719,7 +1724,7 @@ void video_update_vdp1(mame_bitmap *bitmap, const rectangle *cliprect)
 				stv_vdp1_process_list(bitmap,cliprect);
 			break;
 		case 3:	/*<invalid>*/
-			loginfo(2,"Warning: Invalid PTM mode set for VDP1!\n");
+			//loginfo(2,"Warning: Invalid PTM mode set for VDP1!\n");
 			break;
 	}
 	//ui_popup("%04x %04x",STV_VDP1_EWRR_X3,STV_VDP1_EWRR_Y3);

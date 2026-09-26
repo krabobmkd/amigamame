@@ -294,7 +294,9 @@ static UINT16 memory_mapper_r(struct memory_mapper_chip *chip, offs_t offset, UI
 			return 0xff;
 
 		default:
+		/* flood goldenaxe set 6
 			logerror("Unknown memory_mapper_r from address %02X\n", offset);
+			*/
 			break;
 	}
 	return unmapped_val;

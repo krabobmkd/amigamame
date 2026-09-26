@@ -668,10 +668,10 @@ static WRITE8_HANDLER( toaplan2_coin_w )
 	{
 		coin_lockout_global_w(1); /* Lock all coin slots */
 	}
-	if (data & 0xe0)
-	{
-		loginfo(2,"Writing unknown upper bits (%02x) to coin control\n",data);
-	}
+	// if (data & 0xe0)
+	// {
+	// 	loginfo(2,"Writing unknown upper bits (%02x) to coin control\n",data);
+	// }
 }
 static WRITE16_HANDLER( toaplan2_coin_word_w )
 {
@@ -686,10 +686,10 @@ static WRITE16_HANDLER( toaplan2_coin_word_w )
 			}
 		}
 	}
-	if (ACCESSING_MSB && (data & 0xff00) )
-	{
-		loginfo(2,"Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
-	}
+	// if (ACCESSING_MSB && (data & 0xff00) )
+	// {
+	// 	loginfo(2,"Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
+	// }
 }
 
 static READ16_HANDLER( toaplan2_shared_r )
@@ -719,7 +719,7 @@ static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 		else										/* Teki Paki */
 		{
 			mcu_data = data & 0xff;
-			loginfo(2,"PC:%08x Writing command (%04x) to secondary CPU shared port\n",activecpu_get_previouspc(),mcu_data);
+			//loginfo(2,"PC:%08x Writing command (%04x) to secondary CPU shared port\n",activecpu_get_previouspc(),mcu_data);
 		}
 	}
 }
@@ -793,7 +793,7 @@ static WRITE16_HANDLER( ghox_mcu_w )
 		}
 		else
 		{
-			loginfo(2,"PC:%08x Writing %08x to HD647180 cpu shared ram status port\n",activecpu_get_previouspc(),mcu_data);
+			//loginfo(2,"PC:%08x Writing %08x to HD647180 cpu shared ram status port\n",activecpu_get_previouspc(),mcu_data);
 		}
 		toaplan2_shared_ram16[0x56 / 2] = 0x004e;	/* Return a RTS instruction */
 		toaplan2_shared_ram16[0x58 / 2] = 0x0075;
@@ -869,7 +869,7 @@ static WRITE16_HANDLER( shared_ram_w )
 			case 0xcf8:
 			case 0xff8: toaplan2_shared_ram16[offset + 1] = data; /* Dogyuun */
 						toaplan2_shared_ram16[offset + 2] = data; /* FixEight */
-						loginfo(2,"PC:%08x Writing (%04x) to shared RAM at %04x\n",activecpu_get_previouspc(),data,(offset*2));
+						//loginfo(2,"PC:%08x Writing (%04x) to shared RAM at %04x\n",activecpu_get_previouspc(),data,(offset*2));
 						if (data == 0x81) data = 0x0001;
 						break;
 			default:	break;
@@ -892,7 +892,7 @@ static READ16_HANDLER( toaplan2_snd_cpu_r )
 		mcu_data = 0xffff;
 	}
 
-	loginfo(2,"PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),response);
+	//loginfo(2,"PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),response);
 	return response;
 }
 
@@ -922,7 +922,7 @@ static WRITE16_HANDLER( kbash_snd_cpu_w )
 	{
 		kbash_okisnd_w(data);
 	}
-	loginfo(2,"PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",activecpu_get_previouspc(),data);
+	//loginfo(2,"PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",activecpu_get_previouspc(),data);
 }
 
 static READ16_HANDLER( fixeight_sec_cpu_r )
@@ -946,7 +946,7 @@ static READ16_HANDLER( fixeight_sec_cpu_r )
 	{
 		response = mcu_data;	/* Return the shared RAM data during POST */
 	}
-	loginfo(2,"PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),response);
+	//loginfo(2,"PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),response);
 	return response;
 }
 
@@ -987,7 +987,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			mcu_data = data;
 		}
 	}
-	loginfo(2,"PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),mcu_data);
+	//loginfo(2,"PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),mcu_data);
 }
 
 static WRITE16_HANDLER( vfive_snd_cpu_w )
@@ -996,7 +996,7 @@ static WRITE16_HANDLER( vfive_snd_cpu_w )
 	{
 		mcu_data = data;
 	}
-	loginfo(2,"PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),mcu_data);
+	//loginfo(2,"PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),mcu_data);
 }
 
 static WRITE16_HANDLER( batsugun_snd_cpu_w )
@@ -1006,7 +1006,7 @@ static WRITE16_HANDLER( batsugun_snd_cpu_w )
 		mcu_data = data;
 		batsugun_okisnd_w(data);
 	}
-	loginfo(2,"PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port %02x\n",activecpu_get_previouspc(),mcu_data,(offset*2));
+	//loginfo(2,"PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port %02x\n",activecpu_get_previouspc(),mcu_data,(offset*2));
 }
 
 static READ16_HANDLER( V25_sharedram_r )

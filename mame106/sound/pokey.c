@@ -917,8 +917,9 @@ static int pokey_register_r(int chip, int offs)
 				LOG(("POKEY #%d read POT%d (final value)  $%02x\n", chip, pot, data));
 			}
 		}
-		else
+		/*else
 		logerror("PC %04x: warning - read p[chip] #%d POT%d\n", activecpu_get_pc(), chip, pot);
+		*/
 		break;
 
     case ALLPOT_C:

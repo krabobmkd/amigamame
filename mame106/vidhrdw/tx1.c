@@ -1618,7 +1618,7 @@ VIDEO_UPDATE( buggyb1 )
             int sky80 = (*bb_sky & 0x80) ? 1 : 0;
             if (sky80 != bb1_last_sky80)
             {
-                printf("bb1 frame %d: *bb_sky=%02x -> road/sky %s\n", bb1_frame, *bb_sky, sky80 ? "ON" : "OFF");
+               // printf("bb1 frame %d: *bb_sky=%02x -> road/sky %s\n", bb1_frame, *bb_sky, sky80 ? "ON" : "OFF");
                 bb1_last_sky80 = sky80;
             }
             bb1_frame++;
