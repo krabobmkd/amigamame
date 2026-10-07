@@ -34,6 +34,7 @@
  */
 
 #include "amiga_video_tracers_clut16.h"
+#include "amiga_video_tracers_24.h"
 
 // this file is just to implement template calls...
 
@@ -417,7 +418,8 @@ void directDrawClut_ULONG_ULONG_UWORD(directDrawParams *p,ULONG *lut)
 }
 void directDrawClut_type24_ULONG_UWORD(directDrawParams *p,ULONG *lut)
 {
-    directDrawClutT<type24,ULONG,UWORD,typeUWORDToUWord,true,false>(p,lut);
+    // aligned 32 bit writes and 3 lines trick: amiga_video_tracers_24.h
+    directDraw24T<UWORD>(p, [lut](UWORD i) -> ULONG { return lut[i]; });
 }
 void directDrawClut_UBYTE_UBYTE_UWORD(directDrawParams *p,UBYTE *lut)
 {

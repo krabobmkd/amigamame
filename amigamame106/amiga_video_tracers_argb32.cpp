@@ -35,6 +35,7 @@
  */
 
 #include "amiga_video_tracers_argb32.h"
+#include "amiga_video_tracers_24.h"
 
 // this file is just to implement template calls...
 
@@ -507,7 +508,8 @@ void directDraw_BGR16PC_ARGB32(directDrawParams *p)
 
 void directDraw_type24_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<type24>(p);
+    // aligned 32 bit writes and 3 lines trick: amiga_video_tracers_24.h
+    directDraw24T<ULONG>(p, [](ULONG argb) -> ULONG { return argb; });
 }
 
 
