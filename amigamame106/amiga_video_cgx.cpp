@@ -51,6 +51,7 @@
 #include <proto/graphics.h>
 #include <proto/cybergraphics.h>
 #include <proto/intuition.h>
+#include <proto/layers.h>
 
 // Amiga
 extern "C" {
@@ -59,6 +60,8 @@ extern "C" {
     #include <intuition/screens.h>
     #include <graphics/modeid.h>
     #include <graphics/displayinfo.h>
+    #include <graphics/clip.h>
+    #include <utility/hooks.h>
 }
 
 extern "C" {
@@ -270,46 +273,42 @@ void Drawable_CGX::close()
 
 }
 
-void Drawable_CGX::drawCGX_DirectCPU16(
-        RastPort *pRPort,
-        BitMap *pBitmap,
-        _mame_display *display)
+void Drawable_CGX::prepareDirectFrame(_mame_display *display, cgxDirectFrame &frame)
 {
-//    RastPort *pRPort = _drawable.rastPort();
-//    BitMap *pBitmap = _drawable.bitmap();
-    if(!pRPort || !pBitmap) return;
-
     // - - update palette if exist and is needed.
-    if(_pRemap && ((display->changed_flags & GAME_PALETTE_CHANGED) !=0 || _pRemap->needRemap()))
+    if(!isSourceRGBA32() && _pRemap &&
+        ((display->changed_flags & GAME_PALETTE_CHANGED) !=0 || _pRemap->needRemap()))
     {
         _pRemap->updatePaletteRemap(display);
     }
 
     // applied width height if using scale or not, and centering.
     int sourcewidth,sourceheight;
-    int cenx,ceny,ww,hh;
-    _drawable.getGeometry(display,cenx,ceny,ww,hh,sourcewidth,sourceheight);
+    _drawable.getGeometry(display,frame.cenx,frame.ceny,frame.ww,frame.hh,sourcewidth,sourceheight);
 
     mame_bitmap *bitmap = display->game_bitmap;
-
-    directDrawScreen ddscreen;
-
- //   int depth,pixfmt,pixbytes;
-// int dbg=0;
-    ULONG bmwidth,bmheight;
 
     directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
         display->game_visible_area.min_x,display->game_visible_area.min_y,
         display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
         _drawable.flags()
     };
+    frame.source = ddsource;
+}
 
+void Drawable_CGX::drawDirectFrame(BitMap *pBitmap, cgxDirectFrame &frame,
+                                   int shiftx, int shifty, const Rectangle *clip)
+{
+    if(!pBitmap) return;
+
+    directDrawScreen ddscreen;
+    ULONG bmwidth,bmheight;
+
+    // the base address is only valid inside the lock: one lock per call,
+    // and no library call inside.
     APTR hdl = LockBitMapTags(pBitmap,
                               LBMI_WIDTH,(ULONG)&bmwidth,
                               LBMI_HEIGHT,(ULONG)&bmheight,
-                           //   LBMI_DEPTH,(ULONG)&depth,
-                           //   LBMI_PIXFMT,(ULONG)&pixfmt,
-                           //   LBMI_BYTESPERPIX,(ULONG)&pixbytes,
                               LBMI_BYTESPERROW,(ULONG)&ddscreen._bpr,
                               LBMI_BASEADDRESS,(ULONG)&ddscreen._base,
                               TAG_DONE);
@@ -317,13 +316,31 @@ void Drawable_CGX::drawCGX_DirectCPU16(
 
     ddscreen._clipX1 = 0;
     ddscreen._clipY1 = 0;
-
     ddscreen._clipX2 = (WORD)bmwidth;
     ddscreen._clipY2 = (WORD)bmheight;
+    if(clip)
+    {   // Rectangle max is included, clip max is excluded.
+        if(clip->MinX > ddscreen._clipX1) ddscreen._clipX1 = clip->MinX;
+        if(clip->MinY > ddscreen._clipY1) ddscreen._clipY1 = clip->MinY;
+        if(clip->MaxX+1 < ddscreen._clipX2) ddscreen._clipX2 = clip->MaxX+1;
+        if(clip->MaxY+1 < ddscreen._clipY2) ddscreen._clipY2 = clip->MaxY+1;
+    }
 
+    directDrawParams p{&ddscreen,&frame.source,
+        frame.cenx+shiftx,frame.ceny+shifty,frame.ww,frame.hh};
+
+    if(ddscreen._clipX1 >= ddscreen._clipX2 || ddscreen._clipY1 >= ddscreen._clipY2)
+    {
+        // nothing visible
+    } else
+    if(isSourceRGBA32())
+    {
+        // this function pointer has been choosen for the right _PixelFmt and avoid an ugly switch.
+        if(directDrawARGB32) directDrawARGB32(&p);
+        else if(_pRemap) _pRemap->directDraw(&p); // 8bit cases
+    } else
     if(_pRemap)
     {
-        directDrawParams p{&ddscreen,&ddsource,cenx,ceny,ww,hh};
         switch(_PixelFmt) {
             case PIXFMT_RGB15:case PIXFMT_BGR15:case PIXFMT_RGB15PC:case PIXFMT_BGR15PC:
             case PIXFMT_RGB16:case PIXFMT_BGR16:case PIXFMT_RGB16PC:case PIXFMT_BGR16PC:
@@ -350,77 +367,21 @@ void Drawable_CGX::drawCGX_DirectCPU16(
             }
             break;
         default:
-            //debugval =2;
             // shouldnt happen.
             break;
         }
-    } else
-    {
-        //debugval=3;
-        //Truecolor (todo)
     }
+    //else: Truecolor (todo)
 
     UnLockBitMap(hdl);
-//    printf("case:%d\n", dbg );
-//     if(debugval ==2) printf("unknown pixfmt\n");
-//    else if(debugval ==3) printf("Truecolor todo\n");
-//      else if(debugval !=0) printf("TROUBLE:%d\n",debugval);
-
 }
 
-
-void Drawable_CGX::drawCGX_DirectCPU32(
-     //   RastPort *pRPort,
-        BitMap *pBitmap,
-    _mame_display *display)
+void Drawable_CGX::drawCGX_Direct(BitMap *pBitmap,_mame_display *display)
 {
-    //RastPort *pRPort = _drawable.rastPort();
-  //  BitMap *pBitmap = _drawable.bitmap();
-    if(/*!pRPort ||*/ !pBitmap) return;
-
-    // applied width height if using scale or not, and centering.
-    int sourcewidth,sourceheight;
-    int cenx,ceny,ww,hh;
-    _drawable.getGeometry(display,cenx,ceny,ww,hh,sourcewidth,sourceheight);
-
-    mame_bitmap *bitmap = display->game_bitmap;
-
-    directDrawScreen ddscreen;
-
-   // int depth,pixfmt,pixbytes;
-
-    ULONG bmwidth,bmheight;
-
-    directDrawSource ddsource={bitmap->base,bitmap->rowbytes,
-        display->game_visible_area.min_x,display->game_visible_area.min_y,
-        display->game_visible_area.max_x+1,display->game_visible_area.max_y+1,
-        _drawable.flags()
-    };
-
-    APTR hdl = LockBitMapTags(pBitmap,
-                              LBMI_WIDTH,(ULONG)&bmwidth,
-                              LBMI_HEIGHT,(ULONG)&bmheight,
-                           //   LBMI_DEPTH,(ULONG)&depth,
-                           //   LBMI_PIXFMT,(ULONG)&pixfmt,
-                           //   LBMI_BYTESPERPIX,(ULONG)&pixbytes,
-                              LBMI_BYTESPERROW,(ULONG)&ddscreen._bpr,
-                              LBMI_BASEADDRESS,(ULONG)&ddscreen._base,
-                              TAG_DONE);
-    if(!hdl) return;
-
-    ddscreen._clipX1 = 0;
-    ddscreen._clipY1 = 0;
-
-    ddscreen._clipX2 = (WORD)bmwidth;
-    ddscreen._clipY2 = (WORD)bmheight;
-
-    // this function pointer has been choosen for the right _PixelFmt and avoid an ugly switch.
-    directDrawParams p{ &ddscreen,&ddsource,cenx,ceny,ww,hh};
-    if(directDrawARGB32) directDrawARGB32(&p);
-    else if(_pRemap) _pRemap->directDraw(&p); // 8bit cases
-
-    UnLockBitMap(hdl);
-
+    if(!pBitmap) return;
+    cgxDirectFrame frame;
+    prepareDirectFrame(display,frame);
+    drawDirectFrame(pBitmap,frame,0,0,NULL);
 }
 void Drawable_CGX::initARGB32DrawFunctionFromPixelFormat()
 {
@@ -565,14 +526,7 @@ void Intuition_Screen_CGX::close()
 void Intuition_Screen_CGX::draw(_mame_display *display)
 {
 
-    if(isSourceRGBA32() )
-    {
-        drawCGX_DirectCPU32(bitmap(),display);
-    }
-    else
-    {
-        drawCGX_DirectCPU16(rastPort(),bitmap(), display);
-    }
+    drawCGX_Direct(bitmap(),display);
 
 
    if(_pTripleBufferImpl) _pTripleBufferImpl->afterBufferDrawn();
@@ -590,13 +544,41 @@ void Intuition_Screen_CGX::draw(_mame_display *display)
 // - - -- -  - - --
 Intuition_Window_CGX::Intuition_Window_CGX(const AbstractDisplay::params &params)
     :Intuition_Window(params), Drawable_CGX((IntuitionDrawable&)*this),_sWbWinSBitmap(NULL)
+    ,_screenBitmapDirect(false)
 {
     _colorsIndexLength = params._colorsIndexLength;
     _video_attributes = params._video_attributes;
 }
 //Intuition_Window_CGX::~Intuition_Window_CGX()
 //{}
-#define USE_DIRECT_WB_RENDERING 1
+// BackFillMessage, not in the OS3 includes: what DoHookClipRects() gives.
+struct cgxBackFillMsg {
+    struct Layer     *bf_Layer;
+    struct Rectangle  bf_Bounds;    // screen coordinates, max included
+    LONG              bf_OffsetX;
+    LONG              bf_OffsetY;
+};
+struct cgxClipHook {
+    struct Hook hook;   // first: the Hook is a0 on entry
+    Intuition_Window_CGX *window;
+    cgxDirectFrame *frame;
+    BitMap *screenBitmap;
+};
+// called by DoHookClipRects() for each visible rectangle of the window,
+// with the layer locked.
+static void cgxClipHookFunc(struct Hook *h REGUFT(a0), struct RastPort *rp REGUFT(a2),
+                            cgxBackFillMsg *msg REGUFT(a1))
+{
+    cgxClipHook *ch = (cgxClipHook *)h;
+    // simple refresh: only rectangles on screen, never off-screen bitmaps.
+    if(rp->BitMap != ch->screenBitmap) return;
+    struct Layer *layer = msg->bf_Layer;
+    // the window inner area in screen coordinates
+    int shiftx = layer ? layer->bounds.MinX : 0;
+    int shifty = layer ? layer->bounds.MinY : 0;
+    ch->window->drawDirectFrame(rp->BitMap,*ch->frame,shiftx,shifty,&msg->bf_Bounds);
+}
+
 void Intuition_Window_CGX::draw(_mame_display *display)
 {
      if(!_pWbWindow || !_sWbWinSBitmap) return;
@@ -604,60 +586,29 @@ void Intuition_Window_CGX::draw(_mame_display *display)
     // will draw to the current size.
     _widthtarget = (int)(_pWbWindow->GZZWidth);
     _heighttarget = (int)(_pWbWindow->GZZHeight);
+    _screenshiftx = 0; // window coordinates, the shift is applied per frame.
+    _screenshifty = 0;
 
-#ifdef USE_DIRECT_WB_RENDERING
-    Layer *lockedRastPort = NULL;
-    bool rastPortComplete = false;
-    if(_allowDirectDraw)
+    cgxDirectFrame frame;
+    prepareDirectFrame(display,frame);
+
+    BitMap *pScreenBM = _pWbWindow->WScreen->RastPort.BitMap;
+    if(_screenBitmapDirect && _pWbWindow->RPort->Layer)
     {
-        // we can draw directly to wb window in full mode if window is not clipped...
-        // also we have to lock layers for the whole draw.
-        lockedRastPort = _pWbWindow->RPort->Layer;
-        if(lockedRastPort) ObtainSemaphore(&(lockedRastPort->Lock));
-        rastPortComplete = isRastPortComplete(_pWbWindow->RPort,(WORD)_widthtarget,(UWORD)_heighttarget) ;
-
-        { // just to bypass "gzz" bug when window small and directdraw...
-            // same thing as in .getGeometry()
-            int sourcewidth = (display->game_visible_area.max_x - display->game_visible_area.min_x)+1;
-            int sourceheight =( display->game_visible_area.max_y - display->game_visible_area.min_y)+1;
-            if(_flags & ORIENTATION_SWAP_XY)  doSwap(sourcewidth,sourceheight);
-            if(_widthtarget<sourcewidth || _heighttarget<sourceheight)  rastPortComplete = false; // because GZZ bug if window shorter
-        }
-    }
-     if(rastPortComplete)
-     {
-         // window is on top, we don't need layer library,
-         // and can draw directly to wb rastport.
-         // avoid a bitmap copy.
-
-        _screenshiftx = _pWbWindow->LeftEdge+_pWbWindow->BorderLeft; // because rastport is inside window
-        _screenshifty = _pWbWindow->TopEdge+_pWbWindow->BorderTop;
-
-        RastPort *pScreenRp = &(_pWbWindow->WScreen->RastPort);
-        BitMap *pScreenBM = _pWbWindow->WScreen->RastPort.BitMap;
-
-            // use cpu direct copy
-            if(isSourceRGBA32())
-                drawCGX_DirectCPU32(pScreenBM,display);
-            else
-                drawCGX_DirectCPU16(pScreenRp,pScreenBM,display);
-
-
-        if(lockedRastPort) ReleaseSemaphore(&(lockedRastPort->Lock));
-     } else
-#endif
-     {
-#ifdef USE_DIRECT_WB_RENDERING
-        if(lockedRastPort) ReleaseSemaphore(&(lockedRastPort->Lock));
-#endif
-        _screenshiftx = 0; // because rastport is inside window
-        _screenshifty = 0;
-        // will draw on friend bitmap _sWbWinSBitmap.
-        // use cpu direct copy
-        if(isSourceRGBA32())
-            drawCGX_DirectCPU32(bitmap(),display);
-        else
-            drawCGX_DirectCPU16(rastPort(),bitmap(),display);
+        // draw directly in the screen bitmap, only in the visible parts of
+        // the window: layers.library gives them one by one.
+        cgxClipHook ch;
+        ch.hook.h_Entry = (ULONG (*)())cgxClipHookFunc;
+        ch.hook.h_SubEntry = NULL;
+        ch.hook.h_Data = NULL;
+        ch.window = this;
+        ch.frame = &frame;
+        ch.screenBitmap = pScreenBM;
+        DoHookClipRects(&ch.hook,_pWbWindow->RPort,NULL);
+    } else
+    {
+        // draw on friend bitmap _sWbWinSBitmap,
+        drawDirectFrame(_sWbWinSBitmap,frame,0,0,NULL);
 
         // then use os copy to window, it manages layers, slow because 2 pass but easy way.
         BltBitMapRastPort( _sWbWinSBitmap,//CONST struct BitMap *srcBitMap,
@@ -696,6 +647,11 @@ bool Intuition_Window_CGX::open()
         _PixelFmt = PIXFMT_LUT8;
         _PixelBytes = 1;
     }
+
+    // direct drawing in the screen bitmap needs the same pixel format
+    BitMap *pScreenBM = _pWbWindow->WScreen->RastPort.BitMap;
+    _screenBitmapDirect = (CyberGfxBase && GetCyberMapAttr(pScreenBM,CYBRMATTR_ISCYBERGFX) &&
+        GetCyberMapAttr(pScreenBM,CYBRMATTR_PIXFMT) == _PixelFmt);
 
     if(isSourceRGBA32())
     {

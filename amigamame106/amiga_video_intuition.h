@@ -45,8 +45,6 @@ struct ScreenBuffer;
 #define VIDEO_NEEDS_6BITS_PER_GUN		0x0008
 
 
-// tool: Test if RastPort currently needs layer lib clipping.
-bool isRastPortComplete(RastPort *rp,WORD w, WORD h);
 
 /** \class IntuitionDrawable
  * this differenciates Screen and Windows
@@ -159,15 +157,11 @@ public:
         _lastx = lastx; _lasty = lasty;
         _lastWidth = lastWidth; _lastHeight = lastHeight;
     }
-#ifdef USE_DIRECT_WB_RENDERING
-    bool isOnTop();
-#endif
 protected:
     Window *_pWbWindow;
 
     int _machineWidth,_machineHeight;
     int _maxzoomfactor;
-    int _allowDirectDraw;
 
     // know window geometry before opening
     // - could be params to open.

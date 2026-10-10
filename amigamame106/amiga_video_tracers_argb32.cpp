@@ -35,27 +35,16 @@
  */
 
 #include "amiga_video_tracers_argb32.h"
-#include "amiga_video_tracers_24.h"
-#include "amiga_video_tracers_16.h"
+#include "amiga_video_tracers_core.h"
 #include <string.h>
 
 // this file is just to implement template calls...
-
-template<typename T> void doSwap(T&a,T&b) { T c=a; a=b; b=c; }
+// the loop itself, scaling, rotations and clipping: amiga_video_tracers_core.h
 
 #ifdef __GNUC__
 #define ASM
 #define REG(r) __asm(#r)
 #endif
-
-
-// to manage 24 bits mode pixel copy without any hassle,
-// assume there is a 3 byte length type that can copy its value from a 4 byte type.
-// this is finely used by following templates for 24bits mode.
-struct type24{
-    type24(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
-    char r,g,b;
-};
 
 
 struct typeRGB15{
@@ -185,7 +174,7 @@ typedef ULONG typeARGB32;
 //ok: write on PIXFMT_BGRA32
 struct typeBGRA32{
 //    typeBGRA32(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
-    typeBGRA32(ULONG argb) {
+    typeBGRA32(ULONG argb) : a(0) {
 
     asm volatile(
        "move.b %0,(%1)\n"
@@ -209,278 +198,32 @@ struct typeBGRA32{
 };
 
 struct typeRGBA32{
-    typeRGBA32(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb) {}
+    typeRGBA32(ULONG argb) : r((char)(argb>>16)),g((char)(argb>>8)),b((char)argb),a(0) {}
     char r,g,b,a;
 };
 
 
-template<typename SCREENPIXTYPE,bool C_swapXY>
-void directDrawRGB32TT(directDrawParams *p )
-{
-    directDrawScreen *screen = p->screen;
-    directDrawSource *source = p->source;
-    LONG x1=p->x1, y1=p->y1;
-    LONG w=p->w, h=p->h;
-    UWORD wsobpr = source->_bpr>>2;
-    UWORD wscbpr = screen->_bpr/sizeof(SCREENPIXTYPE);
-
-    ULONG *psourcebm = (ULONG *)source->_base;
-    psourcebm += (source->_y1 * wsobpr) + source->_x1;
-
-    SCREENPIXTYPE *pscreenbm = (SCREENPIXTYPE *)screen->_base;
-    pscreenbm += (y1 * wscbpr) + x1;
-
-    LONG sourceHeight = (LONG)(source->_y2 - source->_y1);
-    if(sourceHeight<=0) return;
-
-    LONG sourceWidth = (LONG)(source->_x2 - source->_x1);
-    if(sourceWidth<=0) return;
-
-    // clipping
-    if(y1+h>screen->_clipY2) h=(screen->_clipY2)-y1;
-    if(x1+w>screen->_clipX2) w=(screen->_clipX2)-x1;
-
-    if(x1<screen->_clipX1) { w-=(screen->_clipX1-x1); x1=screen->_clipX1;  }
-    if(y1<screen->_clipY1) { h-=(screen->_clipY1-y1); y1=screen->_clipY1;  }
-
-
-    LONG addw,addh;
-    LONG vh =0;
-    LONG vxStart=0 ;
-
-
-    if(C_swapXY)
-    {
-        addw = wsobpr;
-        addh = 1;
-        if(source->_swapFlags & ORIENTATION_FLIP_Y)
-        {
-            vh = sourceWidth-1;
-            addh = -1;
-        }
-        if(source->_swapFlags & ORIENTATION_FLIP_X)
-        {
-            vxStart = (sourceHeight-1)*wsobpr;
-            addw = -wsobpr;
-        }
-        for(WORD hh=0;hh<h;)
-        {
-            ULONG *psoline = psourcebm + vh;
-
-            SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = vxStart;
-            for(WORD ww=0;ww<w;ww++)
-            {
-                *pscline++ = SCREENPIXTYPE(psoline[vx]);
-                vx += addw;
-            }
-            vh += addh;
-            pscreenbm += wscbpr;
-            hh++;
-        }
-    } else
-    {
-        addw = 1;
-        addh = wsobpr;
-        if(source->_swapFlags & ORIENTATION_FLIP_Y)
-        {
-            vh = (sourceHeight-1)*wsobpr;
-            addh = -wsobpr;
-        }
-        if(source->_swapFlags & ORIENTATION_FLIP_X)
-        {
-            vxStart = sourceWidth/*-1*/; // ,no -1 because use --vx
-            addw = -1;
-        }
-
-        for(WORD hh=0;hh<h;)
-        {
-            ULONG *psoline = psourcebm + vh;
-
-            SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = vxStart;
-            if(addw>0)
-            {
-                for(WORD ww=0;ww<w;ww++)
-                {
-                    *pscline++ = SCREENPIXTYPE(psoline[vx++]);
-                }
-            } else
-            {   // swap X
-                for(WORD ww=0;ww<w;ww++)
-                {
-                    *pscline++ = SCREENPIXTYPE(psoline[--vx]);
-                }
-            }
-            vh += addh;
-            pscreenbm += wscbpr;
-            hh++;
-        }
-    }
-}
-
-template<typename SCREENPIXTYPE,bool C_swapXY>
-void directDrawRGB32ScaleTT(directDrawParams *p )
-{
-    directDrawScreen *screen = p->screen;
-    directDrawSource *source = p->source;
-    LONG x1=p->x1, y1=p->y1;
-    LONG w=p->w, h=p->h;
-
-    UWORD wsobpr = source->_bpr>>2;
-    UWORD wscbpr = screen->_bpr/sizeof(SCREENPIXTYPE);
-
-    ULONG *psourcebm = (ULONG *)source->_base;
-    psourcebm += (source->_y1 * wsobpr) + source->_x1;
-
-    SCREENPIXTYPE *pscreenbm = (SCREENPIXTYPE *)screen->_base;
-    pscreenbm += (y1 * wscbpr) + x1;
-
-    LONG sourceHeight = (LONG)(source->_y2 - source->_y1);
-    if(sourceHeight<=0) return;
-
-    LONG sourceWidth = (LONG)(source->_x2 - source->_x1);
-    if(sourceWidth<=0) return;
-
-    LONG addw,addh;
-    LONG vh ;
-    LONG vxStart ;
-    UWORD hmod;
-    UWORD vmod;
-
-
-    if(C_swapXY)
-    {
-        addw = (sourceHeight<<16)/w; // swapped source size
-        addh = (sourceWidth<<16)/h; //
-    } else
-    {
-        addw = (sourceWidth<<16)/w;
-        addh = (sourceHeight<<16)/h;
-    }
-    vh = 0;
-    vxStart = 0;
-    hmod = (C_swapXY)?1:wsobpr;
-    vmod = (C_swapXY)?wsobpr:1;
-    if(source->_swapFlags & ORIENTATION_FLIP_Y)
-    {
-        vh = (C_swapXY)?(sourceWidth<<16)-1:(sourceHeight<<16)-1;
-        addh = -addh;
-    }
-    if(source->_swapFlags & ORIENTATION_FLIP_X)
-    {
-        vxStart = (C_swapXY)?(sourceHeight<<16)-1:(sourceWidth<<16)-1;
-        addw = -addw;
-    }
-
-    // clipping
-    if(y1+h>screen->_clipY2) h=(screen->_clipY2)-y1;
-    if(x1+w>screen->_clipX2) w=(screen->_clipX2)-x1;
-
-    if(x1<screen->_clipX1) { w-=(screen->_clipX1-x1); x1=screen->_clipX1;  }
-    if(y1<screen->_clipY1) { h-=(screen->_clipY1-y1); y1=screen->_clipY1;  }
-
-    WORD hh=0;
-    while(hh<h-2)
-    {
-        ULONG *psoline = psourcebm + hmod*(vh>>16);
-        ULONG *psoline2 = psourcebm + hmod*((vh+addh)>>16);
-        ULONG *psoline3 = psourcebm + hmod*((vh+addh+addh)>>16);
-        if(psoline == psoline3) // means 3 lines are the same.
-        {
-            SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = vxStart;
-            for(WORD ww=0;ww<w;ww++)
-            {
-                *pscline = pscline[wscbpr] = pscline[wscbpr<<1] = SCREENPIXTYPE(psoline[((UWORD)(vx>>16))*vmod]);
-                pscline++;
-                vx += addw;
-            }
-            vh += addh*3;
-            pscreenbm += wscbpr*3;
-            hh +=3;
-        } else
-        if(psoline == psoline2) // means 2 lines are the same.
-        {
-            SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = vxStart;
-            for(WORD ww=0;ww<w;ww++)
-            {
-                *pscline = pscline[wscbpr] = SCREENPIXTYPE(psoline[((UWORD)(vx>>16))*vmod]);
-
-                pscline++;
-                vx += addw;
-            }
-            vh += addh+addh;
-            pscreenbm += wscbpr+wscbpr;
-            hh +=2;
-        } else
-        {
-            // other do normal one line ...
-            SCREENPIXTYPE *pscline = pscreenbm;
-            LONG vx = vxStart;
-            for(WORD ww=0;ww<w;ww++)
-            {
-                *pscline++ = SCREENPIXTYPE(psoline[((UWORD)(vx>>16))*vmod]);
-                vx += addw;
-            }
-            vh += addh;
-            pscreenbm += wscbpr;
-            hh++;
-        }
-    } // end loop h
-    // last lines must be one line
-    while(hh<h)
-    {
-        // other do normal one line ...
-        ULONG *psoline = psourcebm + hmod*(vh>>16);
-        SCREENPIXTYPE *pscline = pscreenbm;
-        LONG vx = vxStart;
-        for(WORD ww=0;ww<w;ww++)
-        {
-            *pscline++ = SCREENPIXTYPE(psoline[((UWORD)(vx>>16))*vmod]);
-            vx += addw;
-        }
-        vh += addh;
-        pscreenbm += wscbpr;
-        hh++;
-    }
-
-
-}
-
-template<typename SCREENPIXTYPE>
-void directDrawRGB32T(directDrawParams *p)
-{
-    directDrawSource *source = p->source;
-    LONG w= p->w,h=p->h;
-    const bool doSwapXY = source->_swapFlags & ORIENTATION_SWAP_XY;
-
-    WORD sourcewidth = source->_x2-source->_x1;
-    WORD sourceheight = source->_y2-source->_y1;
-    if(doSwapXY) doSwap(sourcewidth,sourceheight);
-
-    const bool doScale = ((sourcewidth!=w) || (sourceheight!=h));
-    if(doSwapXY)
-        if(doScale) directDrawRGB32ScaleTT<SCREENPIXTYPE,true>(p);
-        else  directDrawRGB32TT<SCREENPIXTYPE,true>(p);
-    else
-        if(doScale) directDrawRGB32ScaleTT<SCREENPIXTYPE,false>(p);
-        else  directDrawRGB32TT<SCREENPIXTYPE,false>(p);
-
-}
-
-
 // - - - - - -
 
-// 16 bit screens: aligned 32 bit writes and 3 lines trick, amiga_video_tracers_16.h
+// the pixel types give their bytes as a 16 or 32 bit word for the row writers
 template<typename SCREENPIXTYPE>
 void directDraw16_ARGB32T(directDrawParams *p)
 {
     static_assert(sizeof(SCREENPIXTYPE) == 2, "16 bit pixel type");
-    directDraw16T<ULONG>(p, [](ULONG argb) -> ULONG {
+    directDrawT<tracerRow16,ULONG>(p, [](ULONG argb) -> ULONG {
         SCREENPIXTYPE t(argb);
         UWORD v;
+        memcpy(&v, &t, sizeof(v));
+        return v;
+    });
+}
+template<typename SCREENPIXTYPE>
+void directDraw32_ARGB32T(directDrawParams *p)
+{
+    static_assert(sizeof(SCREENPIXTYPE) == 4, "32 bit pixel type");
+    directDrawT<tracerRow32,ULONG>(p, [](ULONG argb) -> ULONG {
+        SCREENPIXTYPE t(argb);
+        ULONG v;
         memcpy(&v, &t, sizeof(v));
         return v;
     });
@@ -523,23 +266,22 @@ void directDraw_BGR16PC_ARGB32(directDrawParams *p)
 
 void directDraw_type24_ARGB32(directDrawParams *p)
 {
-    // aligned 32 bit writes and 3 lines trick: amiga_video_tracers_24.h
-    directDraw24T<ULONG>(p, [](ULONG argb) -> ULONG { return argb; });
+    directDrawT<tracerRow24,ULONG>(p, [](ULONG argb) -> ULONG { return argb; });
 }
 
 
 void directDrawARGB32_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeARGB32>(p);
+    directDrawT<tracerRow32,ULONG>(p, [](ULONG argb) -> ULONG { return argb; });
 }
 // PIXFMT_BGRA32 type 12.
 void directDrawBGRA32_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeBGRA32>(p);
+    directDraw32_ARGB32T<typeBGRA32>(p);
 }
 void directDrawRGBA32_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeRGBA32>(p);
+    directDraw32_ARGB32T<typeRGBA32>(p);
 }
 
 /*

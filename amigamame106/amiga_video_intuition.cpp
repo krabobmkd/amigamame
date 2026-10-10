@@ -427,7 +427,6 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
     , _pWbWindow(NULL)
     , _machineWidth(params._width),_machineHeight(params._height)
     , _maxzoomfactor(1)
-    , _allowDirectDraw(0)
     , _useLastPosition(0)
 {
 //   printf(" ***** ** Intuition_Window CREATE:%d %d %08x\n",params._width,params._height,params._flags);
@@ -446,14 +445,6 @@ Intuition_Window::Intuition_Window(const AbstractDisplay::params &params)
     MameConfig::Controls &configControls = getMainConfig().controls();
     MameConfig::Misc &configMisc = getMainConfig().misc();
 
-    _allowDirectDraw = ((configMisc._Optims & OPTIMFLAGS_DIRECTWGXWIN) != 0);
-    // this optimisation does not work with OS4 layers.library
-    // very specifically, the test to know is window
-    // is partly occluded in Intuition_Window_CGX::draw() does not work.
-    // well OS3 docs tells not to do this.
-    if(LayersBase->lib_Version>=50) { // if OS4 (petunia emulation).
-        _allowDirectDraw = false;
-    }
 }
 Intuition_Window::~Intuition_Window()
 {
@@ -584,21 +575,6 @@ void Intuition_Window::close()
     _pWbWindow = NULL;
 
 }
-#ifdef USE_DIRECT_WB_RENDERING
-//doesnt work at all! how to check that ? Layer.library ?
-bool Intuition_Window::isOnTop()
-{
-    if(!_pWbWindow || !_pWbWindow->WScreen) return false;
-
-    Screen *pWbScreen;
-    if (!(pWbScreen = LockPubScreen(NULL))
-        ) return false;
-    bool isontop =  (pWbScreen->FirstWindow == _pWbWindow);
-    UnlockPubScreen(NULL,pWbScreen);
-
-    return isontop;
-}
-#endif
 Screen *Intuition_Window::screen()
 {
     if(!_pWbWindow) return NULL;
@@ -846,45 +822,6 @@ WindowGeo IntuitionDisplay::getWindowGeometry()  // to save/reload
     return _params._wingeo;
 }
 
-
-/* tool: test if RastPort currently need layer.library clippings, or not.
- we can use direct pixel copy on workbench bitmap in the simple case.
-  **** This is considered dangerous code. ****
-*/
-bool isRastPortComplete(RastPort *rp,WORD w, WORD h)
-{
-    Layer *lr = rp->Layer;
-    if(!lr) return false; // actually happens a lot when moving/resizing/recreating and could mean windows is being reworked by OS.
-    bool isComplete=false;
-  // ObtainSemaphore(&(lr->Lock)); // must be done by caller, because following direct draw must also keep lock.
-    ClipRect *cr = lr->ClipRect;
-    if(cr)
-    {
-        // to be complete, there must be a single rect. of the whole size.
-        // else it is obscured or cliped.
-         if( (cr->Next == NULL) || (cr->Next == cr))
-         {
-            WORD crw = (cr->bounds.MaxX - cr->bounds.MinX)+1;
-            WORD crh = (cr->bounds.MaxY - cr->bounds.MinY)+1;
-            if(w == crw && h == crh) isComplete = true;
-         } // end if just one cliprect
-    } /*else -> our window is simple_refresh, no superbitmap use.
-    if(lr->SuperClipRect)
-    {
-        ClipRect *cr = lr->SuperClipRect;
-        // to be complete, has
-         //  if just one
-         if( (cr->Next == NULL) || (cr->Next == cr))
-         {
-            WORD crw = (cr->bounds.MaxX - cr->bounds.MinX)+1;
-            WORD crh = (cr->bounds.MaxY - cr->bounds.MinY)+1;
-            if(w == crw && h == crh) isComplete = true;
-         } // end if just one cliprect
-    }*/
-
-//    ReleaseSemaphore(&(lr->Lock));
-    return isComplete;
-}
 
 /*
  * Windows and screens managed with Intuition magic! ✨

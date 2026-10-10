@@ -447,7 +447,7 @@ void MameConfig::toDefault()
     _misc._cheatFilePath = "PROGDIR:cheat.dat";
    // _misc._MiscFlags = 0;
     _misc._Goodies =  GOODIESFLAGS_WHEEL|GOODIESFLAGS_GEAR;
-    _misc._Optims = OPTIMFLAGS_DIRECTWGXWIN;
+    _misc._Optims = 0;
 
 }
 MameConfig::Display_PerScreenMode::Display_PerScreenMode() : ASerializable() {
@@ -787,10 +787,9 @@ void MameConfig::Misc::serialize(ASerializer &serializer)
         ,"Gear Shift"
       });
 
-    serializer("Optims",_Optims,
-          OPTIMFLAGS_DIRECTWGXWIN | SERFLAG_GROUP_FLAGINT2COLUMS //def.
+    serializer("Optimsv2",_Optims,
+           0|SERFLAG_GROUP_FLAGINT2COLUMS //def.
     ,{
-        "Direct draw for RTG Windows",
         "Use native BestCModeID()",
         "Disable TaitoF3 Shading"
       });

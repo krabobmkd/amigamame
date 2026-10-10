@@ -44,14 +44,25 @@ extern "C"
 #endif
 #endif
 
-struct directDrawParams;
+#include "amiga_video_tracers.h"
+
+// what one frame draws: the same for every rectangle it is drawn in.
+struct cgxDirectFrame {
+    directDrawSource source;
+    int cenx,ceny,ww,hh;
+};
 
 class Drawable_CGX {
 public:
   Drawable_CGX(IntuitionDrawable &drawable);
   virtual ~Drawable_CGX();
-  void drawCGX_DirectCPU16(  RastPort *pRPort, BitMap *pBitmap,_mame_display *display);
-  void drawCGX_DirectCPU32( BitMap *pBitmap,_mame_display *display);
+  // draw the frame in the whole bitmap
+  void drawCGX_Direct(BitMap *pBitmap,_mame_display *display);
+  // or in steps: prepare it once, then draw it in a locked bitmap, shifted,
+  // and clipped to a rectangle (all bitmap if NULL).
+  void prepareDirectFrame(_mame_display *display, cgxDirectFrame &frame);
+  void drawDirectFrame(BitMap *pBitmap, cgxDirectFrame &frame,
+                       int shiftx, int shifty, const Rectangle *clip);
 
   inline bool isSourceRGBA32() {
       const ULONG fritata = (VIDEO_RGB_DIRECT|VIDEO_NEEDS_6BITS_PER_GUN);
@@ -98,6 +109,7 @@ public:
     BitMap *bitmap() override;
 protected:
     BitMap *_sWbWinSBitmap;
+    bool _screenBitmapDirect; // screen bitmap has the pixel format of _sWbWinSBitmap
 
 };
 
