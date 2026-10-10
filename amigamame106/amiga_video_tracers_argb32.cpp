@@ -144,8 +144,8 @@ struct typeRGB16PC{
 // this syntax is a hell, I hope you like pain .
 // it is "asm code" : "spec"(varoutput) : "spec"(varinput), : (extra register used)
 //  'd' for d0->d7 'a' for a0->a7 , also can put constants
-           : "=d"( argb)
-           : "d" ( argb)
+           : "+d"( argb)  // read and written: same register in and out
+           :
            : "d1","d2"
            );
         v = (USHORT)argb;
@@ -185,7 +185,7 @@ struct typeBGRA32{
        "\tnop"
        : "+d"(argb) // out
        : "a"(this)  // in
-       : // trashed
+       : "memory" // trashed: writes b,g,r through this
        );
 //        b = (char)argb;
 //        argb>>=8;
