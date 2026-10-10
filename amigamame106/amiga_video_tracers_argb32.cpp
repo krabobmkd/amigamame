@@ -36,6 +36,8 @@
 
 #include "amiga_video_tracers_argb32.h"
 #include "amiga_video_tracers_24.h"
+#include "amiga_video_tracers_16.h"
+#include <string.h>
 
 // this file is just to implement template calls...
 
@@ -57,12 +59,12 @@ struct type24{
 
 
 struct typeRGB15{
-    typeRGB15(ULONG argb) : r((char)(argb>>(16+3))),g((char)(argb>>(8+3))),b((char)argb>>3) {}
+    typeRGB15(ULONG argb) : a(0),r((char)(argb>>(16+3))),g((char)(argb>>(8+3))),b((char)argb>>3) {}
     USHORT  a:1, r:5, g:5, b:5;
 };
 
 struct typeBGR15{
-    typeBGR15(ULONG argb) : r((char)(argb>>(16+3))),g((char)(argb>>(8+3))),b((char)argb>>3) {}
+    typeBGR15(ULONG argb) : a(0),r((char)(argb>>(16+3))),g((char)(argb>>(8+3))),b((char)argb>>3) {}
     USHORT  a:1, b:5, g:5, r:5;
 };
 // validated:
@@ -471,39 +473,52 @@ void directDrawRGB32T(directDrawParams *p)
 
 // - - - - - -
 
+// 16 bit screens: aligned 32 bit writes and 3 lines trick, amiga_video_tracers_16.h
+template<typename SCREENPIXTYPE>
+void directDraw16_ARGB32T(directDrawParams *p)
+{
+    static_assert(sizeof(SCREENPIXTYPE) == 2, "16 bit pixel type");
+    directDraw16T<ULONG>(p, [](ULONG argb) -> ULONG {
+        SCREENPIXTYPE t(argb);
+        UWORD v;
+        memcpy(&v, &t, sizeof(v));
+        return v;
+    });
+}
+
 void directDraw_RGB15_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeRGB15>(p);
+    directDraw16_ARGB32T<typeRGB15>(p);
 }
 void directDraw_BGR15_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeBGR15>(p);
+    directDraw16_ARGB32T<typeBGR15>(p);
 }
 void directDraw_RGB15PC_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeRGB15PC>(p);
+    directDraw16_ARGB32T<typeRGB15PC>(p);
 }
 void directDraw_BGR15PC_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeBGR15PC>(p);
+    directDraw16_ARGB32T<typeBGR15PC>(p);
 }
 
 void directDraw_RGB16_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeRGB16>(p);
+    directDraw16_ARGB32T<typeRGB16>(p);
 }
 void directDraw_BGR16_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeBGR16>(p);
+    directDraw16_ARGB32T<typeBGR16>(p);
 }
 void directDraw_RGB16PC_ARGB32(directDrawParams *p)
 {
 
-    directDrawRGB32T<typeRGB16PC>(p);
+    directDraw16_ARGB32T<typeRGB16PC>(p);
 }
 void directDraw_BGR16PC_ARGB32(directDrawParams *p)
 {
-    directDrawRGB32T<typeBGR16PC>(p);
+    directDraw16_ARGB32T<typeBGR16PC>(p);
 }
 
 void directDraw_type24_ARGB32(directDrawParams *p)
